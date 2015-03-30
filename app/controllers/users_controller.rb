@@ -8,8 +8,8 @@ class UsersController < ApplicationController
   	@user = User.find(params[:id])
   end
 
-  def create
-    @user = User.new(user_params)
+  def create    
+    @user = User.new(user_params)    
     if @user.save
       log_in @user
       flash[:success] = "Welcome to Farmer's Cellar!"
@@ -23,7 +23,7 @@ class UsersController < ApplicationController
   private
 
     def user_params
-      params.require(:user).permit(:name, :email, :password, :password_confirmation)
+      params.require(:user).permit(:name, :email, :password, :password_confirmation, :user_type)
     end
 
 end

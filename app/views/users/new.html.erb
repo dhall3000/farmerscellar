@@ -3,7 +3,7 @@
 <h1>Sign up</h1>
 
 <div class="row">
-	<div class="col-md-6" "col-md-offset-3">
+	<div class="col-md-6 col-md-offset-3">
 		<%= form_for @user do |f| %>
 		<%= render 'shared/error_messages' %>
 
@@ -18,6 +18,16 @@
 
 		<%= f.label :password_confirmation, "Confirmation" %>
 		<%= f.password_field :password_confirmation, class: 'form-control' %>
+
+		<%= f.label :user_type, class: "radio inline" do %>
+		<%= f.radio_button :user_type, "0", checked: "checked" %>
+		<span>new customer account</span>
+		<% end %>
+
+		<%= f.label :user_type, class: "radio inline" do %>
+		<%= f.radio_button :user_type, "1" %>
+		<span>new farmer account</span>
+		<% end %>
 
 		<%= f.submit "Create my account", class: "btn btn-primary" %>
 
