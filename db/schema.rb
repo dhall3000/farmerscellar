@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150330220229) do
+ActiveRecord::Schema.define(version: 20150331000756) do
 
   create_table "users", force: :cascade do |t|
     t.string   "name"
@@ -20,6 +20,7 @@ ActiveRecord::Schema.define(version: 20150330220229) do
     t.datetime "updated_at",      null: false
     t.string   "password_digest"
     t.integer  "account_type"
+    t.string   "remember_digest"
   end
 
   add_index "users", ["account_type"], name: "index_users_on_account_type"
