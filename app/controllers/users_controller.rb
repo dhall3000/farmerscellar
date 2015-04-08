@@ -25,9 +25,9 @@ class UsersController < ApplicationController
   def create    
     @user = User.new(user_params)    
     if @user.save
-      log_in @user
-      flash[:success] = "Welcome to Farmer's Cellar!"
-    	redirect_to @user
+      UserMailer.account_activation(@user).deliver_now
+      flash[:info] = "Please check your email to activate your account."
+      redirect_to root_url
     else
     	render 'new'
     end
@@ -53,8 +53,8 @@ class UsersController < ApplicationController
     def user_params
 
       #david added this hack to attempt to keep folks from giving themselves admin privs. not even sure if it works!
-      if params[:account_type] > 1 
-        params[:account_type] = 0
+      if params[:user][:account_type].to_i > 1 
+        params[:user][:account_type] = 0.to_s
       end
 
       params.require(:user).permit(:name, :email, :password, :password_confirmation, :account_type)
