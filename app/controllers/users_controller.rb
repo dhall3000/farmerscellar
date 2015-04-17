@@ -40,8 +40,13 @@ class UsersController < ApplicationController
 
   def update
     @user = User.find(params[:id])
+    agreement = @user.agreement    
     if @user.update_attributes(user_params)
-      flash[:success] = "Profile updated"
+      flash_message = "Profile updated"      
+      if agreement != 1 and @user.agreement == "1"
+        flash_message = "Request for approval received. A staff member will be in touch with you shortly!"
+      end
+      flash[:success] = flash_message
       redirect_to @user
     else
       render 'edit'
@@ -57,7 +62,7 @@ class UsersController < ApplicationController
         params[:user][:account_type] = 0.to_s
       end
 
-      params.require(:user).permit(:name, :email, :password, :password_confirmation, :account_type)
+      params.require(:user).permit(:name, :email, :password, :password_confirmation, :account_type, :address, :farm_name, :description, :agreement)
 
     end
 

@@ -18,7 +18,30 @@
       <%= f.label :password_confirmation, "Confirmation" %>
       <%= f.password_field :password_confirmation, class: 'form-control' %>
 
-      <%= f.submit "Save changes", class: "btn btn-primary" %>
+      <% #if this is a farmer we need to put all the fields up for them to edit %>
+      <% if @user.account_type == 1 %>
+      
+        <%= f.label :farm_name %>
+        <%= f.text_field :farm_name, class: 'form-control' %>
+
+        <%= f.label :description, "Description (just tell us a little bit about your business or farm)" %>
+        <%= f.text_field :description, class: 'form-control' %>
+
+        <%= f.label :address %>
+        <%= f.text_field :address, class: 'form-control' %>       
+
+        <% button_text = "Save changes" %>
+
+        <% if @user.agreement != 1 %>
+          <%= f.label :agreement, class: "checkbox inline" do %>
+            <%= f.check_box :agreement %>
+            <span>I agree to the Terms of Service</span>
+          <% end %>
+          <% button_text = "Request approval" %>
+        <% end %>
+      <% end %>
+
+      <%= f.submit button_text, class: "btn btn-primary" %>
     <% end %>
 
     <div class="gravatar_edit">
