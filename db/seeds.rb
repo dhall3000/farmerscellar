@@ -5,23 +5,81 @@
 #
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
-User.create!(name:  "david",
-             email: "david@x.com",
+
+User.create!(name:  "f1",
+             email: "f1@f.com",
              password:              "dogdog",
              password_confirmation: "dogdog",
-             account_type: '2',
+             account_type: '1',
              activated: true,
-             activated_at: Time.zone.now)
+             activated_at: Time.zone.now,
+             description: "producer of fine apples",
+             address: "1234 main st",
+             city: "Kirkland",
+             state: "Washington",
+             zip: "98033",
+             phone: "206-588-6579",
+             website: "www.farmerscellar.com",
+             agreement: 1,
+             farmer_approval: 't',
+             farm_name: "BIG F FARM"
+             )
 
-99.times do |n|
-  name  = Faker::Name.name
-  email = "example-#{n+1}@railstutorial.org"
-  password = "password"
-  User.create!(name:  name,
-               email: email,
-               password:              password,
-               password_confirmation: password,
-               account_type: 0,
-               activated: true,
-               activated_at: Time.zone.now)
-end
+Product.create(name: "Fuji Apples")
+Product.create(name: "Carrots")
+Product.create(name: "Milk")
+Product.create(name: "Beef")
+Product.create(name: "Chicken")
+Product.create(name: "Asparagus")
+
+volume = UnitCategory.create(name: "Volume")
+weight = UnitCategory.create(name: "Weight")
+count = UnitCategory.create(name: "Count")
+
+volume.unit_kinds.create(name: "Fluid Ounce")
+volume.unit_kinds.create(name: "Pint")
+volume.unit_kinds.create(name: "Quart")
+volume.unit_kinds.create(name: "Half Gallon")
+volume.unit_kinds.create(name: "Gallon")
+
+weight.unit_kinds.create(name: "Grain")
+weight.unit_kinds.create(name: "Ounce")
+weight.unit_kinds.create(name: "Pound")
+weight.unit_kinds.create(name: "Ton")
+
+count.unit_kinds.create(name: "Whole")
+count.unit_kinds.create(name: "Half")
+count.unit_kinds.create(name: "Quarter")
+count.unit_kinds.create(name: "8th")
+count.unit_kinds.create(name: "16th")
+
+#Unit.create(name: "Gallon")
+#Unit.create(name: "Pound")
+#unit_count = Unit.create(name: "Count")
+
+#unit_modifier = unit_count.unit_modifiers.create(name: "Whole", multiplier: 1.0)
+#unit_modifier = unit_count.unit_modifiers.create(name: "Half", multiplier: 0.5)
+#unit_modifier = unit_count.unit_modifiers.create(name: "Quarter", multiplier: 0.25)
+#unit_modifier = unit_count.unit_modifiers.create(name: "8th", multiplier: 0.125)
+#unit_modifier = unit_count.unit_modifiers.create(name: "16th", multiplier: 0.0625)
+
+#User.create!(name:  "david",
+#             email: "david@x.com",
+#             password:              "dogdog",
+#             password_confirmation: "dogdog",
+#             account_type: '2',
+#             activated: true,
+#             activated_at: Time.zone.now)
+
+#99.times do |n|
+#  name  = Faker::Name.name
+#  email = "example-#{n+1}@railstutorial.org"
+#  password = "password"
+#  User.create!(name:  name,
+#               email: email,
+#               password:              password,
+#               password_confirmation: password,
+#               account_type: 0,
+#               activated: true,
+#               activated_at: Time.zone.now)
+#end
