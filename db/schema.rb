@@ -11,7 +11,24 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150420181832) do
+ActiveRecord::Schema.define(version: 20150420230706) do
+
+  create_table "postings", force: :cascade do |t|
+    t.text     "description"
+    t.integer  "quantity_available"
+    t.float    "price"
+    t.integer  "user_id"
+    t.integer  "product_id"
+    t.integer  "unit_category_id"
+    t.integer  "unit_kind_id"
+    t.datetime "created_at",         null: false
+    t.datetime "updated_at",         null: false
+  end
+
+  add_index "postings", ["product_id"], name: "index_postings_on_product_id"
+  add_index "postings", ["unit_category_id"], name: "index_postings_on_unit_category_id"
+  add_index "postings", ["unit_kind_id"], name: "index_postings_on_unit_kind_id"
+  add_index "postings", ["user_id"], name: "index_postings_on_user_id"
 
   create_table "products", force: :cascade do |t|
     t.string   "name"
