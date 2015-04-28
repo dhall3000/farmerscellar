@@ -1,10 +1,13 @@
 class PostingsController < ApplicationController
-  def new
-  	#@posting = Posting.new(user_id: current_user.id)  	
+  def new  	
   	@posting = current_user.postings.new
   	@products = Product.all
   	@unit_categories = UnitCategory.all
   	@unit_kinds = UnitKind.all
+  end
+
+  def index
+    @postings = Posting.all
   end
 
   def create  	

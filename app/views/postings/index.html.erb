@@ -1,0 +1,19 @@
+<% provide(:title, 'Postings') %>
+
+<h1>Postings</h1>
+
+<% if @postings != nil && @postings.any? %>
+  <ul>
+    <% @postings.each do |p| %>
+      
+      <li><%= Product.find_by(id: p.product_id).name%>, <%= p.price %> per <%= UnitKind.find_by(id: p.unit_kind_id).name %>, Producer: <%= User.find_by(id: p.user_id).farm_name %>, Description: <%= p.description %></li>
+      
+      <% if false %>
+        <%= Product.find_by(id: 1).name %>
+      <% end %>
+      
+      <% if false %>
+      <% end %>
+    <% end %>
+  </ul>
+<% end %>

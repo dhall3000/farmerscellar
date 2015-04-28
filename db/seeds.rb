@@ -19,10 +19,29 @@ User.create!(name:  "f1",
              state: "Washington",
              zip: "98033",
              phone: "206-588-6579",
-             website: "www.farmerscellar.com",
+             website: "www.f1.com",
              agreement: 1,
              farmer_approval: 't',
-             farm_name: "BIG F FARM"
+             farm_name: "F1 FARM"
+             )
+
+User.create!(name:  "f2",
+             email: "f2@f.com",
+             password:              "dogdog",
+             password_confirmation: "dogdog",
+             account_type: '1',
+             activated: true,
+             activated_at: Time.zone.now,
+             description: "we make grass fed beef",
+             address: "9876 Focker St",
+             city: "Bellevue",
+             state: "Washington",
+             zip: "98004",
+             phone: "206-599-6579",
+             website: "www.f2.com",
+             agreement: 1,
+             farmer_approval: 't',
+             farm_name: "F2 FARM"
              )
 
 Product.create(name: "Fuji Apples")
@@ -52,6 +71,12 @@ count.unit_kinds.create(name: "Half")
 count.unit_kinds.create(name: "Quarter")
 count.unit_kinds.create(name: "8th")
 count.unit_kinds.create(name: "16th")
+
+Posting.create(product_id: 1, quantity_available: 1000, price: 2.75, user_id: 1, unit_category_id: 2, unit_kind_id: 8, description: "these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
+Posting.create(product_id: 6, quantity_available: 100, price: 3.25, user_id: 1, unit_category_id: 2, unit_kind_id: 8, description: "these Asparagus are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
+
+Posting.create(product_id: 3, quantity_available: 25, price: 12.00, user_id: 2, unit_category_id: 1, unit_kind_id: 5, description: "these milks are all organic grown with no pesticides. they are raw. no homogeneization. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
+Posting.create(product_id: 4, quantity_available: 10, price: 325, user_id: 2, unit_category_id: 3, unit_kind_id: 11, description: "these beefs are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
 
 #Unit.create(name: "Gallon")
 #Unit.create(name: "Pound")
