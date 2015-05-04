@@ -44,6 +44,34 @@ User.create!(name:  "f2",
              farm_name: "F2 FARM"
              )
 
+User.create!(name:  "c1",
+             email: "c1@c.com",
+             password:              "dogdog",
+             password_confirmation: "dogdog",
+             account_type: '0',
+             activated: true,
+             activated_at: Time.zone.now,             
+             address: "4215 21st St. SW",
+             city: "Redmond",
+             state: "Washington",
+             zip: "98008",
+             phone: "206-599-6579"
+             )
+
+User.create!(name:  "c2",
+             email: "c2@c.com",
+             password:              "dogdog",
+             password_confirmation: "dogdog",
+             account_type: '0',
+             activated: true,
+             activated_at: Time.zone.now,             
+             address: "1964 29st St. NE",
+             city: "Renton",
+             state: "Washington",
+             zip: "98021",
+             phone: "206-599-6579"
+             )
+
 Product.create(name: "Fuji Apples")
 Product.create(name: "Carrots")
 Product.create(name: "Milk")

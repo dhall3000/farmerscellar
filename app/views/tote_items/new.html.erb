@@ -1,0 +1,31 @@
+<% if params[:posting_id] != nil %>
+  <% posting = Posting.find_by(id: params[:posting_id]) %>
+  <% unit_kind = UnitKind.find_by(id: posting.unit_kind_id) %>
+  <% if posting != nil %>
+    <% producer = User.find_by(id: posting.user_id) %>
+    <% provide(:title, producer.farm_name) %>
+    <p>Producer: <%= producer.farm_name %></p>
+    <p>Product: <%= Product.find_by(id: posting.product_id).name %></p>
+    <p>Description: <%= posting.description %></p>
+    <p>Units: <%= unit_kind.name %></p>
+    <p>Price per Unit: <%= posting.price %></p>    
+  <% end %>  
+<% end %>
+
+<div class="row">
+  <div class="col-md-2 col-md-offset-5">
+    <%= form_for @tote_item do |f| %>
+
+      <%= f.label :quantity %>
+      <%= f.number_field :quantity, class: "form-control" %>
+
+      <%= f.number_field :price, value: posting.price, hidden: true %>
+      <%= f.number_field :status, value: ToteItem.states[:START], hidden: true %>
+      <%= f.number_field :posting_id, value: posting.id, hidden: true %>
+      <%= f.number_field :user_id, value: current_user.id, hidden: true %>
+
+      <%= f.submit "Add to shopping tote", class: "btn btn-primary" %>
+      
+    <% end %>
+  </div>
+</div>

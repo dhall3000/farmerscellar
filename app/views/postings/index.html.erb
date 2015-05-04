@@ -3,17 +3,28 @@
 <h1>Postings</h1>
 
 <% if @postings != nil && @postings.any? %>
-  <ul>
-    <% @postings.each do |p| %>
-      
-      <li><%= Product.find_by(id: p.product_id).name%>, <%= p.price %> per <%= UnitKind.find_by(id: p.unit_kind_id).name %>, Producer: <%= User.find_by(id: p.user_id).farm_name %>, Description: <%= p.description %></li>
-      
-      <% if false %>
-        <%= Product.find_by(id: 1).name %>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Producer</th>
+        <th>Product</th>>        
+        <th>Description</th>>
+        <th>Price</th>>        
+        <th>Unit</th>>
+        <th>Posting</th>>     
+      </tr>
+    </thead>
+    <tbody>
+      <% @postings.each do |posting| %>
+        <tr>
+          <td><%= User.find_by(id: posting.user_id).farm_name %></td>
+          <td><%= Product.find_by(id: posting.product_id).name %></td>
+          <td>todo</td>
+          <td><%= posting.price %></td>
+          <td><%= UnitKind.find_by(id: posting.unit_kind_id).name %></td>
+          <td><%= link_to "view", new_tote_item_path(posting_id: posting.id) %></td>
+        </tr>
       <% end %>
-      
-      <% if false %>
-      <% end %>
-    <% end %>
-  </ul>
+    </tbody>
+  </table>
 <% end %>

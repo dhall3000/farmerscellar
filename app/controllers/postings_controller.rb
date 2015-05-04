@@ -21,6 +21,10 @@ class PostingsController < ApplicationController
 
   end
 
+  def show
+    @posting = Posting.find(params[:id])
+  end
+
   private
 
     def posting_params

@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  quantity: 1
+  price: 1.5
+  status: 1
+  posting_id: 
+
+two:
+  quantity: 1
+  price: 1.5
+  status: 1
+  posting_id: 

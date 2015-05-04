@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150420230706) do
+ActiveRecord::Schema.define(version: 20150428213116) do
 
   create_table "postings", force: :cascade do |t|
     t.text     "description"
@@ -35,6 +35,19 @@ ActiveRecord::Schema.define(version: 20150420230706) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
+
+  create_table "tote_items", force: :cascade do |t|
+    t.integer  "quantity"
+    t.float    "price"
+    t.integer  "status"
+    t.integer  "posting_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer  "user_id"
+  end
+
+  add_index "tote_items", ["posting_id"], name: "index_tote_items_on_posting_id"
+  add_index "tote_items", ["user_id"], name: "index_tote_items_on_user_id"
 
   create_table "unit_categories", force: :cascade do |t|
     t.string   "name"
