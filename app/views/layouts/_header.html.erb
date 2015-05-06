@@ -13,6 +13,7 @@
             <ul class="dropdown-menu">
               <li><%= link_to "Profile", current_user %></li>
               <li><%= link_to "Settings", edit_user_path(current_user) %></li>
+              <li><%= link_to "Shopping Tote", tote_items_path %></li>
               <% if current_user.account_type == 1 %>
                 <li><%= link_to "New posting", new_posting_path(current_user) %></li>
               <% end %>
