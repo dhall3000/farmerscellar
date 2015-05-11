@@ -72,6 +72,20 @@ User.create!(name:  "c2",
              phone: "206-599-6579"
              )
 
+User.create!(name:  "a1",
+             email: "a1@a.com",
+             password:              "dogdog",
+             password_confirmation: "dogdog",
+             account_type: '2',
+             activated: true,
+             activated_at: Time.zone.now,             
+             address: "1234 Admin Road NE",
+             city: "Bothell",
+             state: "Washington",
+             zip: "98009",
+             phone: "206-699-6579"
+             )
+
 Product.create(name: "Fuji Apples")
 Product.create(name: "Carrots")
 Product.create(name: "Milk")

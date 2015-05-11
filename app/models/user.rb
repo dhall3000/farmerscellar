@@ -11,6 +11,10 @@ class User < ActiveRecord::Base
   has_many :postings
   has_many :tote_items
 
+  def self.types
+    {CUSTOMER: 0, PRODUCER: 1, ADMIN: 2}
+  end
+
   # Returns the hash digest of the given string.
   def User.digest(string)
     cost = ActiveModel::SecurePassword.min_cost ? BCrypt::Engine::MIN_COST : BCrypt::Engine.cost

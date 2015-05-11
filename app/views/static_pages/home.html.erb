@@ -9,6 +9,12 @@
 <% end %>
 </div>
 
+<% if current_user.account_type == User.types[:ADMIN] %>
+  <div>
+    <%= link_to "Process deliveries", '#' %>
+  </div>
+<% end %>
+
 <div>
   <%= link_to "Browse postings", postings_path %>
 </div>
