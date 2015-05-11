@@ -1,0 +1,32 @@
+<h1>Authorizations#new</h1>
+<p>Find me in app/views/authorizations/new.html.erb</p>
+
+<% tote_items = current_user_current_tote_items %>
+<% @authorization.amount = total_cost_of_tote_items(tote_items) %>
+<%= render partial: "shared/tote", locals: { tote_items: tote_items } %>
+
+<% if tote_has_items(tote_items) %>
+  <div>
+  <p>confirm that you'd like to authorize payment for the items in your tote shown above</p>
+  <p></p>
+    <%= form_for(@authorization) do |f| %>
+      <%= f.hidden_field :token %>
+      <%= f.hidden_field :payer_id %>
+      <%= f.hidden_field :amount %>
+      <%= f.submit "Confirm payment authorization", class: "btn btn-primary" %>      
+    <% end %>
+  </div>
+<% end %>
+
+<% #TODO: if the tote has zero items, what kind of message do we want to display to the user? %>
+
+<% if false %>
+
+  <div>
+	<%= form_tag({controller: "authorizations", action: "create"}, method: "post") do %>
+	  <%= hidden_field_tag(:amount, total_cost_of_tote_items(tote_items)) %>
+	  <%= image_submit_tag("https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif") %>
+	<% end %>
+  </div>
+
+<% end %>

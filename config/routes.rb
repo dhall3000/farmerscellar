@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-    
+
   root 'static_pages#home'
   get 'help' => 'static_pages#help'
   get 'about' => 'static_pages#about'
@@ -14,6 +14,8 @@ Rails.application.routes.draw do
   resources :password_resets,     only: [:new, :create, :edit, :update]
   resources :postings
   resources :tote_items
+  resources :authorization_setups, only: [:create]
+  resources :authorizations, only: [:new, :create]
       
 #  get 'static_pages/help'
 #  get 'static_pages/about'

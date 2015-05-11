@@ -1,0 +1,2 @@
+module AuthorizationSetupsHelper
+end

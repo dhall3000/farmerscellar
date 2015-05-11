@@ -11,7 +11,41 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150428213116) do
+ActiveRecord::Schema.define(version: 20150508224936) do
+
+  create_table "authorization_setup_tote_items", force: :cascade do |t|
+    t.integer  "authorization_setup_id"
+    t.integer  "tote_item_id"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "authorization_setup_tote_items", ["authorization_setup_id"], name: "index_authorization_setup_tote_items_on_authorization_setup_id"
+  add_index "authorization_setup_tote_items", ["tote_item_id"], name: "index_authorization_setup_tote_items_on_tote_item_id"
+
+  create_table "authorization_setups", force: :cascade do |t|
+    t.string   "token"
+    t.float    "amount"
+    t.string   "client_ip"
+    t.text     "response"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "authorizations", force: :cascade do |t|
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+    t.string   "token"
+    t.string   "payer_id"
+    t.float    "amount"
+    t.string   "correlation_id"
+    t.string   "transaction_id"
+    t.datetime "payment_date"
+    t.float    "gross_amount"
+    t.string   "gross_amount_currency_id"
+    t.string   "payment_status"
+    t.string   "pending_reason"
+  end
 
   create_table "postings", force: :cascade do |t|
     t.text     "description"
