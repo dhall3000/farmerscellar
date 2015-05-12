@@ -16,6 +16,7 @@ Rails.application.routes.draw do
   resources :tote_items
   resources :authorization_setups, only: [:create]
   resources :authorizations, only: [:new, :create]
+  resources :deliveries
       
 #  get 'static_pages/help'
 #  get 'static_pages/about'

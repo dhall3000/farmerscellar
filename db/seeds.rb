@@ -72,6 +72,20 @@ User.create!(name:  "c2",
              phone: "206-599-6579"
              )
 
+User.create!(name:  "c3",
+             email: "c3@c.com",
+             password:              "dogdog",
+             password_confirmation: "dogdog",
+             account_type: '0',
+             activated: true,
+             activated_at: Time.zone.now,             
+             address: "1946 31st St. SE",
+             city: "Covington",
+             state: "Washington",
+             zip: "98099",
+             phone: "206-799-6579"
+             )
+
 User.create!(name:  "a1",
              email: "a1@a.com",
              password:              "dogdog",

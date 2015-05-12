@@ -12,6 +12,9 @@
         <th>Price</th>>        
         <th>Unit</th>>
         <th>Posting</th>>     
+        <% if current_user.account_type == User.types[:ADMIN] %>
+          <th>Do delivery</th>
+        <% end %>
       </tr>
     </thead>
     <tbody>
@@ -19,10 +22,13 @@
         <tr>
           <td><%= User.find_by(id: posting.user_id).farm_name %></td>
           <td><%= Product.find_by(id: posting.product_id).name %></td>
-          <td>todo</td>
+          <td>TODO: display via javascript</td>
           <td><%= posting.price %></td>
           <td><%= UnitKind.find_by(id: posting.unit_kind_id).name %></td>
           <td><%= link_to "view", new_tote_item_path(posting_id: posting.id) %></td>
+          <% if current_user.account_type == User.types[:ADMIN] %>
+            <th><%= link_to "Go!", new_delivery_path(posting_id: posting.id) %></th>
+          <% end %>
         </tr>
       <% end %>
     </tbody>

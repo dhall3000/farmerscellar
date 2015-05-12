@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150508224936) do
+ActiveRecord::Schema.define(version: 20150511205103) do
 
   create_table "authorization_setup_tote_items", force: :cascade do |t|
     t.integer  "authorization_setup_id"
@@ -46,6 +46,14 @@ ActiveRecord::Schema.define(version: 20150508224936) do
     t.string   "payment_status"
     t.string   "pending_reason"
   end
+
+  create_table "deliveries", force: :cascade do |t|
+    t.integer  "posting_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_index "deliveries", ["posting_id"], name: "index_deliveries_on_posting_id"
 
   create_table "postings", force: :cascade do |t|
     t.text     "description"

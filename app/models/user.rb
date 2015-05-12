@@ -15,6 +15,16 @@ class User < ActiveRecord::Base
     {CUSTOMER: 0, PRODUCER: 1, ADMIN: 2}
   end
 
+  def self.farm_name_from_posting_id(id)
+    posting = Posting.find(id)
+    if posting != nil
+      user = User.find(posting.user_id)
+      if user != nil
+        user.farm_name
+      end
+    end
+  end
+
   # Returns the hash digest of the given string.
   def User.digest(string)
     cost = ActiveModel::SecurePassword.min_cost ? BCrypt::Engine::MIN_COST : BCrypt::Engine.cost

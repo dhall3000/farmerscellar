@@ -9,7 +9,7 @@
 <% end %>
 </div>
 
-<% if current_user.account_type == User.types[:ADMIN] %>
+<% if current_user != nil && current_user.account_type == User.types[:ADMIN] %>
   <div>
     <%= link_to "Process deliveries", '#' %>
   </div>

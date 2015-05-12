@@ -7,4 +7,14 @@ class Posting < ActiveRecord::Base
 
   validates :quantity_available, presence: true, numericality: { only_integer: true }
 
+  def self.product_name_from_posting_id(id)
+  	posting = Posting.find(id)
+  	if posting != nil
+  		product = Product.find(posting.id)
+  		if product != nil
+  			product.name
+  		end
+  	end
+  end
+
 end
