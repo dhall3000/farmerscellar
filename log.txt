@@ -1,0 +1,38 @@
+2015-05-06 Wednesday
+[state]
+ok wow, head is spinning a little bit. You could first of all git diff the code and see all what's been changed. Bottom line is I just got it so that when user clicks to checkout with paypal we dish off to the new AuthorizationSetupsController where we create a new auth setup + response, save this response to the db by marking each tote_item with it and dish off to paypal for authentication / checkout. What's next is we need to flesh out the functionality on Authorization#new controller. This page is going to show the toteitems again along with maybe some text like “confirm that you authorize Farmer's Cellar to charge your credit card if and when your products are delivered” along with a confirm button.
+
+
+
+2015-05-07 Thursday
+[state]
+ok, to begin with do a git status to see what's been worked on. Short version is I'm doing a deep dive on the auth/capture feature, not breadth. If you want to see where in the game we are, on the linux box there's an unsaved libreoffice doc with the sequence laid out. The yellow-highlighted stuff at the bottom of the file is what remains to be done. Also, in authorizations_controller.rb there's a bunch of comments that represent a list of TODOs. After doing this stuff I need to consider how to do captures. I especially need to flesh out the part where I do multiple captures on a single authorization.
+
+2015-05-08 Friday
+[state]
+ok, today was lame cause I spent over 4 hours running up to everett to extend court date. Ugh. Anyway, today I accomplished adding more columns to the authorizations table and sucking values from the pp auth response to populate these new columns. If you do a “select * from authorizations” you'll see one row and you can go to sandbox account for davideltonhall-facilitator@gmail.com and see the auth there. The transaction_id even matches between our db and what's displayed on the most recent auth. So a person can browse, add to tote, checkout and authorize and see a “congrats” page. This is the tip of the spear. I think the best thing to do on monday is check in all the code. Then, the game plan going forward is to carry on with the payments feature path on in to the admin features to handle order filling and payments capture. The reason is because these admin features will probably drive model/db schema/layout and I don't want to build the rest of the user features only later to realize I need to make significant model changes that break all my work. The admin will log in and process all of farmer bob's apples first. So he'll pull up a list of all tote_items with successful auths in datetime order. Each toteitem row should have an unchecked checkbox under a “Filled” column. The sorter puts a check in the box for each order he fills. When done he hits a 'save' button marking each toteitem as FILLED. When done with farmer bob's apples he moves on to farmer john's oranges and does the same process. When all done with this he goes to a 'capture payments' page or something. Here he sees a list of all filled toteitems about to be charged, sorted by user with a subtotal for each user and a total for the batch. It might be good to show all users' toteitems and have some visual distinction between the filled and the unfilled. We'll also need to plug notifications in to this and void unused portions of authorizations. Notifications will go out “right now” for customers who had toteitems not filled. Delivery notifications will, of course, need to go out upon delivery.
+
+-the plan is to carry on with the payments feature path on in to the admin features to handle order filling, payments capture and notifications. The reason is because these admin features will probably drive model/db schema/layout and I don't want to build the rest of the user features only later to realize I need to make significant model changes that break all my work.
+
+[state]
+capture tool on paypal sandbox looks great. If I select an auth and click 'capture' Im taken to a page that shows some kind of auth id number. I want to see that this is the same number I get in the auth response from paypal via rails. Pick up here by verifying same.
+
+2015-05-09
+this log file needs to be used for "where are we?", "how did we get here?" and "what's the next step?" no longer use radar file for this information.
+
+2015-05-11
+[state]
+\milepost.txt documents the features mentioned in 5/8's state, "The admin will log in and process all of...". to get to current state, log in as an admin and go to the home page. then click "browse postings" and click "Go!" on the top-most fuji apples posting. this brings you to a page where we want to see a list of all the tote_items associated with this posting. notice how there's a table showing quantity. the next thing i'm wanting to do is stick a checkbox on each row so admin can mark it "FILLED". i'm not sure how to do this. i know that i want an array of ids to get submitted to the deliveries controller but haven't done this yet. here's a tut that i think will get the job done: http://blog.endpoint.com/2011/11/performing-bulk-edits-in-rails-part-1.html
+
++make sure there's at least one admin in the seeds file
+-when admin logs in make him see a link to "process deliveries" that gives him a list of live postings to select from
+-admin selects posting which creates a Delivery instance and...
+-takes him to the list of datetime-ordered toteitems where he can start to mark each as FILLED for later capture
+
+2015-05-12
+[state]
+working on building the admin's delivery processing tool. i think it's pretty close. the idea is that the admin clicks 'fill & fetch' button and that simultaneously marks the existing tote_item as FILLED and fetches the next tote_item with state COMMITTED. this all works fine until you get to the end of the road, then you get a crash. i'm out of time to debug it but this is definitely the place to start tomorrow. to start the sequence go to the home page and click 'process delivery'. then click on the posting that you want to process a delivery for. this immediately takes you to the first tote_item to be filled. important: in the background when it pulled this ti from the queue it changed its state in the db from 'COMMITTED' to 'FILLPENDING'. then, when the admin clicks 'fill & fetch' it again changes the state from 'FILLPENDING' to 'FILLED'. before you start this sequence you should set all the states in the tote_items table properly with this:
+update tote_items set status = 2 where status = 3
+then verify there are some statuses of value '2' with this:
+select * from tote_items
+march through the 'fill & fetch' sequence outlined above and you'll see the crash at the end.
