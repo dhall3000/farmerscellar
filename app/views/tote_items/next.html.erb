@@ -1,0 +1,18 @@
+<h1>ToteItems#next</h1>
+
+<% if @tote_item == nil %>
+  <p>Congrats! All done processing this delivery! :)</p>
+<% else %>
+  <p>tote_item.id = <%= @tote_item.id %></p>
+  <p>tote_item.quantity = <%= @tote_item.quantity %></p>
+  <p>tote_item.price = <%= @tote_item.price %></p>
+  <p>tote_item.status = <%= @tote_item.status %></p>
+  <p>tote_item.posting_id = <%= @tote_item.posting_id %></p>
+  <p>tote_item.user_id = <%= @tote_item.user_id %></p>
+
+  <%= form_for @tote_item, url: tote_items_next_path, method: "post" do |f| %>
+    <%= f.hidden_field :id %>
+    <%= f.hidden_field :posting_id %>
+    <%= f.submit "Fill & Fetch" %>
+  <% end %>
+<% end %>

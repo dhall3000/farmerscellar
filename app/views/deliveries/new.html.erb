@@ -4,6 +4,10 @@
 <% #display all the tote_items with a check box for 'filled' %>
 <% #display a 'save' button at the end to mark this delivery with all the tote_items filled %>
 
+
+
+<% if false %>
+
 <% if @tote_items != nil && @tote_items.any? %>
 
 <%= form_tag deliveries_path, method: :post do %>
@@ -29,4 +33,6 @@
   <%= submit_tag "Save", data: { confirm: "Are you sure?" } %>
 
   <% end %>
+<% end %>
+
 <% end %>

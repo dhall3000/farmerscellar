@@ -27,10 +27,14 @@
           <td><%= UnitKind.find_by(id: posting.unit_kind_id).name %></td>
           <td><%= link_to "view", new_tote_item_path(posting_id: posting.id) %></td>
           <% if current_user.account_type == User.types[:ADMIN] %>
-            <th><%= link_to "Go!", new_delivery_path(posting_id: posting.id) %></th>
+            <th><%= link_to "Go!", tote_items_next_path( tote_item: {posting_id: posting.id}) %></th>
           <% end %>
         </tr>
       <% end %>
     </tbody>
   </table>
+<% end %>
+
+<% if false %>
+<th><%= link_to "Go!", 'tote_items/next', posting_id: posting.id %></th>
 <% end %>
