@@ -36,3 +36,35 @@ update tote_items set status = 2 where status = 3
 then verify there are some statuses of value '2' with this:
 select * from tote_items
 march through the 'fill & fetch' sequence outlined above and you'll see the crash at the end.
+
+select * from tote_items
+update tote_items set status = 2 where status = 3
+update tote_items set status = 2 where status = 4
+
++let's see what the delivery stuff is/was supposed to do and consider scratching it
++let's check the code in before moving on to payments capture
+
+2015-05-13
+[state]
+ok, i'm trying to do this:
+
+"-let's set up a situation where customer adds many toteitems and authorizes, then admin fills many but is unable to fill many and then captures"
+
+i set up a batch of paypal sandbox test accounts. the file for that is at the website root named "paypal*.txt". you can probably reseed the db but i'm trying to walk through from front to back. where i'm stuck is that when authorization happens it doesn't mark the tote_items as AUTHORIZED, as it should. so that's what i'm working on. my plan once that is done is to move on with the above-quoted task but i'll have to hack the db along they to dev and test. i'll have to manually set tote_items marked as AUTHORIZED to COMMITTED. at a later time i'll need to add the behind-the-scenes stuff that automatically adjusts tote_item state up to COMMITTED at the proper time.
+
+if you look in authorizations_controller.rb you'll see this comment: #tote_item -> as/ti -> as -> auth
+that shows what i can currently do. what i'm wanting to do is make it so that:
+1) Authorization model has a .getAuthSetup method
+2) AuthorizationSetup model has a .get_tote_items method
+
+then in authorizations_controller.rb it will be easy to pull up the list of tote_items and stamp them. however, if i string along the db associations properly shouldn't i just be able to say auth.auth_setup.tote_items? right now i'm struggling my way through setting up these associations but maybe i need to slow down, study up and nail this one. i already built one migration but it's probably bogus. i can't tell...this pluralization stuff kills me.
+
+2015-05-14
+today i need to bone up my mastery of all things migrations, tables and associations. i need to set up a new rails sandbox project for manipulating these things. here goes...
+
+2015-05-15
+-get rid of "authorization_setup" from the entire project. replace with "checkout"
+-auth_setup and auth_setup_tote_items data shouldn't be written to the db until after successfully coming back from a successful checkout
+
+[state]
+ok, i spent some time cleaning up the project management. from now on, each card in the backlog is just a "user story". this is why they all start with "US: " now. i'm currently working on "US: admin payments experience". if you open up that card i'm about to start item #4 in the description. so that's the first real work to get going monday morning. yesterday all i did was db clinic and today all i did was attempt to put it in to place. look in authorizations_controller.rb to see the fruit of my work. the idea was so that when i get an authorization response object back from paypal i can associate it with the checkout and transition each associated toteitem's state to AUTHORIZED. to continue developing the end to end sequence of payment i'm going to need to manually move the state of each toteitem's state from AUTHORIZED to COMMITTED. there is a different user story to make this transition happen automatically at the proper time. 

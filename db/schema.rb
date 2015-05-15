@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150511205103) do
+ActiveRecord::Schema.define(version: 20150515213911) do
 
   create_table "authorization_setup_tote_items", force: :cascade do |t|
     t.integer  "authorization_setup_id"
@@ -32,6 +32,8 @@ ActiveRecord::Schema.define(version: 20150511205103) do
     t.datetime "updated_at", null: false
   end
 
+  add_index "authorization_setups", ["token"], name: "index_authorization_setups_on_token"
+
   create_table "authorizations", force: :cascade do |t|
     t.datetime "created_at",               null: false
     t.datetime "updated_at",               null: false
@@ -45,15 +47,10 @@ ActiveRecord::Schema.define(version: 20150511205103) do
     t.string   "gross_amount_currency_id"
     t.string   "payment_status"
     t.string   "pending_reason"
+    t.integer  "authorization_setup_id"
   end
 
-  create_table "deliveries", force: :cascade do |t|
-    t.integer  "posting_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  add_index "deliveries", ["posting_id"], name: "index_deliveries_on_posting_id"
+  add_index "authorizations", ["authorization_setup_id"], name: "index_authorizations_on_authorization_setup_id"
 
   create_table "postings", force: :cascade do |t|
     t.text     "description"
