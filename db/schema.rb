@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150515213911) do
+ActiveRecord::Schema.define(version: 20150526195336) do
 
   create_table "authorization_setup_tote_items", force: :cascade do |t|
     t.integer  "authorization_setup_id"
@@ -52,6 +52,15 @@ ActiveRecord::Schema.define(version: 20150515213911) do
 
   add_index "authorizations", ["authorization_setup_id"], name: "index_authorizations_on_authorization_setup_id"
 
+  create_table "captures", force: :cascade do |t|
+    t.float    "amount"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer  "admin_id"
+  end
+
+  add_index "captures", ["admin_id"], name: "index_captures_on_admin_id"
+
   create_table "postings", force: :cascade do |t|
     t.text     "description"
     t.integer  "quantity_available"
@@ -75,6 +84,22 @@ ActiveRecord::Schema.define(version: 20150515213911) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "purchases", force: :cascade do |t|
+    t.float    "amount"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "tote_item_captures", id: false, force: :cascade do |t|
+    t.integer  "capture_id"
+    t.integer  "tote_item_id"
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+  end
+
+  add_index "tote_item_captures", ["capture_id"], name: "index_tote_item_captures_on_capture_id"
+  add_index "tote_item_captures", ["tote_item_id"], name: "index_tote_item_captures_on_tote_item_id"
+
   create_table "tote_items", force: :cascade do |t|
     t.integer  "quantity"
     t.float    "price"
@@ -83,8 +108,10 @@ ActiveRecord::Schema.define(version: 20150515213911) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer  "user_id"
+    t.integer  "capture_id"
   end
 
+  add_index "tote_items", ["capture_id"], name: "index_tote_items_on_capture_id"
   add_index "tote_items", ["posting_id"], name: "index_tote_items_on_posting_id"
   add_index "tote_items", ["user_id"], name: "index_tote_items_on_user_id"
 

@@ -1,13 +1,8 @@
 require 'test_helper'
 
-class DeliveriesControllerTest < ActionController::TestCase
-  test "should get new" do
-    get :new
-    assert_response :success
-  end
-
-  test "should get create" do
-    get :create
+class CapturesControllerTest < ActionController::TestCase
+  test "should get index" do
+    get :index
     assert_response :success
   end
 

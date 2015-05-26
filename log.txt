@@ -67,4 +67,53 @@ today i need to bone up my mastery of all things migrations, tables and associat
 -auth_setup and auth_setup_tote_items data shouldn't be written to the db until after successfully coming back from a successful checkout
 
 [state]
-ok, i spent some time cleaning up the project management. from now on, each card in the backlog is just a "user story". this is why they all start with "US: " now. i'm currently working on "US: admin payments experience". if you open up that card i'm about to start item #4 in the description. so that's the first real work to get going monday morning. yesterday all i did was db clinic and today all i did was attempt to put it in to place. look in authorizations_controller.rb to see the fruit of my work. the idea was so that when i get an authorization response object back from paypal i can associate it with the checkout and transition each associated toteitem's state to AUTHORIZED. to continue developing the end to end sequence of payment i'm going to need to manually move the state of each toteitem's state from AUTHORIZED to COMMITTED. there is a different user story to make this transition happen automatically at the proper time. 
+ok, i spent some time cleaning up the project management. from now on, each card in the backlog is just a "user story". this is why they all start with "US: " now. then each sub task gets stuck in a checklist item in the "US" card. the thinking is this will keep the backlog from becoming some huge bloated flat list of unassociated tasks. the thinking is that i only work on one US at a time and when i do i move it on to the sprint list and then, as necessary, i expand each checklist item out in to its own card so that i can really atomically break down the work and view and track progress. i'm currently working on "US: admin payments experience". if you open up that card i'm about to start item #4 in the description. so that's the first real work to get going monday morning. yesterday all i did was db clinic and today all i did was attempt to put it in to place. look in authorizations_controller.rb to see the fruit of my work. the idea was so that when i get an authorization response object back from paypal i can associate it with the checkout and transition each associated toteitem's state to AUTHORIZED. to continue developing the end to end sequence of payment i'm going to need to manually move the state of each toteitem from AUTHORIZED to COMMITTED. there is a different user story to make this transition happen automatically at the proper time. oh, one last thing...just reset the db to start monday's work but you might want to use these queries:
+
+select * from authorizations
+select * from authorization_setups
+select * from authorization_setup_tote_items
+select * from users where id = 6
+select * from tote_items where user_id = 6
+
+the '6' is because this is the user that had a bunch of toteitems whose state was ADDED that i walked through to the AUTHORIZED state.
+
+2015-05-18
+i'm working on determining what behavior i want when capturing customer payment. do I want to batch capture? sequential? what options does activemerchant provide?
+
+[state]
+ok, took a long time for me to get my wheels spinning today. i made a new seeds file called 'paymentCapture.rb'. then i used this to push the state of the db right up to where we can start developing the payment capture stuff. there's a 'captures_controller' now which needs to get fleshed out. the site can be used to walk customers through from shopping to authorizing, then we need to issue a sql command to bump their toteitems' state to COMMITTED. then the admin walks through the fill process which moves each toteitem's state to FILLED. so, to begin tuesday, look at captures_controller.rb. there's a comment in the 'index' action about how we use dates. currently the capture index view shows a link for 'show' and 'edit' but i think we should wait on both of those and for now just do a 'new' action. i think we should make a model object to store captures, which are just buckets of toteitems, the payment for which all happened in the same batch. bottom line: look at the db browser and notice how the toteitem statuss are all '4'. then look at http://localhost:3000/captures and get to work designing a model that can store captures, complete with which admin did it. the capture should probably have a 'amount' attribute etc.
+
+ok update state. i left to go make casserole but it had 30 minute cook time so i came back up to do some more stuff. scratch the 'index' stuff for now. for now just do 'new'. the way to do it is on the home page, make the "capture payments" just link_to the 'new' Capture action. add some comments to the 'index' action to the effect that we're scrapping that feature for now but that when we come back to it we want for admin to be able to peruse a list of historical capture events. i just added the 'new' action in the controller but not even positive it should remain. just go from there...
+
+2015-05-19
+[state]
+super painful day. everything was so arduous. anyway, i'm trying render the new action for captures. i'm wanting to show a table (of sorts) depicting the info i have on the yellow sheet on the clipboard. right now i'm just trying to display the authorization amount which is the sum of user id groups of price * quantity. i was stuck trying to create the new Capture object in the CaptureController, populating its tote_items and handing it off to the view, then in the view doing the necessary grouping to show the sum amounts. the reason i couldn't get it to work was because the tote_items aren't yet associated in the db with the capture object since the capture object is so new. this makes some methods like .where and .sum not work right. so i hacked up the controller's new action to pass over an array object called @tote_items. to prove to myself that it works i'm displaying the sum of all the prices of products ordered on a per user basis. but since they all ordered some of the same kind of proudct it just shows the same amount for every row. no problem. wednesday's task is to multiply the price * quantity and display that. for now, it's chicken cordon bleu!
+
+2015-05-22
++get toteitems associated with a capture? no, don't want to do this until the admin actually does the capture.
+-get tote item amounts subtotaled by customer
+-show cumulative capture amount
+
+[state]
+very frustrating end to a very frustrating week. just look in the captures/new.html.erb file to see what i'm doing. i'm wanting to have admin start at home page and click "capture payments" and when this goes through to the above-referenced file trying to query the @tote_items object to show subtotals on a per user basis. the step i'd like to see now is just querying the toteitems object with a select, selecting the 'price' and 'quantity' columns but then also doing a 'dynamic' column in the returned Relation that has a 'cost' column that is a multiplication of the price and quantity cols. in the .erb file you can see all the commented out lines of stuff i've tried. i've come across SOF postings saying you can do a rails .select call and just put raw sql in there with an ...as 'cost' substring. when i do this i don't get an exception but using the debugger i get a Relation that does not contain the aliased column. unsure which direction to proceed.
+
+2015-05-25
+[state]
+ok, had to play some air guitar after today. first, i brute-forced up some by-user totals on the capture page. then i implemented eric's suggestions to make everything many-to-many. i had a big 'aha' moment when creating join tables. i think in the future i have this nailed. on the ubuntu desktop i created a file called 'howtojointable.txt' or something like that that gives everything i need to whip these out in the future. ok, so the plan is that when admin is on home page and clicks "capture payments" it's going to the Captures#new action which will create a new capture object and store it to the database. it will also create a whole pile of capture_tote_items entries before showing the new captures view page.
+
+Experimenting around with the following sql queries is instructive:
+select * from capture_tote_items
+select * from tote_items
+select * from captures
+
+there's presently a 'debugger' line in the new.html.erb file. if you hit this breakpoint and examine @capture you see it has a legit id. here are some ttds going forward
+
+-fill in the amount of the capture column in the captures table
+-nuke the capture_id column in the tote_items table
+-need to create a column for state in the captures table
+-need to set captures state appropriately
++nuke the extraneous columns in the captures_tote_items table
++how can we make join table names be relationship based rather than tables-joined based?
+
+2015-05-26
+-can we make it so that a capture isn't saved on the 'new' action?

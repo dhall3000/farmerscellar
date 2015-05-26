@@ -1,4 +1,6 @@
 class ToteItem < ActiveRecord::Base
+  has_many :tote_item_captures
+  has_many :captures, through: :tote_item_captures
   belongs_to :posting
   belongs_to :user
 
