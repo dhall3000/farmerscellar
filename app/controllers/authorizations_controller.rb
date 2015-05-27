@@ -23,13 +23,22 @@ class AuthorizationsController < ApplicationController
     #tote_item -> as/ti -> as -> auth
     #TODO: error checking needs to happen here. what if there are no toteitems in the tote or no toteitems in the proper start state to make this transition?
     #@authorization.authorization_setup.tote_items.where(status: ToteItem.states[:ADDED]).update_all(status: ToteItem.states[:AUTHORIZED])
-    authorization_setup = AuthorizationSetup.find_by(token: authorization_params[:token])
-    if authorization_setup != nil      
-      authorization_setup.tote_items.where(status: ToteItem.states[:ADDED]).update_all(status: ToteItem.states[:AUTHORIZED])
-      @authorization.authorization_setup_id = authorization_setup.id
-    end
+    checkout = Checkout.find_by(token: authorization_params[:token])
+    if checkout != nil      
+      @authorization.checkouts << checkout
 
-    @authorization.save
+      if @authorization.checkouts.last.tote_items.any?
+        #TODO: is this a potential bug? what if the .where method returns a relation with zero records, will the .update_all crash?
+        @authorization.checkouts.last.tote_items.where(status: ToteItem.states[:ADDED]).update_all(status: ToteItem.states[:AUTHORIZED])
+      end
+
+      #commenting out the state transition stuff...perhaps keeping state on a toteitem is unnecessary with the new db model layout as
+      #i'll be able to go tote_item.checkouts.last.authorizations.any? and if that evaluates to true you know the tote_item is in the
+      #authorized state.
+      #authorization_setup.tote_items.where(status: ToteItem.states[:ADDED]).update_all(status: ToteItem.states[:AUTHORIZED])
+      #@authorization.authorization_setup_id = authorization_setup.id
+      @authorization.save
+    end    
 
     #TODO
   	#stamp tote_items with @authorization.id

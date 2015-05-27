@@ -16,9 +16,9 @@ Rails.application.routes.draw do
   resources :password_resets,     only: [:new, :create, :edit, :update]
   resources :postings
   resources :tote_items
-  resources :authorization_setups, only: [:create]
   resources :authorizations, only: [:new, :create]
   resources :captures
+  resources :checkouts, only: [:create]
       
 #  get 'static_pages/help'
 #  get 'static_pages/about'

@@ -1,6 +1,7 @@
 class ToteItem < ActiveRecord::Base
-  has_many :tote_item_captures
-  has_many :captures, through: :tote_item_captures
+  has_many :tote_item_checkouts
+  has_many :checkouts, through: :tote_item_checkouts
+
   belongs_to :posting
   belongs_to :user
 
@@ -20,7 +21,7 @@ class ToteItem < ActiveRecord::Base
   end
 
   def self.dequeue(posting_id)
-  	ti = ToteItem.where(status: 2, posting_id: posting_id).first
+  	ti = ToteItem.where(status: states[:COMMITTED], posting_id: posting_id).first
   	#probably need to change the state of the ti to something like FILLPENDING. but we need this db operation to be atomic.
   	
     if ti != nil

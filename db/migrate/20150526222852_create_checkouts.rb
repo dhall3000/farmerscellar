@@ -1,6 +1,6 @@
-class CreateAuthorizationSetups < ActiveRecord::Migration
+class CreateCheckouts < ActiveRecord::Migration
   def change
-    create_table :authorization_setups do |t|
+    create_table :checkouts do |t|
       t.string :token
       t.float :amount
       t.string :client_ip
@@ -8,5 +8,6 @@ class CreateAuthorizationSetups < ActiveRecord::Migration
 
       t.timestamps null: false
     end
+    add_index :checkouts, :token
   end
 end

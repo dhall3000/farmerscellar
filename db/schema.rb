@@ -11,28 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150526195336) do
-
-  create_table "authorization_setup_tote_items", force: :cascade do |t|
-    t.integer  "authorization_setup_id"
-    t.integer  "tote_item_id"
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
-  add_index "authorization_setup_tote_items", ["authorization_setup_id"], name: "index_authorization_setup_tote_items_on_authorization_setup_id"
-  add_index "authorization_setup_tote_items", ["tote_item_id"], name: "index_authorization_setup_tote_items_on_tote_item_id"
-
-  create_table "authorization_setups", force: :cascade do |t|
-    t.string   "token"
-    t.float    "amount"
-    t.string   "client_ip"
-    t.text     "response"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  add_index "authorization_setups", ["token"], name: "index_authorization_setups_on_token"
+ActiveRecord::Schema.define(version: 20150526232821) do
 
   create_table "authorizations", force: :cascade do |t|
     t.datetime "created_at",               null: false
@@ -60,6 +39,27 @@ ActiveRecord::Schema.define(version: 20150526195336) do
   end
 
   add_index "captures", ["admin_id"], name: "index_captures_on_admin_id"
+
+  create_table "checkout_authorizations", id: false, force: :cascade do |t|
+    t.integer  "checkout_id"
+    t.integer  "authorization_id"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+  end
+
+  add_index "checkout_authorizations", ["authorization_id"], name: "index_checkout_authorizations_on_authorization_id"
+  add_index "checkout_authorizations", ["checkout_id"], name: "index_checkout_authorizations_on_checkout_id"
+
+  create_table "checkouts", force: :cascade do |t|
+    t.string   "token"
+    t.float    "amount"
+    t.string   "client_ip"
+    t.text     "response"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_index "checkouts", ["token"], name: "index_checkouts_on_token"
 
   create_table "postings", force: :cascade do |t|
     t.text     "description"
@@ -90,15 +90,15 @@ ActiveRecord::Schema.define(version: 20150526195336) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "tote_item_captures", id: false, force: :cascade do |t|
-    t.integer  "capture_id"
+  create_table "tote_item_checkouts", id: false, force: :cascade do |t|
     t.integer  "tote_item_id"
+    t.integer  "checkout_id"
     t.datetime "created_at",   null: false
     t.datetime "updated_at",   null: false
   end
 
-  add_index "tote_item_captures", ["capture_id"], name: "index_tote_item_captures_on_capture_id"
-  add_index "tote_item_captures", ["tote_item_id"], name: "index_tote_item_captures_on_tote_item_id"
+  add_index "tote_item_checkouts", ["checkout_id"], name: "index_tote_item_checkouts_on_checkout_id"
+  add_index "tote_item_checkouts", ["tote_item_id"], name: "index_tote_item_checkouts_on_tote_item_id"
 
   create_table "tote_items", force: :cascade do |t|
     t.integer  "quantity"
@@ -108,10 +108,8 @@ ActiveRecord::Schema.define(version: 20150526195336) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer  "user_id"
-    t.integer  "capture_id"
   end
 
-  add_index "tote_items", ["capture_id"], name: "index_tote_items_on_capture_id"
   add_index "tote_items", ["posting_id"], name: "index_tote_items_on_posting_id"
   add_index "tote_items", ["user_id"], name: "index_tote_items_on_user_id"
 

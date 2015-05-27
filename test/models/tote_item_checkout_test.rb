@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class AuthorizationSetupTest < ActiveSupport::TestCase
+class ToteItemCheckoutTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end

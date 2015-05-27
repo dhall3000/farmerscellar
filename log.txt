@@ -116,4 +116,18 @@ there's presently a 'debugger' line in the new.html.erb file. if you hit this br
 +how can we make join table names be relationship based rather than tables-joined based?
 
 2015-05-26
--can we make it so that a capture isn't saved on the 'new' action?
++can we make it so that a capture isn't saved on the 'new' action?
+
+-redo authsetup -> checkout
+-nuke the capture-toteitem link
+-we're going to make it so that captures have many purchases and purchases have many toteitems
+
+[state]
+ok you can ignore everything in today's log besides this. i'm in the middle of a big db mobel overhaul. i've always hated the 'authorization_setups' junk that really should have been called 'checkout' from the beginning. and it was a nightmare trying to remember which had what. so i'm in the middle of gutting this all and implementing the model i have sketched out currently sitting on the laptop keyboard. it goes:
+
+tote_item <-> checkout <-> authorization <-> purchase <-> bulk_buy
+
+between each of those is a join table with a has_many relationship so you can traverse in any direction you want. i'm currently stopped pondering if i need the explicit tote_item state management stuff. if i wanted to know if a tote_item was authorized i could say tote_item.checkouts.last.authorizations.any?, couldn't i? likewise a tote_item would be FILLED if tote_item.checkouts.last.authorizations.last.purchase.any?, right? but how would i efficiently tell if a tote_item was NOTFILLED and therefore in need of a notification to that effect? my hand is being forced on this issue as i rewrite the admin fill-processing code. to continue, look at tote_items_controll#next action and carry on.
+
+2015-05-27
+-let's take a look at the various tote_item states to see which are redundant to the new db tables

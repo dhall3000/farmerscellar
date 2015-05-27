@@ -1,3 +1,4 @@
 class Authorization < ActiveRecord::Base
-  belongs_to :authorization_setup
+  has_many :checkout_authorizations
+  has_many :checkouts, through: :checkout_authorizations
 end
