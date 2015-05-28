@@ -130,4 +130,35 @@ tote_item <-> checkout <-> authorization <-> purchase <-> bulk_buy
 between each of those is a join table with a has_many relationship so you can traverse in any direction you want. i'm currently stopped pondering if i need the explicit tote_item state management stuff. if i wanted to know if a tote_item was authorized i could say tote_item.checkouts.last.authorizations.any?, couldn't i? likewise a tote_item would be FILLED if tote_item.checkouts.last.authorizations.last.purchase.any?, right? but how would i efficiently tell if a tote_item was NOTFILLED and therefore in need of a notification to that effect? my hand is being forced on this issue as i rewrite the admin fill-processing code. to continue, look at tote_items_controll#next action and carry on.
 
 2015-05-27
--let's take a look at the various tote_item states to see which are redundant to the new db tables
++let's take a look at the various tote_item states to see which are redundant to the new db tables
+
+
+[state]
+just ripped out a ton of code in bulk_buys_controller. i have a crash which is up right now. the error message is 
+
+ActiveModel::MissingAttributeError (can't write unknown attribute `admin_id`):
+  app/controllers/bulk_buys_controller.rb:25:in `create'
+
+so this has to do with trying to record who the admin is when the 'admin' is really a User instance. ugh. hate this. this is where to pick up tomorrow.
+
+2015-05-27
++check in code
++nuke *capture*
++nuke authorization_setup_id column from authorizations table
+-check in code
+-need to test a large delay between auth -> capture
+
++see what speed is like for many-purchase bulk_buy (about 2 seconds per purchase)
+
+to test admin's bulk buy feature:
+1) blank the database
+2) seed the db
+3) log in to each customer and walk through the pp auth process
+4) update tote_items set status = 4 where status = 1
+4 alt) update tote_items set status = 4 where status = 1 and ( user_id = 5 or user_id = 10 )
+5) log in as admin
+6) go to home page
+7) click 'do bulk buy'
+8) click 'capture payments'
+
+#TODO: in the tote view where customer has option to hit the paypal checkout button there's a table with info with a cost column. i once saw a number with a 1 out about 10 places to the righ tof the decimal. not good.
