@@ -1,0 +1,2 @@
+module BulkBuysHelper
+end

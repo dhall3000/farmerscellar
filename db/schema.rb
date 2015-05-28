@@ -11,7 +11,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150526232821) do
+ActiveRecord::Schema.define(version: 20150527232947) do
+
+  create_table "admin_bulk_buys", force: :cascade do |t|
+    t.integer  "user_id"
+    t.integer  "bulk_buy_id"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
+
+  add_index "admin_bulk_buys", ["bulk_buy_id"], name: "index_admin_bulk_buys_on_bulk_buy_id"
+  add_index "admin_bulk_buys", ["user_id"], name: "index_admin_bulk_buys_on_user_id"
+
+  create_table "authorization_purchases", id: false, force: :cascade do |t|
+    t.integer  "authorization_id"
+    t.integer  "purchase_id"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+  end
+
+  add_index "authorization_purchases", ["authorization_id"], name: "index_authorization_purchases_on_authorization_id"
+  add_index "authorization_purchases", ["purchase_id"], name: "index_authorization_purchases_on_purchase_id"
 
   create_table "authorizations", force: :cascade do |t|
     t.datetime "created_at",               null: false
@@ -30,6 +50,12 @@ ActiveRecord::Schema.define(version: 20150526232821) do
   end
 
   add_index "authorizations", ["authorization_setup_id"], name: "index_authorizations_on_authorization_setup_id"
+
+  create_table "bulk_buys", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.float    "amount"
+  end
 
   create_table "captures", force: :cascade do |t|
     t.float    "amount"
@@ -84,11 +110,27 @@ ActiveRecord::Schema.define(version: 20150526232821) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "purchase_bulk_buys", force: :cascade do |t|
+    t.integer  "purchase_id"
+    t.integer  "bulk_buy_id"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
+
+  add_index "purchase_bulk_buys", ["bulk_buy_id"], name: "index_purchase_bulk_buys_on_bulk_buy_id"
+  add_index "purchase_bulk_buys", ["purchase_id"], name: "index_purchase_bulk_buys_on_purchase_id"
+
   create_table "purchases", force: :cascade do |t|
     t.float    "amount"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string   "payer_id"
+    t.string   "token"
+    t.text     "response"
   end
+
+  add_index "purchases", ["payer_id"], name: "index_purchases_on_payer_id"
+  add_index "purchases", ["token"], name: "index_purchases_on_token"
 
   create_table "tote_item_checkouts", id: false, force: :cascade do |t|
     t.integer  "tote_item_id"

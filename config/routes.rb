@@ -17,7 +17,7 @@ Rails.application.routes.draw do
   resources :postings
   resources :tote_items
   resources :authorizations, only: [:new, :create]
-  resources :captures
+  resources :bulk_buys, only: [:new, :create]
   resources :checkouts, only: [:create]
       
 #  get 'static_pages/help'

@@ -1,0 +1,28 @@
+<h1>BulkBuys#new</h1>
+<p>Find me in app/views/bulk_buys/new.html.erb</p>
+
+<% total_amount = 0 %>
+<% user_ids = @tote_items.select(:user_id).distinct %>
+
+<% user_ids.each do |user_id| %>  
+  <% tote_items_by_user = @tote_items.where(user_id: user_id.user_id) %>
+  <% user_name = '' %>
+  <% user_total_amount = 0 %>
+  <% tote_items_by_user.each do |tote_item_by_user| %>
+    <% user_total_amount += tote_item_by_user.quantity * tote_item_by_user.price %>
+    <% user_name = tote_item_by_user.user.name %>
+  <% end %>
+  <p>Capturing <%= user_total_amount %> from user: <%= user_name %></p>
+  <% total_amount += user_total_amount %>
+<% end %>
+
+<p> Total Amount: $<%= total_amount %></p>
+
+-------------------------------------------------------
+
+<%= form_tag(bulk_buys_path) do %>
+  <% for tote_item in @tote_items %>  
+    <%= hidden_field_tag "tote_item_ids[]", tote_item.id %>   
+  <% end %>
+  <%= submit_tag "Capture payments" %>
+<% end %>
