@@ -22,22 +22,27 @@ class BulkBuysController < ApplicationController
   	#create a bulkbuy object
   	bulk_buy = BulkBuy.new
   	bulk_buy.admins << current_user
+    bulk_buy.amount = 0;
 
   	#for each authorization
   	authorizations.each do |key, value|  		
   	  #do the gateway purchase operation
-  	  response = GATEWAY.purchase(value[:amount] * 100, token: key, payer_id: value[:authorization].payer_id)  	  
+  	  response = GATEWAY.capture(value[:amount] * 100, value[:authorization].transaction_id)
   	  if response.success?
   	    #create a new purchase object
-  	    purchase = Purchase.new(response: response, amount: value[:amount], token: key, payer_id: value[:authorization].payer_id)
+  	    purchase = Purchase.new(response: response, amount: value[:amount], token: key, payer_id: value[:authorization].payer_id)  	    
   	    #associate the purchase object with the authorization
   	    purchase.authorizations << value[:authorization]
   	    #change toteitems' states to PURCHASED
-  	    value[:tote_items].all.update_all(status: ToteItem.states[:PURCHASED])
+  	    value[:tote_items].each do |tote_item|
+          tote_item.update(status: ToteItem.states[:PURCHASED])
+        end
+
    	    #associate the purchase object with the bulk buy object
   	    bulk_buy.purchases << purchase
+        bulk_buy.amount += purchase.amount
    	  else  	
-  	  	#TODO: this is the scenario where a purchase dind't work out. we probably need to record this in the db also, probably right here in the purchases table? we'll also need to somehow notify the customer and the admin that payment failed
+  	  	#TODO: this is the scenario where a purchase dind't work out. we probably need to record this in the db also, probably right here in the purchases table? we'll also need to somehow notify the customer and the admin that payment failed  	  	
    	  end  	  
   	end  	  	  	  	  	
 

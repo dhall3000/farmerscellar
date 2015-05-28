@@ -13,7 +13,7 @@
 
 ActiveRecord::Schema.define(version: 20150527232947) do
 
-  create_table "admin_bulk_buys", force: :cascade do |t|
+  create_table "admin_bulk_buys", id: false, force: :cascade do |t|
     t.integer  "user_id"
     t.integer  "bulk_buy_id"
     t.datetime "created_at",  null: false
@@ -110,7 +110,7 @@ ActiveRecord::Schema.define(version: 20150527232947) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "purchase_bulk_buys", force: :cascade do |t|
+  create_table "purchase_bulk_buys", id: false, force: :cascade do |t|
     t.integer  "purchase_id"
     t.integer  "bulk_buy_id"
     t.datetime "created_at",  null: false
