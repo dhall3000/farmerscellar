@@ -22,7 +22,7 @@
 
 <%= form_tag(bulk_buys_path) do %>
   <% for tote_item in @tote_items %>  
-    <%= hidden_field_tag "tote_item_ids[]", tote_item.id %>   
+    <%= hidden_field_tag "filled_tote_item_ids[]", tote_item.id %>   
   <% end %>
   <%= submit_tag "Capture payments" %>
 <% end %>

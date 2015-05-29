@@ -1,20 +1,20 @@
 class BulkBuysController < ApplicationController
   def new
-  	@tote_items = ToteItem.where(status: ToteItem.states[:FILLED])  	
+  	@filled_tote_items = ToteItem.where(status: ToteItem.states[:FILLED])  	
   end
 
   def create
     authorizations = {}
-  	tote_items = ToteItem.find(params[:tote_item_ids])
-  	for tote_item in tote_items
-  	  if tote_item.checkouts != nil && tote_item.checkouts.any?
-  	  	if tote_item.checkouts.last.authorizations != nil && tote_item.checkouts.last.authorizations.any?
-  	  	  authorization = tote_item.checkouts.last.authorizations.last
+  	filled_tote_items = ToteItem.find(params[:filled_tote_item_ids])
+  	for filled_tote_item in filled_tote_items
+  	  if filled_tote_item.checkouts != nil && filled_tote_item.checkouts.any?
+  	  	if filled_tote_item.checkouts.last.authorizations != nil && filled_tote_item.checkouts.last.authorizations.any?
+  	  	  authorization = filled_tote_item.checkouts.last.authorizations.last
   	  	  if authorizations[authorization.token] == nil
-  	  	  	authorizations[authorization.token] = {amount: 0, authorization: authorization, tote_items: []}
+  	  	  	authorizations[authorization.token] = {amount: 0, authorization: authorization, filled_tote_items: []}
   	  	  end
-  	  	  authorizations[authorization.token][:amount] += tote_item.quantity * tote_item.price
-  	  	  authorizations[authorization.token][:tote_items] << tote_item
+  	  	  authorizations[authorization.token][:amount] += filled_tote_item.quantity * filled_tote_item.price
+  	  	  authorizations[authorization.token][:filled_tote_items] << filled_tote_item
   	  	end
   	  end
   	end
@@ -34,7 +34,7 @@ class BulkBuysController < ApplicationController
   	    #associate the purchase object with the authorization
   	    purchase.authorizations << value[:authorization]
   	    #change toteitems' states to PURCHASED
-  	    value[:tote_items].each do |tote_item|
+  	    value[:filled_tote_items].each do |tote_item|
           tote_item.update(status: ToteItem.states[:PURCHASED])
         end
 
