@@ -54,15 +54,6 @@ ActiveRecord::Schema.define(version: 20150528214208) do
     t.float    "amount"
   end
 
-  create_table "captures", force: :cascade do |t|
-    t.float    "amount"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer  "admin_id"
-  end
-
-  add_index "captures", ["admin_id"], name: "index_captures_on_admin_id"
-
   create_table "checkout_authorizations", id: false, force: :cascade do |t|
     t.integer  "checkout_id"
     t.integer  "authorization_id"
