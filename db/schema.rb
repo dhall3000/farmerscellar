@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150602191645) do
+ActiveRecord::Schema.define(version: 20150602222551) do
 
   create_table "account_states", force: :cascade do |t|
     t.integer  "state"
@@ -112,6 +112,7 @@ ActiveRecord::Schema.define(version: 20150602191645) do
     t.integer  "unit_kind_id"
     t.datetime "created_at",         null: false
     t.datetime "updated_at",         null: false
+    t.date     "delivery_date"
   end
 
   add_index "postings", ["product_id"], name: "index_postings_on_product_id"

@@ -7,7 +7,7 @@
 		<%= form_for @posting do |f| %>
 
 		<% if true %>
-		<%= render 'shared/error_messages_posting' %>
+		  <%= render 'shared/error_messages_posting' %>
 		<% end %>
 
 		<%= f.label :product_id %>
@@ -25,28 +25,11 @@
 		<%= f.label :price, "Price per Unit" %>
 		<%= f.number_field :price, min: 0.01, step: 0.01, class: 'form-control' %>
 
+		<%= f.label :delivery_date, "Delivery Date" %>
+		<%= f.collection_select :delivery_date, @delivery_dates, :to_s, :to_s, prompt: true %>
+
 		<%= f.submit "Create new posting", class: "btn btn-primary" %>
 
 		<% end %>
 	</div>
-</div>
-
-<div id="daviddiv">
-mydiv
-</div>
-
-<div>
-
-<% if @posting.id == nil %>
-  <p>id == nil</p>
-<% else %>
-  <p><%= @posting.id %></p>
-<% end %>
-
-<% if @posting.user_id == nil %>
-  <p>user_id == nil</p>
-<% else %>
-  <p><%= @posting.user_id %></p>
-<% end %>
-
 </div>

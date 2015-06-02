@@ -184,22 +184,30 @@ count.unit_kinds.create(name: "Quarter")
 count.unit_kinds.create(name: "8th")
 count.unit_kinds.create(name: "16th")
 
+def next_friday
+  i = 1
+  while !(Date.today + i).friday?   
+    i += 1
+  end
+  Date.today + i
+end
+
 #Apples
-Posting.create(product_id: 1, quantity_available: 1000, price: 2.75, user_id: 1, unit_category_id: 2, unit_kind_id: 8, description: "these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
+Posting.create(delivery_date: next_friday, product_id: 1, quantity_available: 1000, price: 2.75, user_id: 1, unit_category_id: 2, unit_kind_id: 8, description: "these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
 #Asparagus
-Posting.create(product_id: 6, quantity_available: 100, price: 3.25, user_id: 1, unit_category_id: 2, unit_kind_id: 8, description: "these Asparagus are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
+Posting.create(delivery_date: next_friday, product_id: 6, quantity_available: 100, price: 3.25, user_id: 1, unit_category_id: 2, unit_kind_id: 8, description: "these Asparagus are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
 #Milk
-Posting.create(product_id: 3, quantity_available: 25, price: 2.00, user_id: 2, unit_category_id: 1, unit_kind_id: 5, description: "these milks are all organic grown with no pesticides. they are raw. no homogeneization. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
+Posting.create(delivery_date: next_friday, product_id: 3, quantity_available: 25, price: 2.00, user_id: 2, unit_category_id: 1, unit_kind_id: 5, description: "these milks are all organic grown with no pesticides. they are raw. no homogeneization. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
 #Beef
-Posting.create(product_id: 4, quantity_available: 10, price: 3.75, user_id: 2, unit_category_id: 3, unit_kind_id: 11, description: "these beefs are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
+Posting.create(delivery_date: next_friday, product_id: 4, quantity_available: 10, price: 3.75, user_id: 2, unit_category_id: 3, unit_kind_id: 11, description: "these beefs are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
 #Carrots
-Posting.create(product_id: 2, quantity_available: 15, price: 2.25, user_id: 3, unit_category_id: 2, unit_kind_id: 8, description: "yummy, crunchy carrots. tastiest ever!")
+Posting.create(delivery_date: next_friday, product_id: 2, quantity_available: 15, price: 2.25, user_id: 3, unit_category_id: 2, unit_kind_id: 8, description: "yummy, crunchy carrots. tastiest ever!")
 #Chicken
-Posting.create(product_id: 5, quantity_available: 50, price: 1.50, user_id: 3, unit_category_id: 3, unit_kind_id: 10, description: "best whole chickens around. all grass fed on clean, organic fields. no antibiotics. no supplements. just lots of grass and all the bugs they can eat! :)")
+Posting.create(delivery_date: next_friday, product_id: 5, quantity_available: 50, price: 1.50, user_id: 3, unit_category_id: 3, unit_kind_id: 10, description: "best whole chickens around. all grass fed on clean, organic fields. no antibiotics. no supplements. just lots of grass and all the bugs they can eat! :)")
 #Oranges
-Posting.create(product_id: 7, quantity_available: 100, price: 1.25, user_id: 4, unit_category_id: 2, unit_kind_id: 8, description: "best oranges ever!")
+Posting.create(delivery_date: next_friday, product_id: 7, quantity_available: 100, price: 1.25, user_id: 4, unit_category_id: 2, unit_kind_id: 8, description: "best oranges ever!")
 #Celery
-Posting.create(product_id: 8, quantity_available: 100, price: 2.50, user_id: 4, unit_category_id: 2, unit_kind_id: 8, description: "best celery ever!")
+Posting.create(delivery_date: next_friday, product_id: 8, quantity_available: 100, price: 2.50, user_id: 4, unit_category_id: 2, unit_kind_id: 8, description: "best celery ever!")
 
 #Apples
 ToteItem.create(quantity: 2, price: 2.75, status: ToteItem.states[:ADDED], user_id: 7, posting_id: 1)
