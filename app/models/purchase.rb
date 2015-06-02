@@ -4,7 +4,6 @@ class Purchase < ActiveRecord::Base
   has_many :authorization_purchases
   has_many :authorizations, through: :authorization_purchases
 
-  has_many :purchase_bulk_buys
-  has_many :bulk_buys, through: :purchase_bulk_buys
-
+  has_many :purchase_purchase_receivables
+  has_many :purchase_receivables, through: :purchase_purchase_receivables
 end

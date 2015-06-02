@@ -11,7 +11,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150528214208) do
+ActiveRecord::Schema.define(version: 20150601215355) do
+
+  create_table "account_states", force: :cascade do |t|
+    t.integer  "state"
+    t.text     "description"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
 
   create_table "admin_bulk_buys", id: false, force: :cascade do |t|
     t.integer  "user_id"
@@ -47,6 +54,26 @@ ActiveRecord::Schema.define(version: 20150528214208) do
     t.string   "payment_status"
     t.string   "pending_reason"
   end
+
+  create_table "bulk_buy_purchase_receivables", id: false, force: :cascade do |t|
+    t.integer  "purchase_receivable_id"
+    t.integer  "bulk_buy_id"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "bulk_buy_purchase_receivables", ["bulk_buy_id"], name: "index_bulk_buy_purchase_receivables_on_bulk_buy_id"
+  add_index "bulk_buy_purchase_receivables", ["purchase_receivable_id"], name: "index_bulk_buy_purchase_receivables_on_purchase_receivable_id"
+
+  create_table "bulk_buy_tote_items", id: false, force: :cascade do |t|
+    t.integer  "tote_item_id"
+    t.integer  "bulk_buy_id"
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+  end
+
+  add_index "bulk_buy_tote_items", ["bulk_buy_id"], name: "index_bulk_buy_tote_items_on_bulk_buy_id"
+  add_index "bulk_buy_tote_items", ["tote_item_id"], name: "index_bulk_buy_tote_items_on_tote_item_id"
 
   create_table "bulk_buys", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -108,6 +135,33 @@ ActiveRecord::Schema.define(version: 20150528214208) do
   add_index "purchase_bulk_buys", ["bulk_buy_id"], name: "index_purchase_bulk_buys_on_bulk_buy_id"
   add_index "purchase_bulk_buys", ["purchase_id"], name: "index_purchase_bulk_buys_on_purchase_id"
 
+  create_table "purchase_purchase_receivables", id: false, force: :cascade do |t|
+    t.integer  "purchase_id"
+    t.integer  "purchase_receivable_id"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "purchase_purchase_receivables", ["purchase_id"], name: "index_purchase_purchase_receivables_on_purchase_id"
+  add_index "purchase_purchase_receivables", ["purchase_receivable_id"], name: "index_purchase_purchase_receivables_on_purchase_receivable_id"
+
+  create_table "purchase_receivable_tote_items", id: false, force: :cascade do |t|
+    t.integer  "tote_item_id"
+    t.integer  "purchase_receivable_id"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "purchase_receivable_tote_items", ["purchase_receivable_id"], name: "index_purchase_receivable_tote_items_on_purchase_receivable_id"
+  add_index "purchase_receivable_tote_items", ["tote_item_id"], name: "index_purchase_receivable_tote_items_on_tote_item_id"
+
+  create_table "purchase_receivables", force: :cascade do |t|
+    t.float    "amount"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+    t.float    "amount_paid"
+  end
+
   create_table "purchases", force: :cascade do |t|
     t.float    "amount"
     t.datetime "created_at", null: false
@@ -157,6 +211,26 @@ ActiveRecord::Schema.define(version: 20150528214208) do
   end
 
   add_index "unit_kinds", ["unit_category_id"], name: "index_unit_kinds_on_unit_category_id"
+
+  create_table "user_account_states", id: false, force: :cascade do |t|
+    t.integer  "account_state_id"
+    t.integer  "user_id"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+  end
+
+  add_index "user_account_states", ["account_state_id"], name: "index_user_account_states_on_account_state_id"
+  add_index "user_account_states", ["user_id"], name: "index_user_account_states_on_user_id"
+
+  create_table "user_purchase_receivables", id: false, force: :cascade do |t|
+    t.integer  "user_id"
+    t.integer  "purchase_receivable_id"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "user_purchase_receivables", ["purchase_receivable_id"], name: "index_user_purchase_receivables_on_purchase_receivable_id"
+  add_index "user_purchase_receivables", ["user_id"], name: "index_user_purchase_receivables_on_user_id"
 
 # Could not dump table "users" because of following NoMethodError
 #   undefined method `[]' for nil:NilClass

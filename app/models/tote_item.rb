@@ -2,6 +2,12 @@ class ToteItem < ActiveRecord::Base
   has_many :tote_item_checkouts
   has_many :checkouts, through: :tote_item_checkouts
 
+  has_many :bulk_buy_tote_items
+  has_many :bulk_buys, through: :bulk_buy_tote_items
+
+  has_many :purchase_receivable_tote_items
+  has_many :purchase_receivables, through: :purchase_receivable_tote_items
+
   belongs_to :posting
   belongs_to :user
 

@@ -4,9 +4,17 @@ class BulkBuysController < ApplicationController
   end
 
   def create
+
+    #create a bulkbuy object
+    bulk_buy = BulkBuy.new
+    bulk_buy.admins << current_user
+    bulk_buy.amount = 0;
+
     authorizations = {}
+
   	filled_tote_items = ToteItem.find(params[:filled_tote_item_ids])
   	for filled_tote_item in filled_tote_items
+      bulk_buy.tote_items << filled_tote_item
   	  if filled_tote_item.checkouts != nil && filled_tote_item.checkouts.any?
   	  	if filled_tote_item.checkouts.last.authorizations != nil && filled_tote_item.checkouts.last.authorizations.any?
   	  	  authorization = filled_tote_item.checkouts.last.authorizations.last
@@ -19,32 +27,48 @@ class BulkBuysController < ApplicationController
   	  end
   	end
 
-  	#create a bulkbuy object
-  	bulk_buy = BulkBuy.new
-  	bulk_buy.admins << current_user
-    bulk_buy.amount = 0;
+#authorizations[token][:amount] //this is the purchase_receivable amount
+#authorizations[token][:authorization]
+#authorizations[token][:filled_tote_items]
 
-  	#for each authorization
-  	authorizations.each do |key, value|  		
-  	  #do the gateway purchase operation
-  	  response = GATEWAY.capture(value[:amount] * 100, value[:authorization].transaction_id)
-  	  if response.success?
-  	    #create a new purchase object
-  	    purchase = Purchase.new(response: response, amount: value[:amount], token: key, payer_id: value[:authorization].payer_id)  	    
-  	    #associate the purchase object with the authorization
-  	    purchase.authorizations << value[:authorization]
-  	    #change toteitems' states to PURCHASED
-  	    value[:filled_tote_items].each do |tote_item|
+#for each authorization...
+    authorizations.each do |token, value|
+      ftis = value[:filled_tote_items]
+      if ftis == nil || !ftis.any?
+        next
+      end
+
+      bulk_buy.purchase_receivables.build(amount: value[:amount], amount_paid: 0)
+      pr = bulk_buy.purchase_receivables.last
+      user = User.find(ftis.first.user_id)                      
+      pr.users << user
+
+      ftis.each do |fti|
+        pr.tote_items << fti
+      end
+            
+      #do the gateway purchase operation
+      response = GATEWAY.capture(value[:amount] * 100, value[:authorization].transaction_id)
+      #create a new purchase object
+      pr.purchases.build(response: response, amount: value[:amount], token: token, payer_id: value[:authorization].payer_id)       
+      purchase = pr.purchases.last
+      #associate the purchase object with the authorization
+      purchase.authorizations << value[:authorization]
+
+      if response.success?
+        #change toteitems' states to PURCHASED
+        value[:filled_tote_items].each do |tote_item|
           tote_item.update(status: ToteItem.states[:PURCHASED])
         end
-
-   	    #associate the purchase object with the bulk buy object
-  	    bulk_buy.purchases << purchase
+        #associate the purchase object with the bulk buy object
+        #TODO: need to update the purchase_receivable.amount_paid attribute
         bulk_buy.amount += purchase.amount
-   	  else  	
-  	  	#TODO: this is the scenario where a purchase dind't work out. we probably need to record this in the db also, probably right here in the purchases table? we'll also need to somehow notify the customer and the admin that payment failed  	  	
-   	  end  	  
-  	end  	  	  	  	  	
+      else    
+        #TODO: this is the scenario where a purchase dind't work out. we probably need to record this in the db also, probably right here in the purchases table? we'll also need to somehow notify the customer and the admin that payment failed
+        #and that their account is now on hold
+      end     
+      #bulk_buy.purchases << purchase      
+    end
 
   	#save the bulkbuy object
   	bulk_buy.save

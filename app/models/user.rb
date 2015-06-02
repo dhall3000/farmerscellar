@@ -11,9 +11,20 @@ class User < ActiveRecord::Base
   has_many :postings
   has_many :tote_items
 
+  has_many :user_account_states
+  has_many :account_states, through: :user_account_states
+
+  has_many :user_purchase_receivables
+  has_many :purchase_receivables, through: :user_purchase_receivables
+
   def self.types
     {CUSTOMER: 0, PRODUCER: 1, ADMIN: 2}
   end
+
+  def initialize(args=nil)
+    super
+    account_states.build(state: AccountState.states[:OK], description: AccountState.descriptions[:OK])
+  end  
 
   def self.farm_name_from_posting_id(id)
     posting = Posting.find(id)
