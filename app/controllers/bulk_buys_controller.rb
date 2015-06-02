@@ -49,8 +49,22 @@ class BulkBuysController < ApplicationController
             
       #do the gateway purchase operation
       response = GATEWAY.capture(value[:amount] * 100, value[:authorization].transaction_id)
+
+      gross_amount = response.params["gross_amount"].to_f
+      fee_amount = response.params["fee_amount"].to_f
+      net_amount = gross_amount - fee_amount
+
       #create a new purchase object
-      pr.purchases.build(response: response, amount: value[:amount], token: token, payer_id: value[:authorization].payer_id)       
+      pr.purchases.build(
+        response: response,
+        amount: value[:amount],
+        token: token,
+        payer_id: value[:authorization].payer_id,
+        gross_amount: gross_amount,
+        fee_amount: fee_amount,
+        net_amount: net_amount
+        )
+
       purchase = pr.purchases.last
       #associate the purchase object with the authorization
       purchase.authorizations << value[:authorization]

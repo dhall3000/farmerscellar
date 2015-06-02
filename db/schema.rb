@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150601215355) do
+ActiveRecord::Schema.define(version: 20150602191645) do
 
   create_table "account_states", force: :cascade do |t|
     t.integer  "state"
@@ -164,11 +164,14 @@ ActiveRecord::Schema.define(version: 20150601215355) do
 
   create_table "purchases", force: :cascade do |t|
     t.float    "amount"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
     t.string   "payer_id"
     t.string   "token"
     t.text     "response"
+    t.float    "gross_amount"
+    t.float    "fee_amount"
+    t.float    "net_amount"
   end
 
   add_index "purchases", ["payer_id"], name: "index_purchases_on_payer_id"
