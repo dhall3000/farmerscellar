@@ -8,7 +8,7 @@
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
-User.create!(name:  "f1",
+f1 = User.create!(name:  "f1",
              email: "f1@f.com",
              password:              "dogdog",
              password_confirmation: "dogdog",
@@ -27,7 +27,7 @@ User.create!(name:  "f1",
              farm_name: "F1 FARM"
              )
 
-User.create!(name:  "f2",
+f2 = User.create!(name:  "f2",
              email: "f2@f.com",
              password:              "dogdog",
              password_confirmation: "dogdog",
@@ -46,7 +46,7 @@ User.create!(name:  "f2",
              farm_name: "F2 FARM"
              )
 
-User.create!(name:  "f3",
+f3 = User.create!(name:  "f3",
              email: "f3@f.com",
              password:              "dogdog",
              password_confirmation: "dogdog",
@@ -65,7 +65,7 @@ User.create!(name:  "f3",
              farm_name: "F3 FARM"
              )
 
-User.create!(name:  "f4",
+f4 = User.create!(name:  "f4",
              email: "f4@f.com",
              password:              "dogdog",
              password_confirmation: "dogdog",
@@ -154,14 +154,16 @@ User.create!(name:  "a1",
              phone: "206-699-6579"
              )
 
-Product.create(name: "Fuji Apples")
-Product.create(name: "Carrots")
-Product.create(name: "Milk")
-Product.create(name: "Beef")
-Product.create(name: "Chicken")
-Product.create(name: "Asparagus")
-Product.create(name: "Oranges")
-Product.create(name: "Celery")
+apples = Product.create(name: "Fuji Apples")
+carrots = Product.create(name: "Carrots")
+milk = Product.create(name: "Milk")
+beef = Product.create(name: "Beef")
+chicken = Product.create(name: "Chicken")
+asparagus = Product.create(name: "Asparagus")
+oranges = Product.create(name: "Oranges")
+celery = Product.create(name: "Celery")
+
+
 
 volume = UnitCategory.create(name: "Volume")
 weight = UnitCategory.create(name: "Weight")
@@ -191,6 +193,15 @@ def next_friday
   end
   Date.today + i
 end
+
+f1.producer_product_commissions.create(product: apples, commission: 0.05)
+f1.producer_product_commissions.create(product: asparagus, commission: 0.15)
+f2.producer_product_commissions.create(product: milk, commission: 0.10)
+f2.producer_product_commissions.create(product: beef, commission: 0.03)
+f3.producer_product_commissions.create(product: carrots, commission: 0.04)
+f3.producer_product_commissions.create(product: chicken, commission: 0.07)
+f4.producer_product_commissions.create(product: oranges, commission: 0.08)
+f4.producer_product_commissions.create(product: celery, commission: 0.12)
 
 #Apples
 Posting.create(delivery_date: next_friday, product_id: 1, quantity_available: 1000, price: 2.75, user_id: 1, unit_category_id: 2, unit_kind_id: 8, description: "these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")

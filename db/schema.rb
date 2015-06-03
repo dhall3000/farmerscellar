@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150602222551) do
+ActiveRecord::Schema.define(version: 20150603174232) do
 
   create_table "account_states", force: :cascade do |t|
     t.integer  "state"
@@ -119,6 +119,17 @@ ActiveRecord::Schema.define(version: 20150602222551) do
   add_index "postings", ["unit_category_id"], name: "index_postings_on_unit_category_id"
   add_index "postings", ["unit_kind_id"], name: "index_postings_on_unit_kind_id"
   add_index "postings", ["user_id"], name: "index_postings_on_user_id"
+
+  create_table "producer_product_commissions", id: false, force: :cascade do |t|
+    t.integer  "product_id"
+    t.integer  "user_id"
+    t.float    "commission"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_index "producer_product_commissions", ["product_id"], name: "index_producer_product_commissions_on_product_id"
+  add_index "producer_product_commissions", ["user_id"], name: "index_producer_product_commissions_on_user_id"
 
   create_table "products", force: :cascade do |t|
     t.string   "name"
