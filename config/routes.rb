@@ -1,5 +1,4 @@
 Rails.application.routes.draw do
-
   root 'static_pages#home'
   get 'help' => 'static_pages#help'
   get 'about' => 'static_pages#about'
@@ -19,6 +18,7 @@ Rails.application.routes.draw do
   resources :authorizations, only: [:new, :create]
   resources :bulk_buys, only: [:new, :create]
   resources :checkouts, only: [:create]
+  resources :bulk_purchases, only: [:new, :create]
       
 #  get 'static_pages/help'
 #  get 'static_pages/about'

@@ -8,6 +8,9 @@ class ToteItem < ActiveRecord::Base
   has_many :purchase_receivable_tote_items
   has_many :purchase_receivables, through: :purchase_receivable_tote_items
 
+  has_many :payment_payable_tote_items
+  has_many :payment_payables, through: :payment_payable_tote_items
+
   belongs_to :posting
   belongs_to :user
 
@@ -41,4 +44,11 @@ class ToteItem < ActiveRecord::Base
   	#thread-switches over to process the other sorter's request. both requests pull/return the same tote_item record?  	
 
   end
+
+  def authorization
+    if checkouts && checkouts.any? && checkouts.last.authorizations && checkouts.last.authorizations.any?
+      checkouts.last.authorizations.last
+    end
+  end
+
 end

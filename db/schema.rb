@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150603174232) do
+ActiveRecord::Schema.define(version: 20150604193940) do
 
   create_table "account_states", force: :cascade do |t|
     t.integer  "state"
@@ -81,6 +81,31 @@ ActiveRecord::Schema.define(version: 20150603174232) do
     t.float    "amount"
   end
 
+  create_table "bulk_purchase_purchases", id: false, force: :cascade do |t|
+    t.integer  "purchase_id"
+    t.integer  "bulk_purchase_id"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+  end
+
+  add_index "bulk_purchase_purchases", ["bulk_purchase_id"], name: "index_bulk_purchase_purchases_on_bulk_purchase_id"
+  add_index "bulk_purchase_purchases", ["purchase_id"], name: "index_bulk_purchase_purchases_on_purchase_id"
+
+  create_table "bulk_purchase_receivables", id: false, force: :cascade do |t|
+    t.integer  "purchase_receivable_id"
+    t.integer  "bulk_purchase_id"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "bulk_purchase_receivables", ["bulk_purchase_id"], name: "index_bulk_purchase_receivables_on_bulk_purchase_id"
+  add_index "bulk_purchase_receivables", ["purchase_receivable_id"], name: "index_bulk_purchase_receivables_on_purchase_receivable_id"
+
+  create_table "bulk_purchases", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "checkout_authorizations", id: false, force: :cascade do |t|
     t.integer  "checkout_id"
     t.integer  "authorization_id"
@@ -101,6 +126,23 @@ ActiveRecord::Schema.define(version: 20150603174232) do
   end
 
   add_index "checkouts", ["token"], name: "index_checkouts_on_token"
+
+  create_table "payment_payable_tote_items", id: false, force: :cascade do |t|
+    t.integer  "tote_item_id"
+    t.integer  "payment_payable_id"
+    t.datetime "created_at",         null: false
+    t.datetime "updated_at",         null: false
+  end
+
+  add_index "payment_payable_tote_items", ["payment_payable_id"], name: "index_payment_payable_tote_items_on_payment_payable_id"
+  add_index "payment_payable_tote_items", ["tote_item_id"], name: "index_payment_payable_tote_items_on_tote_item_id"
+
+  create_table "payment_payables", force: :cascade do |t|
+    t.float    "amount"
+    t.float    "amount_paid"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
 
   create_table "postings", force: :cascade do |t|
     t.text     "description"
@@ -236,6 +278,16 @@ ActiveRecord::Schema.define(version: 20150603174232) do
 
   add_index "user_account_states", ["account_state_id"], name: "index_user_account_states_on_account_state_id"
   add_index "user_account_states", ["user_id"], name: "index_user_account_states_on_user_id"
+
+  create_table "user_payment_payables", id: false, force: :cascade do |t|
+    t.integer  "user_id"
+    t.integer  "payment_payable_id"
+    t.datetime "created_at",         null: false
+    t.datetime "updated_at",         null: false
+  end
+
+  add_index "user_payment_payables", ["payment_payable_id"], name: "index_user_payment_payables_on_payment_payable_id"
+  add_index "user_payment_payables", ["user_id"], name: "index_user_payment_payables_on_user_id"
 
   create_table "user_purchase_receivables", id: false, force: :cascade do |t|
     t.integer  "user_id"

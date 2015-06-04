@@ -1,0 +1,7 @@
+<h1>BulkPurchases#new</h1>
+<p>Find me in app/views/bulk_purchases/new.html.erb</p>
+
+<p>this bulk purchase includes the following purchase_receivables:</p>
+<% for purchase_receivable in @bulk_purchase.purchase_receivables %>
+  <p>purchase_receivable id: <%= purchase_receivable.id %></p>
+<% end %>
