@@ -30,16 +30,6 @@ ActiveRecord::Schema.define(version: 20150604193940) do
   add_index "admin_bulk_buys", ["bulk_buy_id"], name: "index_admin_bulk_buys_on_bulk_buy_id"
   add_index "admin_bulk_buys", ["user_id"], name: "index_admin_bulk_buys_on_user_id"
 
-  create_table "authorization_purchases", id: false, force: :cascade do |t|
-    t.integer  "authorization_id"
-    t.integer  "purchase_id"
-    t.datetime "created_at",       null: false
-    t.datetime "updated_at",       null: false
-  end
-
-  add_index "authorization_purchases", ["authorization_id"], name: "index_authorization_purchases_on_authorization_id"
-  add_index "authorization_purchases", ["purchase_id"], name: "index_authorization_purchases_on_purchase_id"
-
   create_table "authorizations", force: :cascade do |t|
     t.datetime "created_at",               null: false
     t.datetime "updated_at",               null: false
@@ -189,16 +179,6 @@ ActiveRecord::Schema.define(version: 20150604193940) do
   add_index "purchase_bulk_buys", ["bulk_buy_id"], name: "index_purchase_bulk_buys_on_bulk_buy_id"
   add_index "purchase_bulk_buys", ["purchase_id"], name: "index_purchase_bulk_buys_on_purchase_id"
 
-  create_table "purchase_purchase_receivables", id: false, force: :cascade do |t|
-    t.integer  "purchase_id"
-    t.integer  "purchase_receivable_id"
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
-  add_index "purchase_purchase_receivables", ["purchase_id"], name: "index_purchase_purchase_receivables_on_purchase_id"
-  add_index "purchase_purchase_receivables", ["purchase_receivable_id"], name: "index_purchase_purchase_receivables_on_purchase_receivable_id"
-
   create_table "purchase_receivable_tote_items", id: false, force: :cascade do |t|
     t.integer  "tote_item_id"
     t.integer  "purchase_receivable_id"
@@ -299,7 +279,32 @@ ActiveRecord::Schema.define(version: 20150604193940) do
   add_index "user_purchase_receivables", ["purchase_receivable_id"], name: "index_user_purchase_receivables_on_purchase_receivable_id"
   add_index "user_purchase_receivables", ["user_id"], name: "index_user_purchase_receivables_on_user_id"
 
-# Could not dump table "users" because of following NoMethodError
-#   undefined method `[]' for nil:NilClass
+  create_table "users", force: :cascade do |t|
+    t.string   "name"
+    t.string   "email"
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+    t.string   "password_digest"
+    t.integer  "account_type"
+    t.string   "remember_digest"
+    t.string   "activation_digest"
+    t.boolean  "activated",         default: false
+    t.datetime "activated_at"
+    t.string   "reset_digest"
+    t.datetime "reset_sent_at"
+    t.text     "description"
+    t.string   "address"
+    t.string   "city"
+    t.string   "state"
+    t.string   "zip"
+    t.string   "phone"
+    t.string   "website"
+    t.boolean  "agreement"
+    t.boolean  "farmer_approval",   default: false
+    t.string   "farm_name"
+  end
+
+  add_index "users", ["account_type"], name: "index_users_on_account_type"
+  add_index "users", ["email"], name: "index_users_on_email", unique: true
 
 end

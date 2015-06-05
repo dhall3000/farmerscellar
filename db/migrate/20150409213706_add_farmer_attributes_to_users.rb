@@ -7,6 +7,6 @@ class AddFarmerAttributesToUsers < ActiveRecord::Migration
     add_column :users, :zip, :string
     add_column :users, :phone, :string
     add_column :users, :website, :string
-    add_column :users, :agreement, :bool    
+    add_column :users, :agreement, :boolean
   end
 end
