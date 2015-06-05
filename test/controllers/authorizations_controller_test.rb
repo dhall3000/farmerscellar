@@ -1,14 +1,21 @@
 require 'test_helper'
 
 class AuthorizationsControllerTest < ActionController::TestCase
-  test "should get new" do
-    get :new
-    assert_response :success
+
+  def setup
+    @user = users(:david)    
   end
 
-  test "should get create" do
-    get :create
+  test "should get new" do
+  	log_in_as @user
+    get :new, token: "toke"
     assert_response :success
+    assert_template 'authorizations/new'
   end
+
+  #test "should get create" do
+  #  get :create
+  #  assert_response :success
+  #end
 
 end
