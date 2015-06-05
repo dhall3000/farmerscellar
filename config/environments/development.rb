@@ -51,6 +51,7 @@ Rails.application.configure do
       password: "2U4THLGZVCG6BSHH",
       signature: "An5ns1Kso7MWUdW4ErQKJJJ4qi4-A-.uIGKotw7d0j4apBMju1cKS2pZ"
       )
+    ::USEGATEWAY = false
   end
 
 end

@@ -1,9 +1,1 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
-one:
-  checkout_id: 
-  authorization_id: 
-
-two:
-  checkout_id: 
-  authorization_id: 

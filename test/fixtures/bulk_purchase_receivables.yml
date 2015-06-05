@@ -1,9 +1,1 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
-one:
-  purchase_receivable_id: 
-  bulk_purchase_id: 
-
-two:
-  purchase_receivable_id: 
-  bulk_purchase_id: 

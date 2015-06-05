@@ -1,9 +1,1 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
-one:
-  amount_attempted: 1.5
-  amount_actual: 1.5
-
-two:
-  amount_attempted: 1.5
-  amount_actual: 1.5

@@ -1,9 +1,1 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
-one:
-  tote_item_id: 
-  purchase_receivable_id: 
-
-two:
-  tote_item_id: 
-  purchase_receivable_id: 

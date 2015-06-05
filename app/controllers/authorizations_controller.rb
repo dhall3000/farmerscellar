@@ -1,8 +1,11 @@
 class AuthorizationsController < ApplicationController
   def new
   	# add express_token and payer_id columns to auth table
-  	@authorization = Authorization.new(token: params[:token], payer_id: params[:PayerID])  	
-
+    if USEGATEWAY
+      @authorization = Authorization.new(token: params[:token], payer_id: params[:PayerID])  	
+    else
+      @authorization = Authorization.new(token: params[:token], payer_id: ('a'..'z').to_a.shuffle[0..10].join)
+    end
   end
 
 #response.params["timestamp"]
@@ -10,15 +13,20 @@ class AuthorizationsController < ApplicationController
   def create
   	@authorization = Authorization.new(authorization_params)
   	options = { ip:  request.remote_ip, token: @authorization.token, payer_id: @authorization.payer_id }  	
-  	response = GATEWAY.authorize(@authorization.amount * 100, options)  
 
-  	@authorization.correlation_id = response.params["correlation_id"]
-  	@authorization.transaction_id = response.params["transaction_id"]
-  	@authorization.payment_date = DateTime.parse(response.params["payment_date"])
-  	@authorization.gross_amount = response.params["gross_amount"].to_f
-  	@authorization.gross_amount_currency_id = response.params["gross_amount_currency_id"]
-  	@authorization.payment_status = response.params["payment_status"]
-  	@authorization.pending_reason = response.params["pending_reason"]
+    if USEGATEWAY
+      response = GATEWAY.authorize(@authorization.amount * 100, options)  
+    else
+      response = FakeAuthorizationResponse.new(@authorization.amount)
+    end
+
+    @authorization.correlation_id = response.params["correlation_id"]
+    @authorization.transaction_id = response.params["transaction_id"]
+    @authorization.payment_date = DateTime.parse(response.params["payment_date"])
+    @authorization.gross_amount = response.params["gross_amount"].to_f
+    @authorization.gross_amount_currency_id = response.params["gross_amount_currency_id"]
+    @authorization.payment_status = response.params["payment_status"]
+    @authorization.pending_reason = response.params["pending_reason"]
  	      
     #tote_item -> as/ti -> as -> auth
     #TODO: error checking needs to happen here. what if there are no toteitems in the tote or no toteitems in the proper start state to make this transition?
@@ -55,4 +63,25 @@ class AuthorizationsController < ApplicationController
 
 end
 
-  
+class FakeAuthorizationResponse
+  attr_reader :params
+  def initialize(amount)
+    @params = {
+      "correlation_id": random_string,
+      "transaction_id": random_string,
+      "payment_date": DateTime.now.to_s,
+      "gross_amount": amount,
+      "gross_amount_currency_id": "USD",
+      "payment_status": "FAKEPENDING",
+      "pending_reason": "FAKEREAON"
+    }
+
+    @params = @params.stringify_keys
+
+  end
+
+  private
+    def random_string
+      ('a'..'z').to_a.shuffle[0..10].join
+    end
+end
