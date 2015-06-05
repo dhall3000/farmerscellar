@@ -1,43 +1,147 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+f1:
+  name: f1
+  email: f1@f.com
+  password_digest: <%= User.digest('dogdog') %>
+  account_type: 1
+  activated: true
+  activated_at: Time.zone.now
+  description: producer of fine apples
+  address: 1234 main st
+  city: Kirkland
+  state: Washington
+  zip: 98033
+  phone: 206-588-6579
+  website: www.f1.com
+  agreement: 1
+  farmer_approval: t
+  farm_name: F1 FARM
 
-david:
-  name: david fixture
-  email: david@fixture.com
-  password_digest: <%= User.digest('password') %>
+f2:
+  name: f2
+  email: f2@f.com
+  password_digest: <%= User.digest('dogdog') %>
+  account_type: 1
+  activated: true
+  activated_at: Time.zone.now
+  description: we make grass fed beef
+  address: 9876 Focker St
+  city: Bellevue
+  state: Washington
+  zip: 98004
+  phone: 206-599-6579
+  website: www.f2.com
+  agreement: 1
+  farmer_approval: t
+  farm_name: F2 FARM
+
+f3:
+  name: f3
+  email: f3@f.com
+  password_digest: <%= User.digest('dogdog') %>
+  account_type: 1
+  activated: true
+  activated_at: Time.zone.now
+  description: producers of fine food
+  address: 9876 Blaster St
+  city: Bellevue
+  state: Washington
+  zip: 98004
+  phone: 206-590-6579
+  website: www.f3.com
+  agreement: 1
+  farmer_approval: t
+  farm_name: F3 FARM
+
+f4:
+  name: f4
+  email: f4@f.com
+  password_digest: <%= User.digest('dogdog') %>
+  account_type: 1
+  activated: true
+  activated_at: Time.zone.now
+  description: producers of sea food
+  address: 9876 Yollimer Rd
+  city: Republic
+  state: Washington
+  zip: 98114
+  phone: 206-650-6579
+  website: www.f4.com
+  agreement: 1
+  farmer_approval: t
+  farm_name: F4 FARM
+
+c1:
+  name: c1
+  email: c1@c.com
+  password_digest: <%= User.digest('dogdog') %>
   account_type: 0
   activated: true
-  activated_at: <%= Time.zone.now %>
+  activated_at: Time.zone.now
+  address: 4215 21st St. SW
+  city: Redmond
+  state: Washington
+  zip: 98008
+  phone: 206-599-6579
 
-archer:
-  name: Sterling Archer
-  email: duchess@example.gov
-  password_digest: <%= User.digest('password') %>
+c2:
+  name: c2
+  email: c2@c.com
+  password_digest: <%= User.digest('dogdog') %>
   account_type: 0
   activated: true
-  activated_at: <%= Time.zone.now %>
+  activated_at: Time.zone.now
+  address: 1964 29st St. NE
+  city: Renton
+  state: Washington
+  zip: 98021
+  phone: 206-599-6579
 
-lana:
-  name: Lana Kane
-  email: hands@example.gov
-  password_digest: <%= User.digest('password') %>
+c3:
+  name: c3
+  email: c3@c.com
+  password_digest: <%= User.digest('dogdog') %>
   account_type: 0
   activated: true
-  activated_at: <%= Time.zone.now %>
+  activated_at: Time.zone.now
+  address: 1946 31st St. SE
+  city: Covington
+  state: Washington
+  zip: 98099
+  phone: 206-799-6579
 
-mallory:
-  name: Mallory Archer
-  email: boss@example.gov
-  password_digest: <%= User.digest('password') %>
+c4:
+  name: c4
+  email: c4@c.com
+  password_digest: <%= User.digest('dogdog') %>
   account_type: 0
   activated: true
-  activated_at: <%= Time.zone.now %>
+  activated_at: Time.zone.now
+  address: 1974 33st St. South
+  city: Ravensdale
+  state: Washington
+  zip: 98001
+  phone: 206-899-6579
 
-<% 30.times do |n| %>
-user_<%= n %>:
-  name:  <%= "User #{n}" %>
-  email: <%= "user-#{n}@example.com" %>
-  password_digest: <%= User.digest('password') %>
-  account_type: '0'
+a1:
+  name: a1
+  email: a1@c.com
+  password_digest: <%= User.digest('dogdog') %>
+  account_type: 2
   activated: true
-  activated_at: <%= Time.zone.now %>  
-<% end %>
+  activated_at: Time.zone.now
+  address: 1234 Admin Road NE
+  city: Bothell
+  state: Washington
+  zip: 98009
+  phone: 206-699-6579
+
+#<% 30.times do |n| %>
+#user_<%= n %>:
+#  name:  <%= "User #{n}" %>
+#  email: <%= "user-#{n}@example.com" %>
+#  password_digest: <%= User.digest('dogdog') %>
+#  account_type: '0'
+#  activated: true
+#  activated_at: <%= Time.zone.now %>  
+#<% end %>
