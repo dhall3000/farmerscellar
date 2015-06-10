@@ -1,1 +1,10 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+volume:
+  name: Volume
+
+weight:
+  name: Weight
+
+count:
+  name: Count

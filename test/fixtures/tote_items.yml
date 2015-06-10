@@ -1,1 +1,129 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+#Apples
+c1apple:
+  quantity: 3
+  price: 2.75
+  status: <%= ToteItem.states[:AUTHORIZED] %>
+  user: c1
+  posting: postingf1apples
+
+c2apple:
+  quantity: 5
+  price: 2.75
+  status: <%= ToteItem.states[:AUTHORIZED] %>
+  user: c2
+  posting: postingf1apples
+
+c3apple:
+  quantity: 2
+  price: 2.75
+  status: <%= ToteItem.states[:AUTHORIZED] %>
+  user: c3
+  posting: postingf1apples
+
+c4apple:
+  quantity: 1
+  price: 2.75
+  status: <%= ToteItem.states[:AUTHORIZED] %>
+  user: c4
+  posting: postingf1apples
+
+#Milk
+#ToteItem.create(quantity: 1, price: 2.00, status: ToteItem.states[:ADDED], user_id: 1, posting_id: 3)
+c1milk:
+  quantity: 1
+  price: 2.00
+  status: <%= ToteItem.states[:AUTHORIZED] %>
+  user: c1
+  posting: postingf2milk
+
+#ToteItem.create(quantity: 4, price: 2.00, status: ToteItem.states[:ADDED], user_id: 2, posting_id: 3)
+c2milk:
+  quantity: 1
+  price: 2.00
+  status: <%= ToteItem.states[:AUTHORIZED] %>
+  user: c2
+  posting: postingf2milk
+
+#ToteItem.create(quantity: 2, price: 2.00, status: ToteItem.states[:ADDED], user_id: 3, posting_id: 3)
+c3milk:
+  quantity: 1
+  price: 2.00
+  status: <%= ToteItem.states[:AUTHORIZED] %>
+  user: c3
+  posting: postingf2milk
+
+#ToteItem.create(quantity: 3, price: 2.00, status: ToteItem.states[:ADDED], user_id: 4, posting_id: 3)
+c4milk:
+  quantity: 1
+  price: 2.00
+  status: <%= ToteItem.states[:AUTHORIZED] %>
+  user: c4
+  posting: postingf2milk
+
+#Chicken
+#ToteItem.create(quantity: 7, price: 1.50, status: ToteItem.states[:ADDED], user_id: 1, posting_id: 6)
+c1chicken:
+  quantity: 7
+  price: 1.50
+  status: <%= ToteItem.states[:AUTHORIZED] %>
+  user: c1
+  posting: postingf3chicken
+
+#ToteItem.create(quantity: 2, price: 1.50, status: ToteItem.states[:ADDED], user_id: 2, posting_id: 6)
+c2chicken:
+  quantity: 2
+  price: 1.50
+  status: <%= ToteItem.states[:AUTHORIZED] %>
+  user: c2
+  posting: postingf3chicken
+
+#ToteItem.create(quantity: 1, price: 1.50, status: ToteItem.states[:ADDED], user_id: 3, posting_id: 6)
+c3chicken:
+  quantity: 1
+  price: 1.50
+  status: <%= ToteItem.states[:AUTHORIZED] %>
+  user: c3
+  posting: postingf3chicken
+
+#ToteItem.create(quantity: 4, price: 1.50, status: ToteItem.states[:ADDED], user_id: 4, posting_id: 6)
+c4chicken:
+  quantity: 4
+  price: 1.50
+  status: <%= ToteItem.states[:AUTHORIZED] %>
+  user: c4
+  posting: postingf3chicken
+
+#Celery
+#ToteItem.create(quantity: 3, price: 2.50, status: ToteItem.states[:ADDED], user_id: 1, posting_id: 8)
+c1celery:
+  quantity: 3
+  price: 2.50
+  status: <%= ToteItem.states[:AUTHORIZED] %>
+  user: c1
+  posting: postingf4celery
+
+#ToteItem.create(quantity: 1, price: 2.50, status: ToteItem.states[:ADDED], user_id: 2, posting_id: 8)
+c2celery:
+  quantity: 1
+  price: 2.50
+  status: <%= ToteItem.states[:AUTHORIZED] %>
+  user: c2
+  posting: postingf4celery
+
+#ToteItem.create(quantity: 5, price: 2.50, status: ToteItem.states[:ADDED], user_id: 3, posting_id: 8)
+c3celery:
+  quantity: 5
+  price: 2.50
+  status: <%= ToteItem.states[:AUTHORIZED] %>
+  user: c3
+  posting: postingf4celery
+
+#ToteItem.create(quantity: 2, price: 2.50, status: ToteItem.states[:ADDED], user_id: 4, posting_id: 8)
+c4celery:
+  quantity: 2
+  price: 2.50
+  status: <%= ToteItem.states[:AUTHORIZED] %>
+  user: c4
+  posting: postingf4celery

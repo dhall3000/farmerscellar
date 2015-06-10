@@ -1,1 +1,25 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+apples:
+  name: Fuji Apples
+
+carrots:
+  name: Carrots
+
+milk:
+  name: Milk
+
+beef:
+  name: Beef
+
+chicken:
+  name: Chicken
+
+asparagus:
+  name: Asparagus
+
+oranges:
+  name: Oranges
+
+celery:
+  name: Celery
