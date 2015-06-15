@@ -1,6 +1,9 @@
 class ToteItemsController < ApplicationController
   def index
-    #@tote_items = ToteItem.includes(posting: [:user, :product]).where(user_id: current_user.id)    
+    if logged_in?
+      @tote_items = current_user_current_tote_items
+      @total_amount = total_cost_of_tote_items(@tote_items)      
+    end
   end
 
   def show

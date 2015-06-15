@@ -1,14 +1,18 @@
 <h1>ToteItems#index</h1>
 <p>Find me in app/views/tote_items/index.html.erb</p>
 
-<% tote_items = current_user_current_tote_items %>
-<%= render partial: "shared/tote", locals: { tote_items: tote_items } %>
-
-<% if tote_has_items(tote_items) %>
-  <div>
-	<%= form_tag(checkouts_path) do %>
-	  <%= hidden_field_tag(:amount, total_cost_of_tote_items(tote_items)) %>
-	  <%= image_submit_tag("https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif") %>
-	<% end %>
-  </div>
+<% if logged_in? %>  
+  <%= render partial: "shared/tote", locals: { tote_items: @tote_items } %>
+  <% if tote_has_items(@tote_items) %>
+    <div>
+	  <%= form_tag(checkouts_path) do %>
+	    <%= hidden_field_tag(:amount, @total_amount) %>
+  	    <%= image_submit_tag("https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif") %>
+	  <% end %>
+    </div>
+  <% else %>
+    <p>Your tote is empty. You need to add some items to your tote in order to see anything here</p>
+  <% end %>
+<% else %>
+  <p>Sorry, you need to log in before you can view the contents of your tote</p>
 <% end %>

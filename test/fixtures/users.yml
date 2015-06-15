@@ -123,6 +123,19 @@ c4:
   zip: 98001
   phone: 206-899-6579
 
+c_no_tote_items:
+  name: c_no_tote_items
+  email: c_no_tote_items@c.com
+  password_digest: <%= User.digest('dogdog') %>
+  account_type: 0
+  activated: true
+  activated_at: Time.zone.now
+  address: 3195 27st St. South
+  city: Ramsdale
+  state: Washington
+  zip: 98009
+  phone: 206-319-6579
+
 a1:
   name: a1
   email: a1@c.com
