@@ -10,22 +10,30 @@ class AuthorizationsTest < ActionDispatch::IntegrationTest
     @c3 = users(:c3)
     @c4 = users(:c4)
     @c_no_tote_items = users(:c_no_tote_items)
+    puts "AuthorizationsTest output:-----------------------------"
   end
 
   #this should create an auth in the db for each customer that has tote items
   test "should create new authorizations" do
-    #log_in_as(@c_no_tote_items)    
-    puts "number of authorizations: #{Authorization.count}"
+    puts "test: should create new authorizations"
+    #first verify there are currently no auths in the db
+    assert_equal 0, Authorization.count, "there should be no authorizations in the database at the beginning of this test but there actually are #{Authorization.count}"
 
-    newauthorization = create_authorization_for_user(@c1)
-    authorizationdb = Authorization.find_by(token: newauthorization.token)
-    assert_not_nil authorizationdb
-    puts "authorization token pulled from the db: #{authorizationdb.token}"
-    assert_equal newauthorization.token, authorizationdb.token
-    
-    create_authorization_for_user(@c2)
-    create_authorization_for_user(@c3)
-    create_authorization_for_user(@c4)    
+    customers = [@c1, @c2, @c3, @c4]
+
+    for customer in customers
+      #create a new auth
+      newauthorization = create_authorization_for_user(customer)
+      #verify a new auth was actually created
+      assert_not_nil newauthorization
+      #attempt to pull this new auth from the db
+      authorizationdb = Authorization.find_by(token: newauthorization.token)
+      #verify the attempt to pull new auth from db succeeded
+      assert_not_nil authorizationdb
+      #verify the auth token in the db matches the auth token in memory
+      assert_equal newauthorization.token, authorizationdb.token
+    end    
+
   end
 
   def create_authorization_for_user(user)
