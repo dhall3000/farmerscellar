@@ -34,6 +34,9 @@ class AuthorizationsTest < ActionDispatch::IntegrationTest
       assert_equal newauthorization.token, authorizationdb.token
     end    
 
+    #check that as a result of the above authorizations at least some of the tote item states were changed from ADDED -> AUTHORIZED
+    assert_equal 0, ToteItem.first.status
+
   end
 
   def create_authorization_for_user(user)
