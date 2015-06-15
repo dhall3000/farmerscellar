@@ -4,28 +4,28 @@
 c1apple:
   quantity: 3
   price: 2.75
-  status: <%= ToteItem.states[:AUTHORIZED] %>
+  status: <%= ToteItem.states[:ADDED] %>
   user: c1
   posting: postingf1apples
 
 c2apple:
   quantity: 5
   price: 2.75
-  status: <%= ToteItem.states[:AUTHORIZED] %>
+  status: <%= ToteItem.states[:ADDED] %>
   user: c2
   posting: postingf1apples
 
 c3apple:
   quantity: 2
   price: 2.75
-  status: <%= ToteItem.states[:AUTHORIZED] %>
+  status: <%= ToteItem.states[:ADDED] %>
   user: c3
   posting: postingf1apples
 
 c4apple:
   quantity: 1
   price: 2.75
-  status: <%= ToteItem.states[:AUTHORIZED] %>
+  status: <%= ToteItem.states[:ADDED] %>
   user: c4
   posting: postingf1apples
 
@@ -34,7 +34,7 @@ c4apple:
 c1milk:
   quantity: 1
   price: 2.00
-  status: <%= ToteItem.states[:AUTHORIZED] %>
+  status: <%= ToteItem.states[:ADDED] %>
   user: c1
   posting: postingf2milk
 
@@ -42,7 +42,7 @@ c1milk:
 c2milk:
   quantity: 1
   price: 2.00
-  status: <%= ToteItem.states[:AUTHORIZED] %>
+  status: <%= ToteItem.states[:ADDED] %>
   user: c2
   posting: postingf2milk
 
@@ -50,7 +50,7 @@ c2milk:
 c3milk:
   quantity: 1
   price: 2.00
-  status: <%= ToteItem.states[:AUTHORIZED] %>
+  status: <%= ToteItem.states[:ADDED] %>
   user: c3
   posting: postingf2milk
 
@@ -58,7 +58,7 @@ c3milk:
 c4milk:
   quantity: 1
   price: 2.00
-  status: <%= ToteItem.states[:AUTHORIZED] %>
+  status: <%= ToteItem.states[:ADDED] %>
   user: c4
   posting: postingf2milk
 
@@ -67,7 +67,7 @@ c4milk:
 c1chicken:
   quantity: 7
   price: 1.50
-  status: <%= ToteItem.states[:AUTHORIZED] %>
+  status: <%= ToteItem.states[:ADDED] %>
   user: c1
   posting: postingf3chicken
 
@@ -75,7 +75,7 @@ c1chicken:
 c2chicken:
   quantity: 2
   price: 1.50
-  status: <%= ToteItem.states[:AUTHORIZED] %>
+  status: <%= ToteItem.states[:ADDED] %>
   user: c2
   posting: postingf3chicken
 
@@ -83,7 +83,7 @@ c2chicken:
 c3chicken:
   quantity: 1
   price: 1.50
-  status: <%= ToteItem.states[:AUTHORIZED] %>
+  status: <%= ToteItem.states[:ADDED] %>
   user: c3
   posting: postingf3chicken
 
@@ -91,7 +91,7 @@ c3chicken:
 c4chicken:
   quantity: 4
   price: 1.50
-  status: <%= ToteItem.states[:AUTHORIZED] %>
+  status: <%= ToteItem.states[:ADDED] %>
   user: c4
   posting: postingf3chicken
 
@@ -100,7 +100,7 @@ c4chicken:
 c1celery:
   quantity: 3
   price: 2.50
-  status: <%= ToteItem.states[:AUTHORIZED] %>
+  status: <%= ToteItem.states[:ADDED] %>
   user: c1
   posting: postingf4celery
 
@@ -108,7 +108,7 @@ c1celery:
 c2celery:
   quantity: 1
   price: 2.50
-  status: <%= ToteItem.states[:AUTHORIZED] %>
+  status: <%= ToteItem.states[:ADDED] %>
   user: c2
   posting: postingf4celery
 
@@ -116,7 +116,7 @@ c2celery:
 c3celery:
   quantity: 5
   price: 2.50
-  status: <%= ToteItem.states[:AUTHORIZED] %>
+  status: <%= ToteItem.states[:ADDED] %>
   user: c3
   posting: postingf4celery
 
@@ -124,6 +124,6 @@ c3celery:
 c4celery:
   quantity: 2
   price: 2.50
-  status: <%= ToteItem.states[:AUTHORIZED] %>
+  status: <%= ToteItem.states[:ADDED] %>
   user: c4
   posting: postingf4celery
