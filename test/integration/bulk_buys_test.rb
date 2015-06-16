@@ -57,10 +57,34 @@ class BulkBuysTest < Authorizer
     #verify there are filled
     assert ToteItem.where(status: ToteItem.states[:FILLED]).count > 0
 
-  	#puts "first ti status is #{ToteItem.first.status}"
+  	get new_bulk_buy_path
+    assert 'bulk_buy/new'
+    #puts @response.body
+    assert total_bulk_buy_amount = assigns(:total_bulk_buy_amount) > 0
+    filled_tote_items = assigns(:filled_tote_items)
+    assert filled_tote_items.count > 0
 
-  	#auth_test = AuthorizationsTest.new
-  	#assert_not_nil auth_test
+    filled_tote_item_ids = []
+    for tote_item in filled_tote_items
+      filled_tote_item_ids << tote_item.id
+    end
+
+    num_bulk_buys = BulkBuy.count
+    assert PurchaseReceivable.count == 0    
+    post bulk_buys_path, filled_tote_item_ids: filled_tote_item_ids
+    assert PurchaseReceivable.count > 0    
+
+    assert_equal num_bulk_buys + 1, BulkBuy.count
+
+    prs = PurchaseReceivable.all.to_a
+    pr = prs[0]
+    puts "amount=#{pr.amount.to_s}"
+    puts pr.users.last.name
+    puts "number of tote_items: #{pr.tote_items.count.to_s}"
+
+
+    #puts prs[0][:amount].to_s
+    #puts prs[0][:amount_paid].to_s
 
   end
 
