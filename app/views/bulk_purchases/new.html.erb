@@ -5,3 +5,10 @@
 <% for purchase_receivable in @bulk_purchase.purchase_receivables %>
   <p>purchase_receivable id: <%= purchase_receivable.id %></p>
 <% end %>
+
+<%= form_for @bulk_purchase do |f| %>
+  <% for purchase_receivable in @bulk_purchase.purchase_receivables %>
+    <%= hidden_field_tag "purchase_receivables[]", purchase_receivable.id %>
+  <% end %>
+  <%= f.submit "Capture payments" %>
+<% end %>

@@ -38,6 +38,7 @@ class AuthorizationsController < ApplicationController
       if @authorization.checkouts.last.tote_items.any?
         #TODO: is this a potential bug? what if the .where method returns a relation with zero records, will the .update_all crash?
         @authorization.checkouts.last.tote_items.where(status: ToteItem.states[:ADDED]).update_all(status: ToteItem.states[:AUTHORIZED])
+        #@authorization.checkouts.last.tote_items.where(status: ToteItem.states[:ADDED]).update_all(status: ToteItem.states[:FILLED])
       end
 
       #commenting out the state transition stuff...perhaps keeping state on a toteitem is unnecessary with the new db model layout as

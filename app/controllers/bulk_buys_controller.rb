@@ -61,6 +61,8 @@ class BulkBuysController < ApplicationController
       ftis.each do |fti|
         pr.tote_items << fti
       end                  
+      #this represents the total value of everything that was filled for this bulk buy
+      @bulk_buy.amount += value[:amount]
     end
   	#save the bulkbuy object
   	@bulk_buy.save

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150604193940) do
+ActiveRecord::Schema.define(version: 20150617193756) do
 
   create_table "account_states", force: :cascade do |t|
     t.integer  "state"
@@ -197,11 +197,10 @@ ActiveRecord::Schema.define(version: 20150604193940) do
   end
 
   create_table "purchases", force: :cascade do |t|
-    t.float    "amount"
-    t.datetime "created_at",   null: false
-    t.datetime "updated_at",   null: false
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
     t.string   "payer_id"
-    t.string   "token"
+    t.string   "transaction_id"
     t.text     "response"
     t.float    "gross_amount"
     t.float    "fee_amount"
@@ -209,7 +208,7 @@ ActiveRecord::Schema.define(version: 20150604193940) do
   end
 
   add_index "purchases", ["payer_id"], name: "index_purchases_on_payer_id"
-  add_index "purchases", ["token"], name: "index_purchases_on_token"
+  add_index "purchases", ["transaction_id"], name: "index_purchases_on_transaction_id"
 
   create_table "tote_item_checkouts", id: false, force: :cascade do |t|
     t.integer  "tote_item_id"

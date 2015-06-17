@@ -13,5 +13,5 @@
   <% for tote_item in @filled_tote_items %>  
     <%= hidden_field_tag "filled_tote_item_ids[]", tote_item.id %>   
   <% end %>
-  <%= submit_tag "Capture payments" %>
+  <%= submit_tag "Create purchase receivables in bulk" %>
 <% end %>
