@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150617193756) do
+ActiveRecord::Schema.define(version: 20150618223823) do
 
   create_table "account_states", force: :cascade do |t|
     t.integer  "state"
@@ -70,16 +70,6 @@ ActiveRecord::Schema.define(version: 20150617193756) do
     t.datetime "updated_at", null: false
     t.float    "amount"
   end
-
-  create_table "bulk_purchase_purchases", id: false, force: :cascade do |t|
-    t.integer  "purchase_id"
-    t.integer  "bulk_purchase_id"
-    t.datetime "created_at",       null: false
-    t.datetime "updated_at",       null: false
-  end
-
-  add_index "bulk_purchase_purchases", ["bulk_purchase_id"], name: "index_bulk_purchase_purchases_on_bulk_purchase_id"
-  add_index "bulk_purchase_purchases", ["purchase_id"], name: "index_bulk_purchase_purchases_on_purchase_id"
 
   create_table "bulk_purchase_receivables", id: false, force: :cascade do |t|
     t.integer  "purchase_receivable_id"
@@ -178,6 +168,16 @@ ActiveRecord::Schema.define(version: 20150617193756) do
 
   add_index "purchase_bulk_buys", ["bulk_buy_id"], name: "index_purchase_bulk_buys_on_bulk_buy_id"
   add_index "purchase_bulk_buys", ["purchase_id"], name: "index_purchase_bulk_buys_on_purchase_id"
+
+  create_table "purchase_purchase_receivables", force: :cascade do |t|
+    t.integer  "purchase_id"
+    t.integer  "purchase_receivable_id"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "purchase_purchase_receivables", ["purchase_id"], name: "index_purchase_purchase_receivables_on_purchase_id"
+  add_index "purchase_purchase_receivables", ["purchase_receivable_id"], name: "index_purchase_purchase_receivables_on_purchase_receivable_id"
 
   create_table "purchase_receivable_tote_items", id: false, force: :cascade do |t|
     t.integer  "tote_item_id"
