@@ -53,6 +53,10 @@ class BulkPurchasesTest < BulkBuyer
     assert_not_nil purchase_receivables
     assert purchase_receivables.count > 0
     puts "number of purchase receivables: #{purchase_receivables.count}"
+
+    for purchase_receivable in purchase_receivables
+      assert_equal purchase_receivable.amount, purchase_receivable.amount_paid
+    end
     
     bulk_purchase = assigns(:bulk_purchase)
     assert_not_nil bulk_purchase

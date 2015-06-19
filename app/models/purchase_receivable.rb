@@ -14,8 +14,7 @@ class PurchaseReceivable < ActiveRecord::Base
   has_many :purchase_purchase_receivables
   has_many :purchases, through: :purchase_purchase_receivables
 
-  def purchase
-    purchase_amount = amount - amount_paid
+  def purchase    
     authorization = nil
     if tote_items && tote_items.any?
       authorization = tote_items.last.authorization
@@ -50,11 +49,13 @@ class PurchaseReceivable < ActiveRecord::Base
       	gross_amount: gross_amount,
       	fee_amount: fee_amount,
       	net_amount: net_amount
-      	)
-
-      net_reduction_factor = 1.0 - (net_amount / gross_amount)
+      	)      
 
       if response.success?
+        previously_paid = amount_paid
+        update(amount_paid: gross_amount + previously_paid)
+        
+      	net_reduction_factor = 1.0 - (net_amount / gross_amount)
         #for each tote_item:
           #1) change toteitems' states to PURCHASED
           #2) create a new PaymentPayable record
@@ -73,8 +74,6 @@ class PurchaseReceivable < ActiveRecord::Base
           #payment_payable.users << User.find(producer_id)
           #payment_payable.save
         end                    
-        previously_paid = amount_paid
-        update(amount_paid: gross_amount + previously_paid)
       else    
         #TODO: this is the scenario where a purchase dind't work out. we probably need to record this in the db also, probably right here in the purchases table? we'll also need to somehow notify the customer and the admin that payment failed
         #and that their account is now on hold
