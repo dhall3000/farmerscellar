@@ -29,10 +29,6 @@ class PurchaseReceivable < ActiveRecord::Base
       return nil
     end
 
-    if authorization.amount_purchased == nil
-      authorization.amount_purchased = 0
-    end
-
     #we don't want to capture more than the purchase_receivable outstanding amount is
     #likewise, we don't want to attempt to capture more than is available on this authorization
     #so, select the lesser of the two    

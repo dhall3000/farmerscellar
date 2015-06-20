@@ -12,6 +12,7 @@ class AuthorizationsController < ApplicationController
 
   def create
   	@authorization = Authorization.new(authorization_params)
+    @authorization.amount_purchased = 0
   	options = { ip:  request.remote_ip, token: @authorization.token, payer_id: @authorization.payer_id }  	
 
     if USEGATEWAY
