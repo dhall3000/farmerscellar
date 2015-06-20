@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150618223823) do
+ActiveRecord::Schema.define(version: 20150619183718) do
 
   create_table "account_states", force: :cascade do |t|
     t.integer  "state"
@@ -43,6 +43,7 @@ ActiveRecord::Schema.define(version: 20150618223823) do
     t.string   "gross_amount_currency_id"
     t.string   "payment_status"
     t.string   "pending_reason"
+    t.float    "amount_purchased"
   end
 
   create_table "bulk_buy_purchase_receivables", id: false, force: :cascade do |t|

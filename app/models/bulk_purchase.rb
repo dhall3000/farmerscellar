@@ -14,11 +14,42 @@ class BulkPurchase < ActiveRecord::Base
 
   def go
   	if purchase_receivables && purchase_receivables.any?
-  	  for purchase_receivable in purchase_receivables
-        purchase_receivable.purchase
+  	  for purchase_receivable in purchase_receivables                
+        purchase = purchase_receivable.purchase
+        #create_payment_payable(purchase)
   	  end
   	  save
   	end    
   end
 
+  private
+    def create_payment_payable(purchase)
+      if response.success?
+        previously_paid = amount_paid
+        update(amount_paid: gross_amount + previously_paid)
+
+        net_reduction_factor = 1.0 - (net_amount / gross_amount)
+        #for each tote_item:
+          #1) change toteitems' states to PURCHASED
+          #2) create a new PaymentPayable record
+        tote_items.each do |tote_item|
+          tote_item.update(status: ToteItem.states[:PURCHASED])
+          tote_item_purchase_amount = tote_item.quantity * tote_item.price
+          net_after_payment_fees = tote_item_purchase_amount * net_reduction_factor
+          product_id = tote_item.posting.product_id
+          producer_id = tote_item.posting.user_id
+          #farmers_cellar_commission_factor = tote_item.posting.product.producer_product_commissions.where(product_id: product_id, user_id: producer_id).last
+          #farmers_cellar_commission = farmers_cellar_commission_factor * net_after_payment_fees
+          #producer_sales = net_after_payment_fees - @farmers_cellar_commission
+          #TODO: record farmers_cellar_commission in FC master sales table
+          #tote_item.payment_payables.create(amount: producer_sales, amount_paid: 0)
+          #payment_payable = tote_item.payment_payables.last
+          #payment_payable.users << User.find(producer_id)
+          #payment_payable.save
+        end                    
+      else    
+        #TODO: this is the scenario where a purchase dind't work out. we probably need to record this in the db also, probably right here in the purchases table? we'll also need to somehow notify the customer and the admin that payment failed
+        #and that their account is now on hold
+      end        
+    end
 end

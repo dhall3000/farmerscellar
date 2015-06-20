@@ -70,7 +70,9 @@ class BulkPurchasesTest < BulkBuyer
     for purchase in purchases
       authorization = Authorization.find_by(transaction_id: purchase.transaction_id)
       assert_not_nil authorization
-      assert authorization.transaction_id == purchase.transaction_id
+      assert_equal authorization.transaction_id, purchase.transaction_id
+      assert_equal authorization.amount, authorization.amount_purchased
+      assert_equal authorization.amount, purchase.gross_amount
       puts "-------purchase-------"
       puts "authorization.transaction_id: #{authorization.transaction_id}"
       puts "purchase.payer_id: #{purchase.payer_id}"
