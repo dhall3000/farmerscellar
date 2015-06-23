@@ -1,4 +1,5 @@
 class BulkPurchase < ActiveRecord::Base
+  include ToteItemsHelper
   has_many :bulk_purchase_receivables
   has_many :purchase_receivables, through: :bulk_purchase_receivables
 
@@ -16,6 +17,12 @@ class BulkPurchase < ActiveRecord::Base
   	if purchase_receivables && purchase_receivables.any?
   	  for purchase_receivable in purchase_receivables                
         purchase = purchase_receivable.purchase
+        
+        sub_tote_value_by_payment_sequenced_producer_id = get_sub_tote_value_by_payment_sequenced_producer_id(purchase_receivable)
+
+        
+        #producers_ids = purchase_receivable.get_producer_ids
+        #sub_totes = 
         #create_payment_payable(purchase)
   	  end
   	  save
@@ -23,6 +30,47 @@ class BulkPurchase < ActiveRecord::Base
   end
 
   private
+
+    #returns a hash where key = producer id and value is a hash with keys/values for subtotevalue and subtotecommission.
+    #this is a nominal commission, by the way
+    def get_sub_tote_value_by_payment_sequenced_producer_id(purchase_receivable)
+      sub_totes_by_producer_id = purchase_receivable.get_sub_totes_by_producer_id      
+      producer_id_payment_order = get_producer_id_payment_order(sub_totes_by_producer_id)
+
+      sub_tote_value_by_payment_sequenced_producer_id = {}
+
+      producer_id_payment_order.each do |producer_id|
+        sub_tote = purchase_receivable.get_sub_tote(producer_id)        
+        sub_tote_value = total_cost_of_tote_items(sub_tote)                
+        sub_tote_commission = get_commission(sub_tote)
+        sub_tote_value_by_payment_sequenced_producer_id[producer_id] = { sub_tote_value: sub_tote_value, sub_tote_commission: sub_tote_commission }
+      end
+
+      return sub_tote_value_by_payment_sequenced_producer_id
+
+    end
+
+    #returns an array of producer ids in the order in which payments should be applied
+    def get_producer_id_payment_order(sub_totes_by_producer_id)
+
+      first_order_time_by_producer_id = {}
+
+      sub_totes_by_producer_id.each do |producer_id, sub_tote|
+        sorted_sub_tote = sub_tote.sort_by{|x| x.created_at}
+        first_order_time_by_producer_id[producer_id] = sorted_sub_tote[0].created_at
+      end      
+
+      producer_id_payment_order_nested = first_order_time_by_producer_id.sort_by { |product_id, order_time| order_time }
+      producer_id_payment_order = []
+
+      producer_id_payment_order_nested.each do |x|
+        producer_id_payment_order << x[0]        
+      end      
+
+      return producer_id_payment_order
+
+    end
+
     def create_payment_payable(purchase)
       if response.success?
         previously_paid = amount_paid

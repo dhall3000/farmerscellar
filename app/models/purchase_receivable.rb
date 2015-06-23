@@ -14,6 +14,47 @@ class PurchaseReceivable < ActiveRecord::Base
   has_many :purchase_purchase_receivables
   has_many :purchases, through: :purchase_purchase_receivables
 
+  #return a hash where the keys are producer ids and the values are arrays of tote_items from that producer
+  def get_sub_totes_by_producer_id
+
+  	sub_totes_by_producer_id = {}
+  	producer_ids = get_producer_ids    
+
+  	for producer_id in producer_ids
+  	  sub_tote = get_sub_tote(producer_id)      
+  	  sub_totes_by_producer_id[producer_id] = sub_tote
+  	end
+
+  	return sub_totes_by_producer_id
+
+  end
+
+  #returns an array of all tote_items for the given producer id
+  def get_sub_tote(producer_id)
+
+  	sub_tote = []
+    tote_items.each do |tote_item|
+      if tote_item.posting.user.id == producer_id
+      	sub_tote << tote_item
+      end
+    end  
+
+    return sub_tote
+
+  end
+
+  #returns an array of the producer ids in this purchase receivable
+  def get_producer_ids
+
+  	producer_ids = []
+    tote_items.each do |tote_item|
+      producer_ids << tote_item.posting.user.id
+    end
+
+    return producer_ids.uniq
+
+  end
+
   def purchase    
     
     authorization = nil
