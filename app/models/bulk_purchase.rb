@@ -18,6 +18,9 @@ class BulkPurchase < ActiveRecord::Base
 
   	  for purchase_receivable in purchase_receivables                
         purchase = purchase_receivable.purchase
+
+        #TODO: here we should probably check for purchase.response.success? and do something smart including notifying user there
+        #was a payments problem
         
         sub_tote_value_by_payment_sequenced_producer_id = get_sub_tote_value_by_payment_sequenced_producer_id(purchase_receivable)
         create_payment_payables(purchase_receivable, purchase, sub_tote_value_by_payment_sequenced_producer_id)
@@ -62,13 +65,17 @@ class BulkPurchase < ActiveRecord::Base
         commission = net_after_payment_processor_fee * value[:sub_tote_commission_factor]
         net_after_commission = net_after_payment_processor_fee - commission
 
-        #TODO: tote_item.update(status: ToteItem.states[:PURCHASED])
+        payment_payable = PaymentPayable.new(amount: net_after_commission, amount_paid: 0)
+        producer = User.find(producer_id)
+        payment_payable.users << producer
 
-        #net_towards_producer_after_payments_fees = gross_amount_payable_to_this_producer * (1.0 - payment_processor_effective_fee_factor)
-        #net_towards_producer_after_commission = net_towards_producer_after_payments_fees * (1.0 - value.sub_tote_commission_factor)
+        for tote_item in value[:sub_tote]
+          payment_payable.tote_items << tote_item
+        end
+
+        payment_payable.save
 
       end
-
     end
 
     #returns a hash where key = producer id and value is a hash with keys/values for subtotevalue and subtotecommission.
@@ -83,7 +90,7 @@ class BulkPurchase < ActiveRecord::Base
         sub_tote = purchase_receivable.get_sub_tote(producer_id)        
         sub_tote_value = total_cost_of_tote_items(sub_tote)                
         sub_tote_commission_factor = get_commission_factor(sub_tote)
-        sub_tote_value_by_payment_sequenced_producer_id[producer_id] = { sub_tote_value: sub_tote_value, sub_tote_commission_factor: sub_tote_commission_factor }
+        sub_tote_value_by_payment_sequenced_producer_id[producer_id] = { sub_tote: sub_tote, sub_tote_value: sub_tote_value, sub_tote_commission_factor: sub_tote_commission_factor }
       end
 
       return sub_tote_value_by_payment_sequenced_producer_id
@@ -109,35 +116,5 @@ class BulkPurchase < ActiveRecord::Base
 
       return producer_id_payment_order
 
-    end
-
-    def create_payment_payable(purchase)
-      if response.success?
-        previously_paid = amount_paid
-        update(amount_paid: gross_amount + previously_paid)
-
-        net_reduction_factor = 1.0 - (net_amount / gross_amount)
-        #for each tote_item:
-          #1) change toteitems' states to PURCHASED
-          #2) create a new PaymentPayable record
-        tote_items.each do |tote_item|
-          tote_item.update(status: ToteItem.states[:PURCHASED])
-          tote_item_purchase_amount = tote_item.quantity * tote_item.price
-          net_after_payment_fees = tote_item_purchase_amount * net_reduction_factor
-          product_id = tote_item.posting.product_id
-          producer_id = tote_item.posting.user_id
-          #farmers_cellar_commission_factor = tote_item.posting.product.producer_product_commissions.where(product_id: product_id, user_id: producer_id).last
-          #farmers_cellar_commission = farmers_cellar_commission_factor * net_after_payment_fees
-          #producer_sales = net_after_payment_fees - @farmers_cellar_commission
-          #TODO: record farmers_cellar_commission in FC master sales table
-          #tote_item.payment_payables.create(amount: producer_sales, amount_paid: 0)
-          #payment_payable = tote_item.payment_payables.last
-          #payment_payable.users << User.find(producer_id)
-          #payment_payable.save
-        end                    
-      else    
-        #TODO: this is the scenario where a purchase dind't work out. we probably need to record this in the db also, probably right here in the purchases table? we'll also need to somehow notify the customer and the admin that payment failed
-        #and that their account is now on hold
-      end        
     end
 end

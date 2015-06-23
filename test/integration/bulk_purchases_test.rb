@@ -52,7 +52,8 @@ class BulkPurchasesTest < BulkBuyer
       purchase_receivables << pr.id
     end
 
-    post bulk_purchases_path, purchase_receivables: purchase_receivables    
+    assert_equal 0, PaymentPayable.count
+    post bulk_purchases_path, purchase_receivables: purchase_receivables
     assert :success
     assert_template 'bulk_purchases/create'
     purchase_receivables = assigns(:purchase_receivables)
@@ -88,6 +89,19 @@ class BulkPurchasesTest < BulkBuyer
       puts "purchase.gross_amount: #{purchase.gross_amount}"
       puts "purchase.fee_amount: #{purchase.fee_amount}"
       puts "purchase.net_amount: #{purchase.net_amount}"      
+    end
+
+    assert PaymentPayable.count > 0
+
+    puts "-------------------PaymentPayable---------------"
+
+    for payment_payable in PaymentPayable.all
+      puts "id: #{payment_payable.id}, amount: #{payment_payable.amount}, amount_paid: #{payment_payable.amount_paid}, producer: #{payment_payable.users.last.name}"
+
+      for tote_item in payment_payable.tote_items
+        puts "     #{tote_item.posting.product.name}, amount: #{tote_item.quantity * tote_item.price}"
+      end
+
     end
 
   end
