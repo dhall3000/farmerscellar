@@ -1,6 +1,15 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-#Apples
+#postingf1apples: 2.75
+#postingf1asparagus: 3.25
+#postingf2milk: 2.00
+#postingf2beef: 3.75
+#postingf3carrots: 2.25
+#postingf3chicken: 1.50
+#postingf4oranges: 1.25
+#postingf4celery: 2.50
+
+#---------------------------------C1-------------------------------
 c1apple:
   quantity: 3
   price: 2.75
@@ -8,29 +17,13 @@ c1apple:
   user: c1
   posting: postingf1apples
 
-c2apple:
+c1asparagus:
   quantity: 5
-  price: 2.75
+  price: 3.25
   status: <%= ToteItem.states[:ADDED] %>
-  user: c2
-  posting: postingf1apples
+  user: c1
+  posting: postingf1asparagus
 
-c3apple:
-  quantity: 2
-  price: 2.75
-  status: <%= ToteItem.states[:ADDED] %>
-  user: c3
-  posting: postingf1apples
-
-c4apple:
-  quantity: 1
-  price: 2.75
-  status: <%= ToteItem.states[:ADDED] %>
-  user: c4
-  posting: postingf1apples
-
-#Milk
-#ToteItem.create(quantity: 1, price: 2.00, status: ToteItem.states[:ADDED], user_id: 1, posting_id: 3)
 c1milk:
   quantity: 1
   price: 2.00
@@ -38,32 +31,20 @@ c1milk:
   user: c1
   posting: postingf2milk
 
-#ToteItem.create(quantity: 4, price: 2.00, status: ToteItem.states[:ADDED], user_id: 2, posting_id: 3)
-c2milk:
-  quantity: 1
-  price: 2.00
+c1beef:
+  quantity: 10
+  price: 3.75
   status: <%= ToteItem.states[:ADDED] %>
-  user: c2
-  posting: postingf2milk
+  user: c1
+  posting: postingf2beef
 
-#ToteItem.create(quantity: 2, price: 2.00, status: ToteItem.states[:ADDED], user_id: 3, posting_id: 3)
-c3milk:
-  quantity: 1
-  price: 2.00
+c1carrots:
+  quantity: 10
+  price: 2.25
   status: <%= ToteItem.states[:ADDED] %>
-  user: c3
-  posting: postingf2milk
+  user: c1
+  posting: postingf3carrots
 
-#ToteItem.create(quantity: 3, price: 2.00, status: ToteItem.states[:ADDED], user_id: 4, posting_id: 3)
-c4milk:
-  quantity: 1
-  price: 2.00
-  status: <%= ToteItem.states[:ADDED] %>
-  user: c4
-  posting: postingf2milk
-
-#Chicken
-#ToteItem.create(quantity: 7, price: 1.50, status: ToteItem.states[:ADDED], user_id: 1, posting_id: 6)
 c1chicken:
   quantity: 7
   price: 1.50
@@ -71,32 +52,13 @@ c1chicken:
   user: c1
   posting: postingf3chicken
 
-#ToteItem.create(quantity: 2, price: 1.50, status: ToteItem.states[:ADDED], user_id: 2, posting_id: 6)
-c2chicken:
-  quantity: 2
-  price: 1.50
+c1oranges:
+  quantity: 30
+  price: 1.25
   status: <%= ToteItem.states[:ADDED] %>
-  user: c2
-  posting: postingf3chicken
+  user: c1
+  posting: postingf4oranges
 
-#ToteItem.create(quantity: 1, price: 1.50, status: ToteItem.states[:ADDED], user_id: 3, posting_id: 6)
-c3chicken:
-  quantity: 1
-  price: 1.50
-  status: <%= ToteItem.states[:ADDED] %>
-  user: c3
-  posting: postingf3chicken
-
-#ToteItem.create(quantity: 4, price: 1.50, status: ToteItem.states[:ADDED], user_id: 4, posting_id: 6)
-c4chicken:
-  quantity: 4
-  price: 1.50
-  status: <%= ToteItem.states[:ADDED] %>
-  user: c4
-  posting: postingf3chicken
-
-#Celery
-#ToteItem.create(quantity: 3, price: 2.50, status: ToteItem.states[:ADDED], user_id: 1, posting_id: 8)
 c1celery:
   quantity: 3
   price: 2.50
@@ -104,25 +66,178 @@ c1celery:
   user: c1
   posting: postingf4celery
 
-#ToteItem.create(quantity: 1, price: 2.50, status: ToteItem.states[:ADDED], user_id: 2, posting_id: 8)
-c2celery:
+
+#---------------------------------C2-------------------------------
+
+
+c2apple:
+  quantity: 2
+  price: 2.75
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c2
+  posting: postingf1apples
+
+c2asparagus:
+  quantity: 7
+  price: 3.25
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c2
+  posting: postingf1asparagus
+
+c2milk:
+  quantity: 3
+  price: 2.00
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c2
+  posting: postingf2milk
+
+c2beef:
+  quantity: 4
+  price: 3.75
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c2
+  posting: postingf2beef
+
+c2carrots:
+  quantity: 10
+  price: 2.25
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c2
+  posting: postingf3carrots
+
+c2chicken:
+  quantity: 2
+  price: 1.50
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c2
+  posting: postingf3chicken
+
+c2oranges:
   quantity: 1
+  price: 1.25
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c2
+  posting: postingf4oranges
+
+c2celery:
+  quantity: 6
   price: 2.50
   status: <%= ToteItem.states[:ADDED] %>
   user: c2
   posting: postingf4celery
 
-#ToteItem.create(quantity: 5, price: 2.50, status: ToteItem.states[:ADDED], user_id: 3, posting_id: 8)
-c3celery:
+#---------------------------------C3-------------------------------
+
+c3apple:
   quantity: 5
+  price: 2.75
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c3
+  posting: postingf1apples
+
+c3asparagus:
+  quantity: 2
+  price: 3.25
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c3
+  posting: postingf1asparagus
+
+c3milk:
+  quantity: 7
+  price: 2.00
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c3
+  posting: postingf2milk
+
+c3beef:
+  quantity: 8
+  price: 3.75
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c3
+  posting: postingf2beef
+
+c3carrots:
+  quantity: 3
+  price: 2.25
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c3
+  posting: postingf3carrots
+
+c3chicken:
+  quantity: 3
+  price: 1.50
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c3
+  posting: postingf3chicken
+
+c3oranges:
+  quantity: 2
+  price: 1.25
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c3
+  posting: postingf4oranges
+
+c3celery:
+  quantity: 9
   price: 2.50
   status: <%= ToteItem.states[:ADDED] %>
   user: c3
   posting: postingf4celery
 
-#ToteItem.create(quantity: 2, price: 2.50, status: ToteItem.states[:ADDED], user_id: 4, posting_id: 8)
-c4celery:
+
+#---------------------------------C4-------------------------------
+
+c4apple:
+  quantity: 4
+  price: 2.75
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c4
+  posting: postingf1apples
+
+c4asparagus:
+  quantity: 3
+  price: 3.25
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c4
+  posting: postingf1asparagus
+
+c4milk:
+  quantity: 5
+  price: 2.00
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c4
+  posting: postingf2milk
+
+c4beef:
   quantity: 2
+  price: 3.75
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c4
+  posting: postingf2beef
+
+c4carrots:
+  quantity: 6
+  price: 2.25
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c4
+  posting: postingf3carrots
+
+c4chicken:
+  quantity: 1
+  price: 1.50
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c4
+  posting: postingf3chicken
+
+c4oranges:
+  quantity: 7
+  price: 1.25
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c4
+  posting: postingf4oranges
+
+c4celery:
+  quantity: 8
   price: 2.50
   status: <%= ToteItem.states[:ADDED] %>
   user: c4
