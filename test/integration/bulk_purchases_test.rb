@@ -37,6 +37,12 @@ class BulkPurchasesTest < BulkBuyer
       assert purchase_receivable.tote_items.count > 0
 
       puts "purchase_receivable.tote_items.count: #{purchase_receivable.tote_items.count}"
+
+      #the filled tote items should all be marked as PURCHASED by now even though technically they
+      #haven't been paid for yet by the customer
+      for tote_item in purchase_receivable.tote_items
+        assert_equal tote_item.status, ToteItem.states[:PURCHASED]
+      end
     end
     
     purchase_receivables = []
