@@ -15,12 +15,12 @@ class BulkPurchase < ActiveRecord::Base
 
   def go
   	if purchase_receivables && purchase_receivables.any?
+
   	  for purchase_receivable in purchase_receivables                
         purchase = purchase_receivable.purchase
         
         sub_tote_value_by_payment_sequenced_producer_id = get_sub_tote_value_by_payment_sequenced_producer_id(purchase_receivable)
 
-        
         #producers_ids = purchase_receivable.get_producer_ids
         #sub_totes = 
         #create_payment_payable(purchase)
@@ -42,8 +42,8 @@ class BulkPurchase < ActiveRecord::Base
       producer_id_payment_order.each do |producer_id|
         sub_tote = purchase_receivable.get_sub_tote(producer_id)        
         sub_tote_value = total_cost_of_tote_items(sub_tote)                
-        sub_tote_commission = get_commission(sub_tote)
-        sub_tote_value_by_payment_sequenced_producer_id[producer_id] = { sub_tote_value: sub_tote_value, sub_tote_commission: sub_tote_commission }
+        sub_tote_commission_factor = get_commission_factor(sub_tote)
+        sub_tote_value_by_payment_sequenced_producer_id[producer_id] = { sub_tote_value: sub_tote_value, sub_tote_commission_factor: sub_tote_commission_factor }
       end
 
       return sub_tote_value_by_payment_sequenced_producer_id

@@ -58,4 +58,16 @@ module ToteItemsHelper
     return total_commission
 
   end
+
+  #the intent here is for you to be able to hand a whole collection of tote_items and get the total commission for all items
+  def get_commission_factor(tote_items)
+    
+    value = total_cost_of_tote_items(tote_items)
+    commission = get_commission(tote_items)
+
+    commission_factor = commission / value
+
+    return commission_factor
+
+  end
 end
