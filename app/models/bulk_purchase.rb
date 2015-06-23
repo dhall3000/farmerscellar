@@ -20,6 +20,7 @@ class BulkPurchase < ActiveRecord::Base
         purchase = purchase_receivable.purchase
         
         sub_tote_value_by_payment_sequenced_producer_id = get_sub_tote_value_by_payment_sequenced_producer_id(purchase_receivable)
+        create_payment_payables(purchase_receivable, purchase, sub_tote_value_by_payment_sequenced_producer_id)
 
         #producers_ids = purchase_receivable.get_producer_ids
         #sub_totes = 
@@ -30,6 +31,45 @@ class BulkPurchase < ActiveRecord::Base
   end
 
   private
+
+    def create_payment_payables(purchase_receivable, purchase, sub_tote_value_by_payment_sequenced_producer_id)
+
+      #amount_paid_prior_to_this_purchase
+
+      amount_already_paid = purchase_receivable.amount_paid - purchase.gross_amount
+      gross_amount_payable = purchase.gross_amount
+      cutoff_amount = 0
+
+      sub_tote_value_by_payment_sequenced_producer_id.each do |producer_id, value|
+
+        if gross_amount_payable <= 0
+          next
+        end
+
+        cutoff_amount += value[:sub_tote_value]
+        if amount_already_paid > cutoff_amount
+          next
+        end
+
+        amount_remaining_to_pay_to_this_producer = cutoff_amount - amount_already_paid
+        gross_amount_payable_to_this_producer = [gross_amount_payable, amount_remaining_to_pay_to_this_producer].min
+        amount_already_paid += gross_amount_payable_to_this_producer
+        gross_amount_payable -= gross_amount_payable_to_this_producer
+
+        payment_processor_effective_fee_factor = purchase.fee_amount / purchase.gross_amount
+        payment_processor_fee = gross_amount_payable_to_this_producer * payment_processor_effective_fee_factor
+        net_after_payment_processor_fee = gross_amount_payable_to_this_producer - payment_processor_fee
+        commission = net_after_payment_processor_fee * value[:sub_tote_commission_factor]
+        net_after_commission = net_after_payment_processor_fee - commission
+
+        #TODO: tote_item.update(status: ToteItem.states[:PURCHASED])
+
+        #net_towards_producer_after_payments_fees = gross_amount_payable_to_this_producer * (1.0 - payment_processor_effective_fee_factor)
+        #net_towards_producer_after_commission = net_towards_producer_after_payments_fees * (1.0 - value.sub_tote_commission_factor)
+
+      end
+
+    end
 
     #returns a hash where key = producer id and value is a hash with keys/values for subtotevalue and subtotecommission.
     #this is a nominal commission, by the way
