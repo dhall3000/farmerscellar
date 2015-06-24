@@ -91,18 +91,30 @@ class BulkPurchasesTest < BulkBuyer
       puts "purchase.net_amount: #{purchase.net_amount}"      
     end
 
+    puts "BulkPurchase -> total_gross: #{bulk_purchase.total_gross}, total_fee: #{bulk_purchase.total_fee}, total_commission: #{bulk_purchase.total_commission}, total_net: #{bulk_purchase.total_net}"
+    puts "BulkBuy amount: #{purchase_receivables.last.bulk_buys.last.amount}"
+    assert_equal purchase_receivables.last.bulk_buys.last.amount, bulk_purchase.total_gross
+    assert_equal bulk_purchase.total_gross, bulk_purchase.total_fee + bulk_purchase.total_commission + bulk_purchase.total_net
+    assert bulk_purchase.total_gross > 0
+    assert bulk_purchase.total_fee > 0
+    assert bulk_purchase.total_commission > 0
+    assert bulk_purchase.total_net > 0
+    assert bulk_purchase.total_gross > bulk_purchase.total_net
+    assert bulk_purchase.total_net > bulk_purchase.total_commission
+    assert bulk_purchase.total_commission > bulk_purchase.total_fee
+
     assert PaymentPayable.count > 0
 
-    puts "-------------------PaymentPayable---------------"
+    #puts "-------------------PaymentPayable---------------"
 
-    for payment_payable in PaymentPayable.all
-      puts "id: #{payment_payable.id}, amount: #{payment_payable.amount}, amount_paid: #{payment_payable.amount_paid}, producer: #{payment_payable.users.last.name}"
+    #for payment_payable in PaymentPayable.all
+    #  puts "id: #{payment_payable.id}, amount: #{payment_payable.amount}, amount_paid: #{payment_payable.amount_paid}, producer: #{payment_payable.users.last.name}"
 
-      for tote_item in payment_payable.tote_items
-        puts "     #{tote_item.posting.product.name}, amount: #{tote_item.quantity * tote_item.price}"
-      end
+    #  for tote_item in payment_payable.tote_items
+    #    puts "     #{tote_item.posting.product.name}, amount: #{tote_item.quantity * tote_item.price}"
+    #  end
 
-    end
+    #end
 
   end
 end

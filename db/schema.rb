@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150619183718) do
+ActiveRecord::Schema.define(version: 20150623234504) do
 
   create_table "account_states", force: :cascade do |t|
     t.integer  "state"
@@ -83,8 +83,12 @@ ActiveRecord::Schema.define(version: 20150619183718) do
   add_index "bulk_purchase_receivables", ["purchase_receivable_id"], name: "index_bulk_purchase_receivables_on_purchase_receivable_id"
 
   create_table "bulk_purchases", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+    t.float    "total_gross"
+    t.float    "total_fee"
+    t.float    "total_commission"
+    t.float    "total_net"
   end
 
   create_table "checkout_authorizations", id: false, force: :cascade do |t|

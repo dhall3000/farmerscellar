@@ -19,9 +19,13 @@ class BulkPurchase < ActiveRecord::Base
   	  for purchase_receivable in purchase_receivables                
         purchase = purchase_receivable.purchase
 
-        #TODO: here we should probably check for purchase.response.success? and do something smart including notifying user there
-        #was a payments problem
-        
+        if purchase.response.success?
+          #TODO: here we should probably check for purchase.response.success? and do something smart including notifying user there
+          #was a payments problem
+        end
+
+        self.total_gross += purchase.gross_amount
+
         sub_tote_value_by_payment_sequenced_producer_id = get_sub_tote_value_by_payment_sequenced_producer_id(purchase_receivable)
         create_payment_payables(purchase_receivable, purchase, sub_tote_value_by_payment_sequenced_producer_id)
 
@@ -35,9 +39,7 @@ class BulkPurchase < ActiveRecord::Base
 
   private
 
-    def create_payment_payables(purchase_receivable, purchase, sub_tote_value_by_payment_sequenced_producer_id)
-
-      #amount_paid_prior_to_this_purchase
+    def create_payment_payables(purchase_receivable, purchase, sub_tote_value_by_payment_sequenced_producer_id)      
 
       amount_already_paid = purchase_receivable.amount_paid - purchase.gross_amount
       gross_amount_payable = purchase.gross_amount
@@ -64,6 +66,10 @@ class BulkPurchase < ActiveRecord::Base
         net_after_payment_processor_fee = gross_amount_payable_to_this_producer - payment_processor_fee
         commission = net_after_payment_processor_fee * value[:sub_tote_commission_factor]
         net_after_commission = net_after_payment_processor_fee - commission
+
+        self.total_fee += payment_processor_fee
+        self.total_commission += commission
+        self.total_net += net_after_commission
 
         payment_payable = PaymentPayable.new(amount: net_after_commission, amount_paid: 0)
         producer = User.find(producer_id)

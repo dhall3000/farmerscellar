@@ -18,10 +18,10 @@ f2milk:
   commission: 0.10
   user: f2
 
-#f2.producer_product_commissions.create(product: beef, commission: 0.03)
+#f2.producer_product_commissions.create(product: beef, commission: 0.045)
 f2beef:
   product: beef
-  commission: 0.03
+  commission: 0.045
   user: f2
 
 #f3.producer_product_commissions.create(product: carrots, commission: 0.04)
