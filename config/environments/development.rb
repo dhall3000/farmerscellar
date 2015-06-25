@@ -45,13 +45,22 @@ Rails.application.configure do
   config.action_mailer.default_url_options = { host: host }
 
   config.after_initialize do
-    ActiveMerchant::Billing::Base.mode = :test
+    ::PAYPALCREDENTIALS =
+    {
+      "USER" => "davideltonhall-facilitator_api1.gmail.com",
+      "PWD" => "2U4THLGZVCG6BSHH",
+      "SIGNATURE" => "An5ns1Kso7MWUdW4ErQKJJJ4qi4-A-.uIGKotw7d0j4apBMju1cKS2pZ"
+    }
+
+    ActiveMerchant::Billing::Base.mode = :test    
     ::GATEWAY = ActiveMerchant::Billing::PaypalExpressGateway.new(
-      login: "davideltonhall-facilitator_api1.gmail.com",
-      password: "2U4THLGZVCG6BSHH",
-      signature: "An5ns1Kso7MWUdW4ErQKJJJ4qi4-A-.uIGKotw7d0j4apBMju1cKS2pZ"
+      login: PAYPALCREDENTIALS["USER"],
+      password: PAYPALCREDENTIALS["PWD"],
+      signature: PAYPALCREDENTIALS["SIGNATURE"]
       )
+    
     ::USEGATEWAY = false
+
   end
 
 end

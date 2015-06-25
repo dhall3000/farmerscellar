@@ -119,10 +119,26 @@ class BulkPurchasesTest < BulkBuyer
     assert_not_nil payment_info_by_producer_id
     puts "payment_info_by_producer_id: #{payment_info_by_producer_id}"    
 
+    puts "number of bulk payments in the database: #{BulkPayment.count}"
+    puts "number of payments in the database: #{Payment.count}"
     post bulk_payments_path, payment_info_by_producer_id: payment_info_by_producer_id
+    puts "number of bulk payments in the database: #{BulkPayment.count}"
+    puts "BulkPayment.first.num_payees: #{BulkPayment.first.num_payees}"
+    puts "BulkPayment.first.total_payments_amount: #{BulkPayment.first.total_payments_amount}"
+
+    puts "number of payments in the database: #{Payment.count}"
+
+    Payment.all.each do |payment|
+      puts "payment id: #{payment.id}, payment amount: #{payment.amount}"
+    end
 
     puts assigns(:num_payees)
     puts assigns(:cumulative_total_payout)   
+
+
+
+
+
 
     #puts "-------------------PaymentPayable---------------"
 
