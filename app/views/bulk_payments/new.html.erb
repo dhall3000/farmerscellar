@@ -55,5 +55,6 @@
 
 <%= form_tag bulk_payments_path do %>
   <%= hidden_field_tag :total_payout_amount_by_producer_id, @total_payout_amount_by_producer_id %>
+  <%= hidden_field_tag :unpaid_payment_payable_ids, @unpaid_payment_payable_ids %>
   <%= submit_tag "do bulk payment" %>
 <% end %>

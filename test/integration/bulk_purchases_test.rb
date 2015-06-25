@@ -117,6 +117,13 @@ class BulkPurchasesTest < BulkBuyer
     total_payout_amount_by_producer_id = assigns(:total_payout_amount_by_producer_id)    
     assert_not_nil total_payout_amount_by_producer_id
     puts "total_payout_amount_by_producer_id: #{total_payout_amount_by_producer_id}"
+    assert_not_nil assigns(:unpaid_payment_payable_ids)
+    post bulk_payments_path, total_payout_amount_by_producer_id: total_payout_amount_by_producer_id
+
+    puts assigns(:num_payees)
+    puts assigns(:cumulative_total_payout)
+    
+
 
     #puts "-------------------PaymentPayable---------------"
 
