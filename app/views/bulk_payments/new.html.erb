@@ -36,13 +36,13 @@
         <th>Total Payout</th>>
       </tr>
     </thead>
-    <tbody>
-      <% @total_payout_amount_by_producer_id.each do |producer_id, total_payout_amount| %>
+    <tbody>    
+      <% @payment_info_by_producer_id.each do |producer_id, payment_info| %>
       <% producer = User.find(producer_id) %>
         <tr>
           <td><%= producer.farm_name %></td>
           <td><%= producer.email %></td>          
-          <td><%= total_payout_amount %></td>
+          <td><%= payment_info[:amount] %></td>
         </tr>
       <% end %>
     </tbody>
@@ -54,7 +54,6 @@
 <% end %>
 
 <%= form_tag bulk_payments_path do %>
-  <%= hidden_field_tag :total_payout_amount_by_producer_id, @total_payout_amount_by_producer_id %>
-  <%= hidden_field_tag :unpaid_payment_payable_ids, @unpaid_payment_payable_ids %>
+  <%= hidden_field_tag :payment_info_by_producer_id, @payment_info_by_producer_id %>
   <%= submit_tag "do bulk payment" %>
 <% end %>

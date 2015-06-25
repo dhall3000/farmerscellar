@@ -3,30 +3,28 @@ class BulkPaymentsController < ApplicationController
   	@unpaid_payment_payables = PaymentPayable.where(:amount_paid < :amount)
   	@grand_total_payout = 0
 
-  	@total_payout_amount_by_producer_id = {}
-  	@unpaid_payment_payable_ids = []
+  	@payment_info_by_producer_id = {}
 
   	@unpaid_payment_payables.each do |p|
-  	  @unpaid_payment_payable_ids << p.id
   	  producer = p.users.last
-  	  if @total_payout_amount_by_producer_id[producer.id] == nil
-  	  	@total_payout_amount_by_producer_id[producer.id] = 0  	    	  	
+  	  if @payment_info_by_producer_id[producer.id] == nil
+  	  	@payment_info_by_producer_id[producer.id] = {amount: 0, payment_payable_ids: []}
   	  end
   	  amount_unpaid_on_this_payment_payable = p.amount - p.amount_paid
-  	  @total_payout_amount_by_producer_id[producer.id] += amount_unpaid_on_this_payment_payable
+  	  @payment_info_by_producer_id[producer.id][:amount] += amount_unpaid_on_this_payment_payable
+  	  @payment_info_by_producer_id[producer.id][:payment_payable_ids] << p.id
   	  @grand_total_payout += amount_unpaid_on_this_payment_payable
   	end
 
   end
 
   def create
-  	total_payout_amount_by_producer_id = params[:total_payout_amount_by_producer_id]
-  	unpaid_payment_payable_ids = params[:unpaid_payment_payable_ids]
+  	@payment_info_by_producer_id = params[:payment_info_by_producer_id]  	
 
-  	@num_payees = total_payout_amount_by_producer_id.keys.count
+  	@num_payees = @payment_info_by_producer_id.keys.count
   	@cumulative_total_payout = 0
-  	total_payout_amount_by_producer_id.each do |producer_id, total_payout_amount|
-  	  @cumulative_total_payout += total_payout_amount.to_f
-  	end
+  	@payment_info_by_producer_id.each do |producer_id, payment_info|
+  	  @cumulative_total_payout += payment_info[:amount].to_f
+  	end  	
   end
 end
