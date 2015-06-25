@@ -105,6 +105,19 @@ class BulkPurchasesTest < BulkBuyer
 
     assert PaymentPayable.count > 0
 
+    puts "PaymentPayable.count = #{PaymentPayable.count}"
+    puts "unpaid PaymentPayable.count = #{PaymentPayable.where(:amount_paid < :amount).count}"
+
+    get new_bulk_payment_path
+    assert :success
+    unpaid_payment_payables = assigns(:unpaid_payment_payables)
+    assert_not_nil unpaid_payment_payables
+    grand_total_payout = assigns(:grand_total_payout)
+    puts grand_total_payout
+    total_payout_amount_by_producer_id = assigns(:total_payout_amount_by_producer_id)    
+    assert_not_nil total_payout_amount_by_producer_id
+    puts "total_payout_amount_by_producer_id: #{total_payout_amount_by_producer_id}"
+
     #puts "-------------------PaymentPayable---------------"
 
     #for payment_payable in PaymentPayable.all

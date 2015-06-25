@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150623234504) do
+ActiveRecord::Schema.define(version: 20150624212739) do
 
   create_table "account_states", force: :cascade do |t|
     t.integer  "state"
@@ -72,6 +72,23 @@ ActiveRecord::Schema.define(version: 20150623234504) do
     t.float    "amount"
   end
 
+  create_table "bulk_payment_payables", force: :cascade do |t|
+    t.integer  "payment_payable_id"
+    t.integer  "bulk_payment_id"
+    t.datetime "created_at",         null: false
+    t.datetime "updated_at",         null: false
+  end
+
+  add_index "bulk_payment_payables", ["bulk_payment_id"], name: "index_bulk_payment_payables_on_bulk_payment_id"
+  add_index "bulk_payment_payables", ["payment_payable_id"], name: "index_bulk_payment_payables_on_payment_payable_id"
+
+  create_table "bulk_payments", force: :cascade do |t|
+    t.integer  "num_payees"
+    t.float    "total_payments_amount"
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
+  end
+
   create_table "bulk_purchase_receivables", id: false, force: :cascade do |t|
     t.integer  "purchase_receivable_id"
     t.integer  "bulk_purchase_id"
@@ -112,6 +129,16 @@ ActiveRecord::Schema.define(version: 20150623234504) do
 
   add_index "checkouts", ["token"], name: "index_checkouts_on_token"
 
+  create_table "payment_payable_payments", force: :cascade do |t|
+    t.integer  "payment_payable_id"
+    t.integer  "payment_id"
+    t.datetime "created_at",         null: false
+    t.datetime "updated_at",         null: false
+  end
+
+  add_index "payment_payable_payments", ["payment_id"], name: "index_payment_payable_payments_on_payment_id"
+  add_index "payment_payable_payments", ["payment_payable_id"], name: "index_payment_payable_payments_on_payment_payable_id"
+
   create_table "payment_payable_tote_items", id: false, force: :cascade do |t|
     t.integer  "tote_item_id"
     t.integer  "payment_payable_id"
@@ -127,6 +154,13 @@ ActiveRecord::Schema.define(version: 20150623234504) do
     t.float    "amount_paid"
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
+  end
+
+  create_table "payments", force: :cascade do |t|
+    t.string   "email"
+    t.float    "amount"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "postings", force: :cascade do |t|

@@ -19,7 +19,8 @@ Rails.application.routes.draw do
   resources :bulk_buys, only: [:new, :create]
   resources :checkouts, only: [:create]
   resources :bulk_purchases, only: [:new, :create]
-      
+  resources :bulk_payments, only: [:new, :create]      
+  
 #  get 'static_pages/help'
 #  get 'static_pages/about'
 #  get 'static_pages/contact'

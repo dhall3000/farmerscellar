@@ -1,0 +1,59 @@
+<h1>BulkPayments#new</h1>
+<p>Find me in app/views/bulk_payments/new.html.erb</p>
+
+<% if @unpaid_payment_payables != nil && @unpaid_payment_payables.any? %>
+<p>ALL INDIVIDUAL PAYMENT PAYABLES</p>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Producer</th>
+        <th>Email</th>>        
+        <th>Amount</th>>
+        <th>Amount Paid</th>>        
+        <th>Amount Unpaid</th>>        
+      </tr>
+    </thead>
+    <tbody>
+      <% @unpaid_payment_payables.each do |unpaid_payment_payable| %>
+        <% producer = unpaid_payment_payable.users.last %>
+        <tr>
+          <td><%= producer.farm_name %></td>
+          <td><%= producer.email %></td>          
+          <td><%= unpaid_payment_payable.amount %></td>
+          <td><%= unpaid_payment_payable.amount_paid %></td>
+          <td><%= unpaid_payment_payable.amount - unpaid_payment_payable.amount_paid %></td>          
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+<p>ALL PAYMENT PAYABLES SUMMED BY PRODUCER</p>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Producer</th>
+        <th>Email</th>>        
+        <th>Total Payout</th>>
+      </tr>
+    </thead>
+    <tbody>
+      <% @total_payout_amount_by_producer_id.each do |producer_id, total_payout_amount| %>
+      <% producer = User.find(producer_id) %>
+        <tr>
+          <td><%= producer.farm_name %></td>
+          <td><%= producer.email %></td>          
+          <td><%= total_payout_amount %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<% if @grand_total_payout > 0 %>
+<p>GRAND TOTAL PAYOUT: $<%= @grand_total_payout %></p>
+<% end %>
+
+<%= form_tag bulk_payments_path do %>
+  <%= hidden_field_tag :total_payout_amount_by_producer_id, @total_payout_amount_by_producer_id %>
+  <%= submit_tag "do bulk payment" %>
+<% end %>
