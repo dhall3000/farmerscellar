@@ -19,7 +19,7 @@
 		<%= f.label :unit_kind_id, "Units" %>
 		<%= f.grouped_collection_select :unit_kind_id, UnitCategory.order(:name), :unit_kinds, :name, :id, :name, { include_blank: true, prompt: true } %>
 
-		<%= f.label :quantity_available, "Number of Units for Sale" %>
+		<%= f.label :quantity_available, "Approximate Number of Units for Sale" %>
 		<%= f.number_field :quantity_available, min: 1, step: 1, class: 'form-control' %>
 
 		<%= f.label :price, "Price per Unit" %>
