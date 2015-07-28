@@ -1,34 +1,38 @@
+<h1>Shopping Tote Addition</h1>
 <% if params[:posting_id] != nil %>
   <% posting = Posting.find_by(id: params[:posting_id]) %>
   <% unit_kind = UnitKind.find_by(id: posting.unit_kind_id) %>
   <% if posting != nil %>
     <% producer = User.find_by(id: posting.user_id) %>
     <% provide(:title, producer.farm_name) %>
-    <p>Producer: <%= producer.farm_name %></p>
-    <p>Product: <%= Product.find_by(id: posting.product_id).name %></p>
-    <p>Description: <%= posting.description %></p>
-    <p>Units: <%= unit_kind.name %></p>
-    <p>Price per Unit: <%= posting.price %></p>    
-  <% end %>  
+
+    <div class="row">      
+      <div class="productInfo col-md-4">
+        <ul>
+          <li>Producer: <%= producer.farm_name %></li>        
+          <li>Product: <%= Product.find_by(id: posting.product_id).name %></li>
+          <li>Description: TODO...</li>
+          <li>Units: <%= unit_kind.name %></li>
+          <li>Price per Unit: <%= posting.price %></li>
+          <% #TODO: price above here needs to be properly formatted %>
+        </ul>
+      </div>       
+      <div class="col-md-2 col-md-offset-1">
+        <% disabled = current_user.account_states.last.state != AccountState.states[:OK] %>    
+        <%= form_for @tote_item do |f| %>
+          <%= f.label :quantity, "Quantity to add" %>
+          <%= f.number_field :quantity, class: "form-control" %>
+          <%= f.number_field :price, value: posting.price, hidden: true %>
+          <%= f.number_field :status, value: ToteItem.states[:ADDED], hidden: true %>
+          <%= f.number_field :posting_id, value: posting.id, hidden: true %>
+          <%= f.number_field :user_id, value: current_user.id, hidden: true %>
+
+          <%= f.submit "Add to shopping tote", class: "btn btn-primary", disabled: disabled %>
+          <% if disabled %>
+            <%= "your account is on hold, most likely due to a positive balance on your account. please pay your balance before continuing shopping." %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
 <% end %>
-
-<div class="row">
-  <div class="col-md-2 col-md-offset-5">
-    <% disabled = current_user.account_states.last.state != AccountState.states[:OK] %>    
-    <%= form_for @tote_item do |f| %>
-
-      <%= f.label :quantity %>
-      <%= f.number_field :quantity, class: "form-control" %>
-
-      <%= f.number_field :price, value: posting.price, hidden: true %>
-      <%= f.number_field :status, value: ToteItem.states[:ADDED], hidden: true %>
-      <%= f.number_field :posting_id, value: posting.id, hidden: true %>
-      <%= f.number_field :user_id, value: current_user.id, hidden: true %>
-
-      <%= f.submit "Add to shopping tote", class: "btn btn-primary", disabled: disabled %>
-      <% if disabled %>
-        <%= "your account is on hold, most likely due to a positive balance on your account. please pay your balance before continuing shopping." %>
-      <% end %>
-    <% end %>
-  </div>
-</div>
