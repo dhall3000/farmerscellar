@@ -1,8 +1,7 @@
 <% provide(:title, 'Postings') %>
 
 <h1>Postings</h1>
-
-<% if @postings != nil && @postings.any? %>
+<% if @postings != nil && @postings.any? %>  
   <table class="table">
     <thead>
       <tr>
@@ -22,7 +21,7 @@
         <tr>
           <td><%= User.find_by(id: posting.user_id).farm_name %></td>
           <td><%= Product.find_by(id: posting.product_id).name %></td>
-          <td>TODO: display via javascript</td>
+          <td><button type="button" class="btn btn-primary" data-container="body" data-toggle="popover" data-placement="right" data-content="<%= posting.description %>">See description</button></td> 
           <td><%= posting.price %></td>
           <td><%= UnitKind.find_by(id: posting.unit_kind_id).name %></td>
           <td><%= link_to "view", new_tote_item_path(posting_id: posting.id) %></td>
@@ -32,9 +31,15 @@
         </tr>
       <% end %>
     </tbody>
-  </table>
+  </table>  
 <% end %>
 
 <% if false %>
 <th><%= link_to "Go!", 'tote_items/next', posting_id: posting.id %></th>
 <% end %>
+
+<script>
+
+$(function(){ $('.btn').popover(); });
+
+</script>
