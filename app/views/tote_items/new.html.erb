@@ -6,16 +6,35 @@
     <% producer = User.find_by(id: posting.user_id) %>
     <% provide(:title, producer.farm_name) %>
 
+  <table class="table">
+    <thead>
+      <tr>
+        <th class="text-center">Producer</th>
+        <th class="text-center">Product</th>
+        <th class="text-center">Price</th>   
+        <th class="text-center">Unit</th>        
+      </tr>
+    </thead>
+    <tbody>
+        <% farmInfo = "Producer has not provided info about their operation" %>
+        <% if posting.user.description != nil %>
+          <% farmInfo = "<u>Producer Description</u><p>" + posting.user.description %>
+        <% end %>
+        <% if !posting.user.website.blank? %>
+          <% farmInfo = farmInfo + "<p>" + "<u>Producer Website</u><p><a href='" + posting.user.website + "' target='_blank'>" + posting.user.website + "</a>"%>
+        <% end %>
+
+        <tr>
+          <td><a tabindex="0" class="btn btn-primary btn-block" role="button" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=farmInfo%>"><%= User.find_by(id: posting.user_id).farm_name %></a></td>          
+          <td><a tabindex="0" class="btn btn-primary btn-block" role="button" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%= posting.description %>"><%= Product.find_by(id: posting.product_id).name %></a></td>
+          <td class="text-center"><%= posting.price %></td>
+          <td class="text-center"><%= UnitKind.find_by(id: posting.unit_kind_id).name %></td>          
+        </tr>      
+    </tbody>
+  </table>  
+
     <div class="row">      
-      <div class="productInfo col-md-4">
-        <ul>
-          <li>Producer: <%= producer.farm_name %></li>        
-          <li>Product: <%= Product.find_by(id: posting.product_id).name %></li>
-          <li>Description: TODO...</li>
-          <li>Units: <%= unit_kind.name %></li>
-          <li>Price per Unit: <%= posting.price %></li>
-          <% #TODO: price above here needs to be properly formatted %>
-        </ul>
+      <div class="productInfo col-md-4">        
       </div>       
       <div class="col-md-2 col-md-offset-1">
         <% disabled = current_user.account_states.last.state != AccountState.states[:OK] %>    
@@ -36,3 +55,7 @@
     </div>
   <% end %>
 <% end %>
+
+<script>
+$(function(){ $('.btn').popover(); });
+</script>
