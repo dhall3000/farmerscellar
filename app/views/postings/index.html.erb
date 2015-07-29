@@ -19,9 +19,9 @@
     <tbody>
       <% @postings.each do |posting| %>
         <tr>
-          <td><%= User.find_by(id: posting.user_id).farm_name %></td>
+          <td><a tabindex="0" class="btn btn-primary" role="button" data-toggle="popover" data-trigger="focus" data-content="<%=posting.user.description%>"><%= User.find_by(id: posting.user_id).farm_name %></a></td>
           <td><%= Product.find_by(id: posting.product_id).name %></td>
-          <td><button type="button" class="btn btn-primary" data-trigger="focus" data-container="body" data-toggle="popover" data-placement="right" data-content="<%= posting.description %>">See description</button></td> 
+          <td><a tabindex="0" class="btn btn-primary" role="button" data-toggle="popover" data-trigger="focus" data-content="<%= posting.description %>">See description</button></td> 
           <td><%= posting.price %></td>
           <td><%= UnitKind.find_by(id: posting.unit_kind_id).name %></td>
           <td><%= link_to "view", new_tote_item_path(posting_id: posting.id) %></td>
@@ -39,7 +39,5 @@
 <% end %>
 
 <script>
-
 $(function(){ $('.btn').popover(); });
-
 </script>
