@@ -17,9 +17,18 @@
     </thead>
     <tbody>
       <% @postings.each do |posting| %>
+
+        <% farmInfo = "Producer has not provided info about their operation" %>
+        <% if posting.user.description != nil %>
+          <% farmInfo = "<u>Producer Description</u><p>" + posting.user.description %>
+        <% end %>
+        <% if !posting.user.website.blank? %>
+          <% farmInfo = farmInfo + "<p>" + "<u>Producer Website</u><p><a href='" + posting.user.website + "' target='_blank'>" + posting.user.website + "</a>"%>
+        <% end %>
+
         <tr>
-          <td><a tabindex="0" class="btn btn-primary btn-block" role="button" data-toggle="popover" data-trigger="focus" data-content="<%=posting.user.description%>"><%= User.find_by(id: posting.user_id).farm_name %></a></td>          
-          <td><a tabindex="0" class="btn btn-primary btn-block" role="button" data-toggle="popover" data-trigger="focus" data-content="<%= posting.description %>"><%= Product.find_by(id: posting.product_id).name %></a></td>
+          <td><a tabindex="0" class="btn btn-primary btn-block" role="button" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=farmInfo%>"><%= User.find_by(id: posting.user_id).farm_name %></a></td>          
+          <td><a tabindex="0" class="btn btn-primary btn-block" role="button" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%= posting.description %>"><%= Product.find_by(id: posting.product_id).name %></a></td>
           <td class="text-center"><%= posting.price %></td>
           <td class="text-center"><%= UnitKind.find_by(id: posting.unit_kind_id).name %></td>
           <td class="text-center"><%= link_to "view", new_tote_item_path(posting_id: posting.id) %></td>
