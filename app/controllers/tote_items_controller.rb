@@ -57,6 +57,9 @@ class ToteItemsController < ApplicationController
   end
 
   def destroy
+    ToteItem.find(params[:id]).destroy
+    flash[:success] = "Shopping tote item deleted"
+    redirect_to tote_items_path
   end
 
   private

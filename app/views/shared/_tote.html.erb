@@ -20,7 +20,7 @@
           <td><%= number_to_currency(tote_item.price) %></td>
           <td><%= tote_item.quantity %></td>
           <td class="text-left"><%= number_to_currency(tote_item.price * tote_item.quantity) %></td>
-          <td><div class="text-center"><%= link_to "-", "#", class: "btn btn-primary" %></div></td>
+          <td><div class="text-center"><%= link_to "-", tote_item, class: "btn btn-primary", method: :delete %></div></td>
         </tr>        
       <% end %>
     </tbody>
