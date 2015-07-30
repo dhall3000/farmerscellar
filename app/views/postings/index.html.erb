@@ -29,7 +29,7 @@
         <tr>
           <td><a tabindex="0" class="btn btn-primary btn-block" role="button" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=farmInfo%>"><%= User.find_by(id: posting.user_id).farm_name %></a></td>          
           <td><a tabindex="0" class="btn btn-primary btn-block" role="button" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%= posting.description %>"><%= Product.find_by(id: posting.product_id).name %></a></td>
-          <td class="text-center"><%= posting.price %></td>
+          <td class="text-center"><%= number_to_currency(posting.price) %></td>
           <td class="text-center"><%= UnitKind.find_by(id: posting.unit_kind_id).name %></td>
           <td class="text-center"><%= link_to "view", new_tote_item_path(posting_id: posting.id) %></td>
           <% if current_user.account_type == User.types[:ADMIN] %>

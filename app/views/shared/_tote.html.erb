@@ -16,14 +16,14 @@
           <td><%= tote_item.posting.product.name %></td>
           <td><%= tote_item.posting.user.farm_name %></td>
           <td><%= link_to "view", new_tote_item_path(posting_id: tote_item.posting_id) %></td>
-          <td><%= tote_item.price %></td>
+          <td><%= number_to_currency(tote_item.price) %></td>
           <td><%= tote_item.quantity %></td>
-          <td><%= tote_item.price * tote_item.quantity %></td>
+          <td class="text-left"><%= number_to_currency(tote_item.price * tote_item.quantity) %></td>
         </tr>        
       <% end %>
     </tbody>
   </table>
   <div>
-    <p>TOTAL: $<%= total_cost_of_tote_items(tote_items) %></p>
+    <p><h3><strong>TOTAL: <%= number_to_currency(total_cost_of_tote_items(tote_items)) %></strong></h3></p>
   </div>
 <% end %>
