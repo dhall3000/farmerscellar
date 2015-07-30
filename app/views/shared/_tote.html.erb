@@ -7,7 +7,8 @@
         <th>Posting</th>        
         <th>Price per Unit</th>
         <th>Quantity</th>
-        <th>Cost</th>  
+        <th>Cost</th>
+        <th class="text-center">Remove from tote</th>
       </tr>
     </thead>
     <tbody>
@@ -19,6 +20,7 @@
           <td><%= number_to_currency(tote_item.price) %></td>
           <td><%= tote_item.quantity %></td>
           <td class="text-left"><%= number_to_currency(tote_item.price * tote_item.quantity) %></td>
+          <td><div class="text-center"><%= link_to "-", "#", class: "btn btn-primary" %></div></td>
         </tr>        
       <% end %>
     </tbody>
