@@ -31,8 +31,10 @@
         <%= f.text_field :address, class: 'form-control' %>       
 
         <% button_text = "Save changes" %>
+        <% save_button_disabled_state = false %>
 
-        <% if @user.agreement != 1 %>
+        <% if @user.agreement != true %>        
+          <% save_button_disabled_state = true %>
           <%= f.label :agreement, class: "checkbox inline" do %>
             <%= f.check_box :agreement %>
             <span>I agree to the Terms of Service</span>
@@ -41,7 +43,7 @@
         <% end %>
       <% end %>
 
-      <%= f.submit button_text, class: "btn btn-primary" %>
+      <%= f.submit button_text, id: "submit_button", class: "btn btn-primary", disabled: save_button_disabled_state %>
     <% end %>
 
     <div class="gravatar_edit">
@@ -50,3 +52,12 @@
     </div>
   </div>
 </div>
+
+<script>
+$(function(){
+    $("#user_agreement").change(function() {
+        if ($(this).is(':checked')) $("#submit_button").removeAttr("disabled");
+        else $("#submit_button").attr("disabled", true);
+    });
+});
+</script>

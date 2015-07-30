@@ -43,7 +43,7 @@ class UsersController < ApplicationController
     agreement = @user.agreement    
     if @user.update_attributes(user_params)
       flash_message = "Profile updated"      
-      if agreement != 1 and @user.agreement == "1"
+      if agreement != true and @user.agreement == true
         flash_message = "Request for approval received. A staff member will be in touch with you shortly!"
       end
       flash[:success] = flash_message

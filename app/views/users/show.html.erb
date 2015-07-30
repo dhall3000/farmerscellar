@@ -25,7 +25,7 @@
   </div>
 <% end %>
 
-  <% if @user.account_type == 1 and @user.agreement != 1 %>
+  <% if @user.account_type == 1 and @user.agreement != true %>
     <div class="row">
       <div class="col-md-2 col-md-offset-5">  
         <%= link_to "Request approval", edit_user_path, class: "btn btn-lg btn-primary" %>
