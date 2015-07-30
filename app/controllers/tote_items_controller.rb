@@ -17,7 +17,7 @@ class ToteItemsController < ApplicationController
     @tote_item = ToteItem.new(tote_item_params)
     if @tote_item.save
       flash[:success] = "item saved to your shopping tote!"
-      render 'index'
+      redirect_to tote_items_path
     else
       #flash[:failed] = "item not saved to your shopping tote :("
     end
