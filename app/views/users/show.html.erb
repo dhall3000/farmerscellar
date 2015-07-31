@@ -10,26 +10,3 @@
 		</section>
 	</aside>
 </div>
-
-<% #farmer needs to get our approval before he can post product. he needs to fill out a form and have us contact him for a chat first %>
-<% if @user.account_type == 1 and @user.farmer_approval == 'f' %>
-  <div class="row">
-    <div class="col-md-6 col-md-offset-3">  
-      <h1>Farmer approval</h1>
-      <% unapproved_message = "Before you can post product for sale you need to get approval from our staff. " %>
-      <% if @user.agreement != 1 %>
-        <% unapproved_message += "Click the button below to fill out our approval request form and we will get in touch with you shortly!" %>
-      <% end %>
-      <h2><%= unapproved_message %></h2>      
-    </div>
-  </div>
-<% end %>
-
-  <% if @user.account_type == 1 and @user.agreement != true %>
-    <div class="row">
-      <div class="col-md-2 col-md-offset-5">  
-        <%= link_to "Request approval", edit_user_path, class: "btn btn-lg btn-primary" %>
-      </div>
-    </div>
-  <% end %>
-

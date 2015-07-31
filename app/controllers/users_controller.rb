@@ -44,7 +44,7 @@ class UsersController < ApplicationController
     if @user.update_attributes(user_params)
       flash_message = "Profile updated"      
       if agreement != true and @user.agreement == true
-        flash_message = "Request for approval received. A staff member will be in touch with you shortly!"
+        #flash_message = "Request for approval received. A staff member will be in touch with you shortly!"
       end
       flash[:success] = flash_message
       redirect_to @user
