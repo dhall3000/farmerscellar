@@ -10,3 +10,11 @@
 		</section>
 	</aside>
 </div>
+
+<% if current_user.access_code == nil %>
+  <%= render partial: "shared/access_code_submission" %>
+<% else %>
+  <div class="row text-center">
+    <%= link_to "Shop!", postings_path, class: "btn btn-lg btn-primary" %>  
+  </div>
+<% end %>
