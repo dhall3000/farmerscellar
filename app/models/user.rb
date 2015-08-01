@@ -20,6 +20,8 @@ class User < ActiveRecord::Base
   has_many :producer_product_commissions
   has_many :products, through: :producer_product_commissions
 
+  has_one :access_code
+
   def self.types
     {CUSTOMER: 0, PRODUCER: 1, ADMIN: 2}
   end
