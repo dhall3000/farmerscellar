@@ -1,0 +1,12 @@
+<div class="row">
+  <div class="col-md-2 col-md-offset-5">
+    <%= form_for current_user do |f| %>
+      <div class="text-center">
+        <%= f.label :access_code %>      
+      </div>
+      <%= f.text_field :access_code, class: "form-control" %>
+      <%= f.submit "Go!", class: "btn btn-primary" %>
+      <%= link_to "(what's an access code?)", '#' %>
+    <% end %>    
+  </div>
+</div>

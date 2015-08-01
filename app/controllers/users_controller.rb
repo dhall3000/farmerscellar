@@ -38,18 +38,47 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
   end
 
-  def update
+  def update    
     @user = User.find(params[:id])
-    agreement = @user.agreement    
-    if @user.update_attributes(user_params)
-      flash_message = "Profile updated"      
-      if agreement != true and @user.agreement == true
-        #flash_message = "Request for approval received. A staff member will be in touch with you shortly!"
+    agreement = @user.agreement            
+
+    if params.has_key?(:user)
+      if params[:user].has_key?(:access_code)
+        #ok, user just provided the access code
+        user_provided_access_code = params[:user][:access_code]
+        db_access_code = AccessCode.find_by_id(user_provided_access_code)
+
+        if db_access_code == nil
+          #TODO: need to tell user the code didn't work. (it didn't work because the access code doesn't exist. try again or contact us.
+            flash[:danger] = "That access code did not work. Please try again. If you continue to have difficulties, please contact us."
+        else
+          if db_access_code.user == nil
+            #TODO: this is the success case. set the accesscode.userid == currentuser.id and flash success
+            db_access_code.user = current_user
+            if db_access_code.save
+              flash[:success] = "Access granted. Welcome to Farmer's Cellar!"
+            else
+              flash[:danger] = "That access code did not work. Please try again. If you continue to have difficulties, please contact us."
+            end
+          else
+            #TODO: there was a problem. this accesscode.userid was already assigned. it probably belongs to someone else but we haven't checked for that yet. flash error and move on.
+            flash[:danger] = "That access code did not work. Please try again. If you continue to have difficulties, please contact us."
+          end
+        end        
+        redirect_to root_url
+      else        
+        #user is just updating their profile
+        if @user.update_attributes(user_params)
+          flash_message = "Profile updated"      
+          if agreement != true and @user.agreement == true
+            #flash_message = "Request for approval received. A staff member will be in touch with you shortly!"
+          end
+          flash[:success] = flash_message
+          redirect_to @user
+        else
+          render 'edit'
+        end
       end
-      flash[:success] = flash_message
-      redirect_to @user
-    else
-      render 'edit'
     end
   end
 
