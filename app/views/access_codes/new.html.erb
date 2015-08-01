@@ -1,0 +1,11 @@
+<h1>Create New Access Code</h1>
+
+<div class="row">
+	<div class="col-md-6 col-md-offset-3">
+      <%= form_for @access_code do |f| %>
+        <%= f.label :notes %>        
+        <%= f.text_area :notes, class: "form-control", rows: "8" %>
+        <%= f.submit class: "btn btn-primary" %>
+      <% end %>
+  </div>
+</div>
