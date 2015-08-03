@@ -14,9 +14,11 @@
             <ul class="dropdown-menu">
               <li><%= link_to "Profile", current_user %></li>
               <li><%= link_to "Settings", edit_user_path(current_user) %></li>
+              <% if current_user.access_code != nil  %>
               <li><%= link_to "Shopping Tote", tote_items_path %></li>
-              <% if current_user.account_type == 1 && current_user.farmer_approval == true %>
-                <li><%= link_to "New posting", new_posting_path(current_user) %></li>
+              <% end %>
+              <% if current_user.account_type == 1 && current_user.access_code != nil %>
+                <li><%= link_to "Create new posting", new_posting_path(current_user) %></li>
               <% end %>
               <li class="divider"></li>
               <li>
