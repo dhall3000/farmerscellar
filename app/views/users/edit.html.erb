@@ -12,11 +12,13 @@
       <%= f.label :email %>
       <%= f.email_field :email, class: 'form-control' %>
 
-      <%= f.label :beta, class: "checkbox inline" do %>
-        <%= f.check_box :beta %>
-        <span>Join beta users group</span>
-        <a id="beta_users_explanation" tabindex="0" data-container="body" data-toggle="popover" data-trigger="focus" data-content="As we grow, our beta users will get a first shot at new features and give feedback about their experiences. This feedback is an integral part of helping Farmer's Cellar take shape. Keep in mind there may be times where we make mistakes as a normal part of growing pains. As always we'll fix any mistakes to your satisfaction and work to not repeat them.">(?)</a>
-      <% end %>
+    <%= f.label :beta, class: "inline" do %>
+      <%= f.check_box :beta %>
+      <span>Join beta users group</span>      
+    <% end %>
+
+    <a id="beta_users_explanation" tabindex="0" data-container="body" data-toggle="popover" data-trigger="focus" data-content="As we grow, our beta users will get a first shot at new features and give feedback about their experiences. This feedback is an integral part of helping Farmer's Cellar take shape. Keep in mind there may be times where we make mistakes as a normal part of growing pains. As always we'll fix any mistakes to your satisfaction and work to not repeat them.">(?)</a>
+    <p></p>
 
       <%= f.label :password %>
       <%= f.password_field :password, class: 'form-control' %>
