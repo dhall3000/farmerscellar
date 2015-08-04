@@ -19,15 +19,22 @@
 		<%= f.label :password_confirmation, "Confirmation" %>
 		<%= f.password_field :password_confirmation, class: 'form-control' %>
 
-		<%= f.label :account_type, class: "radio inline" do %>
-		<%= f.radio_button :account_type, "0", checked: true %>
-		<span>New customer account</span>
-		<% end %>
+    <%= f.label :beta, class: "checkbox inline" do %>
+      <%= f.check_box :beta %>
+      <span>Join beta users group</span>
+      <a id="beta_users_explanation" tabindex="0" data-container="body" data-toggle="popover" data-trigger="focus" data-content="As we grow, our beta users will get a first shot at new features and give feedback about their experiences. This feedback is an integral part of helping Farmer's Cellar take shape. Keep in mind there may be times where we make mistakes as a normal part of growing pains. As always we'll fix any mistakes to your satisfaction and work to not repeat them.">(?)</a>
+    <% end %>
 
-		<%= f.label :account_type, class: "radio inline" do %>
-		<%= f.radio_button :account_type, "1" %>
-		<span>New producer account</span>
-		<% end %>
+    <%= f.label :account_type, class: "radio inline" do %>
+    <%= f.radio_button :account_type, "0", checked: true %>
+    <span>New customer account</span>
+    <% end %>
+
+    <%= f.label :account_type, class: "radio inline" do %>
+    <%= f.radio_button :account_type, "1" %>
+    <span>New producer account</span>
+    <% end %>
+
 
 		<div id="producer_input" hidden="true">
           <%= f.label :farm_name %>
@@ -47,6 +54,9 @@
 </div>
 
 <script>
+
+  $('#beta_users_explanation').popover()
+
 
   $(function()
   {
