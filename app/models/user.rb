@@ -5,6 +5,7 @@ class User < ActiveRecord::Base
   validates :name, presence: true, length: { maximum: 50 }  
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
   validates :email, presence: true, length: { maximum: 255 }, format: { with: VALID_EMAIL_REGEX }, uniqueness: { case_sensitive: false }
+  validates :farm_name, presence: true, if: :is_producer?
 
   has_secure_password
   validates :password, length: { minimum: 6 }, allow_blank: true
@@ -21,6 +22,10 @@ class User < ActiveRecord::Base
   has_many :products, through: :producer_product_commissions
 
   has_one :access_code
+
+  def is_producer?
+    return account_type == 1
+  end
 
   def self.types
     {CUSTOMER: 0, PRODUCER: 1, ADMIN: 2}
