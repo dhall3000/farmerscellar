@@ -23,9 +23,11 @@ f1 = User.create!(name:  "f1",
              phone: "206-588-6579",
              website: "www.f1.com",
              agreement: 1,
-             farmer_approval: 't',
-             farm_name: "F1 FARM"
+             farm_name: "F1 FARM",
+             beta: false
              )
+
+AccessCode.create(user: f1, notes: "code for user 1")
 
 f2 = User.create!(name:  "f2",
              email: "f2@f.com",
@@ -42,9 +44,11 @@ f2 = User.create!(name:  "f2",
              phone: "206-599-6579",
              website: "www.f2.com",
              agreement: 1,
-             farmer_approval: 't',
-             farm_name: "F2 FARM"
+             farm_name: "F2 FARM",
+             beta: false
              )
+
+AccessCode.create(user: f2, notes: "code for user 2")
 
 f3 = User.create!(name:  "f3",
              email: "f3@f.com",
@@ -61,9 +65,11 @@ f3 = User.create!(name:  "f3",
              phone: "206-590-6579",
              website: "www.f3.com",
              agreement: 1,
-             farmer_approval: 't',
-             farm_name: "F3 FARM"
+             farm_name: "F3 FARM",
+             beta: false
              )
+
+AccessCode.create(user: f3, notes: "code for user 3")
 
 f4 = User.create!(name:  "f4",
              email: "f4@f.com",
@@ -80,11 +86,13 @@ f4 = User.create!(name:  "f4",
              phone: "206-650-6579",
              website: "www.f4.com",
              agreement: 1,
-             farmer_approval: 't',
-             farm_name: "F4 FARM"
+             farm_name: "F4 FARM",
+             beta: false
              )
 
-User.create!(name:  "c1",
+AccessCode.create(user: f4, notes: "code for user 4")
+
+c = User.create!(name:  "c1",
              email: "c1@c.com",
              password:              "dogdog",
              password_confirmation: "dogdog",
@@ -95,10 +103,13 @@ User.create!(name:  "c1",
              city: "Redmond",
              state: "Washington",
              zip: "98008",
-             phone: "206-599-6579"
+             phone: "206-599-6579",
+             beta: false
              )
 
-User.create!(name:  "c2",
+AccessCode.create(user: c, notes: "code for user 5")
+
+c = User.create!(name:  "c2",
              email: "c2@c.com",
              password:              "dogdog",
              password_confirmation: "dogdog",
@@ -109,10 +120,13 @@ User.create!(name:  "c2",
              city: "Renton",
              state: "Washington",
              zip: "98021",
-             phone: "206-599-6579"
+             phone: "206-599-6579",
+             beta: false
              )
 
-User.create!(name:  "c3",
+AccessCode.create(user: c, notes: "code for user 6")
+
+c = User.create!(name:  "c3",
              email: "c3@c.com",
              password:              "dogdog",
              password_confirmation: "dogdog",
@@ -123,10 +137,13 @@ User.create!(name:  "c3",
              city: "Covington",
              state: "Washington",
              zip: "98099",
-             phone: "206-799-6579"
+             phone: "206-799-6579",
+             beta: false
              )
 
-User.create!(name:  "c4",
+AccessCode.create(user: c, notes: "code for user 7")
+
+c = User.create!(name:  "c4",
              email: "c4@c.com",
              password:              "dogdog",
              password_confirmation: "dogdog",
@@ -137,10 +154,13 @@ User.create!(name:  "c4",
              city: "Ravensdale",
              state: "Washington",
              zip: "98001",
-             phone: "206-899-6579"
+             phone: "206-899-6579",
+             beta: false
              )
 
-User.create!(name:  "a1",
+AccessCode.create(user: c, notes: "code for user 8")
+
+c = User.create!(name:  "a1",
              email: "a1@a.com",
              password:              "dogdog",
              password_confirmation: "dogdog",
@@ -151,8 +171,11 @@ User.create!(name:  "a1",
              city: "Bothell",
              state: "Washington",
              zip: "98009",
-             phone: "206-699-6579"
+             phone: "206-699-6579",
+             beta: false
              )
+
+AccessCode.create(user: c, notes: "code for user 9")
 
 apples = Product.create(name: "Fuji Apples")
 carrots = Product.create(name: "Carrots")
