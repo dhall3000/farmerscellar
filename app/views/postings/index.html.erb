@@ -9,6 +9,7 @@
         <th class="text-center">Product</th>
         <th class="text-center">Price</th>   
         <th class="text-center">Unit</th>
+        <th class="text-center">Delivery Date</th>
         <th class="text-center">Buy</th>
         <% if current_user.account_type == User.types[:ADMIN] %>
           <th>Do delivery</th>
@@ -31,6 +32,7 @@
           <td><a tabindex="0" class="btn btn-primary btn-block" role="button" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%= posting.description %>"><%= Product.find_by(id: posting.product_id).name %></a></td>
           <td class="text-center"><%= number_to_currency(posting.price) %></td>
           <td class="text-center"><%= UnitKind.find_by(id: posting.unit_kind_id).name %></td>
+          <td class="text-center"><%= posting.delivery_date.strftime("%A %b %d, %Y") %></td>
           <td class="text-center"><%= link_to "View 'buy' page", new_tote_item_path(posting_id: posting.id), class: "btn btn-primary" %></td>
           <% if current_user.account_type == User.types[:ADMIN] %>
             <th><%= link_to "Go!", tote_items_next_path( tote_item: {posting_id: posting.id}) %></th>
