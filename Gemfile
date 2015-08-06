@@ -1,5 +1,6 @@
 source 'https://rubygems.org'
 
+gem 'jquery-turbolinks'
 gem 'activemerchant',		'1.49.0'
 gem 'rails',                '4.2.0'
 gem 'bcrypt',				'3.1.7'
