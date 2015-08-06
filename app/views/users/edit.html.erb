@@ -23,9 +23,6 @@
       <%= f.label :password %>
       <%= f.password_field :password, class: 'form-control' %>
 
-      <%= f.label :password_confirmation, "Confirmation" %>
-      <%= f.password_field :password_confirmation, class: 'form-control' %>
-
       <% #if this is a farmer we need to put all the fields up for them to edit %>
       <% if @user.account_type == 1 %>
       
