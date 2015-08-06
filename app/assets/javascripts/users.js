@@ -1,4 +1,9 @@
 $(function(){
+  
+  if ($("#user_account_type_1").is(':checked'))
+  {
+    $("#producer_input").removeAttr("hidden");
+  }
 
   $('#beta_users_explanation').popover();
 
