@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150806210135) do
+ActiveRecord::Schema.define(version: 20150809065618) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -342,13 +342,13 @@ ActiveRecord::Schema.define(version: 20150806210135) do
     t.string   "address"
     t.string   "city"
     t.string   "state"
-    t.integer  "zip"
     t.string   "phone"
     t.string   "website"
     t.boolean  "agreement"
     t.boolean  "farmer_approval",   default: false
     t.string   "farm_name"
     t.boolean  "beta"
+    t.integer  "zip"
   end
 
   add_index "users", ["account_type"], name: "index_users_on_account_type"
