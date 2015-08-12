@@ -8,7 +8,8 @@ class PostingsController < ApplicationController
   end
 
   def index
-    @postings = Posting.all
+    # we only want to pull postings whose delivery date is >= today
+    @postings = Posting.where("delivery_date >= ?", Date.today)
   end
 
   def create  	
