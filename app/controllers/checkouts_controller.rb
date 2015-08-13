@@ -3,7 +3,7 @@ class CheckoutsController < ApplicationController
   	@tote_items = current_user_current_tote_items
 
     if @tote_items == nil || !@tote_items.any?
-      flash[:alert] = "Can't checkout until you have some product in your tote"
+      flash[:danger] = "Can't checkout until you have some product in your tote"
       redirect_to postings_path
       return
     end

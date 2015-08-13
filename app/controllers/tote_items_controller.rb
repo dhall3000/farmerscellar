@@ -16,10 +16,10 @@ class ToteItemsController < ApplicationController
   def create    
     @tote_item = ToteItem.new(tote_item_params)
     if @tote_item.save
-      flash[:success] = "item saved to your shopping tote!"
+      flash[:success] = "Item saved to your shopping tote!"
       redirect_to tote_items_path
     else
-      #flash[:failed] = "item not saved to your shopping tote :("
+      flash[:danger] = "Item not saved to your shopping tote. If you continue to experience this problem please contact Farmer's Cellar support."
     end
   end
 
@@ -57,8 +57,21 @@ class ToteItemsController < ApplicationController
   end
 
   def destroy
-    ToteItem.find(params[:id]).destroy
-    flash[:success] = "Shopping tote item deleted"
+
+    #DESCRIPTION: the intent is for use by shopping tote editing feature enabling user to remove items from their tote
+    ti = ToteItem.find_by_id(params[:id])
+
+    if ti == nil
+      flash[:danger] = "Shopping tote item not deleted."
+    else
+      if ti.status == ToteItem.states[:ADDED] || ti.status == ToteItem.states[:AUTHORIZED]
+        ti.update(status: ToteItem.states[:REMOVED])
+        flash[:success] = "Shopping tote item removed."
+      else
+        flash[:danger] = "This item is not removable, probably because it is already 'committed'. Please see our policies regarding committed shopping tote items. Shopping tote item not deleted."        
+      end
+    end
+    
     redirect_to tote_items_path
   end
 

@@ -1,7 +1,24 @@
 module ToteItemsHelper
 	def current_user_current_tote_items
-		#TODO: this should return only the tote items that are in the cart and 'current'. what I mean is we don't want 'removed' items and we don't want items from postings past
-		ToteItem.includes(posting: [:user, :product]).where(user_id: current_user.id)
+
+    #DESCRIPTION: the intent of this method is to get a collection of toteitems that are currently in the abstract, virtual 'tote'. so, old/expired
+    #toteitems are not included, nor are those in states REMOVED, FILLED, NOTFILLED etc.
+
+    #here's all the toteitems associated with this user
+    all = ToteItem.joins(posting: [:user, :product]).where(user_id: current_user.id)
+
+    #the 'displayable' items are just the ones in the proper states for user viewing
+    if all != nil && all.count > 0
+      displayable = all.where("status = ? or status = ? or status = ?", ToteItem.states[:ADDED], ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED])
+    end
+
+    #now, we don't want the user to see old posts. we only want them to see 'current' posts. current posts are those yet to be delivered.
+    if displayable != nil && displayable.count > 0      
+      current = displayable.where("postings.delivery_date >= ?", Date.today)
+    end
+
+    return current
+
 	end
 
 	def tote_has_items(tote_items)
