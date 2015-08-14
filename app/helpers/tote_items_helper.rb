@@ -3,18 +3,26 @@ module ToteItemsHelper
 
     #DESCRIPTION: the intent of this method is to get a collection of toteitems that are currently in the abstract, virtual 'tote'. so, old/expired
     #toteitems are not included, nor are those in states REMOVED, FILLED, NOTFILLED etc.
+    #actually, that is false. as of this writing, the possible toteitem states are:
+    #{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLPENDING: 3, FILLED: 4, NOTFILLED: 5, REMOVED: 6, PURCHASED: 7}
+    #should we display them all except REMOVED? no. we should display all things that are on track to becoming purchased, strictly.
+    #in other words, we should display in the tote all the following items:
+    #ADDED, AUTHORIZED, COMMITTED, FILLPENDING and FILLED
 
     #here's all the toteitems associated with this user
     all = ToteItem.joins(posting: [:user, :product]).where(user_id: current_user.id)
 
     #the 'displayable' items are just the ones in the proper states for user viewing
     if all != nil && all.count > 0
-      displayable = all.where("status = ? or status = ? or status = ?", ToteItem.states[:ADDED], ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED])
+      displayable = all.where("status = ? or status = ? or status = ? or status = ? or status = ?", ToteItem.states[:ADDED], ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED], ToteItem.states[:FILLPENDING], ToteItem.states[:FILLED])
     end
 
     #now, we don't want the user to see old posts. we only want them to see 'current' posts. current posts are those yet to be delivered.
+    #however there is one exception to this rule and that is when an item has progressed to the FILLED state but then does not make
+    #it to the PURCHASED state, for whatever reason. in this case, the customer owes money but has not yet paid so we want it to
+    #remain in their tote forever until it's paid
     if displayable != nil && displayable.count > 0      
-      current = displayable.where("postings.delivery_date >= ?", Date.today)
+      current = displayable.where("postings.delivery_date >= ? or status = ?", Date.today, ToteItem.states[:FILLED])
     end
 
     return current
