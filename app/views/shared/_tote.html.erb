@@ -12,7 +12,7 @@
           <th>Product</th>
           <th>Producer</th>
           <th class="text-center">Posting</th>        
-          <th class="text-center">Price per Unit</th>
+          <th class="text-center">Price</th>
           <th class="text-center">Quantity</th>
           <th class="text-center">Cost</th>
           <th class="text-center">Remove from tote</th>
@@ -30,7 +30,7 @@
             <td><%= tote_item.posting.product.name %></td>
             <td><%= tote_item.posting.user.farm_name %></td>
             <td class="text-center"><%= link_to "View", new_tote_item_path(posting_id: tote_item.posting_id) %></td>
-            <td class="text-center"><%= number_to_currency(tote_item.price) %></td>
+            <td class="text-center"><%= number_to_currency(tote_item.price) %> / <%= tote_item.posting.unit_kind.name %></td>
             <td class="text-center"><%= tote_item.quantity %></td>
             <td class="text-center"><%= number_to_currency(tote_item.price * tote_item.quantity) %></td>
             <td class="text-center">
