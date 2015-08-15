@@ -56,8 +56,9 @@
       <table class="table">
         <tbody>
           <% if tote_items_authorized.count > 0 %>
+            <% data_content = "This is the total of all the items that you have authorized Farmer's Cellar to charge your payment account. These are the items listed above that are highlighted in light green. Your account will be charged the total amount shown here if and when all your ordered items are delivered. For more information please see " + link_to("Authorization", how_things_work_path(anchor: "authorization")) + "." %>
             <tr class="success">
-              <td>Total (authorized items)</td>
+              <td><a href="#" class="popover_init" tabindex="0" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=data_content%>">Total (authorized items)</a></td>
               <td><%= number_to_currency(total_cost_of_tote_items(tote_items_authorized)) %></td>
             </tr>
           <% end %>
