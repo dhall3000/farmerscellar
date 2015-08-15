@@ -2,7 +2,11 @@ class ToteItemsController < ApplicationController
   def index
     if logged_in?
       @tote_items = current_user_current_tote_items
-      @total_amount_to_authorize = total_cost_of_tote_items(@tote_items.where(status: ToteItem.states[:ADDED]))      
+      if @tote_items == nil
+        @total_amount_to_authorize = 0
+      else
+        @total_amount_to_authorize = total_cost_of_tote_items(@tote_items.where(status: ToteItem.states[:ADDED]))      
+      end
     end
   end
 
