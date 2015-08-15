@@ -1,39 +1,74 @@
 <% if tote_has_items(tote_items) %>  
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Product</th>
-        <th>Producer</th>
-        <th>Posting</th>        
-        <th>Price per Unit</th>
-        <th>Quantity</th>
-        <th>Cost</th>
-        <th class="text-center">Remove from tote</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% tote_items.each do |tote_item| %>        
+
+<% tote_items_added = [] %>
+<% tote_items_authorized = [] %>
+
+<div class="row">
+  <div class="col-md-12">
+    <table class="table">
+      <thead>
         <tr>
-          <td><%= tote_item.posting.product.name %></td>
-          <td><%= tote_item.posting.user.farm_name %></td>
-          <td><%= link_to "view", new_tote_item_path(posting_id: tote_item.posting_id) %></td>
-          <td><%= number_to_currency(tote_item.price) %></td>
-          <td><%= tote_item.quantity %></td>
-          <td class="text-left"><%= number_to_currency(tote_item.price * tote_item.quantity) %></td>
-          <td class="text-center">
+          <th>Product</th>
+          <th>Producer</th>
+          <th>Posting</th>        
+          <th>Price per Unit</th>
+          <th>Quantity</th>
+          <th>Cost</th>
+          <th class="text-center">Remove from tote</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% tote_items.each do |tote_item| %>        
+          <% if tote_item.status == ToteItem.states[:ADDED] %>
+            <% tote_items_added << tote_item %>
+            <tr>
+          <% else %>
+            <% tote_items_authorized << tote_item %>
+            <tr class="success">
+          <% end %>        
+            <td><%= tote_item.posting.product.name %></td>
+            <td><%= tote_item.posting.user.farm_name %></td>
+            <td><%= link_to "view", new_tote_item_path(posting_id: tote_item.posting_id) %></td>
+            <td><%= number_to_currency(tote_item.price) %></td>
+            <td><%= tote_item.quantity %></td>
+            <td class="text-left"><%= number_to_currency(tote_item.price * tote_item.quantity) %></td>
+            <td class="text-center">
             <% if tote_item.status == ToteItem.states[:ADDED] || tote_item.status == ToteItem.states[:AUTHORIZED] %>
               <%= link_to "-", tote_item, class: "btn btn-primary", method: :delete %>
             <% else %>
               <% data_content = "This item is not removable because it is in the " + link_to("Commitment Zone", how_things_work_path(anchor: "commitment_zone")) %>
               <a tabindex="0" class="btn btn-primary" role="button" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=data_content%>">-</a>
-            <% end %>
-          </td>
-          
-        </tr>        
-      <% end %>
-    </tbody>
-  </table>
-  <div>
-    <p><h3><strong>TOTAL: <%= number_to_currency(total_cost_of_tote_items(tote_items)) %></strong></h3></p>
+              <% end %>
+            </td>          
+          </tr>        
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>  
+
+  <div class="row">
+    <div class="col-md-4">
+
+      <table class="table">
+        <tbody>
+          <tr>
+            <td>Total (authorized items)</td>
+            <td><%= number_to_currency(total_cost_of_tote_items(tote_items_authorized)) %></td>
+          </tr>
+          <tr>
+            <td>Total (unauthorized items)</td>
+            <td><%= number_to_currency(total_cost_of_tote_items(tote_items_added)) %></td>
+          </tr>
+          <tr>
+            <td>Total (all items)</td>
+            <td><%= number_to_currency(total_cost_of_tote_items(tote_items)) %></td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+    <div class="col-md-8">
+    </div>
   </div>
 <% end %>
