@@ -63,8 +63,9 @@
             </tr>
           <% end %>
           <% if tote_items_added.count > 0 %>
+            <% data_content = "This is the total of all the items that you added to your shopping tote but have not yet authorized Farmer's Cellar to charge your payment account for. These are the items listed above with a white background. Your account will not be charged for these unless you first authorize them. For more information please see " + link_to("Addition", how_things_work_path(anchor: "addition")) + "." %>
             <tr>
-              <td>Total (unauthorized items)</td>
+              <td><a href="#" class="popover_init" tabindex="0" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=data_content%>">Total (unauthorized items)</a></td>
               <td><%= number_to_currency(total_cost_of_tote_items(tote_items_added)) %></td>
             </tr>
           <% end %>
