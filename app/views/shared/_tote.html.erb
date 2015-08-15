@@ -48,20 +48,25 @@
   </div>
 </div>  
 
+
   <h2>Totals</h2>
   <div class="row">
     <div class="col-md-4">
 
       <table class="table">
         <tbody>
-          <tr class="success">
-            <td>Total (authorized items)</td>
-            <td><%= number_to_currency(total_cost_of_tote_items(tote_items_authorized)) %></td>
-          </tr>
-          <tr>
-            <td>Total (unauthorized items)</td>
-            <td><%= number_to_currency(total_cost_of_tote_items(tote_items_added)) %></td>
-          </tr>
+          <% if tote_items_authorized.count > 0 %>
+            <tr class="success">
+              <td>Total (authorized items)</td>
+              <td><%= number_to_currency(total_cost_of_tote_items(tote_items_authorized)) %></td>
+            </tr>
+          <% end %>
+          <% if tote_items_added.count > 0 %>
+            <tr>
+              <td>Total (unauthorized items)</td>
+              <td><%= number_to_currency(total_cost_of_tote_items(tote_items_added)) %></td>
+            </tr>
+          <% end %>
           <tr>
             <td>Total (all items)</td>
             <td><%= number_to_currency(total_cost_of_tote_items(tote_items)) %></td>
