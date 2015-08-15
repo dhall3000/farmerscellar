@@ -38,7 +38,7 @@
               <%= link_to "-", tote_item, class: "btn btn-primary", method: :delete %>
             <% else %>
               <% data_content = "This item is not removable because it is in the " + link_to("Commitment Zone", how_things_work_path(anchor: "commitment_zone")) %>
-              <a tabindex="0" class="btn btn-primary" role="button" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=data_content%>">-</a>
+              <a tabindex="0" class="btn btn-primary" role="button" data-container="body" data-placement="left" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=data_content%>">-</a>
               <% end %>
             </td>          
           </tr>        
@@ -64,14 +64,14 @@
           <% if tote_items_authorized.count > 0 %>
             <% data_content = "This is the total of all the items that you have authorized Farmer's Cellar to charge your payment account. These are the items listed above that are highlighted in light green. Your account will be charged the total amount shown here if and when all your ordered items are delivered. For more information please see " + link_to("Authorization", how_things_work_path(anchor: "authorization")) + "." %>
             <tr>
-              <td><a href="#" class="popover_init" tabindex="0" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=data_content%>">Total (already authorized)</a></td>
+              <td><a href="#" class="popover_init" tabindex="0" data-container="body" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=data_content%>">Total (already authorized)</a></td>
               <td><%= number_to_currency(total_cost_of_tote_items(tote_items_authorized)) %></td>
             </tr>
           <% end %>
           <% if tote_items_added.count > 0 %>
             <% data_content = "This is the total of all the items that you added to your shopping tote but have not yet authorized Farmer's Cellar to charge your payment account for. These are the items listed above with a white background. Your account will not be charged for these unless you first authorize them. For more information please see " + link_to("Addition", how_things_work_path(anchor: "addition")) + "." %>
             <tr class="action_needed">
-              <td><a href="#" class="popover_init" tabindex="0" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=data_content%>">Total (needs authorization)</a></td>
+              <td><a href="#" class="popover_init" tabindex="0" data-container="body" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=data_content%>">Total (needs authorization)</a></td>
               <td><%= number_to_currency(total_cost_of_tote_items(tote_items_added)) %></td>
             </tr>
           <% end %>
