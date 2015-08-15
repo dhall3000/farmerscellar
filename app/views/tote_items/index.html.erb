@@ -2,17 +2,30 @@
 
 <% if logged_in? %>  
   <%= render partial: "shared/tote", locals: { tote_items: @tote_items } %>
-  <% if tote_has_items(@tote_items) %>
+  <% if @total_amount_to_authorize > 0 %>
+    <h2>Checkout</h2>
     <div class="row">
-      <div class="col-md-4 col-md-offset-4">
-	      <%= form_tag(checkouts_path) do %>
-	        <%= hidden_field_tag(:amount, @total_amount_to_authorize) %>
-  	      <%= image_submit_tag("https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif", class: 'form-control') %>
-	      <% end %>
+      <div class="col-md-4">
+        <table class="table">
+          <tbody>          
+            <tr>
+              <td>TOTAL: <%= number_to_currency(@total_amount_to_authorize) %></td>
+              <td><%= form_tag(checkouts_path) do %>
+                <%= hidden_field_tag(:amount, @total_amount_to_authorize) %>
+                <%= image_submit_tag("https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif", class: 'form-control', style: "border: 0px solid #bbb;") %>
+                <% #that style: stuff is random. it's cause there's the "input, textarea, select, .uneditable-input {" line in the custom.css file adds a border. so i'm just removing that border here. %>
+                <% end %>
+              </td>
+            </tr>
+          </tbody>
+        </table>          	      
+      </div>  
+      <div class="col-md-8">
       </div>  
     </div>
-  <% else %>
-    <p>Your tote is empty. You need to add some items to your tote in order to see anything here</p>
+  <% end %>
+  <% if !tote_has_items(@tote_items) %>
+    <p>Your shopping tote is empty so there is nothing to view here. You need to <%= link_to "add some items to your tote", postings_path %>, then you will see them listed here.</p>
   <% end %>
 <% else %>
   <p>Sorry, you need to log in before you can view the contents of your tote</p>
