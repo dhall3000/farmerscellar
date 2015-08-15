@@ -1,5 +1,12 @@
 class AuthorizationsController < ApplicationController
   def new
+
+    @unauthorized_tote_items = current_user_current_tote_items.where(status: ToteItem.states[:ADDED])
+    
+    if @unauthorized_tote_items.count < 1
+      return
+    end
+
   	# add express_token and payer_id columns to auth table
     if USEGATEWAY
       @authorization = Authorization.new(token: params[:token], payer_id: params[:PayerID])  	
