@@ -21,7 +21,7 @@ class ToteItemsController < ApplicationController
     @tote_item = ToteItem.new(tote_item_params)
     if @tote_item.save
       flash[:success] = "Item saved to your shopping tote!"
-      redirect_to tote_items_path
+      redirect_to postings_path
     else
       flash[:danger] = "Item not saved to your shopping tote. If you continue to experience this problem please contact Farmer's Cellar support."
     end
