@@ -1,4 +1,14 @@
 module ToteItemsHelper
+
+  def current_user_current_unauthorized_tote_items
+    all_tote_items = current_user_current_tote_items
+    if all_tote_items == nil or all_tote_items.count < 1
+      return nil
+    end
+    unauthorized_tote_items = all_tote_items.where(status: ToteItem.states[:ADDED])
+    return unauthorized_tote_items
+  end
+
 	def current_user_current_tote_items
 
     #DESCRIPTION: the intent of this method is to get a collection of toteitems that are currently in the abstract, virtual 'tote'. so, old/expired

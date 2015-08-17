@@ -1,4 +1,4 @@
-<h1>New Authorization</h1>
+<h1>Payment Authorization</h1>
 
 <% if @unauthorized_tote_items.count < 1 %>
   <p>There is nothing to authorize payment for. Either your shopping tote is empty or everything in your shopping tote has already been authorized.</p>
@@ -8,7 +8,7 @@
 
   <% if tote_has_items(@unauthorized_tote_items) %>
     <div>
-    <p>confirm that you'd like to authorize payment for the items in your tote shown above</p>
+    <p>Please confirm that you'd like to authorize payment for the items in your tote shown above.</p>
     <p></p>
       <%= form_for(@authorization) do |f| %>
         <%= f.hidden_field :token %>

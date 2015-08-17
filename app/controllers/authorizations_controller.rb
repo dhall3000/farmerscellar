@@ -1,7 +1,7 @@
 class AuthorizationsController < ApplicationController
   def new
 
-    @unauthorized_tote_items = current_user_current_tote_items.where(status: ToteItem.states[:ADDED])
+    @unauthorized_tote_items = current_user_current_unauthorized_tote_items
     
     if @unauthorized_tote_items.count < 1
       return

@@ -19,7 +19,7 @@ class ToteItem < ActiveRecord::Base
   end
 
   def self.status(id, newstate)
-  	#TODO: change this to be a setter method instead of this hocus pocus
+
   	ti = ToteItem.find_by(id: id)
   	if ti != nil
   	  if ti.status == states[:FILLPENDING] && newstate == states[:FILLED]
@@ -31,17 +31,12 @@ class ToteItem < ActiveRecord::Base
 
   def self.dequeue(posting_id)
   	ti = ToteItem.where(status: states[:COMMITTED], posting_id: posting_id).first
-  	#probably need to change the state of the ti to something like FILLPENDING. but we need this db operation to be atomic.
   	
     if ti != nil
   	  ti.update_attribute(:status, states[:FILLPENDING])
     end
 
   	ti
-
-  	#TODO: need to scrutinize this. is it possible two sorters pull up the same tote_item at the same time? say, for example,
-  	#they both click 'next' at nearly the exact same time and the server gets half way through processing this request and then
-  	#thread-switches over to process the other sorter's request. both requests pull/return the same tote_item record?  	
 
   end
 

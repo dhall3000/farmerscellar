@@ -1,8 +1,8 @@
 class CheckoutsController < ApplicationController
   def create
-  	@tote_items = current_user_current_tote_items
+  	@unauthorized_tote_items = current_user_current_unauthorized_tote_items
 
-    if @tote_items == nil || !@tote_items.any?
+    if @unauthorized_tote_items == nil || !@unauthorized_tote_items.any?
       flash[:danger] = "Can't checkout until you have some product in your tote"
       redirect_to postings_path
       return
@@ -22,18 +22,15 @@ class CheckoutsController < ApplicationController
 
     @checkout = Checkout.new(token: response.token, amount: params[:amount].to_f, client_ip: request.remote_ip, response: response)  	  	
 
-  	#TODO: before i save model instances should i check for .valid?
-
-  	@tote_items.each do |tote_item|
-  	  @checkout.tote_items << tote_item
+  	@unauthorized_tote_items.each do |unauthorized_tote_item|
+  	  @checkout.tote_items << unauthorized_tote_item
   	end
 
   	#save the AS to the db
   	if @checkout.save
   	  if USEGATEWAY
         redirect_to GATEWAY.redirect_url_for(response.token)
-      else        
-        #redirect_to new_authorization_path, token: response.token
+      else                
         redirect_to(new_authorization_path(token: response.token))
       end
   	else
