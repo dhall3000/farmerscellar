@@ -7,15 +7,19 @@
   <%= render partial: "shared/tote", locals: { tote_items: @unauthorized_tote_items } %>
 
   <% if tote_has_items(@unauthorized_tote_items) %>
-    <div>
-    <p>Please confirm that you'd like to authorize payment for the items in your tote shown above.</p>
-    <p></p>
-      <%= form_for(@authorization) do |f| %>
-        <%= f.hidden_field :token %>
-        <%= f.hidden_field :payer_id %>
-        <%= f.hidden_field :amount %>
-        <%= f.submit "Confirm payment authorization", class: "btn btn-primary" %>      
-      <% end %>
+    <div class="row">
+      <div class="col-md-4">
+        <p>Please confirm that you'd like to authorize payment for the items in your tote shown above.</p>
+        <p></p>
+          <%= form_for(@authorization) do |f| %>
+            <%= f.hidden_field :token %>
+            <%= f.hidden_field :payer_id %>
+            <%= f.hidden_field :amount %>
+            <%= f.submit "Confirm payment authorization", class: "btn btn-primary" %>      
+          <% end %>
+      </div>
+      <div class="col-md-8">          
+      </div>
     </div>
   <% end %>
 <% end %>
