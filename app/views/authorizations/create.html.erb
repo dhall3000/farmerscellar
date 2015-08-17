@@ -1,9 +1,6 @@
-<h1>Authorizations#create</h1>
-<p>Find me in app/views/authorizations/create.html.erb</p>
-<p>
-  <%= @mymessage %>
-</p>
-
-<p>
-  "you made it to the authorizations view. congrats!"
-</p>
+<% if @authorization_succeeded %>
+<h1>Payment Authorization Complete</h1>
+<% else %>
+<h1>Payment Authorization Error</h1>
+  Something seemed to have gone wrong with your payment authorization. Please <%= link_to "contact us", contact_path %> to get this issue correct. Thank you!
+<% end %>

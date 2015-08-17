@@ -33,21 +33,23 @@ class AuthorizationsController < ApplicationController
     @authorization.gross_amount_currency_id = response.params["gross_amount_currency_id"]
     @authorization.payment_status = response.params["payment_status"]
     @authorization.pending_reason = response.params["pending_reason"]
- 	      
+
+    @authorization_succeeded = response.params["ack"] == "Success" && @authorization.gross_amount > 0
+
     checkout = Checkout.find_by(token: authorization_params[:token])
     if checkout != nil      
       @authorization.checkouts << checkout
 
-      if @authorization.checkouts.last.tote_items.any?        
+      if @authorization_succeeded && @authorization.checkouts.last.tote_items.any?        
+        flash.now[:success] = "Payment authorized!"
         @authorization.checkouts.last.tote_items.where(status: ToteItem.states[:ADDED]).update_all(status: ToteItem.states[:AUTHORIZED])
+      else
+        flash.now[:danger] = "Payment not authorized."
       end
 
       @authorization.save
     end    
 
-    #TODO
-  	#put success or failure code here
-    
   end
 
   private
@@ -67,7 +69,8 @@ class FakeAuthorizationResponse
       "gross_amount": amount,
       "gross_amount_currency_id": "USD",
       "payment_status": "FAKEPENDING",
-      "pending_reason": "FAKEREAON"
+      "pending_reason": "FAKEREASON",
+      "ack": "Success"
     }
 
     @params = @params.stringify_keys
