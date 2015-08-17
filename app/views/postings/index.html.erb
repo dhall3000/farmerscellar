@@ -35,7 +35,7 @@
           <td class="text-center"><%= posting.delivery_date.strftime("%A %b %d, %Y") %></td>
           <td class="text-center"><%= link_to "View 'buy' page", new_tote_item_path(posting_id: posting.id), class: "btn btn-primary" %></td>
           <% if current_user.account_type == User.types[:ADMIN] %>
-            <th><%= link_to "Go!", tote_items_next_path( tote_item: {posting_id: posting.id}) %></th>
+            <td><%= link_to "Go!", tote_items_next_path( tote_item: {posting_id: posting.id}) %></td>
           <% end %>
         </tr>
       <% end %>
