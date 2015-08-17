@@ -34,7 +34,7 @@ class CheckoutsController < ApplicationController
         redirect_to(new_authorization_path(token: response.token))
       end
   	else
-  		#TODO: handle error case
+      flash[:danger] = "Payment checkout error."
   	end    
   end
 end
