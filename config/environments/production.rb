@@ -90,4 +90,8 @@ Rails.application.configure do
     :domain         => 'heroku.com',
     :enable_starttls_auto => true
   }
+
+  config.after_initialize do
+    ::USEGATEWAY = true
+  end
 end
