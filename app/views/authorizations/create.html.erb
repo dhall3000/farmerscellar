@@ -1,5 +1,10 @@
 <% if @authorization_succeeded %>
 <h1>Payment Authorization Complete</h1>
+  <div>
+    <p>You just successfully completed payment authorization for the items listed below.</p>
+  </div>
+  <% @authorization.amount = total_cost_of_tote_items(@successfully_authorized_tote_items) %>
+  <%= render partial: "shared/tote", locals: { tote_items: @successfully_authorized_tote_items, authorization_adjective: "successful" } %>
 <% else %>
 <h1>Payment Authorization Error</h1>
   Something seemed to have gone wrong with your payment authorization. Please <%= link_to "contact us", contact_path %> to get this issue correct. Thank you!
