@@ -49,11 +49,9 @@ class UsersController < ApplicationController
         db_access_code = AccessCode.find_by_id(user_provided_access_code)
 
         if db_access_code == nil
-          #TODO: need to tell user the code didn't work. (it didn't work because the access code doesn't exist. try again or contact us.
-            flash[:danger] = "That access code did not work. Please try again. If you continue to have difficulties, please contact us."
+          flash[:danger] = "That access code did not work. Please try again. If you continue to have difficulties, please contact us."
         else
           if db_access_code.user == nil
-            #TODO: this is the success case. set the accesscode.userid == currentuser.id and flash success
             db_access_code.user = current_user
             if db_access_code.save
               flash[:success] = "Access granted. Welcome to Farmer's Cellar!"
@@ -61,7 +59,6 @@ class UsersController < ApplicationController
               flash[:danger] = "That access code did not work. Please try again. If you continue to have difficulties, please contact us."
             end
           else
-            #TODO: there was a problem. this accesscode.userid was already assigned. it probably belongs to someone else but we haven't checked for that yet. flash error and move on.
             flash[:danger] = "That access code did not work. Please try again. If you continue to have difficulties, please contact us."
           end
         end        
