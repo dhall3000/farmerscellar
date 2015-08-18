@@ -21,6 +21,10 @@ class BulkPaymentsController < ApplicationController
   def create
   	@payment_info_by_producer_id = params[:payment_info_by_producer_id]  	
 
+    if @payment_info_by_producer_id.is_a? String
+      @payment_info_by_producer_id = eval @payment_info_by_producer_id
+    end
+
   	@num_payees = @payment_info_by_producer_id.keys.count
   	@cumulative_total_payout = 0
   	@payment_info_by_producer_id.each do |producer_id, payment_info|
