@@ -38,11 +38,11 @@ class BulkPurchasesTest < BulkBuyer
 
       puts "purchase_receivable.tote_items.count: #{purchase_receivable.tote_items.count}"
 
-      #the filled tote items should all be marked as PURCHASED by now even though technically they
-      #haven't been paid for yet by the customer
+      #the filled tote items should all be marked as PURCHASEPENDING by now
       for tote_item in purchase_receivable.tote_items
         assert_equal tote_item.status, ToteItem.states[:PURCHASEPENDING]
       end
+
     end
     
     purchase_receivables = []
@@ -63,6 +63,11 @@ class BulkPurchasesTest < BulkBuyer
 
     for purchase_receivable in purchase_receivables
       assert_equal purchase_receivable.amount, purchase_receivable.amount_paid
+
+      for tote_item in purchase_receivable.tote_items
+        assert_equal tote_item.status, ToteItem.states[:PURCHASED]
+      end
+      
     end
     
     bulk_purchase = assigns(:bulk_purchase)

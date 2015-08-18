@@ -60,11 +60,6 @@ class BulkBuysController < ApplicationController
 
       ftis.each do |fti|
         pr.tote_items << fti
-
-        #TODO: this isn't exactly correct. the tote items haven't actually been purchased yet. this could be changed in the future. the basic
-        #hack idea with this code here is that once a ti gets to this point, payment state is going to be managed by a different
-        #monster. so just set this ti to an end state (should probably create a new one called PURCHASEPENDING) so that subsequent bulk buys don't scoop it up and generate another
-        #purchase receivable for the same ti set
         fti.update(status: ToteItem.states[:PURCHASEPENDING])
       end                              
 

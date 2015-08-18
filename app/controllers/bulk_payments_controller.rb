@@ -50,7 +50,6 @@ class BulkPaymentsController < ApplicationController
   	  	payment.save
   	  end
   	  bulk_payment.save
-  	  #TODO: send email and/or report that bulk payment was just made?
   	end  	
 
   end

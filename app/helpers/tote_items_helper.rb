@@ -18,13 +18,14 @@ module ToteItemsHelper
     #should we display them all except REMOVED? no. we should display all things that are on track to becoming purchased, strictly.
     #in other words, we should display in the tote all the following items:
     #ADDED, AUTHORIZED, COMMITTED, FILLPENDING and FILLED
+    #a new toteitem state was added....PURCHASEPENDING. this should be displayed to the user as well.
 
     #here's all the toteitems associated with this user
     all = ToteItem.joins(posting: [:user, :product]).where(user_id: current_user.id)
 
     #the 'displayable' items are just the ones in the proper states for user viewing
     if all != nil && all.count > 0
-      displayable = all.where("status = ? or status = ? or status = ? or status = ? or status = ?", ToteItem.states[:ADDED], ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED], ToteItem.states[:FILLPENDING], ToteItem.states[:FILLED])
+      displayable = all.where("status = ? or status = ? or status = ? or status = ? or status = ? or status = ?", ToteItem.states[:ADDED], ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED], ToteItem.states[:FILLPENDING], ToteItem.states[:FILLED], ToteItem.states[:PURCHASEPENDING])
     end
 
     #now, we don't want the user to see old posts. we only want them to see 'current' posts. current posts are those yet to be delivered.

@@ -81,14 +81,20 @@ class PurchaseReceivable < ActiveRecord::Base
     purchase.go(amount_to_capture * 100, authorization.payer_id, authorization.transaction_id)
         
     if purchase == nil
-      #TODO: hmm, error. not sure what we should do here. we tried to create a purchase but it just totally failed. this should be impossible
-    else        	
-      purchases << purchase      
-      self.amount_paid += purchase.gross_amount      
-      authorization.amount_purchased += purchase.gross_amount
-      authorization.save
-      tote_items.where(status: ToteItem.states[:PURCHASEPENDING]).update_all(status: ToteItem.states[:PURCHASED])
+      #error. not sure what we should do here. we tried to create a purchase but it just totally failed. this should be impossible
+    else
+      if purchase.response.params["ack"] == "Success"
+        purchases << purchase      
+        self.amount_paid += purchase.gross_amount      
+        authorization.amount_purchased += purchase.gross_amount
+        authorization.save            
+        tote_items.where(status: ToteItem.states[:PURCHASEPENDING]).update_all(status: ToteItem.states[:PURCHASED])
+      else
+        #change the state of the ToteItem.states[:PURCHASEPENDING] -> ToteItem.states[:FILLED] so that an attempt
+        #to purchase will again be made next time an admin does a bulk purchase
+        tote_items.where(status: ToteItem.states[:PURCHASEPENDING]).update_all(status: ToteItem.states[:FILLED])
       end
+
     end
 
     return purchase

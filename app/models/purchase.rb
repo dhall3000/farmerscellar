@@ -32,7 +32,8 @@ class FakeCaptureResponse
     @params = {
       "transaction_id" => authorization_transaction_id,
       "gross_amount" => (amount_in_cents / 100).to_s,
-      "fee_amount" => fee_amount.to_s
+      "fee_amount" => fee_amount.to_s,
+      "ack" => "Success"
     }
   end
 
