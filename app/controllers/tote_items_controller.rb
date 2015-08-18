@@ -44,13 +44,14 @@ class ToteItemsController < ApplicationController
     #if we also have a ti id, flip it's state to FILLED
     #get the next ti id to fill
 
+    @errors = []
     posting_id = nil
     
     if params[:tote_item] == nil
-      #TODO: we have an error here we should handle gracefully
+      @errors << "not sure how this happened but we just hit 'impossible' logic in tote_items_controller.rb: params[:tote_item] == nil"
     else
       if params[:tote_item][:posting_id] == nil
-        #TODO: we have an error here we should handle gracefully
+        @errors << "not sure how this happened but we just hit 'impossible' logic in tote_items_controller.rb: params[:tote_item][:posting_id] == nil"
       else
         posting_id = params[:tote_item][:posting_id]
         @tote_item = ToteItem.dequeue(posting_id)

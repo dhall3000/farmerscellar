@@ -1,5 +1,16 @@
 <h1>ToteItems#next</h1>
 
+<% if @errors != nil %>
+  <div>
+    <% @errors.each do |error| %>
+      <p>
+        <%= error %>
+      </p>
+    <% end %>
+  </div>
+  <p></p>
+<% end %>
+
 <% if @tote_item == nil %>
   <p>Congrats! All done processing this delivery! :)</p>
 <% else %>
