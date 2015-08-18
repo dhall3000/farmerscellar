@@ -41,7 +41,7 @@ class BulkPurchasesTest < BulkBuyer
       #the filled tote items should all be marked as PURCHASED by now even though technically they
       #haven't been paid for yet by the customer
       for tote_item in purchase_receivable.tote_items
-        assert_equal tote_item.status, ToteItem.states[:PURCHASED]
+        assert_equal tote_item.status, ToteItem.states[:PURCHASEPENDING]
       end
     end
     

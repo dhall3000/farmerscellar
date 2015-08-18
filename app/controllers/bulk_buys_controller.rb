@@ -65,7 +65,7 @@ class BulkBuysController < ApplicationController
         #hack idea with this code here is that once a ti gets to this point, payment state is going to be managed by a different
         #monster. so just set this ti to an end state (should probably create a new one called PURCHASEPENDING) so that subsequent bulk buys don't scoop it up and generate another
         #purchase receivable for the same ti set
-        fti.update(status: ToteItem.states[:PURCHASED])
+        fti.update(status: ToteItem.states[:PURCHASEPENDING])
       end                              
 
       #this represents the total value of everything that was filled for this bulk buy

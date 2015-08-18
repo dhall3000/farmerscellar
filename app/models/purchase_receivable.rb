@@ -87,6 +87,8 @@ class PurchaseReceivable < ActiveRecord::Base
       self.amount_paid += purchase.gross_amount      
       authorization.amount_purchased += purchase.gross_amount
       authorization.save
+      tote_items.where(status: ToteItem.states[:PURCHASEPENDING]).update_all(status: ToteItem.states[:PURCHASED])
+      end
     end
 
     return purchase
