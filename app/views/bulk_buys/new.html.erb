@@ -9,6 +9,8 @@
 
 -------------------------------------------------------
 
+<% #TODO(Future) we are creating a hidden field for evrey single tote item. this might be bad when we're %>
+<% #processing 10,000 tote items. maybe find a more elegant solution in the future %>
 <%= form_tag(bulk_buys_path) do %>
   <% for tote_item in @filled_tote_items %>  
     <%= hidden_field_tag "filled_tote_item_ids[]", tote_item.id %>   

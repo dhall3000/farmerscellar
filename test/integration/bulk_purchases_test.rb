@@ -118,7 +118,7 @@ class BulkPurchasesTest < BulkBuyer
     unpaid_payment_payables = assigns(:unpaid_payment_payables)
     assert_not_nil unpaid_payment_payables
     grand_total_payout = assigns(:grand_total_payout)
-    puts grand_total_payout
+    puts "grand total payout: $#{grand_total_payout}"
 
     payment_info_by_producer_id = assigns(:payment_info_by_producer_id)    
     assert_not_nil payment_info_by_producer_id

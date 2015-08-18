@@ -61,12 +61,13 @@ class PurchaseReceivable < ActiveRecord::Base
 
     if tote_items && tote_items.any?
       authorization = tote_items.last.authorization
+    else
+      puts "returning nil because there were no ToteItem objects when trying to do PurchaseReceivable.purchase()."
+      return nil      
     end
 
     if authorization == nil
-      #TODO: we should probably raise this for the admin to manually process
-      #this block happens if we somehow didn't find an authorization to use
-      #debugger
+      puts "returning nil because there was no authorization object when trying to do PurchaseReceivable.purchase()."
       return nil
     end
 
@@ -81,7 +82,7 @@ class PurchaseReceivable < ActiveRecord::Base
     purchase.go(amount_to_capture * 100, authorization.payer_id, authorization.transaction_id)
         
     if purchase == nil
-      #error. not sure what we should do here. we tried to create a purchase but it just totally failed. this should be impossible
+      puts "Purchase object is nil. this should be impossible. we are in PurchaseReceivable.purchase() method."
     else
       if purchase.response.params["ack"] == "Success"
         purchases << purchase      
