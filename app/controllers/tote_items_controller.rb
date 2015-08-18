@@ -22,6 +22,12 @@ class ToteItemsController < ApplicationController
 
   def create    
     @tote_item = ToteItem.new(tote_item_params)
+
+    if !correct_user_create(@tote_item)
+      redirect_to(root_url)
+      return
+    end
+
     if @tote_item.save
       flash[:success] = "Item saved to your shopping tote!"
       redirect_to postings_path
@@ -124,6 +130,25 @@ class ToteItemsController < ApplicationController
         return
       end        
 
+    end
+
+    def correct_user_create(tote_item)
+
+      if tote_item == nil
+        return false
+      end
+
+      user = User.find_by_id(tote_item.user_id)
+
+      if user == nil        
+        return false
+      end
+
+      if current_user?(user)        
+        return true
+      else
+        return false
+      end        
     end
 
 end
