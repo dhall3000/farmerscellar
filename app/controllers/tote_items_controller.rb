@@ -1,4 +1,6 @@
 class ToteItemsController < ApplicationController
+  before_action :admin_user, only: :next
+
   def index
     if logged_in?
       @tote_items = current_user_current_tote_items
@@ -28,7 +30,6 @@ class ToteItemsController < ApplicationController
   end
 
   def next
-    #TODO: this action should only be visible to an admin.
     #this page is for pulling the next tote_item off the queue to fill when sorters are processing a delivery
     #render 'next'
 
@@ -91,6 +92,12 @@ class ToteItemsController < ApplicationController
   private
     def tote_item_params
       params.require(:tote_item).permit(:quantity, :price, :status, :posting_id, :user_id)
+    end
+
+    def admin_user
+      if current_user == nil || current_user.account_type < 2
+        redirect_to(root_url)        
+      end
     end
 
 end
