@@ -135,11 +135,6 @@ class BulkPurchasesTest < BulkBuyer
     puts assigns(:num_payees)
     puts assigns(:cumulative_total_payout)   
 
-
-
-
-
-
     #puts "-------------------PaymentPayable---------------"
 
     #for payment_payable in PaymentPayable.all

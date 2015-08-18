@@ -4,7 +4,7 @@ class BulkPurchase < ActiveRecord::Base
   has_many :purchase_receivables, through: :bulk_purchase_receivables
 
   def load_unpaid_receivables
-  	#TODO: this will probably be really inefficient as the db grows. maybe want a boolean for when each record is fully paid off
+  	#TODO(Future): this will probably be really inefficient as the db grows. maybe want a boolean for when each record is fully paid off
   	prs = PurchaseReceivable.where("amount_paid < amount")
   	if prs &&  prs.any?
   	  for pr in prs
@@ -62,7 +62,7 @@ class BulkPurchase < ActiveRecord::Base
         gross_amount_payable -= gross_amount_payable_to_this_producer
 
         payment_processor_effective_fee_factor = purchase.fee_amount / purchase.gross_amount
-        payment_processor_fee = gross_amount_payable_to_this_producer * payment_processor_effective_fee_factor
+        payment_processor_fee = gross_amount_payable_to_this_producer * payment_processor_effective_fee_factor        
         net_after_payment_processor_fee = gross_amount_payable_to_this_producer - payment_processor_fee
         commission = net_after_payment_processor_fee * value[:sub_tote_commission_factor]
         net_after_commission = net_after_payment_processor_fee - commission

@@ -70,27 +70,27 @@ class BulkPaymentsController < ApplicationController
       payouts_params =
       {
       	"METHOD" => "MassPay",
-		"CURRENCYCODE" => "USD",
-		"RECEIVERTYPE" => "EmailAddress",
-		"VERSION" => "51.0"
-	  }
+    		"CURRENCYCODE" => "USD",
+    		"RECEIVERTYPE" => "EmailAddress",
+    		"VERSION" => "51.0"
+    	}
 
-	  i = 0
+  	  i = 0
 
-	  payment_info_by_producer_id.each do |producer_id, payment_info|
-	  	email = User.find(producer_id).email
-	  	new_email_key = "L_EMAIL" + i.to_s	
+  	  payment_info_by_producer_id.each do |producer_id, payment_info|
+  	  	email = User.find(producer_id).email
+  	  	new_email_key = "L_EMAIL" + i.to_s	
 
-	  	amount = payment_info[:amount].to_s
-	  	new_amount_key = "L_AMT" + i.to_s
+  	  	amount = payment_info[:amount].to_s
+  	  	new_amount_key = "L_AMT" + i.to_s
 
-	  	payouts_params[new_email_key] = email
-	  	payouts_params[new_amount_key] = amount
+  	  	payouts_params[new_email_key] = email
+  	  	payouts_params[new_amount_key] = amount
 
-	  	i += 1
-	  end
+  	  	i += 1
+  	  end
 
-	  return payouts_params
+  	  return payouts_params
 
     end
 
@@ -100,12 +100,12 @@ class BulkPaymentsController < ApplicationController
 
       if USEGATEWAY
         endpoint = "https://api-3t.sandbox.paypal.com"
-	    url = URI.parse(endpoint)
-	    http = Net::HTTP.new(url.host, url.port)
-	    http.use_ssl = true
-	    all_params = credentials.merge(payouts_params)
-	    stringified_params = all_params.collect { |tuple| "#{tuple.first}=#{CGI.escape(tuple.last)}" }.join("&")
-	    response = http.post("/nvp", stringified_params)
+  	    url = URI.parse(endpoint)
+  	    http = Net::HTTP.new(url.host, url.port)
+  	    http.use_ssl = true
+  	    all_params = credentials.merge(payouts_params)
+  	    stringified_params = all_params.collect { |tuple| "#{tuple.first}=#{CGI.escape(tuple.last)}" }.join("&")
+  	    response = http.post("/nvp", stringified_params)
       else
       	response = true
       end

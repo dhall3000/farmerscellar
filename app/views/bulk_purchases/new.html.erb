@@ -10,5 +10,5 @@
   <% for purchase_receivable in @bulk_purchase.purchase_receivables %>
     <%= hidden_field_tag "purchase_receivables[]", purchase_receivable.id %>
   <% end %>
-  <%= f.submit "Capture payments" %>
+  <%= f.submit "Capture purchases" %>
 <% end %>

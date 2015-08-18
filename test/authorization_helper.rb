@@ -38,14 +38,14 @@ class Authorizer < ActionDispatch::IntegrationTest
     assert_response :success
     assert_template 'tote_items/index'
     assert_not_nil assigns(:tote_items)
-    total_amount = assigns(:total_amount)
-    assert_not_nil total_amount
-    assert total_amount > 0, "total amount of tote items is not greater than zero"
-    puts "total_amount = $#{total_amount}"
-    post checkouts_path, amount: total_amount
-    tote_items = assigns(:tote_items)
-    assert_not_nil tote_items
-    assert tote_items.any?
+    total_amount_to_authorize = assigns(:total_amount_to_authorize)
+    assert_not_nil total_amount_to_authorize
+    assert total_amount_to_authorize > 0, "total amount of tote items is not greater than zero"
+    puts "total_amount_to_authorize = $#{total_amount_to_authorize}"
+    post checkouts_path, amount: total_amount_to_authorize
+    unauthorized_tote_items = assigns(:unauthorized_tote_items)
+    assert_not_nil unauthorized_tote_items
+    assert unauthorized_tote_items.any?
     checkout = assigns(:checkout)
     assert_not_nil checkout
     puts "checkout token: #{checkout.token}"
