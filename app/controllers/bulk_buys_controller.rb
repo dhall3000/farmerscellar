@@ -28,7 +28,12 @@ class BulkBuysController < ApplicationController
     authorizations = {}
 
     #get the filled tote items and group them by user's authorization
-  	filled_tote_items = ToteItem.find(params[:filled_tote_item_ids])
+  	filled_tote_items = ToteItem.where(id: params[:filled_tote_item_ids])
+    
+    if filled_tote_items == nil || filled_tote_items.count < 1
+      return
+    end
+
   	for filled_tote_item in filled_tote_items
       @bulk_buy.tote_items << filled_tote_item
   	  if filled_tote_item.checkouts != nil && filled_tote_item.checkouts.any?
