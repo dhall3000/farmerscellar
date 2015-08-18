@@ -1,5 +1,6 @@
 class ToteItemsController < ApplicationController
   before_action :admin_user, only: :next
+  before_action :correct_user,   only: [:destroy]
 
   def index
     if logged_in?
@@ -98,6 +99,31 @@ class ToteItemsController < ApplicationController
       if current_user == nil || current_user.account_type < 2
         redirect_to(root_url)        
       end
+    end
+
+    # Confirms the correct user.
+    def correct_user
+      #@user = User.find(params[:id])
+      #redirect_to(root_url) unless current_user?(@user)
+      ti = ToteItem.find_by_id(params[:id])
+
+      if ti == nil
+        redirect_to(root_url)
+        return
+      end
+
+      user = User.find(ti.user_id)
+
+      if user == nil
+        redirect_to(root_url)
+        return
+      end
+
+      if !current_user?(user)
+        redirect_to(root_url)
+        return
+      end        
+
     end
 
 end
