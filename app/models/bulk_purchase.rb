@@ -67,11 +67,11 @@ class BulkPurchase < ActiveRecord::Base
         commission = net_after_payment_processor_fee * value[:sub_tote_commission_factor]
         net_after_commission = net_after_payment_processor_fee - commission
 
-        self.total_fee += payment_processor_fee
-        self.total_commission += commission
-        self.total_net += net_after_commission
+        self.total_fee += payment_processor_fee.round(2)
+        self.total_commission += commission.round(2)
+        self.total_net += net_after_commission.round(2)
 
-        payment_payable = PaymentPayable.new(amount: net_after_commission, amount_paid: 0)
+        payment_payable = PaymentPayable.new(amount: net_after_commission.round(2), amount_paid: 0)
         producer = User.find(producer_id)
         payment_payable.users << producer
 
