@@ -1,5 +1,4 @@
-<h1>BulkPayments#new</h1>
-<p>Find me in app/views/bulk_payments/new.html.erb</p>
+<h1>New BulkPayment</h1>
 
 <% if @unpaid_payment_payables != nil && @unpaid_payment_payables.any? %>
 <p>ALL INDIVIDUAL PAYMENT PAYABLES</p>
@@ -47,13 +46,14 @@
       <% end %>
     </tbody>
   </table>
+<% else %>
+  <p>There are no unpaid payment payables.</p>
 <% end %>
 
 <% if @grand_total_payout > 0 %>
-<p>GRAND TOTAL PAYOUT: $<%= @grand_total_payout %></p>
-<% end %>
-
-<%= form_tag bulk_payments_path do %>
-  <%= hidden_field_tag :payment_info_by_producer_id, @payment_info_by_producer_id %>
-  <%= submit_tag "do bulk payment" %>
+  <p>GRAND TOTAL PAYOUT: $<%= @grand_total_payout %></p>
+  <%= form_tag bulk_payments_path do %>
+    <%= hidden_field_tag :payment_info_by_producer_id, @payment_info_by_producer_id %>
+    <%= submit_tag "do bulk payment" %>
+  <% end %>
 <% end %>

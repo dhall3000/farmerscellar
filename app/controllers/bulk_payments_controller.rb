@@ -1,8 +1,7 @@
 class BulkPaymentsController < ApplicationController
   def new
-  	@unpaid_payment_payables = PaymentPayable.where(:amount_paid < :amount)
+  	@unpaid_payment_payables = PaymentPayable.where("amount_paid < amount")
   	@grand_total_payout = 0
-
   	@payment_info_by_producer_id = {}
 
   	@unpaid_payment_payables.each do |p|
@@ -48,6 +47,7 @@ class BulkPaymentsController < ApplicationController
   	  	payment = Payment.new(amount: payment_info[:amount])  	  	
   	  	payment_info[:payment_payable_ids].each do |payment_payable_id|
   	  	  payment_payable = PaymentPayable.find(payment_payable_id.to_i)
+          payment_payable.update(amount_paid: payment_payable.amount)
   	  	  payment.payment_payables << payment_payable
   	  	  bulk_payment.payment_payables << payment_payable
   	  	end
