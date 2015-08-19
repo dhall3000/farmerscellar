@@ -34,7 +34,7 @@ class BulkPaymentsController < ApplicationController
   	response = send_payments(@payment_info_by_producer_id)
   	proceed = false
 
-  	if USEGATEWAY && debugger #[TODO: in real life there should be a success/response-checking condition from the masspay we just did]
+  	if USEGATEWAY
   	  proceed = true
   	else
   	  proceed = true
@@ -61,7 +61,7 @@ class BulkPaymentsController < ApplicationController
   private
 
     def send_payments(payment_info_by_producer_id)
-      payouts_params = get_payout_params(payment_info_by_producer_id)
+      payouts_params = get_payout_params(payment_info_by_producer_id)      
       send_paypal_masspay(PAYPALCREDENTIALS, payouts_params)
     end
 
@@ -88,7 +88,7 @@ class BulkPaymentsController < ApplicationController
   	  	new_amount_key = "L_AMT" + i.to_s
 
   	  	payouts_params[new_email_key] = email
-  	  	payouts_params[new_amount_key] = amount
+  	  	payouts_params[new_amount_key] = amount.to_f.round(2).to_s
 
   	  	i += 1
   	  end
@@ -97,7 +97,7 @@ class BulkPaymentsController < ApplicationController
 
     end
 
-    def send_paypal_masspay(credentials, payouts_params)
+    def send_paypal_masspay(credentials, payouts_params)      
 
       response = nil
 
