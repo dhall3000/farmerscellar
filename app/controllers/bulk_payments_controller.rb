@@ -10,10 +10,10 @@ class BulkPaymentsController < ApplicationController
   	  if @payment_info_by_producer_id[producer.id] == nil
   	  	@payment_info_by_producer_id[producer.id] = {amount: 0, payment_payable_ids: []}
   	  end
-  	  amount_unpaid_on_this_payment_payable = p.amount - p.amount_paid
-  	  @payment_info_by_producer_id[producer.id][:amount] += amount_unpaid_on_this_payment_payable
+  	  amount_unpaid_on_this_payment_payable = p.amount - p.amount_paid  	  
+      @payment_info_by_producer_id[producer.id][:amount] = (@payment_info_by_producer_id[producer.id][:amount] + amount_unpaid_on_this_payment_payable).round(2)
   	  @payment_info_by_producer_id[producer.id][:payment_payable_ids] << p.id
-  	  @grand_total_payout += amount_unpaid_on_this_payment_payable
+      @grand_total_payout = (@grand_total_payout + amount_unpaid_on_this_payment_payable).round(2)
   	end
 
   end
