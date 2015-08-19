@@ -24,7 +24,7 @@ class BulkPurchase < ActiveRecord::Base
           #was a payments problem
         end
 
-        self.total_gross += purchase.gross_amount
+        self.total_gross = (self.total_gross + purchase.gross_amount).round(2)
 
         sub_tote_value_by_payment_sequenced_producer_id = get_sub_tote_value_by_payment_sequenced_producer_id(purchase_receivable)
         create_payment_payables(purchase_receivable, purchase, sub_tote_value_by_payment_sequenced_producer_id)
@@ -67,9 +67,9 @@ class BulkPurchase < ActiveRecord::Base
         commission = net_after_payment_processor_fee * value[:sub_tote_commission_factor]
         net_after_commission = net_after_payment_processor_fee - commission
 
-        self.total_fee += payment_processor_fee.round(2)
-        self.total_commission += commission.round(2)
-        self.total_net += net_after_commission.round(2)
+        self.total_fee = (self.total_fee + payment_processor_fee).round(2)
+        self.total_commission = (self.total_commission + commission).round(2)
+        self.total_net = (self.total_net + net_after_commission).round(2)
 
         payment_payable = PaymentPayable.new(amount: net_after_commission.round(2), amount_paid: 0)
         producer = User.find(producer_id)

@@ -14,8 +14,8 @@ class Purchase < ActiveRecord::Base
     self.transaction_id = response.params["transaction_id"]
     self.payer_id = authorization_payer_id
     self.gross_amount = response.params["gross_amount"].to_f
-    self.fee_amount = response.params["fee_amount"].to_f
-    self.net_amount = gross_amount - fee_amount        
+    self.fee_amount = response.params["fee_amount"].to_f.round(2)
+    self.net_amount = (gross_amount - fee_amount).round(2)
     
   end
 end
@@ -26,7 +26,7 @@ class FakeCaptureResponse
   def initialize(amount_in_cents, authorization_transaction_id)
 
     percentage = 0.035
-    fee_amount = amount_in_cents * percentage / 100
+    fee_amount = (amount_in_cents * percentage / 100).round(2)
 
     @success = true
     @params = {
