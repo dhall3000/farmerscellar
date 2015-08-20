@@ -17,7 +17,7 @@ class BulkPaymentsController < ApplicationController
 
   end
 
-  def create
+  def create    
   	@payment_info_by_producer_id = params[:payment_info_by_producer_id]  	
 
     if @payment_info_by_producer_id.is_a? String
@@ -101,9 +101,8 @@ class BulkPaymentsController < ApplicationController
 
       response = nil
 
-      if USEGATEWAY
-        endpoint = "https://api-3t.sandbox.paypal.com"
-  	    url = URI.parse(endpoint)
+      if USEGATEWAY                
+  	    url = URI.parse(PAYPALMASSPAYENDPOINT)
   	    http = Net::HTTP.new(url.host, url.port)
   	    http.use_ssl = true
   	    all_params = credentials.merge(payouts_params)

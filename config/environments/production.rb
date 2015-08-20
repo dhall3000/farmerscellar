@@ -92,6 +92,15 @@ Rails.application.configure do
   }
 
   config.after_initialize do
+    ::PAYPALCREDENTIALS = eval(ENV['PAYPALCREDENTIALS'])
+
+    ::GATEWAY = ActiveMerchant::Billing::PaypalExpressGateway.new(
+      login: PAYPALCREDENTIALS["USER"],
+      password: PAYPALCREDENTIALS["PWD"],
+      signature: PAYPALCREDENTIALS["SIGNATURE"]
+      )
+
     ::USEGATEWAY = true
+    ::PAYPALMASSPAYENDPOINT = "https://api-3t.paypal.com"
   end
 end

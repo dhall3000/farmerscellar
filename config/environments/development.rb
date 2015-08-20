@@ -53,18 +53,10 @@ Rails.application.configure do
 #      "PWD" => "GPAY4EJ3MZ2MTYJS",
 #      "SIGNATURE" => "AT6eAVSmMQynPpedcbmxy565ovQXAM-X9BnmoGTjVMyKn1FZ70rjebxN"
 
-#account: "davideltonhall.gmail.com"
-#      "USER" => "davideltonhall_api2.gmail.com",
-#      "PWD" => "5XPMFXMHV7YQ86YT",
-#      "SIGNATURE" => "AFcWxV21C7fd0v3bYYYRCpSSRl31A3.LUZ4wqRc0rQwJgovVKQwfbSpq"
-
+  ENV['PAYPALCREDENTIALS'] = "{\"USER\" => \"davideltonhall-w_api1.gmail.com\", \"PWD\" => \"GPAY4EJ3MZ2MTYJS\",\"SIGNATURE\" => \"AT6eAVSmMQynPpedcbmxy565ovQXAM-X9BnmoGTjVMyKn1FZ70rjebxN\"}"
+  
   config.after_initialize do
-    ::PAYPALCREDENTIALS =
-    {
-      "USER" => "davideltonhall-w_api1.gmail.com",
-      "PWD" => "GPAY4EJ3MZ2MTYJS",
-      "SIGNATURE" => "AT6eAVSmMQynPpedcbmxy565ovQXAM-X9BnmoGTjVMyKn1FZ70rjebxN"
-    }
+    ::PAYPALCREDENTIALS = eval(ENV['PAYPALCREDENTIALS'])
 
     ActiveMerchant::Billing::Base.mode = :test    
     ::GATEWAY = ActiveMerchant::Billing::PaypalExpressGateway.new(
@@ -72,8 +64,10 @@ Rails.application.configure do
       password: PAYPALCREDENTIALS["PWD"],
       signature: PAYPALCREDENTIALS["SIGNATURE"]
       )
+
+    ::PAYPALMASSPAYENDPOINT = "https://api-3t.sandbox.paypal.com"
     
-    ::USEGATEWAY = false
+    ::USEGATEWAY = true
 
   end
 
