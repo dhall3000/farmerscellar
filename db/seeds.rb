@@ -8,8 +8,8 @@
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
-f1 = User.create!(name:  "f1",
-             email: "f1@f.com",
+f1 = User.create!(name:  "dhall21hotmail (farmer)",
+             email: "dhall21@hotmail.com",
              password:              "dogdog",
              password_confirmation: "dogdog",
              account_type: '1',
@@ -23,8 +23,8 @@ f1 = User.create!(name:  "f1",
              phone: "206-588-6579",
              website: "www.f1.com",
              agreement: 1,
-             farm_name: "F1 FARM",
-             beta: false
+             farm_name: "DHALL21 FARM",
+             beta: true
              )
 
 AccessCode.create(user: f1, notes: "code for user 1")
@@ -92,8 +92,8 @@ f4 = User.create!(name:  "f4",
 
 AccessCode.create(user: f4, notes: "code for user 4")
 
-c = User.create!(name:  "c1",
-             email: "c1@c.com",
+c = User.create!(name:  "Kellye (customer)",
+             email: "kellye@farmerscellar.com",
              password:              "dogdog",
              password_confirmation: "dogdog",
              account_type: '0',
@@ -104,7 +104,7 @@ c = User.create!(name:  "c1",
              state: "Washington",
              zip: "98008",
              phone: "206-599-6579",
-             beta: false
+             beta: true
              )
 
 AccessCode.create(user: c, notes: "code for user 5")
@@ -160,8 +160,8 @@ c = User.create!(name:  "c4",
 
 AccessCode.create(user: c, notes: "code for user 8")
 
-c = User.create!(name:  "a1",
-             email: "a1@a.com",
+c = User.create!(name:  "david (admin)",
+             email: "davideltonhall@gmail.com",
              password:              "dogdog",
              password_confirmation: "dogdog",
              account_type: '2',
@@ -172,7 +172,7 @@ c = User.create!(name:  "a1",
              state: "Washington",
              zip: "98009",
              phone: "206-699-6579",
-             beta: false
+             beta: true
              )
 
 AccessCode.create(user: c, notes: "code for user 9")
