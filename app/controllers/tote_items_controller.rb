@@ -1,5 +1,5 @@
 class ToteItemsController < ApplicationController
-  before_action :admin_user, only: :next
+  before_action :redirect_to_root_if_user_not_admin, only: :next
   before_action :correct_user,   only: [:destroy]
 
   def index
@@ -100,12 +100,6 @@ class ToteItemsController < ApplicationController
   private
     def tote_item_params
       params.require(:tote_item).permit(:quantity, :price, :status, :posting_id, :user_id)
-    end
-
-    def admin_user
-      if current_user == nil || current_user.account_type < 2
-        redirect_to(root_url)        
-      end
     end
 
     # Confirms the correct user.
