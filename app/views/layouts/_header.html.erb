@@ -7,8 +7,7 @@
         <% if logged_in? %>          
           <% if current_user.access_code != nil  %>
             <li><%= link_to "Shop", postings_path %></li>
-            <li><%= link_to "Tote", tote_items_path %></li>
-            <li><%= link_to "How Things Work", how_things_work_path %></li>
+            <li><%= link_to "Tote", tote_items_path %></li>            
           <% end %>
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
