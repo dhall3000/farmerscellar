@@ -1,4 +1,7 @@
 class StaticPagesController < ApplicationController
+  before_action :redirect_to_root_if_user_not_admin, only: [:test_page]
+  before_action :redirect_to_root_if_not_logged_in, only: [:how_things_work]
+  
   def home
   end
 
@@ -9,5 +12,8 @@ class StaticPagesController < ApplicationController
   end
 
   def how_things_work
+  end
+
+  def test_page
   end
 end

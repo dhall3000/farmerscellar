@@ -21,6 +21,18 @@ module SessionsHelper
     user == current_user
   end
 
+  def redirect_to_root_if_user_not_admin
+    if !logged_in? || current_user.account_type < 2    
+      redirect_to(root_url)
+    end
+  end
+
+  def redirect_to_root_if_not_logged_in
+    if !logged_in?
+      redirect_to(root_url)
+    end
+  end
+
   def logged_in?
     !current_user.nil?
   end
