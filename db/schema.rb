@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150809065618) do
+ActiveRecord::Schema.define(version: 20150822040845) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -54,6 +54,26 @@ ActiveRecord::Schema.define(version: 20150809065618) do
     t.string   "pending_reason"
     t.float    "amount_purchased"
   end
+
+  create_table "bp_pp_mp_commons", id: false, force: :cascade do |t|
+    t.integer  "bulk_payment_id"
+    t.integer  "pp_mp_common_id"
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
+  end
+
+  add_index "bp_pp_mp_commons", ["bulk_payment_id"], name: "index_bp_pp_mp_commons_on_bulk_payment_id"
+  add_index "bp_pp_mp_commons", ["pp_mp_common_id"], name: "index_bp_pp_mp_commons_on_pp_mp_common_id"
+
+  create_table "bp_pp_mp_errors", id: false, force: :cascade do |t|
+    t.integer  "bulk_payment_id"
+    t.integer  "pp_mp_error_id"
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
+  end
+
+  add_index "bp_pp_mp_errors", ["bulk_payment_id"], name: "index_bp_pp_mp_errors_on_bulk_payment_id"
+  add_index "bp_pp_mp_errors", ["pp_mp_error_id"], name: "index_bp_pp_mp_errors_on_pp_mp_error_id"
 
   create_table "bulk_buy_purchase_receivables", id: false, force: :cascade do |t|
     t.integer  "purchase_receivable_id"
@@ -171,6 +191,24 @@ ActiveRecord::Schema.define(version: 20150809065618) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "paypal_masspay_common_responses", force: :cascade do |t|
+    t.string   "correlation_id"
+    t.string   "time_stamp"
+    t.string   "ack"
+    t.string   "version"
+    t.string   "build"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+  end
+
+  create_table "paypal_masspay_error_responses", force: :cascade do |t|
+    t.string   "correlation_id"
+    t.string   "name"
+    t.string   "value"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+  end
+
   create_table "postings", force: :cascade do |t|
     t.text     "description"
     t.integer  "quantity_available"
@@ -188,6 +226,24 @@ ActiveRecord::Schema.define(version: 20150809065618) do
   add_index "postings", ["unit_category_id"], name: "index_postings_on_unit_category_id"
   add_index "postings", ["unit_kind_id"], name: "index_postings_on_unit_kind_id"
   add_index "postings", ["user_id"], name: "index_postings_on_user_id"
+
+  create_table "pp_mp_commons", force: :cascade do |t|
+    t.string   "correlation_id"
+    t.string   "time_stamp"
+    t.string   "ack"
+    t.string   "version"
+    t.string   "build"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+  end
+
+  create_table "pp_mp_errors", force: :cascade do |t|
+    t.string   "correlation_id"
+    t.string   "name"
+    t.string   "value"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+  end
 
   create_table "producer_product_commissions", id: false, force: :cascade do |t|
     t.integer  "product_id"

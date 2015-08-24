@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  correlation_id: MyString
+  time_stamp: MyString
+  ack: MyString
+  version: MyString
+  build: MyString
+
+two:
+  correlation_id: MyString
+  time_stamp: MyString
+  ack: MyString
+  version: MyString
+  build: MyString

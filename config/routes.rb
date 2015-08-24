@@ -10,6 +10,8 @@ Rails.application.routes.draw do
   delete 'logout' => 'sessions#destroy'
   get 'tote_items/next' => 'tote_items#next'
   post 'tote_items/next' => 'tote_items#next'
+  get 'bulk_payments/test_masspay' => 'bulk_payments#test_masspay'
+  post 'bulk_payments/test_masspay' => 'bulk_payments#test_masspay'
 
   resources :users
   resources :account_activations, only: [:edit]
