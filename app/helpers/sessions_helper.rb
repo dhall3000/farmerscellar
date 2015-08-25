@@ -33,6 +33,12 @@ module SessionsHelper
     end
   end
 
+  def redirect_to_root_if_user_lacks_access
+    if !logged_in? || current_user.access_code.nil?
+      redirect_to(root_url)
+    end
+  end
+
   def logged_in?
     !current_user.nil?
   end
