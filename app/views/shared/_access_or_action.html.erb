@@ -4,16 +4,11 @@
   <% else %>
     <div class="row text-center">
       <% if current_user.account_type == 0 %>
-        <%= link_to "Shop!", postings_path, class: "btn btn-lg btn-primary" %>
+        <p>This is your profile page. We'll fill this out with interesting features as we grow. But for now, try clicking 'Shop' above in the header! :)
       <% else %>
-        <div class="col-md-4"></div>
-        <div class="col-md-2">
-          <%= link_to "Shop!", postings_path, class: "btn btn-lg btn-primary btn-block" %>
-        </div>
-        <div class="col-md-2">        
+        <div class="col-md-4 col-md-offset-4">
           <%= link_to "Create new posting", new_posting_path(current_user), class: "btn btn-lg btn-primary" %>         
-        </div>
-        <div class="col-md-4"></div>
+        </div>        
       <% end %>
     </div>
   <% end %>
