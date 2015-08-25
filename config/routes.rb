@@ -24,7 +24,10 @@ Rails.application.routes.draw do
   resources :bulk_purchases, only: [:new, :create]
   resources :bulk_payments, only: [:new, :create]      
   resources :access_codes, only: [:new, :create, :update]
-  
+
+  #THIS MUST BE THE LAST THING IN THIS ROUTES FILE. it's for catching bad paths and redirecting to root  
+  get '*path' => redirect('/')
+
 #  get 'static_pages/help'
 #  get 'static_pages/about'
 #  get 'static_pages/contact'
