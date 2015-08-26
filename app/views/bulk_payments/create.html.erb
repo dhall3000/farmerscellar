@@ -1,2 +1,12 @@
-<h1>BulkPayments#create</h1>
-<p>Find me in app/views/bulk_payments/create.html.erb</p>
+<h1>BulkPayment Creation</h1>
+
+<% if !@messages.nil? && @messages.count > 0 %>
+  <h2>Action Messages</h2>
+  <ul>
+
+  <% @messages.each do |message| %>
+    <li><%= message %></li>
+  <% end %>
+
+  </ul>
+<% end %>

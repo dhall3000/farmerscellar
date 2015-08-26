@@ -20,7 +20,14 @@ class BulkPaymentsController < ApplicationController
   end
 
   def create    
-  	@payment_info_by_producer_id = params[:payment_info_by_producer_id]  	
+  	@messages = []
+
+    @payment_info_by_producer_id = params[:payment_info_by_producer_id]
+    
+    if @payment_info_by_producer_id.nil?
+      @messages << "@payment_info_by_producer_id is nil. We cannot proceed with this bulk payment. Please do not touch the system any further until you can report this to a developer."
+      return
+    end
 
     if @payment_info_by_producer_id.is_a? String
       @payment_info_by_producer_id = eval @payment_info_by_producer_id
