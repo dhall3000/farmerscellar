@@ -9,9 +9,10 @@
 		</section>
 	</aside>	
 </div>
+<%= render partial: "shared/access_or_action" %>
 <div class="row">
   <div class="col-md-12">
-    <% if !@postings.nil? && @postings.any? %>
+    <% if @user.account_type == 1 && !@postings.nil? && @postings.any? %>
       <h1>My Postings</h1>
 	    <table class="table">
 		  <thead>
@@ -44,8 +45,18 @@
 		      <% end %>
 		    </tbody>
 		  </table>  
+		<% else %>
+		  <% if @user.account_type == 1 %>
+		    <p>
+		      This is your profile page. You currently don't have any postings created but once you do they'll be displayed for your viewing here (as well as appearing on the 'shopping' page).
+		    </p>
+		  <% else %>
+		    <% if @user.account_type == 0 %>
+		      <p>
+	            This is your profile page. We'll fill this out with interesting features as we grow. But for now, try clicking 'Shop' above in the header! :)
+	          </p>
+	        <% end %>
+		  <% end %>	      
         <% end %>
       </div>
     </div>
-
-<%= render partial: "shared/access_or_action" %>

@@ -3,6 +3,7 @@ class UsersController < ApplicationController
   before_action :logged_in_user, only: [:index, :edit, :update, :destroy]
   before_action :correct_user,   only: [:edit, :update]
   before_action :redirect_to_root_if_user_not_admin,     only: :destroy
+  before_action :redirect_to_root_if_user_lacks_access, only: [:destroy, :index, :show, :edit]
 
   def destroy
     User.find(params[:id]).destroy
