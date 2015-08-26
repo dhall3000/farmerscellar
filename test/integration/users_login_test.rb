@@ -20,6 +20,7 @@ class UsersLoginTest < ActionDispatch::IntegrationTest
   end
 
   test "login with valid information" do
+    get_access_for(@user)
     get login_path
     post login_path, session: { email: @user.email, password: 'dogdog' }
     assert_redirected_to @user
@@ -31,6 +32,7 @@ class UsersLoginTest < ActionDispatch::IntegrationTest
   end
 
   test "login with valid information followed by logout" do
+    get_access_for(@user)
     get login_path
     post login_path, session: { email: @user.email, password: 'dogdog' }
     assert is_logged_in?

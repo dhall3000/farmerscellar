@@ -24,6 +24,22 @@ class ActiveSupport::TestCase
     end
   end
 
+  def get_access_code    
+    @a1 = users(:a1)
+    log_in_as(@a1)
+    post access_codes_path, access_code: {notes: "empty notes"}
+    code = assigns(:code)
+
+    return code
+
+  end
+
+  def get_access_for(user)
+    code = get_access_code
+    log_in_as(user)
+    patch user_path(user), user: { access_code: code }
+  end
+
   private
 
     # Returns true inside an integration test.
