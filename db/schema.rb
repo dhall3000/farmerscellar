@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150822040845) do
+ActiveRecord::Schema.define(version: 20150826211717) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -387,7 +387,7 @@ ActiveRecord::Schema.define(version: 20150822040845) do
     t.datetime "created_at",                        null: false
     t.datetime "updated_at",                        null: false
     t.string   "password_digest"
-    t.integer  "account_type"
+    t.integer  "account_type",      default: 0
     t.string   "remember_digest"
     t.string   "activation_digest"
     t.boolean  "activated",         default: false
