@@ -1,6 +1,13 @@
 class PostingsController < ApplicationController
   def new  	
-  	@posting = current_user.postings.new
+
+    if params[:posting_id].nil?
+      @posting = current_user.postings.new
+    else
+      posting_to_clone = Posting.find(params[:posting_id])
+      @posting = posting_to_clone.dup
+    end
+
   	@products = Product.all
   	@unit_categories = UnitCategory.all
   	@unit_kinds = UnitKind.all

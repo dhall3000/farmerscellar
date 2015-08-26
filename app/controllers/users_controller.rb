@@ -20,6 +20,12 @@ class UsersController < ApplicationController
 
   def show
   	@user = User.find(params[:id])
+
+    #we want farmer to be able to see all his past postings
+    if @user.account_type > 0
+      @postings = Posting.where(user_id: @user.id).order(delivery_date: :desc)
+    end
+
   end
 
   def create    
