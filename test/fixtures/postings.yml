@@ -17,6 +17,7 @@ postingf1apples:
   unit_category: weight
   unit_kind: pound
   description: these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.
+  live: true
 
 #Asparagus
 #Posting.create(delivery_date: next_friday, product_id: 6, quantity_available: 100, price: 3.25, user_id: 1, unit_category_id: 2, unit_kind_id: 8, description: "these Asparagus are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
