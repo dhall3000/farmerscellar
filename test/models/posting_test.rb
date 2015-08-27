@@ -3,10 +3,11 @@ require 'test_helper'
 class PostingTest < ActiveSupport::TestCase
 
   def setup
-    @posting = Posting.new(quantity_available: 100, price: 1.25, live: true)
+    @posting = Posting.new(description: "descrip", quantity_available: 100, price: 1.25, live: true, delivery_date: "2015-08-28")
+    @posting.save
   end
 
-  test "posting is valid" do
+  test "posting is valid" do    
     assert @posting.valid?
   end
 

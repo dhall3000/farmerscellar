@@ -21,9 +21,8 @@ class PostingsTest < ActionDispatch::IntegrationTest
     login_for(@user)
     mylive = @posting.live
     mynotlive = !@posting.live
-    patch posting_path(@posting), posting: {description: "edited description", quantity_available: @posting.quantity_available, price: @posting.price, live: mynotlive}
-    assert_redirected_to @user
-    
+    patch posting_path(@posting), posting: {description: "edited description", quantity_available: @posting.quantity_available, price: @posting.price, live: mynotlive, delivery_date: @posting.delivery_date}
+    assert_redirected_to @user    
   end
 
   def login_for(user)

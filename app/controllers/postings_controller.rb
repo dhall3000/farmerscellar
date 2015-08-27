@@ -10,10 +10,7 @@ class PostingsController < ApplicationController
       @posting = posting_to_clone.dup
     end
 
-  	@products = Product.all
-  	@unit_categories = UnitCategory.all
-  	@unit_kinds = UnitKind.all
-    @delivery_dates = next_delivery_dates(4)
+    load_posting_choices
 
   end
 
@@ -24,10 +21,12 @@ class PostingsController < ApplicationController
 
   def create        
   	@posting = Posting.new(posting_params)
+
   	if @posting.save
   	  flash[:info] = "Your new posting is now live!"
-      redirect_to root_url
+      redirect_to postings_path
     else      
+      load_posting_choices
       render 'new'
   	end
 
@@ -42,17 +41,13 @@ class PostingsController < ApplicationController
 
   def update    
     @posting = Posting.find(params[:id])
-    stuff = posting_params
 
-    if @posting.update_attributes(posting_params)
-      puts "enter if"
+    if @posting.update_attributes(posting_params)      
       flash[:success] = "Posting updated!"
       redirect_to current_user
     else
-      puts "enter else"
       render 'edit'
     end
-
 
   end
 
@@ -61,6 +56,13 @@ class PostingsController < ApplicationController
   end
 
   private
+
+    def load_posting_choices
+      @products = Product.all
+      @unit_categories = UnitCategory.all
+      @unit_kinds = UnitKind.all
+      @delivery_dates = next_delivery_dates(4)
+    end
 
     def posting_params
 
