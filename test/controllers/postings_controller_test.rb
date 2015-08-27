@@ -15,8 +15,18 @@ class PostingsControllerTest < ActionController::TestCase
     #verify redirection    
     assert_template 'postings/new'
     #verify sad message
-    posting = assigns(:posting)
-    assert_not posting.valid?           
+    posting = assigns(:posting)    
+    assert_not posting.valid?
+    #this is for the flash
+    assert_select 'div.alert-danger', "The form contains 2 errors."    
+
+    #this is for the specific errors that should be reported to the user
+    assert_select 'div#error_explanation' do
+      assert_select 'ul' do
+        assert_select 'li', "Price can't be blank"
+        assert_select 'li', "Price is not a number"
+      end
+    end
 
   end
 
