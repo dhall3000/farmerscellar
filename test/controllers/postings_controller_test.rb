@@ -11,7 +11,7 @@ class PostingsControllerTest < ActionController::TestCase
     #log in
     log_in_as(@user)
     #make a posting that doesn't have price set
-    post :create, id: @user.id, posting: { description: "descrip", quantity_available: 10, live: true, delivery_date: "3000-08-28" }    
+    post :create, id: @user.id, posting: { description: "descrip", quantity_available: 10, live: true, delivery_date: "3000-08-28" }
     #verify redirection    
     assert_template 'postings/new'
     #verify sad message
@@ -30,18 +30,51 @@ class PostingsControllerTest < ActionController::TestCase
 
   end
 
+  test "newly created posting is posted when created properly with live set" do
+    log_in_as(@user)
+    get :index
+    postings = assigns(:postings)
+    assert_not postings.nil?
+    puts "postings.count = #{postings.count}"
+    postings_count_prior = postings.count
+    successfully_create_posting
+    posting = assigns(:posting)
+    assert_not posting.nil?
+    get :index
+    postings = assigns(:postings)
+    assert_not postings.nil?
+    puts "postings.count = #{postings.count}"
+    postings_count_post = postings.count
+    assert postings_count_post > postings_count_prior, "the number of posts after successful post-creation was not greater than before successful post-creation"
+  end
+
+  test "newly created posting is not posted when created properly with live unset" do
+    
+  end
+
+  test "posted posting becomes unposted after unsetting live" do
+
+  end
+
+  test "unposted posting becomes posted after setting live" do
+
+  end
+
   test "successfully create a posting" do
+    successfully_create_posting
+  end
+
+  def successfully_create_posting
     #log in
     log_in_as(@user)
     #go to post creation page
     #specify values, submit form
-    post :create, id: @user.id, posting: { description: "descrip", price: 1, quantity_available: 10, live: true, delivery_date: "3000-08-28" }
+    post :create, id: @user.id, posting: { description: "descrip", price: 1, quantity_available: 10, live: true, delivery_date: "3000-08-28", product_id: @posting.product_id, unit_kind_id: @posting.unit_kind.id, unit_category_id: @posting.unit_category.id }
     posting = assigns(:posting)
     assert_not posting.nil?
     assert posting.valid?
     assert_redirected_to postings_path
     assert_not flash.empty?
-    
   end
 
   test "should get redirected if not logged in" do  	
