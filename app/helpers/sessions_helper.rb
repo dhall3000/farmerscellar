@@ -39,6 +39,16 @@ module SessionsHelper
     end
   end
 
+  #NOTE!: this is half implemented and zero tested. it's a good concept but found another way around my intent here.
+  #it's not getting used anywhere yet
+  def redirect_to_if_not_logged_in(redirect_path, flash_message)
+    if !logged_in?    
+      store_location
+      flash[:danger] = "Please log in."
+      redirect_to login_url
+    end
+  end
+
   def logged_in?
     !current_user.nil?
   end
@@ -70,5 +80,14 @@ module SessionsHelper
   # Stores the URL trying to be accessed.
   def store_location
     session[:forwarding_url] = request.url if request.get?
+  end
+
+  # Confirms a logged-in user.
+  def logged_in_user
+    unless logged_in?
+      store_location
+      flash[:danger] = "Please log in."
+      redirect_to login_url
+    end
   end
 end

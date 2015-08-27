@@ -28,6 +28,11 @@
 		<%= f.label :delivery_date, "Delivery Date" %>
 		<%= f.collection_select :delivery_date, @delivery_dates, :to_s, :to_s, prompt: true %>
 
+	    <%= f.label :live, class: "inline" do %>
+	      <%= f.check_box :live, checked: true %>
+	      <span>Posting is live</span>      
+	    <% end %>
+
 		<%= f.submit "Create new posting", class: "btn btn-primary" %>
 
 		<% end %>

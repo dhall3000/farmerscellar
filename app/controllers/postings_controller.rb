@@ -1,4 +1,6 @@
 class PostingsController < ApplicationController
+  before_action :logged_in_user
+
   def new  	
 
     if params[:posting_id].nil?
@@ -12,6 +14,7 @@ class PostingsController < ApplicationController
   	@unit_categories = UnitCategory.all
   	@unit_kinds = UnitKind.all
     @delivery_dates = next_delivery_dates(4)
+
   end
 
   def index
@@ -19,14 +22,37 @@ class PostingsController < ApplicationController
     @postings = Posting.where("delivery_date >= ?", Date.today)
   end
 
-  def create  	
+  def create        
   	@posting = Posting.new(posting_params)
   	if @posting.save
   	  flash[:info] = "Your new posting is now live!"
       redirect_to root_url
-    else
+    else      
       render 'new'
   	end
+
+  end
+
+  def edit
+    #if an admin is doing this we want him to be able to edit it but if it's a farmer we want to put
+    #contraints on. however, for now all we're implementing is the ability for farmer to switch between making the 
+    #posting live or not live
+    @posting = Posting.find(params[:id])        
+  end
+
+  def update    
+    @posting = Posting.find(params[:id])
+    stuff = posting_params
+
+    if @posting.update_attributes(posting_params)
+      puts "enter if"
+      flash[:success] = "Posting updated!"
+      redirect_to current_user
+    else
+      puts "enter else"
+      render 'edit'
+    end
+
 
   end
 
@@ -37,12 +63,27 @@ class PostingsController < ApplicationController
   private
 
     def posting_params
-      
-      posting = params.require(:posting).permit(:description, :quantity_available, :price, :user_id, :product_id, :unit_category_id, :unit_kind_id, :delivery_date)
+
+      posting = params.require(:posting).permit(:description, :quantity_available, :price, :user_id, :product_id, :unit_category_id, :unit_kind_id, :delivery_date, :live)
       posting[:user_id] = current_user[:id]
 
       unit_kind = UnitKind.all.find_by(id: posting[:unit_kind_id])
-      posting[:unit_category_id] = unit_kind.unit_category.id
+
+      if !unit_kind.nil?
+        posting[:unit_category_id] = unit_kind.unit_category.id
+      end
+
+      #this hocus pocus has to do with some strange gotchas. a check box sends in a "1" or "0", both of which evaluate to true for a boolean type,
+      #which the live attribute is. so i'm just hackishly converting from one to the other to be ridiculously specific
+      if posting.has_key?(:live)
+        if posting[:live] == "0"
+          posting[:live] = false
+        else
+          if posting[:live] == "1"
+            posting[:live] = true
+          end
+        end
+      end
 
       posting
 
