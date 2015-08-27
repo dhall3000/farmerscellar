@@ -48,7 +48,27 @@ class PostingsControllerTest < ActionController::TestCase
     assert postings_count_post > postings_count_prior, "the number of posts after successful post-creation was not greater than before successful post-creation"
   end
 
+  #this new posting SHOULD show up in the My Postings section of the farmer's profile  
   test "newly created posting is not posted when created properly with live unset" do
+    #this new posting should NOT show up in the shopping pages
+    
+    log_in_as(@user)
+    get :index
+    postings = assigns(:postings)        
+    assert_not postings.nil?
+    puts "postings.count = #{postings.count}"
+    postings_count_prior = postings.count
+    
+    successfully_create_posting_with_live_unset
+
+    posting = assigns(:posting)
+    assert_not posting.nil?
+    get :index
+    postings = assigns(:postings)
+    assert_not postings.nil?
+    puts "postings.count = #{postings.count}"
+    postings_count_post = postings.count
+    assert postings_count_post == postings_count_prior, "the number of posts after successful non-live post-creation was not equal to the before successful non-live post-creation"
     
   end
 
@@ -70,6 +90,19 @@ class PostingsControllerTest < ActionController::TestCase
     #go to post creation page
     #specify values, submit form
     post :create, id: @user.id, posting: { description: "descrip", price: 1, quantity_available: 10, live: true, delivery_date: "3000-08-28", product_id: @posting.product_id, unit_kind_id: @posting.unit_kind.id, unit_category_id: @posting.unit_category.id }
+    posting = assigns(:posting)
+    assert_not posting.nil?
+    assert posting.valid?
+    assert_redirected_to postings_path
+    assert_not flash.empty?
+  end
+
+  def successfully_create_posting_with_live_unset
+    #log in
+    log_in_as(@user)
+    #go to post creation page
+    #specify values, submit form
+    post :create, id: @user.id, posting: { description: "descrip", price: 1, quantity_available: 10, live: false, delivery_date: "3000-08-28", product_id: @posting.product_id, unit_kind_id: @posting.unit_kind.id, unit_category_id: @posting.unit_category.id }
     posting = assigns(:posting)
     assert_not posting.nil?
     assert posting.valid?

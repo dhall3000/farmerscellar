@@ -15,8 +15,8 @@ class PostingsController < ApplicationController
   end
 
   def index
-    # we only want to pull postings whose delivery date is >= today
-    @postings = Posting.where("delivery_date >= ?", Date.today)
+    # we only want to pull postings whose delivery date is >= today and that are 'live'
+    @postings = Posting.where("delivery_date >= ? and live = ?", Date.today, true)
   end
 
   def create        
