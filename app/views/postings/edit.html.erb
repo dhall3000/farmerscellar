@@ -18,8 +18,10 @@
 
 	    <%= f.label :live, class: "inline" do %>
 	      <%= f.check_box :live %>
-	      <span>Posting is live</span>      
+	      <span>Make posting live</span>      
 	    <% end %>
+
+	    <a href='#' class="popover_init" tabindex="0" data-container="body" data-toggle="popover" data-trigger="focus" data-content="A 'live' posting is one that shows up on the shopping pages for customers to view and make purchases from. Unchecking this 'live' box will make your posting instantly disappear from the shopping pages so that no further customer interactions can happen. It does not delete your posting and any customer orders in place at the time you uncheck this box will remain fully intact and legitimate.">(?)</a>
 
 		<%= f.submit "Edit posting", class: "btn btn-primary" %>
 
