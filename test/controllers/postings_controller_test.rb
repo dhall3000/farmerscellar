@@ -31,57 +31,71 @@ class PostingsControllerTest < ActionController::TestCase
   end
 
   test "newly created posting is posted when created properly with live set" do
-    log_in_as(@user)
-    get :index
-    postings = assigns(:postings)
-    assert_not postings.nil?
-    puts "postings.count = #{postings.count}"
-    postings_count_prior = postings.count
+    
+    postings_count_prior = get_postings_count
     successfully_create_posting
     posting = assigns(:posting)
-    assert_not posting.nil?
-    get :index
-    postings = assigns(:postings)
-    assert_not postings.nil?
-    puts "postings.count = #{postings.count}"
-    postings_count_post = postings.count
+    assert_not posting.nil?    
+    postings_count_post = get_postings_count
     assert postings_count_post > postings_count_prior, "the number of posts after successful post-creation was not greater than before successful post-creation"
+
   end
 
   #this new posting SHOULD show up in the My Postings section of the farmer's profile  
   test "newly created posting is not posted when created properly with live unset" do
     #this new posting should NOT show up in the shopping pages
     
-    log_in_as(@user)
-    get :index
-    postings = assigns(:postings)        
-    assert_not postings.nil?
-    puts "postings.count = #{postings.count}"
-    postings_count_prior = postings.count
-    
-    successfully_create_posting_with_live_unset
+    postings_count_prior = get_postings_count
 
+    successfully_create_posting_with_live_unset
     posting = assigns(:posting)
     assert_not posting.nil?
-    get :index
-    postings = assigns(:postings)
-    assert_not postings.nil?
-    puts "postings.count = #{postings.count}"
-    postings_count_post = postings.count
+    
+    postings_count_post = get_postings_count
     assert postings_count_post == postings_count_prior, "the number of posts after successful non-live post-creation was not equal to the before successful non-live post-creation"
     
   end
 
   test "posted posting becomes unposted after unsetting live" do
-
+    posting = successfully_create_posting
+    postings_count_prior = get_postings_count
+    live_prior = posting.live
+    posting.live = false
+    posting.save
+    posting.reload
+    live_post = posting.live
+    assert live_prior != live_post
+    postings_count_post = get_postings_count
+    assert postings_count_post < postings_count_prior
   end
 
   test "unposted posting becomes posted after setting live" do
-
+    posting = successfully_create_posting_with_live_unset
+    postings_count_prior = get_postings_count
+    live_prior = posting.live
+    posting.live = true
+    posting.save
+    posting.reload
+    live_post = posting.live
+    assert live_prior != live_post
+    postings_count_post = get_postings_count
+    assert postings_count_post > postings_count_prior
   end
 
   test "successfully create a posting" do
     successfully_create_posting
+  end
+
+  def get_postings_count
+    
+    log_in_as(@user)
+    get :index
+    postings = assigns(:postings)        
+    assert_not postings.nil?
+    puts "postings.count = #{postings.count}"
+
+    return postings.count
+
   end
 
   def successfully_create_posting
@@ -95,6 +109,9 @@ class PostingsControllerTest < ActionController::TestCase
     assert posting.valid?
     assert_redirected_to postings_path
     assert_not flash.empty?
+
+    return posting
+
   end
 
   def successfully_create_posting_with_live_unset
@@ -108,6 +125,7 @@ class PostingsControllerTest < ActionController::TestCase
     assert posting.valid?
     assert_redirected_to postings_path
     assert_not flash.empty?
+    return posting
   end
 
   test "should get redirected if not logged in" do  	
