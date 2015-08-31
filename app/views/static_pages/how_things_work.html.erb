@@ -7,12 +7,8 @@
     
     <div id="help_navigation" class="affix">
       <ul class="nav nav-pills nav-stacked">
-        <li class="active"><a href="#posting">Posting</a></li>
-        <li><a href="#shopping_tote">Shopping Tote</a></li>
-        <li><a href="#shopping_tote_item">Shopping Tote Item</a></li>
-        <li><a href="#addition">Addition</a></li>
-        <li><a href="#authorization">Authorization</a></li>
-        <li><a href="#commitment_zone">Commitment Zone</a></li>
+        <li class="active"><a href="#the_simple_version">The Simple Version</a></li>
+        <li><a href="#the_detailed_version">The Detailed Version</a></li>
       </ul>
     </div>
   
@@ -22,122 +18,42 @@
 
 
 
-    <div class="anchor" id="posting">
-      <h2>Posting</h2>
-      <div>
-        
-          <h3>What</h3>
-          <p>This can be thought of as similar to a craigslist ad. The producer / farmer logs in to his Farmer's Cellar account and creates an 'ad' of sorts that advertises various details of his product offering, including the date of delivery and price. The producer is in full control of their posting. In particular, they set the price of their offering, not Farmer's Cellar.</p>
-                
-          <h3>How to View</h3>
-          <p>A complete list of available <%= link_to "postings", postings_path %> is available by clicking the 'Shop' link in the header. To view an individual posting and make a purchase, click on the 'View buy page' button on the <%= link_to "postings", postings_path %> page.</p>
+    <div class="anchor" id="the_simple_version">
+      <h2>The Simple Version</h2>
+      <h3>Action Sequence</h3>
+      <ol>
+        <li>Producers post their products for sale</li>
+        <li>You add the products you want to your shopping tote</li>
+        <li>You check out</li>
+        <li>Your products get delivered to our self serve dropsites</li>
+        <li>We notify you via email that your products are ready for pickup</li>
+        <li>You pickup whenever you want</li>        
+      </ol>
+      <h3>Uncommon Aspects</h3>
+      Probably the two most important things to be aware of are:
+      <ol>
+        <li>
+          Due to product availability constraints you might not actually get everything you order.
+        </li>      
+        <li>
+          Due to the above, we don't actually charge your payment account when you checkout / authorize. We wait to collect payment from your authorization until product actually arrives on your behalf.
+        </li>
+      </ol>
 
-          <h3>Approximate Quantity Available</h3>
-          <p>When a producer creates a posting they provide Farmer's Cellar with an approximate quantity they have available to sell through Farmer's Cellar. There are many good reasons for this. For example...It usually is in the producer's best interest to try to delivery on Farmer's Cellar customer commitments. But sometimes it will happen that they just don't have product available to fill your order. In that case you won't get product and, of course, won't be charged either. </p>
+    </div>
 
+
+
+    <div class="anchor" id="the_detailed_version">
+      <h2>The Detailed Version</h2>
+      <div>                        
+        <p>
+          We'll flesh this out soon....
+        </p>
       </div>
     </div>
 
 
-
-    <div class="anchor" id="shopping_tote">
-      <h2>Shopping Tote</h2>
-      <div>
-        
-          <h3>What</h3>
-          <p>Similar to a traditional 'shopping cart' in that it is a place for you to collect items you have interest in purchasing. However, what is important to note is that the producer never has an obligation to deliver. For more information on why this is, please see <%= link_to "Posting", "#posting"%>.</p>
-                
-          <h3>Example 1</h3>
-          <p></p>
-
-          <h3>Example 2</h3>
-          <p></p>
-
-          <h3>Why</h3>
-          <p></p>
-
-      </div>
-    </div>
-
-
-
-    <div class="anchor" id="shopping_tote_item">
-      <h2>Shopping Tote Item</h2>
-      <div>
-        
-          <h3>What</h3>
-          <p>This is a quantity of a particular <%= link_to "Posting", "#posting"%> that you have added to your <%= link_to "Shopping Tote", "#shopping_tote"%>. Your 'tote' is viewed by going to the Account drop down and selecting 'Shopping Tote'.</p>
-                
-          <h3>Example 1</h3>
-          <p></p>
-
-          <h3>Example 2</h3>
-          <p></p>
-
-          <h3>Why</h3>
-          <p></p>
-
-      </div>
-    </div>
-
-
-
-    <div class="anchor" id="addition">
-      <h2>Addition</h2>
-      <div>        
-        <h3>What</h3>
-        <p>This is just the process of viewing a producer's product <%= link_to "posting", "#posting" %> and adding some quantity of it to your <%= link_to "shopping tote", "#shopping_tote" %>. Immediately after doing this your tote items has been 'added'. However, if you do nothing further, we will take no action. We will neither charge your payment account, forward your order along to the producer nor process any product. For all those things to occur you must first <%= link_to "authorize", "#authorization" %> payment for this newly added shopping tote item.</p>
-      </div>
-    </div>
-
-
-
-    <div class="anchor" id="authorization">
-      <h2>Authorization</h2>
-      <div>
-        
-          <h3>What</h3>
-          <p>Authorization is simply the process of telling your payment company (e.g. PayPal) that you authorize a specific amount of funds to be charged by Farmer's Cellar for goods purchased.
-
-          This process is initiated right from your Shopping Tote page.  A single authorization is made for the entire batch of items in your tote that are yet to be authorized.
-
-          Authorized items can be removed individually up until they cross in to the <%= link_to "Commitment Zone", "#commitment_zone" %>.
-
-          </p>
-                
-          <h3>Example 1</h3>
-          <p>Say that on Sunday you add an item to your shopping tote but do not authorize it and that this item is scheduled for Friday delivery. No problem. You could leave that item in your shopping tote as is forever and it will never become "committed" because you have not authorized payment for it. You would not be charged nor expected to pay for this item.</p>
-
-          <h3>Example 2</h3>
-          <p>Say that, like in Example 1, you add an item to your shopping tote and that this item is scheduled for Friday delivery. Only this time you <u>do</u> authorize payment for it. Even after authorizing payment for this item you could still remove it from your shopping tote up until Wednesday at 12:01 AM. But if you leave the item as is (i.e. <%= link_to "authorized", "#authorization" %>), at 12:01 AM on Wednesday the item will become "committed", beyond which you will be expected to pay once the item is delivered.</p>
-
-          <h3>Why</h3>
-          <p>The reason for this is to protect the producer from preparing your order only to have you cancel and leave him with product he can't sell or use. Think of this two day Commitment Zone as the harvesting and packaging lead time a farmer would need to get your order ready. Within this Commitment Zone this farmer could rest assured that if he delivers product there will be funds waiting for him.</p>
-
-      </div>
-    </div>
-
-
-
-    <div class="anchor" id="commitment_zone">
-      <h2>Commitment Zone</h2>
-	    <div>
-	      
-		      <h3>What</h3>
-          <p>The Commitment Zone is the two day period prior to delivery. Any authorized item in your shopping tote becomes "committed" once it is within this two day pre-delivery period. A committed shopping tote item cannot be removed and you must pay for it upon delivery.</p>		    
-		    		    
-		      <h3>Example 1</h3>
-		      <p>Say that on Sunday you add an item to your shopping tote but do not authorize it and that this item is scheduled for Friday delivery. No problem. You could leave that item in your shopping tote as is forever and it will never become "committed" because you have not authorized payment for it. You would not be charged nor expected to pay for this item.</p>
-
-		      <h3>Example 2</h3>
-		      <p>Say that, like in Example 1, you add an item to your shopping tote and that this item is scheduled for Friday delivery. Only this time you <u>do</u> authorize payment for it. Even after authorizing payment for this item you could still remove it from your shopping tote up until Wednesday at 12:01 AM. But if you leave the item as is, at 12:01 AM on Wednesday the item will become "committed", beyond which you will be expected to pay once the item is delivered.</p>
-
-		      <h3>Why</h3>
-		      <p>The reason for this is to protect the producer from preparing your order only to have you cancel and leave him with product he can't sell or use. Think of this two day Commitment Zone as the harvesting and packaging lead time a farmer would need to get your order ready. Within this Commitment Zone this farmer could rest assured that if he delivers product there will be funds waiting for him.</p>
-
-	    </div>
-    </div>
-    
    
 
   </div>
