@@ -1,0 +1,15 @@
+<h1>Edit Website Settings</h1>
+<div class="row">
+  <div class="col-md-4 col-md-offset-4">
+    <%= form_for @website_setting do |f| %>
+
+      <%= f.label :new_customer_access_code_required, class: "inline" do %>
+        <%= f.check_box :new_customer_access_code_required %>
+        <span>New customer access code required</span>      
+      <% end %>
+
+      <%= f.submit "Update Website Settings", class: "btn btn-primary" %>
+
+    <% end %>
+  </div>
+</div>

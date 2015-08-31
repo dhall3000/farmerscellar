@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150826214645) do
+ActiveRecord::Schema.define(version: 20150830232711) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -189,24 +189,6 @@ ActiveRecord::Schema.define(version: 20150826214645) do
     t.float    "amount"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-  end
-
-  create_table "paypal_masspay_common_responses", force: :cascade do |t|
-    t.string   "correlation_id"
-    t.string   "time_stamp"
-    t.string   "ack"
-    t.string   "version"
-    t.string   "build"
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
-  end
-
-  create_table "paypal_masspay_error_responses", force: :cascade do |t|
-    t.string   "correlation_id"
-    t.string   "name"
-    t.string   "value"
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
   end
 
   create_table "postings", force: :cascade do |t|
@@ -410,5 +392,11 @@ ActiveRecord::Schema.define(version: 20150826214645) do
 
   add_index "users", ["account_type"], name: "index_users_on_account_type"
   add_index "users", ["email"], name: "index_users_on_email", unique: true
+
+  create_table "website_settings", force: :cascade do |t|
+    t.boolean  "new_customer_access_code_required"
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+  end
 
 end
