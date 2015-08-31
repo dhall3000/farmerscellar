@@ -3,7 +3,7 @@
 <% tote_items_added = [] %>
 <% tote_items_authorized = [] %>
 <% if !local_assigns[:authorization_adjective] %>
-  <% authorization_adjective = "needs" %>
+  <% authorization_adjective = "needs" %>  
 <% end %>
 
 <h2>Tote Items in Tote</h2>
@@ -65,14 +65,20 @@
             </tr>
           <% end %>
           <% if tote_items_authorized.count > 0 %>
-            <% data_content = "This is the total of all the items that you have authorized Farmer's Cellar to charge your payment account. These are the items listed above with a white background. Your account will be charged the total amount shown here if and when all your ordered items are delivered." %>
+            <% data_content = "This is the total of all the items that you have already authorized Farmer's Cellar to charge your payment account for. These are the items listed above with a white background. Your account will be charged the total amount shown here if and when all your ordered items are delivered." %>
             <tr>
               <td><a href="#" class="popover_init" tabindex="0" data-container="body" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=data_content%>">Total (already authorized)</a></td>
               <td class="text-right"><%= number_to_currency(total_cost_of_tote_items(tote_items_authorized)) %></td>
             </tr>
           <% end %>
           <% if tote_items_added.count > 0 %>
-            <% data_content = "This is the total of all the items that you added to your shopping tote but have not yet authorized Farmer's Cellar to charge your payment account for. These are the items listed above with a yellow background. Your account will not be charged for these unless you first authorize payment for them." %>
+
+            <% if authorization_adjective == "needs" %>
+              <% data_content = "This is the total of all the items that you added to your shopping tote but have not yet authorized Farmer's Cellar to charge your payment account for. These are the items listed above with a yellow background. Your account will not be charged for these unless you first authorize payment for them." %>
+            <% else %>
+              <% data_content = "This is the total of all the items that you just successfully authorized Farmer's Cellar to charge your payment account for. Your account will be charged for these once your order is delivered." %>
+            <% end %>
+            
             <tr class="action_needed">
               <td><a href="#" class="popover_init" tabindex="0" data-container="body" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=data_content%>">Total (<%= authorization_adjective %> authorization)</a></td>
               <td class="text-right"><%= number_to_currency(total_cost_of_tote_items(tote_items_added)) %></td>

@@ -7,5 +7,5 @@
   <%= render partial: "shared/tote", locals: { tote_items: @successfully_authorized_tote_items, authorization_adjective: "successful" } %>
 <% else %>
 <h1>Payment Authorization Error</h1>
-  Something seemed to have gone wrong with your payment authorization. Please <%= link_to "contact us", contact_path %> to get this issue correct. Thank you!
+  Something seemed to have gone wrong with your payment authorization. Please <%= link_to "contact us", contact_path %> to get this issue corrected. Thank you!
 <% end %>
