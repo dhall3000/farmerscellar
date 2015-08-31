@@ -12,8 +12,12 @@
 
 <div class="row">
   <div class="col-md-12">
-    <% if @user.account_type == 1 && !@postings.nil? && @postings.any? %>
-      <%= link_to "Create new posting", new_posting_path(current_user), class: "btn btn-lg btn-primary" %>
+    <% if @user.account_type == 1 %>
+      <div class="text-center">
+        <%= link_to "Create new posting", new_posting_path(current_user), class: "btn btn-lg btn-primary" %>
+      </div>
+    <% end %>  
+    <% if @user.account_type == 1 && !@postings.nil? && @postings.any? %>      
       <h1>My Postings</h1>
 	  <table class="table">
 	    <thead>
