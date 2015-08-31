@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   get 'bulk_payments/test_masspay' => 'bulk_payments#test_masspay'
   post 'bulk_payments/test_masspay' => 'bulk_payments#test_masspay'
 
+  resources :products
   resources :website_settings, only: [:edit, :update]
   resources :users
   resources :account_activations, only: [:edit]
