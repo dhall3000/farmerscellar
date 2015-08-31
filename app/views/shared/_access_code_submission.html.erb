@@ -1,16 +1,18 @@
-<div class="row">
-  <div class="col-md-2 col-md-offset-5">
-    <%= form_for current_user do |f| %>
-      <div class="text-center">
-        <%= f.label :access_code %>      
-      </div>
-      <%= f.text_field :access_code, class: "form-control" %>
-      <%= f.submit "Go!", class: "btn btn-primary" %>      
-    <% end %>    
+<% if logged_in? && !user_has_access? %>
+  <div class="row">
+    <div class="col-md-2 col-md-offset-5">
+      <%= form_for current_user do |f| %>
+        <div class="text-center">
+          <%= f.label :access_code %>      
+        </div>
+        <%= f.text_field :access_code, class: "form-control" %>
+        <%= f.submit "Go!", class: "btn btn-primary" %>      
+      <% end %>    
 
-    <div class="text-center">
-      <a id="access_code_explanation" tabindex="0" data-container="body" data-toggle="popover" data-trigger="focus" data-content="Farmer's Cellar is currently invite only but we'll send you an access code as we expand. Thanks for your patience and we look forward to serving you in the very near future!">(access code?)
-      </a>      
+      <div class="text-center">
+        <a href='#' id="access_code_explanation" tabindex="0" data-container="body" data-toggle="popover" data-trigger="focus" data-content="Farmer's Cellar is currently invite only but we'll send you an access code as we expand. Thanks for your patience and we look forward to serving you in the very near future!">(access code?)
+        </a>      
+      </div>
     </div>
   </div>
-</div>
+<% end %>

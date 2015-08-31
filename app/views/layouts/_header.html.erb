@@ -5,7 +5,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li><%= link_to "Home", root_path,  class: "glyphicon" %></li>
         <% if logged_in? %>          
-          <% if current_user.access_code != nil  %>
+          <% if user_has_access?  %>
             <li><%= link_to "Shop", postings_path,  class: "glyphicon" %></li>
             <li><%= link_to " Tote", tote_items_path,  class: "glyphicon glyphicon-shopping-cart" %></li>
           <% end %>
@@ -16,10 +16,10 @@
             
             <ul class="dropdown-menu">
               <li><%= link_to "Profile", current_user %></li>              
-              <% if current_user.access_code != nil  %>
+              <% if user_has_access?  %>
                 <li><%= link_to "Settings", edit_user_path(current_user) %></li>                
               <% end %>
-              <% if current_user.account_type == 1 && current_user.access_code != nil %>
+              <% if current_user.account_type == 1 && user_has_access? %>
                 <li><%= link_to "Create new posting", new_posting_path(current_user) %></li>
               <% end %>
               <li class="divider"></li>

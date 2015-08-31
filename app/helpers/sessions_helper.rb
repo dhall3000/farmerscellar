@@ -34,9 +34,34 @@ module SessionsHelper
   end
 
   def redirect_to_root_if_user_lacks_access
-    if !logged_in? || current_user.access_code.nil?
+    if !user_has_access?
       redirect_to(root_url)
     end
+  end
+
+  def user_has_access?
+
+    #if the user's not even logged in, no access
+    if !logged_in?
+      return false
+    end
+
+    #does the current user have an access code plugged in? if so, they always have access
+    if !current_user.access_code.nil?
+      return true
+    end
+
+    #we always require an access code for farmers because we don't want any tom, dick or harry
+    #posting garbage ads to our site. so what we're doing here is granting access to anybody who doesn't
+    #have an access code if we're in a not-requiring-access-code state UNLESS you are a farmer
+    if !WebsiteSetting.last.new_customer_access_code_required
+      if current_user.account_type == 0 || current_user.account_type == 2
+        return true
+      end
+    end
+
+    return false    
+
   end
 
   #NOTE!: this is half implemented and zero tested. it's a good concept but found another way around my intent here.

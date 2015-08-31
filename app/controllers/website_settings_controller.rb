@@ -1,5 +1,5 @@
 class WebsiteSettingsController < ApplicationController
-  before_action :redirect_to_root_if_user_not_admin, only: [:edit, :update]
+  before_action :redirect_to_root_if_user_not_admin
 
   def edit
   	@website_setting = WebsiteSetting.find(params[:id])	

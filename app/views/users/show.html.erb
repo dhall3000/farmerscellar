@@ -9,56 +9,57 @@
 		</section>
 	</aside>	
 </div>
-<%= render partial: "shared/access_or_action" %>
+
 <div class="row">
   <div class="col-md-12">
     <% if @user.account_type == 1 && !@postings.nil? && @postings.any? %>
+      <%= link_to "Create new posting", new_posting_path(current_user), class: "btn btn-lg btn-primary" %>
       <h1>My Postings</h1>
-	    <table class="table">
-		  <thead>
+	  <table class="table">
+	    <thead>
+		  <tr>
+		    <th class="text-center">Producer</th>
+		    <th class="text-center">Product</th>
+		    <th class="text-center">Price</th>   
+		    <th class="text-center">Unit</th>
+		    <th class="text-center">Delivery Date</th>
+		    <th class="text-center">Re-post</th>
+		    <th class="text-center">Edit</th>
+		  </tr>
+		</thead>
+		<tbody>
+	      <% @postings.each do |posting| %>
+	      <% farmInfo = "Producer has not provided info about their operation" %>
+		  <% if posting.user.description != nil %>
+		    <% farmInfo = "<u>Producer Description</u><p>" + posting.user.description %>
+		  <% end %>
+		  <% if !posting.user.website.blank? %>
+		    <% farmInfo = farmInfo + "<p>" + "<u>Producer Website</u><p><a href='" + posting.user.website + "' target='_blank'>" + posting.user.website + "</a>"%>
+		  <% end %>
 		    <tr>
-		      <th class="text-center">Producer</th>
-		      <th class="text-center">Product</th>
-		      <th class="text-center">Price</th>   
-		      <th class="text-center">Unit</th>
-		      <th class="text-center">Delivery Date</th>
-		      <th class="text-center">Re-post</th>
-		      <th class="text-center">Edit</th>
+	          <td><a tabindex="0" class="btn btn-primary btn-block" role="button" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=farmInfo%>"><%= User.find_by(id: posting.user_id).farm_name %></a></td>          
+	          <td><a tabindex="0" class="btn btn-primary btn-block" role="button" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%= posting.description %>"><%= Product.find_by(id: posting.product_id).name %></a></td>
+	          <td class="text-center"><%= number_to_currency(posting.price) %></td>
+	          <td class="text-center"><%= UnitKind.find_by(id: posting.unit_kind_id).name %></td>
+	          <td class="text-center"><%= posting.delivery_date.strftime("%A %b %d, %Y") %></td>
+	          <td class="text-center"><%= link_to "Copy", new_posting_path(posting_id: posting.id),  class: "glyphicon glyphicon-duplicate" %></td>
+	          <td class="text-center"><%= link_to "Edit posting", edit_posting_path(posting) %></td>
 		    </tr>
-		  </thead>
-		  <tbody>
-	        <% @postings.each do |posting| %>
-		      <% farmInfo = "Producer has not provided info about their operation" %>
-		      <% if posting.user.description != nil %>
-		        <% farmInfo = "<u>Producer Description</u><p>" + posting.user.description %>
-		      <% end %>
-		      <% if !posting.user.website.blank? %>
-		        <% farmInfo = farmInfo + "<p>" + "<u>Producer Website</u><p><a href='" + posting.user.website + "' target='_blank'>" + posting.user.website + "</a>"%>
-		      <% end %>
-		        <tr>
-		          <td><a tabindex="0" class="btn btn-primary btn-block" role="button" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=farmInfo%>"><%= User.find_by(id: posting.user_id).farm_name %></a></td>          
-		          <td><a tabindex="0" class="btn btn-primary btn-block" role="button" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%= posting.description %>"><%= Product.find_by(id: posting.product_id).name %></a></td>
-		          <td class="text-center"><%= number_to_currency(posting.price) %></td>
-		          <td class="text-center"><%= UnitKind.find_by(id: posting.unit_kind_id).name %></td>
-		          <td class="text-center"><%= posting.delivery_date.strftime("%A %b %d, %Y") %></td>
-		          <td class="text-center"><%= link_to "Copy", new_posting_path(posting_id: posting.id),  class: "glyphicon glyphicon-duplicate" %></td>
-		          <td class="text-center"><%= link_to "Edit posting", edit_posting_path(posting) %></td>
-		        </tr>
-		      <% end %>
-		    </tbody>
-		  </table>  
-		<% else %>
-		  <% if @user.account_type == 1 %>
-		    <p>
-		      This is your profile page. You currently don't have any postings created but once you do they'll be displayed for your viewing here (as well as appearing on the 'shopping' page).
-		    </p>
-		  <% else %>
-		    <% if @user.account_type == 0 %>
-		      <p>
-	            This is your profile page. We'll fill this out with interesting features as we grow. But for now, try clicking 'Shop' above in the header! :)
-	          </p>
-	        <% end %>
-		  <% end %>	      
-        <% end %>
-      </div>
-    </div>
+		  <% end %>
+		</tbody>
+	  </table>  
+	<% else %>
+	  <% if @user.account_type == 1 %>
+	    <p>
+	      This is your profile page. You currently don't have any postings created but once you do they'll be displayed for your viewing here (as well as appearing on the 'shopping' page).
+	    </p>
+	  <% else %>
+	    <% if @user.account_type == 0 %>
+	      <p>
+	        This is your profile page. We'll fill this out with interesting features as we grow. But for now, try clicking 'Shop' above in the header! :)
+	      </p>
+	    <% end %>
+	  <% end %>	      
+    <% end %>
+  </div>
+</div>
