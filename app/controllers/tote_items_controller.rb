@@ -29,10 +29,9 @@ class ToteItemsController < ApplicationController
     end
 
     if @tote_item.save
-      flash[:success] = "Item saved to your shopping tote!"
-      redirect_to postings_path
+      flash.now[:success] = "Item saved to your shopping tote!"
     else
-      flash[:danger] = "Item not saved to your shopping tote."
+      flash.now[:danger] = "Item not saved to your shopping tote."
       render 'new'
     end
   end
