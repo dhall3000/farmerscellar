@@ -32,7 +32,8 @@ class ToteItemsController < ApplicationController
       flash[:success] = "Item saved to your shopping tote!"
       redirect_to postings_path
     else
-      flash[:danger] = "Item not saved to your shopping tote. If you continue to experience this problem please contact Farmer's Cellar support."
+      flash[:danger] = "Item not saved to your shopping tote."
+      render 'new'
     end
   end
 

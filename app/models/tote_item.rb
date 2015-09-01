@@ -14,6 +14,14 @@ class ToteItem < ActiveRecord::Base
   belongs_to :posting
   belongs_to :user
 
+  validates :posting, presence: true
+  validates :user, presence: true
+  validates :quantity, :price, :status, presence: true
+
+  validates :price, numericality: { greater_than: 0 }
+  validates :quantity, numericality: { greater_than: 0, only_integer: true }
+  validates :status, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 8 }
+
   def self.states
   	{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLPENDING: 3, FILLED: 4, NOTFILLED: 5, REMOVED: 6, PURCHASEPENDING: 7, PURCHASED: 8}
   end
