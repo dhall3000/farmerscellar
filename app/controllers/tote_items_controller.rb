@@ -44,9 +44,25 @@ class ToteItemsController < ApplicationController
     #if we also have a ti id, flip it's state to FILLED
     #get the next ti id to fill
 
+    #this is so that we can use the test page to inspect the view
+    if params.has_key?("test")
+
+      @tote_item = ToteItem.new
+      @tote_item.user_id = 17
+      @tote_item.quantity = 100
+
+      @tote_item.id = 1
+      @tote_item.price = 2.25
+      @tote_item.status = 7
+      @tote_item.posting_id = 11
+
+      return
+
+    end
+
     @errors = []
     posting_id = nil
-    
+
     if params[:tote_item] == nil
       @errors << "not sure how this happened but we just hit 'impossible' logic in tote_items_controller.rb: params[:tote_item] == nil"
     else
