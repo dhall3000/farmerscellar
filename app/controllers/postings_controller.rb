@@ -1,5 +1,6 @@
 class PostingsController < ApplicationController
   before_action :logged_in_user
+  before_action :redirect_to_root_if_not_producer, only: [:new, :create, :edit, :update]
 
   def new  	
 

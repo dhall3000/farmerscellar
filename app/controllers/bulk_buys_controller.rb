@@ -1,4 +1,6 @@
 class BulkBuysController < ApplicationController
+  before_action :redirect_to_root_if_user_not_admin
+
   def new
   	@filled_tote_items = ToteItem.where(status: ToteItem.states[:FILLED])  	
 

@@ -1,4 +1,6 @@
 class BulkPurchasesController < ApplicationController
+  before_action :redirect_to_root_if_user_not_admin
+  
   def new
   	@bulk_purchase = BulkPurchase.new(total_gross: 0, total_fee: 0, total_commission: 0, total_net: 0)
   	@bulk_purchase.load_unpaid_receivables
