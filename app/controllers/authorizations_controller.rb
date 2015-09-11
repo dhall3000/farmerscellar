@@ -33,6 +33,8 @@ class AuthorizationsController < ApplicationController
     @authorization.gross_amount_currency_id = response.params["gross_amount_currency_id"]
     @authorization.payment_status = response.params["payment_status"]
     @authorization.pending_reason = response.params["pending_reason"]
+    @authorization.ack = response.params["ack"]
+    @authorization.response = response
 
     @authorization_succeeded = response.params["ack"] == "Success" && @authorization.gross_amount > 0
 

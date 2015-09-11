@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150830232711) do
+ActiveRecord::Schema.define(version: 20150911224955) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -53,6 +53,8 @@ ActiveRecord::Schema.define(version: 20150830232711) do
     t.string   "payment_status"
     t.string   "pending_reason"
     t.float    "amount_purchased"
+    t.text     "response"
+    t.string   "ack"
   end
 
   create_table "bp_pp_mp_commons", id: false, force: :cascade do |t|
