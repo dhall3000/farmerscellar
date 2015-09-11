@@ -23,7 +23,11 @@ class PostingsController < ApplicationController
   	@posting = Posting.new(posting_params)
 
   	if @posting.save
-  	  flash[:info] = "Your new posting is now live!"
+      if @posting.live
+        flash[:info] = "Your new posting is now live!"
+      else
+        flash[:info] = "Your posting was created but is not live as you specified during creation."
+      end  	  
       redirect_to postings_path
     else      
       load_posting_choices
