@@ -3,10 +3,8 @@ class Authorization < ActiveRecord::Base
   
   has_many :checkout_authorizations
   has_many :checkouts, through: :checkout_authorizations
+ 
+  validates :token, :payer_id, :amount, :correlation_id, :transaction_id, :payment_date, :gross_amount, :response, :ack, presence: true    
+  validates_presence_of :checkouts
 
-  validates :token, presence: true
-  validates :payer_id, presence: true
-  validates :amount, presence: true
-  validates :transaction_id, presence: true
-  validates :gross_amount, presence: true
 end

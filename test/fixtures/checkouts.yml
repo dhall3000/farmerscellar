@@ -1,1 +1,6 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+checkout1:
+  token: "faketoken"
+  amount: 22.75
+  client_ip: 127.0.0.1
+  response: "fake response"
