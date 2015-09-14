@@ -63,7 +63,7 @@ class PostingsController < ApplicationController
   private
 
     def load_posting_choices
-      @products = Product.all
+      @products = Product.all.order(:name)
       @unit_categories = UnitCategory.all
       @unit_kinds = UnitKind.all
       @delivery_dates = next_delivery_dates(4)
