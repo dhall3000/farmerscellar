@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150911224955) do
+ActiveRecord::Schema.define(version: 20150915203806) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -203,8 +203,8 @@ ActiveRecord::Schema.define(version: 20150911224955) do
     t.integer  "unit_kind_id"
     t.datetime "created_at",         null: false
     t.datetime "updated_at",         null: false
-    t.date     "delivery_date"
     t.boolean  "live"
+    t.datetime "delivery_date"
   end
 
   add_index "postings", ["product_id"], name: "index_postings_on_product_id"
