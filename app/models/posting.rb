@@ -22,4 +22,33 @@ class Posting < ActiveRecord::Base
   	end
   end
 
+  def total_quantity_authorized_or_committed
+
+    total_quantity = 0
+
+    if tote_items.nil? || !tote_items.any?
+      return total_quantity
+    end
+
+    tote_items.each do |tote_item|      
+      case tote_item.status
+        when ToteItem.states[:AUTHORIZED]
+          total_quantity = total_quantity + tote_item.quantity
+        when ToteItem.states[:COMMITTED]
+          total_quantity = total_quantity + tote_item.quantity
+        when ToteItem.states[:FILLPENDING]
+          total_quantity = total_quantity + tote_item.quantity
+        when ToteItem.states[:FILLED]
+          total_quantity = total_quantity + tote_item.quantity
+        when ToteItem.states[:PURCHASEPENDING]
+          total_quantity = total_quantity + tote_item.quantity
+        when ToteItem.states[:PURCHASED]
+          total_quantity = total_quantity + tote_item.quantity      
+      end
+    end
+
+    return total_quantity
+
+  end
+
 end

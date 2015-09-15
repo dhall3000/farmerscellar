@@ -67,7 +67,7 @@ Rails.application.configure do
 
     ::PAYPALMASSPAYENDPOINT = "https://api-3t.sandbox.paypal.com"
     
-    ::USEGATEWAY = true
+    ::USEGATEWAY = false
 
   end
 
