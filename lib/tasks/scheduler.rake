@@ -21,12 +21,16 @@ task :commit_totes => :environment do
 
   	#if (DateTime.now + 1).getutc >= commit_transition_time
     if DateTime.now.getutc >= commit_transition_time
-	  #do transition...
-	  tote_item.update(status: ToteItem.states[:COMMITTED])
-	end
+	    #do transition...
+	    tote_item.update(status: ToteItem.states[:COMMITTED])
+	  end
 
   end
 
   puts "done."
 
+end
+
+task :mailer_test => :environment do
+  AdminNotificationMailer.general_message("test subject", "this is the body").deliver_now
 end
