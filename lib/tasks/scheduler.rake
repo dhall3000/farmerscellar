@@ -6,6 +6,8 @@ task :commit_totes => :environment do
 
   tote_items = ToteItem.where(status: ToteItem.states[:AUTHORIZED])
 
+  transitioned_tote_ids = []
+
   tote_items.each do |tote_item|
 
   	#the '-40' is not obvious. this is being written here in Seattle, Pacific Standard Time. From UTC we're either
@@ -23,14 +25,41 @@ task :commit_totes => :environment do
     if DateTime.now.getutc >= commit_transition_time
 	    #do transition...
 	    tote_item.update(status: ToteItem.states[:COMMITTED])
+      transitioned_tote_ids << tote_item.id
 	  end
 
   end
+
+  #send job summary report to admin
+  subject = "commit_totes job summary report"
+  body = get_commit_totes_email_body(transitioned_tote_ids)
+  AdminNotificationMailer.general_message(subject, body).deliver_now
 
   puts "done."
 
 end
 
+def get_commit_totes_email_body(transitioned_tote_ids)
+
+  body = ""
+
+  if transitioned_tote_ids.nil?
+    body = "empty body"
+  else
+    body = "number of tote_items transitioned from AUTHORIZED -> COMMITTED: #{transitioned_tote_ids.count}. tote_item ids transitioned: #{transitioned_tote_ids.to_s}."
+  end
+
+  return body
+  
+end
+
 task :mailer_test => :environment do
-  AdminNotificationMailer.general_message("test subject", "this is the body").deliver_now
+
+  transitioned_tote_ids = [1,7,3,4]
+
+  subject = "commit_totes job summary report"
+  body = get_commit_totes_email_body(transitioned_tote_ids)
+
+  AdminNotificationMailer.general_message(subject, body).deliver_now
+  
 end
