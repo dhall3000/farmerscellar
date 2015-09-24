@@ -1,12 +1,12 @@
 require 'test_helper'
 
 class AdminNotificationMailerTest < ActionMailer::TestCase
-  test "commit_totes" do
-    mail = AdminNotificationMailer.commit_totes
-    assert_equal "Commit totes", mail.subject
-    assert_equal ["to@example.org"], mail.to
-    assert_equal ["from@example.com"], mail.from
-    assert_match "Hi", mail.body.encoded
+  test "general_message" do
+    mail = AdminNotificationMailer.general_message("my subject", "my body")
+    assert_equal "my subject", mail.subject
+    assert_equal ["david@farmerscellar.com"], mail.to
+    assert_equal ["david@farmerscellar.com"], mail.from
+    assert_match "Hello", mail.body.encoded
   end
 
 end
