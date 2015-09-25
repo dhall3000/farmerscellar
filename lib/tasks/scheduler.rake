@@ -35,6 +35,30 @@ task :commit_totes => :environment do
   body = get_commit_totes_email_body(transitioned_tote_ids)
   AdminNotificationMailer.general_message(subject, body).deliver_now
 
+  producers = {}
+
+  #this, of course, snags all postings with future delivery dates. that isn't quite what we want though.
+  #we want the subset of that whose delivery date is within 1-2 days from now. so here snag all,
+  #then we'll strip down to get that subset.
+  postings = Posting.where("delivery_date >= ?", DateTime.now.getutc)
+
+  #build up the producers hash, which has email as key and postings array as value
+  postings.each do |posting|
+    days_until_delivery = (posting.delivery_date - DateTime.now.getutc) / (60*60*24)
+    #here's we're filtering out all postings whose delivery date is other than 1-2 days in the future
+    if days_until_delivery > 1.0 && days_until_delivery < 2.0
+      if producers[posting.user.email].nil?
+        producers[posting.user.email] = []
+      end
+      producers[posting.user.email] << posting
+    end
+  end
+
+  producers.each do |email, postings|
+    ProducerNotificationsMailer.current_orders(email, postings).deliver_now
+    ProducerNotificationsMailer.current_orders("david@farmerscellar.com", postings).deliver_now
+  end
+
   puts "done."
 
 end
