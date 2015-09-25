@@ -19,5 +19,11 @@ class UserMailer < ApplicationMailer
     @user = user
     mail to: user.email, subject: "Password reset"
   end
+
+  def authorization_receipt(user, authorization)
+    @user = user
+    @authorization = authorization
+    mail to: user.email, subject: "Payment authorization receipt"
+  end
   
 end

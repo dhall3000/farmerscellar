@@ -1,0 +1,56 @@
+<p>
+Hello,
+</p>
+
+<p>
+This email is your Farmer's Cellar payment authorization receipt for authorization #<%= @authorization.id %>.
+</p>
+
+<p>
+Here is the product information for which you authorized payment:
+</p>
+
+<table border="1">
+  <thead>
+    <tr>		    
+      <th align="left">Producer</th>
+      <th align="left">Product</th>
+      <th align="center">Price</th>   
+      <th align="center">Quantity</th>
+      <th align="center">Unit</th>      
+      <th align="center">Delivery Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @authorization.checkouts.last.tote_items.each do |tote_item| %>
+      <tr>
+        <td align="left"><%= tote_item.posting.user.farm_name %></td>
+        <td align="left"><%= tote_item.posting.product.name %></td>
+        <td align="center"><%= number_to_currency(tote_item.price) %></td>
+        <td align="center"><%= tote_item.quantity %></td>
+        <td align="center"><%= tote_item.posting.unit_kind.name %></td>        
+        <td align="center"><%= tote_item.posting.delivery_date.strftime("%A %b %d, %Y") %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<p>
+The total payment amount authorized is <%= number_to_currency(@authorization.amount) %>.
+</p>
+
+<p>
+Charges to your payment account will be made as soon as products are delivered on your behalf. Keep in mind, however, that Farmer's Cellar cannot guarantee products will be delivered on your behalf. In that case your payment account will not be charged.
+</p>
+
+<p>
+We'll email you again on each of the delivery dates listed above to let you know if product has been delivered for you or not.
+</p>
+
+<p>
+Thanks!
+</p>
+
+<p>
+Farmer's Cellar
+</p>

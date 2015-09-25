@@ -45,12 +45,20 @@ class AuthorizationsController < ApplicationController
       if @authorization_succeeded && @authorization.checkouts.last.tote_items.any?        
         flash.now[:success] = "Payment authorized!"
         @successfully_authorized_tote_items = current_user_current_unauthorized_tote_items.to_a
-        @authorization.checkouts.last.tote_items.where(status: ToteItem.states[:ADDED]).update_all(status: ToteItem.states[:AUTHORIZED])
+        @authorization.checkouts.last.tote_items.where(status: ToteItem.states[:ADDED]).update_all(status: ToteItem.states[:AUTHORIZED])        
       else
         flash.now[:danger] = "Payment not authorized."
       end
 
       @authorization.save
+
+      #placing this here is a hack. it's more appropriate location woudl be in the if @authorization_succeeded... block
+      #above. however, we're currently using the auth id as an order number displayed to the user in their email receipt
+      #so if we send the email receipt before saving there is nil for the id so it shows an error to the user. eventually
+      #we need to have some other number besides id displayed to the user for reference back to us in case of a problem.
+      if @authorization_succeeded
+        current_user.send_authorization_receipt(@authorization)        
+      end
     end    
 
   end
