@@ -1,0 +1,38 @@
+<p>
+  Hi <%= @postings.first.user.farm_name %>,
+</p>
+
+<p>
+  Here are the quantities ordered for your upcoming deliveries:
+</p>
+
+<table border="1">
+  <thead>
+    <tr>		    
+      <th align="left">Product</th>
+      <th align="center">Price</th>   
+      <th align="center">Quantity Ordered</th>
+      <th align="center">Unit</th>      
+      <th align="center">Delivery Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @postings.each do |posting| %>
+      <tr>
+        <td align="left"><%= posting.product.name %></td>
+        <td align="center"><%= number_to_currency(posting.price) %></td>
+        <td align="center"><%= posting.total_quantity_authorized_or_committed %></td>
+        <td align="center"><%= posting.unit_kind.name %></td>        
+        <td align="center"><%= posting.delivery_date.strftime("%A %b %d, %Y") %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<p>
+Thanks!
+</p>
+
+<p>
+Farmer's Cellar
+</p>

@@ -1,0 +1,12 @@
+Hi <%= @postings.first.user.farm_name %>,
+
+Here are the quantities ordered for your upcoming deliveries:
+
+<% @postings.each do |posting| %>
+---------------------------------------------
+<%= posting.product.name %>. <%= posting.total_quantity_authorized_or_committed %> ordered @ <%= number_to_currency(posting.price) %> per <%= posting.unit_kind.name %>. This quantity ordered is for delivery on <%= posting.delivery_date.strftime("%A %b %d, %Y") %>
+<% end %>
+
+Thanks!
+
+Farmer's Cellar
