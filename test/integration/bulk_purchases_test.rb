@@ -7,7 +7,8 @@ class BulkPurchasesTest < BulkBuyer
   # end
 
   test "do bulk buy" do
-  	create_bulk_buy
+    fill_all_tote_items = true
+  	create_bulk_buy(fill_all_tote_items)
   	get new_bulk_purchase_path
   	assert :success
     assert_template 'bulk_purchases/new'

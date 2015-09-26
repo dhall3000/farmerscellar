@@ -67,11 +67,21 @@
   </div>
 </div>
 
+<div class="panel panel-default">
   <%= form_for @tote_item, url: tote_items_next_path, method: "post" do |f| %>
     <%= f.hidden_field :id %>
     <%= f.hidden_field :posting_id %>
     <%= f.submit "Fill & Fetch", class: "btn btn-primary" %>
   <% end %>
+</div>
+
+<div class="panel panel-default">
+  <%= form_tag postings_no_more_product_path do %>
+    <%= hidden_field_tag :posting_id, @tote_item.posting_id %>
+    <%= submit_tag "No more product", class: "btn btn-primary", data: { confirm: "This will mark all remaining tote items in the queue as not filled. Are you sure you want to do this?" } %>
+  <% end %>
+</div>
+
 <% end %>
 
 </div>

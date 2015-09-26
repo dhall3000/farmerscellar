@@ -7,6 +7,7 @@ class BulkBuysTest < BulkBuyer
   # end
 
   test "bulk buy should get created and saved to database" do
-    create_bulk_buy
+  	fill_all_tote_items = true
+    create_bulk_buy(fill_all_tote_items)
   end
 end

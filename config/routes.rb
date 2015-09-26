@@ -12,6 +12,7 @@ Rails.application.routes.draw do
   post 'tote_items/next' => 'tote_items#next'
   get 'bulk_payments/test_masspay' => 'bulk_payments#test_masspay'
   post 'bulk_payments/test_masspay' => 'bulk_payments#test_masspay'
+  post 'postings/no_more_product' => 'postings#no_more_product'
 
   resources :producer_product_commissions
   resources :products

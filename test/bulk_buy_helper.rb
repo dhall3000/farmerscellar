@@ -8,12 +8,30 @@ class BulkBuyer < Authorizer
     @a1 = users(:a1)
   end
 
-  def create_bulk_buy
-    assert_equal 0, Authorization.count, "there should be no authorizations in the database at the beginning of this test but there actually are #{Authorization.count}"
+  def fill_tote_items(posting_id, fill_all)
 
-    customers = [@c1, @c2, @c3, @c4]
-    create_authorization_for_customers(customers)
+    num_tote_items = Posting.find(posting_id).tote_items.count
 
+    if fill_all
+      num_to_fill = num_tote_items
+    else
+      num_to_fill = [num_tote_items - 3, 1].max
+    end    
+
+    num_tote_items_filled = 0
+    
+    while(num_tote_items_filled < num_to_fill)
+      tote_item = assigns(:tote_item)
+      if !tote_item.nil?
+        puts "tote_item id: #{tote_item.id}"
+        post tote_items_next_path, {tote_item: {id: tote_item.id, posting_id: posting_id}}
+        num_tote_items_filled = num_tote_items_filled + 1
+      end
+    end      
+
+  end
+
+  def transition_authorized_tote_items_to_committed
     #verify tote_items are in the AUTHORIZED state
     assert_equal ToteItem.states[:AUTHORIZED], ToteItem.first.status    
     assert ToteItem.where(status: ToteItem.states[:ADDED]).count == 0
@@ -26,7 +44,9 @@ class BulkBuyer < Authorizer
     assert_equal ToteItem.states[:COMMITTED], ToteItem.first.status    
     assert ToteItem.where(status: ToteItem.states[:AUTHORIZED]).count == 0
     assert ToteItem.where(status: ToteItem.states[:COMMITTED]).count > 0
+  end
 
+  def simulate_order_filling(fill_all_tote_items)
     #now log in as an admin
     log_in_as(@a1)
     assert is_logged_in?
@@ -41,11 +61,20 @@ class BulkBuyer < Authorizer
       puts "posting_id: #{posting.id}"
       get tote_items_next_path(tote_item: {posting_id: posting.id})
       assert_template 'tote_items/next'
-      while(tote_item = assigns(:tote_item))
-        puts "tote_item id: #{tote_item.id}"
-        post tote_items_next_path, {tote_item: {id: tote_item.id, posting_id: posting.id}}
-      end      
+      fill_tote_items(posting.id, fill_all_tote_items)
+      if !fill_all_tote_items
+        post postings_no_more_product_path, posting_id: posting.id        
+      end
     end
+  end
+
+  def create_bulk_buy(fill_all_tote_items)
+    assert_equal 0, Authorization.count, "there should be no authorizations in the database at the beginning of this test but there actually are #{Authorization.count}"
+
+    customers = [@c1, @c2, @c3, @c4]
+    create_authorization_for_customers(customers)
+    transition_authorized_tote_items_to_committed
+    simulate_order_filling(fill_all_tote_items)
 
     #verify there are no authorized
     assert_equal 0, ToteItem.where(status: ToteItem.states[:AUTHORIZED]).count    
