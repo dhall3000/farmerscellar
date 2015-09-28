@@ -5,7 +5,7 @@ class BulkPurchase < ActiveRecord::Base
 
   def load_unpaid_receivables
   	#TODO(Future): this will probably be really inefficient as the db grows. maybe want a boolean for when each record is fully paid off
-  	prs = PurchaseReceivable.where("amount_paid < amount")
+  	prs = PurchaseReceivable.load_unpaid_purchase_receivables
   	if prs &&  prs.any?
   	  for pr in prs
   	  	purchase_receivables << pr

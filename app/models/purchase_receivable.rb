@@ -14,6 +14,32 @@ class PurchaseReceivable < ActiveRecord::Base
   has_many :purchase_purchase_receivables
   has_many :purchases, through: :purchase_purchase_receivables
 
+  def self.load_unpaid_purchase_receivables
+    prs = where("amount_paid < amount")
+
+    #TODO (future): this method gets called because we're in process of charging customer accounts. with the code as is, each
+    #object returned in 'prs' will get charged. but by doing so the door is a tiny bit open to double charging customers.
+    #it works like this: below (in method 'purchase') we call the following line:
+    #purchase.go(amount_to_capture * 100, authorization.payer_id, authorization.transaction_id)
+    #this is the line of code that does the actual money moving. but what if, after the transaction goes through, things get interrupted
+    #before we call the following two lines of code:
+    #self.amount_paid += purchase.gross_amount      
+    #save
+    #what happens is the next time this method gets called we would return a purchasereceivable object to get charged that shouldn't
+    #get charged. to fix this, what we need to do right here is:
+    #for each pr in prs
+    # ask paypal if any funds have been moved against the authorization associated with this pr
+    #end
+    #only if paypal responds saying no funds have been moved should we include this pr in the prs return set.
+    #question: how do we get the authorization associated with this pr? although there is no direct db association, there is a
+    #one-to-one correspondance between authorization and purchase_receivable and these are made by the toteitems, wich have a many-to-one
+    #relationship with an authorization. so, from the pr, to get your auth, select any one tote_item in your tote_items array and then go
+    #tote_item.checkouts.last.authorizations.last to query paypal if any funds have been drawn. once you do this you'll have a bullet
+    #proof, idempotent payment execution flow.
+
+    return prs
+  end
+
   #return a hash where the keys are producer ids and the values are arrays of tote_items from that producer
   def get_sub_totes_by_producer_id
 
@@ -87,6 +113,9 @@ class PurchaseReceivable < ActiveRecord::Base
       if purchase.response.params["ack"] == "Success"
         purchases << purchase      
         self.amount_paid += purchase.gross_amount      
+        #the following 'save' is important to do because it 'closes the door' on the liklihood that we'll double charge the customer.
+        #this is so because we know to charge by comparing the .amount_paid attribute so we want to save to db asap after collecting funds
+        save
         authorization.amount_purchased += purchase.gross_amount
         authorization.save            
         tote_items.where(status: ToteItem.states[:PURCHASEPENDING]).update_all(status: ToteItem.states[:PURCHASED])
