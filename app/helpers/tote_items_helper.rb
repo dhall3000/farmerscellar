@@ -33,7 +33,7 @@ module ToteItemsHelper
     #it to the PURCHASED state, for whatever reason. in this case, the customer owes money but has not yet paid so we want it to
     #remain in their tote forever until it's paid
     if displayable != nil && displayable.count > 0      
-      current = displayable.where("postings.delivery_date >= ? or status = ?", Date.today, ToteItem.states[:FILLED])
+      current = displayable.where("postings.delivery_date >= ? or status = ? or status = ?", Date.today, ToteItem.states[:FILLED], ToteItem.states[:PURCHASEPENDING])
     end
 
     return current
