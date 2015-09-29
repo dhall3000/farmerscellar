@@ -18,7 +18,8 @@ class PurchaseReceivable < ActiveRecord::Base
     {NORMAL: 0, PURCHASEFAILED: 1}
   end
 
-  def self.load_unpaid_purchase_receivables    
+  def self.load_unpaid_purchase_receivables
+    #TODO(Future): this will probably be really inefficient as the db grows. maybe want a boolean for when each record is fully paid off
     prs = where("amount_paid < amount and (kind is null or kind = ?)", PurchaseReceivable.kind[:NORMAL])
 
     #TODO (future): this method gets called because we're in process of charging customer accounts. with the code as is, each
@@ -110,12 +111,12 @@ class PurchaseReceivable < ActiveRecord::Base
 
     purchase = Purchase.new    
     purchase.go(amount_to_capture * 100, authorization.payer_id, authorization.transaction_id)
-        
+
     if purchase == nil
       puts "Purchase object is nil. this should be impossible. we are in PurchaseReceivable.purchase() method."
     else
-      if purchase.response.params["ack"] == "Success"
-        purchases << purchase      
+      purchases << purchase
+      if purchase.response.success?
         self.amount_paid += purchase.gross_amount      
         #the following 'save' is important to do because it 'closes the door' on the liklihood that we'll double charge the customer.
         #this is so because we know to charge by comparing the .amount_paid attribute so we want to save to db asap after collecting funds

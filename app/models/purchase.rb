@@ -23,18 +23,37 @@ end
 class FakeCaptureResponse
   attr_reader :params
 
+  @@toggle_success = false
+  @@succeed = true
+
+  def self.toggle_success=val
+    @@toggle_success=val
+  end
+
   def initialize(amount_in_cents, authorization_transaction_id)
 
     percentage = 0.035
     fee_amount = (amount_in_cents * percentage / 100).round(2)
 
-    @success = true
+    if @@toggle_success      
+      @@succeed = !@@succeed
+    end
+      
+    if @@succeed
+      ack = "Success"      
+    else
+      ack = "Failure"      
+    end    
+
+    @success = @@succeed
+
     @params = {
       "transaction_id" => authorization_transaction_id,
       "gross_amount" => (amount_in_cents / 100).to_s,
       "fee_amount" => fee_amount.to_s,
-      "ack" => "Success"
+      "ack" => ack
     }
+
   end
 
   def success?

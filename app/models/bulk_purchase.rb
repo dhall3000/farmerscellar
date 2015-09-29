@@ -3,14 +3,13 @@ class BulkPurchase < ActiveRecord::Base
   has_many :bulk_purchase_receivables
   has_many :purchase_receivables, through: :bulk_purchase_receivables
 
-  def load_unpaid_receivables
-  	#TODO(Future): this will probably be really inefficient as the db grows. maybe want a boolean for when each record is fully paid off
-  	prs = PurchaseReceivable.load_unpaid_purchase_receivables
+  def load_unpaid_receivables  	
+  	prs = PurchaseReceivable.load_unpaid_purchase_receivables    
   	if prs &&  prs.any?
   	  for pr in prs
   	  	purchase_receivables << pr
   	  end
-  	end
+  	end    
   end
 
   def go
@@ -22,6 +21,8 @@ class BulkPurchase < ActiveRecord::Base
         if purchase.response.success?
           #TODO: here we should probably check for purchase.response.success? and do something smart including notifying user there
           #was a payments problem
+        else
+          #debugger
         end
 
         self.total_gross = (self.total_gross + purchase.gross_amount).round(2)
