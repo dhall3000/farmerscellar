@@ -14,8 +14,12 @@ class PurchaseReceivable < ActiveRecord::Base
   has_many :purchase_purchase_receivables
   has_many :purchases, through: :purchase_purchase_receivables
 
-  def self.load_unpaid_purchase_receivables
-    prs = where("amount_paid < amount")
+  def self.kind
+    {NORMAL: 0, PURCHASEFAILED: 1}
+  end
+
+  def self.load_unpaid_purchase_receivables    
+    prs = where("amount_paid < amount and (kind is null or kind = ?)", PurchaseReceivable.kind[:NORMAL])
 
     #TODO (future): this method gets called because we're in process of charging customer accounts. with the code as is, each
     #object returned in 'prs' will get charged. but by doing so the door is a tiny bit open to double charging customers.
@@ -119,10 +123,10 @@ class PurchaseReceivable < ActiveRecord::Base
         authorization.amount_purchased += purchase.gross_amount
         authorization.save            
         tote_items.where(status: ToteItem.states[:PURCHASEPENDING]).update_all(status: ToteItem.states[:PURCHASED])
-      else
-        #change the state of the ToteItem.states[:PURCHASEPENDING] -> ToteItem.states[:FILLED] so that an attempt
-        #to purchase will again be made next time an admin does a bulk purchase
-        tote_items.where(status: ToteItem.states[:PURCHASEPENDING]).update_all(status: ToteItem.states[:FILLED])
+      else        
+        tote_items.where(status: ToteItem.states[:PURCHASEPENDING]).update_all(status: ToteItem.states[:PURCHASEFAILED])
+        self.kind = PurchaseReceivable.kind[:PURCHASEFAILED]
+        save
       end
 
     end

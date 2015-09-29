@@ -60,7 +60,7 @@ class BulkBuysController < ApplicationController
         next
       end
 
-      @bulk_buy.purchase_receivables.build(amount: value[:amount], amount_paid: 0)
+      @bulk_buy.purchase_receivables.build(amount: value[:amount], amount_paid: 0, kind: PurchaseReceivable.kind[:NORMAL])
       pr = @bulk_buy.purchase_receivables.last
       user = User.find(ftis.first.user_id)                      
       pr.users << user
