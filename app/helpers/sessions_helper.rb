@@ -2,6 +2,7 @@ module SessionsHelper
 
   def log_in(user)
     session[:user_id] = user.id
+    UserAccountState.ensure_state_exists(user)
   end
 
   def current_user

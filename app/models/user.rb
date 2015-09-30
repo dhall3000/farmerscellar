@@ -34,11 +34,6 @@ class User < ActiveRecord::Base
     {CUSTOMER: 0, PRODUCER: 1, ADMIN: 2}
   end
 
-  def initialize(args=nil)
-    super
-    account_states.build(state: AccountState.states[:OK], description: AccountState.descriptions[:OK])
-  end  
-
   def self.farm_name_from_posting_id(id)
     posting = Posting.find(id)
     if posting != nil

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150928235236) do
+ActiveRecord::Schema.define(version: 20150930185021) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -344,6 +344,7 @@ ActiveRecord::Schema.define(version: 20150928235236) do
     t.integer  "user_id"
     t.datetime "created_at",       null: false
     t.datetime "updated_at",       null: false
+    t.text     "notes"
   end
 
   add_index "user_account_states", ["account_state_id"], name: "index_user_account_states_on_account_state_id"

@@ -1,1 +1,8 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+ok:
+  state: 0
+  description: "account is in good standing with full permissions"
+
+hold:
+  state: 1
+  description: "user can log in but cannot browse, order or post"
