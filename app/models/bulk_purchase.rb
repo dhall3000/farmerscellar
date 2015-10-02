@@ -21,14 +21,14 @@ class BulkPurchase < ActiveRecord::Base
         if purchase.response.success?
           #TODO: here we should probably check for purchase.response.success? and do something smart including notifying user there
           #was a payments problem
+          self.total_gross = (self.total_gross + purchase.gross_amount).round(2)          
+          sub_tote_value_by_payment_sequenced_producer_id = get_sub_tote_value_by_payment_sequenced_producer_id(purchase_receivable)
+          create_payment_payables(purchase_receivable, purchase, sub_tote_value_by_payment_sequenced_producer_id)
         else
           #debugger
-        end
+        end        
 
-        self.total_gross = (self.total_gross + purchase.gross_amount).round(2)
 
-        sub_tote_value_by_payment_sequenced_producer_id = get_sub_tote_value_by_payment_sequenced_producer_id(purchase_receivable)
-        create_payment_payables(purchase_receivable, purchase, sub_tote_value_by_payment_sequenced_producer_id)
 
         #producers_ids = purchase_receivable.get_producer_ids
         #sub_totes = 

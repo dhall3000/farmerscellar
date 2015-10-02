@@ -10,6 +10,8 @@ class BulkPurchasesTest < BulkBuyer
     post bulk_purchases_path, purchase_receivables: purchase_receivables
     verify_legitimacy_of_bulk_purchase
 
+
+
     assert PaymentPayable.count > 0
     get new_bulk_payment_path
     assert :success
@@ -18,6 +20,8 @@ class BulkPurchasesTest < BulkBuyer
     grand_total_payout = assigns(:grand_total_payout)
     payment_info_by_producer_id = assigns(:payment_info_by_producer_id)    
     assert_not_nil payment_info_by_producer_id
+
+
 
     post bulk_payments_path, payment_info_by_producer_id: payment_info_by_producer_id
 
@@ -39,8 +43,27 @@ class BulkPurchasesTest < BulkBuyer
     purchase_receivables = assigns(:purchase_receivables)    
     bulk_purchase = assigns(:bulk_purchase)
     assert_not_nil bulk_purchase
-    assert_equal purchase_receivables.last.bulk_buys.last.amount, bulk_purchase.total_gross
-    assert_equal bulk_purchase.total_gross, bulk_purchase.total_fee + bulk_purchase.total_commission + bulk_purchase.total_net
+
+    prs = bulk_purchase.purchase_receivables
+
+    total_amount_paid = 0
+    for pr in prs
+      total_amount_paid += pr.amount_paid
+    end
+
+    #verify sum of pr amountpaids == bulkpurchase.totalgross
+    assert_equal total_amount_paid, bulk_purchase.total_gross
+    all_purchases_succeeded = all_purchase_receivables_succeeded(prs)
+
+    #verify the associated bulkbuy's amount is proper relative to the bulkpurchase's totalgross
+    if all_purchases_succeeded
+      assert_equal purchase_receivables.last.bulk_buys.last.amount, bulk_purchase.total_gross      
+    else
+      #if there are failed purchases we would expect the actual amount collected to be less than the bulk buy anticipated amount
+      assert purchase_receivables.last.bulk_buys.last.amount > bulk_purchase.total_gross
+    end
+
+    assert_equal bulk_purchase.total_gross, bulk_purchase.total_fee + bulk_purchase.total_commission + bulk_purchase.total_net    
     assert bulk_purchase.total_gross > 0
     assert bulk_purchase.total_fee > 0
     assert bulk_purchase.total_commission > 0
@@ -104,7 +127,7 @@ class BulkPurchasesTest < BulkBuyer
     total_failed_purchases = 0
     total_amount = 0
     total_amount_paid = 0
-    all_purchases_succeeded = true
+    all_purchases_succeeded = all_purchase_receivables_succeeded(prs)
 
     for pr in prs
 
@@ -112,8 +135,7 @@ class BulkPurchasesTest < BulkBuyer
         if purchase.response.success?
           total_purchased += purchase.gross_amount
         else
-          total_failed_purchases += purchase.gross_amount
-          all_purchases_succeeded = false
+          total_failed_purchases += purchase.gross_amount          
         end
       end
       total_amount += pr.amount
@@ -159,6 +181,22 @@ class BulkPurchasesTest < BulkBuyer
       assert_equal authorization.amount, purchase.gross_amount
 
     end
+
+  end
+
+  def all_purchase_receivables_succeeded(prs)
+
+    all_purchases_succeeded = true
+
+    for pr in prs
+      for purchase in pr.purchases
+        if !purchase.response.success?
+          all_purchases_succeeded = false                  
+        end
+      end
+    end
+
+    return all_purchases_succeeded
 
   end
 
