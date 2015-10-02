@@ -98,7 +98,12 @@ class BulkBuyer < Authorizer
     num_bulk_buys = BulkBuy.count
     assert PurchaseReceivable.count == 0    
     post bulk_buys_path, filled_tote_item_ids: filled_tote_item_ids
-    assert PurchaseReceivable.count > 0    
+    assert PurchaseReceivable.count > 0
+
+    bulk_buy = assigns(:bulk_buy)
+
+    assert_equal 4, bulk_buy.purchase_receivables.count
+    assert_equal 0, PaymentPayable.count
 
     assert_equal num_bulk_buys + 1, BulkBuy.count
 

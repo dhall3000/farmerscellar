@@ -2,118 +2,43 @@ require 'test_helper'
 require 'bulk_buy_helper'
 
 class BulkPurchasesTest < BulkBuyer
-  # test "the truth" do
-  #   assert true
-  # end
+
+  #bundle rake test test/integration/bulk_purchases_test.rb
+  test "do bulk buy" do
+  #def skip
+    purchase_receivables = setup_bulk_purchase    
+    post bulk_purchases_path, purchase_receivables: purchase_receivables
+    verify_legitimacy_of_bulk_purchase
+
+    assert PaymentPayable.count > 0
+    get new_bulk_payment_path
+    assert :success
+    unpaid_payment_payables = assigns(:unpaid_payment_payables)
+    assert_not_nil unpaid_payment_payables
+    grand_total_payout = assigns(:grand_total_payout)
+    payment_info_by_producer_id = assigns(:payment_info_by_producer_id)    
+    assert_not_nil payment_info_by_producer_id
+
+    post bulk_payments_path, payment_info_by_producer_id: payment_info_by_producer_id
+
+  end  
 
   #bundle exec rake test test/integration/bulk_purchases_test.rb
   test "do bulk buy with purchase failures" do
+  #def skip1
     purchase_receivables = setup_bulk_purchase            
-    assert_equal 4, purchase_receivables.count
-    assert_equal 0, PaymentPayable.count
-    FakeCaptureResponse.toggle_success = true
+    FakeCaptureResponse.toggle_success = true    
     post bulk_purchases_path, purchase_receivables: purchase_receivables
-    assert :success
-    assert_template 'bulk_purchases/create'
-    purchase_receivables = assigns(:purchase_receivables)
-    assert_not_nil purchase_receivables
-    assert purchase_receivables.count > 0
-    puts "number of purchase receivables: #{purchase_receivables.count}"
-
-    #assert total amount > total amount paid    
-
-    total_purchased = 0
-    total_failed_purchases = 0
-
-    for purchase in Purchase.all
-      if purchase.response.success?
-        total_purchased += purchase.gross_amount
-      else
-        total_failed_purchases += purchase.gross_amount
-      end
-    end
-
-    total_amount = 0
-    total_amount_paid = 0
-
-    #verify toteitems are updated to the proper value
-    #verify pr kind is appropriate    
-    for pr in purchase_receivables
-      total_amount += pr.amount
-      total_amount_paid += pr.amount_paid
-
-      for tote_item in pr.tote_items
-        if pr.kind == PurchaseReceivable.kind[:NORMAL]
-          assert_equal tote_item.status, ToteItem.states[:PURCHASED]          
-        else
-          if pr.kind == PurchaseReceivable.kind[:PURCHASEFAILED]
-            assert_equal tote_item.status, ToteItem.states[:PURCHASEFAILED]
-          end
-        end
-      end
-    end
-
-    total_failed_purchases2 = total_amount - total_amount_paid
-
-    assert_equal total_failed_purchases, total_failed_purchases2
-    assert total_amount_paid < total_amount
-    assert_equal total_purchased, total_amount_paid
-
-    #purchase_receivables = setup_bulk_purchase    
+    verify_legitimacy_of_bulk_purchase
 
   end
 
-  #rake test test/integration/bulk_purchases_test.rb
-  #test "do bulk buy" do
-  def skip
-    return
-    purchase_receivables = setup_bulk_purchase
-    assert_equal 0, PaymentPayable.count
-    post bulk_purchases_path, purchase_receivables: purchase_receivables
+  def verify_legitimacy_of_bulk_purchase
     assert :success
     assert_template 'bulk_purchases/create'
-    purchase_receivables = assigns(:purchase_receivables)
-    assert_not_nil purchase_receivables
-    assert purchase_receivables.count > 0
-    puts "number of purchase receivables: #{purchase_receivables.count}"
-
-    for purchase_receivable in purchase_receivables
-      assert_equal purchase_receivable.amount, purchase_receivable.amount_paid
-
-      for tote_item in purchase_receivable.tote_items
-        assert_equal tote_item.status, ToteItem.states[:PURCHASED]
-      end
-      
-    end
-    
+    purchase_receivables = assigns(:purchase_receivables)    
     bulk_purchase = assigns(:bulk_purchase)
     assert_not_nil bulk_purchase
-    puts "number of prs in this bp: #{bulk_purchase.purchase_receivables.to_a.count.to_s}"
-    puts "number of bulk_purchases in the database: #{BulkPurchase.count.to_s}"
-
-    assert Purchase.count > 0
-    assert Purchase.count == PurchaseReceivable.count
-
-    purchases = Purchase.all
-    for purchase in purchases
-      authorization = Authorization.find_by(transaction_id: purchase.transaction_id)
-      assert_not_nil authorization
-      assert_equal authorization.transaction_id, purchase.transaction_id
-      assert_equal authorization.amount, authorization.amount_purchased
-      assert_equal authorization.amount, purchase.gross_amount
-      puts "-------purchase-------"
-      puts "authorization.transaction_id: #{authorization.transaction_id}"
-      puts "purchase.payer_id: #{purchase.payer_id}"
-      puts "purchase.transaction_id: #{purchase.transaction_id}"
-      puts "purchase.purchase_receivables.last.tote_items.count: #{purchase.purchase_receivables.last.tote_items.count}"
-      puts "purchase.response: #{purchase.response}"
-      puts "purchase.gross_amount: #{purchase.gross_amount}"
-      puts "purchase.fee_amount: #{purchase.fee_amount}"
-      puts "purchase.net_amount: #{purchase.net_amount}"      
-    end
-
-    puts "BulkPurchase -> total_gross: #{bulk_purchase.total_gross}, total_fee: #{bulk_purchase.total_fee}, total_commission: #{bulk_purchase.total_commission}, total_net: #{bulk_purchase.total_net}"
-    puts "BulkBuy amount: #{purchase_receivables.last.bulk_buys.last.amount}"
     assert_equal purchase_receivables.last.bulk_buys.last.amount, bulk_purchase.total_gross
     assert_equal bulk_purchase.total_gross, bulk_purchase.total_fee + bulk_purchase.total_commission + bulk_purchase.total_net
     assert bulk_purchase.total_gross > 0
@@ -123,49 +48,117 @@ class BulkPurchasesTest < BulkBuyer
     assert bulk_purchase.total_gross > bulk_purchase.total_net
     assert bulk_purchase.total_net > bulk_purchase.total_commission
     assert bulk_purchase.total_commission > bulk_purchase.total_fee
+    verify_legitimacy_of_purchase_receivables
+  end
 
-    assert PaymentPayable.count > 0
+  def verify_legitimacy_of_purchase_receivables
+    prs = assigns(:purchase_receivables)
+    for pr in prs
+      #there should now be at least one purchase in the purchases collection
+      assert pr.purchases.count > 0
+      #amount_paid should never be negative
+      assert pr.amount_paid >= 0
+      #amount_paid should never be greater than amount
+      assert pr.amount_paid <= pr.amount
+      
+      for ti in pr.tote_items
+        #toteitems state should not be PURCHASEPENDING anymore
+        assert_not ti.status == ToteItem.states[:PURCHASEPENDING]
+        #toteitems state should be either PURCHASE or PURCHASEFAILED
+        if pr.kind == PurchaseReceivable.kind[:NORMAL]
+          assert_equal ti.status, ToteItem.states[:PURCHASED]          
+        end
+        if pr.kind == PurchaseReceivable.kind[:PURCHASEFAILED]
+          assert_equal ti.status, ToteItem.states[:PURCHASEFAILED]                    
+        end
+      end      
+    end  
 
-    puts "PaymentPayable.count = #{PaymentPayable.count}"
-    puts "unpaid PaymentPayable.count = #{PaymentPayable.where(:amount_paid < :amount).count}"
+    assert_not_nil prs
+    assert prs.count > 0
+    puts "number of purchase receivables: #{prs.count}"
 
-    get new_bulk_payment_path
-    assert :success
-    unpaid_payment_payables = assigns(:unpaid_payment_payables)
-    assert_not_nil unpaid_payment_payables
-    grand_total_payout = assigns(:grand_total_payout)
-    puts "grand total payout: $#{grand_total_payout}"
+    for purchase_receivable in prs
 
-    payment_info_by_producer_id = assigns(:payment_info_by_producer_id)    
-    assert_not_nil payment_info_by_producer_id
-    puts "payment_info_by_producer_id: #{payment_info_by_producer_id}"    
+      if purchase_receivable.kind == PurchaseReceivable.kind[:NORMAL]
+        assert_equal purchase_receivable.amount, purchase_receivable.amount_paid
 
-    puts "number of bulk payments in the database: #{BulkPayment.count}"
-    puts "number of payments in the database: #{Payment.count}"
-    post bulk_payments_path, payment_info_by_producer_id: payment_info_by_producer_id
-    puts "number of bulk payments in the database: #{BulkPayment.count}"
-    puts "BulkPayment.first.num_payees: #{BulkPayment.first.num_payees}"
-    puts "BulkPayment.first.total_payments_amount: #{BulkPayment.first.total_payments_amount}"
+        for tote_item in purchase_receivable.tote_items
+          assert_equal tote_item.status, ToteItem.states[:PURCHASED]
+        end        
+      end
 
-    puts "number of payments in the database: #{Payment.count}"
+      if purchase_receivable.kind == PurchaseReceivable.kind[:PURCHASEFAILED]
+        #this actually might break in the future as we add other features but it should work for our purposes now.
+        #just extend it to handle the new/breaking feature if this assertion ever breaks
+        assert_equal 0, purchase_receivable.amount_paid
+        assert purchase_receivable.amount > 0
 
-    Payment.all.each do |payment|
-      puts "payment id: #{payment.id}, payment amount: #{payment.amount}"
+        for tote_item in purchase_receivable.tote_items
+          assert_equal tote_item.status, ToteItem.states[:PURCHASEFAILED]
+        end        
+      end            
     end
 
-    puts assigns(:num_payees)
-    puts assigns(:cumulative_total_payout)   
+    total_purchased = 0
+    total_failed_purchases = 0
+    total_amount = 0
+    total_amount_paid = 0
+    all_purchases_succeeded = true
 
-    #puts "-------------------PaymentPayable---------------"
+    for pr in prs
 
-    #for payment_payable in PaymentPayable.all
-    #  puts "id: #{payment_payable.id}, amount: #{payment_payable.amount}, amount_paid: #{payment_payable.amount_paid}, producer: #{payment_payable.users.last.name}"
+      for purchase in pr.purchases
+        if purchase.response.success?
+          total_purchased += purchase.gross_amount
+        else
+          total_failed_purchases += purchase.gross_amount
+          all_purchases_succeeded = false
+        end
+      end
+      total_amount += pr.amount
+      total_amount_paid += pr.amount_paid      
+    end
 
-    #  for tote_item in payment_payable.tote_items
-    #    puts "     #{tote_item.posting.product.name}, amount: #{tote_item.quantity * tote_item.price}"
-    #  end
+    total_failed_purchases2 = total_amount - total_amount_paid
+    assert_equal total_failed_purchases, total_failed_purchases2
 
-    #end
+    if all_purchases_succeeded
+      assert_equal total_amount_paid, total_amount
+    else
+      assert total_amount_paid < total_amount
+    end
+    
+    assert_equal total_purchased, total_amount_paid
+
+    verify_legitimacy_of_purchases
+  end
+
+  def verify_legitimacy_of_purchases
+
+    assert Purchase.count > 0
+    assert Purchase.count == PurchaseReceivable.count
+
+    purchase_receivables = assigns(:purchase_receivables)
+
+    for pr in purchase_receivables
+      purchase = pr.purchases.last
+      assert_not_nil purchase
+      authorization = Authorization.find_by(transaction_id: purchase.transaction_id)
+      assert_not_nil authorization
+      assert_equal authorization.transaction_id, purchase.transaction_id
+
+      if pr.kind == PurchaseReceivable.kind[:NORMAL]
+        assert_equal authorization.amount, authorization.amount_purchased                
+      end
+
+      if pr.kind == PurchaseReceivable.kind[:PURCHASEFAILED]
+        assert authorization.amount > authorization.amount_purchased        
+      end
+
+      assert_equal authorization.amount, purchase.gross_amount
+
+    end
 
   end
 
@@ -187,7 +180,10 @@ class BulkPurchasesTest < BulkBuyer
 
     #verify that all the pr's are legit
     for purchase_receivable in bulk_purchase.purchase_receivables
+      #the amount should always be positive
       assert purchase_receivable.amount > 0
+      #this should be zero here because we haven't done the producer payments yet
+      assert_equal purchase_receivable.amount_paid, 0
       assert_not_nil purchase_receivable.bulk_buys
       assert purchase_receivable.bulk_buys.count > 0
 
