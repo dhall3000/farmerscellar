@@ -10,8 +10,10 @@ class BulkPurchasesTest < BulkBuyer
     post bulk_purchases_path, purchase_receivables: purchase_receivables
     verify_legitimacy_of_bulk_purchase
 
-
-
+    #find out how many successful prs there are
+    num_successful_prs = PurchaseReceivable.count - number_of_failed_prs(PurchaseReceivable.all)    
+    #there is a one-to-many relationship between a pr and a pp
+    assert PaymentPayable.count >= num_successful_prs
     assert PaymentPayable.count > 0
     get new_bulk_payment_path
     assert :success
@@ -20,8 +22,6 @@ class BulkPurchasesTest < BulkBuyer
     grand_total_payout = assigns(:grand_total_payout)
     payment_info_by_producer_id = assigns(:payment_info_by_producer_id)    
     assert_not_nil payment_info_by_producer_id
-
-
 
     post bulk_payments_path, payment_info_by_producer_id: payment_info_by_producer_id
 
@@ -184,20 +184,25 @@ class BulkPurchasesTest < BulkBuyer
 
   end
 
-  def all_purchase_receivables_succeeded(prs)
+  def number_of_failed_prs(prs)
+    num = 0
 
-    all_purchases_succeeded = true
-
-    for pr in prs
-      for purchase in pr.purchases
-        if !purchase.response.success?
-          all_purchases_succeeded = false                  
-        end
-      end
+    if prs.nil? || !prs.any?
+      return num
     end
 
-    return all_purchases_succeeded
+    for pr in prs
+      if pr.kind == PurchaseReceivable.kind[:PURCHASEFAILED]      
+        num += 1
+      end
+    end  
 
+    return num  
+
+  end
+
+  def all_purchase_receivables_succeeded(prs)
+    return number_of_failed_prs(prs) == 0
   end
 
   def setup_bulk_purchase
