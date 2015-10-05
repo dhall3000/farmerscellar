@@ -1,5 +1,7 @@
 class BulkPurchase < ActiveRecord::Base
   include ToteItemsHelper
+  attr_reader :num_payment_payables_created
+
   has_many :bulk_purchase_receivables
   has_many :purchase_receivables, through: :bulk_purchase_receivables
 
@@ -13,6 +15,9 @@ class BulkPurchase < ActiveRecord::Base
   end
 
   def go
+
+    @num_payment_payables_created = 0
+
   	if purchase_receivables && purchase_receivables.any?
 
   	  for purchase_receivable in purchase_receivables                
@@ -81,6 +86,7 @@ class BulkPurchase < ActiveRecord::Base
         end
 
         payment_payable.save
+        @num_payment_payables_created = @num_payment_payables_created + 1
 
       end
     end

@@ -15,6 +15,7 @@ class BulkPurchasesController < ApplicationController
   	    @bulk_purchase.purchase_receivables << pr
   	  end
       @bulk_purchase.go  	
+      @num_payment_payables_created = @bulk_purchase.num_payment_payables_created
     end  	
   end
 end

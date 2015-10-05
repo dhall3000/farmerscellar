@@ -3,18 +3,43 @@ require 'bulk_buy_helper'
 
 class BulkPurchasesTest < BulkBuyer
 
-  #bundle rake test test/integration/bulk_purchases_test.rb
-  test "do bulk buy" do
-  #def skip
-    purchase_receivables = setup_bulk_purchase    
-    post bulk_purchases_path, purchase_receivables: purchase_receivables
-    verify_legitimacy_of_bulk_purchase
+  def verify_proper_number_of_payment_payables
+    purchase_receivables = assigns(:purchase_receivables)
+
+    #total_expected_number_payment_payables_generated represents the computed amount of how many PurchaseReceivables we should have...
+    total_expected_number_payment_payables_generated = 0
+
+    for pr in purchase_receivables
+      total_expected_number_payment_payables_generated += expected_number_payment_payables_generated(pr)
+    end
+
+    #this is the actual number of payment_payables created by this action...    
+    num_payment_payables_created = assigns(:num_payment_payables_created)
+
+    assert_equal total_expected_number_payment_payables_generated, num_payment_payables_created
 
     #find out how many successful prs there are
     num_successful_prs = PurchaseReceivable.count - number_of_failed_prs(PurchaseReceivable.all)    
     #there is a one-to-many relationship between a pr and a pp
     assert PaymentPayable.count >= num_successful_prs
     assert PaymentPayable.count > 0
+  end
+
+  #bundle exec rake test test/integration/bulk_purchases_test.rb
+  test "do bulk buy" do
+  #def skip
+    purchase_receivables = setup_bulk_purchase    
+    post bulk_purchases_path, purchase_receivables: purchase_receivables
+    verify_legitimacy_of_bulk_purchase
+
+
+
+    verify_proper_number_of_payment_payables
+
+
+
+
+
     get new_bulk_payment_path
     assert :success
     unpaid_payment_payables = assigns(:unpaid_payment_payables)
@@ -34,7 +59,7 @@ class BulkPurchasesTest < BulkBuyer
     FakeCaptureResponse.toggle_success = true    
     post bulk_purchases_path, purchase_receivables: purchase_receivables
     verify_legitimacy_of_bulk_purchase
-
+    verify_proper_number_of_payment_payables    
   end
 
   def verify_legitimacy_of_bulk_purchase
@@ -257,6 +282,29 @@ class BulkPurchasesTest < BulkBuyer
     end    
 
     return purchase_receivables
+
+  end
+
+  def expected_number_payment_payables_generated(purchase_receivable)
+    val = 0
+
+    if purchase_receivable.nil?
+      return val
+    end
+
+    if purchase_receivable.kind == PurchaseReceivable.kind[:PURCHASEFAILED]
+      return val
+    end
+
+    producer_ids = {}
+
+    for tote_item in purchase_receivable.tote_items
+      if !producer_ids.has_key?(tote_item.posting.user.id)
+        producer_ids[tote_item.posting.user.id] = nil
+      end
+    end
+
+    return producer_ids.count
 
   end
 
