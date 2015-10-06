@@ -10,13 +10,8 @@ class BulkPurchasesTest < BulkBuyer
     post bulk_purchases_path, purchase_receivables: purchase_receivables
     verify_legitimacy_of_bulk_purchase
 
-
-
     verify_proper_number_of_payment_payables
-
-
-
-
+    bulk_purchase = assigns(:bulk_purchase)
 
     get new_bulk_payment_path
     assert :success
@@ -25,18 +20,16 @@ class BulkPurchasesTest < BulkBuyer
     grand_total_payout = assigns(:grand_total_payout)
     payment_info_by_producer_id = assigns(:payment_info_by_producer_id)    
     assert_not_nil payment_info_by_producer_id
-
     post bulk_payments_path, payment_info_by_producer_id: payment_info_by_producer_id
+    bulk_payment = assigns(:bulk_payment)
 
-    bulk_purchase = assigns(:bulk_purchase)
-    debugger
-    #bulk_purchase_total_amount = 
+    assert_equal bulk_purchase.total_net, bulk_payment.total_payments_amount    
 
   end  
 
   #bundle exec rake test test/integration/bulk_purchases_test.rb
-  #test "do bulk buy with purchase failures" do
-  def skip1
+  test "do bulk buy with purchase failures" do
+  #def skip1
     purchase_receivables = setup_bulk_purchase            
     FakeCaptureResponse.toggle_success = true    
     post bulk_purchases_path, purchase_receivables: purchase_receivables

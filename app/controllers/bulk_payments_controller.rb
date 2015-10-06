@@ -51,7 +51,7 @@ class BulkPaymentsController < ApplicationController
   	if proceed
   	  #create a BulkPayment object
   	  #create a Payment object for each payment in the BulkPayment
-  	  bulk_payment = BulkPayment.new(num_payees: @payment_info_by_producer_id.keys.count, total_payments_amount: @cumulative_total_payout)
+  	  @bulk_payment = BulkPayment.new(num_payees: @payment_info_by_producer_id.keys.count, total_payments_amount: @cumulative_total_payout)
   	  @payment_info_by_producer_id.each do |producer_id, payment_info|
   	  	payment = Payment.new(amount: payment_info[:amount])  	  	
   	  	payment_info[:payment_payable_ids].each do |payment_payable_id|
@@ -65,12 +65,12 @@ class BulkPaymentsController < ApplicationController
           #payments failed. so i'd have to write tedious code to correlate this funky id with the ids in my system. notgonnadoit right now.
           payment_payable.update(amount_paid: payment_payable.amount)
   	  	  payment.payment_payables << payment_payable
-  	  	  bulk_payment.payment_payables << payment_payable
+  	  	  @bulk_payment.payment_payables << payment_payable
   	  	end
   	  	payment.save
   	  end
-      save_response(response, bulk_payment)
-  	  bulk_payment.save
+      save_response(response, @bulk_payment)
+  	  @bulk_payment.save
   	end  	
 
   end
