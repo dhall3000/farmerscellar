@@ -35,6 +35,19 @@ class BulkPurchasesTest < BulkBuyer
     post bulk_purchases_path, purchase_receivables: purchase_receivables
     verify_legitimacy_of_bulk_purchase
     verify_proper_number_of_payment_payables    
+    bulk_purchase = assigns(:bulk_purchase)
+    
+    get new_bulk_payment_path
+    assert :success
+    unpaid_payment_payables = assigns(:unpaid_payment_payables)
+    assert_not_nil unpaid_payment_payables
+    grand_total_payout = assigns(:grand_total_payout)
+    payment_info_by_producer_id = assigns(:payment_info_by_producer_id)    
+    assert_not_nil payment_info_by_producer_id
+    post bulk_payments_path, payment_info_by_producer_id: payment_info_by_producer_id
+    bulk_payment = assigns(:bulk_payment)
+
+    assert_equal bulk_purchase.total_net, bulk_payment.total_payments_amount    
   end
 
   def verify_legitimacy_of_bulk_purchase

@@ -36,7 +36,7 @@ class BulkPaymentsController < ApplicationController
   	@num_payees = @payment_info_by_producer_id.keys.count
   	@cumulative_total_payout = 0
   	@payment_info_by_producer_id.each do |producer_id, payment_info|
-  	  @cumulative_total_payout += payment_info[:amount].to_f
+  	  @cumulative_total_payout = (@cumulative_total_payout + payment_info[:amount].to_f).round(2)
   	end
 
   	response = send_payments(@payment_info_by_producer_id)    
