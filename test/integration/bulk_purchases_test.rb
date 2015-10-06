@@ -3,28 +3,6 @@ require 'bulk_buy_helper'
 
 class BulkPurchasesTest < BulkBuyer
 
-  def verify_proper_number_of_payment_payables
-    purchase_receivables = assigns(:purchase_receivables)
-
-    #total_expected_number_payment_payables_generated represents the computed amount of how many PurchaseReceivables we should have...
-    total_expected_number_payment_payables_generated = 0
-
-    for pr in purchase_receivables
-      total_expected_number_payment_payables_generated += expected_number_payment_payables_generated(pr)
-    end
-
-    #this is the actual number of payment_payables created by this action...    
-    num_payment_payables_created = assigns(:num_payment_payables_created)
-
-    assert_equal total_expected_number_payment_payables_generated, num_payment_payables_created
-
-    #find out how many successful prs there are
-    num_successful_prs = PurchaseReceivable.count - number_of_failed_prs(PurchaseReceivable.all)    
-    #there is a one-to-many relationship between a pr and a pp
-    assert PaymentPayable.count >= num_successful_prs
-    assert PaymentPayable.count > 0
-  end
-
   #bundle exec rake test test/integration/bulk_purchases_test.rb
   test "do bulk buy" do
   #def skip
@@ -306,6 +284,28 @@ class BulkPurchasesTest < BulkBuyer
 
     return producer_ids.count
 
+  end
+
+  def verify_proper_number_of_payment_payables
+    purchase_receivables = assigns(:purchase_receivables)
+
+    #total_expected_number_payment_payables_generated represents the computed amount of how many PurchaseReceivables we should have...
+    total_expected_number_payment_payables_generated = 0
+
+    for pr in purchase_receivables
+      total_expected_number_payment_payables_generated += expected_number_payment_payables_generated(pr)
+    end
+
+    #this is the actual number of payment_payables created by this action...    
+    num_payment_payables_created = assigns(:num_payment_payables_created)
+
+    assert_equal total_expected_number_payment_payables_generated, num_payment_payables_created
+
+    #find out how many successful prs there are
+    num_successful_prs = PurchaseReceivable.count - number_of_failed_prs(PurchaseReceivable.all)    
+    #there is a one-to-many relationship between a pr and a pp
+    assert PaymentPayable.count >= num_successful_prs
+    assert PaymentPayable.count > 0
   end
 
 end

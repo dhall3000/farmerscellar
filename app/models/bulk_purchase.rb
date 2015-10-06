@@ -30,14 +30,9 @@ class BulkPurchase < ActiveRecord::Base
           sub_tote_value_by_payment_sequenced_producer_id = get_sub_tote_value_by_payment_sequenced_producer_id(purchase_receivable)
           create_payment_payables(purchase_receivable, purchase, sub_tote_value_by_payment_sequenced_producer_id)
         else
-          #debugger
+          #not really sure what to do in this case, which is when the purchase fails
         end        
 
-
-
-        #producers_ids = purchase_receivable.get_producer_ids
-        #sub_totes = 
-        #create_payment_payable(purchase)
   	  end
   	  save
   	end    
