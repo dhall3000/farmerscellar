@@ -28,11 +28,15 @@ class BulkPurchasesTest < BulkBuyer
 
     post bulk_payments_path, payment_info_by_producer_id: payment_info_by_producer_id
 
+    bulk_purchase = assigns(:bulk_purchase)
+    debugger
+    #bulk_purchase_total_amount = 
+
   end  
 
   #bundle exec rake test test/integration/bulk_purchases_test.rb
-  test "do bulk buy with purchase failures" do
-  #def skip1
+  #test "do bulk buy with purchase failures" do
+  def skip1
     purchase_receivables = setup_bulk_purchase            
     FakeCaptureResponse.toggle_success = true    
     post bulk_purchases_path, purchase_receivables: purchase_receivables
