@@ -45,7 +45,7 @@
 
   <div class="row">          
     <div class="col-xs-4 col-xs-offset-4">
-      <% disabled = current_user.account_states.last.state != AccountState.states[:OK] %>    
+      <% disabled = current_user.user_account_states.last.account_state.state != AccountState.states[:OK] %>    
       <%= form_for @tote_item do |f| %>
         <%= render partial: 'shared/error_messages_general', locals: { active_record_object: @tote_item } %>
         <div class="text-center">
