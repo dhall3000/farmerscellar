@@ -22,7 +22,9 @@ class BulkBuyer < Authorizer
     
     while(num_tote_items_filled < num_to_fill)
       tote_item = assigns(:tote_item)
-      if !tote_item.nil?
+      if tote_item.nil?
+        break
+      else
         puts "tote_item id: #{tote_item.id}"
         post tote_items_next_path, {tote_item: {id: tote_item.id, posting_id: posting_id}}
         num_tote_items_filled = num_tote_items_filled + 1
@@ -31,19 +33,18 @@ class BulkBuyer < Authorizer
 
   end
 
-  def transition_authorized_tote_items_to_committed
-    #verify tote_items are in the AUTHORIZED state
-    assert_equal ToteItem.states[:AUTHORIZED], ToteItem.first.status    
-    assert ToteItem.where(status: ToteItem.states[:ADDED]).count == 0
-    assert ToteItem.where(status: ToteItem.states[:AUTHORIZED]).count > 0
+  def transition_authorized_tote_items_to_committed(customers)    
+
+    num_authorized = ToteItem.where(status: ToteItem.states[:AUTHORIZED]).count
 
     #now change all the tote_items from AUTHORIZED to COMMITTED
     ToteItem.where(status: ToteItem.states[:AUTHORIZED]).update_all(status: ToteItem.states[:COMMITTED])
 
-    #now verify the tote_items are in the COMMITTED state as appropriate
-    assert_equal ToteItem.states[:COMMITTED], ToteItem.first.status    
-    assert ToteItem.where(status: ToteItem.states[:AUTHORIZED]).count == 0
-    assert ToteItem.where(status: ToteItem.states[:COMMITTED]).count > 0
+    num_committed = ToteItem.where(status: ToteItem.states[:COMMITTED]).count
+
+    assert_equal 0, ToteItem.where(status: ToteItem.states[:AUTHORIZED]).count
+    assert_equal num_authorized, num_committed
+
   end
 
   def simulate_order_filling(fill_all_tote_items)
@@ -68,12 +69,9 @@ class BulkBuyer < Authorizer
     end
   end
 
-  def create_bulk_buy(fill_all_tote_items)
-    assert_equal 0, Authorization.count, "there should be no authorizations in the database at the beginning of this test but there actually are #{Authorization.count}"
-
-    customers = [@c1, @c2, @c3, @c4]
+  def create_bulk_buy(customers, fill_all_tote_items)
     create_authorization_for_customers(customers)
-    transition_authorized_tote_items_to_committed
+    transition_authorized_tote_items_to_committed(customers)
     simulate_order_filling(fill_all_tote_items)
 
     #verify there are no authorized
@@ -91,20 +89,24 @@ class BulkBuyer < Authorizer
     assert filled_tote_items.count > 0
 
     filled_tote_item_ids = []
+    filled_users = {}
     for tote_item in filled_tote_items
       filled_tote_item_ids << tote_item.id
+      if filled_users[tote_item.user.id] == nil
+        filled_users[tote_item.user.id] = true
+      end
     end
 
+    expected_num_purchase_receivables = filled_users.count
+
     num_bulk_buys = BulkBuy.count
-    assert PurchaseReceivable.count == 0    
+    num_purchase_receivables_before = PurchaseReceivable.count
     post bulk_buys_path, filled_tote_item_ids: filled_tote_item_ids
-    assert PurchaseReceivable.count > 0
+    assert PurchaseReceivable.count > num_purchase_receivables_before
 
     bulk_buy = assigns(:bulk_buy)
 
-    assert_equal 4, bulk_buy.purchase_receivables.count
-    assert_equal 0, PaymentPayable.count
-
+    assert_equal expected_num_purchase_receivables, bulk_buy.purchase_receivables.count
     assert_equal num_bulk_buys + 1, BulkBuy.count
 
     prs = PurchaseReceivable.all.to_a

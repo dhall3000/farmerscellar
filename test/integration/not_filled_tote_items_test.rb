@@ -16,7 +16,7 @@ class NotFilledToteItemsTest < BulkBuyer
     assert_equal 0, ToteItem.where(status: ToteItem.states[:FILLED]).count
     assert_equal 0, ToteItem.where(status: ToteItem.states[:FILLPENDING]).count
 
-    transition_authorized_tote_items_to_committed
+    transition_authorized_tote_items_to_committed(customers)
     fill_all_tote_items = false
     simulate_order_filling(fill_all_tote_items)
 

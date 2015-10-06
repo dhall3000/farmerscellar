@@ -6,7 +6,8 @@ class BulkPurchasesTest < BulkBuyer
   #bundle exec rake test test/integration/bulk_purchases_test.rb
   test "do bulk buy" do
   #def skip
-    purchase_receivables = setup_bulk_purchase    
+    customers = [@c1, @c2, @c3, @c4]
+    purchase_receivables = setup_bulk_purchase(customers)
     post bulk_purchases_path, purchase_receivables: purchase_receivables
     verify_legitimacy_of_bulk_purchase
 
@@ -30,7 +31,8 @@ class BulkPurchasesTest < BulkBuyer
   #bundle exec rake test test/integration/bulk_purchases_test.rb
   test "do bulk buy with purchase failures" do
   #def skip1
-    purchase_receivables = setup_bulk_purchase            
+    customers = [@c1, @c2, @c3, @c4]
+    purchase_receivables = setup_bulk_purchase(customers)
     FakeCaptureResponse.toggle_success = true    
     post bulk_purchases_path, purchase_receivables: purchase_receivables
     verify_legitimacy_of_bulk_purchase
@@ -48,6 +50,56 @@ class BulkPurchasesTest < BulkBuyer
     bulk_payment = assigns(:bulk_payment)
 
     assert_equal bulk_purchase.total_net, bulk_payment.total_payments_amount    
+  end
+
+  test "sequential bulk buys with some purchase failures" do
+
+    FakeCaptureResponse.toggle_success = true    
+    customers = [@c1, @c2]
+
+    purchase_receivables = setup_bulk_purchase(customers)    
+    post bulk_purchases_path, purchase_receivables: purchase_receivables
+    verify_legitimacy_of_bulk_purchase
+    verify_proper_number_of_payment_payables    
+    bulk_purchase = assigns(:bulk_purchase)    
+    get new_bulk_payment_path
+    assert :success
+    unpaid_payment_payables = assigns(:unpaid_payment_payables)
+    assert_not_nil unpaid_payment_payables
+    grand_total_payout = assigns(:grand_total_payout)
+    payment_info_by_producer_id = assigns(:payment_info_by_producer_id)    
+    assert_not_nil payment_info_by_producer_id
+    post bulk_payments_path, payment_info_by_producer_id: payment_info_by_producer_id
+    bulk_payment = assigns(:bulk_payment)
+    assert_equal bulk_purchase.total_net, bulk_payment.total_payments_amount
+
+    FakeCaptureResponse.toggle_success = false    
+    FakeCaptureResponse.succeed = true
+    customers = [@c3, @c4]
+
+    purchase_receivables = setup_bulk_purchase(customers)    
+    num_prs_just_created = purchase_receivables.count
+    post bulk_purchases_path, purchase_receivables: purchase_receivables    
+
+    #here we want to verify that this bulk purchase is not picking up any failed purchasereceivables from
+    #the prior bulk purchase
+    bulk_purchase = assigns(:bulk_purchase)
+    assert_equal num_prs_just_created, bulk_purchase.purchase_receivables.count
+
+    verify_legitimacy_of_bulk_purchase    
+    verify_proper_number_of_payment_payables    
+    bulk_purchase = assigns(:bulk_purchase)    
+    get new_bulk_payment_path
+    assert :success
+    unpaid_payment_payables = assigns(:unpaid_payment_payables)
+    assert_not_nil unpaid_payment_payables
+    grand_total_payout = assigns(:grand_total_payout)
+    payment_info_by_producer_id = assigns(:payment_info_by_producer_id)    
+    assert_not_nil payment_info_by_producer_id
+    post bulk_payments_path, payment_info_by_producer_id: payment_info_by_producer_id
+    bulk_payment = assigns(:bulk_payment)
+    assert_equal bulk_purchase.total_net, bulk_payment.total_payments_amount
+
   end
 
   def verify_legitimacy_of_bulk_purchase
@@ -218,10 +270,10 @@ class BulkPurchasesTest < BulkBuyer
     return number_of_failed_prs(prs) == 0
   end
 
-  def setup_bulk_purchase
-
+  def setup_bulk_purchase(customers)
+    
     fill_all_tote_items = true
-    create_bulk_buy(fill_all_tote_items)
+    create_bulk_buy(customers, fill_all_tote_items)
     get new_bulk_purchase_path
     assert :success
     assert_template 'bulk_purchases/new'

@@ -30,6 +30,10 @@ class FakeCaptureResponse
     @@toggle_success=val
   end
 
+  def self.succeed=val
+    @@succeed=val
+  end
+
   def initialize(amount_in_cents, authorization_transaction_id)
 
     percentage = 0.035
