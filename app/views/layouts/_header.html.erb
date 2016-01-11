@@ -1,8 +1,18 @@
 <header class="navbar navbar-fixed-top navbar-inverse">
   <div class="container">
     <%= link_to "Farmer's Cellar", root_path, id: "logo" %>
+
+ <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#collapsible-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+
+ <div class="collapse navbar-collapse" id="collapsible-navbar">
+
     <nav>
-      <ul class="nav navbar-nav navbar-right">
+      <ul class="nav navbar-nav navbar-right">        
         <li><%= link_to "Home", root_path,  class: "glyphicon" %></li>
         <% if logged_in? %>          
           <% if user_has_access?  %>
@@ -33,5 +43,8 @@
         <% end %>
       </ul>
     </nav>
+
+</div>
+
   </div>
 </header>
