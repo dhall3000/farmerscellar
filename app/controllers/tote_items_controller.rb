@@ -17,10 +17,19 @@ class ToteItemsController < ApplicationController
   end
 
   def new
+    @account_on_hold = current_user.account_states.last.state == AccountState.states[:HOLD]
     @tote_item = ToteItem.new
   end
 
-  def create    
+  def create
+
+    #if user's account is on hold we don't want to allow them to add tote items
+    account_on_hold = current_user.account_states.last.state == AccountState.states[:HOLD]
+    if account_on_hold
+      redirect_to(root_url)
+      return
+    end
+
     @tote_item = ToteItem.new(tote_item_params)
 
     if !correct_user_create(@tote_item)

@@ -1,6 +1,5 @@
 <h1>Shopping Tote Addition</h1>
 
-
 <% posting = nil %>
 <% if params[:posting_id] != nil %>
   <% posting = Posting.find_by(id: params[:posting_id]) %>
@@ -45,7 +44,6 @@
 
   <div class="row">          
     <div class="col-xs-4 col-xs-offset-4">
-      <% disabled = current_user.user_account_states.last.account_state.state != AccountState.states[:OK] %>    
       <%= form_for @tote_item do |f| %>
         <%= render partial: 'shared/error_messages_general', locals: { active_record_object: @tote_item } %>
         <div class="text-center">
@@ -57,9 +55,11 @@
         <%= f.number_field :posting_id, value: posting.id, hidden: true %>
         <%= f.number_field :user_id, value: current_user.id, hidden: true %>
 
-        <%= f.submit "Add to shopping tote", class: "btn btn-primary", disabled: disabled %>
-        <% if disabled %>
-          <%= "your account is on hold, most likely due to a positive balance on your account. please pay your balance before continuing shopping." %>
+        <%= f.submit "Add to shopping tote", class: "btn btn-primary", disabled: @account_on_hold %>
+        <% if @account_on_hold %>
+          <p class="text-center alert alert-danger alert-dismissable">                      
+            Your account is on hold, most likely due to a positive balance on your account. Please <%= link_to "contact Farmer's Cellar", contact_path %> to pay your balance before continuing to shop.
+          </p>
         <% end %>
       <% end %>
     </div>
