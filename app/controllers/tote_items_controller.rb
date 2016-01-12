@@ -17,14 +17,13 @@ class ToteItemsController < ApplicationController
   end
 
   def new
-    @account_on_hold = current_user.account_states.last.state == AccountState.states[:HOLD]
+    @account_on_hold = account_on_hold
     @tote_item = ToteItem.new
   end
 
   def create
 
-    #if user's account is on hold we don't want to allow them to add tote items
-    account_on_hold = current_user.account_states.last.state == AccountState.states[:HOLD]
+    #if user's account is on hold we don't want to allow them to add tote items    
     if account_on_hold
       redirect_to(root_url)
       return
@@ -125,6 +124,18 @@ class ToteItemsController < ApplicationController
   private
     def tote_item_params
       params.require(:tote_item).permit(:quantity, :price, :status, :posting_id, :user_id)
+    end
+
+    def account_on_hold
+      
+      if current_user.account_states == nil || !current_user.account_states.any?
+        account_on_hold = false
+      else
+        account_on_hold = current_user.account_states.last.state == AccountState.states[:HOLD]
+      end
+
+      return account_on_hold
+
     end
 
     # Confirms the correct user.
