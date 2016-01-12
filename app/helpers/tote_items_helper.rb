@@ -9,7 +9,7 @@ module ToteItemsHelper
     return unauthorized_tote_items
   end
 
-	def current_user_current_tote_items
+  def current_tote_items_for_user(user)
 
     #DESCRIPTION: the intent of this method is to get a collection of toteitems that are currently in the abstract, virtual 'tote'. so, old/expired
     #toteitems are not included, nor are those in states REMOVED, FILLED, NOTFILLED etc.
@@ -21,7 +21,7 @@ module ToteItemsHelper
     #a new toteitem state was added....PURCHASEPENDING. this should be displayed to the user as well.
 
     #here's all the toteitems associated with this user
-    all = ToteItem.joins(posting: [:user, :product]).where(user_id: current_user.id)
+    all = ToteItem.joins(posting: [:user, :product]).where(user_id: user.id)
 
     #the 'displayable' items are just the ones in the proper states for user viewing
     if all != nil && all.count > 0
@@ -38,6 +38,11 @@ module ToteItemsHelper
 
     return current
 
+  end
+
+	def current_user_current_tote_items
+    tote_items = current_tote_items_for_user(current_user)
+    return tote_items
 	end
 
 	def tote_has_items(tote_items)

@@ -127,6 +127,16 @@ class PurchaseReceivable < ActiveRecord::Base
       else        
         tote_items.where(status: ToteItem.states[:PURCHASEPENDING]).update_all(status: ToteItem.states[:PURCHASEFAILED])
         self.kind = PurchaseReceivable.kind[:PURCHASEFAILED]
+
+        #we want to prevent work from beginning on any tote_items in this customer's pipeline for which work hasn't yet begun
+        #in other words, empty out their tote. however, if something is already committed then the customer is on the hook for
+        #that if it gets filled.
+        #TODO: make a test to verify that when a purchase fails the shopping tote gets emptied
+        current_tote_items = ToteItemsController.helpers.current_tote_items_for_user(users.last)
+        if current_tote_items != nil && current_tote_items.any?
+          current_tote_items.where("status = ? or status = ?", ToteItem.states[:ADDED], ToteItem.states[:AUTHORIZED]).update_all(status: ToteItem.states[:REMOVED])
+        end
+
         save
       end
 
