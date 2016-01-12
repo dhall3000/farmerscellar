@@ -13,37 +13,41 @@
   <% producer = User.find_by(id: posting.user_id) %>
   <% provide(:title, producer.farm_name) %>
 
-  <table class="table">
-    <thead>
-      <tr>
-        <th class="text-center">Producer</th>
-        <th class="text-center">Product</th>
-        <th class="text-center">Price</th>   
-        <th class="text-center">Unit</th>        
-        <th class="text-center">Delivery Date</th>
-      </tr>
-    </thead>
-    <tbody>
-        <% farmInfo = "Producer has not provided info about their operation" %>
-        <% if posting.user.description != nil %>
-          <% farmInfo = "<u>Producer Description</u><p>" + posting.user.description %>
-        <% end %>
-        <% if !posting.user.website.blank? %>
-          <% farmInfo = farmInfo + "<p>" + "<u>Producer Website</u><p><a href='" + posting.user.website + "' target='_blank'>" + posting.user.website + "</a>"%>
-        <% end %>
+  <div class="row">
+    <div class="col-xs-12">
+      <table class="table">
+        <thead>
+          <tr>
+            <th class="text-center">Producer</th>
+            <th class="text-center">Product</th>
+            <th class="text-center">Price</th>   
+            <th class="text-center">Unit</th>        
+            <th class="text-center">Delivery Date</th>
+          </tr>
+        </thead>
+        <tbody>
+            <% farmInfo = "Producer has not provided info about their operation" %>
+            <% if posting.user.description != nil %>
+              <% farmInfo = "<u>Producer Description</u><p>" + posting.user.description %>
+            <% end %>
+            <% if !posting.user.website.blank? %>
+              <% farmInfo = farmInfo + "<p>" + "<u>Producer Website</u><p><a href='" + posting.user.website + "' target='_blank'>" + posting.user.website + "</a>"%>
+            <% end %>
 
-        <tr>
-          <td><a tabindex="0" class="btn btn-primary btn-block" role="button" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=farmInfo%>"><%= User.find_by(id: posting.user_id).farm_name %></a></td>          
-          <td><a tabindex="0" class="btn btn-primary btn-block" role="button" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%= posting.description %>"><%= Product.find_by(id: posting.product_id).name %></a></td>
-          <td class="text-center"><%= number_to_currency(posting.price) %></td>
-          <td class="text-center"><%= UnitKind.find_by(id: posting.unit_kind_id).name %></td>          
-          <td class="text-center"><%= posting.delivery_date.strftime("%A %b %d, %Y") %></td>
-        </tr>      
-    </tbody>
-  </table>  
+            <tr>
+              <td><a tabindex="0" class="btn btn-primary btn-block" role="button" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=farmInfo%>"><%= User.find_by(id: posting.user_id).farm_name %></a></td>          
+              <td><a tabindex="0" class="btn btn-primary btn-block" role="button" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%= posting.description %>"><%= Product.find_by(id: posting.product_id).name %></a></td>
+              <td class="text-center"><%= number_to_currency(posting.price) %></td>
+              <td class="text-center"><%= UnitKind.find_by(id: posting.unit_kind_id).name %></td>          
+              <td class="text-center"><%= posting.delivery_date.strftime("%A %b %d, %Y") %></td>
+            </tr>      
+        </tbody>
+      </table>
+    </div>
+  </div>
 
   <div class="row">          
-    <div class="col-xs-4 col-xs-offset-4">
+    <div class="col-xs-12 col-md-4 col-md-offset-4">
       <%= form_for @tote_item do |f| %>
         <%= render partial: 'shared/error_messages_general', locals: { active_record_object: @tote_item } %>
         <div class="text-center">
@@ -56,11 +60,15 @@
         <%= f.number_field :user_id, value: current_user.id, hidden: true %>
 
         <%= f.submit "Add to shopping tote", class: "btn btn-primary", disabled: @account_on_hold %>
-        <% if @account_on_hold %>
-          <p class="text-center alert alert-danger alert-dismissable">                      
-            Your account is on hold, most likely due to a positive balance on your account. Please <%= link_to "contact Farmer's Cellar", contact_path %> to pay your balance before continuing to shop.
-          </p>
-        <% end %>
+      <% end %>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12 col-md-4 col-md-offset-4">
+      <% if @account_on_hold %>
+        <p class="text-center alert alert-danger alert-dismissable">
+          Your account is on hold, most likely due to a positive balance on your account. Please <%= link_to "contact Farmer's Cellar", contact_path %> to pay your balance before continuing to shop.
+        </p>
       <% end %>
     </div>
   </div>
