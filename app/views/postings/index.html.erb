@@ -2,21 +2,27 @@
 
 <h1>Postings</h1>
 
-
-      <div>
-        <p class="text-center alert alert-info alert-dismissable">
-          <em>
-            January 6, 2016<br>            
-            We are aiming for regular product postings before March. We will contact you once we are up and running. Thanks!<br>
-            ~Farmer's Cellar
-          </em>
-        </p>
-      </div>
-
+<div class="row">
+  <div class="col-xs-12 col-md-4 col-md-offset-4">
+    <div>
+      <p class="text-center alert alert-info alert-dismissable">
+        <em>
+          January 6, 2016<br>            
+          We are aiming for regular product postings before March. We will contact you once we are up and running. Thanks!<br>
+          ~Farmer's Cellar
+        </em>
+      </p>
+    </div>
+  </div>
+</div>
 
 
 
 <% if @postings != nil && @postings.any? %>  
+
+<div class="row">
+  <div class="col-xs-12">
+
   <table class="table">
     <thead>
       <tr>
@@ -58,8 +64,7 @@
       <% end %>
     </tbody>
   </table>  
-<% end %>
 
-<% if false %>
-<th><%= link_to "Go!", 'tote_items/next', posting_id: posting.id %></th>
+</div>
+</div>  
 <% end %>
