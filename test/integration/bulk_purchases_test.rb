@@ -33,8 +33,36 @@ class BulkPurchasesTest < BulkBuyer
   #def skip1
     customers = [@c1, @c2, @c3, @c4]
     purchase_receivables = setup_bulk_purchase(customers)
+
+    #COMMENT KEY 000: we're going to set up c1 so that he has some toteitems in a bulk purchase that fail but at the moment of fail
+    #he also has a ti that's ADDED and another that's AUTHORIZED. the code should sense these latter two and
+    #switch them to state REMOVED. so we're going to first verify that we have zero in the REMOVED state and
+    #then after the purchase failure verify that we have 2 in the REMOVED state
+    assert_equal ToteItem.where(status: ToteItem.states[:REMOVED]).count, 0
+
+    #authorize some more tote items
+    log_in_as(@c1)
+    posting_lettuce = postings(:postingf1lettuce)
+    post tote_items_path, tote_item: {quantity: 2, price: posting_lettuce.price, status: ToteItem.states[:ADDED], posting_id: posting_lettuce.id, user_id: @c1.id}
+    get tote_items_path
+    total_amount_to_authorize = assigns(:total_amount_to_authorize)    
+    post checkouts_path, amount: total_amount_to_authorize
+    follow_redirect!
+    authorization = assigns(:authorization)
+    post authorizations_path, authorization: {token: authorization.token, payer_id: authorization.payer_id, amount: authorization.amount}
+    authorization = assigns(:authorization)    
+
+    #add some more toteitems    
+    posting_tomato = postings(:postingf2tomato)
+    post tote_items_path, tote_item: {quantity: 2, price: posting_tomato.price, status: ToteItem.states[:ADDED], posting_id: posting_tomato.id, user_id: @c1.id}
+
+    #by the time we get to this point c1 should have 10 toteitems, 8 in PURCHASEPENDING, 1 in ADDED and 1 in AUTHORIZED
+
+    log_in_as(@a1)
     FakeCaptureResponse.toggle_success = true    
     post bulk_purchases_path, purchase_receivables: purchase_receivables
+    #COMMENT KEY 000
+    assert_equal ToteItem.where(status: ToteItem.states[:REMOVED]).count, 2
     verify_legitimacy_of_bulk_purchase
     verify_proper_number_of_payment_payables    
     bulk_purchase = assigns(:bulk_purchase)

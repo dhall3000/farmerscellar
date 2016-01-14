@@ -5,6 +5,7 @@
   <% i += 1 %>
 <% end %>
 <% delivery_date = Date.today + i %>
+<% delivery_date_next = delivery_date + 7 %>
 
 #Apples
 #Posting.create(delivery_date: next_friday, product_id: 1, quantity_available: 1000, price: 2.75, user_id: 1, unit_category_id: 2, unit_kind_id: 8, description: "these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
@@ -32,6 +33,18 @@ postingf1asparagus:
   description: these Asparagus are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.
   live: true
 
+#Lettuce
+postingf1lettuce:
+  delivery_date: <%= delivery_date_next %>
+  product: lettuce
+  quantity_available: 100
+  price: 4.25
+  user: f1
+  unit_category: weight
+  unit_kind: pound
+  description: delicious lettuce
+  live: true
+
 #Milk
 #Posting.create(delivery_date: next_friday, product_id: 3, quantity_available: 25, price: 2.00, user_id: 2, unit_category_id: 1, unit_kind_id: 5, description: "these milks are all organic grown with no pesticides. they are raw. no homogeneization. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
 postingf2milk:
@@ -56,6 +69,18 @@ postingf2beef:
   unit_category: count
   unit_kind: quarter
   description: these beefs are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.
+  live: true
+
+#Tomato
+postingf2tomato:
+  delivery_date: <%= delivery_date_next %>
+  product: tomato
+  quantity_available: 10
+  price: 2.99
+  user: f2
+  unit_category: count
+  unit_kind: whole
+  description: delicious tomato description
   live: true
 
 #Carrots

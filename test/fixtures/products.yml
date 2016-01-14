@@ -23,3 +23,9 @@ oranges:
 
 celery:
   name: Celery
+
+lettuce:
+  name: Lettuce
+
+tomato:
+  name: Tomato
