@@ -1,0 +1,2 @@
+module DropsitesHelper
+end

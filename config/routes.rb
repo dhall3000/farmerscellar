@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+
   root 'static_pages#home'
   get 'test_page' => 'static_pages#test_page'
   get 'about' => 'static_pages#about'
@@ -28,6 +29,7 @@ Rails.application.routes.draw do
   resources :bulk_purchases, only: [:new, :create]
   resources :bulk_payments, only: [:new, :create]      
   resources :access_codes, only: [:new, :create, :update]
+  resources :dropsites
 
   #THIS MUST BE THE LAST THING IN THIS ROUTES FILE. it's for catching bad paths and redirecting to root  
   get '*path' => redirect('/')
