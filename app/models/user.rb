@@ -24,6 +24,9 @@ class User < ActiveRecord::Base
   has_many :producer_product_commissions
   has_many :products, through: :producer_product_commissions
 
+  has_many :user_dropsites
+  has_many :dropsites, through: :user_dropsites
+
   has_one :access_code
 
   def is_producer?
