@@ -26,6 +26,11 @@ class AccountState < ActiveRecord::Base
   end
 
   def self.auto_populate_database
+
+    if !ActiveRecord::Base.connection.table_exists? 'account_states'
+      return
+    end
+
     states.each do |key, value|
       record = find_by(state: value)
       if record.nil?
