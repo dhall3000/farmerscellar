@@ -30,6 +30,6 @@ class DropsitesController < ApplicationController
 
   private
     def dropsite_params
-      params.require(:dropsite).permit(:name, :phone, :hours, :address, :access_instructions, :active)
+      params.require(:dropsite).permit(:name, :phone, :hours, :address, :access_instructions, :active, :city, :state, :zip)
     end
 end

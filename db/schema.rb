@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160121001124) do
+ActiveRecord::Schema.define(version: 20160123003137) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -169,6 +169,9 @@ ActiveRecord::Schema.define(version: 20160121001124) do
     t.datetime "created_at",          null: false
     t.datetime "updated_at",          null: false
     t.boolean  "active"
+    t.string   "city"
+    t.string   "state"
+    t.integer  "zip"
   end
 
   create_table "payment_payable_payments", force: :cascade do |t|
