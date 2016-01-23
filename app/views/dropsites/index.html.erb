@@ -1,2 +1,28 @@
-<h1>Dropsites#index</h1>
-<p>Find me in app/views/dropsites/index.html.erb</p>
+<h1>Dropsites</h1>
+<% if @dropsites != nil && @dropsites.any? %>  
+
+<div class="row">
+  <div class="col-xs-12">
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th class="text-center">Name</th>
+          <th class="text-center">City</th>
+          <th class="text-center">Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @dropsites.each do |dropsite| %>
+          <tr>
+            <td class="text-center"><%= dropsite.name %></td>            
+            <td class="text-center"><%= dropsite.city %></td>
+            <td class="text-center"><%= link_to "See details", dropsite_path(dropsite) %></td>
+          </tr>          
+        <% end %>
+      </tbody>
+    </table>  
+    
+  </div>
+</div>  
+<% end %>

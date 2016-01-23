@@ -17,9 +17,18 @@ class DropsitesController < ApplicationController
   end
 
   def index
+    
+    @dropsites = Dropsite.all
+
+
+#if this is an admin, fetch Dropsite.all
+#however, if this is a customer, only show 'active' dropsites
+
+
   end
 
   def show
+    @dropsite = Dropsite.find(params[:id])    
   end
 
   def edit
