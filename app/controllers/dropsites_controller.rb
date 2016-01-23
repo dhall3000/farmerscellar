@@ -1,4 +1,6 @@
 class DropsitesController < ApplicationController
+  before_action :redirect_to_root_if_user_not_admin, only: [:new, :create, :destroy, :edit, :update]
+
   def new
     @dropsite = Dropsite.new    
   end
