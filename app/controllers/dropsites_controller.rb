@@ -32,9 +32,17 @@ class DropsitesController < ApplicationController
   end
 
   def edit
+    @dropsite = Dropsite.find(params[:id])    
   end
 
-  def update
+  def update        
+    @dropsite = Dropsite.find(params[:id])
+    if @dropsite.update_attributes(dropsite_params)      
+      flash[:success] = "Dropsite updated"
+      redirect_to @dropsite
+    else
+      render 'edit'
+    end
   end
 
   private

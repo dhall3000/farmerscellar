@@ -10,6 +10,9 @@
           <th class="text-center">Name</th>
           <th class="text-center">City</th>
           <th class="text-center">Details</th>
+          <% if current_user.account_type == User.types[:ADMIN] %>
+            <th class="text-center">Edit</th>
+          <% end %>
         </tr>
       </thead>
       <tbody>
@@ -18,6 +21,9 @@
             <td class="text-center"><%= dropsite.name %></td>            
             <td class="text-center"><%= dropsite.city %></td>
             <td class="text-center"><%= link_to "See details", dropsite_path(dropsite) %></td>
+            <% if current_user.account_type == User.types[:ADMIN] %>
+              <td class="text-center"><%= link_to "Edit", edit_dropsite_path(dropsite) %></td>
+            <% end %>
           </tr>          
         <% end %>
       </tbody>
