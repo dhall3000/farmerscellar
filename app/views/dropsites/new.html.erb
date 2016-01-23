@@ -18,6 +18,11 @@
       <%= f.label :access_instructions %>
       <%= f.text_field :access_instructions, class: 'form-control' %>
 
+      <%= f.label :active, class: "inline" do %>
+        <%= f.check_box :active, checked: true %>
+        <span>Make dropsite active</span>      
+      <% end %>
+
       <%= f.submit "Add new dropsite", class: "btn btn-primary" %>
     <% end %>
   </div>
