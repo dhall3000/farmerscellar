@@ -4,6 +4,23 @@ class ToteItemsController < ApplicationController
 
   def index
     if logged_in?
+
+      @dropsite = nil
+
+      if current_user.dropsites.any?
+        #for this checkout, just set the default dropsite to be whatever they most recently used
+        @dropsite = current_user.dropsites.last
+      else
+        #here the logic is if we only have one dropsite (which is the case for awhile after initial business launch)
+        #then we don't need to ask user to specify dropsite. Just assign the current dropsite (for this checkout) to
+        #be the only dropsite and proceed
+        if Dropsite.count == 1
+          @dropsite = Dropsite.first
+          current_user.dropsites = @dropsite
+          current_user.save
+        end
+      end
+
       @tote_items = current_user_current_tote_items
       if @tote_items == nil
         @total_amount_to_authorize = 0
