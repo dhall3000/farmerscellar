@@ -22,9 +22,13 @@
               <td>TOTAL: <%= number_to_currency(@total_amount_to_authorize) %></td>
               <td><%= form_tag(checkouts_path) do %>
                 <%= hidden_field_tag(:amount, @total_amount_to_authorize) %>
-                <%= image_submit_tag("https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif", class: 'form-control', style: "border: 0px solid #bbb;") %>
+                <%= image_submit_tag("https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif", disabled: @dropsite.nil?, class: 'form-control', style: "border: 0px solid #bbb;") %>
                 <% #that style: stuff is random. it's cause there's the "input, textarea, select, .uneditable-input {" line in the custom.css file adds a border. so i'm just removing that border here. %>
                 <% end %>
+  <% if @dropsite.nil? %>
+    <p class="alert alert-danger">No delivery dropsite specified.</p>
+    <p>You must specify a <%= link_to "delivery dropsite", dropsites_path %> before checking out.</p>
+  <% end %>
               </td>
             </tr>
           </tbody>

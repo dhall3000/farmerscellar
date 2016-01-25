@@ -1,0 +1,2 @@
+module UserDropsitesHelper
+end

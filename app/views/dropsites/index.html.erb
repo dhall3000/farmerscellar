@@ -8,8 +8,7 @@
       <thead>
         <tr>
           <th class="text-center">Name</th>
-          <th class="text-center">City</th>
-          <th class="text-center">Details</th>
+          <th class="text-center">City</th>          
           <% if current_user.account_type == User.types[:ADMIN] %>
             <th class="text-center">Edit</th>
           <% end %>
@@ -18,9 +17,8 @@
       <tbody>
         <% @dropsites.each do |dropsite| %>
           <tr>
-            <td class="text-center"><%= dropsite.name %></td>            
-            <td class="text-center"><%= dropsite.city %></td>
-            <td class="text-center"><%= link_to "See details", dropsite_path(dropsite) %></td>
+            <td class="text-center"><%= link_to dropsite.name, dropsite_path(dropsite) %></td>            
+            <td class="text-center"><%= dropsite.city %></td>            
             <% if current_user.account_type == User.types[:ADMIN] %>
               <td class="text-center"><%= link_to "Edit", edit_dropsite_path(dropsite) %></td>
             <% end %>
