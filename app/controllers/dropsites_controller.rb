@@ -19,13 +19,12 @@ class DropsitesController < ApplicationController
   end
 
   def index
-    
-    @dropsites = Dropsite.all
 
-
-#if this is an admin, fetch Dropsite.all
-#however, if this is a customer, only show 'active' dropsites
-
+    if current_user != nil && current_user.account_type == User.types[:ADMIN]
+      @dropsites = Dropsite.all    
+    else
+      @dropsites = Dropsite.where(active: true)
+    end    
 
   end
 
