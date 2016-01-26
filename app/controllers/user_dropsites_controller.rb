@@ -1,4 +1,6 @@
 class UserDropsitesController < ApplicationController
+  before_action :redirect_to_root_if_not_logged_in
+
   def create
     dropsite = Dropsite.find(params[:user_dropsite][:dropsite_id])
     current_user.dropsites << dropsite
