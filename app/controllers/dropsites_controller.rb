@@ -29,8 +29,13 @@ class DropsitesController < ApplicationController
   end
 
   def show
-    @dropsite = Dropsite.find(params[:id])    
-    @user_dropsite = UserDropsite.new(user_id: current_user.id, dropsite_id: @dropsite.id)
+    @dropsite = Dropsite.find(params[:id])
+
+    @user_dropsite = nil
+
+    if logged_in?
+      @user_dropsite = UserDropsite.new(user_id: current_user.id, dropsite_id: @dropsite.id)
+    end
   end
 
   def edit
