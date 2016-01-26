@@ -8,6 +8,8 @@ class Authorizer < ActionDispatch::IntegrationTest
     @c3 = users(:c3)
     @c4 = users(:c4)
     @c_no_tote_items = users(:c_no_tote_items)
+    @dropsite1 = dropsites(:dropsite1)
+    @dropsite2 = dropsites(:dropsite2)
     puts "AuthorizationsTest output:-----------------------------"
   end
 
@@ -41,6 +43,13 @@ class Authorizer < ActionDispatch::IntegrationTest
 
   def create_authorization_for_customer(customer)
     log_in_as(customer)
+
+    get dropsites_path
+    assert_template 'dropsites/index'
+    get dropsite_path(@dropsite1)
+    assert_template 'dropsites/show'
+    post user_dropsites_path, user_dropsite: {user_id: customer.id, dropsite_id: @dropsite1.id}
+
     get tote_items_path
     assert_response :success
     assert_template 'tote_items/index'

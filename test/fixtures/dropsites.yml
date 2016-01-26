@@ -1,15 +1,23 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  name: MyString
-  phone: MyString
-  hours: MyString
-  address: MyString
-  access_instructions: MyText
+dropsite1:
+  name: Farmer's Cellar
+  phone: 206-588-6579
+  hours: 24x7x365
+  address: 9827 128TH AVE NE
+  access_instructions: 5357 + 'Enter'
+  active: true
+  city: Kirkland
+  state: WA
+  zip: 98033
 
-two:
-  name: MyString
-  phone: MyString
-  hours: MyString
-  address: MyString
-  access_instructions: MyText
+dropsite2:
+  name: Janell's
+  phone: 206-555-1212
+  hours: 7-7
+  address: 1234 Main St.
+  access_instructions: 
+  active: true
+  city: Kirkland
+  state: WA
+  zip: 98033

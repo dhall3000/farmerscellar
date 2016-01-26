@@ -1,18 +1,16 @@
 require 'test_helper'
 
 class DropsitesControllerTest < ActionController::TestCase
+
+  def setup
+    @dropsite = dropsites(:dropsite1)
+    @user = users(:c1)
+    @admin = users(:a1)
+  end
+
   test "should get new" do
+    log_in_as(@admin)
     get :new
-    assert_response :success
-  end
-
-  test "should get create" do
-    get :create
-    assert_response :success
-  end
-
-  test "should get destroy" do
-    get :destroy
     assert_response :success
   end
 
@@ -21,18 +19,14 @@ class DropsitesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test "should get show" do
-    get :show
+  test "should get show" do    
+    get :show, id: @dropsite
     assert_response :success
   end
 
-  test "should get edit" do
-    get :edit
-    assert_response :success
-  end
-
-  test "should get update" do
-    get :update
+  test "should get edit" do    
+    log_in_as(@admin)
+    get :edit, id: @dropsite
     assert_response :success
   end
 
