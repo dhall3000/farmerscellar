@@ -1,5 +1,12 @@
 class CheckoutsController < ApplicationController
   def create
+
+    if current_user.dropsites.nil? || !current_user.dropsites.any?
+      flash[:danger] = "Can't checkout until you specify a delivery dropsite."
+      redirect_to dropsites_path
+      return
+    end
+
   	@unauthorized_tote_items = current_user_current_unauthorized_tote_items
 
     if @unauthorized_tote_items == nil || !@unauthorized_tote_items.any?
