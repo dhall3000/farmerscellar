@@ -4,7 +4,7 @@ class UserDropsitesController < ApplicationController
     current_user.dropsites << dropsite
     current_user.save
   	flash[:success] = "Your delivery dropsite is now " + dropsite.name
-  	redirect_to root_url
+  	redirect_to tote_items_path
   end
 
   private
