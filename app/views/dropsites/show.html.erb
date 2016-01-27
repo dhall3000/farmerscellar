@@ -29,7 +29,8 @@
 
 <div class="row">
   <div class="col-md-4 col-md-offset-4">
-    <%= link_to "Map it!", '#' %>
+    <% address_link = "https://www.google.com/maps/place/" + (@dropsite.address + " " + @dropsite.city + " " + @dropsite.state + " " + @dropsite.zip.to_s).gsub(' ', '+') %>
+    <a target="blank" href="<%= address_link %>">Map it!</a>
   </div>
 </div>
 
