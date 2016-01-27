@@ -41,6 +41,7 @@ class ToteItemsController < ApplicationController
 
     #if user's account is on hold we don't want to allow them to add tote items    
     if account_on_hold
+      flash[:danger] = "Your account is on hold. Please contact Farmer's Cellar."
       redirect_to(root_url)
       return
     end
