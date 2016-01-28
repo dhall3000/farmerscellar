@@ -137,6 +137,9 @@ class PurchaseReceivable < ActiveRecord::Base
           current_tote_items.where("status = ? or status = ?", ToteItem.states[:ADDED], ToteItem.states[:AUTHORIZED]).update_all(status: ToteItem.states[:REMOVED])
         end
 
+        #put this user's account on hold so they can't order again until they clear up this failed purchase        
+        UserAccountState.add_new_state(users.last, :HOLD, "purchase failed")
+
         save
       end
 

@@ -11,7 +11,7 @@ class UserAccountState < ActiveRecord::Base
 
   #call this method like this: UserAccountState.add_new_state(user, :HOLD, "person's oustanding account balance is too high.")
   def self.add_new_state(user, state, notes)
-    account_state_record = AccountState.get_record_for(:OK)
+    account_state_record = AccountState.get_record_for(state)
     if !account_state_record.nil?
       UserAccountState.create(account_state_id: account_state_record.id, user_id: user.id, notes: notes)
     end

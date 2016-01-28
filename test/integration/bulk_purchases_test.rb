@@ -26,7 +26,42 @@ class BulkPurchasesTest < BulkBuyer
 
     assert_equal bulk_purchase.total_net, bulk_payment.total_payments_amount    
 
-  end  
+  end
+
+  def verify_proper_account_states(customers)
+    
+    customers.each do |customer|
+      verify_proper_account_state(customer)
+    end
+
+  end
+
+  def verify_proper_account_state(customer)
+    
+    account_ok = customer.user_account_states.order(:created_at).last.account_state.state == AccountState.states[:OK]
+
+    #verify shopping tote empty. this actually technically doesn't have to be the case for customers with good standing
+    #but it is now true given the way the test is written
+    assert_equal ToteItem.where(status: ToteItem.states[:ADDED], user_id: customer.id).count, 0
+    assert_equal ToteItem.where(status: ToteItem.states[:AUTHORIZED], user_id: customer.id).count, 0
+    assert_equal ToteItem.where(status: ToteItem.states[:COMMITTED], user_id: customer.id).count, 0
+
+    posting_lettuce = postings(:postingf1lettuce)
+    log_in_as(customer)   
+
+    #try to pull up the buy form for a particular posting
+    get new_tote_item_path(posting_id: posting_lettuce.id)
+
+    #check for the existence of nasty-gram related to account state
+    if account_ok
+      assert_select 'p', false, "Your account is on hold, most likely due to a positive balance on your account. Please contact Farmer's Cellar to pay your balance before continuing to shop."
+    else
+      assert_select 'p', "Your account is on hold, most likely due to a positive balance on your account. Please contact Farmer's Cellar to pay your balance before continuing to shop."
+    end    
+
+    #verify can't add new tote items
+    
+  end
 
   #bundle exec rake test test/integration/bulk_purchases_test.rb
   test "do bulk buy with purchase failures" do
@@ -61,12 +96,16 @@ class BulkPurchasesTest < BulkBuyer
     log_in_as(@a1)
     FakeCaptureResponse.toggle_success = true    
     post bulk_purchases_path, purchase_receivables: purchase_receivables
+    
     #COMMENT KEY 000
     assert_equal ToteItem.where(status: ToteItem.states[:REMOVED]).count, 2
     verify_legitimacy_of_bulk_purchase
     verify_proper_number_of_payment_payables    
     bulk_purchase = assigns(:bulk_purchase)
-    
+
+    verify_proper_account_states(customers)
+    log_in_as(@a1)
+
     get new_bulk_payment_path
     assert :success
     unpaid_payment_payables = assigns(:unpaid_payment_payables)
