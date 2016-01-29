@@ -31,6 +31,7 @@ Rails.application.routes.draw do
   resources :access_codes, only: [:new, :create, :update]
   resources :dropsites
   resources :user_dropsites, only: [:create]
+  resources :deliveries
 
   #THIS MUST BE THE LAST THING IN THIS ROUTES FILE. it's for catching bad paths and redirecting to root  
   get '*path' => redirect('/')

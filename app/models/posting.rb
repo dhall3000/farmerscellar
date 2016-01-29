@@ -5,6 +5,9 @@ class Posting < ActiveRecord::Base
   belongs_to :unit_kind
   has_many :tote_items
 
+  has_many :delivery_postings
+  has_many :deliveries, through: :delivery_postings
+
   validates :description, :quantity_available, :price, :delivery_date, presence: true
   validates :quantity_available, numericality: { only_integer: true, greater_than: 0 }
   validates :price, numericality: { greater_than: 0 }

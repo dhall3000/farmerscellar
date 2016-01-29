@@ -1,6 +1,10 @@
 class Dropsite < ActiveRecord::Base
+	
   has_many :user_dropsites
   has_many :users, through: :user_dropsites
+
+  has_many :delivery_dropsites
+  has_many :deliveries, through: :delivery_dropsites
 
   validates :name, presence: true
   validates :hours, presence: true

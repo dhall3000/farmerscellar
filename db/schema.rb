@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160123003137) do
+ActiveRecord::Schema.define(version: 20160129231518) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -159,6 +159,31 @@ ActiveRecord::Schema.define(version: 20160123003137) do
   end
 
   add_index "checkouts", ["token"], name: "index_checkouts_on_token"
+
+  create_table "deliveries", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "delivery_dropsites", id: false, force: :cascade do |t|
+    t.integer  "delivery_id"
+    t.integer  "dropsite_id"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
+
+  add_index "delivery_dropsites", ["delivery_id"], name: "index_delivery_dropsites_on_delivery_id"
+  add_index "delivery_dropsites", ["dropsite_id"], name: "index_delivery_dropsites_on_dropsite_id"
+
+  create_table "delivery_postings", id: false, force: :cascade do |t|
+    t.integer  "posting_id"
+    t.integer  "delivery_id"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
+
+  add_index "delivery_postings", ["delivery_id"], name: "index_delivery_postings_on_delivery_id"
+  add_index "delivery_postings", ["posting_id"], name: "index_delivery_postings_on_posting_id"
 
   create_table "dropsites", force: :cascade do |t|
     t.string   "name"
