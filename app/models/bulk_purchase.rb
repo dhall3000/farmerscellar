@@ -52,21 +52,21 @@ class BulkPurchase < ActiveRecord::Base
           next
         end
 
-        cutoff_amount += value[:sub_tote_value]
+        cutoff_amount = (cutoff_amount + value[:sub_tote_value]).round(2)
         if amount_already_paid > cutoff_amount
           next
         end
 
         amount_remaining_to_pay_to_this_producer = cutoff_amount - amount_already_paid
         gross_amount_payable_to_this_producer = [gross_amount_payable, amount_remaining_to_pay_to_this_producer].min
-        amount_already_paid += gross_amount_payable_to_this_producer
-        gross_amount_payable -= gross_amount_payable_to_this_producer
+        amount_already_paid = (amount_already_paid + gross_amount_payable_to_this_producer).round(2)
+        gross_amount_payable = (gross_amount_payable - gross_amount_payable_to_this_producer).round(2)
 
         payment_processor_effective_fee_factor = purchase.fee_amount / purchase.gross_amount
-        payment_processor_fee = gross_amount_payable_to_this_producer * payment_processor_effective_fee_factor        
-        net_after_payment_processor_fee = gross_amount_payable_to_this_producer - payment_processor_fee
-        commission = net_after_payment_processor_fee * value[:sub_tote_commission_factor]
-        net_after_commission = net_after_payment_processor_fee - commission
+        payment_processor_fee = (gross_amount_payable_to_this_producer * payment_processor_effective_fee_factor).round(2)
+        net_after_payment_processor_fee = (gross_amount_payable_to_this_producer - payment_processor_fee).round(2)        
+        commission = (net_after_payment_processor_fee * value[:sub_tote_commission_factor]).round(2)        
+        net_after_commission = (net_after_payment_processor_fee - commission).round(2)
 
         self.total_fee = (self.total_fee + payment_processor_fee).round(2)
         self.total_commission = (self.total_commission + commission).round(2)

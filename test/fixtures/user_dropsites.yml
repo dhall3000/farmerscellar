@@ -1,9 +1,21 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  user_id: 
-  dropsite_id: 
+c1dropsite:
+  user: c1
+  dropsite: dropsite1
 
-two:
-  user_id: 
-  dropsite_id: 
+c2dropsite:
+  user: c2
+  dropsite: dropsite2
+
+c3dropsite:
+  user: c3
+  dropsite: dropsite3
+
+c4dropsite:
+  user: c4
+  dropsite: dropsite1
+
+c_no_tote_itemsdropsite:
+  user: c_no_tote_items
+  dropsite: dropsite2

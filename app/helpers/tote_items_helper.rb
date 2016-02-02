@@ -53,7 +53,7 @@ module ToteItemsHelper
 	  total = 0
 	  if tote_has_items(tote_items)
 	    tote_items.each do |tote_item|
-	      total += get_tote_item_value(tote_item)
+	      total = (total + get_tote_item_value(tote_item)).round(2)
 	    end	  	  		  	  	
 	  end
 	  total
@@ -65,7 +65,7 @@ module ToteItemsHelper
       return 0
     end
 
-    return tote_item.price * tote_item.quantity
+    return (tote_item.price * tote_item.quantity).round(2)
 
   end
 
@@ -93,7 +93,7 @@ module ToteItemsHelper
 
       commission_factor = commission_factors.last.commission
       tote_item_commission = tote_item_value * commission_factor      
-      total_commission += tote_item_commission
+      total_commission = (total_commission + tote_item_commission).round(2)
     end    
 
     return total_commission

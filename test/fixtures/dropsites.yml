@@ -21,3 +21,14 @@ dropsite2:
   city: Kirkland
   state: WA
   zip: 98033
+
+dropsite3:
+  name: 711
+  phone: 206-555-1212
+  hours: 7-11
+  address: 5197 Bucket St.
+  access_instructions: 
+  active: true
+  city: Renton
+  state: WA
+  zip: 98055

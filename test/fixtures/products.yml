@@ -29,3 +29,9 @@ lettuce:
 
 tomato:
   name: Tomato
+
+avocado:
+  name: avocado
+
+basil:
+  name: basil

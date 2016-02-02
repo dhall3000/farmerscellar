@@ -134,3 +134,27 @@ postingf4celery:
   unit_kind: pound
   description: best celery ever!
   live: true
+
+#Avocado
+postingf4avocado:
+  delivery_date: <%= Date.today %>
+  product: avocado
+  quantity_available: 100
+  price: 2.97
+  user: f4
+  unit_category: count
+  unit_kind: whole
+  description: best avocado ever!
+  live: true
+
+#Basil
+postingf4basil:
+  delivery_date: <%= Date.today %>
+  product: avocado
+  quantity_available: 100
+  price: 2.27
+  user: f4
+  unit_category: count
+  unit_kind: bunch
+  description: best basil ever!
+  live: true

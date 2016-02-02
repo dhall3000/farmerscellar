@@ -26,6 +26,10 @@ class BulkPurchasesTest < BulkBuyer
 
     assert_equal bulk_purchase.total_net, bulk_payment.total_payments_amount    
 
+    get new_delivery_path
+    assert :success
+    assert_template 'deliveries/new'
+
   end
 
   def verify_proper_account_states(customers)
@@ -180,9 +184,14 @@ class BulkPurchasesTest < BulkBuyer
 
     total_amount_paid = 0
     for pr in prs
-      total_amount_paid += pr.amount_paid
+      #NOTE!! it looks like i've done a good job to date of avoiding putting .round(2) in the test code anywhere. but
+      #i came across a failure where it really seems like it's the summing of the total_amount_paid var that is
+      #causing the funky values. I was able to duplicte this in a terminal like this:
+      #irb(main):007:0> amount = 150.91 + 91.0+100.5+82.0
+      #=> 424.40999999999997
+      total_amount_paid = (total_amount_paid + pr.amount_paid).round(2)
     end
-
+    
     #verify sum of pr amountpaids == bulkpurchase.totalgross
     assert_equal total_amount_paid, bulk_purchase.total_gross
     all_purchases_succeeded = all_purchase_receivables_succeeded(prs)
@@ -195,7 +204,12 @@ class BulkPurchasesTest < BulkBuyer
       assert purchase_receivables.last.bulk_buys.last.amount > bulk_purchase.total_gross
     end
 
-    assert_equal bulk_purchase.total_gross, bulk_purchase.total_fee + bulk_purchase.total_commission + bulk_purchase.total_net    
+      #NOTE!! it looks like i've done a good job to date of avoiding putting .round(2) in the test code anywhere. but
+      #i came across a failure where it really seems like it's the summing of the total_amount_paid var that is
+      #causing the funky values. I was able to duplicte this in a terminal like this:
+      #irb(main):008:0> amount = 14.87+32.66+376.89
+      #=> 424.41999999999996
+    assert_equal bulk_purchase.total_gross, (bulk_purchase.total_fee.round(2) + bulk_purchase.total_commission.round(2) + bulk_purchase.total_net.round(2)).round(2)
     assert bulk_purchase.total_gross > 0
     assert bulk_purchase.total_fee > 0
     assert bulk_purchase.total_commission > 0
@@ -265,16 +279,16 @@ class BulkPurchasesTest < BulkBuyer
 
       for purchase in pr.purchases
         if purchase.response.success?
-          total_purchased += purchase.gross_amount
+          total_purchased = (total_purchased + purchase.gross_amount).round(2)
         else
           total_failed_purchases += purchase.gross_amount          
         end
       end
-      total_amount += pr.amount
-      total_amount_paid += pr.amount_paid      
+      total_amount = (total_amount + pr.amount).round(2)
+      total_amount_paid = (total_amount_paid + pr.amount_paid).round(2)
     end
 
-    total_failed_purchases2 = total_amount - total_amount_paid
+    total_failed_purchases2 = (total_amount - total_amount_paid).round(2)
     assert_equal total_failed_purchases, total_failed_purchases2
 
     if all_purchases_succeeded

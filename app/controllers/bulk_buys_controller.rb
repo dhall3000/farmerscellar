@@ -12,10 +12,10 @@ class BulkBuysController < ApplicationController
       user_info = {total_amount: 0, name: ''}
       tote_items_by_user = @filled_tote_items.where(user_id: user_id.user_id)
       for tote_item_by_user in tote_items_by_user
-        user_info[:total_amount] += tote_item_by_user.quantity * tote_item_by_user.price
+        user_info[:total_amount] = (user_info[:total_amount] + (tote_item_by_user.quantity * tote_item_by_user.price).round(2)).round(2)
         user_info[:name] = tote_item_by_user.user.name
       end
-      @total_bulk_buy_amount += user_info[:total_amount]
+      @total_bulk_buy_amount = (@total_bulk_buy_amount + user_info[:total_amount]).round(2)
       @user_infos << user_info
     end
   end
@@ -44,7 +44,7 @@ class BulkBuysController < ApplicationController
   	  	  if authorizations[authorization.token] == nil
   	  	  	authorizations[authorization.token] = {amount: 0, authorization: authorization, filled_tote_items: []}
   	  	  end
-  	  	  authorizations[authorization.token][:amount] += filled_tote_item.quantity * filled_tote_item.price
+  	  	  authorizations[authorization.token][:amount] = (authorizations[authorization.token][:amount] + (filled_tote_item.quantity * filled_tote_item.price).round(2)).round(2)
   	  	  authorizations[authorization.token][:filled_tote_items] << filled_tote_item
   	  	end
   	  end
@@ -71,7 +71,7 @@ class BulkBuysController < ApplicationController
       end                              
 
       #this represents the total value of everything that was filled for this bulk buy
-      @bulk_buy.amount += value[:amount]
+      @bulk_buy.amount = (@bulk_buy.amount + value[:amount]).round(2)
     end
   	#save the bulkbuy object
   	@bulk_buy.save

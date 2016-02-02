@@ -66,6 +66,19 @@ c1celery:
   user: c1
   posting: postingf4celery
 
+c1avocado:
+  quantity: 3
+  price: 2.97
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c1
+  posting: postingf4avocado
+
+c1basil:
+  quantity: 3
+  price: 2.27
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c1
+  posting: postingf4basil
 
 #---------------------------------C2-------------------------------
 
@@ -125,6 +138,13 @@ c2celery:
   status: <%= ToteItem.states[:ADDED] %>
   user: c2
   posting: postingf4celery
+
+c2basil:
+  quantity: 5
+  price: 2.27
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c2
+  posting: postingf4basil
 
 #---------------------------------C3-------------------------------
 

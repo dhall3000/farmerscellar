@@ -13,7 +13,7 @@ class Purchase < ActiveRecord::Base
         
     self.transaction_id = response.params["transaction_id"]
     self.payer_id = authorization_payer_id
-    self.gross_amount = response.params["gross_amount"].to_f
+    self.gross_amount = response.params["gross_amount"].to_f.round(2)
     self.fee_amount = response.params["fee_amount"].to_f.round(2)
     self.net_amount = (gross_amount - fee_amount).round(2)
     

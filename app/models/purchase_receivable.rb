@@ -117,11 +117,11 @@ class PurchaseReceivable < ActiveRecord::Base
     else
       purchases << purchase
       if purchase.response.success?
-        self.amount_paid += purchase.gross_amount      
+        self.amount_paid = (self.amount_paid + purchase.gross_amount).round(2)
         #the following 'save' is important to do because it 'closes the door' on the liklihood that we'll double charge the customer.
         #this is so because we know to charge by comparing the .amount_paid attribute so we want to save to db asap after collecting funds
         save
-        authorization.amount_purchased += purchase.gross_amount
+        authorization.amount_purchased = (authorization.amount_purchased + purchase.gross_amount).round(2)
         authorization.save            
         tote_items.where(status: ToteItem.states[:PURCHASEPENDING]).update_all(status: ToteItem.states[:PURCHASED])
       else        
