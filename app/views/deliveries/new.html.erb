@@ -1,2 +1,33 @@
-<h1>Deliveries#new</h1>
-<p>Find me in app/views/deliveries/new.html.erb</p>
+<h1>New Delivery</h1>
+
+<h2>Postings to Deliver</h2>
+<div class="row">
+  <div class="col-md-12">
+
+    <%= form_tag deliveries_path do %>
+      <table class="table">
+        <thead>
+          <tr>
+            <th class="text-center">Include in Delivery</th>
+            <th class="text-center">Producer</th>
+            <th class="text-center">Product</th>
+            <th class="text-center">Posted Delivery Date</th>
+          </tr>
+        </thead>
+        <tbody>
+    
+          <% @delivery_eligible_postings.each do |posting| %>
+            <tr>
+              <td><%= check_box_tag "posting_ids[]", posting.id %></td>
+              <td class="text-center"><%= User.find_by(id: posting.user_id).farm_name %></td>
+              <td class="text-center"><%= Product.find_by(id: posting.product_id).name %></td>          
+              <td class="text-center"><%= posting.delivery_date.strftime("%a %b %d") %></td>                    
+            </tr>
+          <% end %>
+        </tbody>
+      </table>  
+      <%= submit_tag "Save", class: "btn btn-primary" %>
+    <% end %>
+
+  </div>
+</div>

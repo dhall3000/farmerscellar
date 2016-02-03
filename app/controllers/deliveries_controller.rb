@@ -9,12 +9,22 @@ class DeliveriesController < ApplicationController
     #-have tote_items in any of states FILLED, PURCHASEPENDING, PURCHASED or PURCHASEFAILED
     @delivery_eligible_postings = postings2.includes(:tote_items).where( tote_items: {status: [ToteItem.states[:FILLED], ToteItem.states[:PURCHASEPENDING], ToteItem.states[:PURCHASED], ToteItem.states[:PURCHASEFAILED]]})
 
-debugger
+    
+
+
     #get dropsites that must be delivered to for this set of postings
 
   end
 
   def create
+    
+    delivery = Delivery.create
+    postings = Posting.find(delivery_params)
+
+    postings.each do |posting|
+      delivery.postings << posting
+    end
+
   end
 
   def edit
@@ -31,4 +41,10 @@ debugger
 
   def destroy
   end
+
+  private
+    def delivery_params
+      params.require(:posting_ids)
+    end
+
 end
