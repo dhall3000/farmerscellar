@@ -47,3 +47,13 @@ f4celery:
   product: celery
   commission: 0.12
   user: f4
+
+f4avocado:
+  product: avocado
+  commission: 0.07
+  user: f4
+
+f4basil:
+  product: basil
+  commission: 0.065
+  user: f4

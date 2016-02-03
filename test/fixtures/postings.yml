@@ -150,7 +150,7 @@ postingf4avocado:
 #Basil
 postingf4basil:
   delivery_date: <%= Date.today %>
-  product: avocado
+  product: basil
   quantity_available: 100
   price: 2.27
   user: f4
