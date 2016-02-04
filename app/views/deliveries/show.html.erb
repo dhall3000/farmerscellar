@@ -17,9 +17,9 @@
             <td class="text-center"><%= dropsite.name %></td>
             <td class="text-center"><%= dropsite.address + " " + dropsite.city + " " + dropsite.state + " " + dropsite.zip.to_s %></td>
             <% if @delivery.dropsites.find_by(id: dropsite.id).nil? %>
-              <td class="text-center">-</td>
+              <td class="text-center">In transit</td>
             <% else %>
-              <td class="text-center">delivered</td>
+              <td class="text-center">Delivered</td>
             <% end %>            
           </tr>
         <% end %>
