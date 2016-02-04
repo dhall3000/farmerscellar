@@ -3,7 +3,9 @@ class Posting < ActiveRecord::Base
   belongs_to :product
   belongs_to :unit_category
   belongs_to :unit_kind
+
   has_many :tote_items
+  has_many :users, through: :tote_items
 
   has_many :delivery_postings
   has_many :deliveries, through: :delivery_postings
