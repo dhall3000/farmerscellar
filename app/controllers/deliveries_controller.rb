@@ -12,7 +12,7 @@ class DeliveriesController < ApplicationController
       #-don't have any delivery objects associated
       postings2 = postings1.includes(:delivery_postings).where( delivery_postings: { posting_id: nil } )
       #-have tote_items in any of states FILLED, PURCHASEPENDING, PURCHASED or PURCHASEFAILED
-      @delivery_eligible_postings = postings2.includes(:tote_items).where( tote_items: {status: [ToteItem.states[:FILLED], ToteItem.states[:PURCHASEPENDING], ToteItem.states[:PURCHASED], ToteItem.states[:PURCHASEFAILED]]})    
+      @delivery_eligible_postings = postings2.includes(:tote_items).where( tote_items: {status: get_tote_item_states})    
 
       #get dropsites that must be delivered to for this set of postings
       @dropsites = get_dropsites_from_postings(@delivery_eligible_postings)      
@@ -74,7 +74,7 @@ class DeliveriesController < ApplicationController
     end
 
     def get_tote_item_states
-      return [ToteItem.states[:FILLED], ToteItem.states[:PURCHASEPENDING], ToteItem.states[:PURCHASED], ToteItem.states[:PURCHASEFAILED]]
+      return [ToteItem.states[:FILLED], ToteItem.states[:NOTFILLED], ToteItem.states[:PURCHASEPENDING], ToteItem.states[:PURCHASED], ToteItem.states[:PURCHASEFAILED]]
     end
 
     #returns an array of dropsites from the given postings
