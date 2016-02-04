@@ -8,6 +8,7 @@
         <tr>
           <th class="text-center">Name</th>
           <th class="text-center">Address</th>
+          <th class="text-center">Status</th>
         </tr>
       </thead>
       <tbody>    
@@ -15,6 +16,7 @@
           <tr>
             <td class="text-center"><%= dropsite.name %></td>
             <td class="text-center"><%= dropsite.address + " " + dropsite.city + " " + dropsite.state + " " + dropsite.zip.to_s %></td>
+            <td class="text-center">TBD</td>
           </tr>
         <% end %>
       </tbody>
