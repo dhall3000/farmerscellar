@@ -15,7 +15,7 @@
           <% @deliveries.each do |delivery| %>
             <tr>
               <td class="text-center"><%= delivery.id %></td>
-              <td class="text-center"><%= delivery.created_at %></td>
+              <td class="text-center"><%= link_to delivery.created_at, delivery_path(delivery) %></td>
             </tr>
           <% end %>
         </tbody>

@@ -1,2 +1,23 @@
-<h1>Deliveries#show</h1>
-<p>Find me in app/views/deliveries/show.html.erb</p>
+<h1>Delivery</h1>
+
+<h2>Dropsites Deliverable</h2>
+<div class="row">
+  <div class="col-md-12">
+    <table class="table">
+      <thead>
+        <tr>
+          <th class="text-center">Name</th>
+          <th class="text-center">Address</th>
+        </tr>
+      </thead>
+      <tbody>    
+        <% @dropsites.each do |dropsite| %>
+          <tr>
+            <td class="text-center"><%= dropsite.name %></td>
+            <td class="text-center"><%= dropsite.address + " " + dropsite.city + " " + dropsite.state + " " + dropsite.zip.to_s %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>  
+  </div>
+</div>
