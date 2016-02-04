@@ -47,6 +47,7 @@ class DeliveriesController < ApplicationController
   end
 
   def index
+    @deliveries = Delivery.all.order(created_at: :desc)
   end
 
   def show

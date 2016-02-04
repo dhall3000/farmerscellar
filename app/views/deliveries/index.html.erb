@@ -1,2 +1,24 @@
-<h1>Deliveries#index</h1>
-<p>Find me in app/views/deliveries/index.html.erb</p>
+<h1>Deliveries</h1>
+
+<div><%= link_to "New Delivery", new_delivery_path %></div>
+<div class="row">
+  <div class="col-md-12">
+      <table class="table">
+        <thead>
+          <tr>
+            <th class="text-center">ID</th>
+            <th class="text-center">Created</th>
+          </tr>
+        </thead>
+        <tbody>
+    
+          <% @deliveries.each do |delivery| %>
+            <tr>
+              <td class="text-center"><%= delivery.id %></td>
+              <td class="text-center"><%= delivery.created_at %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+  </div>
+</div>
