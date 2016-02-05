@@ -1,28 +1,27 @@
 class DeliveriesController < ApplicationController
+  before_action :redirect_to_root_if_user_not_admin
 
   def new
 
     prod_mode = true
-    
+
+    #get postings that have no deliveries and whose delivery date is before tomorrow and that have toteitems in a deliverable state
+    #-delivery date is before tomorrow
+    postings1 = Posting.where("delivery_date < ?", Time.zone.now)
+
     if prod_mode
-      #get postings that have no deliveries and whose delivery date is before tomorrow and that have toteitems in a deliverable state
-    
-      #-delivery date is before tomorrow
-      postings1 = Posting.where("delivery_date < ?", Date.today + 1)
       #-don't have any delivery objects associated
       postings2 = postings1.includes(:delivery_postings).where( delivery_postings: { posting_id: nil } )
-      #-have tote_items in any of states FILLED, PURCHASEPENDING, PURCHASED or PURCHASEFAILED
+      #-have tote_items in any of states specified states
       @delivery_eligible_postings = postings2.includes(:tote_items).where( tote_items: {status: get_tote_item_states})    
-
-      #get dropsites that must be delivered to for this set of postings
-      @dropsites = get_dropsites_from_postings(@delivery_eligible_postings)      
     else
       #the purpose of this is for developing the deliveries features. the prod code creates a new delivery only with postings that have elsewhere been marked as delivered.
       #this here dev code will allow you to just keep using the same postings in the creation of new deliveries so that you don't have to repeatedly reseed the db      
-      postings1 = Posting.where("delivery_date < ?", Date.today + 1)
       @delivery_eligible_postings = postings1.includes(:tote_items).where( tote_items: {status: get_tote_item_states})    
-      @dropsites = get_dropsites_from_postings(@delivery_eligible_postings)
     end
+
+    #get dropsites that must be delivered to for this set of postings
+    @dropsites = get_dropsites_from_postings(@delivery_eligible_postings)      
 
   end
 
