@@ -137,7 +137,7 @@ postingf4celery:
 
 #Avocado
 postingf4avocado:
-  delivery_date: <%= Date.today %>
+  delivery_date: <%= Time.zone.now.midnight %>
   product: avocado
   quantity_available: 100
   price: 2.97
@@ -149,7 +149,7 @@ postingf4avocado:
 
 #Basil
 postingf4basil:
-  delivery_date: <%= Date.today %>
+  delivery_date: <%= Time.zone.now.midnight %>
   product: basil
   quantity_available: 100
   price: 2.27

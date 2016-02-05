@@ -27,15 +27,15 @@ class DeliveriesController < ApplicationController
 
   def create
     
-    delivery = Delivery.create
+    @delivery = Delivery.create
     postings = Posting.find(delivery_params)
 
     postings.each do |posting|
-      delivery.postings << posting
+      @delivery.postings << posting
     end
 
     flash[:success] = "New delivery created."
-    redirect_to delivery_path(delivery)
+    redirect_to delivery_path(@delivery)
 
   end
 

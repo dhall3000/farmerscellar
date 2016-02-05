@@ -27,6 +27,7 @@ class NotFilledToteItemsTest < BulkBuyer
     num_tote_items = ToteItem.all.count
     num_filled = ToteItem.where(status: ToteItem.states[:FILLED]).count
     num_not_filled = ToteItem.where(status: ToteItem.states[:NOTFILLED]).count
+    assert num_not_filled > 0
     assert_equal num_tote_items, num_filled + num_not_filled
 
   end

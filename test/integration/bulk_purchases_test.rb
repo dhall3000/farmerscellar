@@ -3,7 +3,7 @@ require 'bulk_buy_helper'
 
 class BulkPurchasesTest < BulkBuyer
 
-  #bundle exec rake test test/integration/bulk_purchases_test.rb
+  #bundle exec rake test test/integration/bulk_purchases_test.rb test_do_bulk_buy
   test "do bulk buy" do
   #def skip
     customers = [@c1, @c2, @c3, @c4]
@@ -29,6 +29,32 @@ class BulkPurchasesTest < BulkBuyer
     get new_delivery_path
     assert :success
     assert_template 'deliveries/new'
+    delivery_eligible_postings = assigns(:delivery_eligible_postings)
+    dropsites = assigns(:dropsites)
+    assert delivery_eligible_postings.count > 0
+    assert dropsites.count > 0
+
+    delivery_count = Delivery.count
+    ids = []
+    delivery_eligible_postings.each do |posting|
+      ids << posting.id
+    end
+
+    post deliveries_path, posting_ids: ids
+    delivery = assigns(:delivery)
+    assert_redirected_to delivery_path(delivery)
+    follow_redirect!
+    assert_template 'deliveries/show'
+    assert_not flash.empty?
+    assert_select 'a', "Edit Delivery"
+    get edit_delivery_path(delivery)
+    assert_template 'deliveries/edit'
+    dropsites_deliverable = assigns(:dropsites_deliverable)
+
+
+    dropsites_deliverable.each do |dropsite|
+      patch delivery_path(delivery), dropsite_id: dropsite.id
+    end
 
   end
 
