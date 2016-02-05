@@ -91,7 +91,7 @@ class DeliveriesController < ApplicationController
       dropsite_ids = []
 
       users.each do |user|
-        dropsite_ids << user.dropsites.last.id
+        dropsite_ids << user.user_dropsites.order(:created_at).last.dropsite.id
       end
 
       dropsites = Array(Dropsite.find(dropsite_ids.uniq))
