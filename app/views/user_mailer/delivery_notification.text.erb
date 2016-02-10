@@ -1,0 +1,53 @@
+<% purchase_failed = false %>
+Hello,
+
+This email is your Farmer's Cellar delivery notification and purchase receipt.
+
+Here is the status of products you recently ordered that were set for delivery today:
+
+<% @tote_items.each do |tote_item| %>
+  <% if tote_item.status == ToteItem.states[:PURCHASEFAILED] %>
+    <% purchase_failed = true %>
+  <% end %>
+  <% status = "UNKNOWN" %>
+  <% if tote_item.status == ToteItem.states[:PURCHASED] || tote_item.status == ToteItem.states[:PURCHASEFAILED] %>
+    <% status = "DELIVERED" %>
+  <% elsif tote_item.status == ToteItem.states[:NOTFILLED] %>
+    <% status = "NOT FILLED" %>
+  <% end %>
+ID=<%= tote_item.id %>,Producer=<%= tote_item.posting.user.farm_name %>,Product=<%= tote_item.posting.product.name %>,Quantity=<%= tote_item.quantity %>,Status=<%= status %>
+---------------------------------------------------------------------------------
+<% end %>
+
+<% if purchase_failed %>
+There was a problem with your purchase transaction. Please contact Farmer's Cellar to ensure your account balance is paid in full.
+www.farmerscellar.com/contact
+<% else %>
+Your payment accounts were charged a total of <%= number_to_currency(@total_cost_of_tote_items) %> for the delivered products.
+<% end %>
+
+<% if !@authorizations.nil? && @authorizations.any? %>
+The products listed above are associated with the following payment authorization(s):
+
+<% @authorizations.each do |authorization| %>
+ID=<%= authorization.id %>,Authorization Amount=<%= authorization.amount %>,Authorization Date=<%= authorization.created_at.localtime.strftime("%a %b %d,%l:%M %p") %>
+---------------------------------------------------------------------------------
+<% end %>
+<% end %>
+
+Products marked 'DELIVERED' are available for you to pick up at your convenience. Your dropsite is:
+
+<%= @dropsite.name %>
+<%= @dropsite.address %> <%= @dropsite.city %>, <%= @dropsite.state %> <%= @dropsite.zip.to_s %>
+Hours: <%= @dropsite.hours %>
+
+First time user? Watch this to see what to expect at pickup: https://youtu.be/YQnfkxfHqNM
+
+<% if @dropsite.access_instructions != nil %>
+<%= @dropsite.access_instructions %>
+<% end %>
+
+Thanks!
+
+Farmer's Cellar
+www.farmerscellar.com

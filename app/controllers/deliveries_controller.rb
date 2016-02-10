@@ -22,7 +22,6 @@ class DeliveriesController < ApplicationController
 
     #get dropsites that must be delivered to for this set of postings
     @dropsites = get_dropsites_from_postings(@delivery_eligible_postings)      
-
   end
 
   def create
@@ -46,11 +45,13 @@ class DeliveriesController < ApplicationController
 
   def update
     @delivery = Delivery.find(params[:id])
-    dropsite = Dropsite.find(params[:dropsite_id])
-    @delivery.dropsites << dropsite
+    @dropsite = Dropsite.find(params[:dropsite_id])
+    @delivery.dropsites << @dropsite
+
+    send_delivery_notification(@delivery, @dropsite)
 
     @dropsites_deliverable = get_dropsites_from_postings(@delivery.postings)
-    flash.now[:success] = dropsite.name + " delivery saved and delivery notifications sent."
+    flash.now[:success] = @dropsite.name + " delivery saved and delivery notifications sent."
     render 'show'
   end
 
@@ -70,6 +71,52 @@ class DeliveriesController < ApplicationController
     
     def delivery_params
       params.require(:posting_ids)
+    end
+
+    def send_delivery_notification(delivery, dropsite)
+      
+      #this relation has ALL users and their most recently specified dropsite
+      users = User.select(:id).joins(:user_dropsites).select("user_id, dropsite_id, max(user_dropsites.created_at)").group(:user_id)
+      
+      tote_items_by_user_id = {}
+
+      users.each do |user|
+        if user.dropsite_id != dropsite.id
+          next
+        end
+
+        if !tote_items_by_user_id.has_key?(user.id)
+          tote_items_by_user_id[user.id] = {tote_items: []}
+        end
+        
+      end
+      
+      delivery.postings.each do |posting|
+        posting.tote_items.each do |tote_item|          
+          if tote_items_by_user_id.has_key?(tote_item.user_id)
+            tote_items_by_user_id[tote_item.user_id][:tote_items] << tote_item
+          end          
+        end
+      end
+
+      tote_items_by_user_id.each do |user_id, value|
+        tote_items = nil
+        if value != nil
+          tote_items = value[:tote_items]
+        end
+
+        if tote_items.nil? || !tote_items.any?
+          next
+        end
+
+        if user_id.nil?
+          next
+        end
+
+        UserMailer.delivery_notification(User.find(user_id), dropsite, tote_items_by_user_id[user_id][:tote_items]).deliver_now
+        
+      end
+
     end
 
     def get_tote_item_states

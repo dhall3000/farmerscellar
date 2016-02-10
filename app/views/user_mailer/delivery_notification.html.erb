@@ -1,0 +1,104 @@
+<p>
+Hello,
+</p>
+
+<p>
+This email is your Farmer's Cellar delivery notification and purchase receipt.
+</p>
+
+<p>
+Here is the status of products you recently ordered that were set for delivery today:
+</p>
+
+<% purchase_failed = false %>
+
+<table border="1">
+  <thead>
+    <tr>		    
+      <th align="left">ID</th>
+      <th align="left">Producer</th>
+      <th align="left">Product</th>
+      <th align="center">Quantity</th>
+      <th align="center">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @tote_items.each do |tote_item| %>
+      <% if tote_item.status == ToteItem.states[:PURCHASEFAILED] %>
+        <% purchase_failed = true %>
+      <% end %>
+      <tr>
+        <td align="left"><%= tote_item.id %></td>
+        <td align="left"><%= tote_item.posting.user.farm_name %></td>
+        <td align="left"><%= tote_item.posting.product.name %></td>
+        <td align="center"><%= tote_item.quantity %></td>
+        <td align="center">
+          <% if tote_item.status == ToteItem.states[:PURCHASED] || tote_item.status == ToteItem.states[:PURCHASEFAILED] %>
+            DELIVERED
+          <% elsif tote_item.status == ToteItem.states[:NOTFILLED] %>
+            NOT FILLED
+          <% else %>
+            UNKNOWN
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<% if purchase_failed %>
+  <b><p style="background-color:red;">There was a problem with your purchase transaction. Please contact <%= link_to "Farmer's Cellar", contact_path %> to ensure your account balance is paid in full.</p></b>
+<% else %>
+  <p>Your payment accounts were charged a total of <%= number_to_currency(@total_cost_of_tote_items) %> for the delivered products. </p>
+<% end %>
+
+<% if !@authorizations.nil? && @authorizations.any? %>
+  <p>The products listed above are associated with the following payment authorization(s):</p>
+
+<table border="1">
+  <thead>
+    <tr>        
+      <th align="left">ID</th>
+      <th align="left">Authorization Amount</th>
+      <th align="left">Authorization Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @authorizations.each do |authorization| %>
+      <tr>
+        <td align="left"><%= authorization.id %></td>
+        <td align="left"><%= authorization.amount %></td>
+        <td align="left"><%= authorization.created_at.localtime.strftime("%a %b %d,%l:%M %p") %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<% end %>
+
+<p>
+Products marked 'DELIVERED' are available for you to pick up at your convenience. Your dropsite is:
+</p>
+<p>
+<%= @dropsite.name %><br>
+<% address_link = "https://www.google.com/maps/place/" + (@dropsite.address + " " + @dropsite.city + " " + @dropsite.state + " " + @dropsite.zip.to_s).gsub(' ', '+') %>
+<a target="blank" href="<%= address_link %>"><%= @dropsite.address %> <%= @dropsite.city %>, <%= @dropsite.state %> <%= @dropsite.zip.to_s %></a><br>
+Hours: <%= @dropsite.hours %>
+</p>
+
+<p>First time user? Watch <%= link_to "this", "https://youtu.be/YQnfkxfHqNM", target: false %> to see what to expect at pickup.</p>
+
+<% if @dropsite.access_instructions != nil %>
+  <p>
+    <%= @dropsite.access_instructions %>
+  </p>
+<% end %>
+
+<p>
+Thanks!
+</p>
+
+<p>
+Farmer's Cellar<br>
+<%= link_to "www.farmerscellar.com", root_url %>
+</p>

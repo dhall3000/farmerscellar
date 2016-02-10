@@ -22,8 +22,24 @@ class UserMailerPreview < ActionMailer::Preview
   #then i had to use the browser to execute an authorization to get all the db info associated properly for this to work
   def authorization_receipt
     user = User.find_by(email: "c1@c.com")
-    authorization = user.tote_items.first.checkouts.last.authorizations.last    
+    authorization = user.tote_items.last.checkouts.last.authorizations.last    
     UserMailer.authorization_receipt(user, authorization)
+  end
+
+  # Preview this email at
+  # http://localhost:3000/rails/mailers/user_mailer/delivery_notification
+  def delivery_notification
+    user = User.find_by(email: "c_delivery_notification@c.com")
+    dropsite = user.user_dropsites.order(:created_at).last.dropsite
+    tote_items = ToteItem.where(user_id: user.id)
+    
+    #if you want to preview various states you can uncomment below as desired
+    #tote_items[0].status = ToteItem.states[:PURCHASED]
+    #tote_items[1].status = ToteItem.states[:PURCHASEFAILED]
+    #tote_items[2].status = ToteItem.states[:NOTFILLED]
+
+    UserMailer.delivery_notification(user, dropsite, tote_items)
+
   end
 
 end
