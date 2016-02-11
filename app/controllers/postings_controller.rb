@@ -109,29 +109,19 @@ class PostingsController < ApplicationController
 
     end
 
-    def next_friday
-      i = 1
-      while !(Date.today + i).friday?   
-        i += 1
-      end
-      Date.today + i
-    end
-
     def next_delivery_dates(num_dates)
 
+      i = 3      
       dates = []
 
-      if num_dates > 0
-        dates << next_friday
-      end
+      while i < 30
+        d = Date.today + i
+        if !d.sunday?
+          dates << d
+        end
 
-      if num_dates > 1
-        i = 1
-        while i < num_dates
-          dates << dates.last + 7  
-          i += 1
-        end    
-      end  
+        i +=1
+      end      
 
       dates
 
