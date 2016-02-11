@@ -1,15 +1,11 @@
 <div class="center jumbotron">
     <h1>Farmer's Cellar</h1>
-    <h3>Think online Farmer's Market, only better!</h3>
+    <h3>Think online Farmer's Market, only better.</h3>
 
     <% if !logged_in? %>
       <%= link_to "Sign up!", signup_path, class: "btn btn-lg btn-primary" %>
     <% end %>
 </div>
-
-  <div>
-    <small>(If you are looking for the old Farmer's Cellar website, <%= link_to "go here", "http://www.farmerscellarfree.com", target: "_blank", class: "active" %>.)</small>
-  </div>
 
 <% if current_user != nil && current_user.account_type == User.types[:ADMIN] %>
   <div>
