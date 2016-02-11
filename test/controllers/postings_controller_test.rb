@@ -11,7 +11,14 @@ class PostingsControllerTest < ActionController::TestCase
     #log in
     log_in_as(@user)
     #make a posting that doesn't have price set
-    post :create, id: @user.id, posting: { description: "descrip", quantity_available: 10, live: true, delivery_date: "3000-08-28" }
+    post :create, id: @user.id, posting: { description: "descrip", quantity_available: 10, live: true, delivery_date: "3000-08-28",
+      "commitment_zone_start(1i)": 3000,
+      "commitment_zone_start(2i)": 8,
+      "commitment_zone_start(3i)": 27,
+      "commitment_zone_start(4i)": 12,
+      "commitment_zone_start(5i)": 0
+      }
+
     #verify redirection    
     assert_template 'postings/new'
     #verify sad message
@@ -103,7 +110,13 @@ class PostingsControllerTest < ActionController::TestCase
     log_in_as(@user)
     #go to post creation page
     #specify values, submit form
-    post :create, id: @user.id, posting: { description: "descrip", price: 1, quantity_available: 10, live: true, delivery_date: "3000-08-28", product_id: @posting.product_id, unit_kind_id: @posting.unit_kind.id, unit_category_id: @posting.unit_category.id }
+    post :create, id: @user.id, posting: { description: "descrip", price: 1, quantity_available: 10, live: true, delivery_date: "3000-08-28", product_id: @posting.product_id, unit_kind_id: @posting.unit_kind.id, unit_category_id: @posting.unit_category.id,
+      "commitment_zone_start(1i)": 3000,
+      "commitment_zone_start(2i)": 8,
+      "commitment_zone_start(3i)": 27,
+      "commitment_zone_start(4i)": 12,
+      "commitment_zone_start(5i)": 0
+      }
     posting = assigns(:posting)
     assert_not posting.nil?
     assert posting.valid?
@@ -119,7 +132,14 @@ class PostingsControllerTest < ActionController::TestCase
     log_in_as(@user)
     #go to post creation page
     #specify values, submit form
-    post :create, id: @user.id, posting: { description: "descrip", price: 1, quantity_available: 10, live: false, delivery_date: "3000-08-28", product_id: @posting.product_id, unit_kind_id: @posting.unit_kind.id, unit_category_id: @posting.unit_category.id }
+    post :create, id: @user.id, posting: { description: "descrip", price: 1, quantity_available: 10, live: false, delivery_date: "3000-08-28", product_id: @posting.product_id, unit_kind_id: @posting.unit_kind.id, unit_category_id: @posting.unit_category.id,
+      "commitment_zone_start(1i)": 3000,
+      "commitment_zone_start(2i)": 8,
+      "commitment_zone_start(3i)": 27,
+      "commitment_zone_start(4i)": 12,
+      "commitment_zone_start(5i)": 0
+      }
+      
     posting = assigns(:posting)
     assert_not posting.nil?
     assert posting.valid?

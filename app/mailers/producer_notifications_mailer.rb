@@ -7,7 +7,7 @@ class ProducerNotificationsMailer < ApplicationMailer
   #
   def current_orders(email, postings)
 
-  	if postings.nil?
+  	if postings.nil? || !postings.any?
   	  return
   	end
 
