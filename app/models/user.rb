@@ -15,7 +15,7 @@ class User < ActiveRecord::Base
   has_many :postings
 
   has_many :tote_items
-  has_many :postings, through: :tote_items
+  #has_many :postings, through: :tote_items
 
   has_many :user_account_states
   has_many :account_states, through: :user_account_states
