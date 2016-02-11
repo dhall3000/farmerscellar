@@ -7,6 +7,9 @@ class PostingsController < ApplicationController
 
     if params[:posting_id].nil?
       @posting = current_user.postings.new
+      
+      #if you are doing dev work on the create method and want the new form autopopulated for sanity's sake, uncomment this line
+      #@posting = Posting.new(live: true, delivery_date: Time.zone.now + 4.days, product_id: 8, quantity_available: 100, price: 2.50, user_id: User.find_by(name: "f4"), unit_category_id: UnitCategory.find_by(name: "Weight"), unit_kind_id: UnitKind.find_by(name: "Pound"), description: "best celery ever!")
     else
       posting_to_clone = Posting.find(params[:posting_id])
       @posting = posting_to_clone.dup
@@ -21,7 +24,8 @@ class PostingsController < ApplicationController
     @postings = Posting.where("delivery_date >= ? and live = ?", Date.today, true).order(delivery_date: :desc, id: :desc)
   end
 
-  def create        
+  def create
+
   	@posting = Posting.new(posting_params)
 
   	if @posting.save
@@ -104,6 +108,14 @@ class PostingsController < ApplicationController
           end
         end
       end
+
+      year = params[:posting]["commitment_zone_start(1i)"]
+      month = params[:posting]["commitment_zone_start(2i)"]
+      day = params[:posting]["commitment_zone_start(3i)"]
+      hour = params[:posting]["commitment_zone_start(4i)"]
+      minute = params[:posting]["commitment_zone_start(5i)"]
+      twz = Time.new(year, month, day, hour, minute).in_time_zone
+      posting[:commitment_zone_start] = twz
 
       posting
 

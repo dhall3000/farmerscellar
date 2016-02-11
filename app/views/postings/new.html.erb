@@ -28,6 +28,9 @@
 		<%= f.label :delivery_date, "Delivery Date" %>
 		<%= f.collection_select :delivery_date, @delivery_dates, :to_s, :to_s, prompt: true %>
 
+		<%= f.label :commitment_zone_start, "Commitment Zone Start" %>
+		<%= f.datetime_select :commitment_zone_start, ampm: true, default: 1.days.from_now.at_noon %>
+
 	    <%= f.label :live, class: "inline" do %>
 	      <%= f.check_box :live, checked: true %>
 	      <span>Make posting live</span>      
