@@ -91,7 +91,7 @@ module ToteItemsHelper
       #as intended when i used a variety of reading methods instead of .to_a
       commission_factors.to_a
 
-      commission_factor = commission_factors.last.commission
+      commission_factor = commission_factors.order(:created_at).last.commission
       tote_item_commission = tote_item_value * commission_factor      
       total_commission = (total_commission + tote_item_commission).round(2)
     end    

@@ -148,7 +148,7 @@ class ToteItemsController < ApplicationController
       if current_user.account_states == nil || !current_user.account_states.any?
         account_on_hold = false
       else
-        account_on_hold = current_user.account_states.last.state == AccountState.states[:HOLD]
+        account_on_hold = current_user.user_account_states.order(:created_at).last.account_state.state == AccountState.states[:HOLD]
       end
 
       return account_on_hold
