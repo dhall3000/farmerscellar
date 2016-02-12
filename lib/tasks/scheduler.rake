@@ -2,9 +2,18 @@ desc "This task is called by the Heroku scheduler add-on"
 
 task :commit_totes => :environment do
 
-  puts "comitting totes..."
+  puts "rake task commit_totes start..."
 
   tote_items = ToteItem.where(status: ToteItem.states[:AUTHORIZED])
+
+  if tote_items.count == 0
+    puts "no authorized totes. quitting."
+
+    #NOTE: this 'next' looks wrong. it's not. if you put a 'return' there it will crash.
+    #don't know, don't care way, but in rake tasks you have to use a next, something like
+    #because it's a block, not a method and blocks don't recognize/allow returns. whatever.
+    next
+  end
 
   transitioned_tote_ids = []
   transitioned_posting_ids = []
@@ -21,6 +30,15 @@ task :commit_totes => :environment do
       transitioned_posting_ids << tote_item.posting.id
     end
 
+  end
+
+  if transitioned_posting_ids.nil? || !transitioned_posting_ids.any?
+    puts "no postings transitioned. quitting."
+
+    #NOTE: this 'next' looks wrong. it's not. if you put a 'return' there it will crash.
+    #don't know, don't care way, but in rake tasks you have to use a next, something like
+    #because it's a block, not a method and blocks don't recognize/allow returns. whatever.
+    next
   end
 
   if !transitioned_tote_ids.nil? && transitioned_tote_ids.any?
@@ -50,7 +68,7 @@ task :commit_totes => :environment do
     ProducerNotificationsMailer.current_orders("david@farmerscellar.com", postings).deliver_now    
   end  
 
-  puts "done."
+  puts "rake task commit_totes done."
 
 end
 
