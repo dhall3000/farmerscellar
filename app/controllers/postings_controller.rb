@@ -113,9 +113,9 @@ class PostingsController < ApplicationController
       month = params[:posting]["commitment_zone_start(2i)"]
       day = params[:posting]["commitment_zone_start(3i)"]
       hour = params[:posting]["commitment_zone_start(4i)"]
-      minute = params[:posting]["commitment_zone_start(5i)"]
-      twz = Time.new(year, month, day, hour, minute).in_time_zone
-      posting[:commitment_zone_start] = twz
+      minute = params[:posting]["commitment_zone_start(5i)"]      
+      czs = Time.zone.local(year.to_i, month.to_i, day.to_i, hour.to_i, minute.to_i)
+      posting[:commitment_zone_start] = czs
 
       posting
 
