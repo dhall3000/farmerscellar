@@ -3,7 +3,16 @@
     <h3>Think online Farmer's Market, only better.</h3>
 
     <% if !logged_in? %>
-      <%= link_to "Sign up!", signup_path, class: "btn btn-lg btn-primary" %>
+      <div class="row row_spacing">
+        <div class="col-xs-6 col-xs-offset-3 col-md-2 col-md-offset-5">
+          <%= link_to "Sign up!", signup_path, class: "btn btn-lg btn-primary btn-block" %>
+        </div>
+      </div>
+      <div class="row row_spacing">
+        <div class="col-xs-6 col-xs-offset-3 col-md-2 col-md-offset-5">
+          <%= link_to "Log in", login_path, class: "btn btn-lg btn-primary btn-block" %>
+        </div>
+      </div>
     <% end %>
 </div>
 
