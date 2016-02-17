@@ -21,7 +21,7 @@ class PostingsController < ApplicationController
 
   def index
     # we only want to pull postings whose delivery date is >= today and that are 'live'
-    @postings = Posting.where("delivery_date >= ? and live = ?", Date.today, true).order(delivery_date: :desc, id: :desc)
+    @postings = Posting.where("delivery_date >= ? and live = ?", Time.zone.today, true).order(delivery_date: :desc, id: :desc)
   end
 
   def create
@@ -127,7 +127,7 @@ class PostingsController < ApplicationController
       dates = []
 
       while i < 30
-        d = Date.today + i
+        d = Time.zone.today + i
         if !d.sunday?
           dates << d
         end
