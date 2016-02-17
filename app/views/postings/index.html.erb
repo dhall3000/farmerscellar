@@ -54,8 +54,11 @@
           
           <td><a tabindex="0" class="btn btn-primary btn-block" role="button" data-html="true" data-toggle="popover" data-trigger="focus" data-content="per <%= UnitKind.find_by(id: posting.unit_kind_id).name %>"><%= number_to_currency(posting.price) %></a></td>
 
-          
-          <td class="text-center"><%= posting.delivery_date.strftime("%a %b %d") %></td>
+          <td class="text-center">              
+            <% data_content = " " + link_to("Commitment Zone", how_things_work_path(anchor: "commitment_zone")) + " for this posting starts " + posting.commitment_zone_start.strftime("%a %b %d, %I:%M%p") %>
+            <a tabindex="0" class="btn btn-primary" role="button" data-container="body" data-placement="left" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%= data_content %>"><%= posting.delivery_date.strftime("%a %b %d") %></a>
+          </td>
+
           <td class="text-center"><%= link_to "Go!", new_tote_item_path(posting_id: posting.id), class: "btn btn-primary" %></td>
           <% if current_user.account_type == User.types[:ADMIN] %>
             <td><%= link_to "Go!", tote_items_next_path( tote_item: {posting_id: posting.id}) %></td>
