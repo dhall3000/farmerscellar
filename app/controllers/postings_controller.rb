@@ -83,13 +83,13 @@ class PostingsController < ApplicationController
       @products = Product.all.order(:name)
       @unit_categories = UnitCategory.all
       @unit_kinds = UnitKind.all
-      @delivery_dates = next_delivery_dates(4)
+      @delivery_dates = next_delivery_dates
+      @producers = User.where(account_type: User.types[:PRODUCER])
     end
 
     def posting_params
 
       posting = params.require(:posting).permit(:description, :quantity_available, :price, :user_id, :product_id, :unit_category_id, :unit_kind_id, :delivery_date, :live)
-      posting[:user_id] = current_user[:id]
 
       unit_kind = UnitKind.all.find_by(id: posting[:unit_kind_id])
 
@@ -121,7 +121,7 @@ class PostingsController < ApplicationController
 
     end
 
-    def next_delivery_dates(num_dates)
+    def next_delivery_dates
 
       i = 3      
       dates = []

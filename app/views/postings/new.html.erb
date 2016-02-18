@@ -10,6 +10,13 @@
 		  <%= render 'shared/error_messages_posting' %>
 		<% end %>
 
+		<% if current_user.account_type == User.types[:ADMIN] %>
+		  <%= f.label :user_id, "Producer" %>
+		  <%= f.collection_select(:user_id, @producers, :id, :farm_name, prompt: true, selected: @posting.user_id) %>
+		<% else %>
+		  <%= f.hidden_field :user_id %>
+		<% end %>
+
 		<%= f.label :product_id %>
 		<%= f.collection_select(:product_id, @products, :id, :name, prompt: true) %>
 

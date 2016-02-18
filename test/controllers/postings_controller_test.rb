@@ -63,6 +63,7 @@ class PostingsControllerTest < ActionController::TestCase
     
   end
 
+  #bundle exec rake test test/controllers/postings_controller_test.rb test_posted_posting_becomes_unposted_after_unsetting_live
   test "posted posting becomes unposted after unsetting live" do
     posting = successfully_create_posting
     postings_count_prior = get_postings_count
@@ -110,7 +111,7 @@ class PostingsControllerTest < ActionController::TestCase
     log_in_as(@user)
     #go to post creation page
     #specify values, submit form
-    post :create, id: @user.id, posting: { description: "descrip", price: 1, quantity_available: 10, live: true, delivery_date: "3000-08-28", product_id: @posting.product_id, unit_kind_id: @posting.unit_kind.id, unit_category_id: @posting.unit_category.id,
+    post :create, id: @user.id, posting: { user_id: @user.id, description: "descrip", price: 1, quantity_available: 10, live: true, delivery_date: "3000-08-28", product_id: @posting.product_id, unit_kind_id: @posting.unit_kind.id, unit_category_id: @posting.unit_category.id,
       "commitment_zone_start(1i)": 3000,
       "commitment_zone_start(2i)": 8,
       "commitment_zone_start(3i)": 27,
@@ -132,7 +133,7 @@ class PostingsControllerTest < ActionController::TestCase
     log_in_as(@user)
     #go to post creation page
     #specify values, submit form
-    post :create, id: @user.id, posting: { description: "descrip", price: 1, quantity_available: 10, live: false, delivery_date: "3000-08-28", product_id: @posting.product_id, unit_kind_id: @posting.unit_kind.id, unit_category_id: @posting.unit_category.id,
+    post :create, id: @user.id, posting: { user_id: @user.id, description: "descrip", price: 1, quantity_available: 10, live: false, delivery_date: "3000-08-28", product_id: @posting.product_id, unit_kind_id: @posting.unit_kind.id, unit_category_id: @posting.unit_category.id,
       "commitment_zone_start(1i)": 3000,
       "commitment_zone_start(2i)": 8,
       "commitment_zone_start(3i)": 27,

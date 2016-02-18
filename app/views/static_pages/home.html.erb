@@ -5,12 +5,12 @@
     <% if !logged_in? %>
       <div class="row row_spacing">
         <div class="col-xs-6 col-xs-offset-3 col-md-2 col-md-offset-5">
-          <%= link_to "Sign up!", signup_path, class: "btn btn-lg btn-primary btn-block" %>
+          <%= link_to "Log in", login_path, class: "btn btn-lg btn-primary btn-block" %>
         </div>
       </div>
       <div class="row row_spacing">
         <div class="col-xs-6 col-xs-offset-3 col-md-2 col-md-offset-5">
-          <%= link_to "Log in", login_path, class: "btn btn-lg btn-primary btn-block" %>
+          <%= link_to "Sign up!", signup_path, class: "btn btn-lg btn-primary btn-block" %>
         </div>
       </div>
     <% end %>
@@ -32,6 +32,7 @@
     <p><%= link_to "Producer Product Commissions", producer_product_commissions_path %></p>
     <p><%= link_to "Add new dropsite", new_dropsite_path %></p>
     <p><%= link_to "List dropsites", dropsites_path %></p>        
+    <p><%= link_to "List Users", users_path %></p>
   </div>
 <% end %>
 
