@@ -1,0 +1,36 @@
+<p>
+  Hi <%= @producer.farm_name %>,
+</p>
+
+<p>
+  We just sent you a total of <%= number_to_currency(@total) %> as payment for the following products / quantities:
+</p>
+
+<table border="1">
+  <thead>
+    <tr>		    
+      <th align="left">Posting ID</th>
+      <th align="center">Product</th>   
+      <th align="center">Quantity</th>
+      <th align="center">Amount Paid</th>      
+    </tr>
+  </thead>
+  <tbody>  
+    <% @posting_infos.each do |posting, value| %>    
+      <tr>
+        <td align="left"><%= posting.id %></td>
+        <td align="center"><%= posting.product.name %></td>
+        <td align="center"><%= value[:unit_count] %></td>
+        <td align="center"><%= number_to_currency(value[:amount]) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<p>
+Thanks!
+</p>
+
+<p>
+Farmer's Cellar
+</p>

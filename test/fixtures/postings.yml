@@ -1,16 +1,17 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 <% i = 1 %>
-<% while !(Date.today + i).friday? %>
+<% while !(Time.zone.today + i).friday? %>
   <% i += 1 %>
 <% end %>
-<% delivery_date = Date.today + i %>
+<% delivery_date = Time.zone.today + i %>
 <% delivery_date_next = delivery_date + 7 %>
 
 #Apples
 #Posting.create(delivery_date: next_friday, product_id: 1, quantity_available: 1000, price: 2.75, user_id: 1, unit_category_id: 2, unit_kind_id: 8, description: "these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
 postingf1apples:
   delivery_date: <%= delivery_date %>
+  commitment_zone_start: <%= delivery_date - 2.days %>
   product: apples
   quantity_available: 1000
   price: 2.75
@@ -24,6 +25,7 @@ postingf1apples:
 #Posting.create(delivery_date: next_friday, product_id: 6, quantity_available: 100, price: 3.25, user_id: 1, unit_category_id: 2, unit_kind_id: 8, description: "these Asparagus are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
 postingf1asparagus:
   delivery_date: <%= delivery_date %>
+  commitment_zone_start: <%= delivery_date - 2.days %>  
   product: asparagus
   quantity_available: 100
   price: 3.25
@@ -36,6 +38,7 @@ postingf1asparagus:
 #Lettuce
 postingf1lettuce:
   delivery_date: <%= delivery_date_next %>
+  commitment_zone_start: <%= delivery_date_next - 2.days %>  
   product: lettuce
   quantity_available: 100
   price: 4.25
@@ -49,6 +52,7 @@ postingf1lettuce:
 #Posting.create(delivery_date: next_friday, product_id: 3, quantity_available: 25, price: 2.00, user_id: 2, unit_category_id: 1, unit_kind_id: 5, description: "these milks are all organic grown with no pesticides. they are raw. no homogeneization. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
 postingf2milk:
   delivery_date: <%= delivery_date %>
+  commitment_zone_start: <%= delivery_date - 2.days %>  
   product: milk
   quantity_available: 25
   price: 2.00
@@ -62,6 +66,7 @@ postingf2milk:
 #Posting.create(delivery_date: next_friday, product_id: 4, quantity_available: 10, price: 3.75, user_id: 2, unit_category_id: 3, unit_kind_id: 11, description: "these beefs are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
 postingf2beef:
   delivery_date: <%= delivery_date %>
+  commitment_zone_start: <%= delivery_date - 2.days %>  
   product: beef
   quantity_available: 10
   price: 3.75
@@ -74,6 +79,7 @@ postingf2beef:
 #Tomato
 postingf2tomato:
   delivery_date: <%= delivery_date_next %>
+  commitment_zone_start: <%= delivery_date_next - 2.days %>  
   product: tomato
   quantity_available: 10
   price: 2.99
@@ -87,6 +93,7 @@ postingf2tomato:
 #Posting.create(delivery_date: next_friday, product_id: 2, quantity_available: 15, price: 2.25, user_id: 3, unit_category_id: 2, unit_kind_id: 8, description: "yummy, crunchy carrots. tastiest ever!")
 postingf3carrots:
   delivery_date: <%= delivery_date %>
+  commitment_zone_start: <%= delivery_date - 2.days %>  
   product: carrots
   quantity_available: 15
   price: 2.25
@@ -100,6 +107,7 @@ postingf3carrots:
 #Posting.create(delivery_date: next_friday, product_id: 5, quantity_available: 50, price: 1.50, user_id: 3, unit_category_id: 3, unit_kind_id: 10, description: "best whole chickens around. all grass fed on clean, organic fields. no antibiotics. no supplements. just lots of grass and all the bugs they can eat! :)")
 postingf3chicken:
   delivery_date: <%= delivery_date %>
+  commitment_zone_start: <%= delivery_date - 2.days %>  
   product: chicken
   quantity_available: 50
   price: 1.50
@@ -113,6 +121,7 @@ postingf3chicken:
 #Posting.create(delivery_date: next_friday, product_id: 7, quantity_available: 100, price: 1.25, user_id: 4, unit_category_id: 2, unit_kind_id: 8, description: "best oranges ever!")
 postingf4oranges:
   delivery_date: <%= delivery_date %>
+  commitment_zone_start: <%= delivery_date - 2.days %>  
   product: oranges
   quantity_available: 100
   price: 1.25
@@ -126,6 +135,7 @@ postingf4oranges:
 #Posting.create(delivery_date: next_friday, product_id: 8, quantity_available: 100, price: 2.50, user_id: 4, unit_category_id: 2, unit_kind_id: 8, description: "best celery ever!")
 postingf4celery:
   delivery_date: <%= delivery_date %>
+  commitment_zone_start: <%= delivery_date - 2.days %>  
   product: celery
   quantity_available: 100
   price: 2.50
@@ -138,6 +148,7 @@ postingf4celery:
 #Avocado
 postingf4avocado:
   delivery_date: <%= Time.zone.now.midnight %>
+  commitment_zone_start: <%= Time.zone.now.midnight - 2.days %>  
   product: avocado
   quantity_available: 100
   price: 2.97
@@ -150,6 +161,7 @@ postingf4avocado:
 #Basil
 postingf4basil:
   delivery_date: <%= Time.zone.now.midnight %>
+  commitment_zone_start: <%= Time.zone.now.midnight - 2.days %>  
   product: basil
   quantity_available: 100
   price: 2.27

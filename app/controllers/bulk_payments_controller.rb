@@ -39,7 +39,8 @@ class BulkPaymentsController < ApplicationController
   	  @cumulative_total_payout = (@cumulative_total_payout + payment_info[:amount].to_f).round(2)
   	end
 
-  	response = send_payments(@payment_info_by_producer_id)    
+  	response = send_payments(@payment_info_by_producer_id)
+    send_payment_invoices(@payment_info_by_producer_id)
   	proceed = false
 
   	if USEGATEWAY
@@ -240,6 +241,21 @@ class BulkPaymentsController < ApplicationController
 
     end
 
+    def send_payment_invoices(payment_info_by_producer_id)
+
+      payment_info_by_producer_id.each do |producer_id, payment_info|
+
+        producer = User.find(producer_id)
+        total_amount = payment_info[:amount]
+        payment_payable_ids = payment_info[:payment_payable_ids]
+
+        ProducerNotificationsMailer.payment_invoice(producer.email, producer, total_amount, payment_payable_ids).deliver_now
+        ProducerNotificationsMailer.payment_invoice("david@farmerscellar.com", producer, total_amount, payment_payable_ids).deliver_now
+                
+      end
+
+    end
+
     def get_credentials_hash
       return PAYPALCREDENTIALS    
     end
@@ -259,13 +275,11 @@ class BulkPaymentsController < ApplicationController
     end
 
     def get_email_amount_pairs(payment_info_by_producer_id)
-      email_amount_pairs = []
 
-      i = 0
+      email_amount_pairs = []
 
       payment_info_by_producer_id.each do |producer_id, payment_info|
         email_amount_pairs << {email: User.find(producer_id).email, amount: payment_info[:amount]}                                
-        i += 1
       end
 
       return email_amount_pairs
