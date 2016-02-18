@@ -49,7 +49,7 @@ Here is the status of products you recently ordered that were set for delivery t
 <% if purchase_failed %>
   <b><p style="background-color:red;">There was a problem with your purchase transaction. Please contact <%= link_to "Farmer's Cellar", contact_url %> to ensure your account balance is paid in full.</p></b>
 <% else %>
-  <p>Your payment accounts were charged a total of <%= number_to_currency(@total_cost_of_tote_items) %> for the delivered products. </p>
+  <p>Your payment account(s) were charged a total of <%= number_to_currency(@total_cost_of_tote_items) %> for the delivered products. </p>
 <% end %>
 
 <% if !@authorizations.nil? && @authorizations.any? %>
@@ -67,7 +67,7 @@ Here is the status of products you recently ordered that were set for delivery t
     <% @authorizations.each do |authorization| %>
       <tr>
         <td align="left"><%= authorization.id %></td>
-        <td align="left"><%= authorization.amount %></td>
+        <td align="left"><%= number_to_currency(authorization.amount) %></td>
         <td align="left"><%= authorization.created_at.localtime.strftime("%a %b %d,%l:%M %p") %></td>
       </tr>
     <% end %>

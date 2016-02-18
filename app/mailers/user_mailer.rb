@@ -30,16 +30,22 @@ class UserMailer < ApplicationMailer
   def delivery_notification(user, dropsite, tote_items)
     @user = user
     @dropsite = dropsite
-    @tote_items = tote_items
-    @total_cost_of_tote_items = total_cost_of_tote_items(@tote_items)
+    @tote_items = tote_items        
 
+    @total_cost_of_tote_items = 0
     auths = []
 
     tote_items.each do |tote_item|
+
       if !tote_item.nil? && !tote_item.checkouts.nil? && tote_item.checkouts.any? && !tote_item.checkouts.last.authorizations.nil? && tote_item.checkouts.last.authorizations.any?
         auths << tote_item.checkouts.last.authorizations.last.id
       end
-    end
+
+      if tote_item.status == ToteItem.states[:PURCHASED]        
+        @total_cost_of_tote_items += get_tote_item_value(tote_item)
+      end
+
+    end    
 
     @authorizations = Authorization.find(auths.uniq)
 
