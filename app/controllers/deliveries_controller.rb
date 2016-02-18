@@ -76,8 +76,8 @@ class DeliveriesController < ApplicationController
     def send_delivery_notification(delivery, dropsite)
       
       #this relation has ALL users and their most recently specified dropsite
-      users = User.select(:id).joins(:user_dropsites).select("user_id, dropsite_id, max(user_dropsites.created_at)").group(:user_id)
-      
+      users = UserDropsite.select("user_id, dropsite_id, max(created_at) as created_at").group(:user_id, :dropsite_id)
+
       tote_items_by_user_id = {}
 
       users.each do |user|
@@ -85,8 +85,8 @@ class DeliveriesController < ApplicationController
           next
         end
 
-        if !tote_items_by_user_id.has_key?(user.id)
-          tote_items_by_user_id[user.id] = {tote_items: []}
+        if !tote_items_by_user_id.has_key?(user.user_id)
+          tote_items_by_user_id[user.user_id] = {tote_items: []}
         end
         
       end

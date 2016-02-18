@@ -15,7 +15,7 @@ class PurchaseReceivable < ActiveRecord::Base
   has_many :purchases, through: :purchase_purchase_receivables
 
   def self.kind
-    {NORMAL: 0, PURCHASEFAILED: 1}
+    {NORMAL: 0, PURCHASEFAILED: 1, DONTCOLLECT: 2}
   end
 
   def self.load_unpaid_purchase_receivables
