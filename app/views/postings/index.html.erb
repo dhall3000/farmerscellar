@@ -21,16 +21,26 @@
     <tbody>
       <% @postings.each do |posting| %> 
 
-        <% farmInfo = "Producer has not provided info about their operation" %>
-        <% if posting.user.description != nil %>
-          <% farmInfo = "<u>Producer Description</u><p>" + posting.user.description %>
+        <% farmInfo = "" %>
+
+        <% if posting.description != nil %>
+          <% farmInfo = "<u>Product Info</u><p>" + posting.description %>
         <% end %>
+
+        <% if posting.user.description != nil %>
+          <% farmInfo = farmInfo + "<p><u>Producer Description</u><p>" + posting.user.description %>
+        <% end %>        
+
         <% if !posting.user.website.blank? %>
           <% farmInfo = farmInfo + "<p>" + "<u>Producer Website</u><p><a href='" + posting.user.website + "' target='_blank'>" + posting.user.website + "</a>"%>
         <% end %>
 
+        <% if farmInfo == "" %>
+          <% farmInfo = "Producer has not provided info about their operation" %>
+        <% end %>
+
         <tr>          
-          <td class="text-center"><a tabindex="0" class="btn" role="button" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=farmInfo%>"> <p class="lead"> <%= Product.find_by(id: posting.product_id).name %> </p> <p class="small"> <%= User.find_by(id: posting.user_id).farm_name %> </p></a></td>
+          <td class="text-center"><a tabindex="0" class="btn" role="button" data-html="true" data-toggle="popover" data-trigger="click" data-content="<%=farmInfo%>"> <p class="lead"> <%= Product.find_by(id: posting.product_id).name %> </p> <p class="small"> <%= User.find_by(id: posting.user_id).farm_name %> </p></a></td>
           
           <td class="text-center">
             <div>
