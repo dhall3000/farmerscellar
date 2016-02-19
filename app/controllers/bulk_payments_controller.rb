@@ -250,7 +250,6 @@ class BulkPaymentsController < ApplicationController
         payment_payable_ids = payment_info[:payment_payable_ids]
 
         ProducerNotificationsMailer.payment_invoice(producer.email, producer, total_amount, payment_payable_ids).deliver_now
-        ProducerNotificationsMailer.payment_invoice("david@farmerscellar.com", producer, total_amount, payment_payable_ids).deliver_now
                 
       end
 

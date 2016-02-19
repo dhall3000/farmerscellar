@@ -65,7 +65,6 @@ task :commit_totes => :environment do
 
   producers.each do |email, postings|
     ProducerNotificationsMailer.current_orders(email, postings).deliver_now    
-    ProducerNotificationsMailer.current_orders("david@farmerscellar.com", postings).deliver_now    
   end  
 
   puts "rake task commit_totes done."
