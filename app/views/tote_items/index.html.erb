@@ -1,17 +1,11 @@
 <h1>Shopping Tote</h1>
 
 <% if logged_in? %>
-  <h2>Delivery Dropsite</h2>
-  <% if @dropsite.nil? %>
-    <p class="alert alert-danger">No delivery dropsite specified.</p>
-    <p>You must specify a <%= link_to "delivery dropsite", dropsites_path %> before checking out.</p>
-  <% else %>
-    <p>Products in this order will be delivered to <%= link_to @dropsite.name, dropsite_path(@dropsite) %>.</p>
-    <% if Dropsite.count > 1 %>
-      <p><%= link_to "Select different delivery dropsite", dropsites_path %></p>
-    <% end %>
-  <% end %>
+
   <%= render partial: "shared/tote", locals: { tote_items: @tote_items } %>
+  
+
+
   <% if @total_amount_to_authorize > 0 %>
     <h2>Checkout</h2>
     <div class="row">
@@ -25,10 +19,10 @@
                 <%= image_submit_tag("https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif", disabled: @dropsite.nil?, class: 'form-control', style: "border: 0px solid #bbb;") %>
                 <% #that style: stuff is random. it's cause there's the "input, textarea, select, .uneditable-input {" line in the custom.css file adds a border. so i'm just removing that border here. %>
                 <% end %>
-  <% if @dropsite.nil? %>
-    <p class="alert alert-danger">No delivery dropsite specified.</p>
-    <p>You must specify a <%= link_to "delivery dropsite", dropsites_path %> before checking out.</p>
-  <% end %>
+                <% if @dropsite.nil? %>
+                  <p class="alert alert-danger">No delivery dropsite specified.</p>
+                  <p>You must specify a <%= link_to "delivery dropsite", dropsites_path %> before checking out.</p>
+                <% end %>
               </td>
             </tr>
           </tbody>
@@ -39,9 +33,34 @@
       </div>  
     </div>
   <% end %>
-  <% if !tote_has_items(@tote_items) %>
+
+
+
+
+
+
+
+  <% if tote_has_items(@tote_items) %>
+
+
+    <h2>Delivery Dropsite</h2>
+    <% if @dropsite.nil? %>
+      <p class="alert alert-danger">No delivery dropsite specified.</p>
+      <p>You must specify a <%= link_to "delivery dropsite", dropsites_path %> before checking out.</p>
+    <% else %>
+      <p>Products in this order will be delivered to <%= link_to @dropsite.name, dropsite_path(@dropsite) %>.</p>
+      <% if Dropsite.count > 1 %>
+        <p><%= link_to "Select different delivery dropsite", dropsites_path %></p>
+      <% end %>
+    <% end %>
+
+
+
+  <% else %>
     <p>Your shopping tote is empty so there is nothing to view here. You need to <%= link_to "add some items to your tote", postings_path %>, then you will see them listed here.</p>
   <% end %>
+
+
 <% else %>
   <p>Sorry, you need to log in before you can view the contents of your tote</p>
 <% end %>
