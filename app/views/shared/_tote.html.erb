@@ -12,13 +12,10 @@
     <table class="table">
       <thead>
         <tr>
-          <th>Product</th>
-          <th>Producer</th>
-          <th class="text-center">Posting</th>        
-          <th class="text-center">Price</th>
+          <th class="text-center">Product</th>          
           <th class="text-center">Quantity</th>
           <th class="text-center">Cost</th>
-          <th class="text-center">Remove from tote</th>
+          <th class="text-center">Remove</th>
         </tr>
       </thead>
       <tbody>
@@ -30,10 +27,7 @@
             <% tote_items_authorized << tote_item %>
             <tr>
           <% end %>        
-            <td><%= tote_item.posting.product.name %></td>
-            <td><%= tote_item.posting.user.farm_name %></td>
-            <td class="text-center"><%= link_to "View", new_tote_item_path(posting_id: tote_item.posting_id) %></td>
-            <td class="text-center"><%= number_to_currency(tote_item.price) %> / <%= tote_item.posting.unit_kind.name %></td>
+            <td><%= link_to tote_item.posting.product.name, new_tote_item_path(posting_id: tote_item.posting_id) %></td>            
             <td class="text-center"><%= tote_item.quantity %></td>
             <td class="text-center"><%= number_to_currency(tote_item.price * tote_item.quantity) %></td>
             <td class="text-center">
