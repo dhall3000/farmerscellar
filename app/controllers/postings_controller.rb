@@ -20,8 +20,15 @@ class PostingsController < ApplicationController
   end
 
   def index
-    # we only want to pull postings whose delivery date is >= today and that are 'live'
-    @postings = Posting.where("delivery_date >= ? and live = ?", Time.zone.today, true).order(delivery_date: :desc, id: :desc)
+
+    if current_user.account_type == User.types[:CUSTOMER] || current_user.account_type == User.types[:PRODUCER]
+      #for customers, we only want to pull postings whose delivery date is >= today and that are 'live'
+      @postings = Posting.where("delivery_date >= ? and live = ?", Time.zone.today, true).order(delivery_date: :desc, id: :desc)
+    elsif current_user.account_type == User.types[:ADMIN]
+      #for admins, same thing but we want to see the unlive as well
+      @postings = Posting.where("delivery_date >= ?", Time.zone.today).order(delivery_date: :desc, id: :desc)
+    end
+
   end
 
   def create
@@ -109,13 +116,17 @@ class PostingsController < ApplicationController
         end
       end
 
-      year = params[:posting]["commitment_zone_start(1i)"]
-      month = params[:posting]["commitment_zone_start(2i)"]
-      day = params[:posting]["commitment_zone_start(3i)"]
-      hour = params[:posting]["commitment_zone_start(4i)"]
-      minute = params[:posting]["commitment_zone_start(5i)"]      
-      czs = Time.zone.local(year.to_i, month.to_i, day.to_i, hour.to_i, minute.to_i)
-      posting[:commitment_zone_start] = czs
+      if params[:posting]["commitment_zone_start(1i)"] != nil
+
+        year = params[:posting]["commitment_zone_start(1i)"]
+        month = params[:posting]["commitment_zone_start(2i)"]
+        day = params[:posting]["commitment_zone_start(3i)"]
+        hour = params[:posting]["commitment_zone_start(4i)"]
+        minute = params[:posting]["commitment_zone_start(5i)"]      
+        czs = Time.zone.local(year.to_i, month.to_i, day.to_i, hour.to_i, minute.to_i)
+        posting[:commitment_zone_start] = czs
+
+      end
 
       posting
 

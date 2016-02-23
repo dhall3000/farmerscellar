@@ -14,6 +14,7 @@
         <th class="text-center"><h2></h2></th>   
         <% if current_user.account_type == User.types[:ADMIN] %>
           <th class="text-center">Delivery Date</th>
+          <th class="text-center"></th>
           <th class="text-center">Do delivery</th>
         <% end %>
       </tr>
@@ -53,6 +54,7 @@
           
           <% if current_user.account_type == User.types[:ADMIN] %>
             <td class="text-center"><%= posting.delivery_date.strftime("%a %b %d") %></td>
+            <td class="text-center"><%= link_to "Edit", edit_posting_path(posting) %></td>
             <td class="text-center"><%= link_to "Go!", tote_items_next_path( tote_item: {posting_id: posting.id}) %></td>
           <% end %>
 
