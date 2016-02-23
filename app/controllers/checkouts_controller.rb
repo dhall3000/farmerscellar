@@ -71,7 +71,7 @@ class CheckoutsController < ApplicationController
       end
 
       name = tote_item.posting.product.name
-      description = "Producer - " + tote_item.posting.user.name
+      description = "Producer - " + tote_item.posting.user.farm_name
 
       summary_item[:name] = name
       summary_item[:description] = description
