@@ -16,6 +16,9 @@ class StaticPagesController < ApplicationController
   def how_things_work
   end
 
+  def support    
+  end
+
   def test_page
   end
 end

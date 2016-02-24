@@ -1,0 +1,51 @@
+<% provide(:title, "How Things Work") %>
+<% #TODO: finish all content %>
+<h1>Support</h1>
+
+<div class="row">
+  <div class="col-xs-12 col-sm-3">
+    
+    <div class="hidden-xs affix" id="help_navigation">
+      <ul class="nav nav-pills nav-stacked">
+        <li class="active"><a href="#password_reset_not_working">Password Reset Isn't Working</a></li>
+        <li><a href="#more_to_come">More to Come...</a></li>
+      </ul>
+    </div>
+
+    <div class="visible-xs-block">
+      <ul class="nav nav-pills nav-stacked">
+        <li class="active"><a href="#password_reset_not_working">Password Reset Isn't Working</a></li>
+        <li><a href="#more_to_come">More to Come...</a></li>
+      </ul>
+    </div>
+  
+  </div>
+
+  <div class="col-xs-12 col-sm-9">
+
+
+    <div class="anchor" id="password_reset_not_working">
+      <h2>Password Reset Isn't Working</h2>
+        <p>
+          Our mail server can be pretty slow, so the trick to resetting your password is to submit your email <%= link_to "here", new_password_reset_path %> only once and then wait a minute or two...a bit longer than you're probably used to.
+        </p>
+        <p>
+          And note: it's ONLY the most recent password reset email you receive that will work. All others will fail. So if you have submitted your email address multiple times you must wait until the last email response from our system is received. Than you should be just fine.
+        </p>
+        
+    </div>
+
+
+
+    <div class="anchor" id="more_to_come">
+      <h2>More to Come</h2>
+      <div>                        
+        <p>
+          We'll add more support content as time goes on. In the meantime, please let us know of any support issue we can help you with!          
+        </p>
+      </div>
+    </div>
+
+
+  </div>
+</div>
