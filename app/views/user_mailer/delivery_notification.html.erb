@@ -68,7 +68,7 @@ Here is the status of products you recently ordered that were set for delivery t
       <tr>
         <td align="left"><%= authorization.id %></td>
         <td align="left"><%= number_to_currency(authorization.amount) %></td>
-        <td align="left"><%= authorization.created_at.localtime.strftime("%a %b %d,%l:%M %p") %></td>
+        <td align="left"><%= Time.zone.at(authorization.created_at).strftime("%a %b %d,%l:%M %p") %></td>
       </tr>
     <% end %>
   </tbody>

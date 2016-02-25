@@ -30,7 +30,7 @@ Your payment account(s) were charged a total of <%= number_to_currency(@total_co
 The products listed above are associated with the following payment authorization(s):
 
 <% @authorizations.each do |authorization| %>
-ID=<%= authorization.id %>,Authorization Amount=<%= number_to_currency(authorization.amount) %>,Authorization Date=<%= authorization.created_at.localtime.strftime("%a %b %d,%l:%M %p") %>
+ID=<%= authorization.id %>,Authorization Amount=<%= number_to_currency(authorization.amount) %>,Authorization Date=<%= Time.zone.at(authorization.created_at).strftime("%a %b %d,%l:%M %p") %>
 ---------------------------------------------------------------------------------
 <% end %>
 <% end %>
