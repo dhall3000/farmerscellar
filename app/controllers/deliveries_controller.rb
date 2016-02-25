@@ -93,9 +93,11 @@ class DeliveriesController < ApplicationController
       
       delivery.postings.each do |posting|
         posting.tote_items.each do |tote_item|          
-          if tote_items_by_user_id.has_key?(tote_item.user_id)
-            tote_items_by_user_id[tote_item.user_id][:tote_items] << tote_item
-          end          
+          if tote_item.status == ToteItem.states[:PURCHASED] || tote_item.status == ToteItem.states[:PURCHASEFAILED] || tote_item.status == ToteItem.states[:NOTFILLED]
+            if tote_items_by_user_id.has_key?(tote_item.user_id)
+              tote_items_by_user_id[tote_item.user_id][:tote_items] << tote_item
+            end
+          end
         end
       end
 
