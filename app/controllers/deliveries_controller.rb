@@ -113,7 +113,7 @@ class DeliveriesController < ApplicationController
           next
         end
 
-        UserMailer.delivery_notification(User.find(user_id), dropsite, tote_items_by_user_id[user_id][:tote_items]).deliver_now
+        UserMailer.delivery_notification(User.find(user_id), dropsite, tote_items).deliver_now
         
       end
 
