@@ -46,7 +46,7 @@
     <h2>Delivery Dropsite</h2>
     <% if @dropsite.nil? %>
       <p class="alert alert-danger">No delivery dropsite specified.</p>
-      <p>You must specify a <%= link_to "delivery dropsite", dropsites_path %> before checking out.</p>
+      <p>Please specify a <%= link_to "delivery dropsite", dropsites_path %>.</p>
     <% else %>
       <p>Products in this order will be delivered to <%= link_to @dropsite.name, dropsite_path(@dropsite) %>.</p>
       <% if Dropsite.count > 1 %>

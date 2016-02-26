@@ -230,26 +230,26 @@ f4.producer_product_commissions.create(product: avocado, commission: 0.08)
 f4.producer_product_commissions.create(product: basil, commission: 0.06)
 
 #Apples
-Posting.create(live: true, delivery_date: next_friday, product_id: 1, quantity_available: 1000, price: 2.75, user_id: f1.id, unit_category_id: 2, unit_kind_id: 8, description: "these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
+Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 1, quantity_available: 1000, price: 2.75, user_id: f1.id, unit_category_id: 2, unit_kind_id: 8, description: "these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
 #Asparagus
-Posting.create(live: true, delivery_date: next_friday, product_id: 6, quantity_available: 100, price: 3.25, user_id: f1.id, unit_category_id: 2, unit_kind_id: 8, description: "these Asparagus are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
+Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 6, quantity_available: 100, price: 3.25, user_id: f1.id, unit_category_id: 2, unit_kind_id: 8, description: "these Asparagus are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
 #Milk
-Posting.create(live: true, delivery_date: next_friday, product_id: 3, quantity_available: 25, price: 2.00, user_id: f2.id, unit_category_id: 1, unit_kind_id: 5, description: "these milks are all organic grown with no pesticides. they are raw. no homogeneization. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
+Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 3, quantity_available: 25, price: 2.00, user_id: f2.id, unit_category_id: 1, unit_kind_id: 5, description: "these milks are all organic grown with no pesticides. they are raw. no homogeneization. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
 #Beef
-Posting.create(live: true, delivery_date: next_friday, product_id: 4, quantity_available: 10, price: 3.75, user_id: f2.id, unit_category_id: 3, unit_kind_id: 11, description: "these beefs are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
+Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 4, quantity_available: 10, price: 3.75, user_id: f2.id, unit_category_id: 3, unit_kind_id: 11, description: "these beefs are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
 #Carrots
-Posting.create(live: true, delivery_date: next_friday, product_id: 2, quantity_available: 15, price: 2.25, user_id: f3.id, unit_category_id: 2, unit_kind_id: 8, description: "yummy, crunchy carrots. tastiest ever!")
+Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 2, quantity_available: 15, price: 2.25, user_id: f3.id, unit_category_id: 2, unit_kind_id: 8, description: "yummy, crunchy carrots. tastiest ever!")
 #Chicken
-Posting.create(live: true, delivery_date: next_friday, product_id: 5, quantity_available: 50, price: 1.50, user_id: f3.id, unit_category_id: 3, unit_kind_id: 10, description: "best whole chickens around. all grass fed on clean, organic fields. no antibiotics. no supplements. just lots of grass and all the bugs they can eat! :)")
+Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 5, quantity_available: 50, price: 1.50, user_id: f3.id, unit_category_id: 3, unit_kind_id: 10, description: "best whole chickens around. all grass fed on clean, organic fields. no antibiotics. no supplements. just lots of grass and all the bugs they can eat! :)")
 #Oranges
-Posting.create(live: true, delivery_date: next_friday, product_id: 7, quantity_available: 100, price: 1.25, user_id: f4.id, unit_category_id: 2, unit_kind_id: 8, description: "best oranges ever!")
+Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 7, quantity_available: 100, price: 1.25, user_id: f4.id, unit_category_id: 2, unit_kind_id: 8, description: "best oranges ever!")
 #Celery
-Posting.create(live: true, delivery_date: next_friday, product_id: 8, quantity_available: 100, price: 2.50, user_id: f4.id, unit_category_id: 2, unit_kind_id: 8, description: "best celery ever!")
+Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 8, quantity_available: 100, price: 2.50, user_id: f4.id, unit_category_id: 2, unit_kind_id: 8, description: "best celery ever!")
 
 #Avocado
-Posting.create(live: true, delivery_date: DateTime.now.getutc.midnight, product_id: avocado.id, quantity_available: 100, price: 2.29, user_id: f4.id, unit_category_id: count.id, unit_kind_id: whole.id, description: "best avocado ever!")
+Posting.create(live: true, delivery_date: Time.zone.today, commitment_zone_start: Time.zone.today - 2.days, product_id: avocado.id, quantity_available: 100, price: 2.29, user_id: f4.id, unit_category_id: count.id, unit_kind_id: whole.id, description: "best avocado ever!")
 #Basil
-Posting.create(live: true, delivery_date: DateTime.now.getutc.midnight, product_id: basil.id, quantity_available: 100, price: 2.97, user_id: f4.id, unit_category_id: count.id, unit_kind_id: bunch.id, description: "best basil ever!")
+Posting.create(live: true, delivery_date: Time.zone.today, commitment_zone_start: Time.zone.today - 2.days, product_id: basil.id, quantity_available: 100, price: 2.97, user_id: f4.id, unit_category_id: count.id, unit_kind_id: bunch.id, description: "best basil ever!")
 
 #Apples
 ToteItem.create(quantity: 2, price: 2.75, status: ToteItem.states[:AUTHORIZED], user_id: 7, posting_id: 1)
@@ -274,3 +274,5 @@ ToteItem.create(quantity: 5, price: 2.50, status: ToteItem.states[:AUTHORIZED], 
 ToteItem.create(quantity: 2, price: 2.50, status: ToteItem.states[:AUTHORIZED], user_id: 8, posting_id: 8)
 ToteItem.create(quantity: 1, price: 2.50, status: ToteItem.states[:AUTHORIZED], user_id: 6, posting_id: 8)
 ToteItem.create(quantity: 3, price: 2.50, status: ToteItem.states[:AUTHORIZED], user_id: 5, posting_id: 8)
+
+Dropsite.create(name: "Farmer's Cellar", phone: "206-588-6579", hours: "8 - 8", address: "9827 128TH AVE NE", city: "Kirkland", state: "WA", zip: 98033, active: true, access_instructions: "punch in 123 and hit enter")
