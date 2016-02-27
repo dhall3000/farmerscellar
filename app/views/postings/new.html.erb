@@ -36,7 +36,9 @@
 		<%= f.text_field :delivery_date, class: 'form-control' %>
 
 		<%= f.label :commitment_zone_start, "Commitment Zone Start" %>
-		<%= f.datetime_select :commitment_zone_start, ampm: true, default: 1.days.from_now.at_noon %>
+	    <div style="position: relative">
+		  <%= f.text_field :commitment_zone_start, class: 'form-control' %>
+	    </div>
 
 	    <%= f.label :live, class: "inline" do %>
 	      <%= f.check_box :live, checked: true %>
