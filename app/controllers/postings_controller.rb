@@ -118,19 +118,11 @@ class PostingsController < ApplicationController
 
       #convert the delivery date string in to a datetime object
       if params[:posting].has_key?(:delivery_date)
-        params[:posting][:delivery_date] = Time.zone.parse(params[:posting][:delivery_date])
+        posting[:delivery_date] = Time.zone.parse(params[:posting][:delivery_date])
       end
 
-      if params[:posting]["commitment_zone_start(1i)"] != nil
-
-        year = params[:posting]["commitment_zone_start(1i)"]
-        month = params[:posting]["commitment_zone_start(2i)"]
-        day = params[:posting]["commitment_zone_start(3i)"]
-        hour = params[:posting]["commitment_zone_start(4i)"]
-        minute = params[:posting]["commitment_zone_start(5i)"]      
-        czs = Time.zone.local(year.to_i, month.to_i, day.to_i, hour.to_i, minute.to_i)
-        posting[:commitment_zone_start] = czs
-
+      if params[:posting][:commitment_zone_start] != nil
+        posting[:commitment_zone_start] = Time.zone.parse(params[:posting][:commitment_zone_start])
       end
 
       posting
