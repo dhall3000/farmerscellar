@@ -12,19 +12,19 @@
 
 		<% if current_user.account_type == User.types[:ADMIN] %>
 		  <%= f.label :user_id, "Producer" %>
-		  <%= f.collection_select(:user_id, @producers, :id, :farm_name, prompt: true, selected: @posting.user_id) %>
+		  <%= f.collection_select(:user_id, @producers, :id, :farm_name, prompt: true, selected: @posting.user_id, class: 'form-control') %>
 		<% else %>
 		  <%= f.hidden_field :user_id %>
 		<% end %>
 
 		<%= f.label :product_id %>
-		<%= f.collection_select(:product_id, @products, :id, :name, prompt: true) %>
+		<%= f.collection_select(:product_id, @products, :id, :name, {prompt: true}, {class: 'form-control'}) %>
 
 		<%= f.label :description %>
 		<%= f.text_field :description, class: 'form-control' %>
 
 		<%= f.label :unit_kind_id, "Units" %>
-		<%= f.grouped_collection_select :unit_kind_id, UnitCategory.order(:name), :unit_kinds, :name, :id, :name, { include_blank: true, prompt: true } %>
+		<%= f.grouped_collection_select :unit_kind_id, UnitCategory.order(:name), :unit_kinds, :name, :id, :name, { include_blank: true, prompt: true }, class: 'form-control' %>
 
 		<%= f.label :quantity_available, "Approximate Number of Units for Sale" %>
 		<%= f.number_field :quantity_available, min: 1, step: 1, class: 'form-control' %>
@@ -33,7 +33,7 @@
 		<%= f.number_field :price, min: 0.01, step: 0.01, class: 'form-control' %>
 
 		<%= f.label :delivery_date, "Delivery Date" %>
-		<%= f.collection_select :delivery_date, @delivery_dates, :to_s, :to_s, prompt: true %>
+		<%= f.text_field :delivery_date, class: 'form-control' %>
 
 		<%= f.label :commitment_zone_start, "Commitment Zone Start" %>
 		<%= f.datetime_select :commitment_zone_start, ampm: true, default: 1.days.from_now.at_noon %>
