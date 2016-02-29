@@ -40,6 +40,23 @@ class ActiveSupport::TestCase
     patch user_path(user), user: { access_code: code }
   end
 
+  def get_error_messages(active_record_object)
+
+    messages = ""
+
+    if active_record_object.nil? || active_record_object.errors.count < 1      
+      messages = "There are no activerecord errors"
+      return messages
+    end
+
+    active_record_object.errors.full_messages.each do |message|
+      messages += message + ", "
+    end
+
+    return messages
+
+  end
+
   private
 
     # Returns true inside an integration test.

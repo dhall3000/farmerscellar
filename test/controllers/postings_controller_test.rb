@@ -11,21 +11,17 @@ class PostingsControllerTest < ActionController::TestCase
     #log in
     log_in_as(@user)
     #make a posting that doesn't have price set
-    post :create, id: @user.id, posting: { description: "descrip", quantity_available: 10, live: true, delivery_date: "3000-08-28",
-      "commitment_zone_start(1i)": 3000,
-      "commitment_zone_start(2i)": 8,
-      "commitment_zone_start(3i)": 27,
-      "commitment_zone_start(4i)": 12,
-      "commitment_zone_start(5i)": 0
-      }
+    posting_params = get_posting_params_hash
+    posting_params.delete(:price)
+    post :create, id: @user.id, posting: posting_params
 
     #verify redirection    
     assert_template 'postings/new'
     #verify sad message
     posting = assigns(:posting)    
-    assert_not posting.valid?
+    assert_not posting.valid?, get_error_messages(posting)    
     #this is for the flash
-    assert_select 'div.alert-danger', "The form contains 2 errors."    
+    assert_select 'div.alert-danger', "The form contains " + posting.errors.count.to_s + " errors."
 
     #this is for the specific errors that should be reported to the user
     assert_select 'div#error_explanation' do
@@ -38,7 +34,7 @@ class PostingsControllerTest < ActionController::TestCase
   end
 
   test "newly created posting is posted when created properly with live set" do
-    
+ 
     postings_count_prior = get_postings_count
     successfully_create_posting
     posting = assigns(:posting)
@@ -106,21 +102,45 @@ class PostingsControllerTest < ActionController::TestCase
 
   end
 
+  def get_posting_params_hash
+
+    delivery_date = Time.zone.today + 5.days
+    if delivery_date.sunday?
+      delivery_date += 1.day
+    end
+
+    posting = {
+      user_id: @user.id,
+      description: "descrip",
+      price: 1,
+      quantity_available: 10,
+      live: true,
+      delivery_date: delivery_date,
+      product_id: @posting.product_id,
+      unit_kind_id: @posting.unit_kind.id,
+      unit_category_id: @posting.unit_category.id,
+      commitment_zone_start: delivery_date - 2.days
+    }
+
+    return posting
+
+  end
+
   def successfully_create_posting
     #log in
     log_in_as(@user)
     #go to post creation page
     #specify values, submit form
-    post :create, id: @user.id, posting: { user_id: @user.id, description: "descrip", price: 1, quantity_available: 10, live: true, delivery_date: "3000-08-28", product_id: @posting.product_id, unit_kind_id: @posting.unit_kind.id, unit_category_id: @posting.unit_category.id,
-      "commitment_zone_start(1i)": 3000,
-      "commitment_zone_start(2i)": 8,
-      "commitment_zone_start(3i)": 27,
-      "commitment_zone_start(4i)": 12,
-      "commitment_zone_start(5i)": 0
-      }
+
+    delivery_date = Time.zone.today + 5.days
+    if delivery_date.sunday?
+      delivery_date += 1.day
+    end
+
+    post :create, id: @user.id, posting: get_posting_params_hash
     posting = assigns(:posting)
     assert_not posting.nil?
-    assert posting.valid?
+    assert posting.valid?, get_error_messages(posting)
     assert_redirected_to postings_path
     assert_not flash.empty?
 
@@ -133,17 +153,15 @@ class PostingsControllerTest < ActionController::TestCase
     log_in_as(@user)
     #go to post creation page
     #specify values, submit form
-    post :create, id: @user.id, posting: { user_id: @user.id, description: "descrip", price: 1, quantity_available: 10, live: false, delivery_date: "3000-08-28", product_id: @posting.product_id, unit_kind_id: @posting.unit_kind.id, unit_category_id: @posting.unit_category.id,
-      "commitment_zone_start(1i)": 3000,
-      "commitment_zone_start(2i)": 8,
-      "commitment_zone_start(3i)": 27,
-      "commitment_zone_start(4i)": 12,
-      "commitment_zone_start(5i)": 0
-      }
+
+    posting_hash = get_posting_params_hash
+    posting_hash[:live] = false
+
+    post :create, id: @user.id, posting: posting_hash
       
     posting = assigns(:posting)
     assert_not posting.nil?
-    assert posting.valid?
+    assert posting.valid?, get_error_messages(posting)
     assert_redirected_to postings_path
     assert_not flash.empty?
     return posting
