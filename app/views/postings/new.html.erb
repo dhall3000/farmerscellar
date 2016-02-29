@@ -33,15 +33,15 @@
 		<%= f.number_field :price, min: 0.01, step: 0.01, class: 'form-control' %>
 
 		<%= f.label :delivery_date, "Delivery Date (Date only)" %>
-	    <div class="input-group date" id="dtpDeliveryDate" style="position: relative">
+	    <div class="input-group date" id="dtpDeliveryDate">
 		  <%= f.text_field :delivery_date, class: 'form-control', readonly: true %>
 		  <span class="input-group-addon">
             <span class="glyphicon glyphicon-calendar"></span>
           </span>
 	    </div>
-
-		<%= f.label :commitment_zone_start, "Commitment Zone Start (Date & Time)" %>
-	    <div class="input-group date" id="dtpCommitmentZoneStart" style="position: relative">
+		
+		<%= f.label :commitment_zone_start, "Commitment Zone Start (Date & Time)", id: "czsLabel" %>
+	    <div class="input-group date" id="dtpCommitmentZoneStart">	      
 		  <%= f.text_field :commitment_zone_start, class: 'form-control', readonly: true %>
 		  <span class="input-group-addon">
             <span class="glyphicon glyphicon-calendar"></span>
