@@ -96,7 +96,18 @@ class PostingsController < ApplicationController
 
     def posting_params
 
-      posting = params.require(:posting).permit(:description, :quantity_available, :price, :user_id, :product_id, :unit_category_id, :unit_kind_id, :delivery_date, :live)
+      posting = params.require(:posting).permit(
+        :description,
+        :quantity_available,
+        :price,
+        :user_id,
+        :product_id,
+        :unit_category_id,
+        :unit_kind_id,
+        :live,
+        :delivery_date,
+        :commitment_zone_start
+        )
 
       unit_kind = UnitKind.all.find_by(id: posting[:unit_kind_id])
 
@@ -114,15 +125,6 @@ class PostingsController < ApplicationController
             posting[:live] = true
           end
         end
-      end
-
-      #convert the delivery date string in to a datetime object
-      if params[:posting].has_key?(:delivery_date)
-        posting[:delivery_date] = Time.zone.parse(params[:posting][:delivery_date])
-      end
-
-      if params[:posting][:commitment_zone_start] != nil
-        posting[:commitment_zone_start] = Time.zone.parse(params[:posting][:commitment_zone_start])
       end
 
       posting
