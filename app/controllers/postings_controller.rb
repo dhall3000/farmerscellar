@@ -7,7 +7,8 @@ class PostingsController < ApplicationController
 
     if params[:posting_id].nil?
       @posting = current_user.postings.new
-      
+      @posting.build_posting_recurrence
+            
       #if you are doing dev work on the create method and want the new form autopopulated for sanity's sake, uncomment this line
       #@posting = Posting.new(live: true, delivery_date: Time.zone.now + 4.days, product_id: 8, quantity_available: 100, price: 2.50, user_id: User.find_by(name: "f4"), unit_category_id: UnitCategory.find_by(name: "Weight"), unit_kind_id: UnitKind.find_by(name: "Pound"), description: "best celery ever!")
     else
@@ -34,6 +35,7 @@ class PostingsController < ApplicationController
   def create
 
   	@posting = Posting.new(posting_params)
+    @posting.build_posting_recurrence(posting_recurrence_params)
 
   	if @posting.save
       if @posting.live
@@ -94,6 +96,19 @@ class PostingsController < ApplicationController
       @producers = User.where(account_type: User.types[:PRODUCER])
     end
 
+    def posting_recurrence_params
+      pr_params = params.require(:posting).require(:posting_recurrence).permit(:interval)
+
+      if pr_params[:interval].to_i > 0
+        pr_params[:on] = true
+      else
+        pr_params[:on] = false
+      end
+
+      return pr_params
+      
+    end
+
     def posting_params
 
       posting = params.require(:posting).permit(
@@ -106,7 +121,7 @@ class PostingsController < ApplicationController
         :unit_kind_id,
         :live,
         :delivery_date,
-        :commitment_zone_start
+        :commitment_zone_start        
         )
 
       unit_kind = UnitKind.all.find_by(id: posting[:unit_kind_id])

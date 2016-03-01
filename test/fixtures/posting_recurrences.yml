@@ -1,0 +1,9 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  interval: 1
+  'on': false
+
+two:
+  interval: 1
+  'on': false

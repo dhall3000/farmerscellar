@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160211022759) do
+ActiveRecord::Schema.define(version: 20160301180642) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -232,6 +232,13 @@ ActiveRecord::Schema.define(version: 20160211022759) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "posting_recurrences", force: :cascade do |t|
+    t.integer  "interval"
+    t.boolean  "on"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "postings", force: :cascade do |t|
     t.text     "description"
     t.integer  "quantity_available"
@@ -245,8 +252,10 @@ ActiveRecord::Schema.define(version: 20160211022759) do
     t.boolean  "live"
     t.datetime "delivery_date"
     t.datetime "commitment_zone_start"
+    t.integer  "posting_recurrence_id"
   end
 
+  add_index "postings", ["posting_recurrence_id"], name: "index_postings_on_posting_recurrence_id"
   add_index "postings", ["product_id"], name: "index_postings_on_product_id"
   add_index "postings", ["unit_category_id"], name: "index_postings_on_unit_category_id"
   add_index "postings", ["unit_kind_id"], name: "index_postings_on_unit_kind_id"
