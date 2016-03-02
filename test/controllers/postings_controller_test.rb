@@ -21,13 +21,13 @@ class PostingsControllerTest < ActionController::TestCase
     posting = assigns(:posting)    
     assert_not posting.valid?, get_error_messages(posting)    
     #this is for the flash
-    assert_select 'div.alert-danger', "The form contains " + posting.errors.count.to_s + " errors."
+
+    assert_select 'div.alert-danger', "The form contains 1 error."
 
     #this is for the specific errors that should be reported to the user
     assert_select 'div#error_explanation' do
       assert_select 'ul' do
-        assert_select 'li', "Price can't be blank"
-        assert_select 'li', "Price is not a number"
+        assert_select 'li', "Price must be greater than 0"        
       end
     end
 
@@ -119,7 +119,8 @@ class PostingsControllerTest < ActionController::TestCase
       product_id: @posting.product_id,
       unit_kind_id: @posting.unit_kind.id,
       unit_category_id: @posting.unit_category.id,
-      commitment_zone_start: delivery_date - 2.days
+      commitment_zone_start: delivery_date - 2.days,
+      posting_recurrence: {interval: 0, on: false}
     }
 
     return posting
