@@ -6,7 +6,7 @@ class PostingsController < ApplicationController
   def new  	
 
     if params[:posting_id].nil?
-      @posting = current_user.postings.new
+      @posting = current_user.postings.new(live: true)
       @posting.build_posting_recurrence
             
       #if you are doing dev work on the create method and want the new form autopopulated for sanity's sake, uncomment this line
