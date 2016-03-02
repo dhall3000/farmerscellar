@@ -11,4 +11,15 @@ class PostingRecurrence < ActiveRecord::Base
   		["Monthly", 5]
   	]
   end
+
+  validates :interval, :on, presence: true
+  validates :interval, inclusion: [
+    PostingRecurrence.intervals[0][1],
+    PostingRecurrence.intervals[1][1],
+    PostingRecurrence.intervals[2][1],
+    PostingRecurrence.intervals[3][1],
+    PostingRecurrence.intervals[4][1],
+    PostingRecurrence.intervals[5][1]
+  ]
+
 end

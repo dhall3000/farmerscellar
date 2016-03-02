@@ -9,22 +9,22 @@ class UserTest < ActiveSupport::TestCase
     @user = User.new(name: "Example User", email: "user@example.com", password: "foobar", password_confirmation: "foobar", zip: 98033, account_type: 0)
   end
 
-  test "should be valid account type" do
+  test "should be invalid account type" do
     @user.account_type = nil
     assert_not @user.valid?
   end
 
-    test "should be valid account type one" do
+    test "should be invalid account type one" do
     @user.account_type = -1
     assert_not @user.valid?
   end
 
-  test "should be valid account type two" do
+  test "should be invalid account type two" do
     @user.account_type = -3
     assert_not @user.valid?
   end
 
-  test "should be valid account type three" do
+  test "should be valid account type" do
     @user.account_type = 1
     assert_not @user.valid?
   end

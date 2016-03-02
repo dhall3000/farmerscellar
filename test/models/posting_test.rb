@@ -11,19 +11,33 @@ class PostingTest < ActiveSupport::TestCase
     @posting.save
   end
 
+  test "posting is valid" do    
+    assert @posting.valid?, get_error_messages(@posting)
+  end
+
   test "description must be present" do
     @posting.description = nil
     assert_not @posting.valid?, get_error_messages(@posting)
   end
 
-  test "quantity_available must be present" do
+  test "quantity_available must be present and positive" do
     @posting.quantity_available = nil
     assert_not @posting.valid?, get_error_messages(@posting)
+    @posting.quantity_available = -1
+    assert_not @posting.valid?, get_error_messages(@posting)
+    @posting.quantity_available = 0
+    assert_not @posting.valid?, get_error_messages(@posting)
+    @posting.quantity_available = 1
+    assert @posting.valid?, get_error_messages(@posting)
   end
 
-  test "price must be present" do
+  test "price must be present and positive" do
     @posting.price = nil
     assert_not @posting.valid?, get_error_messages(@posting)    
+    @posting.price = -1
+    assert_not @posting.valid?, get_error_messages(@posting)    
+    @posting.price = 1.25
+    assert @posting.valid?, get_error_messages(@posting)    
   end
 
   test "delivery_date must be present" do
@@ -61,15 +75,6 @@ class PostingTest < ActiveSupport::TestCase
   test "commitment zone must be present" do
     @posting.commitment_zone_start = nil
     assert_not @posting.valid?, get_error_messages(@posting)
-  end
-
-  test "posting is valid" do    
-    assert @posting.valid?, get_error_messages(@posting)
-  end
-
-  test "quantity must be positive" do
-  	@posting.quantity_available = 0
-  	assert_not @posting.valid?, get_error_messages(@posting)
   end
 
   test "live must be present" do

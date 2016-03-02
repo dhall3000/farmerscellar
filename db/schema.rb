@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160302180111) do
+ActiveRecord::Schema.define(version: 20160302181503) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -240,7 +240,7 @@ ActiveRecord::Schema.define(version: 20160302180111) do
   end
 
   create_table "postings", force: :cascade do |t|
-    t.text     "description"
+    t.string   "description",                                           null: false
     t.integer  "quantity_available",    default: 0
     t.float    "price",                 default: 0.0
     t.integer  "user_id",                                               null: false
