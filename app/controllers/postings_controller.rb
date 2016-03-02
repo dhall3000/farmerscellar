@@ -35,7 +35,13 @@ class PostingsController < ApplicationController
   def create
 
   	@posting = Posting.new(posting_params)
-    @posting.build_posting_recurrence(posting_recurrence_params)
+
+    if posting_recurrence_params.nil?
+      #somehow recurrence params weren't set so just set them to 'no repeat'
+      @posting.build_posting_recurrence(interval: PostingRecurrence.intervals[0][1], on: false)
+    else
+      @posting.build_posting_recurrence(posting_recurrence_params)
+    end
 
   	if @posting.save
       if @posting.live
@@ -44,7 +50,7 @@ class PostingsController < ApplicationController
         flash[:info] = "Your posting was created but is not live as you specified during creation."
       end  	  
       redirect_to postings_path
-    else      
+    else
       load_posting_choices
       render 'new'
   	end
@@ -97,9 +103,18 @@ class PostingsController < ApplicationController
     end
 
     def posting_recurrence_params
-      pr_params = params.require(:posting).require(:posting_recurrence).permit(:interval)
 
-      if pr_params[:interval].to_i > 0
+      if !params.has_key?(:posting)
+        return nil
+      end
+
+      if !params[:posting].has_key?(:posting_recurrence)
+        return nil
+      end
+
+      pr_params = params.require(:posting).require(:posting_recurrence).permit(:interval, :on)
+
+      if pr_params[:interval].to_i > PostingRecurrence.intervals[0][1]
         pr_params[:on] = true
       else
         pr_params[:on] = false

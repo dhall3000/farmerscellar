@@ -119,8 +119,7 @@ class PostingsControllerTest < ActionController::TestCase
       product_id: @posting.product_id,
       unit_kind_id: @posting.unit_kind.id,
       unit_category_id: @posting.unit_category.id,
-      commitment_zone_start: delivery_date - 2.days,
-      posting_recurrence: {interval: 0, on: false}
+      commitment_zone_start: delivery_date - 2.days
     }
 
     return posting
