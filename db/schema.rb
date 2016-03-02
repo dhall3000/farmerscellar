@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160301180642) do
+ActiveRecord::Schema.define(version: 20160302011137) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -233,10 +233,10 @@ ActiveRecord::Schema.define(version: 20160301180642) do
   end
 
   create_table "posting_recurrences", force: :cascade do |t|
-    t.integer  "interval"
-    t.boolean  "on"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.integer  "interval",   default: 0,     null: false
+    t.boolean  "on",         default: false, null: false
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
   end
 
   create_table "postings", force: :cascade do |t|
