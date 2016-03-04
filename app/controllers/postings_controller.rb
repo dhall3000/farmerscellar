@@ -6,9 +6,7 @@ class PostingsController < ApplicationController
   def new  	
 
     if params[:posting_id].nil?
-      @posting = current_user.postings.new(live: true)
-      @posting.build_posting_recurrence
-            
+      @posting = current_user.postings.new(live: true)                  
       #if you are doing dev work on the create method and want the new form autopopulated for sanity's sake, uncomment this line
       #@posting = Posting.new(live: true, delivery_date: Time.zone.now + 4.days, product_id: 8, quantity_available: 100, price: 2.50, user_id: User.find_by(name: "f4"), unit_category_id: UnitCategory.find_by(name: "Weight"), unit_kind_id: UnitKind.find_by(name: "Pound"), description: "best celery ever!")
     else
@@ -16,6 +14,7 @@ class PostingsController < ApplicationController
       @posting = posting_to_clone.dup
     end
 
+    @posting.build_posting_recurrence
     load_posting_choices
 
   end
@@ -29,6 +28,8 @@ class PostingsController < ApplicationController
       #for admins, same thing but we want to see the unlive as well
       @postings = Posting.where("delivery_date >= ?", Time.zone.today).order(delivery_date: :desc, id: :desc)
     end
+
+    return @postings
 
   end
 

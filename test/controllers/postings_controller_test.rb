@@ -3,17 +3,116 @@ require 'test_helper'
 class PostingsControllerTest < ActionController::TestCase
 
   def setup
-  	@user = users(:f1)
+  	@farmer = users(:f1)
+    @customer = users(:c1)
+    @admin = users(:a1)
   	@posting = postings(:postingf1apples)
+  end
+
+  def get_new_successfully
+    get :new
+    assert_response :success
+    assert_template 'postings/new'    
+  end
+
+  test "should get new for farmer and admin" do
+    log_in_as(@farmer)
+    get_new_successfully
+
+    log_in_as(@admin)
+    get_new_successfully    
+  end
+
+  def fail_on_new
+    get :new
+    assert_response :redirect
+    assert_redirected_to login_url
+  end
+
+  test "should redirect on new for customer or non user" do
+    #first try doing 'new' w/o logging in
+    fail_on_new
+
+    #now try logging in as customer. still should fail.
+    log_in_as(@customer)
+    fail_on_new
+  end
+
+  test "should copy posting on new" do
+    log_in_as(@farmer)
+    get :new, posting_id: @posting.id
+    assert_response :success
+    assert_template 'postings/new'
+    assert_select '#posting_quantity_available' do
+      assert_select "[value=?]", @posting.quantity_available.to_s
+    end
+
+  end
+
+  test "should get index for users" do
+    log_in_as(@customer)
+    get :index
+    assert :success
+    assert_template 'postings/index'
+
+    #assert that there are at least several postings (this should be the case as long as there
+    #are "at least several" postings in the posting.yml file)
+    assert_select 'tbody' do |elements|
+      elements.each do |element|
+        assert_select 'tr', minimum: 3
+      end
+    end
+
+    log_in_as(@farmer)
+    get :index
+    assert :success
+    assert_template 'postings/index'
+
+    #assert that there are at least several postings (this should be the case as long as there
+    #are "at least several" postings in the posting.yml file)
+    assert_select 'tbody' do |elements|
+      elements.each do |element|
+        assert_select 'tr', minimum: 3        
+      end
+    end
+
+  end
+
+  test "should get index for admin" do
+    log_in_as(@admin)
+    get :index
+    assert :success
+    assert_template 'postings/index'
+
+    #assert that there are at least several postings (this should be the case as long as there
+    #are "at least several" postings in the posting.yml file)
+    assert_select 'tbody' do |elements|
+      elements.each do |element|
+        assert_select 'tr', minimum: 3        
+      end
+    end
+
+    #additionally, the admin postings index page should have a table with 'Edit' and 'Go!' columns
+    assert_select 'tbody' do
+      assert_select 'a[href=?]', edit_posting_path(@posting), {count: 1, text: "Edit"}
+      assert_select 'a[href=?]', tote_items_next_path( tote_item: {posting_id: @posting.id}), {count: 1, text: "Go!"}
+    end
+
+  end
+
+  test "should not get index for non users" do
+    get :index
+    assert :redirect
+    assert_redirected_to login_url
   end
 
   test "gracefully fail to create posting if price not set" do
     #log in
-    log_in_as(@user)
+    log_in_as(@farmer)
     #make a posting that doesn't have price set
     posting_params = get_posting_params_hash
     posting_params.delete(:price)
-    post :create, id: @user.id, posting: posting_params
+    post :create, id: @farmer.id, posting: posting_params
 
     #verify redirection    
     assert_template 'postings/new'
@@ -92,7 +191,7 @@ class PostingsControllerTest < ActionController::TestCase
 
   def get_postings_count
     
-    log_in_as(@user)
+    log_in_as(@farmer)
     get :index
     postings = assigns(:postings)        
     assert_not postings.nil?
@@ -110,7 +209,7 @@ class PostingsControllerTest < ActionController::TestCase
     end
 
     posting = {
-      user_id: @user.id,
+      user_id: @farmer.id,
       description: "descrip",
       price: 1,
       quantity_available: 10,
@@ -128,7 +227,7 @@ class PostingsControllerTest < ActionController::TestCase
 
   def successfully_create_posting
     #log in
-    log_in_as(@user)
+    log_in_as(@farmer)
     #go to post creation page
     #specify values, submit form
 
@@ -137,7 +236,7 @@ class PostingsControllerTest < ActionController::TestCase
       delivery_date += 1.day
     end
 
-    post :create, id: @user.id, posting: get_posting_params_hash
+    post :create, id: @farmer.id, posting: get_posting_params_hash
     posting = assigns(:posting)
     assert_not posting.nil?
     assert posting.valid?, get_error_messages(posting)
@@ -150,14 +249,14 @@ class PostingsControllerTest < ActionController::TestCase
 
   def successfully_create_posting_with_live_unset
     #log in
-    log_in_as(@user)
+    log_in_as(@farmer)
     #go to post creation page
     #specify values, submit form
 
     posting_hash = get_posting_params_hash
     posting_hash[:live] = false
 
-    post :create, id: @user.id, posting: posting_hash
+    post :create, id: @farmer.id, posting: posting_hash
       
     posting = assigns(:posting)
     assert_not posting.nil?
@@ -181,7 +280,7 @@ class PostingsControllerTest < ActionController::TestCase
 
   test "should redirect edit when not logged in" do
   	return
-    get :edit, id: @user
+    get :edit, id: @farmer
     assert_not flash.empty?
     assert_redirected_to login_url
   end
