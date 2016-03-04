@@ -324,23 +324,31 @@ class PostingsControllerTest < ActionController::TestCase
     return posting
   end
 
-  test "should get redirected if not logged in" do  	
+  test "should get redirected if not logged in" do  	    
     get :edit, id: @posting
     assert_not flash.empty?
     assert_redirected_to login_url    
   end
 
-  test "should get new" do
-  	return
-    get :new
-    assert_response :success
-  end
-
-  test "should redirect edit when not logged in" do
-  	return
-    get :edit, id: @farmer
+  test "should redirect edit when not logged in" do  	
+    get :edit, id: @posting
     assert_not flash.empty?
     assert_redirected_to login_url
+  end
+
+  test "should redirect edit when logged in as customer" do
+    log_in_as(@customer)
+    get :edit, id: @posting    
+    assert_redirected_to root_url    
+  end
+
+  test "should get edit when logged in as farmer" do
+    log_in_as(@farmer)
+    get :edit, id: @posting
+    posting = assigns(:posting)
+    assert posting.valid?
+    assert :success
+    assert_template 'postings/edit'
   end
 
 end
