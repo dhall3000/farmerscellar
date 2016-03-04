@@ -96,6 +96,15 @@ class PostingsControllerTest < ActionController::TestCase
     #make a posting that doesn't have price set
     posting_params = get_posting_params_hash
     posting_params.delete(:price)
+    fail_to_create(posting_params)
+
+    #now let's try it again but with a positive recurrence set. should fail gracefully.
+    posting_params[:posting_recurrence] = {interval: PostingRecurrence.intervals[1][1], on: true}
+    fail_to_create(posting_params)
+
+  end
+
+  def fail_to_create(posting_params)
     post :create, id: @farmer.id, posting: posting_params
 
     #verify redirection    
@@ -113,7 +122,6 @@ class PostingsControllerTest < ActionController::TestCase
         assert_select 'li', "Price must be greater than 0"        
       end
     end
-
   end
 
   test "newly created posting is posted when created properly with live set" do
@@ -209,6 +217,69 @@ class PostingsControllerTest < ActionController::TestCase
 
   end
 
+  test "successfully create posting with recurrence set to not repeat" do
+    successfully_create_posting_with_recurrence_set_to_not_repeat
+  end
+
+  def successfully_create_posting_with_recurrence_set_to_not_repeat
+    #log in
+    log_in_as(@farmer)
+    #go to post creation page
+    #specify values, submit form
+
+    delivery_date = Time.zone.today + 5.days
+    if delivery_date.sunday?
+      delivery_date += 1.day
+    end
+
+    parms = get_posting_params_hash
+    parms[:posting_recurrence] = {interval: PostingRecurrence.intervals[0][1], on: false}
+    post :create, id: @farmer.id, posting: parms
+    posting = assigns(:posting)        
+    assert_not posting.nil?
+    #the params were sent up to teh #create action with recurrence set to not repeat so we want to verify that .posting_recurrence is nil
+    #because we don't want to create a db object for postings that don't repeat
+    assert_not posting.posting_recurrence
+    assert posting.valid?, get_error_messages(posting)
+    assert_redirected_to postings_path
+    assert_not flash.empty?    
+
+    return posting    
+
+  end
+
+  test "successfully create posting with recurrence" do
+    successfully_create_posting_with_recurrence
+  end
+
+  def successfully_create_posting_with_recurrence
+    #log in
+    log_in_as(@farmer)
+    #go to post creation page
+    #specify values, submit form
+
+    delivery_date = Time.zone.today + 5.days
+    if delivery_date.sunday?
+      delivery_date += 1.day
+    end
+
+    posting_recurrence_count = PostingRecurrence.count
+
+    parms = get_posting_params_hash
+    parms[:posting_recurrence] = {interval: PostingRecurrence.intervals[1][1], on: true}
+    post :create, id: @farmer.id, posting: parms
+    posting = assigns(:posting)        
+    assert_not posting.nil?    
+    assert posting.posting_recurrence.valid?
+    assert posting.valid?, get_error_messages(posting)
+    #there should be more posting recurrences in the database now than thre was before this posting
+    assert PostingRecurrence.count > posting_recurrence_count
+    assert_redirected_to postings_path
+    assert_not flash.empty?    
+
+    return posting        
+  end
+
   def successfully_create_posting
     #log in
     log_in_as(@farmer)
@@ -221,8 +292,11 @@ class PostingsControllerTest < ActionController::TestCase
     end
 
     post :create, id: @farmer.id, posting: get_posting_params_hash
-    posting = assigns(:posting)
+    posting = assigns(:posting)        
     assert_not posting.nil?
+    #the params were sent up to teh #create action with no recurrence set so we want to verify that .posting_recurrence is nil
+    #because we don't want to create a db object for postings that don't repeat
+    assert_not posting.posting_recurrence
     assert posting.valid?, get_error_messages(posting)
     assert_redirected_to postings_path
     assert_not flash.empty?
