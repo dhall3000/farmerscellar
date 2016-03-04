@@ -71,7 +71,7 @@ class PostingsController < ApplicationController
   def update    
     @posting = Posting.find(params[:id])
 
-    if @posting.update_attributes(posting_params)      
+    if @posting.update_attributes(posting_params_update)      
       flash[:success] = "Posting updated!"
       redirect_to current_user
     else
@@ -162,6 +162,19 @@ class PostingsController < ApplicationController
       end
 
       posting
+
+    end
+
+    def posting_params_update
+      
+      posting = params.require(:posting).permit(
+        :description,
+        :quantity_available,
+        :price,
+        :live,
+        )      
+
+      return posting
 
     end
 

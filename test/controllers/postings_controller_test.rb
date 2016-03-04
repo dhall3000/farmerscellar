@@ -3,10 +3,11 @@ require 'test_helper'
 class PostingsControllerTest < ActionController::TestCase
 
   def setup
-  	@farmer = users(:f1)
+  	@farmer = users(:f1)    
     @customer = users(:c1)
     @admin = users(:a1)
   	@posting = postings(:postingf1apples)
+    @posting2 = postings(:postingf2milk)
   end
 
   def get_new_successfully
@@ -349,6 +350,131 @@ class PostingsControllerTest < ActionController::TestCase
     assert posting.valid?
     assert :success
     assert_template 'postings/edit'
+  end
+
+  test "should redirect on update" do
+
+    #first try updating as a not-logged-in user
+
+    #update the posting with the new values
+    post :update, id: @posting.id, posting: {
+      description: @posting.description + "new text",
+      quantity_available: @posting.quantity_available + 1,
+      price: @posting.price + 1.0,
+      live: !(@posting.live)
+    }
+
+    assert_redirected_to login_url
+
+    #now try updating as a logged in customer
+    log_in_as(@customer)
+
+    #update the posting with the new values
+    post :update, id: @posting.id, posting: {
+      description: @posting.description + "new text",
+      quantity_available: @posting.quantity_available + 1,
+      price: @posting.price + 1.0,
+      live: !(@posting.live)
+    }
+
+    assert_redirected_to root_url
+
+  end
+
+  test "should update attributes as farmer" do
+    #allow: description, quantity available, price, live
+
+    #we're going to take an existing posting, modify its values and update it
+    #then we'll pull the new values up off the db and compare them to the old
+    #values to verify change occurred
+
+    log_in_as(@farmer)
+
+    #copy the existing posting values so we can compare in the future to verify changes took effect
+    posting_old = @posting.dup
+
+    #update the posting with the new values
+    post :update, id: @posting.id, posting: {
+      description: @posting.description + "new text",
+      quantity_available: @posting.quantity_available + 1,
+      price: @posting.price + 1.0,
+      live: !(@posting.live)
+    }
+
+    #first make sure we were sent to the right place
+    assert_redirected_to user_path(@farmer)    
+    assert :success
+    assert_not flash.empty?
+    assert_equal flash[:success], "Posting updated!"    
+
+    #now pull the new values up off the db for comparison
+    @posting.reload
+    
+    #verify all the values have been changed
+    assert @posting.description != posting_old.description
+    assert @posting.quantity_available != posting_old.quantity_available
+    assert @posting.price != posting_old.price
+    assert @posting.live != posting_old.live
+
+  end
+
+  test "should not update attributes as farmer" do
+    #disallow: user_id, product_id, unit_category_id, unit_kind_id, delivery_date, commitment_zone_start, posting_recurrence values
+
+    log_in_as(@farmer)
+
+    #copy the existing posting values so we can compare in the future to verify changes took effect
+    posting_old = @posting.dup
+
+    #update the posting with the new values
+    post :update, id: @posting.id, posting: {
+      user_id: @posting2.user_id,
+      product_id: @posting2.product_id,
+      unit_category_id: @posting2.unit_category_id,
+      unit_kind_id: @posting2.unit_kind_id,
+      delivery_date: @posting2.delivery_date + 2.days,
+      commitment_zone_start: @posting2.commitment_zone_start + 2.days      
+    }
+
+    #first make sure we were sent to the right place
+    assert_redirected_to user_path(@farmer)
+    assert :success
+    assert_not flash.empty?
+
+    #now pull the new values up off the db for comparison
+    @posting.reload
+
+    #these should not be changed
+    assert @posting.user_id == posting_old.user_id
+    assert @posting.product_id == posting_old.product_id
+    assert @posting.unit_category_id == posting_old.unit_category_id
+    assert @posting.unit_kind_id == posting_old.unit_kind_id
+    assert @posting.delivery_date == posting_old.delivery_date
+    assert @posting.commitment_zone_start == posting_old.commitment_zone_start    
+
+  end
+
+  test "should redirect update because invalid values" do
+    #disallow: user_id, product_id, unit_category_id, unit_kind_id, delivery_date, commitment_zone_start, posting_recurrence values
+
+    log_in_as(@farmer)
+
+    #copy the existing posting values so we can compare in the future to verify changes took effect
+    posting_old = @posting.dup
+
+    #set price to a negative value to trigger a fail
+    post :update, id: @posting.id, posting: {
+      description: @posting.description + "new text",
+      quantity_available: @posting.quantity_available + 1,
+      price: -1.0,
+      live: !(@posting.live)
+    }
+
+    #now we should get sent back to the edit page with errors for user to see what went wrong
+    assert :success
+    assert_template 'postings/edit'
+    assert_select 'div.alert.alert-danger', "The form contains 1 error."
+
   end
 
 end
