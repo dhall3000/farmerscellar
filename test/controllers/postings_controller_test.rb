@@ -23,19 +23,17 @@ class PostingsControllerTest < ActionController::TestCase
     get_new_successfully    
   end
 
-  def fail_on_new
+  test "should redirect on new for customer or non user" do
+    #first try doing 'new' w/o logging in
     get :new
     assert_response :redirect
     assert_redirected_to login_url
-  end
-
-  test "should redirect on new for customer or non user" do
-    #first try doing 'new' w/o logging in
-    fail_on_new
 
     #now try logging in as customer. still should fail.
     log_in_as(@customer)
-    fail_on_new
+    get :new
+    assert_response :redirect
+    assert_redirected_to root_url
   end
 
   test "should copy posting on new" do
