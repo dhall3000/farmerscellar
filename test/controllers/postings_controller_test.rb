@@ -43,14 +43,16 @@ class PostingsControllerTest < ActionController::TestCase
     get :new, posting_id: @posting.id
     assert_response :success
     assert_template 'postings/new'
+
+    #there should be a new posting form that's prepopulated with the old posting's values
+    #do a spot check of one of the input fields to see if this is true
     assert_select '#posting_quantity_available' do
       assert_select "[value=?]", @posting.quantity_available.to_s
     end
 
   end
 
-  test "should get index for users" do
-    log_in_as(@customer)
+  def successfully_get_index
     get :index
     assert :success
     assert_template 'postings/index'
@@ -62,35 +64,19 @@ class PostingsControllerTest < ActionController::TestCase
         assert_select 'tr', minimum: 3
       end
     end
+  end
+
+  test "should get index for users" do
+    log_in_as(@customer)
+    successfully_get_index
 
     log_in_as(@farmer)
-    get :index
-    assert :success
-    assert_template 'postings/index'
-
-    #assert that there are at least several postings (this should be the case as long as there
-    #are "at least several" postings in the posting.yml file)
-    assert_select 'tbody' do |elements|
-      elements.each do |element|
-        assert_select 'tr', minimum: 3        
-      end
-    end
-
+    successfully_get_index
   end
 
   test "should get index for admin" do
     log_in_as(@admin)
-    get :index
-    assert :success
-    assert_template 'postings/index'
-
-    #assert that there are at least several postings (this should be the case as long as there
-    #are "at least several" postings in the posting.yml file)
-    assert_select 'tbody' do |elements|
-      elements.each do |element|
-        assert_select 'tr', minimum: 3        
-      end
-    end
+    successfully_get_index
 
     #additionally, the admin postings index page should have a table with 'Edit' and 'Go!' columns
     assert_select 'tbody' do
