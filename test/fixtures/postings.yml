@@ -1,11 +1,11 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 <% i = 1 %>
-<% while !(Time.zone.today + i).friday? %>
+<% while !(Time.zone.today.midnight + i.days).friday? %>
   <% i += 1 %>
 <% end %>
-<% delivery_date = Time.zone.today + i %>
-<% delivery_date_next = delivery_date + 7 %>
+<% delivery_date = Time.zone.today.midnight + i.days %>
+<% delivery_date_next = delivery_date + 7.days %>
 
 #Apples
 #Posting.create(delivery_date: next_friday, product_id: 1, quantity_available: 1000, price: 2.75, user_id: 1, unit_category_id: 2, unit_kind_id: 8, description: "these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
