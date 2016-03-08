@@ -15,7 +15,7 @@ class RakeTasksTest < ActionDispatch::IntegrationTest
     #save the state counts of all toteitems
     tote_items_set
     #run the task    
-    RakeHelper.commit_totes
+    RakeHelper.do_hourly_production_tasks
     #verify no state changed
     tote_items_compare_equal
     #verify no emails sent
@@ -44,7 +44,7 @@ class RakeTasksTest < ActionDispatch::IntegrationTest
       tote_items_set
 
       #run the task
-      RakeHelper.commit_totes
+      RakeHelper.do_hourly_production_tasks
 
       if Time.zone.now < @posting_apples.commitment_zone_start
         #before transition

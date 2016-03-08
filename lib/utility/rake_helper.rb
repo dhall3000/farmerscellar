@@ -1,6 +1,7 @@
 class RakeHelper
 
-	def self.commit_totes
+	#put tasks here that need to be run at the top of every hour
+	def self.do_hourly_production_tasks
 
 	  puts "rake task commit_totes start..."
 
@@ -60,6 +61,7 @@ class RakeHelper
 	  end  
 
 	  puts "rake task commit_totes done."
+
 	end
 
 	def get_commit_totes_email_body(transitioned_tote_ids)
