@@ -1,20 +1,5 @@
 class RakeHelper
 
-#Before Transition
-#emails zero
-#ti state remains the same
-
-#At Transition
-#emails changed
-#ti state different
-
-#After Transition
-#emails remain the same
-#ti state remains the same
-#-after transition should be zero authorized ti's
-#-should be emails to both producers
-
-
 	def self.commit_totes
 
 	  puts "rake task commit_totes start..."
