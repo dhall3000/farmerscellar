@@ -1,7 +1,7 @@
 class RakeHelper
 
 	#put tasks here that need to be run at the top of every hour
-	def self.do_hourly_production_tasks
+	def self.do_hourly_tasks
 
 	  puts "beginning hourly scheduled tasks..."
 
@@ -85,7 +85,7 @@ class RakeHelper
 		  
 		end
 
-		def get_commit_totes_email_body(tote_item_ids)
+		def self.get_commit_totes_email_body(tote_item_ids)
 
 		  body = ""
 
