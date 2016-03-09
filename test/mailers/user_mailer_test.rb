@@ -52,6 +52,12 @@ class UserMailerTest < ActionMailer::TestCase
     assert_equal "Delivery notification", mail.subject
     assert_equal [user.email], mail.to
     assert_equal ["david@farmerscellar.com"], mail.from
+
+    assert_match basil.unit_kind.name, mail.body.encoded
+    assert_match basil.user.farm_name, mail.body.encoded
+
+    assert_match avocado.unit_kind.name, mail.body.encoded
+    assert_match avocado.user.farm_name, mail.body.encoded
     
   end
 

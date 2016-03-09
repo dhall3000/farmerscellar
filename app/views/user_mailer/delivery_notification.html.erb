@@ -18,6 +18,7 @@ Here is the status of products you recently ordered that were set for delivery t
       <th align="left">ID</th>
       <th align="left">Producer</th>
       <th align="left">Product</th>
+      <th align="left">Unit</th>
       <th align="center">Quantity</th>
       <th align="center">Status</th>
     </tr>
@@ -31,6 +32,7 @@ Here is the status of products you recently ordered that were set for delivery t
         <td align="left"><%= tote_item.id %></td>
         <td align="left"><%= tote_item.posting.user.farm_name %></td>
         <td align="left"><%= tote_item.posting.product.name %></td>
+        <td align="left"><%= tote_item.posting.unit_kind.name %></td>
         <td align="center"><%= tote_item.quantity %></td>
         <td align="center">
           <% if tote_item.status == ToteItem.states[:PURCHASED] || tote_item.status == ToteItem.states[:PURCHASEFAILED] %>
