@@ -2,3 +2,4 @@
 
 website_setting_1:
   new_customer_access_code_required: t
+  recurring_postings_enabled: t

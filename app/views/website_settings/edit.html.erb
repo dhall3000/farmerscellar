@@ -8,6 +8,11 @@
         <span>New customer access code required</span>      
       <% end %>
 
+      <%= f.label :recurring_postings_enabled, class: "inline" do %>
+        <%= f.check_box :recurring_postings_enabled %>
+        <span>Recurring Postings Enabled</span>      
+      <% end %>
+
       <%= f.submit "Update Website Settings", class: "btn btn-primary" %>
 
     <% end %>

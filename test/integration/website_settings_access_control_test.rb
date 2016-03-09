@@ -82,4 +82,40 @@ class WebsiteSettingsAccessControlTest < ActionDispatch::IntegrationTest
   	verify_farmer_access_changes_with_code
   end
 
+  test "posting recurrence option not visible when setting is off" do
+    #log in as admin
+    log_in_as(@admin)
+    #turn on posting recurrence    
+    patch website_setting_path(@website_setting), website_setting: {recurring_postings_enabled: true}
+    assert_response :success
+    @website_setting.reload
+    assert @website_setting.recurring_postings_enabled
+    #log in as farmer
+    log_in_as(@farmer)
+    #get new posting
+    get new_posting_path
+    assert_response :success
+    assert_template 'postings/new'
+    #verify posting recurrence options visible
+    assert_select '#posting_recurrence_label'
+    assert_select '#posting_posting_recurrence_interval'
+    
+    #log in as admin
+    log_in_as(@admin)
+    #turn off posting recurrence feature
+    patch website_setting_path(@website_setting), website_setting: {recurring_postings_enabled: false}
+    assert_response :success
+    @website_setting.reload
+    assert_not @website_setting.recurring_postings_enabled
+    #log in as farmer
+    log_in_as(@farmer)
+    #get new posting
+    get new_posting_path
+    assert_response :success
+    assert_template 'postings/new'
+    #verify posting recurrence options not visible
+    assert_select '#posting_recurrence_label', count: 0
+    assert_select '#posting_posting_recurrence_interval', count: 0
+  end
+
 end

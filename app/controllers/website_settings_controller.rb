@@ -6,11 +6,11 @@ class WebsiteSettingsController < ApplicationController
   end
 
   def update
-  	@website_setting = WebsiteSetting.find(params[:id])
-  	@website_setting.update(website_setting_params)
 
-  	if @website_setting.save
-  	  flash[:success] = "website settings updated successfully"
+  	@website_setting = WebsiteSetting.find(params[:id])
+  	
+  	if @website_setting.update_attributes(website_setting_params)
+  	  flash.now[:success] = "website settings updated successfully"
   	  render 'website_settings/edit'
   	else
   	  flash[:danger] = "website settings failed to update"
@@ -22,6 +22,6 @@ class WebsiteSettingsController < ApplicationController
   private
 
     def website_setting_params
-      params.require(:website_setting).permit(:new_customer_access_code_required)
+      params.require(:website_setting).permit(:new_customer_access_code_required, :recurring_postings_enabled)
     end
 end

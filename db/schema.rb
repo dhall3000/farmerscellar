@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160307194030) do
+ActiveRecord::Schema.define(version: 20160308224728) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -460,8 +460,9 @@ ActiveRecord::Schema.define(version: 20160307194030) do
 
   create_table "website_settings", force: :cascade do |t|
     t.boolean  "new_customer_access_code_required"
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
+    t.datetime "created_at",                                        null: false
+    t.datetime "updated_at",                                        null: false
+    t.boolean  "recurring_postings_enabled",        default: false, null: false
   end
 
 end
