@@ -1,3 +1,5 @@
+require 'utility/rake_helper'
+
 desc "This task is called by the Heroku scheduler add-on"
 
 task :hourly_tasks => :environment do
