@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160312222509) do
+ActiveRecord::Schema.define(version: 20160312223103) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -133,10 +133,10 @@ ActiveRecord::Schema.define(version: 20160312222509) do
   create_table "bulk_purchases", force: :cascade do |t|
     t.datetime "created_at",                             null: false
     t.datetime "updated_at",                             null: false
-    t.float    "total_gross"
+    t.float    "gross"
     t.float    "payment_processor_fee_withheld_from_us"
-    t.float    "total_commission"
-    t.float    "total_net"
+    t.float    "commission"
+    t.float    "net"
   end
 
   create_table "checkout_authorizations", id: false, force: :cascade do |t|
