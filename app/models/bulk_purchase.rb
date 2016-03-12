@@ -79,14 +79,13 @@ class BulkPurchase < ActiveRecord::Base
         purchase.update(payment_processor_fee_withheld_from_producer: payment_processor_fee_withheld_from_producer)
         purchase.save
 
-        net_after_payment_processor_fee = (gross_amount_payable_to_this_producer - payment_processor_fee_withheld_from_producer).round(2)        
-        commission = (net_after_payment_processor_fee * value[:sub_tote_commission_factor]).round(2)        
-        net_after_commission = (net_after_payment_processor_fee - commission).round(2)
+        commission = (gross_amount_payable_to_this_producer * value[:sub_tote_commission_factor]).round(2)        
+        net = gross_amount_payable_to_this_producer - payment_processor_fee_withheld_from_producer - commission
         
         self.commission = (self.commission + commission).round(2)
-        self.net = (self.net + net_after_commission).round(2)
+        self.net = (self.net + net).round(2)
 
-        payment_payable = PaymentPayable.new(amount: net_after_commission.round(2), amount_paid: 0)
+        payment_payable = PaymentPayable.new(amount: net.round(2), amount_paid: 0)
         producer = User.find(producer_id)
         payment_payable.users << producer
 
