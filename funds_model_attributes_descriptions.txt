@@ -2,7 +2,7 @@ BulkPurchase
 	total_gross
 		Total amount pulled off customers' cards by all Purchase objects associated with this BP object. In other words, this is the sum of all Purchase.gross_amount's associated with this BP.
  	total_fee
-		Sum of all Purchase.fee_amount's associated with this BP object.
+		Sum of all Purchase.payment_processor_fee_withheld_from_us's associated with this BP object.
  	total_commission
 		Sum of commissions computed for all associated Purchase objects. Commissions are computed on net after producer's payment processing fee is removed.
  	total_net
@@ -17,11 +17,14 @@ PurchaseReceivable
 Purchase
 	gross_amount
 		The amount pulled off customer's card. It comes straight from Paypal's response object, their “gross_amount” param
- 	fee_amount
+ 	payment_processor_fee_withheld_from_us
 		The amount Paypal withheld from us on the above gross_amount
+	payment_processor_fee_withheld_from_producer
+		The amount we withheld from producer to cover our payment_processor_fee_withheld_from_us cost
+	commission
+		The amount FC withholds as commission on sales
  	net_amount
-		gross_amount - fee_amount
-
+		gross_amount - payment_processor_fee_withheld_from_us
 
 ------------------------------------------------------------------------------------------
 

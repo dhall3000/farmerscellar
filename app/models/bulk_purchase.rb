@@ -27,6 +27,8 @@ class BulkPurchase < ActiveRecord::Base
           #TODO: here we should probably check for purchase.response.success? and do something smart including notifying user there
           #was a payments problem
           self.total_gross = (self.total_gross + purchase.gross_amount).round(2)          
+          self.total_fee = (self.total_fee + purchase.payment_processor_fee_withheld_from_us).round(2)
+
           sub_tote_value_by_payment_sequenced_producer_id = get_sub_tote_value_by_payment_sequenced_producer_id(purchase_receivable)
           create_payment_payables(purchase_receivable, purchase, sub_tote_value_by_payment_sequenced_producer_id)
         else
@@ -65,19 +67,21 @@ class BulkPurchase < ActiveRecord::Base
         proportionally_share_payment_processor_fee_with_producer = false
 
         if proportionally_share_payment_processor_fee_with_producer
-          payment_processor_effective_fee_factor = purchase.fee_amount / purchase.gross_amount
-          payment_processor_fee = (gross_amount_payable_to_this_producer * payment_processor_effective_fee_factor).round(2)
+          payment_processor_effective_fee_factor = purchase.payment_processor_fee_withheld_from_us / purchase.gross_amount
+          payment_processor_fee_withheld_from_producer = (gross_amount_payable_to_this_producer * payment_processor_effective_fee_factor).round(2)
         else
           #we're not going to proportionally share the processor fee. we're going to pass a flat amount on to them, sometimes
           #coming out ahead, sometimes behind. hopefully it all washes out on the average.
-          payment_processor_fee = (gross_amount_payable_to_this_producer * 0.035).round(2)
+          payment_processor_fee_withheld_from_producer = (gross_amount_payable_to_this_producer * 0.035).round(2)
         end
 
-        net_after_payment_processor_fee = (gross_amount_payable_to_this_producer - payment_processor_fee).round(2)        
+        purchase.update(payment_processor_fee_withheld_from_producer: payment_processor_fee_withheld_from_producer)
+        purchase.save
+
+        net_after_payment_processor_fee = (gross_amount_payable_to_this_producer - payment_processor_fee_withheld_from_producer).round(2)        
         commission = (net_after_payment_processor_fee * value[:sub_tote_commission_factor]).round(2)        
         net_after_commission = (net_after_payment_processor_fee - commission).round(2)
-
-        self.total_fee = (self.total_fee + payment_processor_fee).round(2)
+        
         self.total_commission = (self.total_commission + commission).round(2)
         self.total_net = (self.total_net + net_after_commission).round(2)
 
