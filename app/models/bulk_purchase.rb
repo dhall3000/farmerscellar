@@ -31,6 +31,7 @@ class BulkPurchase < ActiveRecord::Base
 
           sub_tote_value_by_payment_sequenced_producer_id = get_sub_tote_value_by_payment_sequenced_producer_id(purchase_receivable)
           create_payment_payables(purchase_receivable, purchase, sub_tote_value_by_payment_sequenced_producer_id)
+          self.payment_processor_fee_withheld_from_producer = (self.payment_processor_fee_withheld_from_producer + purchase.payment_processor_fee_withheld_from_producer).round(2)
         else
           #not really sure what to do in this case, which is when the purchase fails
         end        
@@ -72,7 +73,7 @@ class BulkPurchase < ActiveRecord::Base
         else
           #we're not going to proportionally share the processor fee. we're going to pass a flat amount on to them, sometimes
           #coming out ahead, sometimes behind. hopefully it all washes out on the average.
-          payment_processor_fee_withheld_from_producer = (gross_amount_payable_to_this_producer * 0.035).round(2)
+          payment_processor_fee_withheld_from_producer = (gross_amount_payable_to_this_producer * 0.035).round(2)          
         end
 
         purchase.update(payment_processor_fee_withheld_from_producer: payment_processor_fee_withheld_from_producer)
