@@ -27,7 +27,7 @@ class BulkPurchase < ActiveRecord::Base
           #TODO: here we should probably check for purchase.response.success? and do something smart including notifying user there
           #was a payments problem
           self.total_gross = (self.total_gross + purchase.gross_amount).round(2)          
-          self.total_fee = (self.total_fee + purchase.payment_processor_fee_withheld_from_us).round(2)
+          self.payment_processor_fee_withheld_from_us = (self.payment_processor_fee_withheld_from_us + purchase.payment_processor_fee_withheld_from_us).round(2)
 
           sub_tote_value_by_payment_sequenced_producer_id = get_sub_tote_value_by_payment_sequenced_producer_id(purchase_receivable)
           create_payment_payables(purchase_receivable, purchase, sub_tote_value_by_payment_sequenced_producer_id)

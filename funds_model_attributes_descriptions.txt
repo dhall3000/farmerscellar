@@ -1,7 +1,7 @@
 BulkPurchase
 	total_gross
 		Total amount pulled off customers' cards by all Purchase objects associated with this BP object. In other words, this is the sum of all Purchase.gross_amount's associated with this BP.
- 	total_fee
+ 	payment_processor_fee_withheld_from_us
 		Sum of all Purchase.payment_processor_fee_withheld_from_us's associated with this BP object.
  	total_commission
 		Sum of commissions computed for all associated Purchase objects. Commissions are computed on net after producer's payment processing fee is removed.
