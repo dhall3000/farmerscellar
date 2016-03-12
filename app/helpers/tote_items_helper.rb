@@ -30,8 +30,8 @@ module ToteItemsHelper
 
     #now, we don't want the user to see old posts. we only want them to see 'current' posts. current posts are those yet to be delivered.
     #however there is one exception to this rule and that is when an item has progressed to the FILLED state but then does not make
-    #it to the PURCHASED state, for whatever reason. in this case, the customer owes money but has not yet paid so we want it to
-    #remain in their tote forever until it's paid
+    #it to the PURCHASED state, for whatever reason. in this case, the customer owes money but has not yet purchased so we want it to
+    #remain in their tote forever until it's purchased
     if displayable != nil && displayable.count > 0      
       current = displayable.where("postings.delivery_date >= ? or status = ? or status = ?", Time.zone.today, ToteItem.states[:FILLED], ToteItem.states[:PURCHASEPENDING])
     end

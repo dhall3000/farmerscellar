@@ -208,18 +208,18 @@ class BulkPurchasesTest < BulkBuyer
 
     prs = bulk_purchase.purchase_receivables
 
-    total_amount_paid = 0
+    total_amount_purchased = 0
     for pr in prs
       #NOTE!! it looks like i've done a good job to date of avoiding putting .round(2) in the test code anywhere. but
-      #i came across a failure where it really seems like it's the summing of the total_amount_paid var that is
+      #i came across a failure where it really seems like it's the summing of the total_amount_purchased var that is
       #causing the funky values. I was able to duplicte this in a terminal like this:
       #irb(main):007:0> amount = 150.91 + 91.0+100.5+82.0
       #=> 424.40999999999997
-      total_amount_paid = (total_amount_paid + pr.amount_purchased).round(2)
+      total_amount_purchased = (total_amount_purchased + pr.amount_purchased).round(2)
     end
     
-    #verify sum of pr amountpaids == bulkpurchase.totalgross
-    assert_equal total_amount_paid, bulk_purchase.total_gross
+    #verify sum of pr amountpurchaseds == bulkpurchase.totalgross
+    assert_equal total_amount_purchased, bulk_purchase.total_gross
     all_purchases_succeeded = all_purchase_receivables_succeeded(prs)
 
     #verify the associated bulkbuy's amount is proper relative to the bulkpurchase's totalgross
@@ -231,7 +231,7 @@ class BulkPurchasesTest < BulkBuyer
     end
 
       #NOTE!! it looks like i've done a good job to date of avoiding putting .round(2) in the test code anywhere. but
-      #i came across a failure where it really seems like it's the summing of the total_amount_paid var that is
+      #i came across a failure where it really seems like it's the summing of the total_amount_purchased var that is
       #causing the funky values. I was able to duplicte this in a terminal like this:
       #irb(main):008:0> amount = 14.87+32.66+376.89
       #=> 424.41999999999996
@@ -251,9 +251,9 @@ class BulkPurchasesTest < BulkBuyer
     for pr in prs
       #there should now be at least one purchase in the purchases collection
       assert pr.purchases.count > 0
-      #amount_paid should never be negative
+      #amount_purchased should never be negative
       assert pr.amount_purchased >= 0
-      #amount_paid should never be greater than amount
+      #amount_purchased should never be greater than amount
       assert pr.amount_purchased <= pr.amount
       
       for ti in pr.tote_items
@@ -298,7 +298,7 @@ class BulkPurchasesTest < BulkBuyer
     total_purchased = 0
     total_failed_purchases = 0
     total_amount = 0
-    total_amount_paid = 0
+    total_amount_purchased = 0
     all_purchases_succeeded = all_purchase_receivables_succeeded(prs)
 
     for pr in prs
@@ -311,19 +311,19 @@ class BulkPurchasesTest < BulkBuyer
         end
       end
       total_amount = (total_amount + pr.amount).round(2)
-      total_amount_paid = (total_amount_paid + pr.amount_purchased).round(2)
+      total_amount_purchased = (total_amount_purchased + pr.amount_purchased).round(2)
     end
 
-    total_failed_purchases2 = (total_amount - total_amount_paid).round(2)
+    total_failed_purchases2 = (total_amount - total_amount_purchased).round(2)
     assert_equal total_failed_purchases, total_failed_purchases2
 
     if all_purchases_succeeded
-      assert_equal total_amount_paid, total_amount
+      assert_equal total_amount_purchased, total_amount
     else
-      assert total_amount_paid < total_amount
+      assert total_amount_purchased < total_amount
     end
     
-    assert_equal total_purchased, total_amount_paid
+    assert_equal total_purchased, total_amount_purchased
 
     verify_legitimacy_of_purchases
   end

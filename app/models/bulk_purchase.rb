@@ -5,8 +5,8 @@ class BulkPurchase < ActiveRecord::Base
   has_many :bulk_purchase_receivables
   has_many :purchase_receivables, through: :bulk_purchase_receivables
 
-  def load_unpaid_receivables  	
-  	prs = PurchaseReceivable.load_unpaid_purchase_receivables    
+  def load_unpurchased_receivables  	
+  	prs = PurchaseReceivable.load_unpurchased_purchase_receivables    
   	if prs &&  prs.any?
   	  for pr in prs
   	  	purchase_receivables << pr

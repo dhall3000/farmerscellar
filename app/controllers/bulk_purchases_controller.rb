@@ -3,7 +3,7 @@ class BulkPurchasesController < ApplicationController
   
   def new
   	@bulk_purchase = BulkPurchase.new(total_gross: 0, total_fee: 0, total_commission: 0, total_net: 0)
-  	@bulk_purchase.load_unpaid_receivables
+  	@bulk_purchase.load_unpurchased_receivables
   end
 
   def create

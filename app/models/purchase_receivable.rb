@@ -18,7 +18,7 @@ class PurchaseReceivable < ActiveRecord::Base
     {NORMAL: 0, PURCHASEFAILED: 1, DONTCOLLECT: 2}
   end
 
-  def self.load_unpaid_purchase_receivables
+  def self.load_unpurchased_purchase_receivables
     #TODO(Future): this will probably be really inefficient as the db grows. maybe want a boolean for when each record's amount is fully purchased
     prs = where("amount_purchased < amount and (kind is null or kind = ?)", PurchaseReceivable.kind[:NORMAL])
 
