@@ -262,3 +262,10 @@ c4celery:
   status: <%= ToteItem.states[:ADDED] %>
   user: c4
   posting: postingf4celery
+
+eggs1:
+  quantity: 1
+  price: 6.25
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c_one_tote_item
+  posting: baron_farms_eggs

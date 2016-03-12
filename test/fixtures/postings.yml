@@ -170,3 +170,15 @@ postingf4basil:
   unit_kind: bunch
   description: best basil ever!
   live: true
+
+baron_farms_eggs:
+  delivery_date: <%= delivery_date %>
+  commitment_zone_start: <%= delivery_date - 2.days %>  
+  product: eggs
+  quantity_available: 100
+  price: 6.25
+  user: baron_farms
+  unit_category: count
+  unit_kind: whole
+  description: pastured eggs
+  live: true

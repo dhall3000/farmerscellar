@@ -36,8 +36,8 @@ class FakeCaptureResponse
 
   def initialize(amount_in_cents, authorization_transaction_id)
 
-    percentage = 0.035
-    fee_amount = (amount_in_cents * percentage / 100).round(2)
+    percentage = 0.029
+    fee_amount = (((amount_in_cents * percentage) / 100) + 0.3).round(2)
 
     if @@toggle_success      
       @@succeed = !@@succeed

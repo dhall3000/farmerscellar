@@ -62,8 +62,17 @@ class BulkPurchase < ActiveRecord::Base
         amount_previously_purchased = (amount_previously_purchased + gross_amount_payable_to_this_producer).round(2)
         gross_amount_payable = (gross_amount_payable - gross_amount_payable_to_this_producer).round(2)
 
-        payment_processor_effective_fee_factor = purchase.fee_amount / purchase.gross_amount
-        payment_processor_fee = (gross_amount_payable_to_this_producer * payment_processor_effective_fee_factor).round(2)
+        proportionally_share_payment_processor_fee_with_producer = false
+
+        if proportionally_share_payment_processor_fee_with_producer
+          payment_processor_effective_fee_factor = purchase.fee_amount / purchase.gross_amount
+          payment_processor_fee = (gross_amount_payable_to_this_producer * payment_processor_effective_fee_factor).round(2)
+        else
+          #we're not going to proportionally share the processor fee. we're going to pass a flat amount on to them, sometimes
+          #coming out ahead, sometimes behind. hopefully it all washes out on the average.
+          payment_processor_fee = (gross_amount_payable_to_this_producer * 0.035).round(2)
+        end
+
         net_after_payment_processor_fee = (gross_amount_payable_to_this_producer - payment_processor_fee).round(2)        
         commission = (net_after_payment_processor_fee * value[:sub_tote_commission_factor]).round(2)        
         net_after_commission = (net_after_payment_processor_fee - commission).round(2)

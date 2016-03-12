@@ -57,3 +57,8 @@ f4basil:
   product: basil
   commission: 0.065
   user: f4
+
+baron_farms_eggs_commission:
+  product: eggs
+  commission: 0.0
+  user: baron_farms

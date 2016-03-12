@@ -71,6 +71,24 @@ f4:
   farmer_approval: t
   farm_name: F4 FARM
 
+baron_farms:
+  name: Marty Davis
+  email: martydavis@gmail.com
+  password_digest: <%= User.digest('dogdog') %>
+  account_type: 1
+  activated: true
+  activated_at: Time.zone.now
+  description: pastured eggs
+  address: 9876 Yollimer Rd
+  city: Wapato
+  state: Washington
+  zip: 98114
+  phone: 206-650-6579
+  website: www.baronfarms.com
+  agreement: 1
+  farmer_approval: t
+  farm_name: Baron Farms
+
 c1:
   name: c1
   email: c1@c.com
@@ -126,6 +144,19 @@ c4:
 c_no_tote_items:
   name: c_no_tote_items
   email: c_no_tote_items@c.com
+  password_digest: <%= User.digest('dogdog') %>
+  account_type: 0
+  activated: true
+  activated_at: Time.zone.now
+  address: 3195 27st St. South
+  city: Ramsdale
+  state: Washington
+  zip: 98009
+  phone: 206-319-6579
+
+c_one_tote_item:
+  name: my name is one item customer
+  email: c_one_tote_item@c.com
   password_digest: <%= User.digest('dogdog') %>
   account_type: 0
   activated: true

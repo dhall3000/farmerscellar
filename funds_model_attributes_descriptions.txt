@@ -1,0 +1,42 @@
+BulkPurchase
+	total_gross
+		Total amount pulled off customers' cards by all Purchase objects associated with this BP object. In other words, this is the sum of all Purchase.gross_amount's associated with this BP.
+ 	total_fee
+		Sum of all Purchase.fee_amount's associated with this BP object.
+ 	total_commission
+		Sum of commissions computed for all associated Purchase objects. Commissions are computed on net after producer's payment processing fee is removed.
+ 	total_net
+ 		Sum of all PaymentPayables.amount's created by this BP
+
+PurchaseReceivable
+	amount
+		The amount we are to pull off the customer's card.
+	amount_purchased
+		The amount we have already pulled off the customer's card.
+
+Purchase
+	gross_amount
+		The amount pulled off customer's card. It comes straight from Paypal's response object, their “gross_amount” param
+ 	fee_amount
+		The amount Paypal withheld from us on the above gross_amount
+ 	net_amount
+		gross_amount - fee_amount
+
+
+------------------------------------------------------------------------------------------
+
+
+BulkPayment
+	total_payments_amount
+		Sum of all associated Payment.amount's.
+
+Payment
+	amount
+		Sum of all associated PaymentPayable.amount_paid's.
+
+PaymentPayable
+	amount
+		This is the actual amount that is to be paid to the producer after all commissions and fees removed from customer purchase amount
+	amount_paid
+		This is the amount that has actually been paid
+

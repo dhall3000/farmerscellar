@@ -35,3 +35,6 @@ avocado:
 
 basil:
   name: Basil
+
+eggs:
+  name: Eggs
