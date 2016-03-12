@@ -19,8 +19,8 @@ class PurchaseReceivable < ActiveRecord::Base
   end
 
   def self.load_unpaid_purchase_receivables
-    #TODO(Future): this will probably be really inefficient as the db grows. maybe want a boolean for when each record is fully paid off
-    prs = where("amount_paid < amount and (kind is null or kind = ?)", PurchaseReceivable.kind[:NORMAL])
+    #TODO(Future): this will probably be really inefficient as the db grows. maybe want a boolean for when each record's amount is fully purchased
+    prs = where("amount_purchased < amount and (kind is null or kind = ?)", PurchaseReceivable.kind[:NORMAL])
 
     #TODO (future): this method gets called because we're in process of charging customer accounts. with the code as is, each
     #object returned in 'prs' will get charged. but by doing so the door is a tiny bit open to double charging customers.
@@ -28,7 +28,7 @@ class PurchaseReceivable < ActiveRecord::Base
     #purchase.go(amount_to_capture * 100, authorization.payer_id, authorization.transaction_id)
     #this is the line of code that does the actual money moving. but what if, after the transaction goes through, things get interrupted
     #before we call the following two lines of code:
-    #self.amount_paid += purchase.gross_amount      
+    #self.amount_purchased += purchase.gross_amount      
     #save
     #what happens is the next time this method gets called we would return a purchasereceivable object to get charged that shouldn't
     #get charged. to fix this, what we need to do right here is:
@@ -105,7 +105,7 @@ class PurchaseReceivable < ActiveRecord::Base
     #we don't want to capture more than the purchase_receivable outstanding amount is
     #likewise, we don't want to attempt to capture more than is available on this authorization
     #so, select the lesser of the two    
-    purchase_receivable_amount_outstanding = amount - amount_paid
+    purchase_receivable_amount_outstanding = amount - amount_purchased
     authorization_amount_outstanding = authorization.amount - authorization.amount_purchased
     amount_to_capture = [purchase_receivable_amount_outstanding, authorization_amount_outstanding].min    
 
@@ -117,9 +117,9 @@ class PurchaseReceivable < ActiveRecord::Base
     else
       purchases << purchase
       if purchase.response.success?
-        self.amount_paid = (self.amount_paid + purchase.gross_amount).round(2)
+        self.amount_purchased = (self.amount_purchased + purchase.gross_amount).round(2)
         #the following 'save' is important to do because it 'closes the door' on the liklihood that we'll double charge the customer.
-        #this is so because we know to charge by comparing the .amount_paid attribute so we want to save to db asap after collecting funds
+        #this is so because we know to charge by comparing the .amount_purchased attribute so we want to save to db asap after collecting funds
         save
         authorization.amount_purchased = (authorization.amount_purchased + purchase.gross_amount).round(2)
         authorization.save            

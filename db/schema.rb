@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160308224728) do
+ActiveRecord::Schema.define(version: 20160312182105) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -328,9 +328,9 @@ ActiveRecord::Schema.define(version: 20160308224728) do
 
   create_table "purchase_receivables", force: :cascade do |t|
     t.float    "amount"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
-    t.float    "amount_paid"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+    t.float    "amount_purchased"
     t.integer  "kind"
   end
 

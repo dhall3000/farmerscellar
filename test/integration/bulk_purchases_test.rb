@@ -215,7 +215,7 @@ class BulkPurchasesTest < BulkBuyer
       #causing the funky values. I was able to duplicte this in a terminal like this:
       #irb(main):007:0> amount = 150.91 + 91.0+100.5+82.0
       #=> 424.40999999999997
-      total_amount_paid = (total_amount_paid + pr.amount_paid).round(2)
+      total_amount_paid = (total_amount_paid + pr.amount_purchased).round(2)
     end
     
     #verify sum of pr amountpaids == bulkpurchase.totalgross
@@ -252,9 +252,9 @@ class BulkPurchasesTest < BulkBuyer
       #there should now be at least one purchase in the purchases collection
       assert pr.purchases.count > 0
       #amount_paid should never be negative
-      assert pr.amount_paid >= 0
+      assert pr.amount_purchased >= 0
       #amount_paid should never be greater than amount
-      assert pr.amount_paid <= pr.amount
+      assert pr.amount_purchased <= pr.amount
       
       for ti in pr.tote_items
         #toteitems state should not be PURCHASEPENDING anymore
@@ -276,7 +276,7 @@ class BulkPurchasesTest < BulkBuyer
     for purchase_receivable in prs
 
       if purchase_receivable.kind == PurchaseReceivable.kind[:NORMAL]
-        assert_equal purchase_receivable.amount, purchase_receivable.amount_paid
+        assert_equal purchase_receivable.amount, purchase_receivable.amount_purchased
 
         for tote_item in purchase_receivable.tote_items
           assert_equal tote_item.status, ToteItem.states[:PURCHASED]
@@ -286,7 +286,7 @@ class BulkPurchasesTest < BulkBuyer
       if purchase_receivable.kind == PurchaseReceivable.kind[:PURCHASEFAILED]
         #this actually might break in the future as we add other features but it should work for our purposes now.
         #just extend it to handle the new/breaking feature if this assertion ever breaks
-        assert_equal 0, purchase_receivable.amount_paid
+        assert_equal 0, purchase_receivable.amount_purchased
         assert purchase_receivable.amount > 0
 
         for tote_item in purchase_receivable.tote_items
@@ -311,7 +311,7 @@ class BulkPurchasesTest < BulkBuyer
         end
       end
       total_amount = (total_amount + pr.amount).round(2)
-      total_amount_paid = (total_amount_paid + pr.amount_paid).round(2)
+      total_amount_paid = (total_amount_paid + pr.amount_purchased).round(2)
     end
 
     total_failed_purchases2 = (total_amount - total_amount_paid).round(2)
@@ -398,7 +398,7 @@ class BulkPurchasesTest < BulkBuyer
       #the amount should always be positive
       assert purchase_receivable.amount > 0
       #this should be zero here because we haven't done the producer payments yet
-      assert_equal purchase_receivable.amount_paid, 0
+      assert_equal purchase_receivable.amount_purchased, 0
       assert_not_nil purchase_receivable.bulk_buys
       assert purchase_receivable.bulk_buys.count > 0
 

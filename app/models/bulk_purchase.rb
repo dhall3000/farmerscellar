@@ -42,7 +42,7 @@ class BulkPurchase < ActiveRecord::Base
 
     def create_payment_payables(purchase_receivable, purchase, sub_tote_value_by_payment_sequenced_producer_id)      
 
-      amount_already_paid = purchase_receivable.amount_paid - purchase.gross_amount
+      amount_previously_purchased = purchase_receivable.amount_purchased - purchase.gross_amount
       gross_amount_payable = purchase.gross_amount
       cutoff_amount = 0
 
@@ -53,13 +53,13 @@ class BulkPurchase < ActiveRecord::Base
         end
 
         cutoff_amount = (cutoff_amount + value[:sub_tote_value]).round(2)
-        if amount_already_paid > cutoff_amount
+        if amount_previously_purchased > cutoff_amount
           next
         end
 
-        amount_remaining_to_pay_to_this_producer = cutoff_amount - amount_already_paid
+        amount_remaining_to_pay_to_this_producer = cutoff_amount - amount_previously_purchased
         gross_amount_payable_to_this_producer = [gross_amount_payable, amount_remaining_to_pay_to_this_producer].min
-        amount_already_paid = (amount_already_paid + gross_amount_payable_to_this_producer).round(2)
+        amount_previously_purchased = (amount_previously_purchased + gross_amount_payable_to_this_producer).round(2)
         gross_amount_payable = (gross_amount_payable - gross_amount_payable_to_this_producer).round(2)
 
         payment_processor_effective_fee_factor = purchase.fee_amount / purchase.gross_amount
