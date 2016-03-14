@@ -12,7 +12,30 @@ class BulkPurchasesTest < BulkBuyer
     purchase_receivables = setup_bulk_purchase(customers)
     post bulk_purchases_path, purchase_receivables: purchase_receivables
     verify_legitimacy_of_bulk_purchase({sales_underwater: 1, commission_zero: 1})
+    bulk_purchase = assigns(:bulk_purchase)
+    do_standard_payment(customers)
+    bulk_payment = assigns(:bulk_payment)
 
+  end
+
+  def do_standard_payment(customers)
+    verify_proper_number_of_payment_payables    
+    bulk_purchase = assigns(:bulk_purchase)
+
+    verify_proper_account_states(customers)
+    log_in_as(@a1)
+
+    get new_bulk_payment_path
+    assert :success
+    unpaid_payment_payables = assigns(:unpaid_payment_payables)
+    assert_not_nil unpaid_payment_payables
+    grand_total_payout = assigns(:grand_total_payout)
+    payment_info_by_producer_id = assigns(:payment_info_by_producer_id)    
+    assert_not_nil payment_info_by_producer_id
+    post bulk_payments_path, payment_info_by_producer_id: payment_info_by_producer_id
+    bulk_payment = assigns(:bulk_payment)
+
+    assert_equal bulk_purchase.net, bulk_payment.total_payments_amount    
   end
 
   #bundle exec rake test test/integration/bulk_purchases_test.rb test_do_bulk_buy
