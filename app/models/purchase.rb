@@ -46,7 +46,8 @@ class FakeCaptureResponse
     if @@succeed      
       fee_amount = (((amount_in_cents * percentage) / 100) + flat_fee).round(2)
       ack = "Success"      
-    else            
+    else      
+      amount_in_cents = 0      
       fee_amount = 0
       ack = "Failure"      
     end        

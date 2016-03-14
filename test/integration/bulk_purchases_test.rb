@@ -368,11 +368,19 @@ class BulkPurchasesTest < BulkBuyer
 
     for pr in prs
 
+      assert pr.purchases.count > 0
+
+      if pr.purchases.first.response.success?
+        total_purchased = (total_purchased + pr.amount_purchased).round(2)
+      else
+        total_failed_purchases = (total_failed_purchases + (pr.amount - pr.amount_purchased)).round(2)
+      end
+
       for purchase in pr.purchases
         if purchase.response.success?
-          total_purchased = (total_purchased + purchase.gross_amount).round(2)
+#          total_purchased = (total_purchased + purchase.gross_amount).round(2)
         else
-          total_failed_purchases += purchase.gross_amount          
+#          total_failed_purchases += purchase.gross_amount          
         end
       end
       total_amount = (total_amount + pr.amount).round(2)
@@ -415,7 +423,11 @@ class BulkPurchasesTest < BulkBuyer
         assert authorization.amount > authorization.amount_purchased        
       end
 
-      assert_equal authorization.amount, purchase.gross_amount
+      if purchase.response.success?
+        assert_equal authorization.amount, purchase.gross_amount        
+      else
+        assert_equal authorization.amount, pr.amount
+      end
 
     end
 
