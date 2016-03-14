@@ -182,3 +182,15 @@ baron_farms_eggs:
   unit_kind: whole
   description: pastured eggs
   live: true
+
+pride_and_joy_milk:
+  delivery_date: <%= delivery_date %>
+  commitment_zone_start: <%= delivery_date - 2.days %>  
+  product: milk
+  quantity_available: 100
+  price: 10.50
+  user: pride_and_joy
+  unit_category: volume
+  unit_kind: gallon
+  description: pastured organic raw milk
+  live: true

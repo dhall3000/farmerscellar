@@ -4,4 +4,7 @@ class PaymentPayable < ActiveRecord::Base
 
   has_many :payment_payable_tote_items
   has_many :tote_items, through: :payment_payable_tote_items
+
+  has_many :payment_payable_payments
+  has_many :payments, through: :payment_payable_payments
 end

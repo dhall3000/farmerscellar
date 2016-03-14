@@ -62,3 +62,8 @@ baron_farms_eggs_commission:
   product: eggs
   commission: 0.0
   user: baron_farms
+
+pride_and_joy_commission:
+  product: milk
+  commission: 0.0
+  user: pride_and_joy

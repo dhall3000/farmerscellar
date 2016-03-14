@@ -269,3 +269,10 @@ eggs1:
   status: <%= ToteItem.states[:ADDED] %>
   user: c_one_tote_item
   posting: baron_farms_eggs
+
+pjmilk:
+  quantity: 1
+  price: 10.5
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c1
+  posting: pride_and_joy_milk

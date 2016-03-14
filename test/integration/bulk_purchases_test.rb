@@ -18,6 +18,24 @@ class BulkPurchasesTest < BulkBuyer
 
   end
 
+  test "do ricky tests" do
+
+    customers = [@c1]
+    purchase_receivables = setup_bulk_purchase(customers)
+    post bulk_purchases_path, purchase_receivables: purchase_receivables
+    verify_legitimacy_of_bulk_purchase
+    bulk_purchase = assigns(:bulk_purchase)
+    do_standard_payment(customers)
+    bulk_payment = assigns(:bulk_payment)
+
+    ti = bulk_purchase.purchase_receivables.first.tote_items[8]
+    c1_charge_amount = (ti.quantity * ti.price).round(2)
+    ricky_proceeds = (c1_charge_amount * (0.965)).round(2)
+    
+    assert_equal ricky_proceeds, bulk_payment.payment_payables[4].payments.first.amount
+
+  end
+
   def do_standard_payment(customers)
     verify_proper_number_of_payment_payables    
     bulk_purchase = assigns(:bulk_purchase)

@@ -89,6 +89,24 @@ baron_farms:
   farmer_approval: t
   farm_name: Baron Farms
 
+pride_and_joy:
+  name: Ricky Umipig
+  email: ricky@prideandjoydairy.com
+  password_digest: <%= User.digest('dogdog') %>
+  account_type: 1
+  activated: true
+  activated_at: Time.zone.now
+  description: pastured organic milk
+  address: 9876 Yatzhee Rd
+  city: Wapato
+  state: Washington
+  zip: 98114
+  phone: 206-671-6579
+  website: www.prideandjoydairy.com
+  agreement: 1
+  farmer_approval: t
+  farm_name: Pride and Joy Dairy
+
 c1:
   name: c1
   email: c1@c.com

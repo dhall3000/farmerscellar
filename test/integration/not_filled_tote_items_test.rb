@@ -8,7 +8,7 @@ class NotFilledToteItemsTest < BulkBuyer
   test "not all tote items get filled" do
     assert_equal 0, Authorization.count, "there should be no authorizations in the database at the beginning of this test but there actually are #{Authorization.count}"
 
-    customers = [@c1, @c2, @c3, @c4]
+    customers = [@c_one_tote_item, @c1, @c2, @c3, @c4]
     create_authorization_for_customers(customers)
 
     assert ToteItem.where(status: ToteItem.states[:AUTHORIZED]).count > 0
