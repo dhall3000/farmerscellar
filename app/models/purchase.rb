@@ -37,17 +37,19 @@ class FakeCaptureResponse
   def initialize(amount_in_cents, authorization_transaction_id)
 
     percentage = 0.029
-    fee_amount = (((amount_in_cents * percentage) / 100) + 0.3).round(2)
+    flat_fee = 0.3
 
     if @@toggle_success      
       @@succeed = !@@succeed
     end
       
-    if @@succeed
+    if @@succeed      
+      fee_amount = (((amount_in_cents * percentage) / 100) + flat_fee).round(2)
       ack = "Success"      
-    else
+    else            
+      fee_amount = 0
       ack = "Failure"      
-    end    
+    end        
 
     @success = @@succeed
 

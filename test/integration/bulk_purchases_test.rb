@@ -3,8 +3,21 @@ require 'bulk_buy_helper'
 
 class BulkPurchasesTest < BulkBuyer
 
+  test "do upside down bulk buy" do
+
+    #this test is for beta / launch mode when we're charging flat processor fees and 0% commission service fee
+    #in this scenario we can/will end up with transactions we're upside down on...paying more to the producer
+    #than we're collecting from Paypal. fun.
+    customers = [@c_one_tote_item]
+    purchase_receivables = setup_bulk_purchase(customers)
+    post bulk_purchases_path, purchase_receivables: purchase_receivables
+    verify_legitimacy_of_bulk_purchase({sales_underwater: 1, commission_zero: 1})
+
+  end
+
   #bundle exec rake test test/integration/bulk_purchases_test.rb test_do_bulk_buy
   test "do bulk buy" do
+
   #def skip
     customers = [@c1, @c2, @c3, @c4]
     purchase_receivables = setup_bulk_purchase(customers)
@@ -24,7 +37,7 @@ class BulkPurchasesTest < BulkBuyer
     post bulk_payments_path, payment_info_by_producer_id: payment_info_by_producer_id
     bulk_payment = assigns(:bulk_payment)
 
-    assert_equal bulk_purchase.total_net, bulk_payment.total_payments_amount    
+    assert_equal bulk_purchase.net, bulk_payment.total_payments_amount    
 
     get new_delivery_path
     assert :success
@@ -95,6 +108,7 @@ class BulkPurchasesTest < BulkBuyer
 
   #bundle exec rake test test/integration/bulk_purchases_test.rb
   test "do bulk buy with purchase failures" do
+
   #def skip1
     customers = [@c1, @c2, @c3, @c4]
     purchase_receivables = setup_bulk_purchase(customers)
@@ -146,7 +160,11 @@ class BulkPurchasesTest < BulkBuyer
     post bulk_payments_path, payment_info_by_producer_id: payment_info_by_producer_id
     bulk_payment = assigns(:bulk_payment)
 
-    assert_equal bulk_purchase.total_net, bulk_payment.total_payments_amount    
+    assert_equal bulk_purchase.net, bulk_payment.total_payments_amount    
+
+    FakeCaptureResponse.toggle_success = false    
+    FakeCaptureResponse.succeed = true
+
   end
 
   test "sequential bulk buys with some purchase failures" do
@@ -168,7 +186,7 @@ class BulkPurchasesTest < BulkBuyer
     assert_not_nil payment_info_by_producer_id
     post bulk_payments_path, payment_info_by_producer_id: payment_info_by_producer_id
     bulk_payment = assigns(:bulk_payment)
-    assert_equal bulk_purchase.total_net, bulk_payment.total_payments_amount
+    assert_equal bulk_purchase.net, bulk_payment.total_payments_amount
 
     FakeCaptureResponse.toggle_success = false    
     FakeCaptureResponse.succeed = true
@@ -195,11 +213,11 @@ class BulkPurchasesTest < BulkBuyer
     assert_not_nil payment_info_by_producer_id
     post bulk_payments_path, payment_info_by_producer_id: payment_info_by_producer_id
     bulk_payment = assigns(:bulk_payment)
-    assert_equal bulk_purchase.total_net, bulk_payment.total_payments_amount
+    assert_equal bulk_purchase.net, bulk_payment.total_payments_amount
 
   end
 
-  def verify_legitimacy_of_bulk_purchase
+  def verify_legitimacy_of_bulk_purchase(options = {})
     assert :success
     assert_template 'bulk_purchases/create'
     purchase_receivables = assigns(:purchase_receivables)    
@@ -217,33 +235,80 @@ class BulkPurchasesTest < BulkBuyer
       #=> 424.40999999999997
       total_amount_purchased = (total_amount_purchased + pr.amount_purchased).round(2)
     end
+
+    #total up the amount purchased in another way and verify the two ways are equivalent
+    total_amount_purchased2 = 0
+
+    purchase_receivables.each do |pr|
+      total_amount_purchased2 = total_amount_purchased2 + pr.amount_purchased
+    end
+
+    assert_equal total_amount_purchased, total_amount_purchased2
     
     #verify sum of pr amountpurchaseds == bulkpurchase.totalgross
-    assert_equal total_amount_purchased, bulk_purchase.total_gross
+    assert_equal total_amount_purchased, bulk_purchase.gross
     all_purchases_succeeded = all_purchase_receivables_succeeded(prs)
 
     #verify the associated bulkbuy's amount is proper relative to the bulkpurchase's totalgross
     if all_purchases_succeeded
-      assert_equal purchase_receivables.last.bulk_buys.last.amount, bulk_purchase.total_gross      
+      assert_equal purchase_receivables.last.bulk_buys.last.amount, bulk_purchase.gross      
     else
       #if there are failed purchases we would expect the actual amount collected to be less than the bulk buy anticipated amount
-      assert purchase_receivables.last.bulk_buys.last.amount > bulk_purchase.total_gross
+      assert purchase_receivables.last.bulk_buys.last.amount > bulk_purchase.gross
     end
 
-      #NOTE!! it looks like i've done a good job to date of avoiding putting .round(2) in the test code anywhere. but
-      #i came across a failure where it really seems like it's the summing of the total_amount_purchased var that is
-      #causing the funky values. I was able to duplicte this in a terminal like this:
-      #irb(main):008:0> amount = 14.87+32.66+376.89
-      #=> 424.41999999999996
-    assert_equal bulk_purchase.total_gross, (bulk_purchase.total_fee.round(2) + bulk_purchase.total_commission.round(2) + bulk_purchase.total_net.round(2)).round(2)
-    assert bulk_purchase.total_gross > 0
-    assert bulk_purchase.total_fee > 0
-    assert bulk_purchase.total_commission > 0
-    assert bulk_purchase.total_net > 0
-    assert bulk_purchase.total_gross > bulk_purchase.total_net
-    assert bulk_purchase.total_net > bulk_purchase.total_commission
-    assert bulk_purchase.total_commission > bulk_purchase.total_fee
+    #verify the total amount withheld from us equals the sum of the parts
+    sum_of_payment_processor_fee_withheld_from_us = 0
+    sum_of_payment_processor_fee_withheld_from_producer = 0
+
+    purchase_receivables.each do |pr|
+      pr.purchases.each do |p|
+        sum_of_payment_processor_fee_withheld_from_us = (sum_of_payment_processor_fee_withheld_from_us + p.payment_processor_fee_withheld_from_us).round(2)
+        sum_of_payment_processor_fee_withheld_from_producer = (sum_of_payment_processor_fee_withheld_from_producer + p.payment_processor_fee_withheld_from_producer).round(2)
+      end      
+    end
+
+    assert_equal sum_of_payment_processor_fee_withheld_from_us, bulk_purchase.payment_processor_fee_withheld_from_us    
+    assert_equal sum_of_payment_processor_fee_withheld_from_producer, bulk_purchase.payment_processor_fee_withheld_from_producer
+
+    #NOTE!! it looks like i've done a good job to date of avoiding putting .round(2) in the test code anywhere. but
+    #i came across a failure where it really seems like it's the summing of the total_amount_purchased var that is
+    #causing the funky values. I was able to duplicte this in a terminal like this:
+    #irb(main):008:0> amount = 14.87+32.66+376.89
+    #=> 424.41999999999996
+
+    #assert_equal bulk_purchase.gross, (bulk_purchase.payment_processor_fee_withheld_from_us.round(2) + bulk_purchase.commission.round(2) + bulk_purchase.net.round(2)).round(2)
+
+    sales = (bulk_purchase.commission + bulk_purchase.payment_processor_fee_withheld_from_producer - bulk_purchase.payment_processor_fee_withheld_from_us).round(2)
+
+    if options[:sales_underwater] == 1
+      assert sales < 0, "sales not < 0: " + sales.to_s
+    else
+      assert sales > 0
+    end
+
+    puts "bulk_purchase.gross: " + bulk_purchase.gross.to_s
+    puts "bulk_purchase.payment_processor_fee_withheld_from_us: " + bulk_purchase.payment_processor_fee_withheld_from_us.to_s
+    puts "bulk_purchase.payment_processor_fee_withheld_from_producer: " + bulk_purchase.payment_processor_fee_withheld_from_producer.to_s
+    puts "bulk_purchase.net: " + bulk_purchase.net.to_s
+    puts "bulk_purchase.commission: " + bulk_purchase.commission.to_s
+    puts "sales: " + sales.to_s
+
+    assert bulk_purchase.gross > 0
+    assert bulk_purchase.payment_processor_fee_withheld_from_us > 0
+
+    if options[:commission_zero] == 1 
+      assert_equal bulk_purchase.commission, 0
+    else
+      assert bulk_purchase.commission > 0
+    end
+    
+    assert bulk_purchase.net > 0
+    assert bulk_purchase.gross > bulk_purchase.net
+    assert bulk_purchase.net > bulk_purchase.commission
+  
     verify_legitimacy_of_purchase_receivables
+
   end
 
   def verify_legitimacy_of_purchase_receivables

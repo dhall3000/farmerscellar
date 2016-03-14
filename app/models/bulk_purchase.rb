@@ -65,9 +65,9 @@ class BulkPurchase < ActiveRecord::Base
         amount_previously_purchased = (amount_previously_purchased + gross_amount_payable_to_this_producer).round(2)
         gross_amount_payable = (gross_amount_payable - gross_amount_payable_to_this_producer).round(2)
 
-        proportionally_share_payment_processor_fee_with_producer = false
+        proportionally_share_payment_processor_fee_with_producer = 0
 
-        if proportionally_share_payment_processor_fee_with_producer
+        if proportionally_share_payment_processor_fee_with_producer == 1
           payment_processor_effective_fee_factor = purchase.payment_processor_fee_withheld_from_us / purchase.gross_amount
           payment_processor_fee_withheld_from_producer = (gross_amount_payable_to_this_producer * payment_processor_effective_fee_factor).round(2)
         else
@@ -76,8 +76,7 @@ class BulkPurchase < ActiveRecord::Base
           payment_processor_fee_withheld_from_producer = (gross_amount_payable_to_this_producer * 0.035).round(2)          
         end
 
-        purchase.update(payment_processor_fee_withheld_from_producer: payment_processor_fee_withheld_from_producer)
-        purchase.save
+        purchase.payment_processor_fee_withheld_from_producer = (purchase.payment_processor_fee_withheld_from_producer + payment_processor_fee_withheld_from_producer).round(2)
 
         commission = (gross_amount_payable_to_this_producer * value[:sub_tote_commission_factor]).round(2)        
         net = gross_amount_payable_to_this_producer - payment_processor_fee_withheld_from_producer - commission
@@ -97,6 +96,7 @@ class BulkPurchase < ActiveRecord::Base
         @num_payment_payables_created = @num_payment_payables_created + 1
 
       end
+      purchase.save
     end
 
     #returns a hash where key = producer id and value is a hash with keys/values for subtotevalue and subtotecommission.

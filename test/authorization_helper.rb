@@ -8,6 +8,7 @@ class Authorizer < ActionDispatch::IntegrationTest
     @c3 = users(:c3)
     @c4 = users(:c4)
     @c_no_tote_items = users(:c_no_tote_items)
+    @c_one_tote_item = users(:c_one_tote_item)
     @dropsite1 = dropsites(:dropsite1)
     @dropsite2 = dropsites(:dropsite2)
     puts "AuthorizationsTest output:-----------------------------"
