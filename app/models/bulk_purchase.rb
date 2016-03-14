@@ -47,6 +47,14 @@ class BulkPurchase < ActiveRecord::Base
 
       amount_previously_purchased = purchase_receivable.amount_purchased - purchase.gross_amount
       gross_amount_payable = purchase.gross_amount
+
+      #this cutoff amount var is an odd, but necessary duck. say you have a pr that collects funds to pay
+      #to 4 different producers, each $20. but say the customer only pays 35 on the first purchase (for whatever
+      #reason). this customer is going to have to make another future purchase to bring their account to zero.
+      #when they make this second purchase we want to direct funds to the producers properly. in this example,
+      #the first producer got maid whole, the second was partially paid and the last 2 weren't paid at all. so for
+      #the second purchase we'd need to pay down the #2 producer and then pay off the last 2. the cutoff_amount
+      #var tracks where the final amount to pay to farmer #2 is before switching to pay off #3 & #4.
       cutoff_amount = 0
 
       sub_tote_value_by_payment_sequenced_producer_id.each do |producer_id, value|
