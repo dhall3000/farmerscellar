@@ -13,7 +13,8 @@
       <th align="center">Product</th>
       <th align="center">Units</th>        
       <th align="center">Quantity</th>
-      <th align="center">Amount Paid</th>      
+      <th align="center">Unit Price</th>
+      <th align="center">Sub Total</th>
     </tr>
   </thead>
   <tbody>  
@@ -23,7 +24,8 @@
         <td align="center"><%= posting.product.name %></td>
         <td align="center"><%= posting.unit_kind.name %></td>        
         <td align="center"><%= value[:unit_count] %></td>
-        <td align="center"><%= number_to_currency(value[:amount]) %></td>
+        <td align="center"><%= number_to_currency(value[:unit_price]) %></td>
+        <td align="center"><%= number_to_currency(value[:sub_total]) %></td>
       </tr>
     <% end %>
   </tbody>
