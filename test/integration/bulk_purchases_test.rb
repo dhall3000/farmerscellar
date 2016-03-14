@@ -221,10 +221,10 @@ class BulkPurchasesTest < BulkBuyer
     assert :success
     assert_template 'bulk_purchases/create'
     purchase_receivables = assigns(:purchase_receivables)    
-    bulk_purchase = assigns(:bulk_purchase)
-    assert_not_nil bulk_purchase
+    bp = assigns(:bulk_purchase)
+    assert_not_nil bp
 
-    prs = bulk_purchase.purchase_receivables
+    prs = bp.purchase_receivables
 
     total_amount_purchased = 0
     for pr in prs
@@ -246,15 +246,15 @@ class BulkPurchasesTest < BulkBuyer
     assert_equal total_amount_purchased, total_amount_purchased2
     
     #verify sum of pr amountpurchaseds == bulkpurchase.totalgross
-    assert_equal total_amount_purchased, bulk_purchase.gross
+    assert_equal total_amount_purchased, bp.gross
     all_purchases_succeeded = all_purchase_receivables_succeeded(prs)
 
     #verify the associated bulkbuy's amount is proper relative to the bulkpurchase's totalgross
     if all_purchases_succeeded
-      assert_equal purchase_receivables.last.bulk_buys.last.amount, bulk_purchase.gross      
+      assert_equal purchase_receivables.last.bulk_buys.last.amount, bp.gross      
     else
       #if there are failed purchases we would expect the actual amount collected to be less than the bulk buy anticipated amount
-      assert purchase_receivables.last.bulk_buys.last.amount > bulk_purchase.gross
+      assert purchase_receivables.last.bulk_buys.last.amount > bp.gross
     end
 
     #verify the total amount withheld from us equals the sum of the parts
@@ -268,8 +268,8 @@ class BulkPurchasesTest < BulkBuyer
       end      
     end
 
-    assert_equal sum_of_payment_processor_fee_withheld_from_us, bulk_purchase.payment_processor_fee_withheld_from_us    
-    assert_equal sum_of_payment_processor_fee_withheld_from_producer, bulk_purchase.payment_processor_fee_withheld_from_producer
+    assert_equal sum_of_payment_processor_fee_withheld_from_us, bp.payment_processor_fee_withheld_from_us    
+    assert_equal sum_of_payment_processor_fee_withheld_from_producer, bp.payment_processor_fee_withheld_from_producer
 
     #NOTE!! it looks like i've done a good job to date of avoiding putting .round(2) in the test code anywhere. but
     #i came across a failure where it really seems like it's the summing of the total_amount_purchased var that is
@@ -277,9 +277,8 @@ class BulkPurchasesTest < BulkBuyer
     #irb(main):008:0> amount = 14.87+32.66+376.89
     #=> 424.41999999999996
 
-    #assert_equal bulk_purchase.gross, (bulk_purchase.payment_processor_fee_withheld_from_us.round(2) + bulk_purchase.commission.round(2) + bulk_purchase.net.round(2)).round(2)
-
-    sales = (bulk_purchase.commission + bulk_purchase.payment_processor_fee_withheld_from_producer - bulk_purchase.payment_processor_fee_withheld_from_us).round(2)
+    sales = (bp.commission + bp.payment_processor_fee_withheld_from_producer - bp.payment_processor_fee_withheld_from_us).round(2)
+    assert_equal bp.gross, bp.payment_processor_fee_withheld_from_us + bp.net + sales
 
     if options[:sales_underwater] == 1
       assert sales < 0, "sales not < 0: " + sales.to_s
@@ -287,25 +286,25 @@ class BulkPurchasesTest < BulkBuyer
       assert sales > 0
     end
 
-    puts "bulk_purchase.gross: " + bulk_purchase.gross.to_s
-    puts "bulk_purchase.payment_processor_fee_withheld_from_us: " + bulk_purchase.payment_processor_fee_withheld_from_us.to_s
-    puts "bulk_purchase.payment_processor_fee_withheld_from_producer: " + bulk_purchase.payment_processor_fee_withheld_from_producer.to_s
-    puts "bulk_purchase.net: " + bulk_purchase.net.to_s
-    puts "bulk_purchase.commission: " + bulk_purchase.commission.to_s
+    puts "bulk_purchase.gross: " + bp.gross.to_s
+    puts "bulk_purchase.payment_processor_fee_withheld_from_us: " + bp.payment_processor_fee_withheld_from_us.to_s
+    puts "bulk_purchase.payment_processor_fee_withheld_from_producer: " + bp.payment_processor_fee_withheld_from_producer.to_s
+    puts "bulk_purchase.net: " + bp.net.to_s
+    puts "bulk_purchase.commission: " + bp.commission.to_s
     puts "sales: " + sales.to_s
 
-    assert bulk_purchase.gross > 0
-    assert bulk_purchase.payment_processor_fee_withheld_from_us > 0
+    assert bp.gross > 0
+    assert bp.payment_processor_fee_withheld_from_us > 0
 
     if options[:commission_zero] == 1 
-      assert_equal bulk_purchase.commission, 0
+      assert_equal bp.commission, 0
     else
-      assert bulk_purchase.commission > 0
+      assert bp.commission > 0
     end
     
-    assert bulk_purchase.net > 0
-    assert bulk_purchase.gross > bulk_purchase.net
-    assert bulk_purchase.net > bulk_purchase.commission
+    assert bp.net > 0
+    assert bp.gross > bp.net
+    assert bp.net > bp.commission
   
     verify_legitimacy_of_purchase_receivables
 
