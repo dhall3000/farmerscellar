@@ -95,18 +95,6 @@ module ToteItemsHelper
 
   end
 
-  #the intent here is for you to be able to hand a whole collection of tote_items and get the total commission for all items
-  def get_commission_factor_tote(tote_items)
-    
-    value = get_gross_tote(tote_items)
-    commission = get_commission_tote(tote_items)
-
-    commission_factor = commission / value
-
-    return commission_factor
-
-  end
-
   def get_payment_processor_fee_tote(tote_items)
 
     if tote_items == nil || tote_items.count == 0
@@ -167,6 +155,17 @@ module ToteItemsHelper
     commission_factors.to_a
 
     return commission_factors.order(:created_at).last.commission
+
+  end
+
+  def get_commission_factor_tote(tote_items)
+    
+    value = get_gross_tote(tote_items)
+    commission = get_commission_tote(tote_items)
+
+    commission_factor = commission / value
+
+    return commission_factor
 
   end
 

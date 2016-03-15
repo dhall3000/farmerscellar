@@ -104,9 +104,8 @@ class BulkPurchase < ActiveRecord::Base
 
       producer_id_payment_order.each do |producer_id|
         sub_tote = purchase_receivable.get_sub_tote(producer_id)        
-        sub_tote_value = get_gross_tote(sub_tote)                
-        sub_tote_commission_factor = get_commission_factor_tote(sub_tote)
-        sub_tote_value_by_payment_sequenced_producer_id[producer_id] = { sub_tote: sub_tote, sub_tote_value: sub_tote_value, sub_tote_commission_factor: sub_tote_commission_factor }
+        sub_tote_value = get_gross_tote(sub_tote)        
+        sub_tote_value_by_payment_sequenced_producer_id[producer_id] = { sub_tote: sub_tote, sub_tote_value: sub_tote_value }
       end
 
       return sub_tote_value_by_payment_sequenced_producer_id
