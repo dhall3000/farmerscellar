@@ -33,6 +33,7 @@ class ProducerNotificationsMailer < ApplicationMailer
     @posting_infos = {}
 
     payment_payable_ids.each do |payment_payable_id|
+
       pp = PaymentPayable.find(payment_payable_id)
 
       pp.tote_items.each do |tote_item|
@@ -41,21 +42,14 @@ class ProducerNotificationsMailer < ApplicationMailer
           @posting_infos[tote_item.posting] = {unit_count: 0, amount: 0, unit_price: 0, sub_total: 0}
         end
 
-        retail_reduction_factor = 1.0 - 0.035 - get_commission_factor_tote([tote_item])
+        producer_net_item = get_producer_net_item(tote_item)
 
         @posting_infos[tote_item.posting][:unit_count] += tote_item.quantity
-        @posting_infos[tote_item.posting][:sub_total] = (@posting_infos[tote_item.posting][:sub_total] + get_gross_item(tote_item) * retail_reduction_factor)
-        @posting_infos[tote_item.posting][:unit_price] = (@posting_infos[tote_item.posting][:sub_total] / @posting_infos[tote_item.posting][:unit_count])
-
-        x = 1
+        @posting_infos[tote_item.posting][:sub_total] = (@posting_infos[tote_item.posting][:sub_total] + producer_net_item).round(2)
+        @posting_infos[tote_item.posting][:unit_price] = producer_net_item / tote_item.quantity
 
       end
 
-    end
-
-    @posting_infos.each do |posting, value|
-      value[:sub_total] = value[:sub_total].round(2)
-      value[:unit_price] = value[:unit_price].round(2)
     end
 
     mail to: email, subject: "Payment invoice"
