@@ -243,16 +243,47 @@ class BulkPaymentsController < ApplicationController
 
     def send_payment_invoices(payment_info_by_producer_id)
 
+      @payment_invoice_infos = []
+
       payment_info_by_producer_id.each do |producer_id, payment_info|
 
         producer = User.find(producer_id)
         total_amount = payment_info[:amount]
         payment_payable_ids = payment_info[:payment_payable_ids]
+        posting_infos = get_posting_infos(payment_payable_ids)
+        @payment_invoice_infos << {total: total_amount, posting_infos: posting_infos}
 
-        ProducerNotificationsMailer.payment_invoice(producer.email, producer, total_amount, payment_payable_ids).deliver_now
+        ProducerNotificationsMailer.payment_invoice(producer, total_amount, posting_infos).deliver_now
                 
       end
 
+    end
+
+    def get_posting_infos(payment_payable_ids)
+      posting_infos = {}
+
+      payment_payable_ids.each do |payment_payable_id|
+
+        pp = PaymentPayable.find(payment_payable_id)
+
+        pp.tote_items.each do |tote_item|
+
+          if !posting_infos.has_key?(tote_item.posting)
+            posting_infos[tote_item.posting] = {unit_count: 0, unit_price: 0, sub_total: 0}
+          end
+
+          producer_net_item = get_producer_net_item(tote_item)
+
+          posting_infos[tote_item.posting][:unit_count] += tote_item.quantity
+          posting_infos[tote_item.posting][:sub_total] = (posting_infos[tote_item.posting][:sub_total] + producer_net_item).round(2)
+          posting_infos[tote_item.posting][:unit_price] = (producer_net_item / tote_item.quantity).round(2)
+
+        end
+
+      end
+
+      return posting_infos
+      
     end
 
     def get_credentials_hash

@@ -54,6 +54,45 @@ class BulkPurchasesTest < BulkBuyer
     bulk_payment = assigns(:bulk_payment)
 
     assert_equal bulk_purchase.net, bulk_payment.total_payments_amount    
+
+    #these tests are to verify that the html table in the producer payment invoice has values
+    #that all make sense. that is, the unit_count times unit_price should equal the sub_total and
+    #the sum of the sub_totals should equal the total
+    #@payment_invoice_infos << {total: total_amount, posting_infos: posting_infos}
+    #posting_info looks like this: {unit_count: 0, unit_price: 0, sub_total: 0}
+    payment_invoice_infos = assigns(:payment_invoice_infos)
+    payment_invoice_infos.each do |payment_invoice_info|
+      verify_payment_invoice_info(payment_invoice_info)
+    end   
+    
+  end
+
+  #a posting info is a hash like this: #{unit_count: 0, unit_price: 0, sub_total: 0}
+  #it comes from bulkpaymentscontroller#get_posting_infos
+  def verify_payment_invoice_info(payment_invoice_info)
+
+    total = payment_invoice_info[:total]
+    posting_infos = payment_invoice_info[:posting_infos]
+
+    sub_totals = 0
+
+    posting_infos.each do |posting, value|
+      
+      sub_total = value[:sub_total]
+      units_sum = 0
+      i = 0
+      while i < value[:unit_count]
+        units_sum = (units_sum + value[:unit_price]).round(2)
+        i = i + 1
+      end
+
+      assert_equal sub_total, units_sum
+      sub_totals = (sub_totals + sub_total).round(2)
+
+    end
+
+    assert_equal total.to_f, sub_totals
+
   end
 
   #bundle exec rake test test/integration/bulk_purchases_test.rb test_do_bulk_buy
