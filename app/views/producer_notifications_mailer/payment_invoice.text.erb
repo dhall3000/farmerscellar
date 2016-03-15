@@ -4,7 +4,7 @@ We just sent you a total of <%= number_to_currency(@total) %> as payment for the
 
 <% @posting_infos.each do |posting, value| %>
 ---------------------------------------------
-Posting Id=<%= posting.id %>,Product=<%= posting.product.name %>,Units=<%= posting.unit_kind.name %>,Quantity=<%= value[:unit_count] %>,Amount Paid=<%= number_to_currency(value[:amount]) %>
+Posting Id=<%= posting.id %>,Product=<%= posting.product.name %>,Delivery Date=<%= posting.delivery_date.strftime("%A %b %d, %Y") %>,Units=<%= posting.unit_kind.name %>,Quantity=<%= value[:unit_count] %>,Unit Price=<%= number_to_currency(value[:unit_price]) %>,Sub Total=<%= number_to_currency(value[:sub_total]) %>
 <% end %>
 
 Thanks!

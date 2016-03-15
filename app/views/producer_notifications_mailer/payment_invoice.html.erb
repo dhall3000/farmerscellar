@@ -11,6 +11,7 @@
     <tr>		    
       <th align="left">Posting ID</th>
       <th align="center">Product</th>
+      <th align="center">Delivery Date</th>
       <th align="center">Units</th>        
       <th align="center">Quantity</th>
       <th align="center">Unit Price</th>
@@ -22,6 +23,7 @@
       <tr>
         <td align="left"><%= posting.id %></td>
         <td align="center"><%= posting.product.name %></td>
+        <td align="center"><%= posting.delivery_date.strftime("%A %b %d, %Y") %></td>
         <td align="center"><%= posting.unit_kind.name %></td>        
         <td align="center"><%= value[:unit_count] %></td>
         <td align="center"><%= number_to_currency(value[:unit_price]) %></td>
