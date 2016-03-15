@@ -41,10 +41,10 @@ class ProducerNotificationsMailer < ApplicationMailer
           @posting_infos[tote_item.posting] = {unit_count: 0, amount: 0, unit_price: 0, sub_total: 0}
         end
 
-        retail_reduction_factor = 1.0 - 0.035 - get_commission_factor([tote_item])
+        retail_reduction_factor = 1.0 - 0.035 - get_commission_factor_tote([tote_item])
 
         @posting_infos[tote_item.posting][:unit_count] += tote_item.quantity
-        @posting_infos[tote_item.posting][:sub_total] = (@posting_infos[tote_item.posting][:sub_total] + get_tote_item_value(tote_item) * retail_reduction_factor)
+        @posting_infos[tote_item.posting][:sub_total] = (@posting_infos[tote_item.posting][:sub_total] + get_gross_item(tote_item) * retail_reduction_factor)
         @posting_infos[tote_item.posting][:unit_price] = (@posting_infos[tote_item.posting][:sub_total] / @posting_infos[tote_item.posting][:unit_count])
 
         x = 1

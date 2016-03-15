@@ -21,6 +21,6 @@ class AuthorizationsTest < Authorizer
   test "successful authorization" do
   	#log_in_as(@c1)
   	#get tote_items_path
-  	#post checkouts_path, amount: total_cost_of_tote_items(current_user_current_tote_items)
+  	#post checkouts_path, amount: get_gross_tote(current_user_current_tote_items)
   end
 end

@@ -49,17 +49,17 @@ module ToteItemsHelper
 	  tote_items != nil && tote_items.any?
 	end
 
-	def total_cost_of_tote_items(tote_items)
+	def get_gross_tote(tote_items)
 	  total = 0
 	  if tote_has_items(tote_items)
 	    tote_items.each do |tote_item|
-	      total = (total + get_tote_item_value(tote_item)).round(2)
+	      total = (total + get_gross_item(tote_item)).round(2)
 	    end	  	  		  	  	
 	  end
 	  total
 	end
 
-  def get_tote_item_value(tote_item)
+  def get_gross_item(tote_item)
     
     if tote_item == nil
       return 0
@@ -69,46 +69,55 @@ module ToteItemsHelper
 
   end
 
-  #the intent here is for you to be able to hand a whole collection of tote_items and get the total commission for all items
-  def get_commission(tote_items)
+  def get_commission_tote(tote_items)
+
     if !tote_has_items(tote_items)
       return 0
     end
 
-    total_value = 0
     total_commission = 0
 
     tote_items.each do |tote_item|
-      tote_item_value = get_tote_item_value(tote_item)
-      #tote_item_commission = tote_item_value * tote_item.posting.product.producer_product_commissions.where(user: tote_item.posting.user).last.commission
-
-      producer = tote_item.posting.user
-      product = tote_item.posting.product
-      commission_factors = ProducerProductCommission.where(user: producer, product: product)
-
-      #TODO: the following line is superfluous, as far as i can tell. however, i get a sqlliteexception without it. strange!
-      #i don't think there's anything magical about calling .to_a. when creating this i was able to get things to succeed
-      #as intended when i used a variety of reading methods instead of .to_a
-      commission_factors.to_a
-
-      commission_factor = commission_factors.order(:created_at).last.commission
-      tote_item_commission = tote_item_value * commission_factor      
-      total_commission = (total_commission + tote_item_commission).round(2)
+      total_commission = (total_commission + get_commission_item(tote_item)).round(2)
     end    
 
     return total_commission
 
   end
 
+  def get_commission_item(tote_item)
+
+    commission_factor = get_commission_factor(tote_item.posting.user, tote_item.posting.product)
+    commission_unit = (tote_item.price * commission_factor).round(2)
+    commission_item = (commission_unit * tote_item.quantity).round(2)
+
+    return commission_item
+
+  end
+
   #the intent here is for you to be able to hand a whole collection of tote_items and get the total commission for all items
-  def get_commission_factor(tote_items)
+  def get_commission_factor_tote(tote_items)
     
-    value = total_cost_of_tote_items(tote_items)
-    commission = get_commission(tote_items)
+    value = get_gross_tote(tote_items)
+    commission = get_commission_tote(tote_items)
 
     commission_factor = commission / value
 
     return commission_factor
 
   end
+
+  def get_commission_factor(producer, product)
+
+    commission_factors = ProducerProductCommission.where(user: producer, product: product)
+
+    #TODO: the following line is superfluous, as far as i can tell. however, i get a sqlliteexception without it. strange!
+    #i don't think there's anything magical about calling .to_a. when creating this i was able to get things to succeed
+    #as intended when i used a variety of reading methods instead of .to_a
+    commission_factors.to_a
+
+    return commission_factors.order(:created_at).last.commission
+
+  end
+
 end

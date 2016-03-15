@@ -319,7 +319,7 @@ class BulkPurchasesTest < BulkBuyer
     #=> 424.41999999999996
 
     sales = (bp.commission + bp.payment_processor_fee_withheld_from_producer - bp.payment_processor_fee_withheld_from_us).round(2)
-    assert_equal bp.gross, bp.payment_processor_fee_withheld_from_us + bp.net + sales
+    assert_equal bp.gross, (bp.payment_processor_fee_withheld_from_us + bp.net + sales).round(2)
 
     if options[:sales_underwater] == 1
       assert sales < 0, "sales not < 0: " + sales.to_s

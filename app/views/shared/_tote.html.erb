@@ -55,14 +55,14 @@
           <% if tote_items.count > 0 %>            
             <tr>
               <td>Total (all items)</td>
-              <td class="text-right"><%= number_to_currency(total_cost_of_tote_items(tote_items)) %></td>
+              <td class="text-right"><%= number_to_currency(get_gross_tote(tote_items)) %></td>
             </tr>
           <% end %>
           <% if tote_items_authorized.count > 0 %>
             <% data_content = "This is the total of all the items that you have already authorized Farmer's Cellar to charge your payment account for. These are the items listed above with a white background. Your account will be charged the total amount shown here if and when all your ordered items are delivered." %>
             <tr>
               <td><a href="#" class="popover_init" tabindex="0" data-container="body" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=data_content%>">Total (already authorized)</a></td>
-              <td class="text-right"><%= number_to_currency(total_cost_of_tote_items(tote_items_authorized)) %></td>
+              <td class="text-right"><%= number_to_currency(get_gross_tote(tote_items_authorized)) %></td>
             </tr>
           <% end %>
           <% if tote_items_added.count > 0 %>
@@ -75,7 +75,7 @@
             
             <tr class="action_needed">
               <td><a href="#" class="popover_init" tabindex="0" data-container="body" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=data_content%>">Total (<%= authorization_adjective %> authorization)</a></td>
-              <td class="text-right"><%= number_to_currency(total_cost_of_tote_items(tote_items_added)) %></td>
+              <td class="text-right"><%= number_to_currency(get_gross_tote(tote_items_added)) %></td>
             </tr>
           <% end %>
         </tbody>

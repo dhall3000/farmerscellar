@@ -42,7 +42,7 @@ class UserMailer < ApplicationMailer
       end
 
       if tote_item.status == ToteItem.states[:PURCHASED]        
-        @total_cost_of_tote_items += get_tote_item_value(tote_item)
+        @total_cost_of_tote_items += get_gross_item(tote_item)
       end
 
     end    

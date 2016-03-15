@@ -24,7 +24,7 @@ class ToteItemsController < ApplicationController
       if @tote_items == nil
         @total_amount_to_authorize = 0
       else
-        @total_amount_to_authorize = total_cost_of_tote_items(@tote_items.where(status: ToteItem.states[:ADDED]))      
+        @total_amount_to_authorize = get_gross_tote(@tote_items.where(status: ToteItem.states[:ADDED]))      
       end
     end
   end
