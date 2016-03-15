@@ -107,6 +107,56 @@ module ToteItemsHelper
 
   end
 
+  def get_payment_processor_fee_tote(tote_items)
+
+    if tote_items == nil || tote_items.count == 0
+      return 0
+    end
+
+    payment_processor_fee_tote = 0
+
+    tote_items.each do |tote_item|
+      payment_processor_fee_tote = (payment_processor_fee_tote + get_payment_processor_fee_item(tote_item)).round(2)
+    end
+
+    return payment_processor_fee_tote
+
+  end
+
+  def get_payment_processor_fee_item(tote_item)
+
+    if tote_item == nil
+      return 0
+    end
+
+    unit_fee = (0.035 * tote_item.price).round(2)
+    item_fee = (unit_fee * tote_item.quantity).round(2)
+    
+    return item_fee
+
+  end
+
+  def get_producer_net_tote(tote_items)
+
+    producer_net_tote = 0
+
+    if tote_items == nil || tote_items.count < 1
+      return producer_net_tote
+    end
+
+    tote_items.each do |tote_item|
+      producer_net_tote = (producer_net_tote + get_producer_net_item(tote_item)).round(2)
+    end
+
+    return producer_net_tote
+
+  end
+
+  def get_producer_net_item(tote_item)
+    producer_net_item = (get_gross_item(tote_item) - get_payment_processor_fee_item(tote_item) - get_commission_item(tote_item)).round(2)
+    return producer_net_item
+  end
+
   def get_commission_factor(producer, product)
 
     commission_factors = ProducerProductCommission.where(user: producer, product: product)
