@@ -20,10 +20,14 @@ ID=<%= tote_item.id %>,Producer=<%= tote_item.posting.user.farm_name %>,Product=
 <% end %>
 
 <% if purchase_failed %>
-There was a problem with your purchase transaction. Please contact Farmer's Cellar to ensure your account balance is paid in full.
+  There was a problem with your purchase transaction. Please contact Farmer's Cellar to ensure your account balance is paid in full.
 www.farmerscellar.com/contact
 <% else %>
-Your payment account(s) were charged a total of <%= number_to_currency(@total_cost_of_tote_items) %> for the delivered products.
+  <% if @total_cost_of_tote_items > 0 %>
+    Your payment account was charged a total of <%= number_to_currency(@total_cost_of_tote_items) %> for the delivered products.
+  <% else %>
+    Your payment account was not charged.
+  <% end %>
 <% end %>
 
 <% if !@authorizations.nil? && @authorizations.any? %>

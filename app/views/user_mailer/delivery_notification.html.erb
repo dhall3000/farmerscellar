@@ -51,7 +51,11 @@ Here is the status of products you recently ordered that were set for delivery t
 <% if purchase_failed %>
   <b><p style="background-color:red;">There was a problem with your purchase transaction. Please contact <%= link_to "Farmer's Cellar", contact_url %> to ensure your account balance is paid in full.</p></b>
 <% else %>
-  <p>Your payment account(s) were charged a total of <%= number_to_currency(@total_cost_of_tote_items) %> for the delivered products. </p>
+  <% if @total_cost_of_tote_items > 0 %>
+    <p>Your payment account was charged a total of <%= number_to_currency(@total_cost_of_tote_items) %> for the delivered products.</p>
+  <% else %>
+    <p>Your payment account was not charged.</p>
+  <% end %>
 <% end %>
 
 <% if !@authorizations.nil? && @authorizations.any? %>
