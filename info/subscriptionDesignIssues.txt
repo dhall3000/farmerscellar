@@ -1,0 +1,21 @@
+-what if on three consecutive days a person subscribes to 1 dozen eggs, then increases to 2 dozen eggs, then gets 1 gallon of milk?
+	-can i have just one reference transaction i tap for this?
+	-what if on the fourth day they do a one time beef purchase?
+
+Scenarios
+1
+-Person has only purchased with guest checkout
+-they have a guest checkout auth waiting for fulfillment
+-they want to subscribe to eggs so they get flashed a message that requires a pp account + billing agreement (BA)
+-the create a BA
+-at capture time we look for an active BA. if we find one we charge all (even the guest checkout auth'd items) on that
+
+i was just looking at the db diagram considering where new tables would go and how it would hook up. for example, toteitems curently hook to checkouts -> auths. how would we do the equivalent with RTs?
+
+Here's a list of design issues. Perhaps I should continue to add to this list before beginning coding?
+
+-if i already have a Billing Agreement on file and someone comes and checks out additional products / subscriptions, how do i keep records of that?
+-how do i show subscription items in the tote? just leave the item there as long as the subscription is on?
+-how do i allow a person to turn a subscription off?
+-right at commitment zone startup time i should verify with Paypal that the BA is still legit. if it's not I should remove the toteitem and cancel the subscription.
+-before pulling customer funds off a one-time auth i should check if they have a BA. if they have a BA i should pull from that in a batch.
