@@ -11,6 +11,7 @@
             <th class="text-center">Include in Delivery</th>
             <th class="text-center">Producer</th>
             <th class="text-center">Product</th>
+            <th class="text-center">Units</th>
             <th class="text-center">Posted Delivery Date</th>
           </tr>
         </thead>
@@ -20,7 +21,8 @@
             <tr>
               <td><%= check_box_tag "posting_ids[]", posting.id, checked: true %></td>
               <td class="text-center"><%= User.find_by(id: posting.user_id).farm_name %></td>
-              <td class="text-center"><%= Product.find_by(id: posting.product_id).name %></td>          
+              <td class="text-center"><%= Product.find_by(id: posting.product_id).name %></td>
+              <td class="text-center"><%= posting.unit_kind.name %></td>          
               <td class="text-center"><%= posting.delivery_date.strftime("%a %b %d") %></td>                    
             </tr>
           <% end %>
