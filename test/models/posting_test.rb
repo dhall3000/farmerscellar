@@ -7,7 +7,14 @@ class PostingTest < ActiveSupport::TestCase
     product = products(:apples)
     unit_kind = unit_kinds(:pound)
     unit_category = unit_categories(:weight)
-    @posting = Posting.new(unit_category: unit_category, unit_kind: unit_kind, product: product, user: user, description: "descrip", quantity_available: 100, price: 1.25, live: true, commitment_zone_start: Time.zone.today + 2.days, delivery_date: Time.zone.today + 3.days)
+
+    delivery_date = Time.zone.today + 3.days
+
+    if delivery_date.sunday?
+      delivery_date = Time.zone.today + 4.days
+    end
+
+    @posting = Posting.new(unit_category: unit_category, unit_kind: unit_kind, product: product, user: user, description: "descrip", quantity_available: 100, price: 1.25, live: true, commitment_zone_start: delivery_date - 2.days, delivery_date: delivery_date)
     @posting.save
   end
 

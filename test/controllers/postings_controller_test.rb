@@ -107,6 +107,10 @@ class PostingsControllerTest < ActionController::TestCase
   #this new posting SHOULD show up in the My Postings section of the farmer's profile  
   test "newly created posting is not posted when created properly with live unset" do
     #this new posting should NOT show up in the shopping pages
+
+    #we changed a feature so this is bogus. we now don't make the 'live' setting visible to user, assuming that if they're wanting to create a posting
+    #that they also want it live. they can always go in and edit the posting if they really want it off
+    next
     
     postings_count_prior = get_postings_count
 
@@ -489,15 +493,23 @@ class PostingsControllerTest < ActionController::TestCase
     #specify values, submit form
 
     posting_hash = get_posting_params_hash
+
+    #actually, because of a feature change this now does nothing. on the next line when we 'post' the live var will get set to 'true'
     posting_hash[:live] = false
 
     post :create, id: @farmer.id, posting: posting_hash
-      
     posting = assigns(:posting)
     assert_not posting.nil?
     assert posting.valid?, get_error_messages(posting)
     assert_redirected_to postings_path
     assert_not flash.empty?
+
+    #ok, now we have to update this posting if we really want live unset
+    patch :update, id: posting.id, posting: {live: false}
+    posting = assigns(:posting)
+
+    assert_not posting.live
+
     return posting
   end
 
