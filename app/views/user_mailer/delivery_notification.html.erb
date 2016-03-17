@@ -3,7 +3,7 @@ Hello,
 </p>
 
 <p>
-This email is your Farmer's Cellar delivery notification and purchase receipt.
+This email is your Farmer's Cellar delivery notification.
 </p>
 
 <p>
@@ -35,7 +35,7 @@ Here is the status of products you recently ordered that were set for delivery t
         <td align="left"><%= tote_item.posting.unit_kind.name %></td>
         <td align="center"><%= tote_item.quantity %></td>
         <td align="center">
-          <% if tote_item.status == ToteItem.states[:PURCHASED] || tote_item.status == ToteItem.states[:PURCHASEFAILED] %>
+          <% if tote_item.status == ToteItem.states[:FILLED] || tote_item.status == ToteItem.states[:PURCHASED] || tote_item.status == ToteItem.states[:PURCHASEFAILED] %>
             DELIVERED
           <% elsif tote_item.status == ToteItem.states[:NOTFILLED] %>
             NOT FILLED
@@ -51,11 +51,16 @@ Here is the status of products you recently ordered that were set for delivery t
 <% if purchase_failed %>
   <b><p style="background-color:red;">There was a problem with your purchase transaction. Please contact <%= link_to "Farmer's Cellar", contact_url %> to ensure your account balance is paid in full.</p></b>
 <% else %>
-  <% if @total_cost_of_tote_items > 0 %>
-    <p>Your payment account was charged a total of <%= number_to_currency(@total_cost_of_tote_items) %> for the delivered products.</p>
-  <% else %>
-    <p>Your payment account was not charged.</p>
+
+  <% #I'm if/false'ing this so we can see what the logic used to be. This was for when we always executed purchases immediately prior to dropsite delivery %>
+  <% if false %>
+    <% if @total_cost_of_tote_items > 0 %>
+      <p>Your payment account was charged a total of <%= number_to_currency(@total_cost_of_tote_items) %> for the delivered products.</p>
+    <% else %>
+      <p>Your payment account was not charged.</p>
+    <% end %>
   <% end %>
+
 <% end %>
 
 <% if !@authorizations.nil? && @authorizations.any? %>

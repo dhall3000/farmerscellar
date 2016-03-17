@@ -1,7 +1,7 @@
 <% purchase_failed = false %>
 Hello,
 
-This email is your Farmer's Cellar delivery notification and purchase receipt.
+This email is your Farmer's Cellar delivery notification.
 
 Here is the status of products you recently ordered that were set for delivery today:
 
@@ -10,7 +10,7 @@ Here is the status of products you recently ordered that were set for delivery t
     <% purchase_failed = true %>
   <% end %>
   <% status = "UNKNOWN" %>
-  <% if tote_item.status == ToteItem.states[:PURCHASED] || tote_item.status == ToteItem.states[:PURCHASEFAILED] %>
+  <% if tote_item.status == ToteItem.states[:FILLED] || tote_item.status == ToteItem.states[:PURCHASED] || tote_item.status == ToteItem.states[:PURCHASEFAILED] %>
     <% status = "DELIVERED" %>
   <% elsif tote_item.status == ToteItem.states[:NOTFILLED] %>
     <% status = "NOT FILLED" %>
@@ -23,10 +23,13 @@ ID=<%= tote_item.id %>,Producer=<%= tote_item.posting.user.farm_name %>,Product=
   There was a problem with your purchase transaction. Please contact Farmer's Cellar to ensure your account balance is paid in full.
 www.farmerscellar.com/contact
 <% else %>
-  <% if @total_cost_of_tote_items > 0 %>
-    Your payment account was charged a total of <%= number_to_currency(@total_cost_of_tote_items) %> for the delivered products.
-  <% else %>
-    Your payment account was not charged.
+  <% #I'm if/false'ing this so we can see what the logic used to be. This was for when we always executed purchases immediately prior to dropsite delivery %>
+  <% if false %>
+    <% if @total_cost_of_tote_items > 0 %>
+      Your payment account was charged a total of <%= number_to_currency(@total_cost_of_tote_items) %> for the delivered products.
+    <% else %>
+      Your payment account was not charged.
+    <% end %>
   <% end %>
 <% end %>
 
