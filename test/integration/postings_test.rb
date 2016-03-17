@@ -102,7 +102,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
     post postings_path, posting: {
       description: "hi",
       quantity_available: 100,
-      price: 2.50,
+      price: 2.97,
       user_id: @user.id,
       product_id: @product.id,
       unit_category_id: @unit_category.id,
@@ -117,8 +117,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
     assert_redirected_to postings_path
     follow_redirect!
     assert_template 'postings/index'
-
-    assert_select '.price', "$2.50 / Pound"
+    assert_select '.price', "$2.97 / Pound"
     
     return posting
 
