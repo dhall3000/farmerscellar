@@ -41,6 +41,8 @@ class UserMailer < ApplicationMailer
         auths << tote_item.checkouts.last.authorizations.last.id
       end
 
+      #this 'if' block doesn't make sense any more. it did make sense when we always executed purchases immediately prior to dropsite delivery
+      #but, of course, what we're going with now is delayed purchasing to minimize paypal fees so toteitems will never be PURCHASED at this point in the code
       if tote_item.status == ToteItem.states[:PURCHASED]        
         @total_cost_of_tote_items += get_gross_item(tote_item)
       end
