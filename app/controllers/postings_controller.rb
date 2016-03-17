@@ -37,6 +37,9 @@ class PostingsController < ApplicationController
 
   	@posting = Posting.new(posting_params)
 
+    #this was added so that if we're copying a non-live posting the user doesn't have to take the extra step of edit/update'ing to turn this copy 'on'
+    @posting.live = true
+
     #if posting_recurrence_params are repeating, associate a new recurrence with this posting
     if !posting_recurrence_params.nil? && posting_recurrence_params[:on] && posting_recurrence_params[:interval].to_i > PostingRecurrence.intervals[0][1]
       @posting.build_posting_recurrence(posting_recurrence_params)

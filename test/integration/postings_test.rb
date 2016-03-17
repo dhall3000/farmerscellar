@@ -34,6 +34,50 @@ class PostingsTest < ActionDispatch::IntegrationTest
 
   end
 
+  #should copy an existing posting and have all same values and show up in the postings page
+  test "should copy new posting" do
+    login_for(@user)
+
+    get postings_path
+    assert :success
+    assert_select '.price', {text: "$2.75 / Pound", count: 1}
+    
+    #turn off the existing posting
+    patch posting_path(@posting), posting: {
+      description: "edited description",
+      quantity_available: @posting.quantity_available,
+      price: @posting.price,
+      live: false
+    }
+
+    assert :success  
+    assert_redirected_to @user
+    get postings_path
+    assert :success
+    assert_select '.price', {text: "$2.75 / Pound", count: 0}
+
+    #here is where we need to copy the posting
+    get new_posting_path, posting_id: @posting.id
+    posting = assigns(:posting)
+    post postings_path, posting: {
+      description: posting.description,
+      quantity_available: posting.quantity_available,
+      price: posting.price,
+      user_id: posting.user_id,
+      product_id: posting.product_id,
+      unit_category_id: posting.unit_category_id,
+      unit_kind_id: posting.unit_kind_id,
+      live: posting.live,
+      delivery_date: posting.delivery_date,
+      commitment_zone_start: posting.commitment_zone_start
+    }
+
+    get postings_path
+    assert :success
+    assert_select '.price', {text: "$2.75 / Pound", count: 1}
+
+  end
+
   def login_for(user)
     get_access_for(user)
     get login_path
@@ -69,9 +113,14 @@ class PostingsTest < ActionDispatch::IntegrationTest
       }
 
     assert :success
+    posting = assigns(:posting)
     assert_redirected_to postings_path
     follow_redirect!
     assert_template 'postings/index'
+
+    assert_select '.price', "$2.50 / Pound"
+    
+    return posting
 
   end
   
