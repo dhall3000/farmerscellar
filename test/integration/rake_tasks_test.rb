@@ -11,6 +11,8 @@ class RakeTasksTest < ActionDispatch::IntegrationTest
 
   test "nightly tasks should not change state or send emails" do
 
+    assert_equal 0, ToteItem.where(status: ToteItem.states[:FILLED]).count, "This test requires there be no FILLED tote items as a pre-condition."    
+
     ActionMailer::Base.deliveries.clear
     assert_equal 0, ActionMailer::Base.deliveries.count
 
@@ -25,16 +27,33 @@ class RakeTasksTest < ActionDispatch::IntegrationTest
     verify_db_snapshot_equal
 
     assert_equal 0, ActionMailer::Base.deliveries.count
+    ActionMailer::Base.deliveries.clear
 
   end
 
-  test "nightly tasks should change state or send emails" do
+  test "nightly tasks should change state and send emails" do
+
+    next
+
+    assert ToteItem.where(status: ToteItem.states[:FILLED]).count > 0, "This test requires there be some FILLED tote items as a pre-condition."    
+
+    ActionMailer::Base.deliveries.clear
+    assert_equal 0, ActionMailer::Base.deliveries.count
+
+    db_snapshot_before
+    RakeHelper.do_nightly_tasks
+    db_snapshot_after
+    verify_db_snapshot_not_equal
+
+    assert ActionMailer::Base.deliveries.count > 0
+    ActionMailer::Base.deliveries.clear
+
   end
 
   test "week end tasks should not change state or send emails" do
   end
 
-  test "week end tasks should change state or send emails" do
+  test "week end tasks should change state and send emails" do
   end
 
   test "hourly tasks should not change state or send emails" do
