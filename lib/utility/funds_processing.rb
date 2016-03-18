@@ -85,4 +85,28 @@ class FundsProcessing
 
 	end
 
+	def self.bulk_purchase_new
+
+		bulk_purchase = BulkPurchase.new(gross: 0, payment_processor_fee_withheld_from_us: 0, commission: 0, net: 0)
+  	bulk_purchase.load_unpurchased_receivables
+
+  	return {bulk_purchase: bulk_purchase}
+  	
+	end
+
+	def self.bulk_purchase_create(purchase_receivables)
+
+  	purchase_receivables = PurchaseReceivable.find(purchase_receivables)
+  	if purchase_receivables != nil && purchase_receivables.count > 0
+  	  bulk_purchase = BulkPurchase.new(gross: 0, payment_processor_fee_withheld_from_us: 0, commission: 0, net: 0)
+  	  for pr in purchase_receivables
+  	    bulk_purchase.purchase_receivables << pr
+  	  end
+      bulk_purchase.go      
+    end
+
+    return {bulk_purchase: bulk_purchase}
+
+	end
+
 end

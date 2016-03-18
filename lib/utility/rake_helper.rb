@@ -2,6 +2,18 @@ require 'utility/funds_processing'
 
 class RakeHelper
 
+	def self.do_hourly_tasks
+
+	  puts "beginning hourly scheduled tasks..."
+
+	  transitioned_tote_items_and_postings = transition_tote_items_to_committed_state
+		report_committed_tote_items_to_admin(transitioned_tote_items_and_postings[:tote_item_ids])
+		send_orders_to_producers(transitioned_tote_items_and_postings[:posting_ids])
+
+	  puts "finished with hourly tasks."
+
+	end
+
 	def self.do_nightly_tasks
 		
 		puts "do_nightly_tasks start"
@@ -22,18 +34,6 @@ class RakeHelper
 
 	end
 
-	def self.do_hourly_tasks
-
-	  puts "beginning hourly scheduled tasks..."
-
-	  transitioned_tote_items_and_postings = transition_tote_items_to_committed_state
-		report_committed_tote_items_to_admin(transitioned_tote_items_and_postings[:tote_item_ids])
-		send_orders_to_producers(transitioned_tote_items_and_postings[:posting_ids])
-
-	  puts "finished with hourly tasks."
-
-	end
-
 	private
 
 		def self.do_customer_purchases			
@@ -42,6 +42,14 @@ class RakeHelper
 			admin = User.where(account_type: User.types[:ADMIN]).first
 			FundsProcessing.bulk_buy_create(values[:filled_tote_items], admin)
 			#do bulk purchase
+			values = FundsProcessing.bulk_purchase_new
+
+			purchase_receivables = []
+			values[:bulk_purchase].purchase_receivables.each do |pr|
+				purchase_receivables << pr
+			end
+
+			FundsProcessing.bulk_purchase_create(purchase_receivables)
 			
 			#send e-receipts
 		end
