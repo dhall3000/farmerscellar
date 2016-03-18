@@ -1,0 +1,41 @@
+<% if @user.name.nil? %>
+Hello,
+<% else %>
+Hello <%= @user.name %>,
+<% end %>
+
+This email is your Farmer's Cellar purchase receipt. Below is the status of products we charged your payment account for:
+
+<% purchase_failed = false %>
+    <% @tote_items.each do |tote_item| %>
+      <% if tote_item.status == ToteItem.states[:PURCHASEFAILED] %>
+        <% purchase_failed = true %>
+        <% sub_total = "PURCHASEFAILED" %>
+      <% elsif %>
+        <% sub_total = number_to_currency(get_gross_item(tote_item)).to_s %>
+      <% end %>
+ID=<%= tote_item.id %>,Producer=<%= tote_item.posting.user.farm_name %>,Product=<%= tote_item.posting.product.name %>,Price=<%= number_to_currency(tote_item.price) %> / <%= tote_item.posting.unit_kind.name %>,Quantity=<%= tote_item.quantity %>,Sub Total=<%= sub_total %>
+<% end %>
+
+<% if purchase_failed %>
+There was a problem with your purchase transaction. Please contact <%= contact_url %> to ensure your account balance is paid in full.
+<% else %>
+  <% if @purchase_total > 0 %>
+Your payment account was charged a total of <%= number_to_currency(@purchase_total) %>.
+  <% else %>
+Your payment account was not charged.
+  <% end %>
+<% end %>
+
+<% if !@authorizations.nil? && @authorizations.any? %>
+The products listed above are associated with the following payment <%= pluralize(@authorizations.count, "authorization") %>:
+
+<% @authorizations.each do |authorization| %>
+ID=<%= authorization.id %>,Authorization Amount=<%= number_to_currency(authorization.amount) %>,Authorization Date=<%= Time.zone.at(authorization.created_at).strftime("%a %b %d,%l:%M %p") %>
+  <% end %>
+<% end %>
+
+Thanks!
+
+Farmer's Cellar
+<%= root_url %>

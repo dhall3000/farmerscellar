@@ -1,0 +1,94 @@
+<% if @user.name.nil? %>
+  <p>
+  Hello,
+  </p>
+<% else %>
+  <p>
+  Hello <%= @user.name %>,
+  </p>
+<% end %>
+
+<p>
+This email is your Farmer's Cellar purchase receipt. Below is the status of products we charged your payment account for:
+</p>
+
+<% purchase_failed = false %>
+
+<table border="1">
+  <thead>
+    <tr>        
+      <th align="left">ID</th>
+      <th align="left">Producer</th>
+      <th align="left">Product</th>
+      <th align="left">Price</th>
+      <th align="center">Quantity</th>
+      <th align="center">Sub Total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @tote_items.each do |tote_item| %>
+      <% if tote_item.status == ToteItem.states[:PURCHASEFAILED] %>
+        <% purchase_failed = true %>
+      <% end %>
+      <tr>
+        <td align="left"><%= tote_item.id %></td>
+        <td align="left"><%= tote_item.posting.user.farm_name %></td>
+        <td align="left"><%= tote_item.posting.product.name %></td>
+        <td align="left"><%= number_to_currency(tote_item.price) %> / <%= tote_item.posting.unit_kind.name %></td>
+        <td align="center"><%= tote_item.quantity %></td>
+        <td align="center">
+          <% if tote_item.status == ToteItem.states[:PURCHASED] %>
+            <%= number_to_currency(get_gross_item(tote_item)) %>
+          <% elsif %>
+            PURCHASEFAILED
+          <% end %>          
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<% if purchase_failed %>
+  <b><p style="background-color:red;">There was a problem with your purchase transaction. Please contact <%= link_to "Farmer's Cellar", contact_url %> to ensure your account balance is paid in full.</p></b>
+<% else %>
+  
+  <% if @purchase_total > 0 %>
+    <p>Your payment account was charged a total of <%= number_to_currency(@purchase_total) %>.</p>
+  <% else %>
+    <p>Your payment account was not charged.</p>
+  <% end %>  
+
+<% end %>
+
+<% if !@authorizations.nil? && @authorizations.any? %>
+  <p>The products listed above are associated with the following payment <%= pluralize(@authorizations.count, "authorization") %>:</p>
+
+  <table border="1">
+    <thead>
+      <tr>        
+        <th align="left">ID</th>
+        <th align="left">Authorization Amount</th>
+        <th align="left">Authorization Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @authorizations.each do |authorization| %>
+        <tr>
+          <td align="left"><%= authorization.id %></td>
+          <td align="left"><%= number_to_currency(authorization.amount) %></td>
+          <td align="left"><%= Time.zone.at(authorization.created_at).strftime("%a %b %d,%l:%M %p") %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+<% end %>
+
+<p>
+Thanks!
+</p>
+
+<p>
+Farmer's Cellar<br>
+<%= link_to "www.farmerscellar.com", root_url %>
+</p>
