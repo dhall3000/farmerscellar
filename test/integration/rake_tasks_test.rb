@@ -50,9 +50,9 @@ class RakeTasksTest < BulkBuyer
     
     #now transition them to committed
     3.times do |i|
-      #time travel 1 hour
-      travel 1.hour
       RakeHelper.do_hourly_tasks
+      #time travel 1 hour
+      travel 1.hour      
     end
 
     #verify producer order notifications emailed
@@ -72,8 +72,6 @@ class RakeTasksTest < BulkBuyer
     verify_db_snapshot_not_equal
 
     #assert ActionMailer::Base.deliveries.count > 0
-
-
     
     ActionMailer::Base.deliveries.clear
 

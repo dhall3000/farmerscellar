@@ -1,5 +1,20 @@
 class FundsProcessing
 
+	def self.do_bulk_customer_purchase
+		values = FundsProcessing.bulk_buy_new			
+		admin = User.where(account_type: User.types[:ADMIN]).first
+		FundsProcessing.bulk_buy_create(values[:filled_tote_items], admin)
+		#do bulk purchase
+		values = FundsProcessing.bulk_purchase_new
+
+		purchase_receivables = []
+		values[:bulk_purchase].purchase_receivables.each do |pr|
+			purchase_receivables << pr
+		end
+
+		FundsProcessing.bulk_purchase_create(purchase_receivables)
+	end
+
 	def self.bulk_buy_new
 
 		ret = {}
