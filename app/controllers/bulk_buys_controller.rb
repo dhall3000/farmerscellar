@@ -5,22 +5,12 @@ class BulkBuysController < ApplicationController
 
   def new
 
-  	@filled_tote_items = ToteItem.where(status: ToteItem.states[:FILLED])  	
+    values = FundsProcessing.bulk_buy_new
 
-    user_ids = @filled_tote_items.select(:user_id).distinct    
-    @user_infos = []
-    @total_bulk_buy_amount = 0
+  	@filled_tote_items = values[:filled_tote_items]    
+    @user_infos = values[:user_infos]
+    @total_bulk_buy_amount = values[:total_bulk_buy_amount]    
 
-    for user_id in user_ids
-      user_info = {total_amount: 0, name: ''}
-      tote_items_by_user = @filled_tote_items.where(user_id: user_id.user_id)
-      for tote_item_by_user in tote_items_by_user
-        user_info[:total_amount] = (user_info[:total_amount] + (tote_item_by_user.quantity * tote_item_by_user.price).round(2)).round(2)
-        user_info[:name] = tote_item_by_user.user.name
-      end
-      @total_bulk_buy_amount = (@total_bulk_buy_amount + user_info[:total_amount]).round(2)
-      @user_infos << user_info
-    end
   end
 
   def create
