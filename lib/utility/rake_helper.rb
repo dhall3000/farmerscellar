@@ -1,3 +1,5 @@
+require 'utility/funds_processing'
+
 class RakeHelper
 
 	def self.do_nightly_tasks
@@ -34,7 +36,7 @@ class RakeHelper
 
 	private
 
-		def self.do_customer_purchases
+		def self.do_customer_purchases			
 			#do bulk buy
 			#do bulk purchase
 			#send e-receipts
