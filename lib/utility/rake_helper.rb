@@ -1,6 +1,25 @@
 class RakeHelper
 
-	#put tasks here that need to be run at the top of every hour
+	def self.do_nightly_tasks
+		
+		puts "do_nightly_tasks start"
+
+		do_customer_purchases
+
+		puts "do_nightly_tasks end"
+
+	end
+
+	def self.do_week_end_tasks
+		
+		puts "do_week_end_tasks start"
+
+		do_producer_payments
+
+		puts "do_week_end_tasks end"
+
+	end
+
 	def self.do_hourly_tasks
 
 	  puts "beginning hourly scheduled tasks..."
@@ -14,6 +33,15 @@ class RakeHelper
 	end
 
 	private
+
+		def self.do_customer_purchases
+			#do bulk buy
+			#do bulk purchase
+			#send e-receipts
+		end
+
+		def self.do_producer_payments
+		end
 
 		def self.send_orders_to_producers(posting_ids)
 

@@ -6,12 +6,18 @@ task :hourly_tasks => :environment do
   RakeHelper.do_hourly_tasks
 end
 
+task :nightly_tasks => :environment do
+  RakeHelper.do_nightly_tasks
+end
+
+task :week_end_tasks => :environment do
+  RakeHelper.do_week_end_tasks
+end
+
 task :mailer_test => :environment do
-
-  transitioned_tote_ids = [1,7,3,4]
-
-  subject = "commit_totes job summary report"
-  body = get_commit_totes_email_body(transitioned_tote_ids)
+  
+  subject = "my mailer_test subject"
+  body = "my mailer_test body"
 
   AdminNotificationMailer.general_message(subject, body).deliver_now
   

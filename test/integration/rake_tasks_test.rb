@@ -9,7 +9,35 @@ class RakeTasksTest < ActionDispatch::IntegrationTest
     @posting_milk = postings(:postingf2milk)
   end
 
-  test "commit totes should not change state or send emails" do
+  test "nightly tasks should not change state or send emails" do
+
+    ActionMailer::Base.deliveries.clear
+    assert_equal 0, ActionMailer::Base.deliveries.count
+
+    db_snapshot_before
+    RakeHelper.do_nightly_tasks
+    db_snapshot_after
+    verify_db_snapshot_equal
+
+    db_snapshot_before
+    RakeHelper.do_nightly_tasks
+    db_snapshot_after
+    verify_db_snapshot_equal
+
+    assert_equal 0, ActionMailer::Base.deliveries.count
+
+  end
+
+  test "nightly tasks should change state or send emails" do
+  end
+
+  test "week end tasks should not change state or send emails" do
+  end
+
+  test "week end tasks should change state or send emails" do
+  end
+
+  test "hourly tasks should not change state or send emails" do
     #make sure no totes are authorized
     assert_equal 0, ToteItem.where(status: ToteItem.states[:AUTHORIZED]).count
     #save the state counts of all toteitems
@@ -22,7 +50,7 @@ class RakeTasksTest < ActionDispatch::IntegrationTest
     assert_equal 0, ActionMailer::Base.deliveries.count    
   end
 
-  test "commit totes should change state and send emails" do
+  test "hourly tasks should change state and send emails" do
 
     #make sure some totes are authorized
     assert_equal 0, ToteItem.where(status: ToteItem.states[:AUTHORIZED]).count
@@ -86,6 +114,67 @@ class RakeTasksTest < ActionDispatch::IntegrationTest
 
     #go back to regular time
     travel_back
+
+  end
+
+  def verify_db_snapshot_equal
+    assert_equal "true", db_snapshot_equal
+  end
+
+  def verify_db_snapshot_not_equal
+    assert db_snapshot_equal != "true"
+  end
+
+  def db_snapshot_equal
+
+    if @db_snapshot_before[:num_tote_items_filled] != @db_snapshot_after[:num_tote_items_filled]
+      return "@db_snapshot_before[:num_tote_items_filled] == " + @db_snapshot_before[:num_tote_items_filled].to_s + ", @db_snapshot_after[:num_tote_items_filled] == " + @db_snapshot_after[:num_tote_items_filled].to_s
+    end
+
+    if @db_snapshot_before[:num_tote_items_purchasepending] != @db_snapshot_after[:num_tote_items_purchasepending]
+      return "@db_snapshot_before[:num_tote_items_purchasepending] == " + @db_snapshot_before[:num_tote_items_purchasepending].to_s + ", @db_snapshot_after[:num_tote_items_purchasepending] == " + @db_snapshot_after[:num_tote_items_purchasepending].to_s
+    end
+
+    if @db_snapshot_before[:num_purchase_receivables] != @db_snapshot_after[:num_purchase_receivables]
+      return "@db_snapshot_before[:num_purchase_receivables] == " + @db_snapshot_before[:num_purchase_receivables].to_s + ", @db_snapshot_after[:num_purchase_receivables] == " + @db_snapshot_after[:num_purchase_receivables].to_s
+    end
+
+    if @db_snapshot_before[:num_purchases] != @db_snapshot_after[:num_purchases]
+      return "@db_snapshot_before[:num_purchases] == " + @db_snapshot_before[:num_purchases].to_s + ", @db_snapshot_after[:num_purchases] == " + @db_snapshot_after[:num_purchases].to_s
+    end
+
+    if @db_snapshot_before[:num_bulk_buys] != @db_snapshot_after[:num_bulk_buys]
+      return "@db_snapshot_before[:num_bulk_buys] == " + @db_snapshot_before[:num_bulk_buys].to_s + ", @db_snapshot_after[:num_bulk_buys] == " + @db_snapshot_after[:num_bulk_buys].to_s
+    end
+
+    if @db_snapshot_before[:num_bulk_purchases] != @db_snapshot_after[:num_bulk_purchases]
+      return "@db_snapshot_before[:num_bulk_purchases] == " + @db_snapshot_before[:num_bulk_purchases].to_s + ", @db_snapshot_after[:num_bulk_purchases] == " + @db_snapshot_after[:num_bulk_purchases].to_s
+    end
+    
+    return "true"
+
+  end
+
+  def db_snapshot_before
+    @db_snapshot_before = db_snapshot
+  end
+
+  def db_snapshot_after
+    @db_snapshot_after = db_snapshot
+  end
+
+  def db_snapshot
+
+    db_snapshot = {}
+
+    db_snapshot[:num_tote_items_filled] = ToteItem.where(status: ToteItem.states[:FILLED]).count
+    db_snapshot[:num_tote_items_purchasepending] = ToteItem.where(status: ToteItem.states[:PURCHASEPENDING]).count
+    db_snapshot[:num_purchase_receivables] = PurchaseReceivable.count
+    db_snapshot[:num_purchases] = Purchase.count
+    db_snapshot[:num_bulk_buys] = BulkBuy.count
+    db_snapshot[:num_bulk_purchases] = BulkPurchase.count
+
+    return db_snapshot
 
   end
 
