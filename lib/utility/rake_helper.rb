@@ -38,7 +38,11 @@ class RakeHelper
 
 		def self.do_customer_purchases			
 			#do bulk buy
+			values = FundsProcessing.bulk_buy_new			
+			admin = User.where(account_type: User.types[:ADMIN]).first
+			FundsProcessing.bulk_buy_create(values[:filled_tote_items], admin)
 			#do bulk purchase
+			
 			#send e-receipts
 		end
 

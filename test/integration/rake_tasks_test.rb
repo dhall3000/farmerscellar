@@ -1,9 +1,11 @@
 require 'test_helper'
 require 'utility/rake_helper'
+require 'bulk_buy_helper'
 
-class RakeTasksTest < ActionDispatch::IntegrationTest
+class RakeTasksTest < BulkBuyer
 
   def setup
+    super
     ActionMailer::Base.deliveries.clear    
     @posting_apples = postings(:postingf1apples)
     @posting_milk = postings(:postingf2milk)
@@ -32,21 +34,51 @@ class RakeTasksTest < ActionDispatch::IntegrationTest
   end
 
   test "nightly tasks should change state and send emails" do
-
-    next
-
-    assert ToteItem.where(status: ToteItem.states[:FILLED]).count > 0, "This test requires there be some FILLED tote items as a pre-condition."    
-
+    
     ActionMailer::Base.deliveries.clear
     assert_equal 0, ActionMailer::Base.deliveries.count
 
-    db_snapshot_before
+    #authorize a bunch of tote items
+    customers = [@c1, @c2, @c3, @c4]    
+    create_authorization_for_customers(customers)
+
+    #verify authorization receipts emailed
+    assert ActionMailer::Base.deliveries.count > 0
+    ActionMailer::Base.deliveries.clear
+
+    travel_to (@c1.tote_items[1].posting.commitment_zone_start - 1.hour)
+    
+    #now transition them to committed
+    3.times do |i|
+      #time travel 1 hour
+      travel 1.hour
+      RakeHelper.do_hourly_tasks
+    end
+
+    #verify producer order notifications emailed
+    assert ActionMailer::Base.deliveries.count > 0
+    ActionMailer::Base.deliveries.clear
+
+    #now time travel to delivery day
+    travel_to @c1.tote_items[1].posting.delivery_date + 1.minute    
+
+    #ok, food arrived. now fill some orders        
+    fill_all_tote_items = true
+    simulate_order_filling_for_postings(Posting.where("delivery_date < ?", Time.zone.now), fill_all_tote_items)    
+
+    snapshot = db_snapshot_before
     RakeHelper.do_nightly_tasks
     db_snapshot_after
     verify_db_snapshot_not_equal
 
-    assert ActionMailer::Base.deliveries.count > 0
+    #assert ActionMailer::Base.deliveries.count > 0
+
+
+    
     ActionMailer::Base.deliveries.clear
+
+    #go back to regular time    
+    travel_back    
 
   end
 

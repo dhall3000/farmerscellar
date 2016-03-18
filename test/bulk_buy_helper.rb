@@ -47,17 +47,26 @@ class BulkBuyer < Authorizer
 
   end
 
+  #this fills toteitems for all postings, regardless of prior state of the toteitems
   def simulate_order_filling(fill_all_tote_items)
-    #now log in as an admin
-    log_in_as(@a1)
-    assert is_logged_in?
 
     get postings_path
     assert_template 'postings/index'
     postings = assigns(:postings)
     assert_not_nil postings
     puts "there are #{postings.count} postings"
-    
+
+    simulate_order_filling_for_postings(postings, fill_all_tote_items)    
+
+  end
+
+  #this only fills the toteitems for the given postings
+  def simulate_order_filling_for_postings(postings, fill_all_tote_items)
+
+    #now log in as an admin
+    log_in_as(@a1)
+    assert is_logged_in?
+
     for posting in postings
       puts "posting_id: #{posting.id}"
       get tote_items_next_path(tote_item: {posting_id: posting.id})
@@ -67,6 +76,7 @@ class BulkBuyer < Authorizer
         post postings_no_more_product_path, posting_id: posting.id        
       end
     end
+
   end
 
   def create_bulk_buy(customers, fill_all_tote_items)
