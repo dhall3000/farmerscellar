@@ -66,13 +66,12 @@ class RakeTasksTest < BulkBuyer
     fill_all_tote_items = true
     simulate_order_filling_for_postings(Posting.where("delivery_date < ?", Time.zone.now), fill_all_tote_items)    
 
-    snapshot = db_snapshot_before
+    db_snapshot_before
     RakeHelper.do_nightly_tasks
     db_snapshot_after
     verify_db_snapshot_not_equal
 
-    #assert ActionMailer::Base.deliveries.count > 0
-    
+    #assert ActionMailer::Base.deliveries.count > 0    
     ActionMailer::Base.deliveries.clear
 
     #go back to regular time    
