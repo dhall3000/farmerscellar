@@ -5,14 +5,24 @@ class FundsProcessing
 		admin = User.where(account_type: User.types[:ADMIN]).first
 		bulk_buy_create(values[:filled_tote_items], admin)
 		#do bulk purchase
-		values = bulk_purchase_new
+		values = bulk_purchase_new    
 
 		purchase_receivables = []
-		values[:bulk_purchase].purchase_receivables.each do |pr|
-			purchase_receivables << pr
-		end
 
-		bulk_purchase_create(purchase_receivables)
+    if values[:bulk_purchase] != nil && values[:bulk_purchase].purchase_receivables != nil && values[:bulk_purchase].purchase_receivables.any?
+      values[:bulk_purchase].purchase_receivables.each do |pr|
+        purchase_receivables << pr
+      end
+    end
+
+    if purchase_receivables.any?
+      bulk_purchase = bulk_purchase_create(purchase_receivables)[:bulk_purchase]    
+    end		
+
+    if bulk_purchase != nil
+      send_purchase_receipts(bulk_purchase)    
+    end
+
 	end
 
 	def self.bulk_buy_new
@@ -111,17 +121,49 @@ class FundsProcessing
 
 	def self.bulk_purchase_create(purchase_receivables)
 
-  	purchase_receivables = PurchaseReceivable.find(purchase_receivables)
-  	if purchase_receivables != nil && purchase_receivables.count > 0
-  	  bulk_purchase = BulkPurchase.new(gross: 0, payment_processor_fee_withheld_from_us: 0, commission: 0, net: 0)
-  	  for pr in purchase_receivables
-  	    bulk_purchase.purchase_receivables << pr
-  	  end
-      bulk_purchase.go      
+    if purchase_receivables != nil
+    	purchase_receivables = PurchaseReceivable.find(purchase_receivables)
+    	if purchase_receivables != nil && purchase_receivables.count > 0
+    	  bulk_purchase = BulkPurchase.new(gross: 0, payment_processor_fee_withheld_from_us: 0, commission: 0, net: 0)
+    	  for pr in purchase_receivables
+    	    bulk_purchase.purchase_receivables << pr
+    	  end
+        bulk_purchase.go      
+      end
     end
 
     return {bulk_purchase: bulk_purchase}
 
 	end
+
+  private
+    def self.send_purchase_receipts(bulk_purchase)
+
+      if bulk_purchase.nil?
+        return
+      end
+
+      tote_items_by_user = get_tote_items_by_user(bulk_purchase)
+
+      tote_items_by_user.each do |user, tote_items|
+        UserMailer.purchase_receipt(user, tote_items).deliver_now
+      end
+
+    end
+
+    def self.get_tote_items_by_user(bulk_purchase)
+      tote_items_by_user = {}
+
+      bulk_purchase.purchase_receivables.each do |pr|
+        pr.tote_items.each do |tote_item|
+          if !tote_items_by_user.has_key?(tote_item.user)
+            tote_items_by_user[tote_item.user] = []
+          end
+          tote_items_by_user[tote_item.user] << tote_item
+        end
+      end
+
+      return tote_items_by_user
+    end
 
 end
