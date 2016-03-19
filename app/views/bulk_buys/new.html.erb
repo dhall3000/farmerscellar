@@ -2,7 +2,7 @@
 <p>Find me in app/views/bulk_buys/new.html.erb</p>
 
 <% @user_infos.each do |user_info| %>      
-  <p>Capturing <%= user_info[:total_amount] %> from user: <%= user_info[:name] %></p>
+  <p>Capturing <%= user_info[:total_amount] %> from user: <%= user_info[:email] %></p>
 <% end %>
 
 <p> Total Amount: $<%= @total_bulk_buy_amount %></p>

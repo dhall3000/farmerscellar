@@ -1,10 +1,16 @@
-class Purchase < ActiveRecord::Base
+class Purchase < ActiveRecord::Base  
+  attr_reader :amount_to_capture
   serialize :response
 
   has_many :purchase_purchase_receivables
   has_many :purchase_receivables, through: :purchase_purchase_receivables    
 
-  def go(amount_to_capture_in_cents, authorization_payer_id, authorization_transaction_id)
+  def go(amount_to_capture_in_cents, authorization_payer_id, authorization_transaction_id)    
+
+    puts "Purchase.go start"
+
+    @amount_to_capture = (amount_to_capture_in_cents.to_f / 100.to_f).round(2)
+
     if USEGATEWAY
       self.response = GATEWAY.capture(amount_to_capture_in_cents, authorization_transaction_id)
     else
@@ -16,6 +22,13 @@ class Purchase < ActiveRecord::Base
     self.gross_amount = response.params["gross_amount"].to_f.round(2)
     self.payment_processor_fee_withheld_from_us = response.params["fee_amount"].to_f.round(2)
     self.net_amount = (gross_amount - payment_processor_fee_withheld_from_us).round(2)
+
+    s = JunkCloset.puts_helper("", "@amount_to_capture", number_to_currency(@amount_to_capture))
+    s = JunkCloset.puts_helper(s, "gross_amount", number_to_currency(gross_amount))
+    s = JunkCloset.puts_helper(s, "net_amount", number_to_currency(net_amount))
+    puts s
+
+    puts "Purchase.go end"
     
   end
 end

@@ -1,4 +1,6 @@
 class PurchaseReceivable < ActiveRecord::Base
+  attr_accessor :amount_to_capture
+
   has_many :bulk_buy_purchase_receivables
   has_many :bulk_buys, through: :bulk_buy_purchase_receivables
 
@@ -87,6 +89,8 @@ class PurchaseReceivable < ActiveRecord::Base
   end
 
   def purchase    
+
+    puts "PurchaseReceivable.purchase start"
     
     authorization = nil
 
@@ -94,23 +98,33 @@ class PurchaseReceivable < ActiveRecord::Base
       authorization = tote_items.last.authorization
     else
       puts "returning nil because there were no ToteItem objects when trying to do PurchaseReceivable.purchase()."
+      puts "PurchaseReceivable.purchase end"
       return nil      
     end
 
     if authorization == nil
       puts "returning nil because there was no authorization object when trying to do PurchaseReceivable.purchase()."
+      puts "PurchaseReceivable.purchase end"
       return nil
     end
+
+    s = JunkCloset.puts_helper("Authorization", "id", authorization.id.to_s)
+    s = JunkCloset.puts_helper(s, "date", authorization.created_at.to_s)
+    s = JunkCloset.puts_helper(s, "amount", number_to_currency(authorization.amount))
+    puts s
 
     #we don't want to capture more than the purchase_receivable outstanding amount is
     #likewise, we don't want to attempt to capture more than is available on this authorization
     #so, select the lesser of the two    
     purchase_receivable_amount_outstanding = amount - amount_purchased
     authorization_amount_outstanding = authorization.amount - authorization.amount_purchased
-    amount_to_capture = [purchase_receivable_amount_outstanding, authorization_amount_outstanding].min    
+    @amount_to_capture = [purchase_receivable_amount_outstanding, authorization_amount_outstanding].min    
 
-    purchase = Purchase.new    
-    purchase.go(amount_to_capture * 100, authorization.payer_id, authorization.transaction_id)
+    puts JunkCloset.puts_helper("", "@amount_to_capture", number_to_currency(@amount_to_capture))
+
+    purchase = Purchase.new
+    puts "purchasing..."
+    purchase.go(@amount_to_capture * 100, authorization.payer_id, authorization.transaction_id)
 
     if purchase == nil
       puts "Purchase object is nil. this should be impossible. we are in PurchaseReceivable.purchase() method."
@@ -124,6 +138,7 @@ class PurchaseReceivable < ActiveRecord::Base
         authorization.amount_purchased = (authorization.amount_purchased + purchase.gross_amount).round(2)
         authorization.save            
         tote_items.where(status: ToteItem.states[:PURCHASEPENDING]).update_all(status: ToteItem.states[:PURCHASED])
+        puts JunkCloset.puts_helper("purchase success. tote_items transitioned PURCHASEPENDING -> PURCHASED.", "gross_amount", number_to_currency(purchase.gross_amount))
       else        
         tote_items.where(status: ToteItem.states[:PURCHASEPENDING]).update_all(status: ToteItem.states[:PURCHASEFAILED])
         self.kind = PurchaseReceivable.kind[:PURCHASEFAILED]
@@ -140,11 +155,16 @@ class PurchaseReceivable < ActiveRecord::Base
         #put this user's account on hold so they can't order again until they clear up this failed purchase        
         UserAccountState.add_new_state(users.last, :HOLD, "purchase failed")
 
+        puts "purchase failed. tote_items transitioned PURCHASEPENDING -> PURCHASEFAILED and ADDED/AUTHORIZED -> REMOVED. PurchaseReceivable kind -> PURCHASEFAILED. User account placed on hold."
+
         save
       end
 
     end
 
+    puts "PurchaseReceivable.purchase end"
+
     return purchase
+
   end
 end
