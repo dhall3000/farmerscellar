@@ -1,6 +1,6 @@
 Hi <%= @posting_infos.first[0].user.farm_name %>,
 
-Here are the quantities ordered for your upcoming deliveries:
+Below are orders for your upcoming delivery. If all orders are filled total sales will be <%= number_to_currency(@total) %>.
 
 <% @posting_infos.each do |posting, value| %>
 ---------------------------------------------

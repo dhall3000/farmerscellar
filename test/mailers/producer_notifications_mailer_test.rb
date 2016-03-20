@@ -10,7 +10,7 @@ class ProducerNotificationsMailerTest < ActionMailer::TestCase
     assert_equal "Current orders for upcoming deliveries", mail.subject
     assert_equal [ps.first.user.email], mail.to
     assert_equal ["david@farmerscellar.com"], mail.from
-    assert_match "Here are the quantities", mail.body.encoded
+    assert_match "Below are orders for your upcoming delivery", mail.body.encoded
   end
 
 end

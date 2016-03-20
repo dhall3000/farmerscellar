@@ -13,6 +13,7 @@ class ProducerNotificationsMailer < ApplicationMailer
   	end
 
   	@posting_infos = {}
+    @total = 0
 
   	postings.each do |posting|  		
 
@@ -26,8 +27,10 @@ class ProducerNotificationsMailer < ApplicationMailer
 
       committed_items.each do |tote_item|
         unit_count = unit_count + tote_item.quantity
-        sub_total = (sub_total + get_producer_net_item(tote_item)).round(2)
+        sub_total = (sub_total + get_producer_net_item(tote_item)).round(2)        
       end
+
+      @total = (@total + sub_total).round(2)
 
       unit_price = (sub_total / unit_count.to_f).round(2)
       @posting_infos[posting] = {unit_price: unit_price, unit_count: unit_count, sub_total: sub_total}
