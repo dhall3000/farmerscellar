@@ -12,18 +12,34 @@ class ProducerNotificationsMailer < ApplicationMailer
   	  return
   	end
 
-  	@postings = []
+  	@posting_infos = {}
+
   	postings.each do |posting|  		
-  	  if posting.total_quantity_authorized_or_committed > 0
-  	  	@postings << posting
-  	  end
+
+      committed_items = posting.tote_items.where(status: ToteItem.states[:COMMITTED])
+  	  if committed_items.count < 1
+        next
+      end
+
+      unit_count = 0
+      sub_total = 0
+
+      committed_items.each do |tote_item|
+        unit_count = unit_count + tote_item.quantity
+        sub_total = (sub_total + get_producer_net_item(tote_item)).round(2)
+      end
+
+      unit_price = (sub_total / unit_count.to_f).round(2)
+      @posting_infos[posting] = {unit_price: unit_price, unit_count: unit_count, sub_total: sub_total}
+  	  
   	end  	
 
-  	if @postings.nil? || !@postings.any?
+  	if @posting_infos.nil? || !@posting_infos.any?
   	  return
   	end
 
     mail to: email, subject: "Current orders for upcoming deliveries"
+
   end
 
   def payment_invoice(producer, total, posting_infos)

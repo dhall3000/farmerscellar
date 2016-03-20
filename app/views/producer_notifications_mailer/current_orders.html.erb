@@ -1,5 +1,5 @@
 <p>
-  Hi <%= @postings.first.user.farm_name %>,
+  Hi <%= @posting_infos.first[0].user.farm_name %>,
 </p>
 
 <p>
@@ -9,21 +9,25 @@
 <table border="1">
   <thead>
     <tr>		    
-      <th align="left">Product</th>
-      <th align="center">Price</th>   
-      <th align="center">Quantity Ordered</th>
-      <th align="center">Unit</th>      
+      <th align="left">ID</th>
+      <th align="center">Product</th>
       <th align="center">Delivery Date</th>
+      <th align="center">Units</th>        
+      <th align="center">Quantity</th>
+      <th align="center">Unit Price</th>
+      <th align="center">Sub Total</th>
     </tr>
   </thead>
   <tbody>
-    <% @postings.each do |posting| %>
+    <% @posting_infos.each do |posting, value| %>
       <tr>
-        <td align="left"><%= posting.product.name %></td>
-        <td align="center"><%= number_to_currency(posting.price) %></td>
-        <td align="center"><%= posting.total_quantity_authorized_or_committed %></td>
-        <td align="center"><%= posting.unit_kind.name %></td>        
+        <td align="left"><%= posting.id %></td>
+        <td align="center"><%= posting.product.name %></td>
         <td align="center"><%= posting.delivery_date.strftime("%A %b %d, %Y") %></td>
+        <td align="center"><%= posting.unit_kind.name %></td>        
+        <td align="center"><%= value[:unit_count] %></td>
+        <td align="center"><%= number_to_currency(value[:unit_price]) %></td>
+        <td align="center"><%= number_to_currency(value[:sub_total]) %></td>
       </tr>
     <% end %>
   </tbody>
@@ -34,5 +38,6 @@ Thanks!
 </p>
 
 <p>
-Farmer's Cellar
+Farmer's Cellar<br>
+<%= link_to "www.farmerscellar.com", root_url %>
 </p>

@@ -1,12 +1,13 @@
-Hi <%= @postings.first.user.farm_name %>,
+Hi <%= @posting_infos.first[0].user.farm_name %>,
 
 Here are the quantities ordered for your upcoming deliveries:
 
-<% @postings.each do |posting| %>
+<% @posting_infos.each do |posting, value| %>
 ---------------------------------------------
-<%= posting.product.name %>. <%= posting.total_quantity_authorized_or_committed %> ordered @ <%= number_to_currency(posting.price) %> per <%= posting.unit_kind.name %>. This quantity ordered is for delivery on <%= posting.delivery_date.strftime("%A %b %d, %Y") %>
+Id=<%= posting.id %>,Product=<%= posting.product.name %>,Delivery Date=<%= posting.delivery_date.strftime("%A %b %d, %Y") %>,Units=<%= posting.unit_kind.name %>,Quantity=<%= value[:unit_count] %>,Unit Price=<%= number_to_currency(value[:unit_price]) %>,Sub Total=<%= number_to_currency(value[:sub_total]) %>
 <% end %>
 
 Thanks!
 
 Farmer's Cellar
+www.farmerscellar.com
