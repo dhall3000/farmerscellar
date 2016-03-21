@@ -17,6 +17,10 @@ class ProducerNotificationsMailer < ApplicationMailer
 
   	postings.each do |posting|  		
 
+      if posting.user.email != email
+        next
+      end
+
       committed_items = posting.tote_items.where(status: ToteItem.states[:COMMITTED])
   	  if committed_items.count < 1
         next
