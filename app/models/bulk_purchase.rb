@@ -1,6 +1,6 @@
 class BulkPurchase < ActiveRecord::Base
   include ToteItemsHelper
-  attr_reader :num_payment_payables_created
+  attr_reader :num_payment_payables_created, :admin_report
 
   has_many :bulk_purchase_receivables
   has_many :purchase_receivables, through: :bulk_purchase_receivables
@@ -64,46 +64,62 @@ class BulkPurchase < ActiveRecord::Base
   	  save
   	end
 
-    puts "------"
-    puts JunkCloset.puts_helper("", "BulkPurchase id", id.to_s) + " report:"
-    puts JunkCloset.puts_helper("", "gross", gross.to_s)    
-    puts JunkCloset.puts_helper("", "net", net.to_s)
-    puts JunkCloset.puts_helper("", "payment_processor_fee_withheld_from_producer", payment_processor_fee_withheld_from_producer.to_s)
-    puts JunkCloset.puts_helper("", "payment_processor_fee_withheld_from_us", payment_processor_fee_withheld_from_us.to_s)    
-    puts JunkCloset.puts_helper("", "net on payment processor fees", (payment_processor_fee_withheld_from_producer - payment_processor_fee_withheld_from_us).round(2).to_s)    
-    puts JunkCloset.puts_helper("", "commission", commission.to_s)
-    puts JunkCloset.puts_helper("", "sales", (gross - payment_processor_fee_withheld_from_us - net).round(2).to_s)
-
-    if total_amount_of_failed_purchases > 0
-
-      puts JunkCloset.puts_helper("", "total_amount_of_failed_purchases", total_amount_of_failed_purchases.to_s)
-      failed_purchases.each do |purchase|
-        s = JunkCloset.puts_helper("", "Failed Purchase id", purchase.id.to_s)
-        s = JunkCloset.puts_helper(s, "amount to capture", purchase.amount_to_capture.to_s)
-        s = JunkCloset.puts_helper(s, "gross amount", purchase.gross_amount.to_s)
-        puts s
-      end
-
-    end
-
-    if total_amount_of_underamount_purchases > 0
-
-      puts JunkCloset.puts_helper("", "total_amount_of_underamount_purchases", total_amount_of_underamount_purchases.to_s)
-      underamount_purchases.each do |purchase|
-        s = JunkCloset.puts_helper("", "Underamount Purchase id", purchase.id.to_s)
-        s = JunkCloset.puts_helper(s, "amount to capture", purchase.amount_to_capture.to_s)
-        s = JunkCloset.puts_helper(s, "gross amount", purchase.gross_amount.to_s)
-        puts s
-      end      
-
-    end
-
-    puts "------"
+    create_admin_report(total_amount_of_failed_purchases, total_amount_of_underamount_purchases, failed_purchases)
+    puts "---BULKPURCHASE ADMIN REPORT START---"
+    dump_admin_report_to_log
+    puts "---BULKPURCHASE ADMIN REPORT END---"
     puts "BulkPurchase.go end"
 
   end
 
   private
+
+    def dump_admin_report_to_log
+
+      @admin_report.each do |line|
+        puts line
+      end
+
+    end
+
+    def create_admin_report(total_amount_of_failed_purchases, total_amount_of_underamount_purchases, failed_purchases)
+
+      @admin_report = []
+
+      @admin_report << JunkCloset.puts_helper("", "BulkPurchase id", id.to_s) + " report:"
+      @admin_report << JunkCloset.puts_helper("", "gross", gross.to_s)    
+      @admin_report << JunkCloset.puts_helper("", "net", net.to_s)
+      @admin_report << JunkCloset.puts_helper("", "payment_processor_fee_withheld_from_producer", payment_processor_fee_withheld_from_producer.to_s)
+      @admin_report << JunkCloset.puts_helper("", "payment_processor_fee_withheld_from_us", payment_processor_fee_withheld_from_us.to_s)    
+      @admin_report << JunkCloset.puts_helper("", "net on payment processor fees", (payment_processor_fee_withheld_from_producer - payment_processor_fee_withheld_from_us).round(2).to_s)    
+      @admin_report << JunkCloset.puts_helper("", "commission", commission.to_s)
+      @admin_report << JunkCloset.puts_helper("", "sales", (gross - payment_processor_fee_withheld_from_us - net).round(2).to_s)
+
+      if total_amount_of_failed_purchases > 0
+
+        @admin_report << JunkCloset.puts_helper("", "total_amount_of_failed_purchases", total_amount_of_failed_purchases.to_s)
+        failed_purchases.each do |purchase|
+          s = JunkCloset.puts_helper("", "Failed Purchase id", purchase.id.to_s)
+          s = JunkCloset.puts_helper(s, "amount to capture", purchase.amount_to_capture.to_s)
+          s = JunkCloset.puts_helper(s, "gross amount", purchase.gross_amount.to_s)
+          @admin_report << s
+        end
+
+      end
+
+      if total_amount_of_underamount_purchases > 0
+
+        @admin_report << JunkCloset.puts_helper("", "total_amount_of_underamount_purchases", total_amount_of_underamount_purchases.to_s)
+        underamount_purchases.each do |purchase|
+          s = JunkCloset.puts_helper("", "Underamount Purchase id", purchase.id.to_s)
+          s = JunkCloset.puts_helper(s, "amount to capture", purchase.amount_to_capture.to_s)
+          s = JunkCloset.puts_helper(s, "gross amount", purchase.gross_amount.to_s)
+          @admin_report << s
+        end      
+
+      end      
+
+    end
 
     def create_payment_payables(purchase_receivable, purchase)      
 

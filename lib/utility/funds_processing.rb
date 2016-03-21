@@ -28,6 +28,7 @@ class FundsProcessing
 
     if bulk_purchase != nil
       send_purchase_receipts(bulk_purchase)    
+      send_admin_report(bulk_purchase)
     end
 
     puts "FundsProcessing.do_bulk_customer_purchase end"
@@ -196,6 +197,23 @@ class FundsProcessing
 	end
 
   private
+
+    def self.send_admin_report(bulk_purchase)
+
+      if bulk_purchase.nil?
+        return
+      end
+
+      body = ""
+
+      bulk_purchase.admin_report.each do |line|
+        body += ". " + line
+      end
+
+      AdminNotificationMailer.general_message("bulk purchase report", body).deliver_now      
+
+    end
+
     def self.send_purchase_receipts(bulk_purchase)
 
       if bulk_purchase.nil?
