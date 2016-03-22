@@ -34,10 +34,10 @@ t3:
 
 t4:
   quantity: 3
-  price: 2.74
+  price: 5.00
   status: <%= ToteItem.states[:ADDED] %>
   user: c6
-  posting: p2
+  posting: p3
 
 #------------------------c7
 t5:

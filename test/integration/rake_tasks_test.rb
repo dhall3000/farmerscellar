@@ -64,7 +64,51 @@ class RakeTasksTest < BulkBuyer
 
       #run hourly tasks at top of each hour. this will transition tote items to COMMITTED
       if top_of_hour
+
+        ActionMailer::Base.deliveries.clear
+
         RakeHelper.do_hourly_tasks
+
+        committed_tote_item_count = ToteItem.where(status: ToteItem.states[:COMMITTED]).count
+        email_count = ActionMailer::Base.deliveries.count
+
+        if email_count > 0
+          current_order_mail = ActionMailer::Base.deliveries[1]
+          commit_totes_mail = ActionMailer::Base.deliveries[0]
+        end
+
+        #this is the first of the postings to enter the commitment zone so there should only be items related to this
+        #posting in the total committed tote item count
+        if Time.zone.now == @p1.commitment_zone_start
+          assert_equal 3, committed_tote_item_count          
+          assert_equal 2, email_count          
+          assert_appropriate_email(current_order_mail, @p1.user.email, "Current orders for upcoming deliveries", "Below are orders for your upcoming delivery")
+          assert_appropriate_email(commit_totes_mail, "david@farmerscellar.com", "commit_totes job summary report", "number of tote_items transitioned from AUTHORIZED -> COMMITTED")
+        elsif Time.zone.now == @p2.commitment_zone_start         
+          #at the time we enter the commitment zone for posting p2 we won't have delivered the items for p1 yet
+          #so the total committed tote item count should be all the items for postings p1 and p2        
+          assert_equal 4, committed_tote_item_count
+          assert_equal 2, email_count
+          assert_appropriate_email(current_order_mail, @p2.user.email, "Current orders for upcoming deliveries", "Below are orders for your upcoming delivery")
+          assert_appropriate_email(commit_totes_mail, "david@farmerscellar.com", "commit_totes job summary report", "number of tote_items transitioned from AUTHORIZED -> COMMITTED")
+        elsif Time.zone.now == @p3.commitment_zone_start         
+          #by the time we get to p3's commitment zone, p1's items should have been tranitioned out of the COMMITTED state
+          #so they no longer contribute to the total committed tote item count. it's only p2 and p3 that contribute.        
+          assert_equal 3, committed_tote_item_count
+          assert_equal 2, email_count
+          assert_appropriate_email(current_order_mail, @p3.user.email, "Current orders for upcoming deliveries", "Below are orders for your upcoming delivery")
+          assert_appropriate_email(commit_totes_mail, "david@farmerscellar.com", "commit_totes job summary report", "number of tote_items transitioned from AUTHORIZED -> COMMITTED")
+        elsif Time.zone.now == @p4.commitment_zone_start        
+          #the weekend has elapsed since p3's delivery, so by the time we get to this monday - p4's delivery - all other
+          #tote items should have transitioned out of the committed state        
+          assert_equal 1, committed_tote_item_count
+          assert_equal 2, email_count
+          assert_appropriate_email(current_order_mail, @p4.user.email, "Current orders for upcoming deliveries", "Below are orders for your upcoming delivery")
+          assert_appropriate_email(commit_totes_mail, "david@farmerscellar.com", "commit_totes job summary report", "number of tote_items transitioned from AUTHORIZED -> COMMITTED")
+        else
+          assert_equal 0, ActionMailer::Base.deliveries.count
+        end
+
       end
 
       if is_noon_hour && top_of_hour
@@ -75,37 +119,62 @@ class RakeTasksTest < BulkBuyer
           is_delivery_date = Time.zone.now.midnight == posting.delivery_date
 
           if is_delivery_date
+
+            ActionMailer::Base.deliveries.clear
+
+            previous_filled_count = ToteItem.where(status: ToteItem.states[:FILLED]).count
+
             #ok, food arrived. now fill some orders        
-            fill_all_tote_items = true
+            fill_all_tote_items = true            
             simulate_order_filling_for_postings([posting], fill_all_tote_items)
+            assert previous_filled_count < ToteItem.where(status: ToteItem.states[:FILLED]).count            
+
+            assert_equal 0, ActionMailer::Base.deliveries.count
+
           end
           
         end
 
-      end      
+      end
+
+      #purchase receipts and bulk purchase admin reports
 
       #run the nightly tasks at 10pm pst. this will process bulk purchases
       if Time.zone.now.hour == 22 && top_of_hour
-        RakeHelper.do_nightly_tasks
+
+        ActionMailer::Base.deliveries.clear
+        RakeHelper.do_nightly_tasks     
+        emails = ActionMailer::Base.deliveries
 
         #this is after the nightly tasks on the Monday delivery
         if Time.zone.now.midnight == @p1.delivery_date
           assert_equal 1, PurchaseReceivable.count, "There should only be 1 PurchaseReceivable because the other two customers still have tote items to be delivered later on this week"
+          assert_equal 2, ActionMailer::Base.deliveries.count
+          assert_appropriate_email(emails[0], "c5@c.com", "Purchase receipt", "This email is your Farmer's Cellar purchase receipt")
+          assert_appropriate_email(emails[1], "david@farmerscellar.com", "bulk purchase report", "BulkPurchase id: 1")
         end
 
         #this is after the nightly tasks on the Wednesday delivery
         if Time.zone.now.midnight == @p2.delivery_date
-          assert_equal 2, PurchaseReceivable.count, "There should only be 2 PurchaseReceivables because there's another customer to have tote items delivered later on this week"
+          assert_equal 1, PurchaseReceivable.count, "There should only be 2 PurchaseReceivables because there's another customer to have tote items delivered later on this week"
+          assert_equal 0, ActionMailer::Base.deliveries.count
         end
 
         #this is after the nightly tasks on the Friday delivery
         if Time.zone.now.midnight == @p3.delivery_date
           assert_equal 3, PurchaseReceivable.count, "There should be 3 PurchaseReceivables because all three customers should have gotten purchases by now"
+          assert_equal 3, ActionMailer::Base.deliveries.count
+          assert_appropriate_email(emails[0], "c7@c.com", "Purchase receipt", "This email is your Farmer's Cellar purchase receipt")
+          assert_appropriate_email(emails[1], "c6@c.com", "Purchase receipt", "This email is your Farmer's Cellar purchase receipt")          
+          assert_appropriate_email(emails[2], "david@farmerscellar.com", "bulk purchase report", "BulkPurchase id: 2")
         end
 
         #this is after the nightly tasks on the 2nd Monday delivery
         if Time.zone.now.midnight == @p4.delivery_date
           assert_equal 4, PurchaseReceivable.count, "There should be a 4th PurchaseReceivable because we're in the next week now which is where c5's 2nd tote item is delivered"
+          assert_equal 2, ActionMailer::Base.deliveries.count
+          assert_appropriate_email(emails[0], "c5@c.com", "Purchase receipt", "This email is your Farmer's Cellar purchase receipt")
+          assert_appropriate_email(emails[1], "david@farmerscellar.com", "bulk purchase report", "BulkPurchase id: 3")
         end
 
       end
@@ -113,6 +182,19 @@ class RakeTasksTest < BulkBuyer
       travel 1.minute
       
     end
+
+    #there should be a bp on the first monday because that customer has no further deliveries that week
+    #there should not be a bp on wednesday night because all filled customers have remaining deliveries later that week
+    #there should be a bp on friday night because that's the last delivery this week for these two customers
+    #there should be a bp on the 2nd monday because that customer has no more deliveries that week
+    assert_equal 3, BulkPurchase.count
+
+    #this bp represents only c5's 1st monday night's purchase
+    assert_equal 8.67, BulkPurchase.all[0].gross
+    #this bp represents all orders of c6 & c7 which occurred on friday night
+    assert_equal 81.97, BulkPurchase.all[1].gross
+    #this bp represents only c5's 2nd monday night's purchase
+    assert_equal 46.89, BulkPurchase.all[2].gross
 
     #go back to regular time    
     travel_back    
@@ -249,6 +331,13 @@ class RakeTasksTest < BulkBuyer
     #go back to regular time
     travel_back
 
+  end
+
+  def assert_appropriate_email(mail, to, subject, body)
+    assert_equal subject, mail.subject
+    assert_equal [to], mail.to
+    assert_equal ["david@farmerscellar.com"], mail.from
+    assert_match body, mail.body.encoded
   end
 
   def verify_db_snapshot_equal
