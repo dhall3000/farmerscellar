@@ -24,7 +24,7 @@ class NotFilledToteItemsTest < BulkBuyer
     assert_equal 0, ToteItem.where(status: ToteItem.states[:COMMITTED]).count
     assert_equal 0, ToteItem.where(status: ToteItem.states[:FILLPENDING]).count
 
-    num_tote_items = ToteItem.all.count
+    num_tote_items = ToteItem.where(user_id: customers).count
     num_filled = ToteItem.where(status: ToteItem.states[:FILLED]).count
     num_not_filled = ToteItem.where(status: ToteItem.states[:NOTFILLED]).count
     assert num_not_filled > 0

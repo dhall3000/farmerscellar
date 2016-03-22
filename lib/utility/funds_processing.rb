@@ -22,16 +22,16 @@ class FundsProcessing
 		#do bulk purchase
 		values = bulk_purchase_new    
 
-		purchase_receivables = []
+		purchase_receivable_ids = []
 
     if values[:bulk_purchase] != nil && values[:bulk_purchase].purchase_receivables != nil && values[:bulk_purchase].purchase_receivables.any?
       values[:bulk_purchase].purchase_receivables.each do |pr|
-        purchase_receivables << pr
+        purchase_receivable_ids << pr.id
       end
     end
 
-    if purchase_receivables.any?
-      bulk_purchase = bulk_purchase_create(purchase_receivables)[:bulk_purchase]    
+    if purchase_receivable_ids.any?
+      bulk_purchase = bulk_purchase_create(purchase_receivable_ids)[:bulk_purchase]    
     end		
 
     if bulk_purchase != nil
@@ -205,12 +205,12 @@ class FundsProcessing
   	
 	end
 
-	def self.bulk_purchase_create(purchase_receivables)
+	def self.bulk_purchase_create(purchase_receivable_ids)
 
     puts "FundsProcessing.bulk_purchase_create start"
     
-    if purchase_receivables != nil
-    	purchase_receivables = PurchaseReceivable.find(purchase_receivables)
+    if purchase_receivable_ids != nil
+    	purchase_receivables = PurchaseReceivable.find(purchase_receivable_ids)
     	if purchase_receivables != nil && purchase_receivables.count > 0
         puts JunkCloset.puts_helper("", "num PurchaseReceivables we're about to loop over", purchase_receivables.count.to_s)
     	  bulk_purchase = BulkPurchase.new(gross: 0, payment_processor_fee_withheld_from_us: 0, commission: 0, net: 0)
