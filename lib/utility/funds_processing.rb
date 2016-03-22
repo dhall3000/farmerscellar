@@ -231,7 +231,11 @@ class FundsProcessing
 
     def self.send_admin_report(bulk_purchase)
 
+      puts "FundsProcessing.send_admin_report start"
+
       if bulk_purchase.nil?
+        puts "bulk_purchase.nil? true"
+        puts "FundsProcessing.send_admin_report end"
         return
       end
 
@@ -242,20 +246,30 @@ class FundsProcessing
       end
 
       AdminNotificationMailer.general_message("bulk purchase report", body).deliver_now      
+      
+      puts "sent bulk purchase report email to david@farmerscellar.com"
+      puts "FundsProcessing.send_admin_report end"
 
     end
 
     def self.send_purchase_receipts(bulk_purchase)
 
+      puts "FundsProcessing.send_purchase_receipts start"
+
       if bulk_purchase.nil?
+        puts "bulk_purchase.nil? true"
+        puts "FundsProcessing.send_purchase_receipts end"
         return
       end
 
       tote_items_by_user = get_tote_items_by_user(bulk_purchase)
 
-      tote_items_by_user.each do |user, tote_items|
+      tote_items_by_user.each do |user, tote_items|                
         UserMailer.purchase_receipt(user, tote_items).deliver_now
+        puts "sent purchase receipt email to " + user.email
       end
+
+      puts "FundsProcessing.send_purchase_receipts end"
 
     end
 
