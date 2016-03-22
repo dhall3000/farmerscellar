@@ -15,6 +15,7 @@
 <% two_mondays_out = Time.zone.today.midnight + 7.days + i.days %>
 <% two_wednesdays_out = two_mondays_out + 2.days %>
 <% two_fridays_out = two_wednesdays_out + 2.days %>
+<% three_mondays_out = two_mondays_out + 7.days %>
 
 p1:
   delivery_date: <%= two_mondays_out %>
@@ -50,6 +51,18 @@ p3:
   unit_category: volume
   unit_kind: gallon
   description: milk description
+  live: true  
+
+p4:
+  delivery_date: <%= three_mondays_out %>
+  commitment_zone_start: <%= three_mondays_out - 2.days %>
+  product: beef
+  quantity_available: 1000
+  price: 5.21
+  user: f2
+  unit_category: weight
+  unit_kind: pound
+  description: beef description
   live: true  
 
 #Apples

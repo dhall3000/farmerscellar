@@ -49,7 +49,16 @@ class FundsProcessing
 
 		ret = {}
 
-  	ret[:filled_tote_items] = ToteItem.where(status: ToteItem.states[:FILLED])  	
+    #get all filled tote items where the users of such have no deliveries scheduled later this week
+    num_days_till_end_of_week = ENDOFWEEK - Time.zone.today.wday
+    time_range = Time.zone.today.midnight..(Time.zone.today.midnight + num_days_till_end_of_week.days)
+    #these are the users that have some filled tote items
+    filled_users = User.select(:id).joins(:tote_items).where("tote_items.status = ?", ToteItem.states[:FILLED]).distinct
+    #among these users, which also have toteitems in either AUTHORIZED or COMMITTED states?
+    delivery_later_this_week_users = User.select(:id).joins(tote_items: :posting).where("tote_items.status" => [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED]], 'postings.delivery_date' => time_range).distinct
+    purchase_users = filled_users.where.not(id: delivery_later_this_week_users)
+
+    ret[:filled_tote_items] = ToteItem.joins(:user).where('users.id' => purchase_users, status: ToteItem.states[:FILLED]).distinct
 
     if ret[:filled_tote_items].count < 1
       puts "zero tote items in the FILLED state"

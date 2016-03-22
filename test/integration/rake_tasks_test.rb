@@ -10,6 +10,9 @@ class RakeTasksTest < BulkBuyer
     @posting_apples = postings(:postingf1apples)
     @posting_milk = postings(:postingf2milk)
     @p1 = postings(:p1)
+    @p2 = postings(:p2)
+    @p3 = postings(:p3)
+    @p4 = postings(:p4)
     @c5 = users(:c5)
     @c6 = users(:c6)
     @c7 = users(:c7)
@@ -44,7 +47,7 @@ class RakeTasksTest < BulkBuyer
 
     #authorize a bunch of tote items
     customers = [@c5, @c6, @c7]
-    postings = [postings(:p1), postings(:p2), postings(:p3)]
+    postings = [postings(:p1), postings(:p2), postings(:p3), postings(:p4)]
     create_authorization_for_customers(customers)
 
     #verify authorization receipts emailed
@@ -83,7 +86,28 @@ class RakeTasksTest < BulkBuyer
 
       #run the nightly tasks at 10pm pst. this will process bulk purchases
       if Time.zone.now.hour == 22 && top_of_hour
-        RakeHelper.do_nightly_tasks        
+        RakeHelper.do_nightly_tasks
+
+        #this is after the nightly tasks on the Monday delivery
+        if Time.zone.now.midnight == @p1.delivery_date
+          assert_equal 1, PurchaseReceivable.count, "There should only be 1 PurchaseReceivable because the other two customers still have tote items to be delivered later on this week"
+        end
+
+        #this is after the nightly tasks on the Wednesday delivery
+        if Time.zone.now.midnight == @p2.delivery_date
+          assert_equal 2, PurchaseReceivable.count, "There should only be 2 PurchaseReceivables because there's another customer to have tote items delivered later on this week"
+        end
+
+        #this is after the nightly tasks on the Friday delivery
+        if Time.zone.now.midnight == @p3.delivery_date
+          assert_equal 3, PurchaseReceivable.count, "There should be 3 PurchaseReceivables because all three customers should have gotten purchases by now"
+        end
+
+        #this is after the nightly tasks on the 2nd Monday delivery
+        if Time.zone.now.midnight == @p4.delivery_date
+          assert_equal 4, PurchaseReceivable.count, "There should be a 4th PurchaseReceivable because we're in the next week now which is where c5's 2nd tote item is delivered"
+        end
+
       end
 
       travel 1.minute
