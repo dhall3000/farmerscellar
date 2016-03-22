@@ -217,6 +217,9 @@ class BulkPurchasesTest < BulkBuyer
 
     #by the time we get to this point c1 should have 10 toteitems, 8 in PURCHASEPENDING, 1 in ADDED and 1 in AUTHORIZED
 
+    ActionMailer::Base.deliveries.clear
+    previous_user_account_state_count = UserAccountState.count
+
     log_in_as(@a1)
     FakeCaptureResponse.toggle_success = true    
     post bulk_purchases_path, purchase_receivables: purchase_receivables
@@ -226,6 +229,20 @@ class BulkPurchasesTest < BulkBuyer
     verify_legitimacy_of_bulk_purchase
     verify_proper_number_of_payment_payables    
     bulk_purchase = assigns(:bulk_purchase)
+
+    failed_pr_count = 0
+    bulk_purchase.purchase_receivables.each do |pr|
+      if pr.kind == PurchaseReceivable.kind[:PURCHASEFAILED]
+        failed_pr_count += 1
+      end
+    end
+
+    assert failed_pr_count > 0
+    assert UserAccountState.count, previous_user_account_state_count
+    assert 1, UserAccountState.order(:created_at).last.account_state.state
+    
+    bulk_purchase.do_bulk_email_communication
+    verify_proper_purchase_receipt_emails(bulk_purchase)
 
     verify_proper_account_states(customers)
     log_in_as(@a1)
@@ -388,6 +405,65 @@ class BulkPurchasesTest < BulkBuyer
   
     verify_legitimacy_of_purchase_receivables
 
+  end
+
+  def get_email_for(email)
+
+    messages = []
+
+    ActionMailer::Base.deliveries.each do |mail|
+      if mail.to == [email]
+        messages << mail
+      end
+    end
+
+    return messages
+
+  end
+
+  def verify_proper_purchase_receipt_emails(bulk_purchase)
+    
+    user_ids = []
+    bulk_purchase.purchase_receivables.each do |pr|
+
+      user = pr.users.last
+      user_ids << user.id
+
+      messages = get_email_for(user.email)
+
+      #there should only be one email for this user
+      assert_equal 1, messages.count
+
+      mail = messages[0]
+      if mail.to == ["david@farmerscellar.com"]
+
+      else
+
+        assert_equal [user.email], mail.to
+        assert_equal ["david@farmerscellar.com"], mail.from
+        assert_equal "Purchase receipt", mail.subject
+        assert_match "This email is your Farmer's Cellar purchase receipt", mail.body.encoded
+
+        if pr.kind == PurchaseReceivable.kind[:NORMAL]
+          assert_match "Your payment account was charged a total of", mail.body.encoded
+        elsif pr.kind == PurchaseReceivable.kind[:PURCHASEFAILED]
+          assert_match "There was a problem with your purchase transaction.", mail.body.encoded
+          assert_match "Please contact", mail.body.encoded
+          assert_match "to ensure your account balance is paid in full.", mail.body.encoded
+        elsif pr.kind == PurchaseReceivable.kind[:DONTCOLLECT]
+        else
+        end            
+
+      end
+
+    end
+
+    uniq_user_ids = user_ids.uniq
+
+    #there should be one email (purchase receipt) mailed for each customer represented in the
+    #bulk_purchase.purchase_receivables association
+    assert_equal uniq_user_ids.count + 1, ActionMailer::Base.deliveries.count
+    
   end
 
   def verify_legitimacy_of_purchase_receivables
