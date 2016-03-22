@@ -7,8 +7,16 @@ include ActionView::Helpers::NumberHelper
 class FundsProcessing  
 
 	def self.do_bulk_customer_purchase
+
     puts "FundsProcessing.do_bulk_customer_purchase start"
-		values = bulk_buy_new			
+		values = bulk_buy_new
+
+    if values.nil? || values[:filled_tote_items].nil? || values[:filled_tote_items].count < 1
+      puts "zero filled tote items"
+      puts "FundsProcessing.do_bulk_customer_purchase end"
+      return      
+    end
+
 		admin = User.where(account_type: User.types[:ADMIN]).first
 		bulk_buy_create(values[:filled_tote_items], admin)
 		#do bulk purchase
@@ -42,6 +50,12 @@ class FundsProcessing
 		ret = {}
 
   	ret[:filled_tote_items] = ToteItem.where(status: ToteItem.states[:FILLED])  	
+
+    if ret[:filled_tote_items].count < 1
+      puts "zero tote items in the FILLED state"
+      puts "FundsProcessing.bulk_buy_new end"
+      return
+    end
 
     user_ids = ret[:filled_tote_items].select(:user_id).distinct    
     ret[:user_infos] = []
@@ -91,6 +105,8 @@ class FundsProcessing
   	filled_tote_items = ToteItem.where(id: filled_tote_item_ids)
     
     if filled_tote_items == nil || filled_tote_items.count < 1
+      puts "filled_tote_items == nil || filled_tote_items.count < 1"
+      puts "FundsProcessing.bulk_buy_create end"    
       return
     end
 
@@ -153,6 +169,12 @@ class FundsProcessing
 
 		bulk_purchase = BulkPurchase.new(gross: 0, payment_processor_fee_withheld_from_us: 0, commission: 0, net: 0)
   	bulk_purchase.load_unpurchased_receivables
+
+    if bulk_purchase.purchase_receivables.size < 1
+      puts "zero purchase_receivables"
+      puts "FundsProcessing.bulk_purchase_new end"
+      return
+    end
 
     puts "------"
     s = JunkCloset.puts_helper("", "BulkPurchase id", bulk_purchase.id.to_s)

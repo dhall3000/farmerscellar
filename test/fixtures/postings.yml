@@ -7,6 +7,51 @@
 <% delivery_date = Time.zone.today.midnight + i.days %>
 <% delivery_date_next = delivery_date + 7.days %>
 
+<% two_mondays_out = Time.zone.today.midnight + 7.days %>
+<% i = 1 %>
+<% while !(two_mondays_out + i.days).monday? %>
+  <% i += 1 %>
+<% end %>
+<% two_mondays_out = Time.zone.today.midnight + 7.days + i.days %>
+<% two_wednesdays_out = two_mondays_out + 2.days %>
+<% two_fridays_out = two_wednesdays_out + 2.days %>
+
+p1:
+  delivery_date: <%= two_mondays_out %>
+  commitment_zone_start: <%= two_mondays_out - 2.days %>
+  product: apples
+  quantity_available: 1000
+  price: 2.89
+  user: f1
+  unit_category: weight
+  unit_kind: pound
+  description: these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.
+  live: true  
+
+p2:
+  delivery_date: <%= two_wednesdays_out %>
+  commitment_zone_start: <%= two_wednesdays_out - 2.days %>
+  product: asparagus
+  quantity_available: 1000
+  price: 2.74
+  user: f1
+  unit_category: weight
+  unit_kind: pound
+  description: asparagus description
+  live: true  
+
+p3:
+  delivery_date: <%= two_fridays_out %>
+  commitment_zone_start: <%= two_fridays_out - 2.days %>
+  product: milk
+  quantity_available: 1000
+  price: 5.00
+  user: f2
+  unit_category: volume
+  unit_kind: gallon
+  description: milk description
+  live: true  
+
 #Apples
 #Posting.create(delivery_date: next_friday, product_id: 1, quantity_available: 1000, price: 2.75, user_id: 1, unit_category_id: 2, unit_kind_id: 8, description: "these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
 postingf1apples:

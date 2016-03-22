@@ -9,6 +9,10 @@ class RakeTasksTest < BulkBuyer
     ActionMailer::Base.deliveries.clear    
     @posting_apples = postings(:postingf1apples)
     @posting_milk = postings(:postingf2milk)
+    @p1 = postings(:p1)
+    @c5 = users(:c5)
+    @c6 = users(:c6)
+    @c7 = users(:c7)
   end
 
   test "nightly tasks should not change state or send emails" do
@@ -30,6 +34,64 @@ class RakeTasksTest < BulkBuyer
 
     assert_equal 0, ActionMailer::Base.deliveries.count
     ActionMailer::Base.deliveries.clear
+
+  end
+
+  test "should skip customers who have additional deliveries further ahead in this week" do
+
+    ActionMailer::Base.deliveries.clear
+    assert_equal 0, ActionMailer::Base.deliveries.count
+
+    #authorize a bunch of tote items
+    customers = [@c5, @c6, @c7]
+    postings = [postings(:p1), postings(:p2), postings(:p3)]
+    create_authorization_for_customers(customers)
+
+    #verify authorization receipts emailed
+    assert ActionMailer::Base.deliveries.count > 0
+    ActionMailer::Base.deliveries.clear
+
+    travel_to @p1.commitment_zone_start - 1.hour
+
+    #loop over 10 days worth of minutes
+    14400.times do
+
+      top_of_hour = Time.zone.now.min == 0
+      is_noon_hour = Time.zone.now.hour == 12
+
+      #run hourly tasks at top of each hour. this will transition tote items to COMMITTED
+      if top_of_hour
+        RakeHelper.do_hourly_tasks
+      end
+
+      if is_noon_hour && top_of_hour
+
+        #loop through postings and fill those for whom it presently is noon on their delivery date
+        postings.each do |posting|
+
+          is_delivery_date = Time.zone.now.midnight == posting.delivery_date
+
+          if is_delivery_date
+            #ok, food arrived. now fill some orders        
+            fill_all_tote_items = true
+            simulate_order_filling_for_postings([posting], fill_all_tote_items)
+          end
+          
+        end
+
+      end      
+
+      #run the nightly tasks at 10pm pst. this will process bulk purchases
+      if Time.zone.now.hour == 22 && top_of_hour
+        RakeHelper.do_nightly_tasks        
+      end
+
+      travel 1.minute
+      
+    end
+
+    #go back to regular time    
+    travel_back    
 
   end
 

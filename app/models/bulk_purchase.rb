@@ -30,10 +30,11 @@ class BulkPurchase < ActiveRecord::Base
 
   	  for purchase_receivable in purchase_receivables
 
-        s = JunkCloset.puts_helper("Now executing purchase...", "user", purchase_receivable.users.last.email)
-        s = JunkCloset.puts_helper(s, "PurchaseReceivable id", purchase_receivable.id.to_s)
+        s = JunkCloset.puts_helper("", "PurchaseReceivable id", purchase_receivable.id.to_s)
+        s = JunkCloset.puts_helper(s, "user", purchase_receivable.users.last.email)        
         s = JunkCloset.puts_helper(s, "amount", number_to_currency(purchase_receivable.amount))
         s = JunkCloset.puts_helper(s, "amount_purchased", number_to_currency(purchase_receivable.amount_purchased))
+        s += ". Now executing purchase..."
         puts s
 
         purchase = purchase_receivable.purchase

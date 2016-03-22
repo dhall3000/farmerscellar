@@ -1,4 +1,44 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+c5:
+  name: c5
+  email: c5@c.com
+  password_digest: <%= User.digest('dogdog') %>
+  account_type: 0
+  activated: true
+  activated_at: Time.zone.now
+  address: 4215 21st St. SW
+  city: Redmond
+  state: Washington
+  zip: 98008
+  phone: 206-329-6579
+
+c6:
+  name: c6
+  email: c6@c.com
+  password_digest: <%= User.digest('dogdog') %>
+  account_type: 0
+  activated: true
+  activated_at: Time.zone.now
+  address: 4215 21st St. SW
+  city: Redmond
+  state: Washington
+  zip: 98008
+  phone: 206-419-6579
+
+c7:
+  name: c7
+  email: c7@c.com
+  password_digest: <%= User.digest('dogdog') %>
+  account_type: 0
+  activated: true
+  activated_at: Time.zone.now
+  address: 4215 21st St. SW
+  city: Redmond
+  state: Washington
+  zip: 98008
+  phone: 206-564-6579
+
 f1:
   name: f1
   email: f1@f.com
