@@ -73,7 +73,61 @@ class BulkPurchase < ActiveRecord::Base
 
   end
 
+  def do_bulk_email_communication
+    send_purchase_receipts
+    send_admin_report
+  end
+
   private
+
+    def send_admin_report
+
+      puts "BulkPurchase.send_admin_report start"
+
+      body = ""
+
+      admin_report.each do |line|
+        body += ". " + line
+      end
+
+      AdminNotificationMailer.general_message("bulk purchase report", body).deliver_now      
+      
+      puts "sent bulk purchase report email to david@farmerscellar.com"
+      puts "BulkPurchase.send_admin_report end"
+
+    end
+
+    def send_purchase_receipts
+
+      puts "BulkPurchase.send_purchase_receipts start"
+
+      tote_items_by_user = get_tote_items_by_user
+
+      tote_items_by_user.each do |user, tote_items|                
+        UserMailer.purchase_receipt(user, tote_items).deliver_now
+        puts "sent purchase receipt email to " + user.email
+      end
+
+      puts "BulkPurchase.send_purchase_receipts end"
+
+    end
+
+    def get_tote_items_by_user
+      
+      tote_items_by_user = {}
+
+      purchase_receivables.each do |pr|
+        pr.tote_items.each do |tote_item|
+          if !tote_items_by_user.has_key?(tote_item.user)
+            tote_items_by_user[tote_item.user] = []
+          end
+          tote_items_by_user[tote_item.user] << tote_item
+        end
+      end
+
+      return tote_items_by_user
+
+    end
 
     def dump_admin_report_to_log
 

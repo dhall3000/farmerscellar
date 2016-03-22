@@ -35,8 +35,7 @@ class FundsProcessing
     end		
 
     if bulk_purchase != nil
-      send_purchase_receipts(bulk_purchase)    
-      send_admin_report(bulk_purchase)
+      bulk_purchase.do_bulk_email_communication
     end
 
     puts "FundsProcessing.do_bulk_customer_purchase end"
@@ -226,66 +225,5 @@ class FundsProcessing
     return {bulk_purchase: bulk_purchase}
 
 	end
-
-  private
-
-    def self.send_admin_report(bulk_purchase)
-
-      puts "FundsProcessing.send_admin_report start"
-
-      if bulk_purchase.nil?
-        puts "bulk_purchase.nil? true"
-        puts "FundsProcessing.send_admin_report end"
-        return
-      end
-
-      body = ""
-
-      bulk_purchase.admin_report.each do |line|
-        body += ". " + line
-      end
-
-      AdminNotificationMailer.general_message("bulk purchase report", body).deliver_now      
-      
-      puts "sent bulk purchase report email to david@farmerscellar.com"
-      puts "FundsProcessing.send_admin_report end"
-
-    end
-
-    def self.send_purchase_receipts(bulk_purchase)
-
-      puts "FundsProcessing.send_purchase_receipts start"
-
-      if bulk_purchase.nil?
-        puts "bulk_purchase.nil? true"
-        puts "FundsProcessing.send_purchase_receipts end"
-        return
-      end
-
-      tote_items_by_user = get_tote_items_by_user(bulk_purchase)
-
-      tote_items_by_user.each do |user, tote_items|                
-        UserMailer.purchase_receipt(user, tote_items).deliver_now
-        puts "sent purchase receipt email to " + user.email
-      end
-
-      puts "FundsProcessing.send_purchase_receipts end"
-
-    end
-
-    def self.get_tote_items_by_user(bulk_purchase)
-      tote_items_by_user = {}
-
-      bulk_purchase.purchase_receivables.each do |pr|
-        pr.tote_items.each do |tote_item|
-          if !tote_items_by_user.has_key?(tote_item.user)
-            tote_items_by_user[tote_item.user] = []
-          end
-          tote_items_by_user[tote_item.user] << tote_item
-        end
-      end
-
-      return tote_items_by_user
-    end
 
 end
