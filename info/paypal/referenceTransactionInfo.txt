@@ -1,9 +1,21 @@
+https://www.paypal-knowledge.com/infocenter/index?page=content&id=FAQ1502&actp=LIST
+detailed walkthrough of reference transaction (mentions setting amount to zero)
+
+https://developer.paypal.com/docs/classic/api/merchant/DoReferenceTransaction_API_Operation_NVP/
+string search "amt" to find "Set this field to 0 if the transaction does not include a one-time purchase such as when you set up a billing agreement for a recurring payment that is not immediately charged. When the field is set to 0, purchase-specific fields are ignored."
 
 https://developer.paypal.com/docs/classic/express-checkout/integration-guide/ECReferenceTxns/
-A buyer may have more than one billing agreement ID for your site. This could occur if the buyer established separate agreements for different kinds of service.
+"You must have the buyer's agreement to obtain funds from the buyer's account. The buyer must log into PayPal once to agree, but after that, PayPal does not require the buyer to log in."
+
+"A buyer may have more than one billing agreement ID for your site. This could occur if the buyer established separate agreements for different kinds of service."
+
+"Set Up a Billing Agreement Before Any Payment
+To obtain a billing agreement ID before any payment, modify the previous procedure as follows (see NVP/SOAP API reference for details):
+    In step 1, specify 0 for the amount of purchase in the payment details."
 
 Implement Paypal Reference transactions with Active Merchant
 https://github.com/siliconstraits/guidelines/blob/master/active_merchant_paypal_reference_transactions.md
+https://ducvinh.me/implement-paypal-reference-transactions-with-active-merchant/
 ----------------------------------------------------------------------------
 Responses
 (byebug) details

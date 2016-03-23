@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160312224034) do
+ActiveRecord::Schema.define(version: 20160323184407) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -198,6 +198,11 @@ ActiveRecord::Schema.define(version: 20160312224034) do
     t.string   "city"
     t.string   "state"
     t.integer  "zip"
+  end
+
+  create_table "nightly_task_runs", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "payment_payable_payments", force: :cascade do |t|
