@@ -23,10 +23,10 @@ class PostingsController < ApplicationController
 
     if current_user.account_type == User.types[:CUSTOMER] || current_user.account_type == User.types[:PRODUCER]
       #for customers, we only want to pull postings whose delivery date is >= today and that are 'live'
-      @postings = Posting.where("delivery_date >= ? and live = ?", Time.zone.today, true).order(delivery_date: :desc, id: :desc)
+      @postings = Posting.where("delivery_date >= ? and live = ?", Time.zone.today, true).order(delivery_date: :asc, id: :desc)
     elsif current_user.account_type == User.types[:ADMIN]
       #for admins, same thing but we want to see the unlive as well
-      @postings = Posting.where("delivery_date >= ?", Time.zone.today).order(delivery_date: :desc, id: :desc)
+      @postings = Posting.where("delivery_date >= ?", Time.zone.today).order(delivery_date: :asc, id: :desc)
     end
 
     return @postings
