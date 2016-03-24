@@ -177,7 +177,9 @@ class BulkPurchasesTest < BulkBuyer
 
     #check for the existence of nasty-gram related to account state
     if account_ok
-      assert_select 'p', false, "Your account is on hold, most likely due to a positive balance on your account. Please contact Farmer's Cellar to pay your balance before continuing to shop."
+      assert_select 'p', count: 0, text: "Your account is on hold, most likely due to a positive balance on your account. Please contact Farmer's Cellar to pay your balance before continuing to shop."
+      #there should be 6 paragraphs now on the form cause a whole bunch of mini fixed-amount buttons were added to the Add to Tote form
+      assert_select 'p', 6      
     else
       assert_select 'p', "Your account is on hold, most likely due to a positive balance on your account. Please contact Farmer's Cellar to pay your balance before continuing to shop."
     end    

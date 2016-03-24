@@ -1,1 +1,1 @@
-$(function(){ $('.btn').popover(); });
+$(function(){ $('.popover_init').popover(); });

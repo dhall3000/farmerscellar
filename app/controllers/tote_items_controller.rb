@@ -32,7 +32,17 @@ class ToteItemsController < ApplicationController
   def show
   end
 
+  def url_with_protocol(url)
+    /^http/i.match(url) ? url : "http://#{url}"
+  end
+
   def new
+    posting = Posting.find(params[:posting_id])
+    @sanitized_producer_url = posting.user.website
+    if @sanitized_producer_url != nil
+      @sanitized_producer_url = url_with_protocol(@sanitized_producer_url)
+    end
+
     @account_on_hold = account_on_hold
     @tote_item = ToteItem.new
   end
