@@ -62,7 +62,7 @@
              <h4 class="panel-title">
         <a data-toggle="collapse" data-target="#collapseThree"
            href="#collapseThree" class="collapsed">
-          Delivery Date
+          Delivery <%= posting.delivery_date.strftime("%a, %b %d") %>
         </a>
       </h4>
 
@@ -77,6 +77,15 @@
 
   </div>
 </div>
+
+  <div class="row">
+
+    <div class="col-md-4 col-md-offset-4">
+      <p class="text-center"><%= number_to_currency(posting.price) %> / <%= UnitKind.find_by(id: posting.unit_kind_id).name %></p>
+    </div>
+
+  </div>
+
 
   <div class="row">
 
@@ -145,83 +154,17 @@
   </div>  
 
   <div class="row form_element_spacing">          
-
-    <div class="col-md-4">
-    </div>
-
-    <div class="col-xs-3 col-md-1">
-      <%= form_for @tote_item, class: "form-inline" do |f| %>
-        <%= render partial: 'shared/error_messages_general', locals: { active_record_object: @tote_item } %>
-        
-        <%= f.number_field :quantity, value: 5, hidden: true %>
-        <%= f.number_field :price, value: posting.price, hidden: true %>
-        <%= f.number_field :status, value: ToteItem.states[:ADDED], hidden: true %>
-        <%= f.number_field :posting_id, value: posting.id, hidden: true %>
-        <%= f.number_field :user_id, value: current_user.id, hidden: true %>
-
-        <%= f.submit "+5", class: "btn btn-primary", disabled: @account_on_hold %>
-      <% end %>
-    </div>
-
-    <div class="col-xs-3 col-md-1">
-      <%= form_for @tote_item, class: "form-inline" do |f| %>
-        <%= render partial: 'shared/error_messages_general', locals: { active_record_object: @tote_item } %>
-        
-        <%= f.number_field :quantity, value: 6, hidden: true %>
-        <%= f.number_field :price, value: posting.price, hidden: true %>
-        <%= f.number_field :status, value: ToteItem.states[:ADDED], hidden: true %>
-        <%= f.number_field :posting_id, value: posting.id, hidden: true %>
-        <%= f.number_field :user_id, value: current_user.id, hidden: true %>
-
-        <%= f.submit "+6", class: "btn btn-primary", disabled: @account_on_hold %>
-      <% end %>
-    </div>
-
-    <div class="col-xs-3 col-md-1">
-      <%= form_for @tote_item, class: "form-inline" do |f| %>
-        <%= render partial: 'shared/error_messages_general', locals: { active_record_object: @tote_item } %>
-        
-        <%= f.number_field :quantity, value: 7, hidden: true %>
-        <%= f.number_field :price, value: posting.price, hidden: true %>
-        <%= f.number_field :status, value: ToteItem.states[:ADDED], hidden: true %>
-        <%= f.number_field :posting_id, value: posting.id, hidden: true %>
-        <%= f.number_field :user_id, value: current_user.id, hidden: true %>
-
-        <%= f.submit "+7", class: "btn btn-primary", disabled: @account_on_hold %>
-      <% end %>
-    </div>
-
-    <div class="col-xs-3 col-md-1">
-      <%= form_for @tote_item, class: "form-inline" do |f| %>
-        <%= render partial: 'shared/error_messages_general', locals: { active_record_object: @tote_item } %>
-        
-        <%= f.number_field :quantity, value: 8, hidden: true %>
-        <%= f.number_field :price, value: posting.price, hidden: true %>
-        <%= f.number_field :status, value: ToteItem.states[:ADDED], hidden: true %>
-        <%= f.number_field :posting_id, value: posting.id, hidden: true %>
-        <%= f.number_field :user_id, value: current_user.id, hidden: true %>
-
-        <%= f.submit "+8", class: "btn btn-primary", disabled: @account_on_hold %>
-      <% end %>
-    </div>
-
-    <div class="col-md-4">
-    </div>
-
-  </div>     
-
-  <div class="row form_element_spacing">          
     <div class="col-xs-12 col-md-4 col-md-offset-4">
       <%= form_for @tote_item, class: "form-inline" do |f| %>
         <%= render partial: 'shared/error_messages_general', locals: { active_record_object: @tote_item } %>
         
-        <%= f.number_field :quantity, class: "form-control", placeholder: "Or enter custom quantity here" %>
+        <%= f.number_field :quantity, class: "form-control", placeholder: "Enter custom quantity" %>
         <%= f.number_field :price, value: posting.price, hidden: true %>
         <%= f.number_field :status, value: ToteItem.states[:ADDED], hidden: true %>
         <%= f.number_field :posting_id, value: posting.id, hidden: true %>
         <%= f.number_field :user_id, value: current_user.id, hidden: true %>
 
-        <%= f.submit "Add custom quantity", class: "btn btn-primary", disabled: @account_on_hold %>
+        <%= f.submit "Add", class: "btn btn-primary", disabled: @account_on_hold %>
       <% end %>
     </div>
   </div>  
