@@ -6,12 +6,12 @@ Here is the product information for which you authorized payment:
 
 <% @authorization.checkouts.last.tote_items.each do |tote_item| %>
 --------------------------------------------------------------------------------------------------------
-<%= tote_item.posting.user.farm_name %> <%= tote_item.posting.product.name %>, quantity <%= tote_item.quantity %> @ <%= number_to_currency(tote_item.price) %> per <%= tote_item.posting.unit_kind.name %>, delivered on <%= tote_item.posting.delivery_date.strftime("%A %b %d, %Y") %>
+ID=<%= tote_item.id %>, <%= tote_item.posting.user.farm_name %> <%= tote_item.posting.product.name %> quantity <%= tote_item.quantity %> @ <%= number_to_currency(tote_item.price) %> per <%= tote_item.posting.unit_kind.name %>, Sub Total <%= number_to_currency(get_gross_item(tote_item)) %>, delivered on <%= tote_item.posting.delivery_date.strftime("%A %b %d, %Y") %>
 <% end %>
 
 The total payment amount authorized is <%= number_to_currency(@authorization.amount) %>.
 
-Charges to your payment account will be made as soon as products are delivered on your behalf. Keep in mind, however, that Farmer's Cellar cannot guarantee products will be delivered on your behalf. In that case your payment account will not be charged.
+Charges to your payment account will be made after products are delivered on your behalf. Keep in mind, however, that Farmer's Cellar cannot guarantee products will be delivered on your behalf. In that case your payment account will not be charged.
 
 We'll email you again on each of the delivery dates listed above to let you know if product has been delivered for you or not.
 

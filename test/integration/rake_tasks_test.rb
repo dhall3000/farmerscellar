@@ -189,7 +189,7 @@ class RakeTasksTest < BulkBuyer
       if Time.zone.now.midnight == @p1.delivery_date
         assert_equal 1, PurchaseReceivable.count, "There should only be 1 PurchaseReceivable because the other two customers still have tote items to be delivered later on this week"
         assert_equal 2, ActionMailer::Base.deliveries.count
-        assert_appropriate_email(emails[0], "c5@c.com", "Purchase receipt", "This email is your Farmer's Cellar purchase receipt")
+        assert_appropriate_email(emails[0], "c5@c.com", "Purchase receipt", "Here is your Farmer's Cellar purchase receipt.")        
         assert_appropriate_email(emails[1], "david@farmerscellar.com", "bulk purchase report", "BulkPurchase id: 1")
       end
 
@@ -215,8 +215,9 @@ class RakeTasksTest < BulkBuyer
         assert_equal BulkPayment.last.total_payments_amount, (BulkPurchase.first.net + BulkPurchase.last.net).round(2), "The sum of the two BulkPurchases should equal the total BulkPayment masspayment payout"
 
         assert_equal 6, ActionMailer::Base.deliveries.count
-        assert_appropriate_email(emails[0], "c7@c.com", "Purchase receipt", "This email is your Farmer's Cellar purchase receipt")
-        assert_appropriate_email(emails[1], "c6@c.com", "Purchase receipt", "This email is your Farmer's Cellar purchase receipt")          
+        assert_appropriate_email(emails[0], "c7@c.com", "Purchase receipt", "Here is your Farmer's Cellar purchase receipt.")
+
+        assert_appropriate_email(emails[1], "c6@c.com", "Purchase receipt", "Here is your Farmer's Cellar purchase receipt.")          
         assert_appropriate_email(emails[2], "david@farmerscellar.com", "bulk purchase report", "BulkPurchase id: 2")
         assert_appropriate_email(emails[3], "f1@f.com", "Payment invoice", "We just sent you a total of")
         assert_appropriate_email(emails[4], "f2@f.com", "Payment invoice", "We just sent you a total of")
@@ -227,7 +228,7 @@ class RakeTasksTest < BulkBuyer
       if Time.zone.now.midnight == @p4.delivery_date
         assert_equal 4, PurchaseReceivable.count, "There should be a 4th PurchaseReceivable because we're in the next week now which is where c5's 2nd tote item is delivered" 
         assert_equal 4, ActionMailer::Base.deliveries.count
-        assert_appropriate_email(emails[0], "c5@c.com", "Purchase receipt", "This email is your Farmer's Cellar purchase receipt")
+        assert_appropriate_email(emails[0], "c5@c.com", "Purchase receipt", "Here is your Farmer's Cellar purchase receipt.")
         assert_appropriate_email(emails[1], "david@farmerscellar.com", "bulk purchase report", "BulkPurchase id: 3")
         assert_appropriate_email(emails[2], "f2@f.com", "Payment invoice", "We just sent you a total of")
         assert_appropriate_email(emails[3], "david@farmerscellar.com", "BulkPayment report", "The sum of these payments is")

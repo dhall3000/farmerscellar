@@ -444,7 +444,7 @@ class BulkPurchasesTest < BulkBuyer
         assert_equal [user.email], mail.to
         assert_equal ["david@farmerscellar.com"], mail.from
         assert_equal "Purchase receipt", mail.subject
-        assert_match "This email is your Farmer's Cellar purchase receipt", mail.body.encoded
+        assert_match "Here is your Farmer's Cellar purchase receipt.", mail.body.encoded
 
         if pr.kind == PurchaseReceivable.kind[:NORMAL]
           assert_match "Your payment account was charged a total of", mail.body.encoded
