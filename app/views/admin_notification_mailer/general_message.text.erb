@@ -2,7 +2,13 @@ Hello,
 
 Here is your message from AdminNotificationMailer->GeneralMessage:
 
+<% if @body_lines.nil? %>
 <%= @body %>
+<% else %>
+	<% @body_lines.each do |body_line| %>
+<%= body_line %>
+	<% end %>
+<% end %>
 
 That is all. Goodbye.
 

@@ -1,4 +1,5 @@
 require 'utility/funds_processing'
+require 'utility/bulk_payment_processing'
 
 class RakeHelper
 
@@ -51,6 +52,7 @@ class RakeHelper
 		puts "do_nightly_tasks start"
 
 		FundsProcessing.do_bulk_customer_purchase
+		BulkPaymentProcessing.do_bulk_producer_payment
 
 		puts "do_nightly_tasks end"
 

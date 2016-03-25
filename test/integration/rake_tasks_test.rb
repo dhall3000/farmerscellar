@@ -202,18 +202,35 @@ class RakeTasksTest < BulkBuyer
       #this is after the nightly tasks on the Friday delivery
       if Time.zone.now.midnight == @p3.delivery_date
         assert_equal 3, PurchaseReceivable.count, "There should be 3 PurchaseReceivables because all three customers should have gotten purchases by now"
-        assert_equal 3, ActionMailer::Base.deliveries.count
+
+        #check the bulk purchases
+        assert_equal 2, BulkPurchase.count, "There should be two BulkPurchases by now, one on wedneday and one on friday (today)"
+        assert BulkPurchase.first.net > 0, "BulkPurchase net amount should be greater than zero"
+        assert BulkPurchase.last.net > 0, "BulkPurchase net amount should be greater than zero"
+
+        #check the bulkpayment
+        assert_equal 1, BulkPayment.count, "Since there are zero outstanding deliveries this week we should have done a BulkPayment"
+
+        #check the bulkpayment amount is in line with the bulkpurchases' amounts
+        assert_equal BulkPayment.last.total_payments_amount, (BulkPurchase.first.net + BulkPurchase.last.net).round(2), "The sum of the two BulkPurchases should equal the total BulkPayment masspayment payout"
+
+        assert_equal 6, ActionMailer::Base.deliveries.count
         assert_appropriate_email(emails[0], "c7@c.com", "Purchase receipt", "This email is your Farmer's Cellar purchase receipt")
         assert_appropriate_email(emails[1], "c6@c.com", "Purchase receipt", "This email is your Farmer's Cellar purchase receipt")          
         assert_appropriate_email(emails[2], "david@farmerscellar.com", "bulk purchase report", "BulkPurchase id: 2")
+        assert_appropriate_email(emails[3], "f1@f.com", "Payment invoice", "We just sent you a total of")
+        assert_appropriate_email(emails[4], "f2@f.com", "Payment invoice", "We just sent you a total of")
+        assert_appropriate_email(emails[5], "david@farmerscellar.com", "BulkPayment report", "The sum of these payments is")
       end
 
       #this is after the nightly tasks on the 2nd Monday delivery
       if Time.zone.now.midnight == @p4.delivery_date
-        assert_equal 4, PurchaseReceivable.count, "There should be a 4th PurchaseReceivable because we're in the next week now which is where c5's 2nd tote item is delivered"
-        assert_equal 2, ActionMailer::Base.deliveries.count
+        assert_equal 4, PurchaseReceivable.count, "There should be a 4th PurchaseReceivable because we're in the next week now which is where c5's 2nd tote item is delivered" 
+        assert_equal 4, ActionMailer::Base.deliveries.count
         assert_appropriate_email(emails[0], "c5@c.com", "Purchase receipt", "This email is your Farmer's Cellar purchase receipt")
         assert_appropriate_email(emails[1], "david@farmerscellar.com", "bulk purchase report", "BulkPurchase id: 3")
+        assert_appropriate_email(emails[2], "f2@f.com", "Payment invoice", "We just sent you a total of")
+        assert_appropriate_email(emails[3], "david@farmerscellar.com", "BulkPayment report", "The sum of these payments is")
       end
 
     end

@@ -7,19 +7,20 @@
 <% delivery_date = Time.zone.today.midnight + i.days %>
 <% delivery_date_next = delivery_date + 7.days %>
 
-<% two_mondays_out = Time.zone.today.midnight + 7.days %>
+<% days_out_to_start = 14 %>
+<% base_monday = Time.zone.today.midnight + days_out_to_start.days %>
 <% i = 1 %>
-<% while !(two_mondays_out + i.days).monday? %>
+<% while !(base_monday + i.days).monday? %>
   <% i += 1 %>
 <% end %>
-<% two_mondays_out = Time.zone.today.midnight + 7.days + i.days %>
-<% two_wednesdays_out = two_mondays_out + 2.days %>
-<% two_fridays_out = two_wednesdays_out + 2.days %>
-<% three_mondays_out = two_mondays_out + 7.days %>
+<% base_monday = Time.zone.today.midnight + days_out_to_start.days + i.days %>
+<% wednesday_after_base_monday = base_monday + 2.days %>
+<% friday_after_base_monday = wednesday_after_base_monday + 2.days %>
+<% monday_after_base_monday = base_monday + 7.days %>
 
 p1:
-  delivery_date: <%= two_mondays_out %>
-  commitment_zone_start: <%= two_mondays_out - 2.days %>
+  delivery_date: <%= base_monday %>
+  commitment_zone_start: <%= base_monday - 2.days %>
   product: apples
   quantity_available: 1000
   price: 2.89
@@ -30,8 +31,8 @@ p1:
   live: true  
 
 p2:
-  delivery_date: <%= two_wednesdays_out %>
-  commitment_zone_start: <%= two_wednesdays_out - 2.days %>
+  delivery_date: <%= wednesday_after_base_monday %>
+  commitment_zone_start: <%= wednesday_after_base_monday - 2.days %>
   product: asparagus
   quantity_available: 1000
   price: 2.74
@@ -42,8 +43,8 @@ p2:
   live: true  
 
 p3:
-  delivery_date: <%= two_fridays_out %>
-  commitment_zone_start: <%= two_fridays_out - 2.days %>
+  delivery_date: <%= friday_after_base_monday %>
+  commitment_zone_start: <%= friday_after_base_monday - 2.days %>
   product: milk
   quantity_available: 1000
   price: 5.00
@@ -54,8 +55,8 @@ p3:
   live: true  
 
 p4:
-  delivery_date: <%= three_mondays_out %>
-  commitment_zone_start: <%= three_mondays_out - 2.days %>
+  delivery_date: <%= monday_after_base_monday %>
+  commitment_zone_start: <%= monday_after_base_monday - 2.days %>
   product: beef
   quantity_available: 1000
   price: 5.21

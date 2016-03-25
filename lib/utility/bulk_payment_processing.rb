@@ -7,13 +7,30 @@ include ActionView::Helpers::NumberHelper
 class BulkPaymentProcessing
 
 	def self.do_bulk_producer_payment
+    
+    puts "BulkPaymentProcessing.do_bulk_producer_payment start"
+
+    if deliveries_remaining_this_week
+      puts "BulkPaymentProcessing.do_bulk_producer_payment: there are still deliveries outstanding this week so we're not going to do a bulk payment today. quitting."
+    else      
+      values = bulk_payment_new
+      values = bulk_payment_create(values)      
+      email_report_to_admin(values[:bulk_payment], values[:payment_info_by_producer_id])
+    end
+
+    puts "BulkPaymentProcessing.do_bulk_producer_payment end"
+
 	end
 
 	def self.bulk_payment_new
 
+    puts "BulkPaymentProcessing.bulk_payment_new start"
+
   	unpaid_payment_payables = PaymentPayable.where("amount_paid < amount")
 
   	if unpaid_payment_payables.count == 0
+      puts "BulkPaymentProcessing.bulk_payment_new there are no unpaid PaymentPayables so quitting."
+      puts "BulkPaymentProcessing.bulk_payment_new end"
   		return
   	end
 
@@ -31,17 +48,19 @@ class BulkPaymentProcessing
       grand_total_payout = (grand_total_payout + amount_unpaid_on_this_payment_payable).round(2)
   	end
 
+    puts "BulkPaymentProcessing.bulk_payment_new end"
+
   	return {unpaid_payment_payables: unpaid_payment_payables, grand_total_payout: grand_total_payout, payment_info_by_producer_id: payment_info_by_producer_id}
 
 	end
 
 	def self.bulk_payment_create(params)
 
-    payment_info_by_producer_id = params[:payment_info_by_producer_id]
-    
-    if payment_info_by_producer_id.nil?
-      return {payment_info_by_producer_id: payment_info_by_producer_id, messages: ["payment_info_by_producer_id is nil. We cannot proceed with this bulk payment. Please do not touch the system any further until you can report this to a developer."]}
+    if params.nil? || params[:payment_info_by_producer_id].nil?
+      return {payment_info_by_producer_id: nil, messages: ["payment_info_by_producer_id is nil. We cannot proceed with this bulk payment. Please do not touch the system any further until you can report this to a developer."]}
     end
+
+    payment_info_by_producer_id = params[:payment_info_by_producer_id]
 
     if payment_info_by_producer_id.is_a? String
       payment_info_by_producer_id = eval payment_info_by_producer_id
@@ -109,6 +128,48 @@ class BulkPaymentProcessing
 	end
 
 	private
+
+    def self.email_report_to_admin(bulk_payment, payment_info_by_producer_id)
+
+      body_lines = []
+
+      if !payment_info_by_producer_id.nil?
+
+        payment_amount_sum = 0
+
+        payment_info_by_producer_id.each do |producer_id, payment_info|
+          producer = User.find(producer_id)
+          body_lines << number_to_currency(payment_info[:amount]) + " sent to " + producer.farm_name + " via email address " + producer.email + "."
+          payment_amount_sum = (payment_amount_sum + payment_info[:amount]).round(2)
+        end
+
+        body_lines << "The sum of these payments is " + number_to_currency(payment_amount_sum) + "."
+
+      end
+
+      if !bulk_payment.nil?
+        body_lines << "BulkPayment id: " + bulk_payment.id.to_s + ". num_payees " + bulk_payment.num_payees.to_s + ". total_payments_amount " + number_to_currency(bulk_payment.total_payments_amount)
+      end
+
+      if body_lines.count > 0
+        AdminNotificationMailer.general_message("BulkPayment report", "body empty", body_lines).deliver_now
+      end      
+
+    end
+
+    def self.deliveries_remaining_this_week
+
+      last_day_of_this_week = Time.zone.today
+
+      while last_day_of_this_week.wday != ENDOFWEEK
+        last_day_of_this_week = last_day_of_this_week + 1.day
+      end
+
+      outstanding_deliveries_this_week = Posting.where("delivery_date > ? and delivery_date <= ?", Time.zone.today.midnight, last_day_of_this_week)
+      
+      return outstanding_deliveries_this_week.count > 0
+
+    end
 
     #sample success response.body = "TIMESTAMP=2015%2d08%2d22T00%3a59%3a05Z&CORRELATIONID=4ab512d716828&ACK=Success&VERSION=124%2e0&BUILD=000000"
     #sample failure response.body = "TIMESTAMP=2011%2d11%2d15T20%3a27%3a02Z&CORRELATIONID=5be53331d9700&ACK=Failure&VERSION=78%2e0&BUILD=000000&L_ERRORCODE0=15005&L_SHORTMESSAGE0=Processor%20Decline&L_LONGMESSAGE0=This%20transaction%20cannot%20be%20processed%2e&L_SEVERITYCODE0=Error&L_ERRORPARAMID0=ProcessorResponse&L_ERRORPARAMVALUE0=0051&AMT=10%2e40&CURRENCYCODE=USD&AVSCODE=X&CVV2MATCH=M"
@@ -382,4 +443,11 @@ class BulkPaymentProcessing
 
     end
 
+end
+
+class FakeMasspayResponse
+  attr_reader :body
+  def initialize
+    @body = "TIMESTAMP=2011%2d11%2d15T20%3a27%3a02Z&CORRELATIONID=5be53331d9700&ACK=Failure&VERSION=78%2e0&BUILD=000000&L_ERRORCODE0=15005&L_SHORTMESSAGE0=Processor%20Decline&L_LONGMESSAGE0=This%20transaction%20cannot%20be%20processed%2e&L_SEVERITYCODE0=Error&L_ERRORPARAMID0=ProcessorResponse&L_ERRORPARAMVALUE0=0051&AMT=10%2e40&CURRENCYCODE=USD&AVSCODE=X&CVV2MATCH=M"
+  end
 end
