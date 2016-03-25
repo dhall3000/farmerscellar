@@ -56,7 +56,11 @@ class BulkPaymentProcessing
 
 	def self.bulk_payment_create(params)
 
+    puts "BulkPaymentProcessing.bulk_payment_create start"
+
     if params.nil? || params[:payment_info_by_producer_id].nil?
+      puts "payment_info_by_producer_id is nil. quitting."
+      puts "BulkPaymentProcessing.bulk_payment_create end"
       return {payment_info_by_producer_id: nil, messages: ["payment_info_by_producer_id is nil. We cannot proceed with this bulk payment. Please do not touch the system any further until you can report this to a developer."]}
     end
 
@@ -74,38 +78,32 @@ class BulkPaymentProcessing
 
   	response = send_payments(payment_info_by_producer_id)
     payment_invoice_infos = send_payment_invoices(payment_info_by_producer_id)
-  	proceed = false
+  	
+    puts "BulkPaymentProcessing.bulk_payment_create: returned from sending payments. now building a BulkPayment object to save to db."
+	  #create a BulkPayment object
+	  #create a Payment object for each payment in the BulkPayment
+	  bulk_payment = BulkPayment.new(num_payees: payment_info_by_producer_id.keys.count, total_payments_amount: cumulative_total_payout)
+	  payment_info_by_producer_id.each do |producer_id, payment_info|
+	  	payment = Payment.new(amount: payment_info[:amount])  	  	
+	  	payment_info[:payment_payable_ids].each do |payment_payable_id|
+	  	  payment_payable = PaymentPayable.find(payment_payable_id.to_i)
+        #TODO (Future):this isn't quite the right thing to do. we're unconditionally saying that every payment has been made when in fact it might not have
+        #gone through successfully. the reason for this is because i need to move on since we're in early-stage biz dev
+        #for now what i really want to make sure is that we're keeping all the information in case we get in to a snafu we can
+        #back our way out manually. in the future we should make it so that if there's an error in payment in will not flatten the
+        #payment below but rather leave it as is AND alert the admin that there was a payment problem. the details of how to do this are
+        #that when errors come down they have a funky identifier like 'L_EMAILn' where 'n' is the integer id of exactly which (of the potentially many)
+        #payments failed. so i'd have to write tedious code to correlate this funky id with the ids in my system. notgonnadoit right now.
+        payment_payable.update(amount_paid: payment_payable.amount)
+	  	  payment.payment_payables << payment_payable
+	  	  bulk_payment.payment_payables << payment_payable
+	  	end
+	  	payment.save
+	  end
+    save_response(response, bulk_payment)
+	  bulk_payment.save  	
 
-  	if USEGATEWAY
-  	  proceed = true
-  	else
-  	  proceed = true
-  	end
-
-  	if proceed
-  	  #create a BulkPayment object
-  	  #create a Payment object for each payment in the BulkPayment
-  	  bulk_payment = BulkPayment.new(num_payees: payment_info_by_producer_id.keys.count, total_payments_amount: cumulative_total_payout)
-  	  payment_info_by_producer_id.each do |producer_id, payment_info|
-  	  	payment = Payment.new(amount: payment_info[:amount])  	  	
-  	  	payment_info[:payment_payable_ids].each do |payment_payable_id|
-  	  	  payment_payable = PaymentPayable.find(payment_payable_id.to_i)
-          #TODO (Future):this isn't quite the right thing to do. we're unconditionally saying that every payment has been made when in fact it might not have
-          #gone through successfully. the reason for this is because i need to move on since we're in early-stage biz dev
-          #for now what i really want to make sure is that we're keeping all the information in case we get in to a snafu we can
-          #back our way out manually. in the future we should make it so that if there's an error in payment in will not flatten the
-          #payment below but rather leave it as is AND alert the admin that there was a payment problem. the details of how to do this are
-          #that when errors come down they have a funky identifier like 'L_EMAILn' where 'n' is the integer id of exactly which (of the potentially many)
-          #payments failed. so i'd have to write tedious code to correlate this funky id with the ids in my system. notgonnadoit right now.
-          payment_payable.update(amount_paid: payment_payable.amount)
-  	  	  payment.payment_payables << payment_payable
-  	  	  bulk_payment.payment_payables << payment_payable
-  	  	end
-  	  	payment.save
-  	  end
-      save_response(response, bulk_payment)
-  	  bulk_payment.save
-  	end  	
+    puts "BulkPaymentProcessing.bulk_payment_create end"
 
   	return {payment_invoice_infos: payment_invoice_infos, messages: [], payment_info_by_producer_id: payment_info_by_producer_id, num_payees: num_payees, cumulative_total_payout: cumulative_total_payout, bulk_payment: bulk_payment}
 
@@ -131,6 +129,8 @@ class BulkPaymentProcessing
 
     def self.email_report_to_admin(bulk_payment, payment_info_by_producer_id)
 
+      puts "BulkPaymentProcessing.email_report_to_admin start"
+
       body_lines = []
 
       if !payment_info_by_producer_id.nil?
@@ -152,8 +152,11 @@ class BulkPaymentProcessing
       end
 
       if body_lines.count > 0
+        puts "BulkPaymentProcessing.email_report_to_admin: emailing BulkPayment report to admin"
         AdminNotificationMailer.general_message("BulkPayment report", "body empty", body_lines).deliver_now
       end      
+
+      puts "BulkPaymentProcessing.email_report_to_admin end"
 
     end
 
@@ -305,6 +308,8 @@ class BulkPaymentProcessing
 
     def self.send_payments(payment_info_by_producer_id)
 
+      puts "BulkPaymentProcessing.send_payments start"
+
       if !USEGATEWAY
         response = FakeMasspayResponse.new
         return response
@@ -313,6 +318,8 @@ class BulkPaymentProcessing
       email_amount_pairs = get_email_amount_pairs(payment_info_by_producer_id)
       payouts_params = get_payout_params(email_amount_pairs)
       response = send_paypal_masspay(PAYPALCREDENTIALS, payouts_params)
+
+      puts "BulkPaymentProcessing.send_payments end"
 
       return response
 
@@ -426,12 +433,17 @@ class BulkPaymentProcessing
 
     def self.send_paypal_masspay(credentials, payouts_params)      
 
+      puts "BulkPaymentProcessing.send_paypal_masspay start"
+
       response = nil
 
       if USEGATEWAY                
   	    url = URI.parse(PAYPALMASSPAYENDPOINT)
   	    http = Net::HTTP.new(url.host, url.port)
   	    http.use_ssl = true
+
+        puts "BulkPaymentProcessing.send_paypal_masspay: sending paypal masspay. payouts_params (minus fc credentials): " + payouts_params.to_s        
+
   	    all_params = credentials.merge(payouts_params)
   	    stringified_params = all_params.collect { |tuple| "#{tuple.first}=#{CGI.escape(tuple.last)}" }.join("&")
   	    response = http.post("/nvp", stringified_params)
@@ -439,6 +451,7 @@ class BulkPaymentProcessing
       	response = true
       end
 
+      puts "BulkPaymentProcessing.send_paypal_masspay end"
 	    return response
 
     end
