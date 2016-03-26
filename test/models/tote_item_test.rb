@@ -88,10 +88,12 @@ class ToteItemTest < ActiveSupport::TestCase
   	assert @tote_item.valid?
   	@tote_item.status = 8
   	assert @tote_item.valid?
+    @tote_item.status = 9
+    assert @tote_item.valid?
 
   	@tote_item.status = -1
   	assert_not @tote_item.valid?
-  	@tote_item.status = 9
+  	@tote_item.status = 10
   	assert_not @tote_item.valid?
   end
 

@@ -20,7 +20,7 @@ class ToteItem < ActiveRecord::Base
 
   validates :price, numericality: { greater_than: 0 }
   validates :quantity, numericality: { greater_than: 0, only_integer: true }
-  validates :status, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 8 }
+  validates :status, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 9 }
 
   #PURCHASEFAILED: this state is for when we process a bulk buy and someone's purchase fails. we kick all their toteitems in to this
   #state, empty out their tote and cut off their account so that they can't order anything more until they square up. when in this state

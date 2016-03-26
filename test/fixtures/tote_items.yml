@@ -9,6 +9,78 @@
 #postingf4oranges: 1.25
 #postingf4celery: 2.50
 
+#----------------------------------------------------------------
+t8:
+  quantity: 2
+  price: 5.21
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c8
+  posting: p5
+
+t9:
+  quantity: 2
+  price: 5.21
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c8
+  posting: p5
+
+t10:
+  quantity: 2
+  price: 5.21
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c8
+  posting: p5
+
+t11:
+  quantity: 2
+  price: 5.21
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c8
+  posting: p5
+
+t12:
+  quantity: 2
+  price: 5.21
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c8
+  posting: p5
+
+t13:
+  quantity: 2
+  price: 5.21
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c8
+  posting: p5
+
+t14:
+  quantity: 2
+  price: 5.21
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c8
+  posting: p5
+
+t15:
+  quantity: 2
+  price: 5.21
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c8
+  posting: p5
+
+t16:
+  quantity: 2
+  price: 5.21
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c8
+  posting: p5
+
+t17:
+  quantity: 2
+  price: 5.21
+  status: <%= ToteItem.states[:ADDED] %>
+  user: c8
+  posting: p5
+#----------------------------------------------------------------
+
 #---------------------------------C1-------------------------------
 t1:
   quantity: 3

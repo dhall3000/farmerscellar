@@ -34,10 +34,31 @@ class Posting < ActiveRecord::Base
   def total_quantity_authorized_or_committed
     
     authorized_or_committed_tote_items = tote_items.where("status = ? or status = ?", ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED])
-    
+
     unit_count = 0
 
     authorized_or_committed_tote_items.each do |tote_item|
+      unit_count = unit_count + tote_item.quantity
+    end
+
+    return unit_count
+
+  end
+
+  def total_quantity_ordered
+    #{AUTHORIZED: 1, COMMITTED: 2, FILLPENDING: 3, FILLED: 4, PURCHASEPENDING: 7, PURCHASED: 8, PURCHASEFAILED: 9}    
+    ordered_tote_items = tote_items.where("status = ? or status = ? or status = ? or status = ? or status = ? or status = ? or status = ?",
+      ToteItem.states[:AUTHORIZED],
+      ToteItem.states[:COMMITTED],
+      ToteItem.states[:FILLPENDING],
+      ToteItem.states[:FILLED],
+      ToteItem.states[:PURCHASEPENDING],
+      ToteItem.states[:PURCHASED],
+      ToteItem.states[:PURCHASEFAILED])
+
+    unit_count = 0
+
+    ordered_tote_items.each do |tote_item|
       unit_count = unit_count + tote_item.quantity
     end
 

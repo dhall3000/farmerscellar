@@ -18,6 +18,20 @@
 <% friday_after_base_monday = wednesday_after_base_monday + 2.days %>
 <% monday_after_base_monday = base_monday + 7.days %>
 
+#--------------------------------------------------------------
+p5:
+  delivery_date: <%= delivery_date %>
+  commitment_zone_start: <%= delivery_date - 2.days %>
+  product: beef
+  quantity_available: 1000
+  price: 5.21
+  user: f2
+  unit_category: weight
+  unit_kind: pound
+  description: beef description
+  live: true  
+#--------------------------------------------------------------
+
 p1:
   delivery_date: <%= base_monday %>
   commitment_zone_start: <%= base_monday - 2.days %>

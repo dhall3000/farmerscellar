@@ -39,6 +39,19 @@ c7:
   zip: 98008
   phone: 206-564-6579
 
+c8:
+  name: c8
+  email: c8@c.com
+  password_digest: <%= User.digest('dogdog') %>
+  account_type: 0
+  activated: true
+  activated_at: Time.zone.now
+  address: 4215 21st St. SW
+  city: Redmond
+  state: Washington
+  zip: 98008
+  phone: 206-564-6579
+
 f1:
   name: f1
   email: f1@f.com
