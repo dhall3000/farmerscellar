@@ -44,16 +44,18 @@
           </div>
           <div id="overviewBody" class="panel-collapse collapse" role="tabpanel" aria-labelledby="overviewHeading">
             <div class="panel-body">
-              <p><%= User.find_by(id: posting.user_id).farm_name %> <%= Product.find_by(id: posting.product_id).name %></p>
-              <p><%= number_to_currency(posting.price) %> / <%= UnitKind.find_by(id: posting.unit_kind_id).name %></p>
-              <p>Delivery <%= posting.delivery_date.strftime("%A, %B %-d") %></p>
-              <p>
-                <% data_content = "This is mostly like an 'order cutoff' but with " + link_to("some important differences", how_things_work_path(anchor: "commitment_zone")) + "." %>
+              <ul>
+                <li><%= User.find_by(id: posting.user_id).farm_name %> <%= Product.find_by(id: posting.product_id).name %></li>
+                <li><%= number_to_currency(posting.price) %> / <%= UnitKind.find_by(id: posting.unit_kind_id).name %></li>                
+                <li>
+                  <% data_content = "This is mostly like an 'order cutoff' but with " + link_to("some important differences", how_things_work_path(anchor: "commitment_zone")) + "." %>
 
-                <a href='#' class="popover_init" tabindex="0" data-container="body" data-toggle="popover" data-trigger="focus" data-placement="top" data-html="true" data-content="<%=data_content%>">Commitment Zone</a>
+                  <a href='#' class="popover_init" tabindex="0" data-container="body" data-toggle="popover" data-trigger="focus" data-placement="top" data-html="true" data-content="<%=data_content%>">Commitment Zone</a>
 
-                starts <%= posting.commitment_zone_start.strftime("%a, %b %-d") %>
-              </p>
+                  starts <%= posting.commitment_zone_start.strftime("%A, %B %-d, %l:%M %p") %>
+                </li>
+                <li>Delivery <%= posting.delivery_date.strftime("%A, %B %-d") %></li>
+              </ul>
             </div>
           </div>
         </div>
