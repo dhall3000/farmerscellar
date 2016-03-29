@@ -18,7 +18,7 @@ ID=<%= tote_item.id %>,Producer=<%= tote_item.posting.user.farm_name %>,Product=
 <% end %>
 
 <% if products_delivered == true %>
-Your products are available for you to pick up at your convenience. When you pick, up your products will be labeled with your User ID#: <%= @tote_items.first.user_id.to_s %>.
+Your products are available for you to pick up at your convenience and will be labeled with your User ID#: <%= @tote_items.first.user_id.to_s %>.
 
 Your dropsite is:
 <%= @dropsite.name %>

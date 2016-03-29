@@ -47,7 +47,7 @@ Here is the status of products you recently ordered that were set for delivery t
 </table>
 
 <% if products_delivered == true %>
-  <p>Your products are available for you to pick up at your convenience. When you pick up, <b><ins>your products will be labeled with your User ID#: <%= @tote_items.first.user_id.to_s %>.</ins></b></p>
+  <p>Your products are available for you to pick up at your convenience and <b><ins>will be labeled with your User ID#: <%= @tote_items.first.user_id.to_s %>.</ins></b></p>
   <p>Your dropsite is:</p>
   <p>
   <%= @dropsite.name %><br>
