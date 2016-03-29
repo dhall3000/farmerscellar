@@ -6,7 +6,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
   	@posting_recurrence = PostingRecurrence.new(interval: 1, on: true)
   end
 
-  test "should create exactly one new posting for next week" do
+  test "should create exactly one new posting for next week based recurrence" do
     posting_recurrence = PostingRecurrence.new(interval: 1, on: true)
 
     delivery_date = Time.zone.now.midnight + 4.days
@@ -52,6 +52,17 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     posting_recurrence.recur
     assert_equal 2, posting_recurrence.postings.count
     assert_equal posting, posting_recurrence.postings.last
+
+    travel_to posting_recurrence.postings.first.delivery_date + 1.day + 1
+    #at this point there should be two postings, one unlive, the new one live.
+    #we've just fast forwarded to 1 second after midnight on the day after the first post's delivery date
+    #if we call .recur right now nothing should happen. therefore we after calling .recur again we should
+    #still have 2 postings, one unlive and the most recent live
+    posting_recurrence.recur
+    assert_equal 2, posting_recurrence.postings.count
+    assert_equal posting, posting_recurrence.postings.last
+    assert_equal false, posting_recurrence.postings.first.live
+    assert_equal true, posting_recurrence.postings.last.live
 
     travel_back
     
