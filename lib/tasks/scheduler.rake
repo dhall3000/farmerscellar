@@ -6,14 +6,6 @@ task :hourly_tasks => :environment do
   RakeHelper.do_hourly_tasks
 end
 
-task :nightly_tasks => :environment do
-  RakeHelper.do_nightly_tasks
-end
-
-task :week_end_tasks => :environment do
-  RakeHelper.do_week_end_tasks
-end
-
 task :mailer_test => :environment do
   
   subject = "my mailer_test subject"

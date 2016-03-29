@@ -6,19 +6,114 @@ class PostingsTest < ActionDispatch::IntegrationTest
   # end
 
   def setup
-    @user = users(:f1)
+    @farmer = users(:f1)
     @product = products(:apples)
     @unit_category = unit_categories(:weight)
     @unit_kind = unit_kinds(:pound)    
     @posting = postings(:postingf1apples)
   end  
 
+  test "posting should recur" do
+    price = 12.31
+    #verify the post doesn't exist
+    verify_post_presence(price, @unit_kind, exists = false)
+    #create the post, with recurrence
+    login_for(@farmer)
+    delivery_date = Time.zone.today.midnight + 14.days
+    commitment_zone_start = delivery_date - 2.days
+    post postings_path, posting: {
+      description: "my recurring posting",
+      quantity_available: 100,
+      price: price,
+      user_id: @farmer.id,
+      product_id: @product.id,
+      unit_category_id: @unit_category.id,
+      unit_kind_id: @unit_kind.id,
+      live: true,
+      delivery_date: delivery_date,
+      commitment_zone_start: commitment_zone_start,
+      posting_recurrence: {interval: 1, on: true}
+    }
+    #verify exactly one post exists
+    verify_post_presence(price, @unit_kind, exists = true)
+    #wind the clock forward to between the commitment zone start and delivery date
+    posting = Posting.where(price: price).last
+
+    #add a toteitem to this posting. this is necessary or the rake helper won't transition this posting to committed
+    posting.tote_items.create(quantity: 2, price: price, status: ToteItem.states[:AUTHORIZED], user: users(:c1))
+
+    last_minute = posting.commitment_zone_start - 10.minutes
+    travel_to last_minute
+
+    while Time.zone.now < posting.commitment_zone_start + 10.minutes
+      top_of_hour = Time.zone.now.min == 0
+
+      if top_of_hour
+        RakeHelper.do_hourly_tasks        
+      end
+
+      #as long as we're prior to the commitment zone start of the first posting we should
+      #be able to see the post on the shopping page
+      if Time.zone.now < posting.commitment_zone_start
+        verify_post_presence(price, @unit_kind, true, posting.id)
+      end
+
+      #as soon as we're after the post commitment zone start the old posting should disappear
+      if Time.zone.now > posting.commitment_zone_start
+        #verify_post_visibility(price, @unit_kind, 0)
+      end
+
+      last_minute = Time.zone.now
+      travel 1.minute
+    end
+
+    #verify the old post is not visible
+    #verify the new post is visible
+    #wind the clock forward to between the commitment zone start and delivery date
+    #verify the old post is not visible
+    #verify the new post is visible
+
+    travel_back
+    
+  end
+
+  def verify_post_presence(price, unit_kind, exists, posting_id = nil)
+
+    if exists == true
+      count = 1
+    else
+      count = 0
+    end
+
+    verify_post_visibility(price, unit_kind, count)    
+    verify_post_existence(price, count, posting_id)
+
+  end
+
+  def verify_post_visibility(price, unit_kind, count)
+    get postings_path
+    assert :success
+    assert_select 'div.price p', {text: number_to_currency(price) + " / " + unit_kind.name, count: count}
+  end
+
+  def verify_post_existence(price, count, posting_id = nil)
+
+    postings = Posting.where(price: price)
+    assert_not postings.nil?
+    assert_equal count, postings.count
+
+    if posting_id != nil
+      assert_equal posting_id, postings.last.id
+    end
+
+  end
+
   test "create new posting" do
     create_new_posting
   end
 
   test "edit new posting" do
-    login_for(@user)
+    login_for(@farmer)
     mylive = @posting.live
     mynotlive = !@posting.live
 
@@ -30,13 +125,13 @@ class PostingsTest < ActionDispatch::IntegrationTest
     }
 
     assert :success  
-    assert_redirected_to @user    
+    assert_redirected_to @farmer    
 
   end
 
   #should copy an existing posting and have all same values and show up in the postings page
   test "should copy new posting" do
-    login_for(@user)
+    login_for(@farmer)
 
     get postings_path
     assert :success
@@ -51,7 +146,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
     }
 
     assert :success  
-    assert_redirected_to @user
+    assert_redirected_to @farmer
     get postings_path
     assert :success
     assert_select '.price', {text: "$2.75 / Pound", count: 0}
@@ -81,17 +176,17 @@ class PostingsTest < ActionDispatch::IntegrationTest
   def login_for(user)
     get_access_for(user)
     get login_path
-    post login_path, session: { email: @user.email, password: 'dogdog' }
-    assert_redirected_to @user
+    post login_path, session: { email: @farmer.email, password: 'dogdog' }
+    assert_redirected_to @farmer
     follow_redirect!
   end
 
   def create_new_posting
-    login_for(@user)
+    login_for(@farmer)
     assert_template 'users/show'
     assert_select "a[href=?]", login_path, count: 0
     assert_select "a[href=?]", logout_path
-    assert_select "a[href=?]", user_path(@user)
+    assert_select "a[href=?]", user_path(@farmer)
     get new_posting_path
 
     delivery_date = Time.zone.today + 5.days
@@ -103,7 +198,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
       description: "hi",
       quantity_available: 100,
       price: 2.97,
-      user_id: @user.id,
+      user_id: @farmer.id,
       product_id: @product.id,
       unit_category_id: @unit_category.id,
       unit_kind_id: @unit_kind.id,

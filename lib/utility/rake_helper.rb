@@ -10,6 +10,7 @@ class RakeHelper
 	  transitioned_tote_items_and_postings = transition_tote_items_to_committed_state
 		report_committed_tote_items_to_admin(transitioned_tote_items_and_postings[:tote_item_ids])
 		send_orders_to_producers(transitioned_tote_items_and_postings[:posting_ids])
+		roll_recurring_postings(transitioned_tote_items_and_postings[:posting_ids])
 		do_nightly_tasks
 
 	  puts "finished with hourly tasks."
@@ -58,19 +59,21 @@ class RakeHelper
 
 	end
 
-	def self.do_week_end_tasks
-		
-		puts "do_week_end_tasks start"
-
-		do_producer_payments
-
-		puts "do_week_end_tasks end"
-
-	end
-
 	private
 
-		def self.do_producer_payments
+		#posting_ids are the ids of all postings that just rolled past their commitment zone start, not
+		#just the rolled postings that have recurrences
+		def self.roll_recurring_postings(posting_ids)
+
+			rolled_postings = Posting.where(id: posting_ids)
+
+			rolled_postings.each do |rp|
+
+				if rp.posting_recurrence != nil
+					rp.posting_recurrence.recur					
+				end
+			end
+
 		end
 
 		def self.send_orders_to_producers(posting_ids)
