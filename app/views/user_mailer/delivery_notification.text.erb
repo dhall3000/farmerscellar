@@ -1,17 +1,15 @@
-<% purchase_failed = false %>
 Hello,
 
 This email is your Farmer's Cellar delivery notification.
 
 Here is the status of products you recently ordered that were set for delivery today:
+<% products_delivered = false %>
 
 <% @tote_items.each do |tote_item| %>
-  <% if tote_item.status == ToteItem.states[:PURCHASEFAILED] %>
-    <% purchase_failed = true %>
-  <% end %>
   <% status = "UNKNOWN" %>
   <% if tote_item.status == ToteItem.states[:FILLED] || tote_item.status == ToteItem.states[:PURCHASED] || tote_item.status == ToteItem.states[:PURCHASEFAILED] %>
     <% status = "DELIVERED" %>
+    <% products_delivered = true %>
   <% elsif tote_item.status == ToteItem.states[:NOTFILLED] %>
     <% status = "NOT FILLED" %>
   <% end %>
@@ -19,39 +17,20 @@ ID=<%= tote_item.id %>,Producer=<%= tote_item.posting.user.farm_name %>,Product=
 ---------------------------------------------------------------------------------
 <% end %>
 
-<% if purchase_failed %>
-  There was a problem with your purchase transaction. Please contact Farmer's Cellar to ensure your account balance is paid in full.
-www.farmerscellar.com/contact
-<% else %>
-  <% #I'm if/false'ing this so we can see what the logic used to be. This was for when we always executed purchases immediately prior to dropsite delivery %>
-  <% if false %>
-    <% if @total_cost_of_tote_items > 0 %>
-      Your payment account was charged a total of <%= number_to_currency(@total_cost_of_tote_items) %> for the delivered products.
-    <% else %>
-      Your payment account was not charged.
-    <% end %>
-  <% end %>
-<% end %>
+<% if products_delivered == true %>
+Your products are available for you to pick up at your convenience. When you pick, up your products will be labeled with your User ID#: <%= @tote_items.first.user_id.to_s %>.
 
-<% if !@authorizations.nil? && @authorizations.any? %>
-The products listed above are associated with the following payment authorization(s):
-
-<% @authorizations.each do |authorization| %>
-ID=<%= authorization.id %>,Authorization Amount=<%= number_to_currency(authorization.amount) %>,Authorization Date=<%= Time.zone.at(authorization.created_at).strftime("%a %b %d,%l:%M %p") %>
----------------------------------------------------------------------------------
-<% end %>
-<% end %>
-
-Products marked 'DELIVERED' are available for you to pick up at your convenience. Your dropsite is:
-
+Your dropsite is:
 <%= @dropsite.name %>
 <%= @dropsite.address %> <%= @dropsite.city %>, <%= @dropsite.state %> <%= @dropsite.zip.to_s %>
 Hours: <%= @dropsite.hours %>
 
 First time user? Watch this to see what to expect at pickup: https://youtu.be/YQnfkxfHqNM
-
 <% if @dropsite.access_instructions != nil %>
 <%= @dropsite.access_instructions %>
+<% end %>
+<% else %>
+Unfortunately we were unable to fill your order for today's delivery.
 <% end %>
 
 Thanks!

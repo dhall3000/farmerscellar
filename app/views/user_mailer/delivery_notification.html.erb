@@ -10,7 +10,7 @@ This email is your Farmer's Cellar delivery notification.
 Here is the status of products you recently ordered that were set for delivery today:
 </p>
 
-<% purchase_failed = false %>
+<% products_delivered = false %>
 
 <table border="1">
   <thead>
@@ -25,9 +25,6 @@ Here is the status of products you recently ordered that were set for delivery t
   </thead>
   <tbody>
     <% @tote_items.each do |tote_item| %>
-      <% if tote_item.status == ToteItem.states[:PURCHASEFAILED] %>
-        <% purchase_failed = true %>
-      <% end %>
       <tr>
         <td align="left"><%= tote_item.id %></td>
         <td align="left"><%= tote_item.posting.user.farm_name %></td>
@@ -37,6 +34,7 @@ Here is the status of products you recently ordered that were set for delivery t
         <td align="center">
           <% if tote_item.status == ToteItem.states[:FILLED] || tote_item.status == ToteItem.states[:PURCHASED] || tote_item.status == ToteItem.states[:PURCHASEFAILED] %>
             DELIVERED
+            <% products_delivered = true %>
           <% elsif tote_item.status == ToteItem.states[:NOTFILLED] %>
             NOT FILLED
           <% else %>
@@ -48,67 +46,29 @@ Here is the status of products you recently ordered that were set for delivery t
   </tbody>
 </table>
 
-<% if purchase_failed %>
-  <b><p style="background-color:red;">There was a problem with your purchase transaction. Please contact <%= link_to "Farmer's Cellar", contact_url %> to ensure your account balance is paid in full.</p></b>
-<% else %>
-
-  <% #I'm if/false'ing this so we can see what the logic used to be. This was for when we always executed purchases immediately prior to dropsite delivery %>
-  <% if false %>
-    <% if @total_cost_of_tote_items > 0 %>
-      <p>Your payment account was charged a total of <%= number_to_currency(@total_cost_of_tote_items) %> for the delivered products.</p>
-    <% else %>
-      <p>Your payment account was not charged.</p>
-    <% end %>
-  <% end %>
-
-<% end %>
-
-<% if !@authorizations.nil? && @authorizations.any? %>
-  <p>The products listed above are associated with the following payment authorization(s):</p>
-
-<table border="1">
-  <thead>
-    <tr>        
-      <th align="left">ID</th>
-      <th align="left">Authorization Amount</th>
-      <th align="left">Authorization Date</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @authorizations.each do |authorization| %>
-      <tr>
-        <td align="left"><%= authorization.id %></td>
-        <td align="left"><%= number_to_currency(authorization.amount) %></td>
-        <td align="left"><%= Time.zone.at(authorization.created_at).strftime("%a %b %d,%l:%M %p") %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
-
-<% end %>
-
-<p>
-Products marked 'DELIVERED' are available for you to pick up at your convenience. Your dropsite is:
-</p>
-<p>
-<%= @dropsite.name %><br>
-<% address_link = "https://www.google.com/maps/place/" + (@dropsite.address + " " + @dropsite.city + " " + @dropsite.state + " " + @dropsite.zip.to_s).gsub(' ', '+') %>
-<a target="blank" href="<%= address_link %>"><%= @dropsite.address %> <%= @dropsite.city %>, <%= @dropsite.state %> <%= @dropsite.zip.to_s %></a><br>
-Hours: <%= @dropsite.hours %>
-</p>
-
-<p>First time user? Watch <%= link_to "this", "https://youtu.be/YQnfkxfHqNM", target: false %> to see what to expect at pickup.</p>
-
-<% if @dropsite.access_instructions != nil %>
+<% if products_delivered == true %>
+  <p>Your products are available for you to pick up at your convenience. When you pick up, <b><ins>your products will be labeled with your User ID#: <%= @tote_items.first.user_id.to_s %>.</ins></b></p>
+  <p>Your dropsite is:</p>
   <p>
-    <%= @dropsite.access_instructions %>
+  <%= @dropsite.name %><br>
+  <% address_link = "https://www.google.com/maps/place/" + (@dropsite.address + " " + @dropsite.city + " " + @dropsite.state + " " + @dropsite.zip.to_s).gsub(' ', '+') %>
+  <a target="blank" href="<%= address_link %>"><%= @dropsite.address %> <%= @dropsite.city %>, <%= @dropsite.state %> <%= @dropsite.zip.to_s %></a><br>
+  Hours: <%= @dropsite.hours %>
   </p>
-<% end %>
 
+  <p>First time user? Watch <%= link_to "this", "https://youtu.be/YQnfkxfHqNM", target: false %> to see what to expect at pickup.</p>
+
+  <% if @dropsite.access_instructions != nil %>
+    <p>
+      <%= @dropsite.access_instructions %>
+    </p>
+  <% end %>
+<% else %>
+<p>Unfortunately we were unable to fill your order for today's delivery.</p>
+<% end %>
 <p>
 Thanks!
 </p>
-
 <p>
 Farmer's Cellar<br>
 <%= link_to "www.farmerscellar.com", root_url %>
