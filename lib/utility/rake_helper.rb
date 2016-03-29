@@ -69,7 +69,7 @@ class RakeHelper
 
 			rolled_postings.each do |rp|
 
-				if rp.posting_recurrence != nil
+				if rp.posting_recurrence != nil && rp.posting_recurrence.on
 					rp.posting_recurrence.recur					
 				end
 			end

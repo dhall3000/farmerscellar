@@ -11,6 +11,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     do_not_create_posting_when_turned_off(2)
     do_not_create_posting_when_turned_off(3)
     do_not_create_posting_when_turned_off(4)
+    do_not_create_posting_when_turned_off(5)
   end
 
   def do_not_create_posting_when_turned_off(interval)
@@ -32,21 +33,18 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
 
   end
 
-  test "should create exactly one new posting for next week based recurrence" do
-    create_exactly_one_new_posting_for_next_week_based_recurrence(1)
-    create_exactly_one_new_posting_for_next_week_based_recurrence(2)
-    create_exactly_one_new_posting_for_next_week_based_recurrence(3)
-    create_exactly_one_new_posting_for_next_week_based_recurrence(4)    
+  test "should create exactly one new posting for next regular recurrence" do
+    create_exactly_one_new_posting_for_next_regular_recurrence(1)
+    create_exactly_one_new_posting_for_next_regular_recurrence(2)
+    create_exactly_one_new_posting_for_next_regular_recurrence(3)
+    create_exactly_one_new_posting_for_next_regular_recurrence(4)    
+    create_exactly_one_new_posting_for_next_regular_recurrence(5)
   end
 
   #this method is only for testing intervals 1 - 4. not 0 (no recurrence), not 5 (monthly) and not 6 (irregular)
-  def create_exactly_one_new_posting_for_next_week_based_recurrence(interval)
+  def create_exactly_one_new_posting_for_next_regular_recurrence(interval)
 
     if interval <= 0
-      return
-    end
-
-    if interval >= 5
       return
     end
 
@@ -70,6 +68,17 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     assert_equal false, old_post.live
     assert_equal true, posting_recurrence.postings.last.live
     posting = posting_recurrence.postings.last
+
+    between_posting_span_days = (posting_recurrence.postings.last.delivery_date - posting_recurrence.postings.first.delivery_date) / (24 * 60 * 60)
+
+    if interval > 0 && interval < 5
+      #verify the proper duration between week-based postings      
+      assert_equal interval * 7, between_posting_span_days
+    end
+
+    if interval == 5
+      assert between_posting_span_days >= 28
+    end
 
     #since we're not now in the comitment zone window of the 'last' posting in posting_recurrence.postings
     #calling .recur shouldn't produce a new posting

@@ -14,6 +14,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
   end  
 
   test "posting should recur" do
+    
     price = 12.31
     #verify the post doesn't exist
     verify_post_presence(price, @unit_kind, exists = false)
@@ -58,21 +59,19 @@ class PostingsTest < ActionDispatch::IntegrationTest
         verify_post_presence(price, @unit_kind, true, posting.id)
       end
 
-      #as soon as we're after the post commitment zone start the old posting should disappear
-      if Time.zone.now > posting.commitment_zone_start
-        #verify_post_visibility(price, @unit_kind, 0)
-      end
-
       last_minute = Time.zone.now
       travel 1.minute
     end
 
     #verify the old post is not visible
+    #the old post should disappear from the postings page but the new one
+    #should appear so that what you should actually find is there are now two postings in the
+    #posting_recurrence.postings list but only one is visible in the postings page    
+    assert_equal false, posting.posting_recurrence.postings.first.live
+    assert_equal 2, posting.posting_recurrence.postings.count
     #verify the new post is visible
-    #wind the clock forward to between the commitment zone start and delivery date
-    #verify the old post is not visible
-    #verify the new post is visible
-
+    verify_post_visibility(price, @unit_kind, 1)
+        
     travel_back
     
   end

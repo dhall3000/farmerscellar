@@ -29,6 +29,7 @@ class PostingRecurrence < ActiveRecord::Base
       return
     end
 
+    #if this recurrence is turned off, just quit
     if !on
       return
     end
