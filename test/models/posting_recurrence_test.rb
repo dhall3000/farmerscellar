@@ -7,7 +7,24 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
   end
 
   test "should create exactly one new posting for next week based recurrence" do
-    posting_recurrence = PostingRecurrence.new(interval: 1, on: true)
+    test_recur_for_week_based_intervals(1)
+    test_recur_for_week_based_intervals(2)
+    test_recur_for_week_based_intervals(3)
+    test_recur_for_week_based_intervals(4)    
+  end
+
+  #this method is only for testing intervals 1 - 4. not 0 (no recurrence), not 5 (monthly) and not 6 (irregular)
+  def test_recur_for_week_based_intervals(interval)
+    
+    if interval <= 0
+      return
+    end
+
+    if interval >= 5
+      return
+    end
+
+    posting_recurrence = PostingRecurrence.new(interval: interval, on: true)
 
     delivery_date = Time.zone.now.midnight + 4.days
     commitment_zone_start = delivery_date - 2.days
@@ -65,7 +82,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     assert_equal true, posting_recurrence.postings.last.live
 
     travel_back
-    
+
   end
 
   test "posting_recurrence should be valid" do
