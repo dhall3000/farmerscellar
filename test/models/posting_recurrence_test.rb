@@ -6,16 +6,42 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
   	@posting_recurrence = PostingRecurrence.new(interval: 1, on: true)
   end
 
+  test "should not create new posting when turned off" do
+    do_not_create_posting_when_turned_off(1)
+    do_not_create_posting_when_turned_off(2)
+    do_not_create_posting_when_turned_off(3)
+    do_not_create_posting_when_turned_off(4)
+  end
+
+  def do_not_create_posting_when_turned_off(interval)
+
+    #successfully create a new posting from a recurrence
+    posting_recurrence = verify_recur_creates_one_new_posting(interval)
+
+    #turn off the recurrence
+    posting_recurrence.on = false
+    posting_recurrence.save
+
+    current_num_postings = posting_recurrence.postings.count
+
+    travel_to posting_recurrence.postings.last.commitment_zone_start + 1
+    posting_recurrence.recur
+    assert_equal current_num_postings, posting_recurrence.postings.count
+
+    travel_back
+
+  end
+
   test "should create exactly one new posting for next week based recurrence" do
-    test_recur_for_week_based_intervals(1)
-    test_recur_for_week_based_intervals(2)
-    test_recur_for_week_based_intervals(3)
-    test_recur_for_week_based_intervals(4)    
+    create_exactly_one_new_posting_for_next_week_based_recurrence(1)
+    create_exactly_one_new_posting_for_next_week_based_recurrence(2)
+    create_exactly_one_new_posting_for_next_week_based_recurrence(3)
+    create_exactly_one_new_posting_for_next_week_based_recurrence(4)    
   end
 
   #this method is only for testing intervals 1 - 4. not 0 (no recurrence), not 5 (monthly) and not 6 (irregular)
-  def test_recur_for_week_based_intervals(interval)
-    
+  def create_exactly_one_new_posting_for_next_week_based_recurrence(interval)
+
     if interval <= 0
       return
     end
@@ -24,37 +50,18 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
       return
     end
 
-    posting_recurrence = PostingRecurrence.new(interval: interval, on: true)
+    verify_recur_creates_one_new_posting(interval)
 
-    delivery_date = Time.zone.now.midnight + 4.days
-    commitment_zone_start = delivery_date - 2.days
+  end
 
-    old_post = Posting.new(
-      description: "my descrip",
-      quantity_available: 100,
-      price: 10,
-      user_id: users(:f1).id,
-      product_id: products(:apples).id,
-      unit_category_id: unit_categories(:weight).id,
-      unit_kind_id: unit_kinds(:pound).id,
-      live: true,
-      delivery_date: delivery_date,
-      commitment_zone_start: commitment_zone_start
-      )    
+  def verify_recur_creates_one_new_posting(interval)
 
-    old_post.save
-    assert old_post.valid?
+    posting_recurrence = create_posting_recurrence_with_posting
+    posting_recurrence.interval = interval
+    posting_recurrence.on = true
+    posting_recurrence.save
 
-    posting_recurrence.postings << old_post
-    posting_recurrence.save    
-    assert_equal 1, posting_recurrence.postings.count
-    #verify that old_post.posting_recurrence_id != nil
-    assert_not old_post.posting_recurrence_id.nil?
-
-    #since we're not between the commitment zone start and delivery date, calling .recur should not produce
-    #another posting
-    posting_recurrence.recur
-    assert_equal 1, posting_recurrence.postings.count
+    old_post = posting_recurrence.postings.last
 
     travel_to old_post.commitment_zone_start + 1
 
@@ -82,6 +89,54 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     assert_equal true, posting_recurrence.postings.last.live
 
     travel_back
+
+    return posting_recurrence
+
+  end
+
+  def create_posting_recurrence_with_posting
+
+    posting_recurrence = PostingRecurrence.new(interval: 1, on: true)
+
+    old_post = create_post
+
+    posting_recurrence.postings << old_post
+    posting_recurrence.save    
+    assert_equal 1, posting_recurrence.postings.count
+    #verify that old_post.posting_recurrence_id != nil
+    assert_not old_post.posting_recurrence_id.nil?
+
+    #since we're not between the commitment zone start and delivery date, calling .recur should not produce
+    #another posting
+    posting_recurrence.recur
+    assert_equal 1, posting_recurrence.postings.count
+
+    return posting_recurrence
+
+  end
+
+  def create_post
+
+    delivery_date = Time.zone.now.midnight + 4.days
+    commitment_zone_start = delivery_date - 2.days
+
+    post = Posting.new(
+      description: "my descrip",
+      quantity_available: 100,
+      price: 10,
+      user_id: users(:f1).id,
+      product_id: products(:apples).id,
+      unit_category_id: unit_categories(:weight).id,
+      unit_kind_id: unit_kinds(:pound).id,
+      live: true,
+      delivery_date: delivery_date,
+      commitment_zone_start: commitment_zone_start
+      )    
+
+    post.save
+    assert post.valid?
+
+    return post
 
   end
 

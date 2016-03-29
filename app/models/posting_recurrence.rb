@@ -24,13 +24,17 @@ class PostingRecurrence < ActiveRecord::Base
 
   def recur
 
-    old_post = postings.last
-    now = Time.zone.now
-
     #if there is no recurrence, just quit
     if interval < 1
       return
     end
+
+    if !on
+      return
+    end
+
+    old_post = postings.last
+    now = Time.zone.now
 
     #if we're not between the most recently posted post's commit zone and delivery date, just quit
     if now < old_post.commitment_zone_start || now > old_post.delivery_date
