@@ -16,12 +16,28 @@
 		<%= f.label :price, "Price per Unit" %>
 		<%= f.number_field :price, min: 0.01, step: 0.01, class: 'form-control' %>
 
-	    <%= f.label :live, class: "inline" do %>
-	      <%= f.check_box :live %>
-	      <span>Make posting live</span>      
-	    <% end %>
+    <%= f.label :live, class: "inline" do %>
+      <%= f.check_box :live %>
+      <span class="checkboxText">Make posting live</span>      
+    <% end %>
 
-	    <a href='#' class="popover_init" tabindex="0" data-container="body" data-toggle="popover" data-trigger="focus" data-content="A 'live' posting is one that shows up on the shopping pages for customers to view and make purchases from. Unchecking this 'live' box will make your posting instantly disappear from the shopping pages so that no further customer interactions can happen. It does not delete your posting and any customer orders in place at the time you uncheck this box will remain fully intact and legitimate.">(?)</a>
+    <a href='#' class="popover_init" tabindex="0" data-container="body" data-toggle="popover" data-trigger="focus" data-content="A 'live' posting is one that shows up on the shopping pages for customers to view and make purchases from. Unchecking this 'live' box will make your posting instantly disappear from the shopping pages so that no further customer interactions can happen. It does not delete your posting and any customer orders in place at the time you uncheck this box will remain fully intact and legitimate.">(?)</a>
+
+    <% if WebsiteSetting.last.recurring_postings_enabled && @posting_recurrence != nil && @posting_recurrence.on %>	    
+	    <div>
+		    <%= f.fields_for @posting.posting_recurrence do |posting_recurrence_f| %>
+			    <%= posting_recurrence_f.label :on, class: "inline" do %>
+			      <%= posting_recurrence_f.check_box :on %>
+			      <span class="checkboxText">Repeat posting?</span>      
+			    <% end %>		    	      	
+		    <% end %>	    
+		  </div>
+
+    <% else %>    
+      <div class="form_element_spacing">
+      	<% #this is a hack to get the form elemetn spacing right %>
+      </div>
+    <% end %>
 
 		<%= f.submit class: "btn btn-primary" %>
 

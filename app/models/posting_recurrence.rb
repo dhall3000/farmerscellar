@@ -13,7 +13,7 @@ class PostingRecurrence < ActiveRecord::Base
   	]
   end
 
-  validates :interval, :on, presence: true
+  validates :interval, presence: true
   validates :interval, inclusion: [
     PostingRecurrence.intervals[0][1],
     PostingRecurrence.intervals[1][1],

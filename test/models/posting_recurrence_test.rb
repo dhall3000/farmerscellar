@@ -190,9 +190,4 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     assert @posting_recurrence.valid?, get_error_messages(@posting_recurrence)
   end
 
-  test "posting_recurrence should have on set" do
-  	@posting_recurrence.on = nil
-    assert_not @posting_recurrence.valid?, get_error_messages(@posting_recurrence)
-  end
-
 end

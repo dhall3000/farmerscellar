@@ -69,10 +69,23 @@ class PostingsController < ApplicationController
     #contraints on. however, for now all we're implementing is the ability for farmer to switch between making the 
     #posting live or not live
     @posting = Posting.find(params[:id])        
+    @posting_recurrence = @posting.posting_recurrence
   end
 
   def update    
     @posting = Posting.find(params[:id])
+    @posting_recurrence = @posting.posting_recurrence
+
+    if @posting_recurrence != nil && @posting_recurrence.on
+      #check to see if the user just turned the recurrence off. if they did we need to persist that.
+
+      if params[:posting][:posting_recurrence][:on] == "0"
+        #user just turned off the recurrence so persist that to db
+        @posting_recurrence.on = false
+        @posting_recurrence.save
+      end
+
+    end
 
     if @posting.update_attributes(posting_params_update)      
       flash[:success] = "Posting updated!"
@@ -174,7 +187,7 @@ class PostingsController < ApplicationController
         :description,
         :quantity_available,
         :price,
-        :live,
+        :live
         )      
 
       return posting
