@@ -6,12 +6,33 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
   	@posting_recurrence = PostingRecurrence.new(interval: 1, on: true)
   end
 
+  test "should return proper future delivery dates for martys schedule" do
+
+    posting_recurrence = PostingRecurrence.new(interval: 6, on: true)
+    posting = postings(:postingf1apples)
+    mar29 = Time.zone.local(2016,3,29)    
+    posting.delivery_date = mar29
+    posting.commitment_zone_start = mar29 - 2.days
+    posting.save
+    posting_recurrence.postings << posting
+    posting_recurrence.save
+    
+    may10 = Time.zone.local(2016,5,10)
+    delivery_dates = posting_recurrence.get_next_delivery_dates(3, may10)
+
+    assert_equal Time.zone.local(2016,5,24), delivery_dates[0]
+    assert_equal Time.zone.local(2016,5,31), delivery_dates[1]
+    assert_equal Time.zone.local(2016,6,7), delivery_dates[2]
+    
+  end
+
   test "should not create new posting when turned off" do
     do_not_create_posting_when_turned_off(1)
     do_not_create_posting_when_turned_off(2)
     do_not_create_posting_when_turned_off(3)
     do_not_create_posting_when_turned_off(4)
     do_not_create_posting_when_turned_off(5)
+    do_not_create_posting_when_turned_off(6)
   end
 
   def do_not_create_posting_when_turned_off(interval)
@@ -39,6 +60,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     create_exactly_one_new_posting_for_next_regular_recurrence(3)
     create_exactly_one_new_posting_for_next_regular_recurrence(4)    
     create_exactly_one_new_posting_for_next_regular_recurrence(5)
+    create_exactly_one_new_posting_for_next_regular_recurrence(6)
   end
 
   #this method is only for testing intervals 1 - 4. not 0 (no recurrence), not 5 (monthly) and not 6 (irregular)
@@ -63,6 +85,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
 
     travel_to old_post.commitment_zone_start + 1
 
+    assert_equal 1, posting_recurrence.postings.count
     posting_recurrence.recur
     assert_equal 2, posting_recurrence.postings.count
     assert_equal false, old_post.live
@@ -127,6 +150,9 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
   def create_post
 
     delivery_date = Time.zone.now.midnight + 4.days
+    if delivery_date.sunday?
+      delivery_date += 1.day
+    end
     commitment_zone_start = delivery_date - 2.days
 
     post = Posting.new(

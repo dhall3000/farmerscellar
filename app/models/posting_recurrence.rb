@@ -8,7 +8,8 @@ class PostingRecurrence < ActiveRecord::Base
   		["Every two weeks", 2],
   		["Every three weeks", 3],
   		["Every four weeks", 4],
-  		["Monthly", 5]
+  		["Monthly", 5],
+      ["Three weeks on, one week off", 6]
   	]
   end
 
@@ -19,7 +20,8 @@ class PostingRecurrence < ActiveRecord::Base
     PostingRecurrence.intervals[2][1],
     PostingRecurrence.intervals[3][1],
     PostingRecurrence.intervals[4][1],
-    PostingRecurrence.intervals[5][1]
+    PostingRecurrence.intervals[5][1],
+    PostingRecurrence.intervals[6][1]
   ]
 
   def recur
@@ -73,8 +75,8 @@ class PostingRecurrence < ActiveRecord::Base
       end
 
     elsif interval == 6
-      #we're doing an 'irregular' recurrence so we should pull the next delivery date in the queue        
-
+      #we're doing marty's 3 weeks on, 1 week off recurrence
+      new_post.delivery_date = get_next_delivery_dates(1, old_post.delivery_date)[0]
     end
 
     #set new_post commitment zone start
@@ -89,6 +91,49 @@ class PostingRecurrence < ActiveRecord::Base
       end
     end
     
+  end
+
+  #the 'beyond_date' param means for this method to return the number of scheduled dates that
+  #are in the future ahead of 'beyond_date'
+  def get_next_delivery_dates(num_future_dates, beyond_date)
+
+    future_delivery_dates = []
+
+    if num_future_dates < 1
+      return future_delivery_dates
+    end
+
+    if interval == 6
+
+      date = postings.first.delivery_date
+
+      if postings.first.user_id == 70
+        #HACK! this is marty from helen the hen / baron farms. their first actual delivery to us was march 29, 2016.
+        #that was the date their 3 on 1 off cycle began. but i'm coding this on march 30. so i need to get the code
+        #to base its cycle off of march 29 but i can't make a posting with a delivery date in the past because
+        #the posting model has a excluding validation. so i'm just going to hard code in march 29 for now as the
+        #date to base the beginning of the cycle on
+        date = Time.zone.local(2016, 3, 29)
+      end
+      date_count = 1
+
+      while future_delivery_dates.count < num_future_dates
+
+        if date > beyond_date
+          if date_count % 4 > 0
+            future_delivery_dates << date
+          end
+        end
+
+        date += 7.days
+        date_count += 1
+
+      end
+
+    end
+
+    return future_delivery_dates
+
   end
 
   private

@@ -276,3 +276,4 @@ ToteItem.create(quantity: 1, price: 2.50, status: ToteItem.states[:AUTHORIZED], 
 ToteItem.create(quantity: 3, price: 2.50, status: ToteItem.states[:AUTHORIZED], user_id: 5, posting_id: 8)
 
 Dropsite.create(name: "Farmer's Cellar", phone: "206-588-6579", hours: "8 - 8", address: "9827 128TH AVE NE", city: "Kirkland", state: "WA", zip: 98033, active: true, access_instructions: "punch in 123 and hit enter")
+WebsiteSetting.create(new_customer_access_code_required: false, recurring_postings_enabled: true)
