@@ -26,13 +26,15 @@ class ReferenceTransactionsController < ApplicationController
 
   def create_ba
 
-  	details = GATEWAY.details_for(params[:token])
+  	@params = params
+  	@details = GATEWAY.details_for(params[:token])
 
-  	if details.success?
+  	if @details.success?
   		#this calls Paypal's CreateBillingAgreement API
   		ba = GATEWAY.store(params[:token], {})
   		if ba.success?
   			PAYPALDATASTORE[:ba] = ba.authorization
+  			PAYPALDATASTORE[:token] = params[:token]
   		end
   	end
   	
@@ -42,7 +44,10 @@ class ReferenceTransactionsController < ApplicationController
 
   	amount = (params[:amount].to_f) * 100
 
-		purchase = GATEWAY.reference_transaction(
+  	@details = GATEWAY.details_for(PAYPALDATASTORE[:token])
+  	@agreement_details = GATEWAY.agreement_details(PAYPALDATASTORE[:ba], {})
+
+		@purchase = GATEWAY.reference_transaction(
 		  amount,
 		  reference_id: PAYPALDATASTORE[:ba],
 		  description: 'Sample',
@@ -51,5 +56,5 @@ class ReferenceTransactionsController < ApplicationController
 		)		
 
   end
-  
+
 end
