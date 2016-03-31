@@ -44,6 +44,10 @@ Rails.application.configure do
   host = 'localhost:3000'
   config.action_mailer.default_url_options = { host: host }
 
+#Username: davideltonhall-facilitator_api1.gmail.com
+#Password: 2U4THLGZVCG6BSHH
+#Signature: An5ns1Kso7MWUdW4ErQKJJJ4qi4-A-.uIGKotw7d0j4apBMju1cKS2pZ
+
 #davideltonhall-w_api1.gmail.com
 #Password:
 #GPAY4EJ3MZ2MTYJS
@@ -53,7 +57,8 @@ Rails.application.configure do
 #      "PWD" => "GPAY4EJ3MZ2MTYJS",
 #      "SIGNATURE" => "AT6eAVSmMQynPpedcbmxy565ovQXAM-X9BnmoGTjVMyKn1FZ70rjebxN"
 
-  ENV['PAYPALCREDENTIALS'] = "{\"USER\" => \"davideltonhall-w_api1.gmail.com\", \"PWD\" => \"GPAY4EJ3MZ2MTYJS\",\"SIGNATURE\" => \"AT6eAVSmMQynPpedcbmxy565ovQXAM-X9BnmoGTjVMyKn1FZ70rjebxN\"}"
+#  ENV['PAYPALCREDENTIALS'] = "{\"USER\" => \"davideltonhall-w_api1.gmail.com\", \"PWD\" => \"GPAY4EJ3MZ2MTYJS\",\"SIGNATURE\" => \"AT6eAVSmMQynPpedcbmxy565ovQXAM-X9BnmoGTjVMyKn1FZ70rjebxN\"}"
+  ENV['PAYPALCREDENTIALS'] = "{\"USER\" => \"davideltonhall-facilitator_api1.gmail.com\", \"PWD\" => \"2U4THLGZVCG6BSHH\",\"SIGNATURE\" => \"An5ns1Kso7MWUdW4ErQKJJJ4qi4-A-.uIGKotw7d0j4apBMju1cKS2pZ\"}"
   
   config.after_initialize do
     ::PAYPALCREDENTIALS = eval(ENV['PAYPALCREDENTIALS'])
@@ -67,7 +72,10 @@ Rails.application.configure do
 
     ::PAYPALMASSPAYENDPOINT = "https://api-3t.sandbox.paypal.com"
     
-    ::USEGATEWAY = false
+    ::USEGATEWAY = true
+
+    #this is intended to function a bit like a database so that i don't have to create new models just to fiddle with features like paypal reference transactions
+    ::PAYPALDATASTORE = {}
 
   end
 

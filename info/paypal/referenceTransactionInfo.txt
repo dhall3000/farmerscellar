@@ -16,6 +16,9 @@ To obtain a billing agreement ID before any payment, modify the previous procedu
 Implement Paypal Reference transactions with Active Merchant
 https://github.com/siliconstraits/guidelines/blob/master/active_merchant_paypal_reference_transactions.md
 https://ducvinh.me/implement-paypal-reference-transactions-with-active-merchant/
+
+ActiveMerchant PaypalExpressGateway Docs
+http://www.rubydoc.info/github/Shopify/active_merchant/ActiveMerchant/Billing/PaypalExpressGateway
 ----------------------------------------------------------------------------
 Responses
 (byebug) details

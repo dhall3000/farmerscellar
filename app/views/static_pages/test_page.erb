@@ -49,3 +49,25 @@
     </div>
   </div>
 </div>
+
+<div class="row">
+  <div class="col-md-4 col-md-offset-4">
+    <div class="panel panel-default">
+		  <div class="panel-heading">
+		    <p>Reference Transactions Test</p>
+		  </div>
+	    <div class="panel-body">
+	    	<%= link_to "Create billing agreement", reference_transactions_new_ba_path, class: "btn btn-primary" %>
+	    	
+				<%= form_tag reference_transactions_create_capture_path, method: :post do %>
+				  
+				  <%= label_tag :amount %>
+				  <%= number_field_tag :amount, nil, class: 'form-control' %>
+
+				  <%= submit_tag "Make purchase", class: 'btn btn-primary form-control' %>
+
+				<% end %>
+	    </div>
+    </div>
+  </div>
+</div>

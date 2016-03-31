@@ -16,6 +16,10 @@ Rails.application.routes.draw do
   post 'bulk_payments/test_masspay' => 'bulk_payments#test_masspay'
   post 'postings/no_more_product' => 'postings#no_more_product'
 
+  get 'reference_transactions/new_ba'
+  get 'reference_transactions/create_ba'
+  post 'reference_transactions/create_capture'
+
   resources :producer_product_commissions
   resources :products
   resources :website_settings, only: [:edit, :update]
