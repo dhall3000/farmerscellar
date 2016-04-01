@@ -1,6 +1,9 @@
 class PurchaseReceivable < ActiveRecord::Base
   attr_accessor :amount_to_capture
 
+  has_many :rtpurchase_prs
+  has_many :rtpurchases, through: :rtpurchase_prs
+
   has_many :bulk_buy_purchase_receivables
   has_many :bulk_buys, through: :bulk_buy_purchase_receivables
 

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160323184407) do
+ActiveRecord::Schema.define(version: 20160331235736) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -358,6 +358,47 @@ ActiveRecord::Schema.define(version: 20160323184407) do
   add_index "purchases", ["payer_id"], name: "index_purchases_on_payer_id"
   add_index "purchases", ["transaction_id"], name: "index_purchases_on_transaction_id"
 
+  create_table "rtauthorizations", force: :cascade do |t|
+    t.integer  "rtba_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_index "rtauthorizations", ["rtba_id"], name: "index_rtauthorizations_on_rtba_id"
+
+  create_table "rtbas", force: :cascade do |t|
+    t.string   "token"
+    t.string   "ba_id"
+    t.integer  "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_index "rtbas", ["user_id"], name: "index_rtbas_on_user_id"
+
+  create_table "rtpurchase_prs", id: false, force: :cascade do |t|
+    t.integer  "rtpurchase_id"
+    t.integer  "purchase_receivable_id"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "rtpurchase_prs", ["purchase_receivable_id"], name: "index_rtpurchase_prs_on_purchase_receivable_id"
+  add_index "rtpurchase_prs", ["rtpurchase_id"], name: "index_rtpurchase_prs_on_rtpurchase_id"
+
+  create_table "rtpurchases", force: :cascade do |t|
+    t.boolean  "success"
+    t.string   "message"
+    t.string   "correlation_id"
+    t.string   "rtba_id"
+    t.float    "gross_amount"
+    t.float    "fee_amount"
+    t.string   "ack"
+    t.string   "error_code"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+  end
+
   create_table "tote_item_checkouts", id: false, force: :cascade do |t|
     t.integer  "tote_item_id"
     t.integer  "checkout_id"
@@ -368,17 +409,29 @@ ActiveRecord::Schema.define(version: 20160323184407) do
   add_index "tote_item_checkouts", ["checkout_id"], name: "index_tote_item_checkouts_on_checkout_id"
   add_index "tote_item_checkouts", ["tote_item_id"], name: "index_tote_item_checkouts_on_tote_item_id"
 
+  create_table "tote_item_rtauthorizations", id: false, force: :cascade do |t|
+    t.integer  "tote_item_id"
+    t.integer  "rtauthorization_id"
+    t.datetime "created_at",         null: false
+    t.datetime "updated_at",         null: false
+  end
+
+  add_index "tote_item_rtauthorizations", ["rtauthorization_id"], name: "index_tote_item_rtauthorizations_on_rtauthorization_id"
+  add_index "tote_item_rtauthorizations", ["tote_item_id"], name: "index_tote_item_rtauthorizations_on_tote_item_id"
+
   create_table "tote_items", force: :cascade do |t|
     t.integer  "quantity"
     t.float    "price"
     t.integer  "status"
     t.integer  "posting_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",         null: false
+    t.datetime "updated_at",         null: false
     t.integer  "user_id"
+    t.integer  "rtauthorization_id"
   end
 
   add_index "tote_items", ["posting_id"], name: "index_tote_items_on_posting_id"
+  add_index "tote_items", ["rtauthorization_id"], name: "index_tote_items_on_rtauthorization_id"
   add_index "tote_items", ["user_id"], name: "index_tote_items_on_user_id"
 
   create_table "unit_categories", force: :cascade do |t|

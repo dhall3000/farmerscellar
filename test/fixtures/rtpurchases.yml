@@ -1,0 +1,21 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  success: false
+  message: MyString
+  correlation_id: MyString
+  rtba_id: MyString
+  gross_amount: 1.5
+  fee_amount: 1.5
+  ack: MyString
+  error_code: MyString
+
+two:
+  success: false
+  message: MyString
+  correlation_id: MyString
+  rtba_id: MyString
+  gross_amount: 1.5
+  fee_amount: 1.5
+  ack: MyString
+  error_code: MyString

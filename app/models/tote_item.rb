@@ -1,4 +1,7 @@
 class ToteItem < ActiveRecord::Base
+  has_many :tote_item_rtauthorizations
+  has_many :rtauthorizations, through: :tote_item_rtauthorizations
+
   has_many :tote_item_checkouts
   has_many :checkouts, through: :tote_item_checkouts
 
