@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160401164712) do
+ActiveRecord::Schema.define(version: 20160401183654) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -359,7 +359,7 @@ ActiveRecord::Schema.define(version: 20160401164712) do
   add_index "purchases", ["transaction_id"], name: "index_purchases_on_transaction_id"
 
   create_table "rtauthorizations", force: :cascade do |t|
-    t.integer  "rtba_id"
+    t.integer  "rtba_id",    null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -367,12 +367,12 @@ ActiveRecord::Schema.define(version: 20160401164712) do
   add_index "rtauthorizations", ["rtba_id"], name: "index_rtauthorizations_on_rtba_id"
 
   create_table "rtbas", force: :cascade do |t|
-    t.string   "token"
-    t.string   "ba_id"
-    t.integer  "user_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.boolean  "active"
+    t.string   "token",                      null: false
+    t.string   "ba_id",                      null: false
+    t.integer  "user_id",                    null: false
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+    t.boolean  "active",     default: false, null: false
   end
 
   add_index "rtbas", ["user_id"], name: "index_rtbas_on_user_id"
@@ -389,9 +389,9 @@ ActiveRecord::Schema.define(version: 20160401164712) do
 
   create_table "rtpurchases", force: :cascade do |t|
     t.boolean  "success"
-    t.string   "message"
-    t.string   "correlation_id"
-    t.string   "rtba_id"
+    t.string   "message",        null: false
+    t.string   "correlation_id", null: false
+    t.string   "ba_id"
     t.float    "gross_amount"
     t.float    "fee_amount"
     t.string   "ack"

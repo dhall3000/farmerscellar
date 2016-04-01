@@ -4,7 +4,7 @@ one:
   success: false
   message: MyString
   correlation_id: MyString
-  rtba_id: MyString
+  ba_id: MyString
   gross_amount: 1.5
   fee_amount: 1.5
   ack: MyString
@@ -14,7 +14,7 @@ two:
   success: false
   message: MyString
   correlation_id: MyString
-  rtba_id: MyString
+  ba_id: MyString
   gross_amount: 1.5
   fee_amount: 1.5
   ack: MyString
