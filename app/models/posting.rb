@@ -3,7 +3,6 @@ class Posting < ActiveRecord::Base
   belongs_to :product
   belongs_to :unit_category
   belongs_to :unit_kind
-
   belongs_to :posting_recurrence
 
   has_many :tote_items

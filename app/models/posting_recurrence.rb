@@ -25,6 +25,8 @@ class PostingRecurrence < ActiveRecord::Base
     PostingRecurrence.intervals[6][1]
   ]
 
+  validates_presence_of :postings
+
   def recur
 
     #if there is no recurrence, just quit

@@ -41,8 +41,9 @@ class PostingsController < ApplicationController
     @posting.live = true
 
     #if posting_recurrence_params are repeating, associate a new recurrence with this posting
-    if !posting_recurrence_params.nil? && posting_recurrence_params[:on] && posting_recurrence_params[:interval].to_i > PostingRecurrence.intervals[0][1]
-      @posting.build_posting_recurrence(posting_recurrence_params)
+    if !posting_recurrence_params.nil? && posting_recurrence_params[:on] && posting_recurrence_params[:interval].to_i > PostingRecurrence.intervals[0][1]      
+      posting_recurrence = PostingRecurrence.new(posting_recurrence_params)
+      posting_recurrence.postings << @posting
     end
 
   	if @posting.save

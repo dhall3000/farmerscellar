@@ -4,6 +4,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
   
   def setup
   	@posting_recurrence = PostingRecurrence.new(interval: 1, on: true)
+    @posting_recurrence.postings << postings(:postingf1apples)
   end
 
   test "should return proper future delivery dates for martys schedule" do
