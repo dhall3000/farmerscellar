@@ -3,6 +3,7 @@ class Rtauthorization < ActiveRecord::Base
 
   has_many :tote_item_rtauthorizations
   has_many :tote_items, through: :tote_item_rtauthorizations
+  has_many :subscriptions
 
   validates_presence_of :rtba, :tote_items
 end

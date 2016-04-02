@@ -1,6 +1,7 @@
 class Subscription < ActiveRecord::Base
   belongs_to :user
   belongs_to :posting_recurrence
+  belongs_to :rtauthorization
   has_many :subscription_skip_dates
   has_many :tote_items
 
