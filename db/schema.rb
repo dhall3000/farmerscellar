@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160402171645) do
+ActiveRecord::Schema.define(version: 20160402172658) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -416,6 +416,8 @@ ActiveRecord::Schema.define(version: 20160402171645) do
     t.integer  "posting_recurrence_id"
     t.datetime "created_at",                        null: false
     t.datetime "updated_at",                        null: false
+    t.float    "price",                             null: false
+    t.integer  "quantity",                          null: false
   end
 
   add_index "subscriptions", ["posting_recurrence_id"], name: "index_subscriptions_on_posting_recurrence_id"
