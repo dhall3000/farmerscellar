@@ -1,5 +1,6 @@
 class PostingRecurrence < ActiveRecord::Base
   has_many :postings
+  has_many :subscriptions
 
   def self.intervals  	
   	[

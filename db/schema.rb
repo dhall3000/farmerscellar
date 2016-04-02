@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160401183654) do
+ActiveRecord::Schema.define(version: 20160402053435) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -399,6 +399,18 @@ ActiveRecord::Schema.define(version: 20160401183654) do
     t.datetime "created_at",     null: false
     t.datetime "updated_at",     null: false
   end
+
+  create_table "subscriptions", force: :cascade do |t|
+    t.integer  "interval",              default: 0, null: false
+    t.boolean  "on"
+    t.integer  "user_id"
+    t.integer  "posting_recurrence_id"
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+  end
+
+  add_index "subscriptions", ["posting_recurrence_id"], name: "index_subscriptions_on_posting_recurrence_id"
+  add_index "subscriptions", ["user_id"], name: "index_subscriptions_on_user_id"
 
   create_table "tote_item_checkouts", id: false, force: :cascade do |t|
     t.integer  "tote_item_id"

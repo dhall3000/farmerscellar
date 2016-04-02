@@ -14,6 +14,7 @@ class User < ActiveRecord::Base
   validates :password, length: { minimum: 6 }, allow_blank: true
   has_many :postings
   has_many :rtbas
+  has_many :subscriptions
 
   has_many :tote_items
   #has_many :postings, through: :tote_items
