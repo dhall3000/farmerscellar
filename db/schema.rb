@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160402053435) do
+ActiveRecord::Schema.define(version: 20160402165856) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -399,6 +399,15 @@ ActiveRecord::Schema.define(version: 20160402053435) do
     t.datetime "created_at",     null: false
     t.datetime "updated_at",     null: false
   end
+
+  create_table "subscription_skip_dates", force: :cascade do |t|
+    t.datetime "skip_date",       null: false
+    t.integer  "subscription_id", null: false
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
+  end
+
+  add_index "subscription_skip_dates", ["subscription_id"], name: "index_subscription_skip_dates_on_subscription_id"
 
   create_table "subscriptions", force: :cascade do |t|
     t.integer  "interval",              default: 0, null: false
