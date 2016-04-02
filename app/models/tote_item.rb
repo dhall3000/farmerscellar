@@ -16,6 +16,7 @@ class ToteItem < ActiveRecord::Base
 
   belongs_to :posting
   belongs_to :user
+  belongs_to :subscription
 
   validates :posting, presence: true
   validates :user, presence: true
