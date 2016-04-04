@@ -18,9 +18,8 @@ class ToteItem < ActiveRecord::Base
   belongs_to :user
   belongs_to :subscription
 
-  validates :posting, presence: true
-  validates :user, presence: true
-  validates :quantity, :price, :status, presence: true
+  validates :price, :status, :quantity, presence: true
+  validates_presence_of :user, :posting  
 
   validates :price, numericality: { greater_than: 0 }
   validates :quantity, numericality: { greater_than: 0, only_integer: true }
