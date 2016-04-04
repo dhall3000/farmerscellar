@@ -3,7 +3,7 @@ require 'test_helper'
 class PostingRecurrenceTest < ActiveSupport::TestCase
   
   def setup
-  	@posting_recurrence = PostingRecurrence.new(interval: 1, on: true)
+  	@posting_recurrence = PostingRecurrence.new(frequency: 1, on: true)
     @posting_recurrence.postings << postings(:postingf1apples)
   end
 
@@ -19,7 +19,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
 
   test "should return proper future delivery dates for martys schedule" do
 
-    posting_recurrence = PostingRecurrence.new(interval: 6, on: true)
+    posting_recurrence = PostingRecurrence.new(frequency: 6, on: true)
     posting = postings(:postingf1apples)
     mar29 = Time.zone.local(2016,3,29)    
     posting.delivery_date = mar29
@@ -46,10 +46,10 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     do_not_create_posting_when_turned_off(6)
   end
 
-  def do_not_create_posting_when_turned_off(interval)
+  def do_not_create_posting_when_turned_off(frequency)
 
     #successfully create a new posting from a recurrence
-    posting_recurrence = verify_recur_creates_one_new_posting(interval)
+    posting_recurrence = verify_recur_creates_one_new_posting(frequency)
 
     #turn off the recurrence
     posting_recurrence.on = false
@@ -74,21 +74,21 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     create_exactly_one_new_posting_for_next_regular_recurrence(6)
   end
 
-  #this method is only for testing intervals 1 - 4. not 0 (no recurrence), not 5 (monthly) and not 6 (irregular)
-  def create_exactly_one_new_posting_for_next_regular_recurrence(interval)
+  #this method is only for testing frequency 1 - 4. not 0 (no recurrence), not 5 (monthly) and not 6 (irregular)
+  def create_exactly_one_new_posting_for_next_regular_recurrence(frequency)
 
-    if interval <= 0
+    if frequency <= 0
       return
     end
 
-    verify_recur_creates_one_new_posting(interval)
+    verify_recur_creates_one_new_posting(frequency)
 
   end
 
-  def verify_recur_creates_one_new_posting(interval)
+  def verify_recur_creates_one_new_posting(frequency)
 
     posting_recurrence = create_posting_recurrence_with_posting
-    posting_recurrence.interval = interval
+    posting_recurrence.frequency = frequency
     posting_recurrence.on = true
     posting_recurrence.save
 
@@ -105,12 +105,12 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
 
     between_posting_span_days = (posting_recurrence.postings.last.delivery_date - posting_recurrence.postings.first.delivery_date) / (24 * 60 * 60)
 
-    if interval > 0 && interval < 5
+    if frequency > 0 && frequency < 5
       #verify the proper duration between week-based postings      
-      assert_equal interval * 7, between_posting_span_days
+      assert_equal frequency * 7, between_posting_span_days
     end
 
-    if interval == 5
+    if frequency == 5
       assert between_posting_span_days >= 28
     end
 
@@ -139,7 +139,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
 
   def create_posting_recurrence_with_posting
 
-    posting_recurrence = PostingRecurrence.new(interval: 1, on: true)
+    posting_recurrence = PostingRecurrence.new(frequency: 1, on: true)
 
     old_post = create_post
 
@@ -190,14 +190,14 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     assert @posting_recurrence.valid?, get_error_messages(@posting_recurrence)
   end
 
-  test "posting_recurrence interval must be valid value" do
-  	@posting_recurrence.interval = nil
+  test "posting_recurrence frequency must be valid value" do
+  	@posting_recurrence.frequency = nil
     assert_not @posting_recurrence.valid?, get_error_messages(@posting_recurrence)
-  	@posting_recurrence.interval = -1
+  	@posting_recurrence.frequency = -1
     assert_not @posting_recurrence.valid?, get_error_messages(@posting_recurrence)
-  	@posting_recurrence.interval = PostingRecurrence.intervals.last[1] + 1
+  	@posting_recurrence.frequency = PostingRecurrence.frequency.last[1] + 1
     assert_not @posting_recurrence.valid?, get_error_messages(@posting_recurrence)
-  	@posting_recurrence.interval = PostingRecurrence.intervals.last[1]
+  	@posting_recurrence.frequency = PostingRecurrence.frequency.last[1]
     assert @posting_recurrence.valid?, get_error_messages(@posting_recurrence)
   end
 

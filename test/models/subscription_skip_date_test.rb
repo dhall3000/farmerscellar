@@ -3,9 +3,9 @@ require 'test_helper'
 class SubscriptionSkipDateTest < ActiveSupport::TestCase
 
 	def setup
-		@subscription = Subscription.new(interval: 1, on: true, quantity: 1)		
+		@subscription = Subscription.new(frequency: 1, on: true, quantity: 1)		
 		@user = users(:c1)
-		@posting_recurrence = PostingRecurrence.new(interval: 1, on: true)
+		@posting_recurrence = PostingRecurrence.new(frequency: 1, on: true)
 		@subscription.user = @user
 		@subscription.posting_recurrence = @posting_recurrence				
 		@ssd = SubscriptionSkipDate.new(skip_date: Time.zone.now)

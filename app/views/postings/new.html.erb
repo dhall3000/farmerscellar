@@ -53,8 +53,8 @@
 	    <% if WebsiteSetting.last.recurring_postings_enabled %>
 		    <div>
 			    <%= f.fields_for @posting.posting_recurrence do |posting_recurrence_f| %>
-			      <%= posting_recurrence_f.label :interval, "Repeat?", id: "posting_recurrence_label" %>	      
-			      <%= posting_recurrence_f.select(:interval, options_for_select(PostingRecurrence.intervals), {}, {class: 'form-control'}) %>
+			      <%= posting_recurrence_f.label :frequency, id: "posting_recurrence_label" %>	      
+			      <%= posting_recurrence_f.select(:frequency, options_for_select(PostingRecurrence.frequency), {}, {class: 'form-control'}) %>
 			    <% end %>
 		    </div>
 

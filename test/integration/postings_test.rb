@@ -33,7 +33,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
       live: true,
       delivery_date: delivery_date,
       commitment_zone_start: commitment_zone_start,
-      posting_recurrence: {interval: 1, on: true}
+      posting_recurrence: {frequency: 1, on: true}
     }
     #verify exactly one post exists
     verify_post_presence(price, @unit_kind, exists = true)

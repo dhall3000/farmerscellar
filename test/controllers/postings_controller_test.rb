@@ -88,7 +88,7 @@ class PostingsControllerTest < ActionController::TestCase
     fail_to_create(posting_params)
 
     #now let's try it again but with a positive recurrence set. should fail gracefully.
-    posting_params[:posting_recurrence] = {interval: PostingRecurrence.intervals[1][1], on: true}
+    posting_params[:posting_recurrence] = {frequency: PostingRecurrence.frequency[1][1], on: true}
     fail_to_create(posting_params)
 
   end
@@ -418,7 +418,7 @@ class PostingsControllerTest < ActionController::TestCase
     end
 
     parms = get_posting_params_hash
-    parms[:posting_recurrence] = {interval: PostingRecurrence.intervals[0][1], on: false}
+    parms[:posting_recurrence] = {frequency: PostingRecurrence.frequency[0][1], on: false}
     post :create, id: @farmer.id, posting: parms
     posting = assigns(:posting)        
     assert_not posting.nil?
@@ -447,7 +447,7 @@ class PostingsControllerTest < ActionController::TestCase
     posting_recurrence_count = PostingRecurrence.count
 
     parms = get_posting_params_hash
-    parms[:posting_recurrence] = {interval: PostingRecurrence.intervals[1][1], on: true}
+    parms[:posting_recurrence] = {frequency: PostingRecurrence.frequency[1][1], on: true}
     post :create, id: @farmer.id, posting: parms
     posting = assigns(:posting)        
     assert_not posting.nil?    

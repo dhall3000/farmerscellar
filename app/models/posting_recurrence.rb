@@ -2,7 +2,7 @@ class PostingRecurrence < ActiveRecord::Base
   has_many :postings
   has_many :subscriptions
 
-  def self.intervals  	
+  def self.frequency  	
   	[
   		["No", 0],
   		["Every week", 1],
@@ -14,15 +14,15 @@ class PostingRecurrence < ActiveRecord::Base
   	]
   end
 
-  validates :interval, presence: true
-  validates :interval, inclusion: [
-    PostingRecurrence.intervals[0][1],
-    PostingRecurrence.intervals[1][1],
-    PostingRecurrence.intervals[2][1],
-    PostingRecurrence.intervals[3][1],
-    PostingRecurrence.intervals[4][1],
-    PostingRecurrence.intervals[5][1],
-    PostingRecurrence.intervals[6][1]
+  validates :frequency, presence: true
+  validates :frequency, inclusion: [
+    PostingRecurrence.frequency[0][1],
+    PostingRecurrence.frequency[1][1],
+    PostingRecurrence.frequency[2][1],
+    PostingRecurrence.frequency[3][1],
+    PostingRecurrence.frequency[4][1],
+    PostingRecurrence.frequency[5][1],
+    PostingRecurrence.frequency[6][1]
   ]
 
   validates_presence_of :postings
@@ -34,7 +34,7 @@ class PostingRecurrence < ActiveRecord::Base
   def recur
 
     #if there is no recurrence, just quit
-    if interval < 1
+    if frequency < 1
       return
     end
 
@@ -65,9 +65,9 @@ class PostingRecurrence < ActiveRecord::Base
     #copy old_post
     new_post = old_post.dup       
     #set new_post delivery_date
-    if interval >= 1 && interval <= 4
-      new_post.delivery_date = old_post.delivery_date + interval.weeks
-    elsif interval == 5
+    if frequency >= 1 && frequency <= 4
+      new_post.delivery_date = old_post.delivery_date + frequency.weeks
+    elsif frequency == 5
       #this is a monthly recurrence. we have to find out which weeknumber of the month the old_post is on so that we can
       #set the new_post delivery date to the same weeknumber of the following month
       week_number = get_week_number(old_post.delivery_date)
@@ -81,7 +81,7 @@ class PostingRecurrence < ActiveRecord::Base
         new_post.delivery_date = get_last_weekday_occurence_of_next_month(old_post.delivery_date)
       end
 
-    elsif interval == 6
+    elsif frequency == 6
       #we're doing marty's 3 weeks on, 1 week off recurrence
       new_post.delivery_date = get_next_delivery_dates(1, old_post.delivery_date)[0]
     end
@@ -110,7 +110,7 @@ class PostingRecurrence < ActiveRecord::Base
       return future_delivery_dates
     end
 
-    if interval == 6
+    if frequency == 6
 
       date = postings.first.delivery_date
 

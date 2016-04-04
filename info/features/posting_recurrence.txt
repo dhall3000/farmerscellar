@@ -1,7 +1,7 @@
 Posting Recurrence Features
 PRs should be like a template that spits out postings on a regular basis. In this regard a PR is pretty much a super set of a posting.
 Create
--specify interval
+-specify frequency
 Edit
 -Turn on/off
 -Adjust price

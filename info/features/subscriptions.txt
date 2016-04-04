@@ -31,12 +31,12 @@ Questions:
 Subscription Features
 Create
 -(MVP) quantity
--(MVP) interval
+-(MVP) frequency
 -start date scheduling. think about Olga: she wants milk every week but she wants to alternate goat and cow milk. so for both she needs "every other week" subscription but needs to be sure to stagger them. it would be nice if in one sitting she could schedule both subscriptions out. also this feature would be great for someone who primarily wants marty's eggs but wants to get palouse eggs on marty's off week. the could schedule "every delivrey" for marty's and "every four weeks beginning on marty's next off week" for palouse.
 
 Edit
 -(MVP) quantity
--(MVP) interval
+-(MVP) frequency
 -(MVP) on/off (off makes subscription permanantly disappear)
 -(MVP) pause (indefinitely)
 -pause (skip dates)

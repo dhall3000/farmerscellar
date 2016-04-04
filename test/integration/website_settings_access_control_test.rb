@@ -98,7 +98,7 @@ class WebsiteSettingsAccessControlTest < ActionDispatch::IntegrationTest
     assert_template 'postings/new'
     #verify posting recurrence options visible
     assert_select '#posting_recurrence_label'
-    assert_select '#posting_posting_recurrence_interval'
+    assert_select '#posting_posting_recurrence_frequency'
     
     #log in as admin
     log_in_as(@admin)
@@ -115,7 +115,7 @@ class WebsiteSettingsAccessControlTest < ActionDispatch::IntegrationTest
     assert_template 'postings/new'
     #verify posting recurrence options not visible
     assert_select '#posting_recurrence_label', count: 0
-    assert_select '#posting_posting_recurrence_interval', count: 0
+    assert_select '#posting_posting_recurrence_frequency', count: 0
   end
 
 end
