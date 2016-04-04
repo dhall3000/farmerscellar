@@ -1,0 +1,16 @@
+Posting Recurrence Features
+PRs should be like a template that spits out postings on a regular basis. In this regard a PR is pretty much a super set of a posting.
+Create
+-specify interval
+Edit
+-Turn on/off
+-Adjust price
+	-alert producer that using this feature pings all subscriptions and gives them advance notice so they can adjust their subscriptions accordingly before the change takes effect
+	-alert producer how many subscriptions and subscribed units he has (so he can gauge the effect)
+	-make price change take effect X (2?) deliveries out
+	-notify customers they're subscribed to a product whose price is increasing/decreasing and the date the need to make changes by to not be affected
+-description: same notification sub-feature set as price change. for example, what if product was organic but now is changing to be inorganic
+-quantity available
+-delivery date: same notification sub-feature set as price change. for example, what if product was organic but now is changing to be inorganic
+-commitment zone start
+

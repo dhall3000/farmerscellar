@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------------------------------------
+Design Scratch
+-what if on three consecutive days a person subscribes to 1 dozen eggs, then increases to 2 dozen eggs, then gets 1 gallon of milk?
+	-can i have just one reference transaction i tap for this?
+	-what if on the fourth day they do a one time beef purchase?
+
+Scenarios
+1
+-Person has only purchased with guest checkout
+-they have a guest checkout auth waiting for fulfillment
+-they want to subscribe to eggs so they get flashed a message that requires a pp account + billing agreement (BA)
+-the create a BA
+-at capture time we look for an active BA. if we find one we charge all (even the guest checkout auth'd items) on that
+
+2
+has paypal account
+
+i was just looking at the db diagram considering where new tables would go and how it would hook up. for example, toteitems curently hook to checkouts -> auths. how would we do the equivalent with RTs?
+
+Here's a list of design issues. Perhaps I should continue to add to this list before beginning coding?
+
+Questions:
+-how/when do i notify people that they need a paypal account to authorize a subscription?
+-if i already have a Billing Agreement on file and someone comes and checks out additional products / subscriptions, how do i keep records of that?
+-how do i allow a person to turn a subscription off?
+-right at commitment zone startup time i should verify with Paypal that the BA is still legit. if it's not I should remove the toteitem and cancel the subscription.
+-before pulling customer funds off a one-time auth i should check if they have a BA. if they have a BA i should pull from that in a batch.
+
+-how do i show subscription items in the tote? just leave the item there as long as the subscription is on?
+---------------------------------------------------------------------------------------------------------
+Subscription Features
+Create
+-(MVP) quantity
+-(MVP) interval
+-start date scheduling. think about Olga: she wants milk every week but she wants to alternate goat and cow milk. so for both she needs "every other week" subscription but needs to be sure to stagger them. it would be nice if in one sitting she could schedule both subscriptions out. also this feature would be great for someone who primarily wants marty's eggs but wants to get palouse eggs on marty's off week. the could schedule "every delivrey" for marty's and "every four weeks beginning on marty's next off week" for palouse.
+
+Edit
+-(MVP) quantity
+-(MVP) interval
+-(MVP) on/off (off makes subscription permanantly disappear)
+-(MVP) pause (indefinitely)
+-pause (skip dates)

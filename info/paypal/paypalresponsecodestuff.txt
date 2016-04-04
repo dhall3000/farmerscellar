@@ -1,0 +1,49 @@
+http://jldbasa.github.io/blog/2014/01/25/rails-4-paypal-express-checkout-integration/
+
+we want a Basic Authorization. Not an Order or an Order Authorization
+https://developer.paypal.com/docs/classic/admin/auth-capture/
+
+main api trailhead:
+https://developer.paypal.com/docs/classic/api/#merchant
+
+https://ppmts.custhelp.com/app/answers/detail/a_id/939/kw/PayPal%20Express%20Checkout%20Payment%20Actions
+
+setup_authorization calls setexpresscheckout with 'options'
+
+(byebug) authorizations["EC-7RN563296J0697537"][:tote_items][0].status
+4
+
+(byebug) response
+#<ActiveMerchant::Billing::PaypalExpressResponse:0xba36bbe4 @params={"timestamp"=>"2015-05-28T17:23:16Z", "ack"=>"Failure", "correlation_id"=>"88d96ebef1a5a", "version"=>"72", "build"=>"16837281", "do_express_checkout_payment_response_details"=>nil, "message"=>"This Express Checkout session has expired.  Token value is no longer valid.", "error_codes"=>"10411", "Timestamp"=>"2015-05-28T17:23:16Z", "Ack"=>"Failure", "CorrelationID"=>"88d96ebef1a5a", "Errors"=>{"ShortMessage"=>"This Express Checkout session has expired.", "LongMessage"=>"This Express Checkout session has expired.  Token value is no longer valid.", "ErrorCode"=>"10411", "SeverityCode"=>"Error"}, "Version"=>"72", "Build"=>"16837281", "DoExpressCheckoutPaymentResponseDetails"=>nil}, @message="This Express Checkout session has expired.  Token value is no longer valid.", @success=false, @test=true, @authorization=nil, @fraud_review=false, @error_code=nil, @emv_authorization=nil, @avs_result={"code"=>nil, "message"=>nil, "street_match"=>nil, "postal_match"=>nil}, @cvv_result={"code"=>nil, "message"=>nil}>
+(byebug) response.success?
+false
+
+http://stackoverflow.com/questions/11436698/paypal-express-checkout-session-expired-token-invalid-error-10411
+My mistake was : - SetExpressCheckout was made toward paypal sandbox - GetExpressCheckoutDetails was made toward real Prod Paypal
+So double check that the Token you get from PaypalSandBox is used with PaypalSandbox (and same thing for real Paypal)
+
+---------------------------------------------------------------------------
+<%= form_tag({controller: "bulk_buys", action: "create"}, method: "post") do %>
+
+rails g model PurchaseBulkBuy purchase:references bulk_buy:references
+
+update tote_items set status = 4 where user_id = 5 or user_id = 10
+update tote_items set status = 0
+select * from users
+select * from tote_items 
+select * from tote_items  order by user_id
+select * from tote_items where user_id = 10 or user_id = 5
+select * from tote_item_checkouts
+select * from checkouts
+select * from checkout_authorizations
+select * from authorizations
+select * from captures
+select * from bulk_buys
+select * from purchases
+select * from admin_bulk_buys
+select * from purchase_bulk_buys
+
+
+
+
+
