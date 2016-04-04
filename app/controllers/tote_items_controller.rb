@@ -45,6 +45,11 @@ class ToteItemsController < ApplicationController
 
     @account_on_hold = account_on_hold
     @tote_item = ToteItem.new
+
+    if !posting.posting_recurrence.nil? && posting.posting_recurrence.subscribable?
+      @subscription = Subscription.new(interval: 0, on: true, user_id: current_user.id, posting_recurrence_id: posting.posting_recurrence.id)
+    end
+
   end
 
   def create

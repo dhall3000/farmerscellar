@@ -7,6 +7,16 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     @posting_recurrence.postings << postings(:postingf1apples)
   end
 
+  test "should be subscribable" do
+    assert @posting_recurrence.subscribable?
+  end
+
+  test "should not be subscribable" do
+    @posting_recurrence.on = false
+    @posting_recurrence.save
+    assert_not @posting_recurrence.subscribable?
+  end
+
   test "should return proper future delivery dates for martys schedule" do
 
     posting_recurrence = PostingRecurrence.new(interval: 6, on: true)

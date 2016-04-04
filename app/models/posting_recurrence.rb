@@ -27,6 +27,10 @@ class PostingRecurrence < ActiveRecord::Base
 
   validates_presence_of :postings
 
+  def subscribable?
+    return on == true
+  end
+
   def recur
 
     #if there is no recurrence, just quit

@@ -31,40 +31,6 @@
 
 
 
-
-
-
-        <div class="panel panel-default">
-          <div class="panel-heading" role="tab" id="overviewHeading">
-            <h4 class="panel-title">
-              <a role="button" data-toggle="collapse" data-parent="#accordion" href="#overviewBody" aria-expanded="false" aria-controls="overviewBody">
-                Overview
-              </a>
-            </h4>
-          </div>
-          <div id="overviewBody" class="panel-collapse collapse" role="tabpanel" aria-labelledby="overviewHeading">
-            <div class="panel-body">
-              <ul>
-                <li><%= User.find_by(id: posting.user_id).farm_name %> <%= Product.find_by(id: posting.product_id).name %></li>
-                <li><%= number_to_currency(posting.price) %> / <%= UnitKind.find_by(id: posting.unit_kind_id).name %></li>                
-                <li>
-                  <% data_content = "This is mostly like an 'order cutoff' but with " + link_to("some important differences", how_things_work_path(anchor: "commitment_zone")) + "." %>
-
-                  <a href='#' class="popover_init" tabindex="0" data-container="body" data-toggle="popover" data-trigger="focus" data-placement="top" data-html="true" data-content="<%=data_content%>">Commitment Zone</a>
-
-                  starts <%= posting.commitment_zone_start.strftime("%A, %B %-d, %l:%M %p") %>
-                </li>
-                <li>Delivery <%= posting.delivery_date.strftime("%A, %B %-d") %></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-
-
-
-
-
         <div class="panel panel-default">
           <div class="panel-heading" role="tab" id="detailsHeading">
             <h4 class="panel-title">
@@ -75,7 +41,19 @@
           </div>          
           <div id="detailsBody" class="panel-collapse collapse" role="tabpanel" aria-labelledby="detailsHeading">
             <div class="panel-body">
+              <h3>Order</h3>
+                <ul>
+                  <li><%= User.find_by(id: posting.user_id).farm_name %> <%= Product.find_by(id: posting.product_id).name %></li>
+                  <li><%= number_to_currency(posting.price) %> / <%= UnitKind.find_by(id: posting.unit_kind_id).name %></li>                
+                  <li>
+                    <% data_content = "This is mostly like an 'order cutoff' but with " + link_to("some important differences", how_things_work_path(anchor: "commitment_zone")) + "." %>
 
+                    <a href='#' class="popover_init" tabindex="0" data-container="body" data-toggle="popover" data-trigger="focus" data-placement="top" data-html="true" data-content="<%=data_content%>">Commitment Zone</a>
+
+                    starts <%= posting.commitment_zone_start.strftime("%A, %B %-d, %l:%M %p") %>
+                  </li>
+                  <li>Delivery <%= posting.delivery_date.strftime("%A, %B %-d") %></li>
+                </ul>
               <h3>Producer</h3>
               <p><%= posting.user.description %></p>
               <% if posting.user.website != nil %>
@@ -88,6 +66,35 @@
             </div>
           </div>
         </div>
+
+
+
+        <% if @subscription != nil && posting.posting_recurrence != nil %>
+
+          <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="subscribeHeading">
+              <h4 class="panel-title">
+                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#subscribeBody" aria-expanded="false" aria-controls="subscribeBody">
+                  Subscribe
+                </a>
+                <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>
+              </h4>
+            </div>
+            <div id="subscribeBody" class="panel-collapse collapse" role="tabpanel" aria-labelledby="subscribeHeading">
+              <div class="panel-body">
+
+
+                <p>stick subscribe settings here</p>
+
+
+
+              </div>
+            </div>
+          </div>
+
+        <% end %>
+
+
 
 
 
