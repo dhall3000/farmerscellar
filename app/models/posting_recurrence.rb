@@ -2,13 +2,20 @@ class PostingRecurrence < ActiveRecord::Base
   has_many :postings
   has_many :subscriptions
 
+  @@just_once = "Just once"
+  @@every_week = "Every week"
+  @@every_2_weeks = "Every 2 weeks"
+  @@every_3_weeks = "Every 3 weeks"
+  @@every_4_weeks = "Every 4 weeks"
+  @@every_8_weeks = "Every 8 weeks"
+
   def self.frequency  	
   	[
-  		["No", 0],
-  		["Every week", 1],
-  		["Every two weeks", 2],
-  		["Every three weeks", 3],
-  		["Every four weeks", 4],
+  		[@@just_once, 0],
+  		[@@every_week, 1],
+  		[@@every_2_weeks, 2],
+  		[@@every_3_weeks, 3],
+  		[@@every_4_weeks, 4],
   		["Monthly", 5],
       ["Three weeks on, one week off", 6]
   	]
@@ -29,6 +36,23 @@ class PostingRecurrence < ActiveRecord::Base
 
   def subscribable?
     return on == true
+  end
+
+  def subscription_options
+
+    options = 
+    {
+      PostingRecurrence.frequency[0][1] => [[@@just_once, 0]],
+      PostingRecurrence.frequency[1][1] => [[@@just_once, 0], [@@every_week, 1], [@@every_2_weeks, 2], [@@every_3_weeks, 3], [@@every_4_weeks, 4]],
+      PostingRecurrence.frequency[2][1] => [[@@just_once, 0], [@@every_2_weeks, 1], [@@every_4_weeks, 2], [@@every_8_weeks, 3]],
+      PostingRecurrence.frequency[3][1] => [[@@just_once, 0], [@@every_3_weeks, 1], ["Every 6 weeks", 2]],
+      PostingRecurrence.frequency[4][1] => [[@@just_once, 0], [@@every_4_weeks, 1], [@@every_8_weeks, 2]],
+      PostingRecurrence.frequency[5][1] => [[@@just_once, 0], ["Every month", 1], ["Every 2 months", 2]],
+      PostingRecurrence.frequency[6][1] => [[@@just_once, 0], ["3 weeks on, 1 week off", 1], [@@every_2_weeks, 2], [@@every_4_weeks, 3]]
+    }
+
+    return options[frequency]
+
   end
 
   def recur
