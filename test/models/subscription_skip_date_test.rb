@@ -3,7 +3,7 @@ require 'test_helper'
 class SubscriptionSkipDateTest < ActiveSupport::TestCase
 
 	def setup
-		@subscription = Subscription.new(interval: 1, on: true, price: 2.50, quantity: 1)		
+		@subscription = Subscription.new(interval: 1, on: true, quantity: 1)		
 		@user = users(:c1)
 		@posting_recurrence = PostingRecurrence.new(interval: 1, on: true)
 		@subscription.user = @user

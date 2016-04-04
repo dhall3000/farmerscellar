@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160402181708) do
+ActiveRecord::Schema.define(version: 20160404173405) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -416,7 +416,6 @@ ActiveRecord::Schema.define(version: 20160402181708) do
     t.integer  "posting_recurrence_id"
     t.datetime "created_at",                        null: false
     t.datetime "updated_at",                        null: false
-    t.float    "price",                             null: false
     t.integer  "quantity",                          null: false
     t.integer  "rtauthorization_id"
   end
