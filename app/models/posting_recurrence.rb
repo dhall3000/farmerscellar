@@ -190,36 +190,36 @@ class PostingRecurrence < ActiveRecord::Base
 
   end
 
-  private
+  #this method envisions a day when we have tons of posting frequency and subscription frequency options. at that time we might have to
+  #do some fancy calculation to determine when the next delivery date is. for example, Marty (Helen the Hen) delivery 3 weeks on, 1 week off.
+  #this theoretically could support an "every delivery" subscription as well as "every other week" and "every 4 weeks". however, to implement
+  #the latter two subscription frequencies we'd have to do special computation to figure out when the next delivery schedule is because there
+  #are situations where it's not the next delivery but rather the delivery after next since those two subscription frequencies can only be
+  #started on week #1 and #3 of his 4 week cycle.
+  #for now we're not going to implement subscription frequencies that require special treatment because they're not the lowest hanging fruit.
+  #so the thinking with this method is to basically stub it out and call in to it so that down the road if/when we want to implement the things
+  #discussed in this comment we just need to throw a few codes in the case statements below and we should be off to the races.
+  def next_delivery_date(subscription_frequency)
 
-    #this method envisions a day when we have tons of posting frequency and subscription frequency options. at that time we might have to
-    #do some fancy calculation to determine when the next delivery date is. for example, Marty (Helen the Hen) delivery 3 weeks on, 1 week off.
-    #this theoretically could support an "every delivery" subscription as well as "every other week" and "every 4 weeks". however, to implement
-    #the latter two subscription frequencies we'd have to do special computation to figure out when the next delivery schedule is because there
-    #are situations where it's not the next delivery but rather the delivery after next since those two subscription frequencies can only be
-    #started on week #1 and #3 of his 4 week cycle.
-    #for now we're not going to implement subscription frequencies that require special treatment because they're not the lowest hanging fruit.
-    #so the thinking with this method is to basically stub it out and call in to it so that down the road if/when we want to implement the things
-    #discussed in this comment we just need to throw a few codes in the case statements below and we should be off to the races.
-    def next_delivery_date(subscription_frequency)
+    next_delivery_date = postings.last.delivery_date
 
-      next_delivery_date = postings.last.delivery_date
-
-      case frequency
-      when 6 #marty's "3 on, 1 off" posting/delivery schedule
-        case subscription_frequency      
-        when 2 #every 2 weeks
-          #NOT IMPLEMENTED AS OF NOW: 2016-03-05
-          #at implementation time, but code here that figures out when the start date is
-        when 3 #every 4 weeks
-          #NOT IMPLEMENTED AS OF NOW: 2016-03-05
-          #at implementation time, but code here that figures out when the start date is
-        end    
-      end
-
-      return next_delivery_date.strftime("%A, %B %-d")
-
+    case frequency
+    when 6 #marty's "3 on, 1 off" posting/delivery schedule
+      case subscription_frequency      
+      when 2 #every 2 weeks
+        #NOT IMPLEMENTED AS OF NOW: 2016-03-05
+        #at implementation time, but code here that figures out when the start date is
+      when 3 #every 4 weeks
+        #NOT IMPLEMENTED AS OF NOW: 2016-03-05
+        #at implementation time, but code here that figures out when the start date is
+      end    
     end
+
+    return next_delivery_date
+
+  end
+
+  private
 
     def get_last_weekday_occurence_of_next_month(reference_date)
 

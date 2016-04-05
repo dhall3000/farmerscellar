@@ -90,7 +90,7 @@
                   <%= select_tag :delivery_frequency, options_for_select(posting.posting_recurrence.subscription_options.collect { |o| [o[:text], o[:subscription_frequency]] }), {id: "frequency_dropdown", class: "form-control"} %>
                 </div>
 
-                <%= content_tag "div", id: "next_delivery_dates", data: {dates: posting.posting_recurrence.subscription_options.collect { |o| o[:next_delivery_date] }} do %>
+                <%= content_tag "div", id: "next_delivery_dates", data: {dates: posting.posting_recurrence.subscription_options.collect { |o| o[:next_delivery_date].strftime("%A, %B %-d") }} do %>
                   <%= label_tag :next_delivery %>
                   <p id="next_delivery_date"><%= posting.delivery_date.strftime("%A, %B %-d") %></p>
                 <% end %>               

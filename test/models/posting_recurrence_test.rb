@@ -11,6 +11,32 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     assert @posting_recurrence.subscribable?
   end
 
+  test "should have legit subscription options" do
+    options = @posting_recurrence.subscription_options
+
+    assert_not options.nil?
+    assert_equal "Just once", options[0][:text]
+    assert_equal "Every week", options[1][:text]
+    assert_equal "Every 2 weeks", options[2][:text]
+    assert_equal "Every 3 weeks", options[3][:text]
+    assert_equal "Every 4 weeks", options[4][:text]
+
+    assert_equal 0, options[0][:subscription_frequency]
+    assert_equal 1, options[1][:subscription_frequency]
+    assert_equal 2, options[2][:subscription_frequency]
+    assert_equal 3, options[3][:subscription_frequency]
+    assert_equal 4, options[4][:subscription_frequency]
+
+    delivery_date = @posting_recurrence.postings.last.delivery_date
+
+    assert_equal delivery_date, options[0][:next_delivery_date]
+    assert_equal delivery_date, options[1][:next_delivery_date]
+    assert_equal delivery_date, options[2][:next_delivery_date]
+    assert_equal delivery_date, options[3][:next_delivery_date]
+    assert_equal delivery_date, options[4][:next_delivery_date]
+
+  end
+
   test "should not be subscribable" do
     @posting_recurrence.on = false
     @posting_recurrence.save
