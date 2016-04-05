@@ -7,6 +7,7 @@ class PostingRecurrence < ActiveRecord::Base
   @@every_2_weeks = "Every 2 weeks"
   @@every_3_weeks = "Every 3 weeks"
   @@every_4_weeks = "Every 4 weeks"
+  @@every_6_weeks = "Every 6 weeks"
   @@every_8_weeks = "Every 8 weeks"
 
   def self.frequency  	
@@ -40,18 +41,40 @@ class PostingRecurrence < ActiveRecord::Base
 
   def subscription_options
 
-    options = 
-    {
-      PostingRecurrence.frequency[0][1] => [[@@just_once, 0]],
-      PostingRecurrence.frequency[1][1] => [[@@just_once, 0], [@@every_week, 1], [@@every_2_weeks, 2], [@@every_3_weeks, 3], [@@every_4_weeks, 4]],
-      PostingRecurrence.frequency[2][1] => [[@@just_once, 0], [@@every_2_weeks, 1], [@@every_4_weeks, 2], [@@every_8_weeks, 3]],
-      PostingRecurrence.frequency[3][1] => [[@@just_once, 0], [@@every_3_weeks, 1], ["Every 6 weeks", 2]],
-      PostingRecurrence.frequency[4][1] => [[@@just_once, 0], [@@every_4_weeks, 1], [@@every_8_weeks, 2]],
-      PostingRecurrence.frequency[5][1] => [[@@just_once, 0], ["Every month", 1], ["Every 2 months", 2]],
-      PostingRecurrence.frequency[6][1] => [[@@just_once, 0], ["3 weeks on, 1 week off", 1], [@@every_2_weeks, 2], [@@every_4_weeks, 3]]
-    }
+    options = [{subscription_frequency: 0, text: @@just_once, next_delivery_date: next_delivery_date(0)}]
 
-    return options[frequency]
+    case frequency
+    when 0 #just once posting frequency      
+    when 1 #weekly posting frequency
+      options << {subscription_frequency: 1, text: @@every_week, next_delivery_date: next_delivery_date(1)}
+      options << {subscription_frequency: 2, text: @@every_2_weeks, next_delivery_date: next_delivery_date(2)}
+      options << {subscription_frequency: 3, text: @@every_3_weeks, next_delivery_date: next_delivery_date(3)}
+      options << {subscription_frequency: 4, text: @@every_4_weeks, next_delivery_date: next_delivery_date(4)}
+    when 2 #every 2 weeks posting frequency
+      options << {subscription_frequency: 1, text: @@every_2_weeks, next_delivery_date: next_delivery_date(1)}
+      options << {subscription_frequency: 2, text: @@every_4_weeks, next_delivery_date: next_delivery_date(2)}
+      options << {subscription_frequency: 3, text: @@every_6_weeks, next_delivery_date: next_delivery_date(3)}
+      options << {subscription_frequency: 3, text: @@every_8_weeks, next_delivery_date: next_delivery_date(4)}
+    when 3 #every 3 weeks posting frequency
+      options << {subscription_frequency: 1, text: @@every_3_weeks, next_delivery_date: next_delivery_date(1)}
+      options << {subscription_frequency: 2, text: @@every_6_weeks, next_delivery_date: next_delivery_date(2)}
+    when 4 #every 4 weeks posting frequency
+      options << {subscription_frequency: 1, text: @@every_4_weeks, next_delivery_date: next_delivery_date(1)}
+      options << {subscription_frequency: 2, text: @@every_8_weeks, next_delivery_date: next_delivery_date(2)}
+    when 5 #monthly posting frequency
+      #TODO: the :text label below needs to say something like "The last Tuesday of every month" or "The 2nd Tuesday of every month"
+      options << {subscription_frequency: 1, text: "Every month", next_delivery_date: next_delivery_date(1)}
+      #TODO: the :text label below needs to say something like "Every 2 months on the last Tuesday"
+      options << {subscription_frequency: 2, text: "Every 2 months", next_delivery_date: next_delivery_date(2)}
+    when 6 #3 weeks on, 1 week off posting frequency
+      options << {subscription_frequency: 1, text: "3 weeks on, 1 week off", next_delivery_date: next_delivery_date(1)}
+      #TODO: need to implement the subscription schedules every_2_weeks and every_4_weeks
+      #PostingRecurrence.frequency[6][1] => [[@@just_once, 0], ["3 weeks on, 1 week off", 1], [@@every_2_weeks, 2], [@@every_4_weeks, 3]]
+      #There are more notes in trello regarding this. you should be able to find the trello card by using the above line of code options <<
+      #to search in Trello
+    end    
+
+    return options
 
   end
 
@@ -168,6 +191,35 @@ class PostingRecurrence < ActiveRecord::Base
   end
 
   private
+
+    #this method envisions a day when we have tons of posting frequency and subscription frequency options. at that time we might have to
+    #do some fancy calculation to determine when the next delivery date is. for example, Marty (Helen the Hen) delivery 3 weeks on, 1 week off.
+    #this theoretically could support an "every delivery" subscription as well as "every other week" and "every 4 weeks". however, to implement
+    #the latter two subscription frequencies we'd have to do special computation to figure out when the next delivery schedule is because there
+    #are situations where it's not the next delivery but rather the delivery after next since those two subscription frequencies can only be
+    #started on week #1 and #3 of his 4 week cycle.
+    #for now we're not going to implement subscription frequencies that require special treatment because they're not the lowest hanging fruit.
+    #so the thinking with this method is to basically stub it out and call in to it so that down the road if/when we want to implement the things
+    #discussed in this comment we just need to throw a few codes in the case statements below and we should be off to the races.
+    def next_delivery_date(subscription_frequency)
+
+      next_delivery_date = postings.last.delivery_date
+
+      case frequency
+      when 6 #marty's "3 on, 1 off" posting/delivery schedule
+        case subscription_frequency      
+        when 2 #every 2 weeks
+          #NOT IMPLEMENTED AS OF NOW: 2016-03-05
+          #at implementation time, but code here that figures out when the start date is
+        when 3 #every 4 weeks
+          #NOT IMPLEMENTED AS OF NOW: 2016-03-05
+          #at implementation time, but code here that figures out when the start date is
+        end    
+      end
+
+      return next_delivery_date.strftime("%A, %B %-d")
+
+    end
 
     def get_last_weekday_occurence_of_next_month(reference_date)
 

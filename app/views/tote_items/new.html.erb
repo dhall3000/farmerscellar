@@ -69,6 +69,8 @@
 
 
 
+
+
         <% if @subscription != nil && posting.posting_recurrence != nil %>
 
           <div class="panel panel-default">
@@ -83,10 +85,15 @@
             <div id="subscribeBody" class="panel-collapse collapse" role="tabpanel" aria-labelledby="subscribeHeading">
               <div class="panel-body">
 
+                <div>
+                  <%= label_tag :delivery_frequency %>
+                  <%= select_tag :delivery_frequency, options_for_select(posting.posting_recurrence.subscription_options.collect { |o| [o[:text], o[:subscription_frequency]] }), {id: "frequency_dropdown", class: "form-control"} %>
+                </div>
 
-                <p>stick subscribe settings here</p>
-
-
+                <%= content_tag "div", id: "next_delivery_dates", data: {dates: posting.posting_recurrence.subscription_options.collect { |o| o[:next_delivery_date] }} do %>
+                  <%= label_tag :next_delivery %>
+                  <p id="next_delivery_date"><%= posting.delivery_date.strftime("%A, %B %-d") %></p>
+                <% end %>               
 
               </div>
             </div>
@@ -124,6 +131,7 @@
                       <%= f.number_field :status, value: ToteItem.states[:ADDED], hidden: true %>
                       <%= f.number_field :posting_id, value: posting.id, hidden: true %>
                       <%= f.number_field :user_id, value: current_user.id, hidden: true %>
+                      <%= f.number_field :subscription_frequency, value: 0, class: "subscription_frequency", hidden: true %>
 
                       <%= f.submit "+1", class: "btn btn-primary", disabled: @account_on_hold %>
                     <% end %>
@@ -137,6 +145,7 @@
                       <%= f.number_field :status, value: ToteItem.states[:ADDED], hidden: true %>
                       <%= f.number_field :posting_id, value: posting.id, hidden: true %>
                       <%= f.number_field :user_id, value: current_user.id, hidden: true %>
+                      <%= f.number_field :subscription_frequency, value: 0, class: "subscription_frequency", hidden: true %>
 
                       <%= f.submit "+2", class: "btn btn-primary", disabled: @account_on_hold %>
                     <% end %>
@@ -150,6 +159,7 @@
                       <%= f.number_field :status, value: ToteItem.states[:ADDED], hidden: true %>
                       <%= f.number_field :posting_id, value: posting.id, hidden: true %>
                       <%= f.number_field :user_id, value: current_user.id, hidden: true %>
+                      <%= f.number_field :subscription_frequency, value: 0, class: "subscription_frequency", hidden: true %>
 
                       <%= f.submit "+3", class: "btn btn-primary", disabled: @account_on_hold %>
                     <% end %>
@@ -163,6 +173,7 @@
                       <%= f.number_field :status, value: ToteItem.states[:ADDED], hidden: true %>
                       <%= f.number_field :posting_id, value: posting.id, hidden: true %>
                       <%= f.number_field :user_id, value: current_user.id, hidden: true %>
+                      <%= f.number_field :subscription_frequency, value: 0, class: "subscription_frequency", class: "subscription_frequency", hidden: true %>
 
                       <%= f.submit "+4", class: "btn btn-primary", disabled: @account_on_hold %>
                     <% end %>
@@ -181,6 +192,7 @@
                 <%= f.number_field :status, value: ToteItem.states[:ADDED], hidden: true %>
                 <%= f.number_field :posting_id, value: posting.id, hidden: true %>
                 <%= f.number_field :user_id, value: current_user.id, hidden: true %>
+                <%= f.number_field :subscription_frequency, value: 0, class: "subscription_frequency", hidden: true %>
 
                 <%= f.submit "Add", class: "btn btn-primary", disabled: @account_on_hold %>
               <% end %>
