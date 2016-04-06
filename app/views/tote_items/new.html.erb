@@ -186,6 +186,7 @@
 
               <%= form_for @tote_item do |f| %>
                 <%= render partial: 'shared/error_messages_general', locals: { active_record_object: @tote_item } %>
+                <%= render partial: 'shared/error_messages_general', locals: { active_record_object: @subscription } %>
                 
                 <%= f.number_field :quantity, class: "form-control", placeholder: "Enter custom quantity" %>
                 <%= f.number_field :price, value: posting.price, hidden: true %>
@@ -194,7 +195,7 @@
                 <%= f.number_field :user_id, value: current_user.id, hidden: true %>
                 <%= f.number_field :subscription_frequency, value: 0, class: "subscription_frequency", hidden: true %>
 
-                <%= f.submit "Add", class: "btn btn-primary", disabled: @account_on_hold %>
+                <%= f.submit "Add to Tote", class: "btn btn-primary", disabled: @account_on_hold %>
               <% end %>
 
             </div>

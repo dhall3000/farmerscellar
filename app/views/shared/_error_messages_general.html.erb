@@ -1,4 +1,4 @@
-<% if active_record_object.errors.any? %>
+<% if active_record_object && active_record_object.errors.any? %>
   <div id="error_explanation">
 	<div class="alert alert-danger">
 		The form contains <%= pluralize(active_record_object.errors.count, "error")%>.
