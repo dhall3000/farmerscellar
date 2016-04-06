@@ -11,6 +11,11 @@ module ToteItemsHelper
 
   def current_tote_items_for_user(user)
 
+    #2016-04-06 NEW DESCRIPTION!:
+    #Ok, enough confuddling things. From now on (until this hack gets yanked/redid) this method is ONLY for fetching tote items that are progressing along the
+    #path of getting FILLED, but not FILLED itself. That is, FILLED is not on the "progression" path to getting filled. It is FILLED> So it doesn't count. Neither
+    #does NOTFILLED, REMOVED, PURCHASEPENDING, PURCHASED or PURCHASEFAILED
+
     #DESCRIPTION: the intent of this method is to get a collection of toteitems that are currently in the abstract, virtual 'tote'. so, old/expired
     #toteitems are not included, nor are those in states REMOVED, FILLED, NOTFILLED etc.
     #actually, that is false. as of this writing, the possible toteitem states are:
@@ -25,15 +30,22 @@ module ToteItemsHelper
 
     #the 'displayable' items are just the ones in the proper states for user viewing
     if all != nil && all.count > 0
-      displayable = all.where("status = ? or status = ? or status = ? or status = ? or status = ? or status = ?", ToteItem.states[:ADDED], ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED], ToteItem.states[:FILLPENDING], ToteItem.states[:FILLED], ToteItem.states[:PURCHASEPENDING])
+      displayable = all.where("status = ? or status = ? or status = ? or status = ?", ToteItem.states[:ADDED], ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED], ToteItem.states[:FILLPENDING])
     end
 
-    #now, we don't want the user to see old posts. we only want them to see 'current' posts. current posts are those yet to be delivered.
-    #however there is one exception to this rule and that is when an item has progressed to the FILLED state but then does not make
-    #it to the PURCHASED state, for whatever reason. in this case, the customer owes money but has not yet purchased so we want it to
-    #remain in their tote forever until it's purchased
     if displayable != nil && displayable.count > 0      
-      current = displayable.where("postings.delivery_date >= ? or status = ? or status = ?", Time.zone.today, ToteItem.states[:FILLED], ToteItem.states[:PURCHASEPENDING])
+      #now, we don't want the user to see old posts. we only want them to see 'current' posts. current posts are those yet to be delivered.
+      #however there is one exception to this rule and that is when an item has progressed to the FILLED state but then does not make
+      #it to the PURCHASED state, for whatever reason. in this case, the customer owes money but has not yet purchased so we want it to
+      #remain in their tote forever until it's purchased
+      #current = displayable.where("postings.delivery_date >= ? or status = ? or status = ?", Time.zone.today, ToteItem.states[:FILLED], ToteItem.states[:PURCHASEPENDING])
+
+      #the above was a good thought. however, we changed the funds collecting model. when the above was in place our funds-collecting model was to pull from customer
+      #credit cards every night. we had to change that to reduce transaction fees though. we changed to where we only pull funds after all a customer's products
+      #have been delivered for the week. so, theoretically a customer could have a product delivered on a monday and a saturday and for all those days it would
+      #the monday product in the tote. this is not good. so we're changing the whole model to where only items currently in motion toward FILLED get displayed.
+      #once products are filled/delivered they should drop out of the tote.
+      current = displayable.where("postings.delivery_date >= ?", Time.zone.today)
     end
 
     return current
