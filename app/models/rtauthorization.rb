@@ -6,4 +6,9 @@ class Rtauthorization < ActiveRecord::Base
   has_many :subscriptions
 
   validates_presence_of :rtba, :tote_items
+
+  def active
+  	return rtba.active
+  end
+
 end

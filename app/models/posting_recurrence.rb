@@ -208,14 +208,24 @@ class PostingRecurrence < ActiveRecord::Base
       case subscription_frequency      
       when 2 #every 2 weeks
         #NOT IMPLEMENTED AS OF NOW: 2016-03-05
-        #at implementation time, but code here that figures out when the start date is
+        #at implementation time, put code here that figures out when the start date is
       when 3 #every 4 weeks
         #NOT IMPLEMENTED AS OF NOW: 2016-03-05
-        #at implementation time, but code here that figures out when the start date is
+        #at implementation time, put code here that figures out when the start date is
       end    
     end
 
     return next_delivery_date
+
+  end
+
+  def current_posting
+
+    if postings == nil || postings.count < 1
+      return nil
+    end
+
+    return postings.last
 
   end
 

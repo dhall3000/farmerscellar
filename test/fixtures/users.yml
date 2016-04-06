@@ -238,6 +238,19 @@ c_one_tote_item:
   zip: 98009
   phone: 206-319-6579
 
+c_account_on_hold:
+  name: "customer accountonhold"
+  email: c_account_on_hold@c.com
+  password_digest: <%= User.digest('dogdog') %>
+  account_type: 0
+  activated: true
+  activated_at: Time.zone.now
+  address: 32195 27st St. South
+  city: Quaylesdale
+  state: Washington
+  zip: 98009
+  phone: 206-379-6579
+
 a1:
   name: a1
   email: a1@c.com

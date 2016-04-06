@@ -2,7 +2,7 @@
 
 one:
   frequency: 1
-  'on': false
+  'on': true
 
 two:
   frequency: 1

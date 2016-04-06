@@ -1,1 +1,6 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+c_account_on_hold:
+  account_state: hold
+  user: c_account_on_hold
+  notes: "this guy didn't pay for his chicken feet!"

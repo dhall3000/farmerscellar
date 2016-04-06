@@ -68,11 +68,44 @@ class ToteItemsController < ApplicationController
       return
     end
 
-    if @tote_item.save
-      flash[:success] = "Item saved to your shopping tote!"
+    #is the user trying to create a new subscription?
+    if params[:tote_item][:subscription_frequency].to_i > 0
+
+      #is there a posting? is the posting live? does the posting have a recurrence? is the posting recurrence turned on?
+      if @tote_item.posting != nil && @tote_item.posting.live && @tote_item.posting.posting_recurrence != nil && @tote_item.posting.posting_recurrence.on
+        
+        frequency = params[:tote_item][:subscription_frequency].to_i      
+        @subscription = Subscription.new(
+          frequency: frequency,
+          on: true,
+          user_id: @tote_item.user_id,
+          posting_recurrence_id: @tote_item.posting.posting_recurrence.id,
+          quantity: @tote_item.quantity
+          )
+
+        if @subscription.save
+          @subscription.generate_next_tote_item
+          flash[:success] = "New subscription created."
+          redirect_to postings_path
+        else
+          flash.now[:danger] = "Subscription not saved. See errors below."
+          render 'new'
+        end
+
+      else
+        #we need a live posting and a 'on' posting recurrence. that isn't the case to inform the user constructively.
+        flash[:danger] = "Oops, it appears that posting is no longer live. Subscription not created."
+        redirect_to postings_path
+      end
+
+    elsif !@tote_item.posting.live
+      flash[:danger] = "Oops, it appears that posting is no longer live. Item not created."
+      redirect_to postings_path
+    elsif @tote_item.save
+      flash[:success] = "Item saved to shopping tote."
       redirect_to postings_path
     else
-      flash.now[:danger] = "Item not saved to your shopping tote. See errors below."
+      flash.now[:danger] = "Item not saved to shopping tote. See errors below."
       render 'new'
     end
   end
