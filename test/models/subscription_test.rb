@@ -3,11 +3,35 @@ require 'test_helper'
 class SubscriptionTest < ActiveSupport::TestCase
 
 	def setup
-		@subscription = Subscription.new(frequency: 1, on: true, quantity: 1)
 		@posting_recurrence = PostingRecurrence.new(frequency: 1, on: true)
+		@posting_recurrence.postings << postings(:postingf1apples)
+		@subscription = Subscription.new(frequency: 1, on: true, quantity: 1)		
 		@subscription.posting_recurrence = @posting_recurrence
 		@user = users(:c1)
 		@subscription.user = @user
+
+		@posting_recurrence.save
+		@subscription.save
+	end
+
+	test "should generate new tote item" do
+		generate_new_tote_item
+	end
+
+	test "should not generate new tote item on immediateley successive calls" do
+		generate_new_tote_item
+		assert_equal 1, @subscription.tote_items.count
+		assert_equal nil, @subscription.generate_next_tote_item
+		assert_equal 1, @subscription.tote_items.count
+	end
+
+	def generate_new_tote_item
+		assert @subscription.valid?
+		assert_equal 0, @subscription.tote_items.count
+		tote_item = @subscription.generate_next_tote_item
+		assert tote_item.valid?
+		assert_equal 1, @subscription.tote_items.count
+		assert_equal ToteItem.states[:ADDED], @subscription.tote_items.last.status
 	end
 
 	test "should save" do

@@ -17,17 +17,17 @@ class Subscription < ActiveRecord::Base
   	#add a single tote item at most because it does its own logic to tell when is the right time to add.
   	
   	current_posting = posting_recurrence.current_posting
+    next_delivery_date = posting_recurrence.next_delivery_date(frequency)
 
   	#if the next delivery date in the series for this subscription frequency is beyond (datewise) the currently
   	#posted posting in the posting_recurrence postings series, we don't generate a new tote_item here
-  	if current_posting.delivery_date < posting_recurrence.next_delivery_date(frequency)
+  	if current_posting.delivery_date < next_delivery_date
   		return nil
   	end
 
   	#if there are no tote items in this series yet or if the last tote item delivery date is behind the
   	#current posting, create a new tote item
-  	if !tote_items.any? || tote_items.last.posting.delivery_date < posting_recurrence.current_posting.delivery_date  		
-  		
+    if (current_posting.delivery_date == next_delivery_date) && (!tote_items.any? || (tote_items.last.posting.delivery_date < next_delivery_date))
   		#if there is no authorization for this subscription or the authorization is not active, add the
   		#tote item in the ADDED state. otherwise, if everything's good to go and we're all authorized, add in state AUTHORIZED
   		if rtauthorization.nil? || !rtauthorization.active
@@ -35,8 +35,7 @@ class Subscription < ActiveRecord::Base
   		else
   			status = ToteItem.states[:AUTHORIZED]
   		end
-
-  		#params.require(:tote_item).permit(:quantity, :price, :status, :posting_id, :user_id)
+  		
   		tote_item = ToteItem.new(quantity: quantity, price: current_posting.price, status: status, posting_id: current_posting.id, user_id: user.id, subscription_id: id)
 
   		if !rtauthorization.nil?
