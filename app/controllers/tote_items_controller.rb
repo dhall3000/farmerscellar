@@ -21,11 +21,17 @@ class ToteItemsController < ApplicationController
       end
 
       @tote_items = current_user_current_tote_items
+
       if @tote_items == nil
         @total_amount_to_authorize = 0
       else
         @total_amount_to_authorize = get_gross_tote(@tote_items.where(status: ToteItem.states[:ADDED]))      
       end
+
+      @rtba = current_user.get_active_rtba
+      @subscriptions = get_subscriptions_from(@tote_items)
+      @provide_guest_checkout_option = !@rtba && !@subscriptions      
+
     end
   end
 

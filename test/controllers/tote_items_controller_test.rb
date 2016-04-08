@@ -22,6 +22,36 @@ class ToteItemsControllerTest < ActionController::TestCase
 
   end
 
+  test "should get billing agreement on index" do
+    log_in_as(@c1)
+    get :index
+    assert_response :success
+    assert_template 'tote_items/index'
+    rtba = assigns(:rtba)
+    assert_not rtba.nil?
+    assert rtba.active
+  end
+
+  test "should not get billing agreement on index" do
+    log_in_as(@c1)
+    rtba = @c1.get_active_rtba
+    rtba.update(active: false)
+    get :index
+    assert_response :success
+    assert_template 'tote_items/index'
+    rtba = assigns(:rtba)
+    assert rtba.nil?    
+  end
+
+  test "should display helpful text on index" do    
+    #if user has no tote items helpful text should be rendered
+    log_in_as(users(:c_no_tote_items))
+    get :index
+    assert_response :success
+    assert_template 'tote_items/index'
+    assert_match 'p', "Your shopping tote is empty so there is nothing to view here."
+  end
+
   test "should display help text when not logged in for index" do
 
     get :index

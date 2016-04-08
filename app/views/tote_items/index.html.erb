@@ -9,32 +9,58 @@
   <% if @total_amount_to_authorize > 0 %>
     <h2>Checkout</h2>
     <div class="row">
-      <div class="col-sm-4">
+      <div class="col-sm-4 col-sm-offset-right-8">
         <table class="table">
           <tbody>          
             <tr>
-              <td>TOTAL: <%= number_to_currency(@total_amount_to_authorize) %></td>
-              <td><%= form_tag(checkouts_path) do %>
-                <%= hidden_field_tag(:amount, @total_amount_to_authorize) %>
-                <%= image_submit_tag("https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif", disabled: @dropsite.nil?, class: 'form-control', style: "border: 0px solid #bbb;") %>
-                <% #that style: stuff is random. it's cause there's the "input, textarea, select, .uneditable-input {" line in the custom.css file adds a border. so i'm just removing that border here. %>
-                <% end %>
-                <% if @dropsite.nil? %>
-                  <p class="alert alert-danger">No delivery dropsite specified.</p>
-                  <p>You must specify a <%= link_to "delivery dropsite", dropsites_path %> before checking out.</p>
-                <% end %>
-              </td>
+              <td>Total: <%= number_to_currency(@total_amount_to_authorize) %></td>
             </tr>
           </tbody>
-        </table>          	      
+        </table>                  
+
+
+
+        <%= form_tag(checkouts_path) do %>
+
+          <% if @provide_guest_checkout_option %> 
+            <div class="text-center">
+              <div class="btn-group" data-toggle="buttons">
+                <%= label_tag :use_reference_transaction, class: "btn btn-default active" do %>
+                  <%= radio_button_tag :use_reference_transaction, "1", checked: true %>
+                  <span>One-click checkout</span>
+                <% end %>
+                <%= label_tag :use_reference_transaction, class: "btn btn-default" do %>
+                  <%= radio_button_tag :use_reference_transaction, "0" %>
+                  <span>Guest checkout</span>
+                <% end %>
+              </div>
+            </div>
+          <% else %>
+              <%= hidden_field_tag(:use_reference_transaction, "1") %>
+          <% end %>
+
+          <%= hidden_field_tag(:amount, @total_amount_to_authorize) %>
+
+          <div id="paypal-div">
+            <%= image_submit_tag "https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif", disabled: @dropsite.nil?, id: "paypal-button" %>
+          </div>
+          
+        <% end %>
+
+        <% if @dropsite.nil? %>
+          <p class="alert alert-danger">No delivery dropsite specified.</p>
+          <p>You must specify a <%= link_to "delivery dropsite", dropsites_path %> before checking out.</p>
+        <% end %>
+
         <p>(By proceeding with checkout you agree to transact with and through Farmer's Cellar in accordance with our operational policies and procedures outlined on our <%= link_to "How Things Work", how_things_work_path %> page)</p>
-      </div>  
-      <div class="col-sm-8">
-      </div>  
+
+
+
+
+      </div>
     </div>
+
   <% end %>
-
-
 
 
 

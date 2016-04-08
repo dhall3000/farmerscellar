@@ -3,5 +3,5 @@
 one:
   token: "faketoken"
   ba_id: "fakeba_id"
-  user_id: c1.id
+  user: c1
   active: true

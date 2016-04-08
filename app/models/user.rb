@@ -33,6 +33,22 @@ class User < ActiveRecord::Base
 
   has_one :access_code
 
+  def get_active_rtba
+
+    if rtbas.nil? || !rtbas.any?            
+      return nil
+    end
+
+    rtba = rtbas.last
+
+    if rtba.active == false
+      return nil
+    end
+    
+    return rtba
+
+  end
+
   def is_producer?
     return account_type == 1
   end
