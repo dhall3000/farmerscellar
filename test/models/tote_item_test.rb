@@ -9,6 +9,29 @@ class ToteItemTest < ActiveSupport::TestCase
   	@tote_item = tote_items(:c1apple)
   end
 
+  test "state checker" do
+    assert @tote_item.state?(:ADDED)
+    @tote_item.status = ToteItem.states[:AUTHORIZED]
+    assert @tote_item.state?(:AUTHORIZED)    
+  end
+
+  test "should deauthorize" do
+    @tote_item.update(status: ToteItem.states[:AUTHORIZED])
+    @tote_item.save
+    ti = @tote_item.reload
+    assert_equal ToteItem.states[:AUTHORIZED], @tote_item.status
+    ti.deauthorize
+    ti = @tote_item.reload
+    assert_equal ToteItem.states[:ADDED], @tote_item.status
+  end
+
+  test "should not deauthorize" do
+    @tote_item.status = ToteItem.states[:COMMITTED]
+    assert @tote_item.state?(:COMMITTED)    
+    @tote_item.deauthorize
+    assert_not @tote_item.state?(:ADDED)
+  end
+
   test "should be valid" do
   	assert @tote_item.valid?  	
   end

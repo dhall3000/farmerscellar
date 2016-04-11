@@ -5,13 +5,24 @@ class SubscriptionTest < ActiveSupport::TestCase
 	def setup
 		@posting_recurrence = PostingRecurrence.new(frequency: 1, on: true)
 		@posting_recurrence.postings << postings(:postingf1apples)
-		@subscription = Subscription.new(frequency: 1, on: true, quantity: 1)		
+		@subscription = Subscription.new(frequency: 1, on: true, quantity: 1)
 		@subscription.posting_recurrence = @posting_recurrence
 		@user = users(:c1)
 		@subscription.user = @user
 
 		@posting_recurrence.save
 		@subscription.save
+	end
+
+	test "should not generate new tote item when off" do
+		assert @subscription.on
+		@subscription.turn_off
+		assert_not @subscription.on
+		assert @subscription.valid?
+		assert_equal 0, @subscription.tote_items.count
+		tote_item = @subscription.generate_next_tote_item
+		assert_not tote_item
+		assert_equal 0, @subscription.tote_items.count		
 	end
 
 	test "should generate new tote item" do

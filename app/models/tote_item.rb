@@ -23,7 +23,6 @@ class ToteItem < ActiveRecord::Base
 
   validates :price, numericality: { greater_than: 0 }
   validates :quantity, numericality: { greater_than: 0, only_integer: true }
-  validates :status, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 9 }
 
   #PURCHASEFAILED: this state is for when we process a bulk buy and someone's purchase fails. we kick all their toteitems in to this
   #state, empty out their tote and cut off their account so that they can't order anything more until they square up. when in this state
@@ -32,6 +31,9 @@ class ToteItem < ActiveRecord::Base
   def self.states
   	{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLPENDING: 3, FILLED: 4, NOTFILLED: 5, REMOVED: 6, PURCHASEPENDING: 7, PURCHASED: 8, PURCHASEFAILED: 9}
   end
+
+  validates :status, inclusion: { in: ToteItem.states.values }
+  validates :status, numericality: {only_integer: true}
 
   def self.status(id, newstate)
 
@@ -53,6 +55,16 @@ class ToteItem < ActiveRecord::Base
 
   	ti
 
+  end
+
+  def deauthorize
+    if state?(:AUTHORIZED)
+      update(status: ToteItem.states[:ADDED])
+    end    
+  end
+
+  def state?(state_key)
+    return status == ToteItem.states[state_key]
   end
 
   def authorization

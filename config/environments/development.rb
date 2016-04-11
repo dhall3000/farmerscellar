@@ -72,7 +72,7 @@ Rails.application.configure do
 
     ::PAYPALMASSPAYENDPOINT = "https://api-3t.sandbox.paypal.com"
     
-    ::USEGATEWAY = true
+    ::USEGATEWAY = false
 
     #this is intended to function a bit like a database so that i don't have to create new models just to fiddle with features like paypal reference transactions
     ::PAYPALDATASTORE = {}

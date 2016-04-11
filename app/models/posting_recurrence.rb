@@ -35,6 +35,13 @@ class PostingRecurrence < ActiveRecord::Base
 
   validates_presence_of :postings
 
+  def turn_off
+    update(on: false)
+    subscriptions.each do |subscription|
+      subscription.turn_off
+    end    
+  end
+
   def subscribable?
     return on == true
   end

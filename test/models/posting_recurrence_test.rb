@@ -3,8 +3,43 @@ require 'test_helper'
 class PostingRecurrenceTest < ActiveSupport::TestCase
   
   def setup
-  	@posting_recurrence = PostingRecurrence.new(frequency: 1, on: true)
+  	
+    @posting_recurrence = PostingRecurrence.new(frequency: 1, on: true)
     @posting_recurrence.postings << postings(:postingf1apples)
+    @posting_recurrence.save
+    @posting_recurrence.recur
+
+    @subscription = Subscription.new(frequency: 1, on: true, quantity: 1)   
+    @subscription.posting_recurrence = @posting_recurrence    
+    @subscription.user = users(:c1)
+    @subscription.save
+    @subscription.generate_next_tote_item    
+
+  end
+
+  test "should turn off" do
+
+    #this should not only turn off the recurrence itself but also ripple through to turn off
+    #all subscriptions based off it
+
+    assert @posting_recurrence.subscribable?
+
+    assert @posting_recurrence.on
+    assert_equal 1, @posting_recurrence.subscriptions.count
+    assert @posting_recurrence.subscriptions.first.on
+
+    @posting_recurrence.turn_off    
+    assert_not @posting_recurrence.subscribable?
+    assert_not @posting_recurrence.on
+    assert_not @posting_recurrence.subscriptions.first.on
+
+    pr = @posting_recurrence.reload
+    s = @posting_recurrence.subscriptions.first.reload
+
+    assert_not pr.subscribable?
+    assert_not pr.on
+    assert_not s.on
+
   end
 
   test "should be subscribable" do
@@ -38,9 +73,9 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
   end
 
   test "should not be subscribable" do
-    @posting_recurrence.on = false
-    @posting_recurrence.save
+    @posting_recurrence.turn_off
     assert_not @posting_recurrence.subscribable?
+    @posting_recurrence.reload
   end
 
   test "should return proper future delivery dates for martys schedule" do
@@ -78,8 +113,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     posting_recurrence = verify_recur_creates_one_new_posting(frequency)
 
     #turn off the recurrence
-    posting_recurrence.on = false
-    posting_recurrence.save
+    posting_recurrence.turn_off
 
     current_num_postings = posting_recurrence.postings.count
 

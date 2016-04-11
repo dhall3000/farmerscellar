@@ -82,7 +82,7 @@ class PostingsController < ApplicationController
 
       if params[:posting][:posting_recurrence][:on] == "0"
         #user just turned off the recurrence so persist that to db
-        @posting_recurrence.on = false
+        @posting_recurrence.turn_off
         @posting_recurrence.save
       end
 

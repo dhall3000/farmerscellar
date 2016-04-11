@@ -9,6 +9,40 @@ class RtauthorizationTest < ActiveSupport::TestCase
 		@rtauthorization.tote_items << @tote_item
 	end
 
+	test "authorized works right" do		
+		assert @rtauthorization.save
+		assert @rtauthorization.authorized?
+		@rtba.update(active: false)
+		@rtauthorization.reload
+		assert_not @rtauthorization.authorized?
+	end
+
+	test "should deauthorize" do
+
+		#move the ti state to auth'd
+		@tote_item.update(status: ToteItem.states[:AUTHORIZED])
+		#verify ti state is auth'd
+		assert @tote_item.state?(:AUTHORIZED)		
+		#call rtauth.deauth
+		@rtauthorization.deauthorize
+		#verify ti is deauth'd
+		assert @tote_item.state?(:ADDED)		
+
+	end
+
+	test "should not deauthorize toteitems" do
+
+		#move the ti state to committed
+		@tote_item.update(status: ToteItem.states[:COMMITTED])
+		#verify ti state is committed
+		assert @tote_item.state?(:COMMITTED)		
+		#call rtauth.deauth
+		@rtauthorization.deauthorize
+		#verify ti is not deauth'd
+		assert_not @tote_item.state?(:ADDED)		
+
+	end
+
 	test "should save" do
 		assert @rtauthorization.save
 		assert @rtauthorization.valid?

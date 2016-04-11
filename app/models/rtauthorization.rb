@@ -7,8 +7,14 @@ class Rtauthorization < ActiveRecord::Base
 
   validates_presence_of :rtba, :tote_items
 
-  def active
-  	return rtba.active
+  def authorized?
+  	return rtba && rtba.active
+  end
+
+  def deauthorize  	
+  	tote_items.each do |ti|
+  		ti.deauthorize
+  	end
   end
 
 end

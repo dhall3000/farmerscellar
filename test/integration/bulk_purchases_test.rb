@@ -207,7 +207,7 @@ class BulkPurchasesTest < BulkBuyer
     post tote_items_path, tote_item: {quantity: 2, price: posting_lettuce.price, status: ToteItem.states[:ADDED], posting_id: posting_lettuce.id, user_id: @c1.id}
     get tote_items_path
     total_amount_to_authorize = assigns(:total_amount_to_authorize)    
-    post checkouts_path, amount: total_amount_to_authorize
+    post checkouts_path, amount: total_amount_to_authorize, use_reference_transaction: "0"
     follow_redirect!
     authorization = assigns(:authorization)
     post authorizations_path, authorization: {token: authorization.token, payer_id: authorization.payer_id, amount: authorization.amount}

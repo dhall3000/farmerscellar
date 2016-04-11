@@ -11,7 +11,19 @@ class Subscription < ActiveRecord::Base
   validates :quantity, numericality: { only_integer: true, greater_than: 0 }
   validates_presence_of :posting_recurrence, :user
 
+  def turn_off
+    update(on: false)
+  end
+
+  def authorized?
+    return rtauthorization && rtauthorization.authorized?
+  end
+
   def generate_next_tote_item
+
+    if !on || !posting_recurrence.on
+      return nil
+    end
 
   	#try to add the next tote item in the series. it can be called any number of times successively and will only
   	#add a single tote item at most because it does its own logic to tell when is the right time to add.
@@ -30,10 +42,10 @@ class Subscription < ActiveRecord::Base
     if (current_posting.delivery_date == next_delivery_date) && (!tote_items.any? || (tote_items.last.posting.delivery_date < next_delivery_date))
   		#if there is no authorization for this subscription or the authorization is not active, add the
   		#tote item in the ADDED state. otherwise, if everything's good to go and we're all authorized, add in state AUTHORIZED
-  		if rtauthorization.nil? || !rtauthorization.active
-  			status = ToteItem.states[:ADDED]
-  		else
+  		if authorized?
   			status = ToteItem.states[:AUTHORIZED]
+  		else
+  			status = ToteItem.states[:ADDED]
   		end
   		
   		tote_item = ToteItem.new(quantity: quantity, price: current_posting.price, status: status, posting_id: current_posting.id, user_id: user.id, subscription_id: id)
@@ -43,7 +55,8 @@ class Subscription < ActiveRecord::Base
 	  		#i don't think we really NEED need this. but doing it anyway. why is it that toteitems have_many rtauths and a subscription also has an auth? isn't one or the other
 	  		#sufficient. indeed, wouldn't it be cleaner to only have the subscription hold the reference to the rtauth parent? no, because toteitems can be atttached to an rtauth
 	  		#by means other than through subscriptions. as in, a person with a billing agreement can add a subscription to the auth but they can also add a single one-time-buy tote item
-	  		tote_item.rtauthorizations << rtauthorization
+	  		rtauthorization.tote_items << tote_item
+        rtauthorization.save
 
   		end
   		
