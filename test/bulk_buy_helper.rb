@@ -91,34 +91,6 @@ class BulkBuyer < Authorizer
     #verify there are filled
     assert ToteItem.where(status: ToteItem.states[:FILLED]).count > 0
 
-    get new_bulk_buy_path
-    assert 'bulk_buy/new'
-    #puts @response.body
-    assert total_bulk_buy_amount = assigns(:total_bulk_buy_amount) > 0
-    filled_tote_items = assigns(:filled_tote_items)
-    assert filled_tote_items.count > 0
-
-    filled_tote_item_ids = []
-    filled_users = {}
-    for tote_item in filled_tote_items
-      filled_tote_item_ids << tote_item.id
-      if filled_users[tote_item.user.id] == nil
-        filled_users[tote_item.user.id] = true
-      end
-    end
-
-    expected_num_purchase_receivables = filled_users.count
-
-    num_bulk_buys = BulkBuy.count
-    num_purchase_receivables_before = PurchaseReceivable.count
-    post bulk_buys_path, filled_tote_item_ids: filled_tote_item_ids
-    assert PurchaseReceivable.count > num_purchase_receivables_before
-
-    bulk_buy = assigns(:bulk_buy)
-
-    assert_equal expected_num_purchase_receivables, bulk_buy.purchase_receivables.count
-    assert_equal num_bulk_buys + 1, BulkBuy.count
-
     prs = PurchaseReceivable.all.to_a
     pr = prs[0]
     puts "amount=#{pr.amount.to_s}"

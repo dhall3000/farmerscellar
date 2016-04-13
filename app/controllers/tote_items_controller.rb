@@ -153,7 +153,8 @@ class ToteItemsController < ApplicationController
         @tote_item = ToteItem.dequeue(posting_id)
         if params[:tote_item][:id] != nil
           #stamp this incoming tote_item as 'FILLED'
-          ToteItem.status(params[:tote_item][:id], ToteItem.states[:FILLED])
+          filled_tote_item = ToteItem.find(params[:tote_item][:id])
+          filled_tote_item.transition(:tote_item_filled)
         end
       end
     end    

@@ -28,11 +28,10 @@ class BulkPurchasesTest < BulkBuyer
     do_standard_payment(customers)
     bulk_payment = assigns(:bulk_payment)
 
-    ti = bulk_purchase.purchase_receivables.first.tote_items[8]
+    ti = bulk_purchase.purchase_receivables[2].tote_items.first
     c1_charge_amount = (ti.quantity * ti.price).round(2)
     ricky_proceeds = (c1_charge_amount * (0.965)).round(2)
-    
-    assert_equal ricky_proceeds, bulk_payment.payment_payables[4].payments.first.amount
+    assert_equal ricky_proceeds, bulk_payment.payment_payables[10].payments.first.amount
 
   end
 
@@ -348,23 +347,21 @@ class BulkPurchasesTest < BulkBuyer
     assert_equal total_amount_purchased, bp.gross
     all_purchases_succeeded = all_purchase_receivables_succeeded(prs)
 
-    #verify the associated bulkbuy's amount is proper relative to the bulkpurchase's totalgross
-    if all_purchases_succeeded
-      assert_equal purchase_receivables.last.bulk_buys.last.amount, bp.gross      
-    else
-      #if there are failed purchases we would expect the actual amount collected to be less than the bulk buy anticipated amount
-      assert purchase_receivables.last.bulk_buys.last.amount > bp.gross
-    end
-
     #verify the total amount withheld from us equals the sum of the parts
     sum_of_payment_processor_fee_withheld_from_us = 0
     sum_of_payment_processor_fee_withheld_from_producer = 0
 
+    purchases = {}
+
     purchase_receivables.each do |pr|
-      pr.purchases.each do |p|
-        sum_of_payment_processor_fee_withheld_from_us = (sum_of_payment_processor_fee_withheld_from_us + p.payment_processor_fee_withheld_from_us).round(2)
-        sum_of_payment_processor_fee_withheld_from_producer = (sum_of_payment_processor_fee_withheld_from_producer + p.payment_processor_fee_withheld_from_producer).round(2)
-      end      
+      purchase = pr.purchases.last
+
+      if !purchases.has_key?(purchase)
+        purchases[purchase] = purchase
+        sum_of_payment_processor_fee_withheld_from_us = (sum_of_payment_processor_fee_withheld_from_us + purchase.payment_processor_fee_withheld_from_us).round(2)
+        sum_of_payment_processor_fee_withheld_from_producer = (sum_of_payment_processor_fee_withheld_from_producer + purchase.payment_processor_fee_withheld_from_producer).round(2)
+      end
+      
     end
 
     assert_equal sum_of_payment_processor_fee_withheld_from_us, bp.payment_processor_fee_withheld_from_us    
@@ -561,7 +558,9 @@ class BulkPurchasesTest < BulkBuyer
   def verify_legitimacy_of_purchases
 
     assert Purchase.count > 0
-    assert Purchase.count == PurchaseReceivable.count
+
+    assert_equal Purchase.count, ToteItem.select(:user_id).where(status: [ToteItem.states[:PURCHASEFAILED], ToteItem.states[:PURCHASED]]).distinct.count
+    assert_equal PurchaseReceivable.count, ToteItem.where(status: [ToteItem.states[:PURCHASEFAILED], ToteItem.states[:PURCHASED]]).distinct.count
 
     purchase_receivables = assigns(:purchase_receivables)
 
@@ -583,7 +582,8 @@ class BulkPurchasesTest < BulkBuyer
       if purchase.response.success?
         assert_equal authorization.amount, purchase.gross_amount        
       else
-        assert_equal authorization.amount, pr.amount
+        assert_equal authorization.amount, pr.purchases.last.purchase_receivables.sum(:amount)
+        assert_equal 0, pr.purchases.last.purchase_receivables.sum(:amount_purchased)
       end
 
     end
@@ -634,7 +634,6 @@ class BulkPurchasesTest < BulkBuyer
       #this should be zero here because we haven't done the producer payments yet
       assert_equal purchase_receivable.amount_purchased, 0
       assert_not_nil purchase_receivable.bulk_buys
-      assert purchase_receivable.bulk_buys.count > 0
 
       puts "purchase_receivable.bulk_buys.count: #{purchase_receivable.bulk_buys.count}"
       

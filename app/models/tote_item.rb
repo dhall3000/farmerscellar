@@ -29,7 +29,7 @@ class ToteItem < ActiveRecord::Base
   #user's tote shoudl show all the items they're on the hook for and when they do payment account stuff the funds should go straight through
   #rather than just authorizing for later capture.
   def self.states
-  	{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLPENDING: 3, FILLED: 4, NOTFILLED: 5, REMOVED: 6, PURCHASEPENDING: 7, PURCHASED: 8, PURCHASEFAILED: 9}
+  	{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLPENDING: 3, FILLED: 4, NOTFILLED: 5, REMOVED: 6, PURCHASEPENDING: 7, PURCHASED: 8, PURCHASEFAILED: 9, DELIVERED: 10, NOTIFIED: 11}
   end
 
   validates :status, inclusion: { in: ToteItem.states.values }
@@ -44,6 +44,74 @@ class ToteItem < ActiveRecord::Base
   	  	ti.update_attribute(:status, newstate)
   	  end
   	end  	
+  end
+
+  def transition(input)
+    
+    new_state = status
+
+    case status
+    when ToteItem.states[:ADDED]
+      case input
+      when :customer_authorized || :subscription_authorized
+        new_state = ToteItem.states[:AUTHORIZED]
+      when :customer_removed
+        new_state = ToteItem.states[:REMOVED]
+      end
+    when ToteItem.states[:AUTHORIZED]
+      case input
+      when :billing_agreement_inactive
+        new_state = ToteItem.states[:ADDED]
+      when :customer_removed
+        new_state = ToteItem.states[:REMOVED]
+      when :commitment_zone_started
+        new_state = ToteItem.states[:COMMITTED]
+      end
+    when ToteItem.states[:COMMITTED]
+      case input
+      when :not_enough_product
+        new_state = ToteItem.states[:NOTFILLED]
+      when :tote_item_filled
+        new_state = ToteItem.states[:FILLED]
+        #create new purchaserecievable here
+        create_purchase_receivable
+      end
+    when ToteItem.states[:FILLPENDING]
+      #TODO: this whole case / state goes away eventually
+      case input
+      when :tote_item_filled
+        new_state = ToteItem.states[:FILLED]
+        #create new purchaserecievable here
+        create_purchase_receivable
+      end
+    when ToteItem.states[:FILLED]
+      case input
+      when :delivered
+        new_state = ToteItem.states[:DELIVERED]
+      end
+    when ToteItem.states[:NOTFILLED]
+      case input
+      when :notified
+        new_state = ToteItem.states[:NOTIFIED]
+      end
+    when ToteItem.states[:REMOVED]
+      
+      #end state
+
+    when ToteItem.states[:DELIVERED]
+      case input
+      when :notified
+      end
+    when ToteItem.states[:NOTIFIED]
+
+      #end state
+
+    end
+
+    if new_state != status
+      update(status: new_state)
+    end
+
   end
 
   def self.dequeue(posting_id)
@@ -72,5 +140,14 @@ class ToteItem < ActiveRecord::Base
       checkouts.last.authorizations.last
     end
   end
+
+  private
+
+    def create_purchase_receivable
+      pr = PurchaseReceivable.new(amount: get_gross_item(self), amount_purchased: 0, kind: PurchaseReceivable.kind[:NORMAL])
+      pr.users << user
+      pr.tote_items << self
+      pr.save
+    end
 
 end

@@ -23,9 +23,11 @@ class PurchaseReceivable < ActiveRecord::Base
     {NORMAL: 0, PURCHASEFAILED: 1, DONTCOLLECT: 2}
   end
 
-  def self.load_unpurchased_purchase_receivables
+  def self.load_unpurchased_purchase_receivables_for_users(users)
     #TODO(Future): this will probably be really inefficient as the db grows. maybe want a boolean for when each record's amount is fully purchased
-    prs = where("amount_purchased < amount and (kind is null or kind = ?)", PurchaseReceivable.kind[:NORMAL])
+    all_prs = where("amount_purchased < amount and (kind is null or kind = ?)", PurchaseReceivable.kind[:NORMAL])
+    uprs = UserPurchaseReceivable.select(:purchase_receivable_id).where(user_id: users, purchase_receivable_id: all_prs)
+    prs = PurchaseReceivable.where(id: uprs)
 
     #TODO (future): this method gets called because we're in process of charging customer accounts. with the code as is, each
     #object returned in 'prs' will get charged. but by doing so the door is a tiny bit open to double charging customers.
@@ -48,6 +50,20 @@ class PurchaseReceivable < ActiveRecord::Base
     #proof, idempotent payment execution flow.
 
     return prs
+  end
+
+  def amount_outstanding
+    self.amount - self.amount_purchased
+  end
+
+  def apply(amount)
+
+    self.amount_purchased = (self.amount_purchased + amount).round(2)
+
+    if amount_outstanding == 0
+      tote_items.where(status: ToteItem.states[:PURCHASEPENDING]).update_all(status: ToteItem.states[:PURCHASED])
+    end
+
   end
 
   #return a hash where the keys are producer ids and the values are arrays of tote_items from that producer
@@ -170,4 +186,21 @@ class PurchaseReceivable < ActiveRecord::Base
     return purchase
 
   end
+
+  def purchase_failed
+    tote_items.where(status: ToteItem.states[:PURCHASEPENDING]).update_all(status: ToteItem.states[:PURCHASEFAILED])    
+    self.kind = PurchaseReceivable.kind[:PURCHASEFAILED]
+
+    #we want to prevent work from beginning on any tote_items in this customer's pipeline for which work hasn't yet begun
+    #in other words, empty out their tote. however, if something is already committed then the customer is on the hook for
+    #that if it gets filled.
+    #TODO: make a test to verify that when a purchase fails the shopping tote gets emptied
+    current_tote_items = ToteItemsController.helpers.current_tote_items_for_user(users.last)
+    if current_tote_items != nil && current_tote_items.any?
+      current_tote_items.where("status = ? or status = ?", ToteItem.states[:ADDED], ToteItem.states[:AUTHORIZED]).update_all(status: ToteItem.states[:REMOVED])
+    end
+
+    save
+  end
+
 end

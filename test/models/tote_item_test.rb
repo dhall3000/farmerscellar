@@ -9,6 +9,15 @@ class ToteItemTest < ActiveSupport::TestCase
   	@tote_item = tote_items(:c1apple)
   end
 
+  #TODO: add more transitions tests
+  test "transitions" do
+    assert_equal ToteItem.states[:ADDED], @tote_item.status
+    @tote_item.transition(:customer_authorized)
+    assert_equal ToteItem.states[:AUTHORIZED], @tote_item.status
+    @tote_item.reload
+    assert_equal ToteItem.states[:AUTHORIZED], @tote_item.status
+  end
+
   test "state checker" do
     assert @tote_item.state?(:ADDED)
     @tote_item.status = ToteItem.states[:AUTHORIZED]
@@ -116,7 +125,7 @@ class ToteItemTest < ActiveSupport::TestCase
 
   	@tote_item.status = -1
   	assert_not @tote_item.valid?
-  	@tote_item.status = 10
+  	@tote_item.status = 12
   	assert_not @tote_item.valid?
   end
 

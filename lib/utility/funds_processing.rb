@@ -9,22 +9,13 @@ class FundsProcessing
 	def self.do_bulk_customer_purchase
 
     puts "FundsProcessing.do_bulk_customer_purchase start"
-		values = bulk_buy_new
-
-    if values.nil? || values[:filled_tote_items].nil? || values[:filled_tote_items].count < 1
-      puts "zero filled tote items"
-      puts "FundsProcessing.do_bulk_customer_purchase end"
-      return      
-    end
-
-		admin = User.where(account_type: User.types[:ADMIN]).first
-		bulk_buy_create(values[:filled_tote_items], admin)
+		
 		#do bulk purchase
 		values = bulk_purchase_new    
 
 		purchase_receivable_ids = []
 
-    if values[:bulk_purchase] != nil && values[:bulk_purchase].purchase_receivables != nil && values[:bulk_purchase].purchase_receivables.any?
+    if !values.nil? && values[:bulk_purchase] != nil && values[:bulk_purchase].purchase_receivables != nil && values[:bulk_purchase].purchase_receivables.any?
       values[:bulk_purchase].purchase_receivables.each do |pr|
         purchase_receivable_ids << pr.id
       end
@@ -42,11 +33,10 @@ class FundsProcessing
 
 	end
 
-	def self.bulk_buy_new
-
-    puts "FundsProcessing.bulk_buy_new start"
-
-		ret = {}
+  #these are all the users who currently have filled tote item (or actually we're about to change it sot hat it doesn't matter
+  #the state of the toteitem, but rather they have more than zero unpurchased purchase receivables) that don't have any more
+  #deliveries scheduled for later this week. in other words, we should pull funds off these users' accounts
+  def self.get_purchase_users
 
     #get all filled tote items where the users of such have no deliveries scheduled later this week
     num_days_till_end_of_week = ENDOFWEEK - Time.zone.today.wday
@@ -57,126 +47,16 @@ class FundsProcessing
     delivery_later_this_week_users = User.select(:id).joins(tote_items: :posting).where("tote_items.status" => [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED]], 'postings.delivery_date' => time_range).distinct
     purchase_users = filled_users.where.not(id: delivery_later_this_week_users)
 
-    ret[:filled_tote_items] = ToteItem.joins(:user).where('users.id' => purchase_users, status: ToteItem.states[:FILLED]).distinct
+    return purchase_users
 
-    if ret[:filled_tote_items].count < 1
-      puts "zero tote items in the FILLED state"
-      puts "FundsProcessing.bulk_buy_new end"
-      return
-    end
-
-    user_ids = ret[:filled_tote_items].select(:user_id).distinct    
-    ret[:user_infos] = []
-    ret[:total_bulk_buy_amount] = 0
-
-    for user_id in user_ids
-      user_info = {email: '', id: 0, total_amount: 0 }
-      tote_items_by_user = ret[:filled_tote_items].where(user_id: user_id.user_id)
-      for tote_item_by_user in tote_items_by_user
-        user_info[:total_amount] = (user_info[:total_amount] + get_gross_item(tote_item_by_user).round(2))
-        user_info[:email] = tote_item_by_user.user.email
-        user_info[:id] = tote_item_by_user.user.id
-      end
-      ret[:total_bulk_buy_amount] = (ret[:total_bulk_buy_amount] + user_info[:total_amount]).round(2)
-      ret[:user_infos] << user_info
-    end
-
-    puts "------"
-    ret[:user_infos].each do |user_info|
-      puts "Purchase info for user: " + user_info[:email]
-      ret[:filled_tote_items].where(user_id: user_info[:id]).each do |tote_item|
-        puts "ToteItem id: " + tote_item.id.to_s + ", amount: " + number_to_currency(get_gross_item(tote_item))
-      end
-      puts "Total amount for user: " + number_to_currency(user_info[:total_amount])
-      puts "------"
-    end
-
-    puts "Total BulkBuy amount: " + number_to_currency(ret[:total_bulk_buy_amount])
-    puts "FundsProcessing.bulk_buy_new end"
-
-    return ret
-
-	end
-
-	def self.bulk_buy_create(filled_tote_item_ids, admin)
-
-    puts "FundsProcessing.bulk_buy_create start"
-
-    #create a bulkbuy object
-    bulk_buy = BulkBuy.new
-    bulk_buy.admins << admin
-    bulk_buy.amount = 0
-
-    authorizations = {}
-
-    #get the filled tote items and group them by user's authorization
-  	filled_tote_items = ToteItem.where(id: filled_tote_item_ids)
-    
-    if filled_tote_items == nil || filled_tote_items.count < 1
-      puts "filled_tote_items == nil || filled_tote_items.count < 1"
-      puts "FundsProcessing.bulk_buy_create end"    
-      return
-    end
-
-  	for filled_tote_item in filled_tote_items
-      bulk_buy.tote_items << filled_tote_item
-  	  if filled_tote_item.checkouts != nil && filled_tote_item.checkouts.any?
-  	  	if filled_tote_item.checkouts.last.authorizations != nil && filled_tote_item.checkouts.last.authorizations.any?
-  	  	  authorization = filled_tote_item.checkouts.last.authorizations.last
-  	  	  if authorizations[authorization.token] == nil
-  	  	  	authorizations[authorization.token] = {amount: 0, authorization: authorization, filled_tote_items: []}
-  	  	  end
-  	  	  authorizations[authorization.token][:amount] = (authorizations[authorization.token][:amount] + (filled_tote_item.quantity * filled_tote_item.price).round(2)).round(2)
-  	  	  authorizations[authorization.token][:filled_tote_items] << filled_tote_item
-  	  	end
-  	  end
-  	end
-
-    #authorizations[token][:amount] //this is the purchase_receivable amount
-    #authorizations[token][:authorization]
-    #authorizations[token][:filled_tote_items]
-
-    authorizations.each do |token, value|
-      ftis = value[:filled_tote_items]
-      if ftis == nil || !ftis.any?
-        next
-      end
-
-      bulk_buy.purchase_receivables.build(amount: value[:amount], amount_purchased: 0, kind: PurchaseReceivable.kind[:NORMAL])
-      pr = bulk_buy.purchase_receivables.last
-      user = User.find(ftis.first.user_id)                      
-      pr.users << user
-
-      ftis.each do |fti|
-        pr.tote_items << fti
-        fti.update(status: ToteItem.states[:PURCHASEPENDING])
-      end                              
-
-      #this represents the total value of everything that was filled for this bulk buy
-      bulk_buy.amount = (bulk_buy.amount + value[:amount]).round(2)
-    end
-  	#save the bulkbuy object
-  	bulk_buy.save
-
-    puts "------"
-    puts "BulkBuy id: " + bulk_buy.id.to_s + " amount: " + number_to_currency(bulk_buy.amount) + " created with the following PurchaseReceivables:"
-
-    bulk_buy.purchase_receivables.each do |pr|
-      puts "PurchaseReceivable id: " + pr.id.to_s + " amount: " + number_to_currency(pr.amount) + " amount_purchased: " + number_to_currency(pr.amount_purchased)
-    end
-
-    puts "FundsProcessing.bulk_buy_create end"    
-
-  	return {bulk_buy: bulk_buy}
-
-	end
+  end
 
 	def self.bulk_purchase_new
 
     puts "FundsProcessing.bulk_purchase_new start"
 
 		bulk_purchase = BulkPurchase.new(gross: 0, payment_processor_fee_withheld_from_us: 0, commission: 0, net: 0)
-  	bulk_purchase.load_unpurchased_receivables
+  	bulk_purchase.load_unpurchased_receivables_for_users(get_purchase_users)
 
     if bulk_purchase.purchase_receivables.size < 1
       puts "zero purchase_receivables"
@@ -196,8 +76,11 @@ class FundsProcessing
 
     bulk_purchase.purchase_receivables.each do |pr|
       puts "PurchaseReceivable id: " + pr.id.to_s + " amount: " + number_to_currency(pr.amount) + " amount_purchased: " + number_to_currency(pr.amount_purchased)
+      pr.tote_items.each do |ti|
+        ti.update(status: ToteItem.states[:PURCHASEPENDING])
+      end
     end    
-
+      
     puts "FundsProcessing.bulk_purchase_new end"
 
   	return {bulk_purchase: bulk_purchase}

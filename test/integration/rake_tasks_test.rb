@@ -187,7 +187,7 @@ class RakeTasksTest < BulkBuyer
 
       #this is after the nightly tasks on the Monday delivery
       if Time.zone.now.midnight == @p1.delivery_date
-        assert_equal 1, PurchaseReceivable.count, "There should only be 1 PurchaseReceivable because the other two customers still have tote items to be delivered later on this week"
+        assert_equal 3, PurchaseReceivable.count, "There should be exactly 3 PurchaseReceivables because one was created for each of the three tote items that was filled & delivered on Monday even though the other two customers still have tote items to be delivered later on this week"
         assert_equal 2, ActionMailer::Base.deliveries.count
         assert_appropriate_email(emails[0], "c5@c.com", "Purchase receipt", "Here is your Farmer's Cellar purchase receipt.")        
         assert_appropriate_email(emails[1], "david@farmerscellar.com", "bulk purchase report", "BulkPurchase id: 1")
@@ -195,13 +195,13 @@ class RakeTasksTest < BulkBuyer
 
       #this is after the nightly tasks on the Wednesday delivery
       if Time.zone.now.midnight == @p2.delivery_date
-        assert_equal 1, PurchaseReceivable.count, "There should only be 2 PurchaseReceivables because there's another customer to have tote items delivered later on this week"
+        assert_equal 4, PurchaseReceivable.count, "There should be 4 PurchaseReceivables because c6 had a delivery today (wednesday)"
         assert_equal 0, ActionMailer::Base.deliveries.count
       end
 
       #this is after the nightly tasks on the Friday delivery
       if Time.zone.now.midnight == @p3.delivery_date
-        assert_equal 3, PurchaseReceivable.count, "There should be 3 PurchaseReceivables because all three customers should have gotten purchases by now"
+        assert_equal 6, PurchaseReceivable.count, "There should be 6 PurchaseReceivables because all three customers should have gotten purchases by now"
 
         #check the bulk purchases
         assert_equal 2, BulkPurchase.count, "There should be two BulkPurchases by now, one on wedneday and one on friday (today)"
@@ -226,7 +226,7 @@ class RakeTasksTest < BulkBuyer
 
       #this is after the nightly tasks on the 2nd Monday delivery
       if Time.zone.now.midnight == @p4.delivery_date
-        assert_equal 4, PurchaseReceivable.count, "There should be a 4th PurchaseReceivable because we're in the next week now which is where c5's 2nd tote item is delivered" 
+        assert_equal 7, PurchaseReceivable.count, "There should be a 7th PurchaseReceivable because we're in the next week now which is where c5's 2nd tote item is delivered" 
         assert_equal 4, ActionMailer::Base.deliveries.count
         assert_appropriate_email(emails[0], "c5@c.com", "Purchase receipt", "Here is your Farmer's Cellar purchase receipt.")
         assert_appropriate_email(emails[1], "david@farmerscellar.com", "bulk purchase report", "BulkPurchase id: 3")
