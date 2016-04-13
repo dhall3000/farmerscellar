@@ -19,18 +19,17 @@
 <% if current_user != nil && current_user.account_type == User.types[:ADMIN] %>
   <div>
     <% if !@website_settings.nil? %>
-      <p><%= link_to "Website Settings", edit_website_setting_path(@website_settings) %></p>
+      <p><%= link_to "Website Settings", edit_website_setting_path(@website_settings), class: "btn btn-lg btn-primary" %></p>
     <% end %>
-    <p><%= link_to "Process deliveries", postings_path %></p>
-    <p><%= link_to "Deliveries", deliveries_path %></p>
-    <p><%= link_to "Do bulk payment", new_bulk_payment_path %></p>
-    <p><%= link_to "Create new access code", new_access_code_path %></p>
-    <p><%= link_to "Go to test page", test_page_path %></p>
-    <p><%= link_to "Products", products_path %></p>
-    <p><%= link_to "Producer Product Commissions", producer_product_commissions_path %></p>
-    <p><%= link_to "Add new dropsite", new_dropsite_path %></p>
-    <p><%= link_to "List dropsites", dropsites_path %></p>        
-    <p><%= link_to "List Users", users_path %></p>
+    <p><%= link_to "Receive products", postings_path, class: "btn btn-lg btn-primary" %></p>
+    <p><%= link_to "Deliver products", deliveries_path, class: "btn btn-lg btn-primary" %></p>
+    <p><%= link_to "Create new access code", new_access_code_path, class: "btn btn-lg btn-primary" %></p>    
+    <p><%= link_to "Products", products_path, class: "btn btn-lg btn-primary" %></p>
+    <p><%= link_to "Producer Product Commissions", producer_product_commissions_path, class: "btn btn-lg btn-primary" %></p>
+    <p><%= link_to "Add new dropsite", new_dropsite_path, class: "btn btn-lg btn-primary" %></p>
+    <p><%= link_to "List dropsites", dropsites_path, class: "btn btn-lg btn-primary" %></p>        
+    <p><%= link_to "List Users", users_path, class: "btn btn-lg btn-primary" %></p>
+    <p><%= link_to "Go to test page", test_page_path, class: "btn btn-lg btn-primary" %></p>
   </div>
 <% end %>
 
