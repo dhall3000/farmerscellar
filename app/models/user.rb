@@ -15,6 +15,7 @@ class User < ActiveRecord::Base
   has_many :postings
   has_many :rtbas
   has_many :subscriptions
+  has_many :pickups
 
   has_many :tote_items
   #has_many :postings, through: :tote_items
@@ -54,7 +55,17 @@ class User < ActiveRecord::Base
   end
 
   def self.types
-    {CUSTOMER: 0, PRODUCER: 1, ADMIN: 2}
+    {CUSTOMER: 0, PRODUCER: 1, ADMIN: 2, DROPSITE: 3}
+  end
+
+  def account_type_is?(type_key)
+
+    if !User.types.has_key?(type_key)
+      return false
+    end
+
+    return self.account_type == User.types[type_key]
+    
   end
 
   def self.farm_name_from_posting_id(id)

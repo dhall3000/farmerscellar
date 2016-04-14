@@ -1,5 +1,18 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
+dropsite1:
+  name: d1
+  email: da@d.com
+  password_digest: <%= User.digest('dogdog') %>
+  account_type: <%= User.types[:DROPSITE] %>
+  activated: true
+  activated_at: Time.zone.now
+  address: 8971 23st St. SW
+  city: Redmond
+  state: Washington
+  zip: 98008
+  phone: 206-339-6579
+
 c5:
   name: c5
   email: c5@c.com
