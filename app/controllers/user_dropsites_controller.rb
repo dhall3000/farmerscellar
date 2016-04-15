@@ -3,8 +3,7 @@ class UserDropsitesController < ApplicationController
 
   def create
     dropsite = Dropsite.find(params[:user_dropsite][:dropsite_id])
-    current_user.dropsites << dropsite
-    current_user.save
+    current_user.set_dropsite(dropsite)    
   	flash[:success] = "Your delivery dropsite is now " + dropsite.name
   	redirect_to tote_items_path
   end

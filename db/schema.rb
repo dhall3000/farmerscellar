@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160414183117) do
+ActiveRecord::Schema.define(version: 20160414232819) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -237,6 +237,16 @@ ActiveRecord::Schema.define(version: 20160414183117) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
+
+  create_table "pickup_codes", force: :cascade do |t|
+    t.string   "code",       null: false
+    t.integer  "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_index "pickup_codes", ["code"], name: "index_pickup_codes_on_code"
+  add_index "pickup_codes", ["user_id"], name: "index_pickup_codes_on_user_id"
 
   create_table "pickups", force: :cascade do |t|
     t.integer  "user_id"

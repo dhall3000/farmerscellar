@@ -7,6 +7,51 @@ class ToteItemsControllerTest < ActionController::TestCase
     @posting_apples = postings(:postingf1apples)
   end
 
+  test "should auto assign dropsite if only one dropsite exists and user has not specified a dropsite" do    
+    #verify only one dropsite exists
+    dropsite = dropsites(:dropsite2)
+    dropsite.destroy
+    dropsite = dropsites(:dropsite3)
+    dropsite.destroy
+    assert_equal 1, Dropsite.count
+    #verify user does not have dropsite specified
+    c5 = users(:c5)
+    log_in_as(c5)
+    assert_not c5.dropsite
+    #verify user does not have pickup code
+    assert_not c5.pickup_code
+    #view index
+    get :index
+    assert :success
+    #verify user now has dropsite
+    assert c5.dropsite
+    assert c5.dropsite.valid?
+    #verify user now has pickup code
+    c5.reload    
+    assert c5.pickup_code
+    assert c5.pickup_code.valid?
+    assert_not c5.pickup_code.code.nil?
+  end
+
+  test "should prompt user to select dropsite" do
+    #verify more than one dropsite
+    assert Dropsite.count > 1
+    #verify no dropsite specified
+    c5 = users(:c5)
+    log_in_as(c5)
+    assert_not c5.dropsite
+    #view index
+    get :index
+    assert :success
+    #verify user still has no dropsite specified
+    c5.reload
+    assert_not c5.dropsite
+    #verify warning messages appear
+    assert_select 'p.alert.alert-danger', "No delivery dropsite specified."    
+    #verify checkout button disabled
+    assert_select '#paypal-button[disabled=?]', "disabled"
+  end
+
   test "should get index" do
 
     log_in_as(@c1)

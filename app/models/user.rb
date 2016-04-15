@@ -33,6 +33,44 @@ class User < ActiveRecord::Base
   has_many :dropsites, through: :user_dropsites
 
   has_one :access_code
+  has_one :pickup_code
+
+  def set_dropsite(dropsite)
+
+    if dropsite.nil?
+      return
+    end
+
+    if dropsite.class.to_s != "Dropsite"
+      return
+    end
+
+    if !dropsite.valid?
+      return
+    end
+
+    dropsites << dropsite
+
+    if pickup_code.nil?
+      create_pickup_code(user: self)
+    end
+
+    pickup_code.set_code(dropsite)
+    save
+
+  end
+
+  def dropsite
+    
+    if dropsites.nil? || !dropsites.any?
+      return nil
+    end
+
+    dropsite = Dropsite.find(dropsites.joins(:user_dropsites).order('user_dropsites.created_at').last.id)
+
+    return dropsite
+
+  end
 
   def get_active_rtba
 

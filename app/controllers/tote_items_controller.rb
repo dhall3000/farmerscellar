@@ -8,15 +8,14 @@ class ToteItemsController < ApplicationController
       @dropsite = nil
 
       if current_user.dropsites.any?        
-        @dropsite = Dropsite.find(current_user.dropsites.joins(:user_dropsites).order('user_dropsites.created_at').last.id)
+        @dropsite = current_user.dropsite
       else
         #here the logic is if we only have one dropsite (which is the case for awhile after initial business launch)
         #then we don't need to ask user to specify dropsite. Just assign the current dropsite (for this checkout) to
         #be the only dropsite and proceed
         if Dropsite.count == 1
           @dropsite = Dropsite.first
-          current_user.dropsites << @dropsite
-          current_user.save
+          current_user.set_dropsite(@dropsite)
         end
       end
 

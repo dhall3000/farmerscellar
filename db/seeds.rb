@@ -8,6 +8,21 @@
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
+dropsite_user_one = User.create!(name:  "dropsite one user",
+             email: "da@d.com",
+             password:              "dogdog",
+             password_confirmation: "dogdog",
+             account_type: '3',
+             activated: true,
+             activated_at: Time.zone.now,             
+             address: "4215 21st St. SW",
+             city: "Redmond",
+             state: "Washington",
+             zip: "98008",
+             phone: "206-599-6579",
+             beta: false
+             )
+
 f1 = User.create!(name:  "f1",
              email: "f1@f.com",
              password:              "dogdog",

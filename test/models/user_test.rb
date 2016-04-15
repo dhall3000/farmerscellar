@@ -1,12 +1,68 @@
 require 'test_helper'
 
 class UserTest < ActiveSupport::TestCase
-  # test "the truth" do
-  #   assert true
-  # end
 
   def setup
     @user = User.new(name: "Example User", email: "user@example.com", password: "foobar", password_confirmation: "foobar", zip: 98033, account_type: 0)
+  end
+
+  test "should change dropsites" do
+    assert @user.valid?
+    assert_equal nil, @user.dropsite
+    dropsite = dropsites(:dropsite1)
+    @user.set_dropsite(dropsite)
+    @user.reload
+    assert @user.valid?
+    assert @user.dropsite.valid?
+    dropsite_id = @user.dropsite.id
+    new_dropsite = dropsites(:dropsite2)    
+    @user.set_dropsite(new_dropsite)
+    @user.reload
+    assert_not dropsite_id == @user.dropsite.id
+  end
+
+  test "should change pickup code when switching dropsites" do
+    assert @user.valid?
+    assert_equal nil, @user.dropsite
+    dropsite = dropsites(:dropsite1)
+    @user.set_dropsite(dropsite)
+    @user.reload
+    assert @user.valid?
+    assert @user.dropsite.valid?
+    old_code = @user.pickup_code.code
+    dropsite_id = @user.dropsite.id
+    new_dropsite = dropsites(:dropsite2)    
+    @user.set_dropsite(new_dropsite)
+    @user.reload
+    assert_not dropsite_id == @user.dropsite.id
+    new_code = @user.pickup_code.code
+    assert new_code != old_code
+  end
+
+  test "should not change dropsite if dropsite is invalid" do
+
+    assert @user.valid?
+    dropsite = dropsites(:dropsite1)
+    @user.set_dropsite(dropsite)
+    @user.reload
+    assert @user.valid?
+    assert @user.dropsite.valid?
+    dropsite_id = @user.dropsite.id
+    @user.set_dropsite(nil)
+    assert @user.valid?
+    assert_equal dropsite_id, @user.dropsite.id
+
+    @user.set_dropsite("david")
+    assert @user.valid?
+    assert_equal dropsite_id, @user.dropsite.id
+
+    invalid_dropsite = Dropsite.new(name: nil, hours: "7-7", address: "1234 main", city: "Kirkland", state: "WA", zip: 98033)
+    invalid_dropsite.save
+    assert_not invalid_dropsite.valid?
+
+    @user.set_dropsite(invalid_dropsite)
+    assert_equal dropsite_id, @user.dropsite.id
+
   end
 
   test "should be invalid account type" do
