@@ -2,11 +2,14 @@ class PickupsController < ApplicationController
 	before_action :redirect_to_root_if_user_not_dropsite_user
 
   def new
+  	@is_dropsite_user = true
   	#first step is to blast the session in case we're getting here due to someone clicking "all done"
   	@pickup_code = PickupCode.new
   end
 
   def create
+
+  	@is_dropsite_user = true
 
   	entered_code = params[:pickup_code]
   	@pickup_code = PickupCode.new(code: entered_code, user: current_user)
@@ -20,6 +23,8 @@ class PickupsController < ApplicationController
   			@user = @pickup_code.user
   			#get a product list of everything that's been delivered since the last pickup (or 7 days, whichever is more recent)
   			@tote_items = @user.tote_items_to_pickup
+  			@last_pickup = @user.pickups.last
+
   			#now create a new pickup to represent the current pickup  				 				
  				@user.pickups.create
   		end

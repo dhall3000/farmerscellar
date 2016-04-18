@@ -1,2 +1,43 @@
-<h1>Pickups#create</h1>
-<p>Find me in app/views/pickups/create.html.erb</p>
+<div class="center jumbotron">
+  <h1>Farmer's Cellar</h1>
+  <h2>Pickup List</h2>
+</div>
+
+<% if @last_pickup %>
+	<p class="text-center">Your last pickup checkout was <%= @last_pickup.created_at.strftime("%A %B %d, %Y at %l:%M %p") %>. Below is a list of products that have been delivered since then.</p>
+<% else %>
+	<p class="text-center">Below is your list of products to pick up.</p>
+<% end %>
+
+<div class="row">
+	<div class="col-sm-8 col-sm-offset-2">
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th class="text-center">Producer</th>
+          <th class="text-center">Product</th>
+          <th class="text-center">Quantity</th>
+        </tr>
+      </thead>
+      <tbody>
+
+	        <% @tote_items.each do |tote_item| %>        
+	        	<tr>
+		        	<td class="text-center"><%= tote_item.posting.user.farm_name %></td>
+		        	<td class="text-center"><%= tote_item.posting.product.name %></td>
+							<td class="text-center"><%= pluralize(tote_item.quantity, tote_item.posting.unit_kind.name) %></td>
+	          </tr>        
+	        <% end %>
+
+      </tbody>
+    </table>
+
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-sm-8 col-sm-offset-2">
+	    <%= link_to "All done", new_pickup_path, class: 'btn btn-lg btn-primary btn-block' %>
+	</div>
+</div>
