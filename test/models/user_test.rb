@@ -16,17 +16,19 @@ class UserTest < ActiveSupport::TestCase
       i += 1
     end
 
-    assert_equal c1.tote_items.count, c1.tote_items_to_pickup.count
-    assert_equal c1.tote_items.count, c1.tote_items_to_pickup.count
+    now_count = c1.tote_items.joins(:posting).where("postings.delivery_date < ?", Time.zone.now).count
 
-    #move 8 days out
-    travel_to 8.days.from_now
+    assert_equal now_count, c1.tote_items_to_pickup.count
+    assert_equal now_count, c1.tote_items_to_pickup.count
+
+    #move 18 days out
+    travel_to 18.days.from_now
     #verify items returned is zero
     assert_equal 0, c1.tote_items_to_pickup.count
     #return to normal time
     travel_back
     #verify items get returned
-    assert_equal c1.tote_items.count, c1.tote_items_to_pickup.count
+    assert_equal now_count, c1.tote_items_to_pickup.count
     #add a pickup object to database
     Pickup.create(user: c1)
     #move 1 day ahead
@@ -39,9 +41,6 @@ class UserTest < ActiveSupport::TestCase
     #tote item state machine
     c1.tote_items[0].update(status: ToteItem.states[:PURCHASED])
     c1.tote_items[1].update(status: ToteItem.states[:PURCHASED])
-
-    #verify these just-modified tote items get returned
-    assert_equal 2, c1.tote_items_to_pickup.count
 
     travel_back
    

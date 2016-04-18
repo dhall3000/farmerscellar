@@ -96,8 +96,70 @@ class BulkPurchasesTest < BulkBuyer
 
   #bundle exec rake test test/integration/bulk_purchases_test.rb test_do_bulk_buy
   test "do bulk buy" do
+    do_bulk_buy
+    do_delivery
+  end
 
-  #def skip
+  test "do pickups" do    
+    do_bulk_buy
+    do_delivery
+
+    #find the earliest and latest delivery dates among c1's toteitems
+    tote_items = @c1.tote_items
+    earliest_delivery_date = 100.days.from_now
+    latest_delivery_date = 100.days.ago
+    tote_items.each do |ti|
+      if ti.posting.delivery_date < earliest_delivery_date
+        earliest_delivery_date = ti.posting.delivery_date
+      end
+      if ti.posting.delivery_date > latest_delivery_date
+        latest_delivery_date = ti.posting.delivery_date
+      end
+    end
+
+    #split the difference, time wise
+    middle_date = earliest_delivery_date + ((latest_delivery_date - earliest_delivery_date) / 2)    
+    #jump to that middle-ground time
+    travel_to middle_date
+    #do a pickup
+    log_in_as(users(:dropsite1))
+    post pickups_path, pickup_code: @c1.pickup_code.code
+    tote_items = assigns(:tote_items)
+    #verify the number of items is less than the total amount    
+    assert tote_items.count < @c1.tote_items.count
+    #save the number picked up for later comparison
+    num_items_first_pickup_count = tote_items.count
+    assert num_items_first_pickup_count > 0
+    #jump to one day after the last delivery day
+    travel_to latest_delivery_date + 1.day
+    #hit c1's model object for the number of items remaining to pick up
+    num_items_second_pickup_count = @c1.tote_items_to_pickup.count
+    assert num_items_second_pickup_count > 0
+    #compare this remaining-to-pick-up number to the number already picked up to the total number of items
+    assert_equal @c1.tote_items.count, num_items_first_pickup_count + num_items_second_pickup_count
+    #jump forward 7 days from now
+    travel_to Time.zone.now + 7.days
+    #hit c1's model object for the number of items remaining to pick up
+    #verify it's zero since they should all be beyond the 7 day max holding period
+    assert_equal 0, @c1.tote_items_to_pickup.count    
+    #jump back to one day after the last delivery date
+    travel_to latest_delivery_date + 1.day    
+    #post a pickup
+    post pickups_path, pickup_code: @c1.pickup_code.code
+    tote_items = assigns(:tote_items)
+    #verify proper number of items picked up
+    assert_equal num_items_second_pickup_count, tote_items.count
+    #post another pickup
+    post pickups_path, pickup_code: @c1.pickup_code.code
+    tote_items = assigns(:tote_items)
+    #verify no more items picked up
+    assert_equal 0, tote_items.count
+
+    travel_back
+
+  end
+
+  def do_bulk_buy
     customers = [@c1, @c2, @c3, @c4]
     purchase_receivables = setup_bulk_purchase(customers)
     post bulk_purchases_path, purchase_receivables: purchase_receivables
@@ -117,7 +179,9 @@ class BulkPurchasesTest < BulkBuyer
     bulk_payment = assigns(:bulk_payment)
 
     assert_equal bulk_purchase.net, bulk_payment.total_payments_amount    
+  end
 
+  def do_delivery
     get new_delivery_path
     assert :success
     assert_template 'deliveries/new'
@@ -142,7 +206,6 @@ class BulkPurchasesTest < BulkBuyer
     get edit_delivery_path(delivery)
     assert_template 'deliveries/edit'
     dropsites_deliverable = assigns(:dropsites_deliverable)
-
 
     dropsites_deliverable.each do |dropsite|
       patch delivery_path(delivery), dropsite_id: dropsite.id
