@@ -62,7 +62,7 @@ module SessionsHelper
     #posting garbage ads to our site. so what we're doing here is granting access to anybody who doesn't
     #have an access code if we're in a not-requiring-access-code state UNLESS you are a farmer
     if !WebsiteSetting.last.new_customer_access_code_required
-      if current_user.account_type == 0 || current_user.account_type == 2
+      if current_user.account_type == 0 || current_user.account_type == 2 || current_user.account_type == 3
         return true
       end
     end

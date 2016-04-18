@@ -8,7 +8,7 @@ class User < ActiveRecord::Base
   validates :email, presence: true, length: { maximum: 255 }, format: { with: VALID_EMAIL_REGEX }, uniqueness: { case_sensitive: false }
   validates :farm_name, presence: true, if: :is_producer?
   validates :account_type, presence: true
-  validates :account_type, numericality: {only_integer: true, greater_than: -1, less_than: 3, message: "account_type is invalid"}
+  validates :account_type, numericality: {only_integer: true, greater_than: -1, less_than: 4, message: "account_type is invalid"}
 
   has_secure_password
   validates :password, length: { minimum: 6 }, allow_blank: true
