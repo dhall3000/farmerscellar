@@ -3,9 +3,26 @@ class PickupsController < ApplicationController
 
   def new
   	#first step is to blast the session in case we're getting here due to someone clicking "all done"
+  	@pickup_code = PickupCode.new
   end
 
   def create
+
+  	entered_code = params[:pickup_code]
+  	@pickup_code = PickupCode.new(code: entered_code, user: current_user)
+
+  	if @pickup_code.valid?
+  		@pickup_code = PickupCode.find_by(code: entered_code)  		
+  		if @pickup_code.nil?
+	  		flash.now[:danger] = "Invalid code entry"
+	  		render 'pickups/new'	  	
+  		else
+  			@user = @pickup_code.user
+  		end
+  	else
+  		flash.now[:danger] = "Invalid code entry"
+  		render 'pickups/new'
+  	end
 
   end
 

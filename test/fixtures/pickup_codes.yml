@@ -1,9 +1,9 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  code: 1234
+  code: "1234"
   user: c1
 
 two:
-  code: 9876
+  code: "9876"
   user: c2

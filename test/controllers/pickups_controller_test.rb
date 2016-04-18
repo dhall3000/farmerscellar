@@ -43,12 +43,34 @@ class PickupsControllerTest < ActionController::TestCase
     assert_select 'input#pickup_code', count: 0
   end
 
-  test "should get create" do
-    #get :create
-    #assert_response :success
+  test "should create" do
+  	log_in_as(@dropsite_user)
+    post :create, pickup_code: "1234"
+    assert_response :success
+    pickup_code = assigns(:pickup_code)
+    assert pickup_code.valid?
+    user = assigns(:user)
+    assert user.valid?
   end
 
-	test "should give helpful error text on invalid input" do
-	end
+  test "should not create when invalid code submitted" do
+  	log_in_as(@dropsite_user)
+    post :create, pickup_code: "12A45"
+    assert_response :success
+    pickup_code = assigns(:pickup_code)
+    assert_not pickup_code.valid?
+    assert_not flash.empty?
+    assert_equal "Invalid code entry", flash[:danger]
+  end
+
+  test "should not create when non existent code submitted" do
+  	log_in_as(@dropsite_user)
+    post :create, pickup_code: "1345"
+    assert_response :success
+    pickup_code = assigns(:pickup_code)
+    assert pickup_code.nil?
+    assert_not flash.empty?
+    assert_equal "Invalid code entry", flash[:danger]
+  end
 
 end

@@ -1,7 +1,8 @@
 class PickupCode < ActiveRecord::Base
   belongs_to :user
 
-  validates :code, presence: true, length: {is: 4}, format: { with: /\A[0-9]{4}\z/, message: "Must be exactly 4 digits" }    
+  #we don't want to be too specific about what the proper code format is to discourage guessing
+  validates :code, presence: true, format: { with: /\A[0-9]{4}\z/, message: "format is invalid" }
   validates_presence_of :user
 
   #finds and sets the code to a unique 4 digit random code that is unique for the given dropsite
