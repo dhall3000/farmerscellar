@@ -35,6 +35,30 @@ class User < ActiveRecord::Base
   has_one :access_code
   has_one :pickup_code
 
+  def tote_items_to_pickup
+    #this should return a set of toteitems that have been delivered but not picked up yet
+
+    #TODO: for now for 'delivered' we're going to use toteitem states FILLED or PURCHASED
+    #this will eventually change though once we overhaul the toteitem statemachine
+
+    #A) 7 days ago
+    last_pickup = 7.days.ago
+    if pickups.any?
+      #or...
+      #B) the last pickup
+      last_pickup = pickups.last.created_at
+    end
+
+    #whichever is more recent
+    cutoff = [last_pickup, 7.days.ago].max
+    #@tote_items = @user.tote_items.where(status: [ToteItem.states[:FILLED], ToteItem.states[:PURCHASED]], "updated_at > ?", last_pickup)
+    #TODO: the below line isn't quite right. it will display toteitems that have been purchased in the last 7 days even though it could be that
+    #some purchased items were actually delivered a longer time period ago like, say, 9 days ago. the reason is because the .updated_at field
+    #will get modified when the purchas goes through. leaving it this way cause i'll be redoing it anyway after cleaning up the toteitem state machine
+    return tote_items.where(status: [ToteItem.states[:FILLED], ToteItem.states[:PURCHASED]]).where("updated_at > ?", cutoff)    
+
+  end
+
   def set_dropsite(dropsite)
 
     if dropsite.nil?

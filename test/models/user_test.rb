@@ -6,6 +6,47 @@ class UserTest < ActiveSupport::TestCase
     @user = User.new(name: "Example User", email: "user@example.com", password: "foobar", password_confirmation: "foobar", zip: 98033, account_type: 0)
   end
 
+  test "should get tote items to pickup" do
+
+    c1 = users(:c1)
+    i = 0
+
+    while i < c1.tote_items.count
+      c1.tote_items[i].update(status: ToteItem.states[:FILLED])
+      i += 1
+    end
+
+    assert_equal c1.tote_items.count, c1.tote_items_to_pickup.count
+    assert_equal c1.tote_items.count, c1.tote_items_to_pickup.count
+
+    #move 8 days out
+    travel_to 8.days.from_now
+    #verify items returned is zero
+    assert_equal 0, c1.tote_items_to_pickup.count
+    #return to normal time
+    travel_back
+    #verify items get returned
+    assert_equal c1.tote_items.count, c1.tote_items_to_pickup.count
+    #add a pickup object to database
+    Pickup.create(user: c1)
+    #move 1 day ahead
+    travel_to 1.day.from_now
+    #verify items returned is zero
+    assert_equal 0, c1.tote_items_to_pickup.count
+    
+    #update a couple toteitems to be PURCHASED
+    #TODO: note that this is only going to work for now. it will probalby hav eto change once we clean up the
+    #tote item state machine
+    c1.tote_items[0].update(status: ToteItem.states[:PURCHASED])
+    c1.tote_items[1].update(status: ToteItem.states[:PURCHASED])
+
+    #verify these just-modified tote items get returned
+    assert_equal 2, c1.tote_items_to_pickup.count
+
+    travel_back
+   
+  end
+
   test "should change dropsites" do
     assert @user.valid?
     assert_equal nil, @user.dropsite
