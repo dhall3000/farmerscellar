@@ -15,6 +15,7 @@
     <table class="table">
       <thead>
         <tr>
+        	<th class="text-center"></th>
           <th class="text-center">Producer</th>
           <th class="text-center">Product</th>
           <th class="text-center">Quantity</th>
@@ -24,6 +25,7 @@
 
 	        <% @tote_items.each do |tote_item| %>        
 	        	<tr>
+	        		<td><%= image_tag "sun.jpg" %></td>
 		        	<td class="text-center"><%= tote_item.posting.user.farm_name %></td>
 		        	<td class="text-center"><%= tote_item.posting.product.name %></td>
 							<td class="text-center"><%= pluralize(tote_item.quantity, tote_item.posting.unit_kind.name) %></td>

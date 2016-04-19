@@ -6,7 +6,7 @@
 <div class="row">
 	<div class="col-sm-4 col-sm-offset-4">
 		<%= form_tag pickups_path do %>
-			<%= number_field_tag :pickup_code, nil, class: 'form-control', placeholder: "Enter pickup code here..." %>
+			<%= number_field_tag :pickup_code, nil, class: 'input-lg', placeholder: "Tap here to enter pickup code..." %>
 			<%= submit_tag "Enter", class: 'btn btn-lg btn-primary form-control' %>
 		<% end %>
 	</div>
