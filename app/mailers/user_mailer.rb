@@ -33,9 +33,6 @@ class UserMailer < ApplicationMailer
     @dropsite = dropsite
     @tote_items = tote_items        
 
-    @total_cost_of_tote_items = 0
-    @authorizations = get_auths(tote_items)
-
     mail to: user.email, subject: "Delivery notification"
   end
 

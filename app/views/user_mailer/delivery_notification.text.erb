@@ -1,6 +1,6 @@
 Hello,
 
-This email is your Farmer's Cellar delivery notification.
+This email is your Farmer's Cellar delivery notification. Your pickup code is <%= @user.pickup_code.code %>. Please enter this at the kiosk when you arrive to pick up your products. Doing so provides you with a list of your products and lets us know you picked up.
 
 Here is the status of products you recently ordered that were set for delivery today:
 <% products_delivered = false %>
@@ -18,7 +18,7 @@ ID=<%= tote_item.id %>,Producer=<%= tote_item.posting.user.farm_name %>,Product=
 <% end %>
 
 <% if products_delivered == true %>
-Your products are available for you to pick up at your convenience and will be labeled with your User ID#: <%= @tote_items.first.user_id.to_s %>.
+Your products are available for you to pick up at your convenience.
 
 Your dropsite is:
 <%= @dropsite.name %>
