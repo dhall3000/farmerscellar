@@ -3,38 +3,55 @@
   <h2>Pickup List</h2>
 </div>
 
-<% if @last_pickup %>
-	<p class="text-center">Your last pickup checkout was <%= @last_pickup.created_at.strftime("%A %B %d, %Y at %l:%M %p") %>. Below is a list of products that have been delivered since then.</p>
-<% else %>
-	<p class="text-center">Below is your list of products to pick up.</p>
-<% end %>
-
 <div class="row">
 	<div class="col-sm-8 col-sm-offset-2">
 
-    <table class="table">
-      <thead>
-        <tr>
-        	<th class="text-center"></th>
-          <th class="text-center">Producer</th>
-          <th class="text-center">Product</th>
-          <th class="text-center">Quantity</th>
-        </tr>
-      </thead>
-      <tbody>
+    <div class="panel-group">
 
-	        <% @tote_items.each do |tote_item| %>        
-	        	<tr>
-	        		<td><%= image_tag "sun.jpg" %></td>
-		        	<td class="text-center"><%= tote_item.posting.user.farm_name %></td>
-		        	<td class="text-center"><%= tote_item.posting.product.name %></td>
-							<td class="text-center"><%= pluralize(tote_item.quantity, tote_item.posting.unit_kind.name) %></td>
-	          </tr>        
-	        <% end %>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h2 class="panel-title"><%= @user.email %></h2>
+        </div>          
+        <div class="panel-body">
+        	<% if @last_pickup %>
+						<p>Last pickup checkout: <%= @last_pickup.created_at.strftime("%A %B %d, %Y at %l:%M %p") %></p>
+					<% else %>
+						<p>Below is your list of products to pick up.</p>
+					<% end %>        	
+        </div>        
+      </div>
 
-      </tbody>
-    </table>
+      
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h2 class="panel-title">Products to pickup today</h2>
+        </div>          
+        <div class="panel-body">
+			    <table class="table">
+			      <thead>
+			        <tr>
+			        	<th class="text-center"></th>
+			          <th class="text-center">Producer</th>
+			          <th class="text-center">Product</th>
+			          <th class="text-center">Quantity</th>
+			        </tr>
+			      </thead>
+			      <tbody>
 
+				        <% @tote_items.each do |tote_item| %>        
+				        	<tr>
+				        		<td><%= image_tag "sun.jpg" %></td>
+					        	<td class="text-center"><%= tote_item.posting.user.farm_name %></td>
+					        	<td class="text-center"><%= tote_item.posting.product.name %></td>
+										<td class="text-center"><%= pluralize(tote_item.quantity, tote_item.posting.unit_kind.name) %></td>
+				          </tr>        
+				        <% end %>
+
+			      </tbody>
+			    </table>          	
+        </div>
+      </div>
+    </div>
 	</div>
 </div>
 
