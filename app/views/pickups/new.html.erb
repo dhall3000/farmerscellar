@@ -1,12 +1,12 @@
 <% provide(:title, "Pickup") %>
-<div class="center jumbotron">
+<div class="center jumbotron jumbotron-spacing">
   <h1>Farmer's Cellar</h1>
   <h2>Checkout here</h2>
 </div>
 <div class="row">
-	<div class="col-sm-4 col-sm-offset-4">
+	<div class="col-xs-8 col-xs-offset-2 col-sm-4 col-sm-offset-4">
 		<%= form_tag pickups_path do %>
-			<%= number_field_tag :pickup_code, nil, class: 'input-lg', placeholder: "Tap here to enter pickup code..." %>
+			<%= number_field_tag :pickup_code, nil, class: 'input-lg fat-finger-spacing', placeholder: "Tap here to enter pickup code..." %>			
 			<%= submit_tag "Enter", class: 'btn btn-lg btn-primary form-control' %>
 		<% end %>
 	</div>
