@@ -118,7 +118,7 @@ class DeliveriesController < ApplicationController
         user = User.find(user_id)
         
         if user.pickup_code.nil?
-          set_pickup_code_if_nil(dropsite)          
+          user.set_pickup_code_if_nil(dropsite)          
         end
 
         UserMailer.delivery_notification(user, dropsite, tote_items).deliver_now
