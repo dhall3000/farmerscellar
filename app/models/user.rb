@@ -76,6 +76,12 @@ class User < ActiveRecord::Base
 
     dropsites << dropsite
 
+    set_pickup_code_if_nil(dropsite)
+
+  end
+
+  def set_pickup_code_if_nil(dropsite)
+    
     if pickup_code.nil?
       create_pickup_code(user: self)
     end
