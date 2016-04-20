@@ -19,22 +19,38 @@
         </table>                  
 
 
+<% show_subscription_stuff = false %>
+
 
         <%= form_tag(checkouts_path) do %>
 
           <% if @provide_guest_checkout_option %> 
-            <div class="text-center">
-              <div class="btn-group" data-toggle="buttons">
-                <%= label_tag :use_reference_transaction, class: "btn btn-default active" do %>
-                  <%= radio_button_tag :use_reference_transaction, "1", checked: true %>
-                  <span>One-click checkout</span>
-                <% end %>
-                <%= label_tag :use_reference_transaction, class: "btn btn-default" do %>
-                  <%= radio_button_tag :use_reference_transaction, "0" %>
-                  <span>Guest checkout</span>
-                <% end %>
-              </div>
-            </div>
+
+          
+
+            <% if show_subscription_stuff == true %>
+
+              <div class="text-center">
+                <div class="btn-group" data-toggle="buttons">
+                  <%= label_tag :use_reference_transaction, class: "btn btn-default active" do %>
+                    <%= radio_button_tag :use_reference_transaction, "1", checked: true %>
+                    <span>One-click checkout</span>
+                  <% end %>
+                  <%= label_tag :use_reference_transaction, class: "btn btn-default" do %>
+                    <%= radio_button_tag :use_reference_transaction, "0" %>
+                    <span>Guest checkout</span>
+                  <% end %>
+                </div>
+              </div>          
+
+            <% else %>
+              <%= hidden_field_tag(:use_reference_transaction, "0") %>
+            <% end %>
+
+
+
+
+
           <% else %>
               <%= hidden_field_tag(:use_reference_transaction, "1") %>
           <% end %>
