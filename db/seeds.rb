@@ -267,28 +267,28 @@ Posting.create(live: true, delivery_date: Time.zone.today, commitment_zone_start
 Posting.create(live: true, delivery_date: Time.zone.today, commitment_zone_start: Time.zone.today - 2.days, product_id: basil.id, quantity_available: 100, price: 2.97, user_id: f4.id, unit_category_id: count.id, unit_kind_id: bunch.id, description: "best basil ever!")
 
 #Apples
-ToteItem.create(quantity: 2, price: 2.75, status: ToteItem.states[:AUTHORIZED], user_id: 7, posting_id: 1)
-ToteItem.create(quantity: 1, price: 2.75, status: ToteItem.states[:AUTHORIZED], user_id: 8, posting_id: 1)
-ToteItem.create(quantity: 5, price: 2.75, status: ToteItem.states[:AUTHORIZED], user_id: 6, posting_id: 1)
-ToteItem.create(quantity: 3, price: 2.75, status: ToteItem.states[:AUTHORIZED], user_id: 5, posting_id: 1)
+ToteItem.create(quantity: 2, price: 2.75, state: ToteItem.states[:AUTHORIZED], user_id: 7, posting_id: 1)
+ToteItem.create(quantity: 1, price: 2.75, state: ToteItem.states[:AUTHORIZED], user_id: 8, posting_id: 1)
+ToteItem.create(quantity: 5, price: 2.75, state: ToteItem.states[:AUTHORIZED], user_id: 6, posting_id: 1)
+ToteItem.create(quantity: 3, price: 2.75, state: ToteItem.states[:AUTHORIZED], user_id: 5, posting_id: 1)
 
 #Milk
-ToteItem.create(quantity: 2, price: 2.00, status: ToteItem.states[:AUTHORIZED], user_id: 7, posting_id: 3)
-ToteItem.create(quantity: 3, price: 2.00, status: ToteItem.states[:AUTHORIZED], user_id: 8, posting_id: 3)
-ToteItem.create(quantity: 4, price: 2.00, status: ToteItem.states[:AUTHORIZED], user_id: 6, posting_id: 3)
-ToteItem.create(quantity: 1, price: 2.00, status: ToteItem.states[:AUTHORIZED], user_id: 5, posting_id: 3)
+ToteItem.create(quantity: 2, price: 2.00, state: ToteItem.states[:AUTHORIZED], user_id: 7, posting_id: 3)
+ToteItem.create(quantity: 3, price: 2.00, state: ToteItem.states[:AUTHORIZED], user_id: 8, posting_id: 3)
+ToteItem.create(quantity: 4, price: 2.00, state: ToteItem.states[:AUTHORIZED], user_id: 6, posting_id: 3)
+ToteItem.create(quantity: 1, price: 2.00, state: ToteItem.states[:AUTHORIZED], user_id: 5, posting_id: 3)
 
 #Chicken
-ToteItem.create(quantity: 1, price: 1.50, status: ToteItem.states[:AUTHORIZED], user_id: 7, posting_id: 6)
-ToteItem.create(quantity: 4, price: 1.50, status: ToteItem.states[:AUTHORIZED], user_id: 8, posting_id: 6)
-ToteItem.create(quantity: 2, price: 1.50, status: ToteItem.states[:AUTHORIZED], user_id: 6, posting_id: 6)
-ToteItem.create(quantity: 7, price: 1.50, status: ToteItem.states[:AUTHORIZED], user_id: 5, posting_id: 6)
+ToteItem.create(quantity: 1, price: 1.50, state: ToteItem.states[:AUTHORIZED], user_id: 7, posting_id: 6)
+ToteItem.create(quantity: 4, price: 1.50, state: ToteItem.states[:AUTHORIZED], user_id: 8, posting_id: 6)
+ToteItem.create(quantity: 2, price: 1.50, state: ToteItem.states[:AUTHORIZED], user_id: 6, posting_id: 6)
+ToteItem.create(quantity: 7, price: 1.50, state: ToteItem.states[:AUTHORIZED], user_id: 5, posting_id: 6)
 
 #Celery
-ToteItem.create(quantity: 5, price: 2.50, status: ToteItem.states[:AUTHORIZED], user_id: 7, posting_id: 8)
-ToteItem.create(quantity: 2, price: 2.50, status: ToteItem.states[:AUTHORIZED], user_id: 8, posting_id: 8)
-ToteItem.create(quantity: 1, price: 2.50, status: ToteItem.states[:AUTHORIZED], user_id: 6, posting_id: 8)
-ToteItem.create(quantity: 3, price: 2.50, status: ToteItem.states[:AUTHORIZED], user_id: 5, posting_id: 8)
+ToteItem.create(quantity: 5, price: 2.50, state: ToteItem.states[:AUTHORIZED], user_id: 7, posting_id: 8)
+ToteItem.create(quantity: 2, price: 2.50, state: ToteItem.states[:AUTHORIZED], user_id: 8, posting_id: 8)
+ToteItem.create(quantity: 1, price: 2.50, state: ToteItem.states[:AUTHORIZED], user_id: 6, posting_id: 8)
+ToteItem.create(quantity: 3, price: 2.50, state: ToteItem.states[:AUTHORIZED], user_id: 5, posting_id: 8)
 
 Dropsite.create(name: "Farmer's Cellar", phone: "206-588-6579", hours: "8 - 8", address: "9827 128TH AVE NE", city: "Kirkland", state: "WA", zip: 98033, active: true, access_instructions: "punch in 123 and hit enter")
 WebsiteSetting.create(new_customer_access_code_required: false, recurring_postings_enabled: true)

@@ -35,14 +35,14 @@ class BulkBuyer < Authorizer
 
   def transition_authorized_tote_items_to_committed(customers)    
 
-    num_authorized = ToteItem.where(status: ToteItem.states[:AUTHORIZED]).count
+    num_authorized = ToteItem.where(state: ToteItem.states[:AUTHORIZED]).count
 
     #now change all the tote_items from AUTHORIZED to COMMITTED
-    ToteItem.where(status: ToteItem.states[:AUTHORIZED]).update_all(status: ToteItem.states[:COMMITTED])
+    ToteItem.where(state: ToteItem.states[:AUTHORIZED]).update_all(state: ToteItem.states[:COMMITTED])
 
-    num_committed = ToteItem.where(status: ToteItem.states[:COMMITTED]).count
+    num_committed = ToteItem.where(state: ToteItem.states[:COMMITTED]).count
 
-    assert_equal 0, ToteItem.where(status: ToteItem.states[:AUTHORIZED]).count
+    assert_equal 0, ToteItem.where(state: ToteItem.states[:AUTHORIZED]).count
     assert_equal num_authorized, num_committed
 
   end
@@ -85,11 +85,11 @@ class BulkBuyer < Authorizer
     simulate_order_filling(fill_all_tote_items)
 
     #verify there are no authorized
-    assert_equal 0, ToteItem.where(status: ToteItem.states[:AUTHORIZED]).count    
+    assert_equal 0, ToteItem.where(state: ToteItem.states[:AUTHORIZED]).count    
     #verify there are no committed
-    assert_equal 0, ToteItem.where(status: ToteItem.states[:COMMITTED]).count
+    assert_equal 0, ToteItem.where(state: ToteItem.states[:COMMITTED]).count
     #verify there are filled
-    assert ToteItem.where(status: ToteItem.states[:FILLED]).count > 0
+    assert ToteItem.where(state: ToteItem.states[:FILLED]).count > 0
 
     prs = PurchaseReceivable.all.to_a
     pr = prs[0]

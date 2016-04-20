@@ -61,7 +61,7 @@ class PurchaseReceivable < ActiveRecord::Base
     self.amount_purchased = (self.amount_purchased + amount).round(2)
 
     if amount_outstanding == 0
-      tote_items.where(status: ToteItem.states[:PURCHASEPENDING]).update_all(status: ToteItem.states[:PURCHASED])
+      tote_items.where(state: ToteItem.states[:PURCHASEPENDING]).update_all(state: ToteItem.states[:PURCHASED])
     end
 
   end
@@ -156,10 +156,10 @@ class PurchaseReceivable < ActiveRecord::Base
         save
         authorization.amount_purchased = (authorization.amount_purchased + purchase.gross_amount).round(2)
         authorization.save            
-        tote_items.where(status: ToteItem.states[:PURCHASEPENDING]).update_all(status: ToteItem.states[:PURCHASED])
+        tote_items.where(state: ToteItem.states[:PURCHASEPENDING]).update_all(state: ToteItem.states[:PURCHASED])
         puts JunkCloset.puts_helper("purchase success. tote_items transitioned PURCHASEPENDING -> PURCHASED.", "gross_amount", number_to_currency(purchase.gross_amount))
       else        
-        tote_items.where(status: ToteItem.states[:PURCHASEPENDING]).update_all(status: ToteItem.states[:PURCHASEFAILED])
+        tote_items.where(state: ToteItem.states[:PURCHASEPENDING]).update_all(state: ToteItem.states[:PURCHASEFAILED])
         self.kind = PurchaseReceivable.kind[:PURCHASEFAILED]
 
         #we want to prevent work from beginning on any tote_items in this customer's pipeline for which work hasn't yet begun
@@ -168,7 +168,7 @@ class PurchaseReceivable < ActiveRecord::Base
         #TODO: make a test to verify that when a purchase fails the shopping tote gets emptied
         current_tote_items = ToteItemsController.helpers.current_tote_items_for_user(users.last)
         if current_tote_items != nil && current_tote_items.any?
-          current_tote_items.where("status = ? or status = ?", ToteItem.states[:ADDED], ToteItem.states[:AUTHORIZED]).update_all(status: ToteItem.states[:REMOVED])
+          current_tote_items.where("state = ? or state = ?", ToteItem.states[:ADDED], ToteItem.states[:AUTHORIZED]).update_all(state: ToteItem.states[:REMOVED])
         end
 
         #put this user's account on hold so they can't order again until they clear up this failed purchase        
@@ -188,7 +188,7 @@ class PurchaseReceivable < ActiveRecord::Base
   end
 
   def purchase_failed
-    tote_items.where(status: ToteItem.states[:PURCHASEPENDING]).update_all(status: ToteItem.states[:PURCHASEFAILED])    
+    tote_items.where(state: ToteItem.states[:PURCHASEPENDING]).update_all(state: ToteItem.states[:PURCHASEFAILED])    
     self.kind = PurchaseReceivable.kind[:PURCHASEFAILED]
 
     #we want to prevent work from beginning on any tote_items in this customer's pipeline for which work hasn't yet begun
@@ -197,7 +197,7 @@ class PurchaseReceivable < ActiveRecord::Base
     #TODO: make a test to verify that when a purchase fails the shopping tote gets emptied
     current_tote_items = ToteItemsController.helpers.current_tote_items_for_user(users.last)
     if current_tote_items != nil && current_tote_items.any?
-      current_tote_items.where("status = ? or status = ?", ToteItem.states[:ADDED], ToteItem.states[:AUTHORIZED]).update_all(status: ToteItem.states[:REMOVED])
+      current_tote_items.where("tote_items.state = ? or tote_items.state = ?", ToteItem.states[:ADDED], ToteItem.states[:AUTHORIZED]).update_all(state: ToteItem.states[:REMOVED])
     end
 
     save

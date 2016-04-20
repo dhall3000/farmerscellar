@@ -24,7 +24,7 @@ class ToteItemsController < ApplicationController
       if @tote_items == nil
         @total_amount_to_authorize = 0
       else
-        @total_amount_to_authorize = get_gross_tote(@tote_items.where(status: ToteItem.states[:ADDED]))      
+        @total_amount_to_authorize = get_gross_tote(@tote_items.where(state: ToteItem.states[:ADDED]))      
       end
 
       @rtba = current_user.get_active_rtba
@@ -132,7 +132,7 @@ class ToteItemsController < ApplicationController
 
       @tote_item.id = 1
       @tote_item.price = 2.25
-      @tote_item.status = 7
+      @tote_item.state = 7
       @tote_item.posting_id = 11
 
       return
@@ -182,8 +182,8 @@ class ToteItemsController < ApplicationController
     if ti == nil
       flash[:danger] = "Shopping tote item not deleted."
     else
-      if ti.status == ToteItem.states[:ADDED] || ti.status == ToteItem.states[:AUTHORIZED]
-        ti.update(status: ToteItem.states[:REMOVED])
+      if ti.state == ToteItem.states[:ADDED] || ti.state == ToteItem.states[:AUTHORIZED]
+        ti.update(state: ToteItem.states[:REMOVED])
         flash[:success] = "Shopping tote item removed."
       else
         flash[:danger] = "This item is not removable because it is already 'committed'. Please see 'Commitment Zone' on the 'How it Works' page. Shopping tote item not deleted."
@@ -195,7 +195,7 @@ class ToteItemsController < ApplicationController
 
   private
     def tote_item_params
-      params.require(:tote_item).permit(:quantity, :price, :status, :posting_id, :user_id)
+      params.require(:tote_item).permit(:quantity, :price, :state, :posting_id, :user_id)
     end
 
     def account_on_hold

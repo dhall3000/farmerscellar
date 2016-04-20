@@ -52,7 +52,7 @@
           <th class="text-center">Posting ID</th>
           <th class="text-center">Price</th>
           <th class="text-center">ToteItem ID</th>
-          <th class="text-center">ToteItem Status</th>
+          <th class="text-center">ToteItem State</th>
         </tr>
       </thead>
       <tbody>
@@ -60,7 +60,7 @@
           <td class="text-center"><%= @tote_item.posting_id %></td>
           <td class="text-center"><%= number_to_currency(@tote_item.price) %></td>
           <td class="text-center"><%= @tote_item.id %></td>
-          <td class="text-center"><%= @tote_item.status %></td>
+          <td class="text-center"><%= @tote_item.state %></td>
         </tr>
       </tbody>
     </table>

@@ -52,11 +52,11 @@ class User < ActiveRecord::Base
     #whichever is more recent
     cutoff = [last_pickup, 7.days.ago].max
 
-    #@tote_items = @user.tote_items.where(status: [ToteItem.states[:FILLED], ToteItem.states[:PURCHASED]], "updated_at > ?", last_pickup)
+    #@tote_items = @user.tote_items.where(state: [ToteItem.states[:FILLED], ToteItem.states[:PURCHASED]], "updated_at > ?", last_pickup)
     #TODO: the below line isn't quite right. it will display toteitems that have been purchased in the last 7 days even though it could be that
     #some purchased items were actually delivered a longer time period ago like, say, 9 days ago. the reason is because the .updated_at field
     #will get modified when the purchas goes through. leaving it this way cause i'll be redoing it anyway after cleaning up the toteitem state machine
-    return tote_items.joins(:posting).where("postings.delivery_date > ? and postings.delivery_date < ?", cutoff, Time.zone.now).where(status: [ToteItem.states[:FILLED], ToteItem.states[:PURCHASED]])
+    return tote_items.joins(:posting).where("postings.delivery_date > ? and postings.delivery_date < ?", cutoff, Time.zone.now).where(state: [ToteItem.states[:FILLED], ToteItem.states[:PURCHASED]])
 
   end
 

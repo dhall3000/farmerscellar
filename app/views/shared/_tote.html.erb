@@ -20,7 +20,7 @@
       </thead>
       <tbody>
         <% tote_items.each do |tote_item| %>        
-          <% if tote_item.status == ToteItem.states[:ADDED] %>
+          <% if tote_item.state == ToteItem.states[:ADDED] %>
             <% tote_items_added << tote_item %>
             <tr class="action_needed">
           <% else %>
@@ -36,7 +36,7 @@
             <td class="text-center"><%= pluralize(tote_item.quantity, tote_item.posting.unit_kind.name)%></td>
             <td class="text-center"><%= number_to_currency(tote_item.price * tote_item.quantity) %></td>
             <td class="text-center">
-            <% if tote_item.status == ToteItem.states[:ADDED] || tote_item.status == ToteItem.states[:AUTHORIZED] %>
+            <% if tote_item.state == ToteItem.states[:ADDED] || tote_item.state == ToteItem.states[:AUTHORIZED] %>
               <%= link_to "-", tote_item, class: "btn btn-primary", method: :delete %>
             <% else %>
               <% data_content = "This item is not removable because it is in the " + link_to("Commitment Zone", how_things_work_path(anchor: "commitment_zone")) %>

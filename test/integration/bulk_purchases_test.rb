@@ -227,9 +227,9 @@ class BulkPurchasesTest < BulkBuyer
 
     #verify shopping tote empty. this actually technically doesn't have to be the case for customers with good standing
     #but it is now true given the way the test is written
-    assert_equal ToteItem.where(status: ToteItem.states[:ADDED], user_id: customer.id).count, 0
-    assert_equal ToteItem.where(status: ToteItem.states[:AUTHORIZED], user_id: customer.id).count, 0
-    assert_equal ToteItem.where(status: ToteItem.states[:COMMITTED], user_id: customer.id).count, 0
+    assert_equal ToteItem.where(state: ToteItem.states[:ADDED], user_id: customer.id).count, 0
+    assert_equal ToteItem.where(state: ToteItem.states[:AUTHORIZED], user_id: customer.id).count, 0
+    assert_equal ToteItem.where(state: ToteItem.states[:COMMITTED], user_id: customer.id).count, 0
 
     posting_lettuce = postings(:postingf1lettuce)
     log_in_as(customer)   
@@ -261,12 +261,12 @@ class BulkPurchasesTest < BulkBuyer
     #he also has a ti that's ADDED and another that's AUTHORIZED. the code should sense these latter two and
     #switch them to state REMOVED. so we're going to first verify that we have zero in the REMOVED state and
     #then after the purchase failure verify that we have 2 in the REMOVED state
-    assert_equal ToteItem.where(status: ToteItem.states[:REMOVED]).count, 0
+    assert_equal ToteItem.where(state: ToteItem.states[:REMOVED]).count, 0
 
     #authorize some more tote items
     log_in_as(@c1)
     posting_lettuce = postings(:postingf1lettuce)
-    post tote_items_path, tote_item: {quantity: 2, price: posting_lettuce.price, status: ToteItem.states[:ADDED], posting_id: posting_lettuce.id, user_id: @c1.id}
+    post tote_items_path, tote_item: {quantity: 2, price: posting_lettuce.price, state: ToteItem.states[:ADDED], posting_id: posting_lettuce.id, user_id: @c1.id}
     get tote_items_path
     total_amount_to_authorize = assigns(:total_amount_to_authorize)    
     post checkouts_path, amount: total_amount_to_authorize, use_reference_transaction: "0"
@@ -277,7 +277,7 @@ class BulkPurchasesTest < BulkBuyer
 
     #add some more toteitems    
     posting_tomato = postings(:postingf2tomato)
-    post tote_items_path, tote_item: {quantity: 2, price: posting_tomato.price, status: ToteItem.states[:ADDED], posting_id: posting_tomato.id, user_id: @c1.id}
+    post tote_items_path, tote_item: {quantity: 2, price: posting_tomato.price, state: ToteItem.states[:ADDED], posting_id: posting_tomato.id, user_id: @c1.id}
 
     #by the time we get to this point c1 should have 10 toteitems, 8 in PURCHASEPENDING, 1 in ADDED and 1 in AUTHORIZED
 
@@ -289,7 +289,7 @@ class BulkPurchasesTest < BulkBuyer
     post bulk_purchases_path, purchase_receivables: purchase_receivables
     
     #COMMENT KEY 000
-    assert_equal ToteItem.where(status: ToteItem.states[:REMOVED]).count, 2
+    assert_equal ToteItem.where(state: ToteItem.states[:REMOVED]).count, 2
     verify_legitimacy_of_bulk_purchase
     verify_proper_number_of_payment_payables    
     bulk_purchase = assigns(:bulk_purchase)
@@ -540,13 +540,13 @@ class BulkPurchasesTest < BulkBuyer
       
       for ti in pr.tote_items
         #toteitems state should not be PURCHASEPENDING anymore
-        assert_not ti.status == ToteItem.states[:PURCHASEPENDING]
+        assert_not ti.state == ToteItem.states[:PURCHASEPENDING]
         #toteitems state should be either PURCHASE or PURCHASEFAILED
         if pr.kind == PurchaseReceivable.kind[:NORMAL]
-          assert_equal ti.status, ToteItem.states[:PURCHASED]          
+          assert_equal ti.state, ToteItem.states[:PURCHASED]          
         end
         if pr.kind == PurchaseReceivable.kind[:PURCHASEFAILED]
-          assert_equal ti.status, ToteItem.states[:PURCHASEFAILED]                    
+          assert_equal ti.state, ToteItem.states[:PURCHASEFAILED]                    
         end
       end      
     end  
@@ -561,7 +561,7 @@ class BulkPurchasesTest < BulkBuyer
         assert_equal purchase_receivable.amount, purchase_receivable.amount_purchased
 
         for tote_item in purchase_receivable.tote_items
-          assert_equal tote_item.status, ToteItem.states[:PURCHASED]
+          assert_equal tote_item.state, ToteItem.states[:PURCHASED]
         end        
       end
 
@@ -572,7 +572,7 @@ class BulkPurchasesTest < BulkBuyer
         assert purchase_receivable.amount > 0
 
         for tote_item in purchase_receivable.tote_items
-          assert_equal tote_item.status, ToteItem.states[:PURCHASEFAILED]
+          assert_equal tote_item.state, ToteItem.states[:PURCHASEFAILED]
         end        
       end            
     end
@@ -622,8 +622,8 @@ class BulkPurchasesTest < BulkBuyer
 
     assert Purchase.count > 0
 
-    assert_equal Purchase.count, ToteItem.select(:user_id).where(status: [ToteItem.states[:PURCHASEFAILED], ToteItem.states[:PURCHASED]]).distinct.count
-    assert_equal PurchaseReceivable.count, ToteItem.where(status: [ToteItem.states[:PURCHASEFAILED], ToteItem.states[:PURCHASED]]).distinct.count
+    assert_equal Purchase.count, ToteItem.select(:user_id).where(state: [ToteItem.states[:PURCHASEFAILED], ToteItem.states[:PURCHASED]]).distinct.count
+    assert_equal PurchaseReceivable.count, ToteItem.where(state: [ToteItem.states[:PURCHASEFAILED], ToteItem.states[:PURCHASED]]).distinct.count
 
     purchase_receivables = assigns(:purchase_receivables)
 
@@ -712,7 +712,7 @@ class BulkPurchasesTest < BulkBuyer
 
       #the filled tote items should all be marked as PURCHASEPENDING by now
       for tote_item in purchase_receivable.tote_items
-        assert_equal tote_item.status, ToteItem.states[:PURCHASEPENDING]
+        assert_equal tote_item.state, ToteItem.states[:PURCHASEPENDING]
       end
 
     end

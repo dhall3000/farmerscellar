@@ -11,31 +11,31 @@ class ToteItemTest < ActiveSupport::TestCase
 
   #TODO: add more transitions tests
   test "transitions" do
-    assert_equal ToteItem.states[:ADDED], @tote_item.status
+    assert_equal ToteItem.states[:ADDED], @tote_item.state
     @tote_item.transition(:customer_authorized)
-    assert_equal ToteItem.states[:AUTHORIZED], @tote_item.status
+    assert_equal ToteItem.states[:AUTHORIZED], @tote_item.state
     @tote_item.reload
-    assert_equal ToteItem.states[:AUTHORIZED], @tote_item.status
+    assert_equal ToteItem.states[:AUTHORIZED], @tote_item.state
   end
 
-  test "state checker" do
+  test "state method checker" do
     assert @tote_item.state?(:ADDED)
-    @tote_item.status = ToteItem.states[:AUTHORIZED]
+    @tote_item.state = ToteItem.states[:AUTHORIZED]
     assert @tote_item.state?(:AUTHORIZED)    
   end
 
   test "should deauthorize" do
-    @tote_item.update(status: ToteItem.states[:AUTHORIZED])
+    @tote_item.update(state: ToteItem.states[:AUTHORIZED])
     @tote_item.save
     ti = @tote_item.reload
-    assert_equal ToteItem.states[:AUTHORIZED], @tote_item.status
+    assert_equal ToteItem.states[:AUTHORIZED], @tote_item.state
     ti.deauthorize
     ti = @tote_item.reload
-    assert_equal ToteItem.states[:ADDED], @tote_item.status
+    assert_equal ToteItem.states[:ADDED], @tote_item.state
   end
 
   test "should not deauthorize" do
-    @tote_item.status = ToteItem.states[:COMMITTED]
+    @tote_item.state = ToteItem.states[:COMMITTED]
     assert @tote_item.state?(:COMMITTED)    
     @tote_item.deauthorize
     assert_not @tote_item.state?(:ADDED)
@@ -91,41 +91,41 @@ class ToteItemTest < ActiveSupport::TestCase
   	assert_not @tote_item.valid?
   end
 
-  test "status should be present" do
-  	@tote_item.status = nil
+  test "state should be present" do
+  	@tote_item.state = nil
   	assert_not @tote_item.valid?
   end
 
-  test "status should be integer" do
-  	@tote_item.status = 1.5
+  test "state should be integer" do
+  	@tote_item.state = 1.5
   	assert_not @tote_item.valid?
   end
 
-  test "status should be within range" do
-  	@tote_item.status = 0
+  test "state should be within range" do
+  	@tote_item.state = 0
   	assert @tote_item.valid?
-  	@tote_item.status = 1
+  	@tote_item.state = 1
   	assert @tote_item.valid?
-  	@tote_item.status = 2
+  	@tote_item.state = 2
   	assert @tote_item.valid?
-  	@tote_item.status = 3
+  	@tote_item.state = 3
   	assert @tote_item.valid?
-  	@tote_item.status = 4
+  	@tote_item.state = 4
   	assert @tote_item.valid?
-  	@tote_item.status = 5
+  	@tote_item.state = 5
   	assert @tote_item.valid?
-  	@tote_item.status = 6
+  	@tote_item.state = 6
   	assert @tote_item.valid?
-  	@tote_item.status = 7
+  	@tote_item.state = 7
   	assert @tote_item.valid?
-  	@tote_item.status = 8
+  	@tote_item.state = 8
   	assert @tote_item.valid?
-    @tote_item.status = 9
+    @tote_item.state = 9
     assert @tote_item.valid?
 
-  	@tote_item.status = -1
+  	@tote_item.state = -1
   	assert_not @tote_item.valid?
-  	@tote_item.status = 12
+  	@tote_item.state = 12
   	assert_not @tote_item.valid?
   end
 

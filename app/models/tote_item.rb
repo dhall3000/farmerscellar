@@ -18,7 +18,7 @@ class ToteItem < ActiveRecord::Base
   belongs_to :user
   belongs_to :subscription
 
-  validates :price, :status, :quantity, presence: true
+  validates :price, :state, :quantity, presence: true
   validates_presence_of :user, :posting  
 
   validates :price, numericality: { greater_than: 0 }
@@ -32,25 +32,27 @@ class ToteItem < ActiveRecord::Base
   	{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLPENDING: 3, FILLED: 4, NOTFILLED: 5, REMOVED: 6, PURCHASEPENDING: 7, PURCHASED: 8, PURCHASEFAILED: 9, DELIVERED: 10, NOTIFIED: 11}
   end
 
-  validates :status, inclusion: { in: ToteItem.states.values }
-  validates :status, numericality: {only_integer: true}
+  validates :state, inclusion: { in: ToteItem.states.values }
+  validates :state, numericality: {only_integer: true}
 
-  def self.status(id, newstate)
+  def self.state(id, newstate)
 
   	ti = ToteItem.find_by(id: id)
   	if ti != nil
-  	  if ti.status == states[:FILLPENDING] && newstate == states[:FILLED]
+  	  if ti.state == states[:FILLPENDING] && newstate == states[:FILLED]
   	  	#this indeed is a legal state transition
-  	  	ti.update_attribute(:status, newstate)
+  	  	ti.update_attribute(:state, newstate)
   	  end
   	end  	
   end
 
   def transition(input)
     
-    new_state = status
+    new_state = state
 
-    case status
+    case state
+
+
     when ToteItem.states[:ADDED]
       case input
       when :customer_authorized || :subscription_authorized
@@ -58,6 +60,8 @@ class ToteItem < ActiveRecord::Base
       when :customer_removed
         new_state = ToteItem.states[:REMOVED]
       end
+
+
     when ToteItem.states[:AUTHORIZED]
       case input
       when :billing_agreement_inactive
@@ -67,6 +71,8 @@ class ToteItem < ActiveRecord::Base
       when :commitment_zone_started
         new_state = ToteItem.states[:COMMITTED]
       end
+
+
     when ToteItem.states[:COMMITTED]
       case input
       when :not_enough_product
@@ -76,6 +82,8 @@ class ToteItem < ActiveRecord::Base
         #create new purchaserecievable here
         create_purchase_receivable
       end
+
+
     when ToteItem.states[:FILLPENDING]
       #TODO: this whole case / state goes away eventually
       case input
@@ -84,16 +92,22 @@ class ToteItem < ActiveRecord::Base
         #create new purchaserecievable here
         create_purchase_receivable
       end
+
+
     when ToteItem.states[:FILLED]
       case input
       when :delivered
         new_state = ToteItem.states[:DELIVERED]
       end
+
+
     when ToteItem.states[:NOTFILLED]
       case input
       when :notified
         new_state = ToteItem.states[:NOTIFIED]
       end
+
+
     when ToteItem.states[:REMOVED]
       
       #end state
@@ -102,23 +116,25 @@ class ToteItem < ActiveRecord::Base
       case input
       when :notified
       end
+
+
     when ToteItem.states[:NOTIFIED]
 
       #end state
 
     end
 
-    if new_state != status
-      update(status: new_state)
+    if new_state != state
+      update(state: new_state)
     end
 
   end
 
   def self.dequeue(posting_id)
-  	ti = ToteItem.where(status: states[:COMMITTED], posting_id: posting_id).first
+  	ti = ToteItem.where(state: states[:COMMITTED], posting_id: posting_id).first
   	
     if ti != nil
-  	  ti.update_attribute(:status, states[:FILLPENDING])
+  	  ti.update_attribute(:state, states[:FILLPENDING])
     end
 
   	ti
@@ -127,12 +143,12 @@ class ToteItem < ActiveRecord::Base
 
   def deauthorize
     if state?(:AUTHORIZED)
-      update(status: ToteItem.states[:ADDED])
+      update(state: ToteItem.states[:ADDED])
     end    
   end
 
   def state?(state_key)
-    return status == ToteItem.states[state_key]
+    return state == ToteItem.states[state_key]
   end
 
   def authorization

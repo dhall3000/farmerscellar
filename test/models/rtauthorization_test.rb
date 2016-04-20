@@ -20,7 +20,7 @@ class RtauthorizationTest < ActiveSupport::TestCase
 	test "should deauthorize" do
 
 		#move the ti state to auth'd
-		@tote_item.update(status: ToteItem.states[:AUTHORIZED])
+		@tote_item.update(state: ToteItem.states[:AUTHORIZED])
 		#verify ti state is auth'd
 		assert @tote_item.state?(:AUTHORIZED)		
 		#call rtauth.deauth
@@ -33,7 +33,7 @@ class RtauthorizationTest < ActiveSupport::TestCase
 	test "should not deauthorize toteitems" do
 
 		#move the ti state to committed
-		@tote_item.update(status: ToteItem.states[:COMMITTED])
+		@tote_item.update(state: ToteItem.states[:COMMITTED])
 		#verify ti state is committed
 		assert @tote_item.state?(:COMMITTED)		
 		#call rtauth.deauth

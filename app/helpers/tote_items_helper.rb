@@ -5,7 +5,7 @@ module ToteItemsHelper
     if all_tote_items == nil or all_tote_items.count < 1
       return nil
     end
-    unauthorized_tote_items = all_tote_items.where(status: ToteItem.states[:ADDED])
+    unauthorized_tote_items = all_tote_items.where(state: ToteItem.states[:ADDED])
     return unauthorized_tote_items
   end
 
@@ -30,7 +30,7 @@ module ToteItemsHelper
 
     #the 'displayable' items are just the ones in the proper states for user viewing
     if all != nil && all.count > 0
-      displayable = all.where("status = ? or status = ? or status = ? or status = ?", ToteItem.states[:ADDED], ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED], ToteItem.states[:FILLPENDING])
+      displayable = all.where("tote_items.state = ? or tote_items.state = ? or tote_items.state = ? or tote_items.state = ?", ToteItem.states[:ADDED], ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED], ToteItem.states[:FILLPENDING])
     end
 
     if displayable != nil && displayable.count > 0      
@@ -38,7 +38,7 @@ module ToteItemsHelper
       #however there is one exception to this rule and that is when an item has progressed to the FILLED state but then does not make
       #it to the PURCHASED state, for whatever reason. in this case, the customer owes money but has not yet purchased so we want it to
       #remain in their tote forever until it's purchased
-      #current = displayable.where("postings.delivery_date >= ? or status = ? or status = ?", Time.zone.today, ToteItem.states[:FILLED], ToteItem.states[:PURCHASEPENDING])
+      #current = displayable.where("postings.delivery_date >= ? or state = ? or state = ?", Time.zone.today, ToteItem.states[:FILLED], ToteItem.states[:PURCHASEPENDING])
 
       #the above was a good thought. however, we changed the funds collecting model. when the above was in place our funds-collecting model was to pull from customer
       #credit cards every night. we had to change that to reduce transaction fees though. we changed to where we only pull funds after all a customer's products

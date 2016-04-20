@@ -13,11 +13,11 @@ class DeliveriesController < ApplicationController
       #-don't have any delivery objects associated
       postings2 = postings1.includes(:delivery_postings).where( delivery_postings: { posting_id: nil } )
       #-have tote_items in any of states specified states
-      @delivery_eligible_postings = postings2.includes(:tote_items).where( tote_items: {status: get_tote_item_states})    
+      @delivery_eligible_postings = postings2.includes(:tote_items).where( tote_items: {state: get_tote_item_states})    
     else
       #the purpose of this is for developing the deliveries features. the prod code creates a new delivery only with postings that have elsewhere been marked as delivered.
       #this here dev code will allow you to just keep using the same postings in the creation of new deliveries so that you don't have to repeatedly reseed the db      
-      @delivery_eligible_postings = postings1.includes(:tote_items).where( tote_items: {status: get_tote_item_states})    
+      @delivery_eligible_postings = postings1.includes(:tote_items).where( tote_items: {state: get_tote_item_states})    
     end
 
     #get dropsites that must be delivered to for this set of postings
@@ -93,7 +93,7 @@ class DeliveriesController < ApplicationController
       
       delivery.postings.each do |posting|
         posting.tote_items.each do |tote_item|          
-          if get_tote_item_states.include? tote_item.status
+          if get_tote_item_states.include? tote_item.state
             if tote_items_by_user_id.has_key?(tote_item.user_id)
               tote_items_by_user_id[tote_item.user_id][:tote_items] << tote_item
             end
@@ -131,7 +131,7 @@ class DeliveriesController < ApplicationController
       user_ids = []
 
       postings.each do |posting|        
-        posting.tote_items.where(status: get_tote_item_states).each do |ti|
+        posting.tote_items.where(state: get_tote_item_states).each do |ti|
           user_ids << ti.user.id
         end
       end

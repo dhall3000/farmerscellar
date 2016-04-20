@@ -42,9 +42,9 @@ class FundsProcessing
     num_days_till_end_of_week = ENDOFWEEK - Time.zone.today.wday
     time_range = Time.zone.today.midnight..(Time.zone.today.midnight + num_days_till_end_of_week.days)
     #these are the users that have some filled tote items
-    filled_users = User.select(:id).joins(:tote_items).where("tote_items.status = ?", ToteItem.states[:FILLED]).distinct
+    filled_users = User.select(:id).joins(:tote_items).where("tote_items.state = ?", ToteItem.states[:FILLED]).distinct
     #among these users, which also have toteitems in either AUTHORIZED or COMMITTED states?
-    delivery_later_this_week_users = User.select(:id).joins(tote_items: :posting).where("tote_items.status" => [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED]], 'postings.delivery_date' => time_range).distinct
+    delivery_later_this_week_users = User.select(:id).joins(tote_items: :posting).where("tote_items.state" => [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED]], 'postings.delivery_date' => time_range).distinct
     purchase_users = filled_users.where.not(id: delivery_later_this_week_users)
 
     return purchase_users
@@ -77,7 +77,7 @@ class FundsProcessing
     bulk_purchase.purchase_receivables.each do |pr|
       puts "PurchaseReceivable id: " + pr.id.to_s + " amount: " + number_to_currency(pr.amount) + " amount_purchased: " + number_to_currency(pr.amount_purchased)
       pr.tote_items.each do |ti|
-        ti.update(status: ToteItem.states[:PURCHASEPENDING])
+        ti.update(state: ToteItem.states[:PURCHASEPENDING])
       end
     end    
       

@@ -21,7 +21,7 @@ class ProducerNotificationsMailer < ApplicationMailer
         next
       end
 
-      committed_items = posting.tote_items.where(status: ToteItem.states[:COMMITTED])
+      committed_items = posting.tote_items.where(state: ToteItem.states[:COMMITTED])
   	  if committed_items.count < 1
         next
       end

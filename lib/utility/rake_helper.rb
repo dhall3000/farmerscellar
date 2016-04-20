@@ -110,7 +110,7 @@ class RakeHelper
 		  posting_ids = []
 			transitioned_tote_items_and_postings = {tote_item_ids: tote_item_ids, posting_ids: posting_ids}
 
-		  tote_items = ToteItem.where(status: ToteItem.states[:AUTHORIZED])
+		  tote_items = ToteItem.where(state: ToteItem.states[:AUTHORIZED])
 
 		  if tote_items.count == 0
 		    puts "transition_tote_items_to_committed_state: no authorized totes so nothing to transition to committed. all done."
@@ -124,7 +124,7 @@ class RakeHelper
 		    end
 
 		    if Time.zone.now >= tote_item.posting.commitment_zone_start
-				  tote_item.update(status: ToteItem.states[:COMMITTED])
+				  tote_item.update(state: ToteItem.states[:COMMITTED])
 				  tote_item_ids << tote_item.id
 				  posting_ids << tote_item.posting.id
 		    end

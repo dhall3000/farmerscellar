@@ -7,10 +7,10 @@ Here is the status of products you recently ordered that were set for delivery t
 
 <% @tote_items.each do |tote_item| %>
   <% status = "UNKNOWN" %>
-  <% if tote_item.status == ToteItem.states[:FILLED] || tote_item.status == ToteItem.states[:PURCHASED] || tote_item.status == ToteItem.states[:PURCHASEFAILED] %>
+  <% if tote_item.state == ToteItem.states[:FILLED] || tote_item.state == ToteItem.states[:PURCHASED] || tote_item.state == ToteItem.states[:PURCHASEFAILED] %>
     <% status = "DELIVERED" %>
     <% products_delivered = true %>
-  <% elsif tote_item.status == ToteItem.states[:NOTFILLED] %>
+  <% elsif tote_item.state == ToteItem.states[:NOTFILLED] %>
     <% status = "NOT FILLED" %>
   <% end %>
 ID=<%= tote_item.id %>,Producer=<%= tote_item.posting.user.farm_name %>,Product=<%= tote_item.posting.product.name %>,Unit=<%= tote_item.posting.unit_kind.name %>,Quantity=<%= tote_item.quantity %>,Status=<%= status %>

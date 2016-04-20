@@ -8,7 +8,7 @@ Here is your Farmer's Cellar purchase receipt.
 
 <% purchase_failed = false %>
     <% @tote_items.each do |tote_item| %>
-      <% if tote_item.status == ToteItem.states[:PURCHASEFAILED] %>
+      <% if tote_item.state == ToteItem.states[:PURCHASEFAILED] %>
         <% purchase_failed = true %>
         <% sub_total = "PURCHASEFAILED" %>
       <% elsif %>

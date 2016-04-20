@@ -23,16 +23,16 @@ class PostingTest < ActiveSupport::TestCase
 
     #{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLPENDING: 3, FILLED: 4, NOTFILLED: 5, REMOVED: 6, PURCHASEPENDING: 7, PURCHASED: 8, PURCHASEFAILED: 9}
 
-    posting.tote_items[0].status = ToteItem.states[:ADDED]
-    posting.tote_items[1].status = ToteItem.states[:AUTHORIZED]
-    posting.tote_items[2].status = ToteItem.states[:COMMITTED]
-    posting.tote_items[3].status = ToteItem.states[:FILLPENDING]
-    posting.tote_items[4].status = ToteItem.states[:FILLED]
-    posting.tote_items[5].status = ToteItem.states[:NOTFILLED]
-    posting.tote_items[6].status = ToteItem.states[:REMOVED]
-    posting.tote_items[7].status = ToteItem.states[:PURCHASEPENDING]
-    posting.tote_items[8].status = ToteItem.states[:PURCHASED]
-    posting.tote_items[9].status = ToteItem.states[:PURCHASEFAILED]
+    posting.tote_items[0].state = ToteItem.states[:ADDED]
+    posting.tote_items[1].state = ToteItem.states[:AUTHORIZED]
+    posting.tote_items[2].state = ToteItem.states[:COMMITTED]
+    posting.tote_items[3].state = ToteItem.states[:FILLPENDING]
+    posting.tote_items[4].state = ToteItem.states[:FILLED]
+    posting.tote_items[5].state = ToteItem.states[:NOTFILLED]
+    posting.tote_items[6].state = ToteItem.states[:REMOVED]
+    posting.tote_items[7].state = ToteItem.states[:PURCHASEPENDING]
+    posting.tote_items[8].state = ToteItem.states[:PURCHASED]
+    posting.tote_items[9].state = ToteItem.states[:PURCHASEFAILED]
 
     posting.tote_items[0].save
     posting.tote_items[1].save
@@ -54,16 +54,16 @@ class PostingTest < ActiveSupport::TestCase
 
     #{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLPENDING: 3, FILLED: 4, NOTFILLED: 5, REMOVED: 6, PURCHASEPENDING: 7, PURCHASED: 8, PURCHASEFAILED: 9}
 
-    posting.tote_items[0].status = ToteItem.states[:ADDED]
-    posting.tote_items[1].status = ToteItem.states[:AUTHORIZED]
-    posting.tote_items[2].status = ToteItem.states[:COMMITTED]
-    posting.tote_items[3].status = ToteItem.states[:FILLPENDING]
-    posting.tote_items[4].status = ToteItem.states[:FILLED]
-    posting.tote_items[5].status = ToteItem.states[:NOTFILLED]
-    posting.tote_items[6].status = ToteItem.states[:REMOVED]
-    posting.tote_items[7].status = ToteItem.states[:PURCHASEPENDING]
-    posting.tote_items[8].status = ToteItem.states[:PURCHASED]
-    posting.tote_items[9].status = ToteItem.states[:PURCHASEFAILED]
+    posting.tote_items[0].state = ToteItem.states[:ADDED]
+    posting.tote_items[1].state = ToteItem.states[:AUTHORIZED]
+    posting.tote_items[2].state = ToteItem.states[:COMMITTED]
+    posting.tote_items[3].state = ToteItem.states[:FILLPENDING]
+    posting.tote_items[4].state = ToteItem.states[:FILLED]
+    posting.tote_items[5].state = ToteItem.states[:NOTFILLED]
+    posting.tote_items[6].state = ToteItem.states[:REMOVED]
+    posting.tote_items[7].state = ToteItem.states[:PURCHASEPENDING]
+    posting.tote_items[8].state = ToteItem.states[:PURCHASED]
+    posting.tote_items[9].state = ToteItem.states[:PURCHASEFAILED]
 
     posting.tote_items[0].save
     posting.tote_items[1].save

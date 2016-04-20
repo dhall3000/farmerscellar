@@ -42,7 +42,7 @@ class SubscriptionTest < ActiveSupport::TestCase
 		tote_item = @subscription.generate_next_tote_item
 		assert tote_item.valid?
 		assert_equal 1, @subscription.tote_items.count
-		assert_equal ToteItem.states[:ADDED], @subscription.tote_items.last.status
+		assert_equal ToteItem.states[:ADDED], @subscription.tote_items.last.state
 	end
 
 	test "should save" do

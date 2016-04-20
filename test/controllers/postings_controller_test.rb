@@ -331,12 +331,12 @@ class PostingsControllerTest < ActionController::TestCase
 
   test "should post no more product" do    
 
-    #set toteitems' status to simulate as if we got partially through filling the orders before
+    #set toteitems' state to simulate as if we got partially through filling the orders before
     #running out of product
-    @posting.tote_items[0].update(status: ToteItem.states[:FILLED])
-    @posting.tote_items[1].update(status: ToteItem.states[:FILLED])
-    @posting.tote_items[2].update(status: ToteItem.states[:FILLPENDING])
-    @posting.tote_items[3].update(status: ToteItem.states[:COMMITTED])
+    @posting.tote_items[0].update(state: ToteItem.states[:FILLED])
+    @posting.tote_items[1].update(state: ToteItem.states[:FILLED])
+    @posting.tote_items[2].update(state: ToteItem.states[:FILLPENDING])
+    @posting.tote_items[3].update(state: ToteItem.states[:COMMITTED])
 
     log_in_as @admin
     post :no_more_product, posting_id: @posting.id
@@ -345,12 +345,12 @@ class PostingsControllerTest < ActionController::TestCase
     @posting.reload
 
     #these should continue to be marked as 'FILLED'
-    assert_equal @posting.tote_items[0].status, ToteItem.states[:FILLED]
-    assert_equal @posting.tote_items[1].status, ToteItem.states[:FILLED]
+    assert_equal @posting.tote_items[0].state, ToteItem.states[:FILLED]
+    assert_equal @posting.tote_items[1].state, ToteItem.states[:FILLED]
 
-    #and these should have gotten their statuses set to 'NOTFILLED'
-    assert_equal @posting.tote_items[2].status, ToteItem.states[:NOTFILLED]
-    assert_equal @posting.tote_items[3].status, ToteItem.states[:NOTFILLED]
+    #and these should have gotten their statees set to 'NOTFILLED'
+    assert_equal @posting.tote_items[2].state, ToteItem.states[:NOTFILLED]
+    assert_equal @posting.tote_items[3].state, ToteItem.states[:NOTFILLED]
 
   end
 

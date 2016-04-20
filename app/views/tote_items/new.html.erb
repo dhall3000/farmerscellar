@@ -128,7 +128,7 @@
                                             
                       <%= f.number_field :quantity, value: 1, hidden: true %>
                       <%= f.number_field :price, value: posting.price, hidden: true %>
-                      <%= f.number_field :status, value: ToteItem.states[:ADDED], hidden: true %>
+                      <%= f.number_field :state, value: ToteItem.states[:ADDED], hidden: true %>
                       <%= f.number_field :posting_id, value: posting.id, hidden: true %>
                       <%= f.number_field :user_id, value: current_user.id, hidden: true %>
                       <%= f.number_field :subscription_frequency, value: 0, class: "subscription_frequency", hidden: true %>
@@ -142,7 +142,7 @@
                                             
                       <%= f.number_field :quantity, value: 2, hidden: true %>
                       <%= f.number_field :price, value: posting.price, hidden: true %>
-                      <%= f.number_field :status, value: ToteItem.states[:ADDED], hidden: true %>
+                      <%= f.number_field :state, value: ToteItem.states[:ADDED], hidden: true %>
                       <%= f.number_field :posting_id, value: posting.id, hidden: true %>
                       <%= f.number_field :user_id, value: current_user.id, hidden: true %>
                       <%= f.number_field :subscription_frequency, value: 0, class: "subscription_frequency", hidden: true %>
@@ -156,7 +156,7 @@
                                             
                       <%= f.number_field :quantity, value: 3, hidden: true %>
                       <%= f.number_field :price, value: posting.price, hidden: true %>
-                      <%= f.number_field :status, value: ToteItem.states[:ADDED], hidden: true %>
+                      <%= f.number_field :state, value: ToteItem.states[:ADDED], hidden: true %>
                       <%= f.number_field :posting_id, value: posting.id, hidden: true %>
                       <%= f.number_field :user_id, value: current_user.id, hidden: true %>
                       <%= f.number_field :subscription_frequency, value: 0, class: "subscription_frequency", hidden: true %>
@@ -170,7 +170,7 @@
                                             
                       <%= f.number_field :quantity, value: 4, hidden: true %>
                       <%= f.number_field :price, value: posting.price, hidden: true %>
-                      <%= f.number_field :status, value: ToteItem.states[:ADDED], hidden: true %>
+                      <%= f.number_field :state, value: ToteItem.states[:ADDED], hidden: true %>
                       <%= f.number_field :posting_id, value: posting.id, hidden: true %>
                       <%= f.number_field :user_id, value: current_user.id, hidden: true %>
                       <%= f.number_field :subscription_frequency, value: 0, class: "subscription_frequency", hidden: true %>
@@ -190,7 +190,7 @@
                 
                 <%= f.number_field :quantity, class: "form-control", placeholder: "Enter custom quantity" %>
                 <%= f.number_field :price, value: posting.price, hidden: true %>
-                <%= f.number_field :status, value: ToteItem.states[:ADDED], hidden: true %>
+                <%= f.number_field :state, value: ToteItem.states[:ADDED], hidden: true %>
                 <%= f.number_field :posting_id, value: posting.id, hidden: true %>
                 <%= f.number_field :user_id, value: current_user.id, hidden: true %>
                 <%= f.number_field :subscription_frequency, value: 0, class: "subscription_frequency", hidden: true %>

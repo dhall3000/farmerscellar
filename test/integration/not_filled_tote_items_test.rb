@@ -11,22 +11,22 @@ class NotFilledToteItemsTest < BulkBuyer
     customers = [@c_one_tote_item, @c1, @c2, @c3, @c4]
     create_authorization_for_customers(customers)
 
-    assert ToteItem.where(status: ToteItem.states[:AUTHORIZED]).count > 0
-    assert_equal 0, ToteItem.where(status: ToteItem.states[:COMMITTED]).count
-    assert_equal 0, ToteItem.where(status: ToteItem.states[:FILLED]).count
-    assert_equal 0, ToteItem.where(status: ToteItem.states[:FILLPENDING]).count
+    assert ToteItem.where(state: ToteItem.states[:AUTHORIZED]).count > 0
+    assert_equal 0, ToteItem.where(state: ToteItem.states[:COMMITTED]).count
+    assert_equal 0, ToteItem.where(state: ToteItem.states[:FILLED]).count
+    assert_equal 0, ToteItem.where(state: ToteItem.states[:FILLPENDING]).count
 
     transition_authorized_tote_items_to_committed(customers)
     fill_all_tote_items = false
     simulate_order_filling(fill_all_tote_items)
 
-    assert_equal 0, ToteItem.where(status: ToteItem.states[:AUTHORIZED]).count    
-    assert_equal 0, ToteItem.where(status: ToteItem.states[:COMMITTED]).count
-    assert_equal 0, ToteItem.where(status: ToteItem.states[:FILLPENDING]).count
+    assert_equal 0, ToteItem.where(state: ToteItem.states[:AUTHORIZED]).count    
+    assert_equal 0, ToteItem.where(state: ToteItem.states[:COMMITTED]).count
+    assert_equal 0, ToteItem.where(state: ToteItem.states[:FILLPENDING]).count
 
     num_tote_items = ToteItem.where(user_id: customers).count
-    num_filled = ToteItem.where(status: ToteItem.states[:FILLED]).count
-    num_not_filled = ToteItem.where(status: ToteItem.states[:NOTFILLED]).count
+    num_filled = ToteItem.where(state: ToteItem.states[:FILLED]).count
+    num_not_filled = ToteItem.where(state: ToteItem.states[:NOTFILLED]).count
     assert num_not_filled > 0
     assert_equal num_tote_items, num_filled + num_not_filled
 

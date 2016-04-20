@@ -34,9 +34,9 @@ class UserMailerPreview < ActionMailer::Preview
     tote_items = ToteItem.where(user_id: user.id)
     
     #if you want to preview various states you can uncomment below as desired
-    #tote_items[0].status = ToteItem.states[:PURCHASED]
-    #tote_items[1].status = ToteItem.states[:PURCHASEFAILED]
-    #tote_items[2].status = ToteItem.states[:NOTFILLED]
+    #tote_items[0].state = ToteItem.states[:PURCHASED]
+    #tote_items[1].state = ToteItem.states[:PURCHASEFAILED]
+    #tote_items[2].state = ToteItem.states[:NOTFILLED]
 
     UserMailer.delivery_notification(user, dropsite, tote_items)
 

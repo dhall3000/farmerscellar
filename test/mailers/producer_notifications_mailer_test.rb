@@ -3,7 +3,7 @@ require 'test_helper'
 class ProducerNotificationsMailerTest < ActionMailer::TestCase
   test "current_orders" do  	
   	tote_items = ToteItem.all
-  	tote_items.update_all(status: ToteItem.states[:COMMITTED])
+  	tote_items.update_all(state: ToteItem.states[:COMMITTED])
   	ps = Posting.all
     mail = ProducerNotificationsMailer.current_orders(ps.first.user.email, ps).deliver_now
 

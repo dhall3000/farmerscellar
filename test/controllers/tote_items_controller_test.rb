@@ -115,7 +115,7 @@ class ToteItemsControllerTest < ActionController::TestCase
   test "should get create" do
 
     log_in_as(@c1)
-    post :create, tote_item: {quantity: 1, price: 2, status: ToteItem.states[:ADDED], posting_id: @posting_apples, user_id: @c1}
+    post :create, tote_item: {quantity: 1, price: 2, state: ToteItem.states[:ADDED], posting_id: @posting_apples, user_id: @c1}
 
     assert_equal "Item saved to shopping tote.", flash[:success]
     assert :redirected
@@ -137,7 +137,7 @@ class ToteItemsControllerTest < ActionController::TestCase
       subscription_frequency: subscription_frequency,
       quantity: 0,
       price: 5.21,
-      status: ToteItem.states[:ADDED],
+      state: ToteItem.states[:ADDED],
       posting_id: postings(:p_recurrence_on),
       user_id: @c1
     }
@@ -155,7 +155,7 @@ class ToteItemsControllerTest < ActionController::TestCase
     @posting_apples.update(live: false)
 
     log_in_as(@c1)
-    post :create, tote_item: {quantity: 1, price: 2, status: ToteItem.states[:ADDED], posting_id: @posting_apples, user_id: @c1}
+    post :create, tote_item: {quantity: 1, price: 2, state: ToteItem.states[:ADDED], posting_id: @posting_apples, user_id: @c1}
 
     assert_equal "Oops, it appears that posting is no longer live. Item not created.", flash[:danger]
     assert_redirected_to postings_path
@@ -167,7 +167,7 @@ class ToteItemsControllerTest < ActionController::TestCase
     log_in_as(@c1)
 
     #zero quantity should fail
-    post :create, tote_item: {quantity: 0, price: 2, status: ToteItem.states[:ADDED], posting_id: @posting_apples, user_id: @c1}
+    post :create, tote_item: {quantity: 0, price: 2, state: ToteItem.states[:ADDED], posting_id: @posting_apples, user_id: @c1}
 
     assert_equal "Item not saved to shopping tote. See errors below.", flash.now[:danger]
     assert_template 'tote_items/new'
@@ -187,7 +187,7 @@ class ToteItemsControllerTest < ActionController::TestCase
         subscription_frequency: subscription_frequency,
         quantity: 2,
         price: 5.21,
-        status: ToteItem.states[:ADDED],
+        state: ToteItem.states[:ADDED],
         posting_id: postings(:p_recurrence_on),
         user_id: @c1
       }
@@ -202,7 +202,7 @@ class ToteItemsControllerTest < ActionController::TestCase
     new_ti = c1_tote_items.last
     #verify new tote item refers to the proper subscription
     assert_equal new_ti.subscription.id, subscription.id
-    assert_equal ToteItem.states[:ADDED], new_ti.status
+    assert_equal ToteItem.states[:ADDED], new_ti.state
     #verify this user has exactly one more subscription object since the post operation
     assert_equal subscription_count + 1, Subscription.where(user_id: @c1.id).count
     assert_equal true, subscription.on
@@ -226,7 +226,7 @@ class ToteItemsControllerTest < ActionController::TestCase
         subscription_frequency: subscription_frequency,
         quantity: 2,
         price: 5.21,
-        status: ToteItem.states[:ADDED],
+        state: ToteItem.states[:ADDED],
         posting_id: postings(:p_recurrence_off),
         user_id: @c1
       }

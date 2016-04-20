@@ -43,12 +43,12 @@ class Subscription < ActiveRecord::Base
   		#if there is no authorization for this subscription or the authorization is not active, add the
   		#tote item in the ADDED state. otherwise, if everything's good to go and we're all authorized, add in state AUTHORIZED
   		if authorized?
-  			status = ToteItem.states[:AUTHORIZED]
+  			state = ToteItem.states[:AUTHORIZED]
   		else
-  			status = ToteItem.states[:ADDED]
+  			state = ToteItem.states[:ADDED]
   		end
   		
-  		tote_item = ToteItem.new(quantity: quantity, price: current_posting.price, status: status, posting_id: current_posting.id, user_id: user.id, subscription_id: id)
+  		tote_item = ToteItem.new(quantity: quantity, price: current_posting.price, state: state, posting_id: current_posting.id, user_id: user.id, subscription_id: id)
 
   		if !rtauthorization.nil?
 

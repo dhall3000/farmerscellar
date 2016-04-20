@@ -105,11 +105,11 @@ class PostingsController < ApplicationController
 
     #this action gets called by an admin when he runs out of product before he runs out of orders. in this case what needs
     #to happen is all the outstanding COMMITTED and FILLPENDING orders need to get transitioned to NOTFILLED
-    @tote_items_not_filled = ToteItem.where(posting_id: params[:posting_id]).where("status = ? OR status = ?", ToteItem.states[:COMMITTED], ToteItem.states[:FILLPENDING])    
-    @tote_items_not_filled.update_all(status: ToteItem.states[:NOTFILLED])
+    @tote_items_not_filled = ToteItem.where(posting_id: params[:posting_id]).where("state = ? OR state = ?", ToteItem.states[:COMMITTED], ToteItem.states[:FILLPENDING])    
+    @tote_items_not_filled.update_all(state: ToteItem.states[:NOTFILLED])
     
-    @tote_items_filled = ToteItem.select(:id).where(posting_id: params[:posting_id], status: ToteItem.states[:FILLED])
-    @tote_items_not_filled = ToteItem.select(:id).where(posting_id: params[:posting_id], status: ToteItem.states[:NOTFILLED])
+    @tote_items_filled = ToteItem.select(:id).where(posting_id: params[:posting_id], state: ToteItem.states[:FILLED])
+    @tote_items_not_filled = ToteItem.select(:id).where(posting_id: params[:posting_id], state: ToteItem.states[:NOTFILLED])
 
   end
 

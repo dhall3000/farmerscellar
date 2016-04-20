@@ -16,8 +16,8 @@ class Authorizer < ActionDispatch::IntegrationTest
 
   def create_authorization_for_customers(customers)
 
-    num_added_tote_items_before = ToteItem.where(status: ToteItem.states[:ADDED]).count
-    num_authorized_tote_items_before = ToteItem.where(status: ToteItem.states[:AUTHORIZED]).count
+    num_added_tote_items_before = ToteItem.where(state: ToteItem.states[:ADDED]).count
+    num_authorized_tote_items_before = ToteItem.where(state: ToteItem.states[:AUTHORIZED]).count
 
     for customer in customers
 
@@ -34,8 +34,8 @@ class Authorizer < ActionDispatch::IntegrationTest
     end    
 
     #check that as a result of the above authorizations at least some of the tote item states were changed from ADDED -> AUTHORIZED
-    num_added_tote_items_after = ToteItem.where(status: ToteItem.states[:ADDED]).count
-    num_authorized_tote_items_after = ToteItem.where(status: ToteItem.states[:AUTHORIZED]).count
+    num_added_tote_items_after = ToteItem.where(state: ToteItem.states[:ADDED]).count
+    num_authorized_tote_items_after = ToteItem.where(state: ToteItem.states[:AUTHORIZED]).count
 
     assert num_added_tote_items_after < num_added_tote_items_before
     assert num_authorized_tote_items_after > num_authorized_tote_items_before

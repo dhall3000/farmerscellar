@@ -45,7 +45,7 @@ class AuthorizationsController < ApplicationController
       if @authorization_succeeded && @authorization.checkouts.last.tote_items.any?        
         flash.now[:success] = "Payment authorized!"
         @successfully_authorized_tote_items = current_user_current_unauthorized_tote_items.to_a
-        @authorization.checkouts.last.tote_items.where(status: ToteItem.states[:ADDED]).update_all(status: ToteItem.states[:AUTHORIZED])        
+        @authorization.checkouts.last.tote_items.where(state: ToteItem.states[:ADDED]).update_all(state: ToteItem.states[:AUTHORIZED])        
       else
         flash.now[:danger] = "Payment not authorized."
       end

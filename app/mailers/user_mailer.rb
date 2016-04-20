@@ -77,7 +77,7 @@ class UserMailer < ApplicationMailer
 
       tote_items.each do |tote_item|      
         
-        if tote_item.status == ToteItem.states[:PURCHASED]        
+        if tote_item.state == ToteItem.states[:PURCHASED]        
           purchase_total = (purchase_total + get_gross_item(tote_item)).round(2)
         end
 

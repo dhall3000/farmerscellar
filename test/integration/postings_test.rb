@@ -41,7 +41,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
     posting = Posting.where(price: price).last
 
     #add a toteitem to this posting. this is necessary or the rake helper won't transition this posting to committed
-    posting.tote_items.create(quantity: 2, price: price, status: ToteItem.states[:AUTHORIZED], user: users(:c1))
+    posting.tote_items.create(quantity: 2, price: price, state: ToteItem.states[:AUTHORIZED], user: users(:c1))
 
     last_minute = posting.commitment_zone_start - 10.minutes
     travel_to last_minute

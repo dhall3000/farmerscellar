@@ -32,7 +32,7 @@ class Posting < ActiveRecord::Base
 
   def total_quantity_authorized_or_committed
     
-    authorized_or_committed_tote_items = tote_items.where("status = ? or status = ?", ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED])
+    authorized_or_committed_tote_items = tote_items.where("state = ? or state = ?", ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED])
 
     unit_count = 0
 
@@ -46,7 +46,7 @@ class Posting < ActiveRecord::Base
 
   def total_quantity_ordered
     #{AUTHORIZED: 1, COMMITTED: 2, FILLPENDING: 3, FILLED: 4, PURCHASEPENDING: 7, PURCHASED: 8, PURCHASEFAILED: 9}    
-    ordered_tote_items = tote_items.where("status = ? or status = ? or status = ? or status = ? or status = ? or status = ? or status = ?",
+    ordered_tote_items = tote_items.where("state = ? or state = ? or state = ? or state = ? or state = ? or state = ? or state = ?",
       ToteItem.states[:AUTHORIZED],
       ToteItem.states[:COMMITTED],
       ToteItem.states[:FILLPENDING],
