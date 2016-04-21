@@ -47,10 +47,11 @@ class PostingsControllerTest < ActionController::TestCase
     #1,2,3,4,5,6,7 = 28
     #then recieve fill quantity 30 from producer so that all items get filled 
     #and verify quantity 2 remaining
+    fill(30)
   end
 
   test "should handle zero quantity received" do
-    
+
   end
 
   def fill(quantity)
@@ -72,19 +73,32 @@ class PostingsControllerTest < ActionController::TestCase
     #verify all tote items got filled
     filled_quantity = posting.tote_items.where(state: ToteItem.states[:FILLED]).sum(:quantity)
     not_filled_quantity = posting.tote_items.where(state: ToteItem.states[:NOTFILLED]).sum(:quantity)
+    fill_report = assigns(:fill_report)
+
     if quantity == 8
       #if we were given quantity 8 by the producer, our first three tote items are for quantities 1,2 & 3
       #which is a total of 6. the 4th toteitem has quantity of 4 so we don't have enough to fill it so
       #we're all done filling at 6
       assert_equal 6, filled_quantity
       assert_equal 22, not_filled_quantity
+      assert_equal 2, fill_report[:quantity_remaining]
+      assert_equal 22, fill_report[:not_filled_quantity]
       #verify purchasereceivables got created appropriately? there should be 1 PR for each filled tote item
       assert_equal 3, PurchaseReceivable.count
-    else
+    elsif quantity == 30      
       assert_equal committed_quantity, filled_quantity
       assert_equal 0, not_filled_quantity
+      assert_equal 2, fill_report[:quantity_remaining]
+      assert_equal 0, fill_report[:not_filled_quantity]
       #verify purchasereceivables got created appropriately? there should be 1 PR for each filled tote item
-      assert_equal 7, PurchaseReceivable.count
+      assert_equal 7, PurchaseReceivable.count      
+    else quantity == 28
+      assert_equal committed_quantity, filled_quantity
+      assert_equal 0, not_filled_quantity
+      assert_equal 0, fill_report[:quantity_remaining]
+      assert_equal 0, fill_report[:not_filled_quantity]
+      #verify purchasereceivables got created appropriately? there should be 1 PR for each filled tote item
+      assert_equal 7, PurchaseReceivable.count      
     end            
 
   end

@@ -26,7 +26,7 @@ class Posting < ActiveRecord::Base
     tote_item = ToteItem.dequeue2(self.id)
 
     #first fill all the toteitems we can with the quantity provided
-    #fill in FIFO order 
+    #fill in FIFO order    
     while tote_item && quantity_remaining >= tote_item.quantity
       tote_item.transition(:tote_item_filled)
       quantity_remaining = quantity_remaining - tote_item.quantity
@@ -34,10 +34,14 @@ class Posting < ActiveRecord::Base
     end
 
     #now mark all the rest of the toteitems as NOTFILLED
+    not_filled_quantity = 0
     tote_items_not_filled = ToteItem.where(posting_id: self.id).where("state = ? OR state = ?", ToteItem.states[:COMMITTED], ToteItem.states[:FILLPENDING])
     tote_items_not_filled.each do |not_filled_tote_item|
+      not_filled_quantity = not_filled_quantity + not_filled_tote_item.quantity
       not_filled_tote_item.transition(:not_enough_product)
     end
+
+    return {quantity_remaining: quantity_remaining, not_filled_quantity: not_filled_quantity}
 
   end
 

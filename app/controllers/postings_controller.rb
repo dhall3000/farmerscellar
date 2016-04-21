@@ -109,7 +109,7 @@ class PostingsController < ApplicationController
     if !params[:posting_id].nil? && !params[:quantity].nil? && params[:quantity].to_i > 0
       @posting = Posting.find_by(id: params[:posting_id].to_i)
       if @posting
-        @posting.fill(params[:quantity].to_i)
+        @fill_report = @posting.fill(params[:quantity].to_i)
       else
         #put flash danger here
       end
