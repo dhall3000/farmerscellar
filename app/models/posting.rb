@@ -20,6 +20,27 @@ class Posting < ActiveRecord::Base
   validate :delivery_date_not_sunday, :delivery_date_must_be_after_today, :commitment_zone_start_must_be_before_delivery_date
   validates_presence_of :user, :product, :unit_kind, :unit_category
 
+  def fill(quantity)
+
+    quantity_remaining = quantity
+    tote_item = ToteItem.dequeue(self.id)
+
+    #first fill all the toteitems we can with the quantity provided
+    #fill in FIFO order 
+    while tote_item && quantity_remaining >= tote_item.quantity
+      tote_item.transition(:tote_item_filled)
+      quantity_remaining = quantity_remaining - tote_item.quantity
+      tote_item = ToteItem.dequeue(self.id)
+    end
+
+    #now mark all the rest of the toteitems as NOTFILLED
+    tote_items_not_filled = ToteItem.where(posting_id: self.id).where("state = ? OR state = ?", ToteItem.states[:COMMITTED], ToteItem.states[:FILLPENDING])
+    tote_items_not_filled.each do |not_filled_tote_item|
+      not_filled_tote_item.transition(:not_enough_product)
+    end
+
+  end
+
   def self.product_name_from_posting_id(id)
   	posting = Posting.find(id)
   	if posting != nil

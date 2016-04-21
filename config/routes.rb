@@ -12,6 +12,7 @@ Rails.application.routes.draw do
   delete 'logout' => 'sessions#destroy'
   get 'tote_items/next' => 'tote_items#next'
   post 'tote_items/next' => 'tote_items#next'
+  post 'postings/fill' => 'postings#fill'
   get 'bulk_payments/test_masspay' => 'bulk_payments#test_masspay'
   post 'bulk_payments/test_masspay' => 'bulk_payments#test_masspay'
   post 'postings/no_more_product' => 'postings#no_more_product'

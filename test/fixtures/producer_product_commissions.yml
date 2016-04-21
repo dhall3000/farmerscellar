@@ -1,5 +1,10 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
+f5apples:
+  product: apples
+  commission: 0.05
+  user: f5
+
 #f1.producer_product_commissions.create(product: apples, commission: 0.05)
 f1apples:
   product: apples

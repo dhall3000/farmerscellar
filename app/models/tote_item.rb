@@ -39,17 +39,6 @@ class ToteItem < ActiveRecord::Base
     self.state = ToteItem.states[:ADDED]
   end
 
-  def self.state(id, newstate)
-
-  	ti = ToteItem.find_by(id: id)
-  	if ti != nil
-  	  if ti.state == states[:FILLPENDING] && newstate == states[:FILLED]
-  	  	#this indeed is a legal state transition
-  	  	ti.update_attribute(:state, newstate)
-  	  end
-  	end  	
-  end
-
   def transition(input)
     
     new_state = state

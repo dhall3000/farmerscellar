@@ -18,6 +18,18 @@
 <% friday_after_base_monday = wednesday_after_base_monday + 2.days %>
 <% monday_after_base_monday = base_monday + 7.days %>
 
+postingf5apples:
+  delivery_date: <%= delivery_date %>
+  commitment_zone_start: <%= delivery_date - 2.days %>  
+  product: apples
+  quantity_available: 1000
+  price: 4.29
+  user: f5
+  unit_category: weight
+  unit_kind: pound
+  description: crisp, crunchy organic apples. you'll love them.
+  live: true
+
 p_recurrence_off:
   delivery_date: <%= monday_after_base_monday + 7.days %>
   commitment_zone_start: <%= monday_after_base_monday + 5.days %>

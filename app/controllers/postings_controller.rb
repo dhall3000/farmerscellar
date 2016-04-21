@@ -1,8 +1,8 @@
 class PostingsController < ApplicationController
   before_action :logged_in_user
   before_action :redirect_to_root_if_not_producer, only: [:new, :create, :edit, :update]
-  before_action :redirect_to_root_if_user_not_admin, only: [:no_more_product]
-
+  before_action :redirect_to_root_if_user_not_admin, only: [:no_more_product, :fill]
+  
   def new  	
 
     if params[:posting_id].nil?
@@ -99,6 +99,24 @@ class PostingsController < ApplicationController
 
   def show
     @posting = Posting.find(params[:id])
+  end
+
+  def fill
+
+#debugger    
+
+    #get the amount to fill
+    if !params[:posting_id].nil? && !params[:quantity].nil? && params[:quantity].to_i > 0
+      posting = Posting.find_by(id: params[:posting_id].to_i)
+      if posting
+        posting.fill(params[:quantity].to_i)
+      else
+        #put flash danger here
+      end
+    end
+    #loop on toteitem.dequeue until out of quantity
+    #call no_more_product
+
   end
 
   def no_more_product

@@ -1,5 +1,127 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
+f5:
+  name: f5
+  email: f5@f.com
+  password_digest: <%= User.digest('dogdog') %>
+  account_type: 1
+  activated: true
+  activated_at: Time.zone.now
+  description: producers of dog food
+  address: 9876 Yipsam Rd
+  city: Gnarly
+  state: Washington
+  zip: 98119
+  phone: 206-150-6579
+  website: www.f5.com
+  agreement: 1
+  farmer_approval: t
+  farm_name: F5 FARM
+
+c9:
+  name: c9
+  email: c9@c.com
+  password_digest: <%= User.digest('dogdog') %>
+  account_type: 0
+  activated: true
+  activated_at: Time.zone.now
+  address: 4215 21st St. SW
+  city: Redmond
+  state: Washington
+  zip: 98008
+  phone: 206-564-6579
+
+c10:
+  name: c10
+  email: c10@c.com
+  password_digest: <%= User.digest('dogdog') %>
+  account_type: 0
+  activated: true
+  activated_at: Time.zone.now
+  address: 4215 21st St. SW
+  city: Redmond
+  state: Washington
+  zip: 98008
+  phone: 206-564-6579  
+
+c11:
+  name: c11
+  email: c11@c.com
+  password_digest: <%= User.digest('dogdog') %>
+  account_type: 0
+  activated: true
+  activated_at: Time.zone.now
+  address: 4215 21st St. SW
+  city: Redmond
+  state: Washington
+  zip: 98008
+  phone: 206-564-6579
+
+c12:
+  name: c12
+  email: c12@c.com
+  password_digest: <%= User.digest('dogdog') %>
+  account_type: 0
+  activated: true
+  activated_at: Time.zone.now
+  address: 4215 21st St. SW
+  city: Redmond
+  state: Washington
+  zip: 98008
+  phone: 206-564-6579
+
+c13:
+  name: c13
+  email: c13@c.com
+  password_digest: <%= User.digest('dogdog') %>
+  account_type: 0
+  activated: true
+  activated_at: Time.zone.now
+  address: 4215 21st St. SW
+  city: Redmond
+  state: Washington
+  zip: 98008
+  phone: 206-564-6579
+
+c14:
+  name: c14
+  email: c14@c.com
+  password_digest: <%= User.digest('dogdog') %>
+  account_type: 0
+  activated: true
+  activated_at: Time.zone.now
+  address: 4215 21st St. SW
+  city: Redmond
+  state: Washington
+  zip: 98008
+  phone: 206-564-6579
+
+c15:
+  name: c15
+  email: c15@c.com
+  password_digest: <%= User.digest('dogdog') %>
+  account_type: 0
+  activated: true
+  activated_at: Time.zone.now
+  address: 4215 21st St. SW
+  city: Redmond
+  state: Washington
+  zip: 98008
+  phone: 206-564-6579
+
+c16:
+  name: c16
+  email: c16@c.com
+  password_digest: <%= User.digest('dogdog') %>
+  account_type: 0
+  activated: true
+  activated_at: Time.zone.now
+  address: 4215 21st St. SW
+  city: Redmond
+  state: Washington
+  zip: 98008
+  phone: 206-564-6579
+
 dropsite1:
   name: d1
   email: da@d.com

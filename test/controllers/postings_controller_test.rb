@@ -8,9 +8,59 @@ class PostingsControllerTest < ActionController::TestCase
     @admin = users(:a1)
   	@posting = postings(:postingf1apples)
     @posting2 = postings(:postingf2milk)
+
+    #this posting is for the #fill functionality. the tote item states need to be in the following states
+    #but if i initialize them to this in the yml file it breaks other tests so just setting the values here
+    #so i don't have to fix lots of other tests
+    posting = postings(:postingf5apples)
+    posting.tote_items.update_all(state: ToteItem.states[:COMMITTED])
+    ti = posting.tote_items.find_by(user_id: users(:c16))
+    ti.update(state: ToteItem.states[:ADDED])
+
   end
 
 #NEW TESTS
+
+  test "should fill all tote items in this posting" do
+    log_in_as(@admin)
+
+    posting = postings(:postingf5apples)
+    committed_quantity = posting.tote_items.where(state: ToteItem.states[:COMMITTED]).sum(:quantity)
+    assert_equal 28, committed_quantity
+    assert_equal 0, PurchaseReceivable.count
+
+    post :fill, posting_id: posting.id, quantity: committed_quantity
+    #verify success
+    assert :success
+    #verify appropriate template displayed
+    assert_template 'postings/fill'
+    #TODO: verify proper contents of template displayed
+    #verify all tote items got filled
+    filled_quantity = posting.tote_items.where(state: ToteItem.states[:FILLED]).sum(:quantity)
+    assert_equal committed_quantity, filled_quantity
+    not_filled_quantity = posting.tote_items.where(state: ToteItem.states[:NOTFILLED]).sum(:quantity)
+    assert_equal 0, not_filled_quantity
+    #verify purchasereceivables got created appropriately? there should be 1 PR for each filled tote item
+    assert_equal 7, PurchaseReceivable.count
+
+  end
+
+  test "should fill only up to the amount of quantity that we received from producer" do
+    #make this test to have COMMITTED toteitems of quantities like:
+    #1,2,3,4,5,6,7 = 28
+    #then recieve fill quantity 8 from producer so that the first 3 toteitems get fully filled
+    #but the 4th toteitem (quantity 4) doesn't get filled at all and there is quantity 2 left over
+  end
+
+  test "should fill all tote items and have quantity left over" do
+    #make this test to have COMMITTED toteitems of quantities like:
+    #1,2,3,4,5,6,7 = 28
+    #then recieve fill quantity 30 from producer so that all items get filled 
+    #and verify quantity 2 remaining
+  end
+
+  test "should handle zero quantity received" do
+  end
 
   test "should get new for farmer and admin" do
     log_in_as(@farmer)
