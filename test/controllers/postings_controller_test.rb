@@ -14,7 +14,16 @@ class PostingsControllerTest < ActionController::TestCase
     #so i don't have to fix lots of other tests
     posting = postings(:postingf5apples)
     posting.tote_items.update_all(state: ToteItem.states[:COMMITTED])
-    ti = posting.tote_items.find_by(user_id: users(:c16))
+
+    #now in order for these tests to come out right i have to set the quantities according to the id number progression
+    i = 1
+    posting.tote_items.order(:id).each do |tote_item|
+      tote_item.update(quantity: i)      
+      i = i + 1      
+      #puts "#{tote_item.id.to_s}, quantity=#{tote_item.quantity.to_s}"
+    end
+
+    ti = posting.tote_items.find_by(quantity: 8)
     ti.update(state: ToteItem.states[:ADDED])
 
   end
@@ -22,27 +31,7 @@ class PostingsControllerTest < ActionController::TestCase
 #NEW TESTS
 
   test "should fill all tote items in this posting" do
-    log_in_as(@admin)
-
-    posting = postings(:postingf5apples)
-    committed_quantity = posting.tote_items.where(state: ToteItem.states[:COMMITTED]).sum(:quantity)
-    assert_equal 28, committed_quantity
-    assert_equal 0, PurchaseReceivable.count
-
-    post :fill, posting_id: posting.id, quantity: committed_quantity
-    #verify success
-    assert :success
-    #verify appropriate template displayed
-    assert_template 'postings/fill'
-    #TODO: verify proper contents of template displayed
-    #verify all tote items got filled
-    filled_quantity = posting.tote_items.where(state: ToteItem.states[:FILLED]).sum(:quantity)
-    assert_equal committed_quantity, filled_quantity
-    not_filled_quantity = posting.tote_items.where(state: ToteItem.states[:NOTFILLED]).sum(:quantity)
-    assert_equal 0, not_filled_quantity
-    #verify purchasereceivables got created appropriately? there should be 1 PR for each filled tote item
-    assert_equal 7, PurchaseReceivable.count
-
+    fill(28)    
   end
 
   test "should fill only up to the amount of quantity that we received from producer" do
@@ -50,6 +39,7 @@ class PostingsControllerTest < ActionController::TestCase
     #1,2,3,4,5,6,7 = 28
     #then recieve fill quantity 8 from producer so that the first 3 toteitems get fully filled
     #but the 4th toteitem (quantity 4) doesn't get filled at all and there is quantity 2 left over
+    fill(8)
   end
 
   test "should fill all tote items and have quantity left over" do
@@ -60,6 +50,43 @@ class PostingsControllerTest < ActionController::TestCase
   end
 
   test "should handle zero quantity received" do
+    
+  end
+
+  def fill(quantity)
+    log_in_as(@admin)
+
+    posting = postings(:postingf5apples)
+    committed_quantity = posting.tote_items.where(state: ToteItem.states[:COMMITTED]).sum(:quantity)
+
+    assert_equal 28, committed_quantity
+    assert_equal 0, PurchaseReceivable.count
+
+    post :fill, posting_id: posting.id, quantity: quantity
+    #verify success
+    assert :success
+    posting = assigns(:posting)
+    #verify appropriate template displayed
+    assert_template 'postings/fill'
+    #TODO: verify proper contents of template displayed
+    #verify all tote items got filled
+    filled_quantity = posting.tote_items.where(state: ToteItem.states[:FILLED]).sum(:quantity)
+    not_filled_quantity = posting.tote_items.where(state: ToteItem.states[:NOTFILLED]).sum(:quantity)
+    if quantity == 8
+      #if we were given quantity 8 by the producer, our first three tote items are for quantities 1,2 & 3
+      #which is a total of 6. the 4th toteitem has quantity of 4 so we don't have enough to fill it so
+      #we're all done filling at 6
+      assert_equal 6, filled_quantity
+      assert_equal 22, not_filled_quantity
+      #verify purchasereceivables got created appropriately? there should be 1 PR for each filled tote item
+      assert_equal 3, PurchaseReceivable.count
+    else
+      assert_equal committed_quantity, filled_quantity
+      assert_equal 0, not_filled_quantity
+      #verify purchasereceivables got created appropriately? there should be 1 PR for each filled tote item
+      assert_equal 7, PurchaseReceivable.count
+    end            
+
   end
 
   test "should get new for farmer and admin" do

@@ -23,14 +23,14 @@ class Posting < ActiveRecord::Base
   def fill(quantity)
 
     quantity_remaining = quantity
-    tote_item = ToteItem.dequeue(self.id)
+    tote_item = ToteItem.dequeue2(self.id)
 
     #first fill all the toteitems we can with the quantity provided
     #fill in FIFO order 
     while tote_item && quantity_remaining >= tote_item.quantity
       tote_item.transition(:tote_item_filled)
       quantity_remaining = quantity_remaining - tote_item.quantity
-      tote_item = ToteItem.dequeue(self.id)
+      tote_item = ToteItem.dequeue2(self.id)
     end
 
     #now mark all the rest of the toteitems as NOTFILLED

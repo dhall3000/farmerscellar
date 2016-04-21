@@ -123,16 +123,21 @@ class ToteItem < ActiveRecord::Base
 
   end
 
+  def self.dequeue2(posting_id)
+  	return ToteItem.where(state: states[:COMMITTED], posting_id: posting_id).first
+  end
+
   def self.dequeue(posting_id)
-  	ti = ToteItem.where(state: states[:COMMITTED], posting_id: posting_id).first
-  	
+    ti = ToteItem.where(state: states[:COMMITTED], posting_id: posting_id).first
+    
     if ti != nil
-  	  ti.update_attribute(:state, states[:FILLPENDING])
+      ti.update_attribute(:state, states[:FILLPENDING])
     end
 
-  	ti
+    ti
 
   end
+
 
   def deauthorize
     if state?(:AUTHORIZED)
