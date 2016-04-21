@@ -50,6 +50,7 @@ class ToteItemsController < ApplicationController
 
     @account_on_hold = account_on_hold
     @tote_item = ToteItem.new
+    @tote_item.set_initial_state
 
     if !posting.posting_recurrence.nil? && posting.posting_recurrence.subscribable?
       @subscription = Subscription.new(frequency: 0, on: true, user_id: current_user.id, posting_recurrence_id: posting.posting_recurrence.id)
@@ -67,6 +68,7 @@ class ToteItemsController < ApplicationController
     end
 
     @tote_item = ToteItem.new(tote_item_params)
+    @tote_item.set_initial_state
 
     if !correct_user_create(@tote_item)
       redirect_to(root_url)
@@ -127,6 +129,7 @@ class ToteItemsController < ApplicationController
     if params.has_key?("test")
 
       @tote_item = ToteItem.new
+      @tote_item.set_initial_state
       @tote_item.user_id = 17
       @tote_item.quantity = 100
 
@@ -182,12 +185,18 @@ class ToteItemsController < ApplicationController
     if ti == nil
       flash[:danger] = "Shopping tote item not deleted."
     else
-      if ti.state == ToteItem.states[:ADDED] || ti.state == ToteItem.states[:AUTHORIZED]
-        ti.update(state: ToteItem.states[:REMOVED])
-        flash[:success] = "Shopping tote item removed."
-      else
+
+      if ti.state?(:COMMITTED)
         flash[:danger] = "This item is not removable because it is already 'committed'. Please see 'Commitment Zone' on the 'How it Works' page. Shopping tote item not deleted."
+      else
+        ti.transition(:customer_removed)        
+        if ti.state?(:REMOVED)
+          flash[:success] = "Shopping tote item removed."
+        else
+          flash[:danger] = "This item could not be removed. Please contact Farmer's Cellar for help."
+        end
       end
+            
     end
     
     redirect_to tote_items_path

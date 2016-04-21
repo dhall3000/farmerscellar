@@ -35,6 +35,10 @@ class ToteItem < ActiveRecord::Base
   validates :state, inclusion: { in: ToteItem.states.values }
   validates :state, numericality: {only_integer: true}
 
+  def set_initial_state
+    self.state = ToteItem.states[:ADDED]
+  end
+
   def self.state(id, newstate)
 
   	ti = ToteItem.find_by(id: id)

@@ -2,14 +2,9 @@ class PickupsController < ApplicationController
 	before_action :redirect_to_root_if_user_not_dropsite_user
 
   def new
-  	@is_dropsite_user = true
-  	#first step is to blast the session in case we're getting here due to someone clicking "all done"
-  	@pickup_code = PickupCode.new
   end
 
   def create
-
-  	@is_dropsite_user = true
 
   	entered_code = params[:pickup_code]
   	@pickup_code = PickupCode.new(code: entered_code, user: current_user)
@@ -27,6 +22,7 @@ class PickupsController < ApplicationController
 
   			#now create a new pickup to represent the current pickup  				 				
  				@user.pickups.create
+        flash.now[:success] = "Thanks for checking out!"
   		end
   	else
   		flash.now[:danger] = "Invalid code entry"

@@ -40,15 +40,15 @@ class Subscription < ActiveRecord::Base
   	#if there are no tote items in this series yet or if the last tote item delivery date is behind the
   	#current posting, create a new tote item
     if (current_posting.delivery_date == next_delivery_date) && (!tote_items.any? || (tote_items.last.posting.delivery_date < next_delivery_date))
-  		#if there is no authorization for this subscription or the authorization is not active, add the
-  		#tote item in the ADDED state. otherwise, if everything's good to go and we're all authorized, add in state AUTHORIZED
-  		if authorized?
-  			state = ToteItem.states[:AUTHORIZED]
-  		else
-  			state = ToteItem.states[:ADDED]
-  		end
-  		
-  		tote_item = ToteItem.new(quantity: quantity, price: current_posting.price, state: state, posting_id: current_posting.id, user_id: user.id, subscription_id: id)
+  		  		
+  		tote_item = ToteItem.new(quantity: quantity, price: current_posting.price, posting_id: current_posting.id, user_id: user.id, subscription_id: id)
+      tote_item.set_initial_state
+
+      #if there is no authorization for this subscription or the authorization is not active, add the
+      #tote item in the ADDED state. otherwise, if everything's good to go and we're all authorized, add in state AUTHORIZED
+      if authorized?
+        tote_item.transition(:subscription_authorized)
+      end
 
   		if !rtauthorization.nil?
 

@@ -30,10 +30,14 @@ class UserTest < ActiveSupport::TestCase
     #verify items get returned
     assert_equal now_count, c1.tote_items_to_pickup.count
     #add a pickup object to database
-    Pickup.create(user: c1)
+    c1.pickups.create
     #move 1 day ahead
     travel_to 1.day.from_now
     #verify items returned is zero
+    if c1.tote_items_to_pickup.count > 0
+      c1.pickups.create      
+    end
+
     assert_equal 0, c1.tote_items_to_pickup.count
     
     #update a couple toteitems to be PURCHASED
