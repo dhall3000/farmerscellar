@@ -51,7 +51,7 @@ class PostingsControllerTest < ActionController::TestCase
   end
 
   test "should handle zero quantity received" do
-
+    fill(0)
   end
 
   def fill(quantity)
@@ -92,13 +92,20 @@ class PostingsControllerTest < ActionController::TestCase
       assert_equal 0, fill_report[:not_filled_quantity]
       #verify purchasereceivables got created appropriately? there should be 1 PR for each filled tote item
       assert_equal 7, PurchaseReceivable.count      
-    else quantity == 28
+    elsif quantity == 28
       assert_equal committed_quantity, filled_quantity
       assert_equal 0, not_filled_quantity
       assert_equal 0, fill_report[:quantity_remaining]
       assert_equal 0, fill_report[:not_filled_quantity]
       #verify purchasereceivables got created appropriately? there should be 1 PR for each filled tote item
       assert_equal 7, PurchaseReceivable.count      
+    elsif quantity == 0
+      assert_equal 0, filled_quantity
+      assert_equal committed_quantity, not_filled_quantity
+      assert_equal 0, fill_report[:quantity_remaining]
+      assert_equal committed_quantity, fill_report[:not_filled_quantity]
+      #verify purchasereceivables got created appropriately? there should be 1 PR for each filled tote item
+      assert_equal 0, PurchaseReceivable.count      
     end            
 
   end

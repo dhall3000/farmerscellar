@@ -103,10 +103,8 @@ class PostingsController < ApplicationController
 
   def fill
 
-#debugger    
-
     #get the amount to fill
-    if !params[:posting_id].nil? && !params[:quantity].nil? && params[:quantity].to_i > 0
+    if !params[:posting_id].nil? && !params[:quantity].nil? && params[:quantity].to_i >= 0
       @posting = Posting.find_by(id: params[:posting_id].to_i)
       if @posting
         @fill_report = @posting.fill(params[:quantity].to_i)
@@ -114,8 +112,6 @@ class PostingsController < ApplicationController
         #put flash danger here
       end
     end
-    #loop on toteitem.dequeue until out of quantity
-    #call no_more_product
 
   end
 
