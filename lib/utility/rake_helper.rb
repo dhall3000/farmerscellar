@@ -124,7 +124,7 @@ class RakeHelper
 		    end
 
 		    if Time.zone.now >= tote_item.posting.commitment_zone_start
-				  tote_item.update(state: ToteItem.states[:COMMITTED])
+				  tote_item.transition(:commitment_zone_started)
 				  tote_item_ids << tote_item.id
 				  posting_ids << tote_item.posting.id
 		    end

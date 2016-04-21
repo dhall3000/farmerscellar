@@ -33,7 +33,8 @@ class RtauthorizationTest < ActiveSupport::TestCase
 	test "should not deauthorize toteitems" do
 
 		#move the ti state to committed
-		@tote_item.update(state: ToteItem.states[:COMMITTED])
+		@tote_item.transition(:customer_authorized)
+		@tote_item.transition(:commitment_zone_started)
 		#verify ti state is committed
 		assert @tote_item.state?(:COMMITTED)		
 		#call rtauth.deauth

@@ -38,7 +38,9 @@ class BulkBuyer < Authorizer
     num_authorized = ToteItem.where(state: ToteItem.states[:AUTHORIZED]).count
 
     #now change all the tote_items from AUTHORIZED to COMMITTED
-    ToteItem.where(state: ToteItem.states[:AUTHORIZED]).update_all(state: ToteItem.states[:COMMITTED])
+    ToteItem.where(state: ToteItem.states[:AUTHORIZED]).each do |tote_item|
+      tote_item.transition(:commitment_zone_started)
+    end
 
     num_committed = ToteItem.where(state: ToteItem.states[:COMMITTED]).count
 
