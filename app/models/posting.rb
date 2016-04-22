@@ -25,6 +25,8 @@ class Posting < ActiveRecord::Base
     quantity_remaining = quantity
     quantity_filled = 0
     quantity_not_filled = 0
+    tote_items_filled = []
+    tote_items_not_filled = []
 
     #first fill all the toteitems we can with the quantity provided
     #fill in FIFO order    
@@ -40,16 +42,24 @@ class Posting < ActiveRecord::Base
         quantity_remaining = quantity_remaining - tote_item.quantity
         quantity_filled = quantity_filled + tote_item.quantity        
         tote_item.transition(:tote_item_filled)
+        tote_items_filled << tote_item
       else
         quantity_not_filled = quantity_not_filled + tote_item.quantity
-        tote_item.transition(:not_enough_product)        
+        tote_item.transition(:not_enough_product)                
+        tote_items_not_filled << tote_item
       end
       
       tote_item = ToteItem.dequeue2(self.id)
 
     end
 
-    return {quantity_filled: quantity_filled, quantity_not_filled: quantity_not_filled, quantity_remaining: quantity_remaining}
+    return {
+      quantity_filled: quantity_filled,
+      quantity_not_filled: quantity_not_filled,
+      quantity_remaining: quantity_remaining,
+      tote_items_filled: tote_items_filled,
+      tote_items_not_filled: tote_items_not_filled
+    }
 
   end
 
