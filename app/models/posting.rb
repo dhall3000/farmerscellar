@@ -23,16 +23,25 @@ class Posting < ActiveRecord::Base
   def fill(quantity)
 
     quantity_remaining = quantity
-    tote_item = ToteItem.dequeue2(self.id)
+    quantity_filled = 0
+    quantity_not_filled = 0
 
     #first fill all the toteitems we can with the quantity provided
     #fill in FIFO order    
+
+    #we only fill a tote item completely or not at all. so as we're running through the queue if we come across
+    #a tote item we can't fill we shouldn't stop there. we should continue all the way through to the end of the
+    #queue as long as we have 'quantity_remaining' looking for a tote item of smaller quantity that we can
+    #completely fill
+    tote_item = ToteItem.dequeue2(self.id)
     while tote_item
 
       if quantity_remaining >= tote_item.quantity
-        tote_item.transition(:tote_item_filled)
         quantity_remaining = quantity_remaining - tote_item.quantity
+        quantity_filled = quantity_filled + tote_item.quantity        
+        tote_item.transition(:tote_item_filled)
       else
+        quantity_not_filled = quantity_not_filled + tote_item.quantity
         tote_item.transition(:not_enough_product)        
       end
       
@@ -40,15 +49,7 @@ class Posting < ActiveRecord::Base
 
     end
 
-    #now mark all the rest of the toteitems as NOTFILLED
-    not_filled_quantity = 0
-    tote_items_not_filled = ToteItem.where(posting_id: self.id).where(state: ToteItem.states[:NOTFILLED])
-    tote_items_not_filled.each do |not_filled_tote_item|
-      not_filled_quantity = not_filled_quantity + not_filled_tote_item.quantity
-      not_filled_tote_item.transition(:not_enough_product)
-    end
-
-    return {quantity_remaining: quantity_remaining, not_filled_quantity: not_filled_quantity}
+    return {quantity_filled: quantity_filled, quantity_not_filled: quantity_not_filled, quantity_remaining: quantity_remaining}
 
   end
 
