@@ -54,13 +54,38 @@ class PostingsControllerTest < ActionController::TestCase
     fill(0)
   end
 
+  test "should skip larger quantity tote items then fill a smaller quantity item" do
+    #we only fill a tote item completely or not at all. so as we're running through the queue if we come across
+    #a tote item we can't fill we shouldn't stop there. we should continue all the way through to the end of the
+    #queue as long as we have 'quantity_remaining' looking for a tote item of smaller quantity that we can
+    #completely fill. test that this works as expected.
+
+    #make this test to have COMMITTED toteitems of quantities like:
+    #1,2,3,4,2,6,7 = 25
+    #then recieve fill quantity 9 from producer so that items 1,2 & 3 get filled, then 5 is skipped, 2 is filled with 1 leftover
+    
+    ######################setup######################
+    posting = postings(:postingf5apples)
+    ti = posting.tote_items.find_by(quantity: 5)
+    ti.update(quantity: 2)
+    ######################end setup######################
+
+    fill(9)
+
+  end
+
   def fill(quantity)
     log_in_as(@admin)
 
     posting = postings(:postingf5apples)
     committed_quantity = posting.tote_items.where(state: ToteItem.states[:COMMITTED]).sum(:quantity)
 
-    assert_equal 28, committed_quantity
+    if quantity == 9
+      assert_equal 25, committed_quantity
+    else
+      assert_equal 28, committed_quantity
+    end
+    
     assert_equal 0, PurchaseReceivable.count
 
     post :fill, posting_id: posting.id, quantity: quantity
@@ -106,6 +131,13 @@ class PostingsControllerTest < ActionController::TestCase
       assert_equal committed_quantity, fill_report[:not_filled_quantity]
       #verify purchasereceivables got created appropriately? there should be 1 PR for each filled tote item
       assert_equal 0, PurchaseReceivable.count      
+    elsif quantity == 9
+      assert_equal 8, filled_quantity
+      assert_equal 17, not_filled_quantity
+      assert_equal 1, fill_report[:quantity_remaining]
+      assert_equal 17, fill_report[:not_filled_quantity]
+      #verify purchasereceivables got created appropriately? there should be 1 PR for each filled tote item
+      assert_equal 4, PurchaseReceivable.count
     end            
 
   end
