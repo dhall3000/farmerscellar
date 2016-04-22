@@ -88,6 +88,8 @@ class PostingsControllerTest < ActionController::TestCase
     
     assert_equal 0, PurchaseReceivable.count
 
+    travel_to posting.delivery_date + 1
+
     post :fill, posting_id: posting.id, quantity: quantity
     #verify success
     assert :success
@@ -139,6 +141,8 @@ class PostingsControllerTest < ActionController::TestCase
       #verify purchasereceivables got created appropriately? there should be 1 PR for each filled tote item
       assert_equal 4, PurchaseReceivable.count
     end            
+
+    travel_back
 
   end
 
@@ -193,8 +197,8 @@ class PostingsControllerTest < ActionController::TestCase
     #additionally, the admin postings index page should have a table with 'Edit' and 'Go!' columns
     assert_select 'tbody' do
       assert_select 'a[href=?]', edit_posting_path(@posting), {count: 1, text: "Edit"}
-      assert_select 'a[href=?]', tote_items_next_path( tote_item: {posting_id: @posting.id}), {count: 1, text: "Go!"}
-    end
+      assert_select 'form input[type=hidden][value=?]', @posting.id.to_s, {count: 1}
+    end    
 
   end
 

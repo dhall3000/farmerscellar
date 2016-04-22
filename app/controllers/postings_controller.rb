@@ -101,16 +101,21 @@ class PostingsController < ApplicationController
     @posting = Posting.find(params[:id])
   end
 
-  def fill
+  def fill  
 
-    #get the amount to fill
     if !params[:posting_id].nil? && !params[:quantity].nil? && params[:quantity].to_i >= 0
       @posting = Posting.find_by(id: params[:posting_id].to_i)
       if @posting
-        @fill_report = @posting.fill(params[:quantity].to_i)
+        if Time.zone.now >= @posting.delivery_date
+          @fill_report = @posting.fill(params[:quantity].to_i)          
+        else
+          flash.now[:danger] = "The delivery date for this posting is #{@posting.delivery_date}"
+        end
       else
-        #put flash danger here
+        flash.now[:danger] = "No posting was found with posting_id = #{params[:posting_id]}"
       end
+    else
+      flash.now[:danger] = "Something wasn't right. This condition failed: if !params[:posting_id].nil? && !params[:quantity].nil? && params[:quantity].to_i >= 0"
     end
 
   end

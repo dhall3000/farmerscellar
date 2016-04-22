@@ -227,10 +227,10 @@ bunch = count.unit_kinds.create(name: "Bunch")
 
 def next_friday
   i = 1
-  while !(DateTime.now.getutc + i).friday?   
+  while !(Time.zone.now + i.days).friday?   
     i += 1
   end
-  return (DateTime.now.getutc + i).midnight
+  return (Time.zone.now + i.days).midnight
 end
 
 f1.producer_product_commissions.create(product: apples, commission: 0.05)

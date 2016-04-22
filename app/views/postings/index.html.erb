@@ -15,7 +15,7 @@
         <% if current_user.account_type == User.types[:ADMIN] %>
           <th class="text-center">Delivery Date</th>
           <th class="text-center"></th>
-          <th class="text-center">Do delivery</th>
+          <th class="text-center">Fills</th>
         <% end %>
       </tr>
     </thead>
@@ -64,7 +64,13 @@
           <% if current_user.account_type == User.types[:ADMIN] %>
             <td class="text-center"><%= posting.delivery_date.strftime("%a %b %d") %></td>
             <td class="text-center"><%= link_to "Edit", edit_posting_path(posting) %></td>
-            <td class="text-center"><%= link_to "Go!", tote_items_next_path( tote_item: {posting_id: posting.id}) %></td>
+            <td>
+              <%= form_tag postings_fill_path do %>
+                <%= hidden_field_tag :posting_id, posting.id %>
+                <%= number_field_tag :quantity, nil, class: 'input-lg', placeholder: "Enter quantity received..." %>
+                <%= submit_tag "Fill", class: 'btn btn-lg btn-primary', data: { confirm: "You are about to 'fill' this posting. Click 'OK' to continue." } %>                
+              <% end %>              
+            </td>
           <% end %>
 
         </tr>
