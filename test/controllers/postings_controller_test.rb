@@ -146,6 +146,152 @@ class PostingsControllerTest < ActionController::TestCase
 
   end
 
+  test "should fill" do
+    
+    log_in_as(@admin)
+    posting = postings(:postingf5apples)        
+
+    #here is the non-failing "good" case
+    travel_to posting.delivery_date + 1
+    post :fill, posting_id: posting.id, quantity: 28
+    assert :success
+    assert_template 'postings/fill'
+    assert_select 'p', "quantity filled: 28", {count: 1}
+    assert_select 'p', "quantity not filled: 0", {count: 1}
+    assert_select 'p', "quantity remaining: 0", {count: 1}
+    travel_back
+
+  end
+
+  test "should not fill if posting id is nil" do
+
+    log_in_as(@admin)
+    posting = postings(:postingf5apples)        
+
+    #posting_id is nil
+    travel_to posting.delivery_date + 1
+    post :fill, posting_id: nil, quantity: 28
+    assert :success
+    assert_template 'postings/fill'
+    #assert fail message in body is there
+    assert_select 'p', "@fill_report is nil"
+    #assert report info not there
+    assert_select 'p', {text: "quantity filled: 28", count: 0}
+
+    #assert flash is present
+    assert_not flash.now[:danger].empty?
+    assert_equal flash.now[:danger], "Something wasn't right. This condition failed: if !params[:posting_id].nil? && !params[:quantity].nil? && params[:quantity].to_i >= 0"
+    travel_back    
+
+  end
+
+  test "should not fill if quantity is nil" do
+
+    log_in_as(@admin)
+    posting = postings(:postingf5apples)        
+
+    travel_to posting.delivery_date + 1
+    #quantity is nil
+    post :fill, posting_id: posting.id, quantity: nil
+    assert :success
+    assert_template 'postings/fill'
+    #assert fail message in body is there
+    assert_select 'p', "@fill_report is nil"
+    #assert report info not there
+    assert_select 'p', {text: "quantity filled: 28", count: 0}
+    #assert flash is present
+    assert_not flash.now[:danger].empty?
+    assert_equal flash.now[:danger], "Something wasn't right. This condition failed: if !params[:posting_id].nil? && !params[:quantity].nil? && params[:quantity].to_i >= 0"
+    travel_back    
+
+  end
+
+  test "should not fill if quantity non number" do
+    #TODO: we're not going to do this cause it's non obvious how to ensure the fill quantity param is a number
+    return
+
+    log_in_as(@admin)
+    posting = postings(:postingf5apples)        
+    
+    travel_to posting.delivery_date + 1
+    #quantity is not a number
+    post :fill, posting_id: posting.id, quantity: 'abcd'
+    assert :success
+    assert_template 'postings/fill'
+    #assert fail message in body is there
+    assert_select 'p', "@fill_report is nil"
+    #assert report info not there
+    assert_select 'p', {text: "quantity filled: 28", count: 0}
+    #assert flash is present
+    assert_not flash.now[:danger].empty?
+    assert_equal flash.now[:danger], "Something wasn't right. This condition failed: if !params[:posting_id].nil? && !params[:quantity].nil? && params[:quantity].to_i >= 0"
+    travel_back    
+
+  end
+
+  test "should not fill if quantity is negative" do
+
+    log_in_as(@admin)
+    posting = postings(:postingf5apples)        
+    
+    travel_to posting.delivery_date + 1
+    #quantity is negative
+    post :fill, posting_id: posting.id, quantity: -1
+    assert :success
+    assert_template 'postings/fill'
+    #assert fail message in body is there
+    assert_select 'p', "@fill_report is nil"
+    #assert report info not there
+    assert_select 'p', {text: "quantity filled: 28", count: 0}
+    #assert flash is present
+    assert_not flash.now[:danger].empty?
+    assert_equal flash.now[:danger], "Something wasn't right. This condition failed: if !params[:posting_id].nil? && !params[:quantity].nil? && params[:quantity].to_i >= 0"
+    travel_back    
+
+  end
+
+  test "should not fill if posting does not exist" do
+
+    log_in_as(@admin)
+    posting = postings(:postingf5apples)        
+
+    travel_to posting.delivery_date + 1
+    #posting does not exist
+    fake_posting_id = 987654
+    post :fill, posting_id: fake_posting_id, quantity: 28
+    assert :success
+    assert_template 'postings/fill'
+    #assert fail message in body is there
+    assert_select 'p', "@fill_report is nil"
+    #assert report info not there
+    assert_select 'p', {text: "quantity filled: 28", count: 0}
+    #assert flash is present
+    assert_not flash.now[:danger].empty?
+    assert_equal flash.now[:danger], "No posting was found with posting_id = #{fake_posting_id}"
+    travel_back    
+
+  end
+
+  test "should not fill if posting has not been delivered yet" do
+
+    log_in_as(@admin)
+    posting = postings(:postingf5apples)        
+
+    travel_to posting.delivery_date - 1
+    post :fill, posting_id: posting.id, quantity: 28
+    assert :success
+    assert_template 'postings/fill'
+    #assert fail message in body is there
+    assert_select 'p', "@fill_report is nil"
+    #assert report info not there
+    assert_select 'p', {text: "quantity filled: 28", count: 0}
+    #assert flash is present
+    assert_not flash.now[:danger].empty?
+    assert_equal flash.now[:danger], "The delivery date for this posting is #{@posting.delivery_date}"
+    travel_back    
+
+  end
+
   test "should get new for farmer and admin" do
     log_in_as(@farmer)
     get_new_successfully
