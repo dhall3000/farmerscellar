@@ -593,47 +593,6 @@ class PostingsControllerTest < ActionController::TestCase
 
   end
 
-#NO_MORE_PRODUCT TESTS
-  test "should redirect no more product if not admin" do
-
-    post :no_more_product, posting_id: @posting.id
-    assert_redirected_to login_url
-
-    log_in_as @customer
-    post :no_more_product, posting_id: @posting.id
-    assert_redirected_to root_url
-
-    log_in_as @farmer
-    post :no_more_product, posting_id: @posting.id
-    assert_redirected_to root_url
-
-  end
-
-  test "should post no more product" do    
-
-    #set toteitems' state to simulate as if we got partially through filling the orders before
-    #running out of product
-    @posting.tote_items[0].update(state: ToteItem.states[:FILLED])
-    @posting.tote_items[1].update(state: ToteItem.states[:FILLED])
-    @posting.tote_items[2].update(state: ToteItem.states[:FILLPENDING])
-    @posting.tote_items[3].update(state: ToteItem.states[:COMMITTED])
-
-    log_in_as @admin
-    post :no_more_product, posting_id: @posting.id
-    assert :success
-
-    @posting.reload
-
-    #these should continue to be marked as 'FILLED'
-    assert_equal @posting.tote_items[0].state, ToteItem.states[:FILLED]
-    assert_equal @posting.tote_items[1].state, ToteItem.states[:FILLED]
-
-    #and these should have gotten their statees set to 'NOTFILLED'
-    assert_equal @posting.tote_items[2].state, ToteItem.states[:NOTFILLED]
-    assert_equal @posting.tote_items[3].state, ToteItem.states[:NOTFILLED]
-
-  end
-
 #SHOW TESTS
   test "should not get show" do
     get :show, id: @posting.id

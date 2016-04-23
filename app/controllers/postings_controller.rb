@@ -1,7 +1,7 @@
 class PostingsController < ApplicationController
   before_action :logged_in_user
   before_action :redirect_to_root_if_not_producer, only: [:new, :create, :edit, :update]
-  before_action :redirect_to_root_if_user_not_admin, only: [:no_more_product, :fill]
+  before_action :redirect_to_root_if_user_not_admin, only: :fill
   
   def new  	
 
@@ -117,18 +117,6 @@ class PostingsController < ApplicationController
     else
       flash.now[:danger] = "Something wasn't right. This condition failed: if !params[:posting_id].nil? && !params[:quantity].nil? && params[:quantity].to_i >= 0"
     end
-
-  end
-
-  def no_more_product
-
-    #this action gets called by an admin when he runs out of product before he runs out of orders. in this case what needs
-    #to happen is all the outstanding COMMITTED and FILLPENDING orders need to get transitioned to NOTFILLED
-    @tote_items_not_filled = ToteItem.where(posting_id: params[:posting_id]).where("state = ? OR state = ?", ToteItem.states[:COMMITTED], ToteItem.states[:FILLPENDING])    
-    @tote_items_not_filled.update_all(state: ToteItem.states[:NOTFILLED])
-    
-    @tote_items_filled = ToteItem.select(:id).where(posting_id: params[:posting_id], state: ToteItem.states[:FILLED])
-    @tote_items_not_filled = ToteItem.select(:id).where(posting_id: params[:posting_id], state: ToteItem.states[:NOTFILLED])
 
   end
 
