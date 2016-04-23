@@ -9,6 +9,17 @@ class ToteItemTest < ActiveSupport::TestCase
   	@tote_item = tote_items(:c1apple)
   end
 
+  test "should create purchase receivable object" do
+    pr_count = PurchaseReceivable.count
+    @tote_item.update(state: ToteItem.states[:COMMITTED])
+    @tote_item.reload
+    @tote_item.transition(:tote_item_filled)
+    assert_equal pr_count + 1, PurchaseReceivable.count    
+    tote_item_value = (@tote_item.price * @tote_item.quantity).round(2)
+    pr = @tote_item.purchase_receivables.last
+    assert_equal pr.amount, tote_item_value
+  end
+
   #TODO: add more transitions tests
   test "transitions" do
     assert_equal ToteItem.states[:ADDED], @tote_item.state
