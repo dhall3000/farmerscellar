@@ -6,8 +6,8 @@
   <config:config-item-set config:name="ooo:view-settings">
    <config:config-item config:name="VisibleAreaTop" config:type="int">2355</config:config-item>
    <config:config-item config:name="VisibleAreaLeft" config:type="int">-9657</config:config-item>
-   <config:config-item config:name="VisibleAreaWidth" config:type="int">40825</config:config-item>
-   <config:config-item config:name="VisibleAreaHeight" config:type="int">23178</config:config-item>
+   <config:config-item config:name="VisibleAreaWidth" config:type="int">40824</config:config-item>
+   <config:config-item config:name="VisibleAreaHeight" config:type="int">23177</config:config-item>
    <config:config-item-map-indexed config:name="Views">
     <config:config-item-map-entry>
      <config:config-item config:name="ViewId" config:type="string">view1</config:config-item>
@@ -37,10 +37,10 @@
      <config:config-item config:name="EditModeStandard" config:type="int">0</config:config-item>
      <config:config-item config:name="EditModeNotes" config:type="int">0</config:config-item>
      <config:config-item config:name="EditModeHandout" config:type="int">1</config:config-item>
-     <config:config-item config:name="VisibleAreaTop" config:type="int">2355</config:config-item>
-     <config:config-item config:name="VisibleAreaLeft" config:type="int">-9657</config:config-item>
-     <config:config-item config:name="VisibleAreaWidth" config:type="int">40826</config:config-item>
-     <config:config-item config:name="VisibleAreaHeight" config:type="int">23179</config:config-item>
+     <config:config-item config:name="VisibleAreaTop" config:type="int">1773</config:config-item>
+     <config:config-item config:name="VisibleAreaLeft" config:type="int">-5826</config:config-item>
+     <config:config-item config:name="VisibleAreaWidth" config:type="int">33130</config:config-item>
+     <config:config-item config:name="VisibleAreaHeight" config:type="int">24348</config:config-item>
      <config:config-item config:name="GridCoarseWidth" config:type="int">1270</config:config-item>
      <config:config-item config:name="GridCoarseHeight" config:type="int">1270</config:config-item>
      <config:config-item config:name="GridFineWidth" config:type="int">127</config:config-item>
@@ -92,7 +92,7 @@
    <config:config-item config:name="PrintQuality" config:type="int">0</config:config-item>
    <config:config-item config:name="PrinterIndependentLayout" config:type="string">low-resolution</config:config-item>
    <config:config-item config:name="PrinterName" config:type="string">HP-Officejet-Pro-8600</config:config-item>
-   <config:config-item config:name="PrinterSetup" config:type="base64Binary">swH+/0hQLU9mZmljZWpldC1Qcm8tODYwMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQ1VQUzpIUC1PZmZpY2VqZXQtUHJvLTg2MDAAAAAAAAAWAAMA2QAAAAAAAAAIAFZUAAAkbQAASm9iRGF0YSAxCnByaW50ZXI9SFAtT2ZmaWNlamV0LVByby04NjAwCm9yaWVudGF0aW9uPVBvcnRyYWl0CmNvcGllcz0xCmNvbGxhdGU9ZmFsc2UKbWFyZ2luZGFqdXN0bWVudD0wLDAsMCwwCmNvbG9yZGVwdGg9MjQKcHNsZXZlbD0wCnBkZmRldmljZT0xCmNvbG9yZGV2aWNlPTAKUFBEQ29udGV4RGF0YQpEdXBsZXg6Tm9uZQBJbnB1dFNsb3Q6QXV0bwBQYWdlU2l6ZTpMZXR0ZXIAABIAQ09NUEFUX0RVUExFWF9NT0RFCgBEVVBMRVhfT0ZG</config:config-item>
+   <config:config-item config:name="PrinterSetup" config:type="base64Binary">swH+/0hQLU9mZmljZWpldC1Qcm8tODYwMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQ1VQUzpIUC1PZmZpY2VqZXQtUHJvLTg2MDAAAAAAAAAWAAMA2QAAAAAAAAAIAFZUAAAkbQAASm9iRGF0YSAxCnByaW50ZXI9SFAtT2ZmaWNlamV0LVByby04NjAwCm9yaWVudGF0aW9uPVBvcnRyYWl0CmNvcGllcz0xCmNvbGxhdGU9ZmFsc2UKbWFyZ2luZGFqdXN0bWVudD0wLDAsMCwwCmNvbG9yZGVwdGg9MjQKcHNsZXZlbD0wCnBkZmRldmljZT0xCmNvbG9yZGV2aWNlPTAKUFBEQ29udGV4RGF0YQpQYWdlU2l6ZTpMZXR0ZXIASW5wdXRTbG90OkF1dG8ARHVwbGV4Ok5vbmUAABIAQ09NUEFUX0RVUExFWF9NT0RFCgBEVVBMRVhfT0ZG</config:config-item>
    <config:config-item config:name="SaveVersionOnClose" config:type="boolean">false</config:config-item>
    <config:config-item config:name="ScaleDenominator" config:type="int">1</config:config-item>
    <config:config-item config:name="ScaleNumerator" config:type="int">1</config:config-item>
@@ -414,7 +414,7 @@
     </draw:frame>
     <draw:frame draw:style-name="gr5" draw:text-style-name="P2" draw:layer="layout" svg:width="2.794cm" svg:height="3.048cm" svg:x="8.112cm" svg:y="12.684cm">
      <draw:text-box>
-      <text:p><text:span text:style-name="T1">Not enough product</text:span></text:p>
+      <text:p><text:span text:style-name="T1">Toteitem not filled</text:span></text:p>
      </draw:text-box>
     </draw:frame>
     <draw:frame draw:style-name="gr5" draw:text-style-name="P2" draw:layer="layout" svg:width="2.794cm" svg:height="3.048cm" svg:x="15.859cm" svg:y="12.938cm">

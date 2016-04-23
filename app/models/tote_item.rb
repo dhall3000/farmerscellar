@@ -68,7 +68,7 @@ class ToteItem < ActiveRecord::Base
 
     when ToteItem.states[:COMMITTED]
       case input
-      when :not_enough_product
+      when :tote_item_not_filled
         new_state = ToteItem.states[:NOTFILLED]
       when :tote_item_filled
         new_state = ToteItem.states[:FILLED]
@@ -111,10 +111,6 @@ class ToteItem < ActiveRecord::Base
       update(state: new_state)
     end
 
-  end
-
-  def self.dequeue2(posting_id)
-  	return ToteItem.where(state: states[:COMMITTED], posting_id: posting_id).first
   end
 
   def deauthorize

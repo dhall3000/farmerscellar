@@ -35,21 +35,21 @@ class Posting < ActiveRecord::Base
     #a tote item we can't fill we shouldn't stop there. we should continue all the way through to the end of the
     #queue as long as we have 'quantity_remaining' looking for a tote item of smaller quantity that we can
     #completely fill
-    tote_item = ToteItem.dequeue2(self.id)
-    while tote_item
+    first_committed_tote_item = get_first_committed_tote_item
+    while first_committed_tote_item
 
-      if quantity_remaining >= tote_item.quantity
-        quantity_remaining = quantity_remaining - tote_item.quantity
-        quantity_filled = quantity_filled + tote_item.quantity        
-        tote_item.transition(:tote_item_filled)
-        tote_items_filled << tote_item
+      if quantity_remaining >= first_committed_tote_item.quantity
+        quantity_remaining = quantity_remaining - first_committed_tote_item.quantity
+        quantity_filled = quantity_filled + first_committed_tote_item.quantity        
+        first_committed_tote_item.transition(:tote_item_filled)
+        tote_items_filled << first_committed_tote_item
       else
-        quantity_not_filled = quantity_not_filled + tote_item.quantity
-        tote_item.transition(:not_enough_product)                
-        tote_items_not_filled << tote_item
+        quantity_not_filled = quantity_not_filled + first_committed_tote_item.quantity
+        first_committed_tote_item.transition(:tote_item_not_filled)                
+        tote_items_not_filled << first_committed_tote_item
       end
       
-      tote_item = ToteItem.dequeue2(self.id)
+      first_committed_tote_item = get_first_committed_tote_item
 
     end
 
@@ -108,6 +108,11 @@ class Posting < ActiveRecord::Base
   end
 
   private
+
+    def get_first_committed_tote_item
+      return tote_items.where(state: ToteItem.states[:COMMITTED]).first    
+    end  
+    
     def delivery_date_not_sunday
       if delivery_date != nil && delivery_date.sunday?
         errors.add(:delivery_date, "Delivery date can not be Sunday")
