@@ -18,7 +18,8 @@ class NotFilledToteItemsTest < BulkBuyer
 
     transition_authorized_tote_items_to_committed(customers)
     fill_all_tote_items = false
-    simulate_order_filling(fill_all_tote_items)
+    time_travel_to_delivery_dates = true
+    simulate_order_filling(fill_all_tote_items, time_travel_to_delivery_dates)
 
     assert_equal 0, ToteItem.where(state: ToteItem.states[:AUTHORIZED]).count    
     assert_equal 0, ToteItem.where(state: ToteItem.states[:COMMITTED]).count

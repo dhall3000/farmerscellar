@@ -10,7 +10,8 @@ class BulkBuyer < Authorizer
 
   def fill_tote_items(posting_id, fill_all)
 
-    num_tote_items = Posting.find(posting_id).tote_items.count
+    posting = Posting.find(posting_id)
+    num_tote_items = posting.tote_items.count
 
     if fill_all
       num_to_fill = num_tote_items
@@ -19,17 +20,17 @@ class BulkBuyer < Authorizer
     end    
 
     num_tote_items_filled = 0
-    
-    while(num_tote_items_filled < num_to_fill)
-      tote_item = assigns(:tote_item)
-      if tote_item.nil?
-        break
-      else
-        puts "tote_item id: #{tote_item.id}"
-        post tote_items_next_path, {tote_item: {id: tote_item.id, posting_id: posting_id}}
-        num_tote_items_filled = num_tote_items_filled + 1
+    total_quantity = 0
+
+    posting.tote_items.each do |tote_item|
+      if num_tote_items_filled < num_to_fill
+        puts "tote_item id: #{tote_item.id}"          
+        total_quantity = total_quantity + tote_item.quantity
+        num_tote_items_filled = num_tote_items_filled + 1          
       end
-    end      
+    end
+
+    post postings_fill_path, {posting_id: posting.id, quantity: total_quantity}    
 
   end
 
@@ -50,7 +51,7 @@ class BulkBuyer < Authorizer
   end
 
   #this fills toteitems for all postings, regardless of prior state of the toteitems
-  def simulate_order_filling(fill_all_tote_items)
+  def simulate_order_filling(fill_all_tote_items, time_travel_to_delivery_dates = false)
 
     get postings_path
     assert_template 'postings/index'
@@ -58,33 +59,38 @@ class BulkBuyer < Authorizer
     assert_not_nil postings
     puts "there are #{postings.count} postings"
 
-    simulate_order_filling_for_postings(postings, fill_all_tote_items)    
+    simulate_order_filling_for_postings(postings, fill_all_tote_items, time_travel_to_delivery_dates)
 
   end
 
   #this only fills the toteitems for the given postings
-  def simulate_order_filling_for_postings(postings, fill_all_tote_items)
+  def simulate_order_filling_for_postings(postings, fill_all_tote_items, time_travel_to_delivery_dates = false)
 
     #now log in as an admin
     log_in_as(@a1)
     assert is_logged_in?
 
-    for posting in postings
-      puts "posting_id: #{posting.id}"
-      get tote_items_next_path(tote_item: {posting_id: posting.id})
-      assert_template 'tote_items/next'
-      fill_tote_items(posting.id, fill_all_tote_items)
-      if !fill_all_tote_items
-        post postings_no_more_product_path, posting_id: posting.id        
+    postings.each do |posting|
+      
+      if time_travel_to_delivery_dates
+        travel_to posting.delivery_date + 1
       end
+
+      fill_tote_items(posting.id, fill_all_tote_items)
+
+      if time_travel_to_delivery_dates
+        travel_back
+      end
+
     end
 
-  end
+  end  
 
   def create_bulk_buy(customers, fill_all_tote_items)
     create_authorization_for_customers(customers)
     transition_authorized_tote_items_to_committed(customers)
-    simulate_order_filling(fill_all_tote_items)
+    time_travel_to_delivery_dates = true
+    simulate_order_filling(fill_all_tote_items, time_travel_to_delivery_dates)
 
     #verify there are no authorized
     assert_equal 0, ToteItem.where(state: ToteItem.states[:AUTHORIZED]).count    
