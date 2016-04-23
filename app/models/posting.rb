@@ -88,11 +88,10 @@ class Posting < ActiveRecord::Base
   end
 
   def total_quantity_ordered
-    #{AUTHORIZED: 1, COMMITTED: 2, FILLPENDING: 3, FILLED: 4, PURCHASEPENDING: 7, PURCHASED: 8, PURCHASEFAILED: 9}    
-    ordered_tote_items = tote_items.where("state = ? or state = ? or state = ? or state = ? or state = ? or state = ? or state = ?",
+    #{AUTHORIZED: 1, COMMITTED: 2, FILLED: 4, PURCHASEPENDING: 7, PURCHASED: 8, PURCHASEFAILED: 9}    
+    ordered_tote_items = tote_items.where("state = ? or state = ? or state = ? or state = ? or state = ? or state = ?",
       ToteItem.states[:AUTHORIZED],
       ToteItem.states[:COMMITTED],
-      ToteItem.states[:FILLPENDING],
       ToteItem.states[:FILLED],
       ToteItem.states[:PURCHASEPENDING],
       ToteItem.states[:PURCHASED],

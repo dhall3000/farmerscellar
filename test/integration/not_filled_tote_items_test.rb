@@ -14,7 +14,6 @@ class NotFilledToteItemsTest < BulkBuyer
     assert ToteItem.where(state: ToteItem.states[:AUTHORIZED]).count > 0
     assert_equal 0, ToteItem.where(state: ToteItem.states[:COMMITTED]).count
     assert_equal 0, ToteItem.where(state: ToteItem.states[:FILLED]).count
-    assert_equal 0, ToteItem.where(state: ToteItem.states[:FILLPENDING]).count
 
     transition_authorized_tote_items_to_committed(customers)
     fill_all_tote_items = false
@@ -23,7 +22,6 @@ class NotFilledToteItemsTest < BulkBuyer
 
     assert_equal 0, ToteItem.where(state: ToteItem.states[:AUTHORIZED]).count    
     assert_equal 0, ToteItem.where(state: ToteItem.states[:COMMITTED]).count
-    assert_equal 0, ToteItem.where(state: ToteItem.states[:FILLPENDING]).count
 
     num_tote_items = ToteItem.where(user_id: customers).count
     num_filled = ToteItem.where(state: ToteItem.states[:FILLED]).count

@@ -109,7 +109,7 @@ class ToteItemTest < ActiveSupport::TestCase
   	@tote_item.state = 2
   	assert @tote_item.valid?
   	@tote_item.state = 3
-  	assert @tote_item.valid?
+  	assert_not @tote_item.valid?
   	@tote_item.state = 4
   	assert @tote_item.valid?
   	@tote_item.state = 5

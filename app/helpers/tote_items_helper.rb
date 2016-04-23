@@ -19,10 +19,10 @@ module ToteItemsHelper
     #DESCRIPTION: the intent of this method is to get a collection of toteitems that are currently in the abstract, virtual 'tote'. so, old/expired
     #toteitems are not included, nor are those in states REMOVED, FILLED, NOTFILLED etc.
     #actually, that is false. as of this writing, the possible toteitem states are:
-    #{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLPENDING: 3, FILLED: 4, NOTFILLED: 5, REMOVED: 6, PURCHASED: 7}
+    #{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLED: 4, NOTFILLED: 5, REMOVED: 6, PURCHASED: 7}
     #should we display them all except REMOVED? no. we should display all things that are on track to becoming purchased, strictly.
     #in other words, we should display in the tote all the following items:
-    #ADDED, AUTHORIZED, COMMITTED, FILLPENDING and FILLED
+    #ADDED, AUTHORIZED, COMMITTED and FILLED
     #a new toteitem state was added....PURCHASEPENDING. this should be displayed to the user as well.
 
     #here's all the toteitems associated with this user
@@ -30,7 +30,7 @@ module ToteItemsHelper
 
     #the 'displayable' items are just the ones in the proper states for user viewing
     if all != nil && all.count > 0
-      displayable = all.where("tote_items.state = ? or tote_items.state = ? or tote_items.state = ? or tote_items.state = ?", ToteItem.states[:ADDED], ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED], ToteItem.states[:FILLPENDING])
+      displayable = all.where("tote_items.state = ? or tote_items.state = ? or tote_items.state = ?", ToteItem.states[:ADDED], ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED])
     end
 
     if displayable != nil && displayable.count > 0      

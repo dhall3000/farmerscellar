@@ -21,12 +21,11 @@ class PostingTest < ActiveSupport::TestCase
   test "total_quantity_authorized_or_committed should be correct" do
     posting = postings(:p5)
 
-    #{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLPENDING: 3, FILLED: 4, NOTFILLED: 5, REMOVED: 6, PURCHASEPENDING: 7, PURCHASED: 8, PURCHASEFAILED: 9}
+    #{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLED: 4, NOTFILLED: 5, REMOVED: 6, PURCHASEPENDING: 7, PURCHASED: 8, PURCHASEFAILED: 9}
 
     posting.tote_items[0].state = ToteItem.states[:ADDED]
     posting.tote_items[1].state = ToteItem.states[:AUTHORIZED]
     posting.tote_items[2].state = ToteItem.states[:COMMITTED]
-    posting.tote_items[3].state = ToteItem.states[:FILLPENDING]
     posting.tote_items[4].state = ToteItem.states[:FILLED]
     posting.tote_items[5].state = ToteItem.states[:NOTFILLED]
     posting.tote_items[6].state = ToteItem.states[:REMOVED]
@@ -52,12 +51,10 @@ class PostingTest < ActiveSupport::TestCase
   test "total_quantity_ordered should be correct" do
     posting = postings(:p5)
 
-    #{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLPENDING: 3, FILLED: 4, NOTFILLED: 5, REMOVED: 6, PURCHASEPENDING: 7, PURCHASED: 8, PURCHASEFAILED: 9}
-
+    #{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLED: 4, NOTFILLED: 5, REMOVED: 6, PURCHASEPENDING: 7, PURCHASED: 8, PURCHASEFAILED: 9}
     posting.tote_items[0].state = ToteItem.states[:ADDED]
     posting.tote_items[1].state = ToteItem.states[:AUTHORIZED]
     posting.tote_items[2].state = ToteItem.states[:COMMITTED]
-    posting.tote_items[3].state = ToteItem.states[:FILLPENDING]
     posting.tote_items[4].state = ToteItem.states[:FILLED]
     posting.tote_items[5].state = ToteItem.states[:NOTFILLED]
     posting.tote_items[6].state = ToteItem.states[:REMOVED]
@@ -68,7 +65,6 @@ class PostingTest < ActiveSupport::TestCase
     posting.tote_items[0].save
     posting.tote_items[1].save
     posting.tote_items[2].save
-    posting.tote_items[3].save
     posting.tote_items[4].save
     posting.tote_items[5].save
     posting.tote_items[6].save
@@ -76,7 +72,7 @@ class PostingTest < ActiveSupport::TestCase
     posting.tote_items[8].save
     posting.tote_items[9].save
 
-    assert_equal 14, posting.total_quantity_ordered
+    assert_equal 12, posting.total_quantity_ordered
 
   end
 

@@ -126,7 +126,7 @@ class ToteItemsController < ApplicationController
 
     #notes for future implementation:
     #after an auth'd item is removed from the toteitem, do we nuke the auth? ppal nukes the entire auth if we do.
-    #answer: when an item gets removed we get its authorization. if for this auth there still exists any toteitems in states AUTHORIZED: 1, COMMITTED: 2, FILLPENDING: 3, FILLED then we do nothing because this auth is still needed for those items.
+    #answer: when an item gets removed we get its authorization. if for this auth there still exists any toteitems in states AUTHORIZED: 1, COMMITTED: 2, FILLED then we do nothing because this auth is still needed for those items.
     #however, if there are no items remaining in any of the above-mentioned states we can cancel the remaining authorized balance, per the following:
     #https://developer.paypal.com/docs/classic/paypal-payments-standard/integration-guide/authcapture/
     #Lower Capture Amount

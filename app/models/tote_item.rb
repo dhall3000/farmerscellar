@@ -29,7 +29,7 @@ class ToteItem < ActiveRecord::Base
   #user's tote shoudl show all the items they're on the hook for and when they do payment account stuff the funds should go straight through
   #rather than just authorizing for later capture.
   def self.states
-  	{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLPENDING: 3, FILLED: 4, NOTFILLED: 5, REMOVED: 6, PURCHASEPENDING: 7, PURCHASED: 8, PURCHASEFAILED: 9, DELIVERED: 10, NOTIFIED: 11}
+  	{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLED: 4, NOTFILLED: 5, REMOVED: 6, PURCHASEPENDING: 7, PURCHASED: 8, PURCHASEFAILED: 9, DELIVERED: 10, NOTIFIED: 11}
   end
 
   validates :state, inclusion: { in: ToteItem.states.values }
@@ -77,16 +77,6 @@ class ToteItem < ActiveRecord::Base
       end
 
 
-    when ToteItem.states[:FILLPENDING]
-      #TODO: this whole case / state goes away eventually
-      case input
-      when :tote_item_filled
-        new_state = ToteItem.states[:FILLED]
-        #create new purchaserecievable here
-        create_purchase_receivable
-      end
-
-
     when ToteItem.states[:FILLED]
       case input
       when :delivered
@@ -126,18 +116,6 @@ class ToteItem < ActiveRecord::Base
   def self.dequeue2(posting_id)
   	return ToteItem.where(state: states[:COMMITTED], posting_id: posting_id).first
   end
-
-  def self.dequeue(posting_id)
-    ti = ToteItem.where(state: states[:COMMITTED], posting_id: posting_id).first
-    
-    if ti != nil
-      ti.update_attribute(:state, states[:FILLPENDING])
-    end
-
-    ti
-
-  end
-
 
   def deauthorize
     if state?(:AUTHORIZED)

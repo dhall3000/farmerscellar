@@ -443,11 +443,10 @@ class RakeTasksTest < BulkBuyer
   end
 
   def tote_items_set
-    #{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLPENDING: 3, FILLED: 4, NOTFILLED: 5, REMOVED: 6, PURCHASEPENDING: 7, PURCHASED: 8, PURCHASEFAILED: 9}
+    #{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLED: 4, NOTFILLED: 5, REMOVED: 6, PURCHASEPENDING: 7, PURCHASED: 8, PURCHASEFAILED: 9}
     @added_count = ToteItem.where(state: ToteItem.states[:ADDED]).count
     @authorized_count = ToteItem.where(state: ToteItem.states[:AUTHORIZED]).count
     @committed_count = ToteItem.where(state: ToteItem.states[:COMMITTED]).count
-    @fillpending_count = ToteItem.where(state: ToteItem.states[:FILLPENDING]).count
     @filled_count = ToteItem.where(state: ToteItem.states[:FILLED]).count
     @notfilled_count = ToteItem.where(state: ToteItem.states[:NOTFILLED]).count
     @removed_count = ToteItem.where(state: ToteItem.states[:REMOVED]).count
@@ -460,7 +459,6 @@ class RakeTasksTest < BulkBuyer
     assert_equal @added_count, ToteItem.where(state: ToteItem.states[:ADDED]).count
     assert_equal @authorized_count, ToteItem.where(state: ToteItem.states[:AUTHORIZED]).count
     assert_equal @committed_count, ToteItem.where(state: ToteItem.states[:COMMITTED]).count
-    assert_equal @fillpending_count, ToteItem.where(state: ToteItem.states[:FILLPENDING]).count
     assert_equal @filled_count, ToteItem.where(state: ToteItem.states[:FILLED]).count
     assert_equal @notfilled_count, ToteItem.where(state: ToteItem.states[:NOTFILLED]).count
     assert_equal @removed_count, ToteItem.where(state: ToteItem.states[:REMOVED]).count
