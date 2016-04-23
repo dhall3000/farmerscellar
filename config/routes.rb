@@ -10,8 +10,6 @@ Rails.application.routes.draw do
   get 'login' => 'sessions#new'
   post 'login' => 'sessions#create'
   delete 'logout' => 'sessions#destroy'
-  get 'tote_items/next' => 'tote_items#next'
-  post 'tote_items/next' => 'tote_items#next'
   post 'postings/fill' => 'postings#fill'
   get 'bulk_payments/test_masspay' => 'bulk_payments#test_masspay'
   post 'bulk_payments/test_masspay' => 'bulk_payments#test_masspay'

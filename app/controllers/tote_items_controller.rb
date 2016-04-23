@@ -1,5 +1,4 @@
 class ToteItemsController < ApplicationController
-  before_action :redirect_to_root_if_user_not_admin, only: :next
   before_action :correct_user,   only: [:destroy]
 
   def index
@@ -115,51 +114,6 @@ class ToteItemsController < ApplicationController
       flash.now[:danger] = "Item not saved to shopping tote. See errors below."
       render 'new'
     end
-  end
-
-  def next
-    #this page is for pulling the next tote_item off the queue to fill when sorters are processing a delivery
-    #render 'next'
-
-    #get the posting_id
-    #if we also have a ti id, flip it's state to FILLED
-    #get the next ti id to fill
-
-    #this is so that we can use the test page to inspect the view
-    if params.has_key?("test")
-
-      @tote_item = ToteItem.new
-      @tote_item.set_initial_state
-      @tote_item.user_id = 17
-      @tote_item.quantity = 100
-
-      @tote_item.id = 1
-      @tote_item.price = 2.25
-      @tote_item.state = 7
-      @tote_item.posting_id = 11
-
-      return
-
-    end
-
-    @errors = []
-    posting_id = nil
-
-    if params[:tote_item] == nil
-      @errors << "not sure how this happened but we just hit 'impossible' logic in tote_items_controller.rb: params[:tote_item] == nil"
-    else
-      if params[:tote_item][:posting_id] == nil
-        @errors << "not sure how this happened but we just hit 'impossible' logic in tote_items_controller.rb: params[:tote_item][:posting_id] == nil"
-      else
-        posting_id = params[:tote_item][:posting_id]
-        @tote_item = ToteItem.dequeue(posting_id)
-        if params[:tote_item][:id] != nil
-          #stamp this incoming tote_item as 'FILLED'
-          filled_tote_item = ToteItem.find(params[:tote_item][:id])
-          filled_tote_item.transition(:tote_item_filled)
-        end
-      end
-    end    
   end
 
   def edit
