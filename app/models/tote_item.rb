@@ -44,7 +44,9 @@ class ToteItem < ActiveRecord::Base
 
     when ToteItem.states[:ADDED]
       case input
-      when :customer_authorized || :subscription_authorized
+      when :customer_authorized
+        new_state = ToteItem.states[:AUTHORIZED]
+      when :subscription_authorized
         new_state = ToteItem.states[:AUTHORIZED]
       when :customer_removed
         new_state = ToteItem.states[:REMOVED]
@@ -62,7 +64,7 @@ class ToteItem < ActiveRecord::Base
       when :system_removed
         new_state = ToteItem.states[:REMOVED]
       when :commitment_zone_started
-        new_state = ToteItem.states[:COMMITTED]
+        new_state = ToteItem.states[:COMMITTED]      
       end
 
 
@@ -114,12 +116,6 @@ class ToteItem < ActiveRecord::Base
     return users_with_no_deliveries_later_this_week
 
   end  
-
-  def deauthorize
-    if state?(:AUTHORIZED)
-      update(state: ToteItem.states[:ADDED])
-    end    
-  end
 
   def state?(state_key)
     return state == ToteItem.states[state_key]

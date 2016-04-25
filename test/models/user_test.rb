@@ -9,11 +9,12 @@ class UserTest < ActiveSupport::TestCase
   test "should get tote items to pickup" do
 
     c1 = users(:c1)
-    i = 0
 
-    while i < c1.tote_items.count
-      c1.tote_items[i].update(state: ToteItem.states[:FILLED])
-      i += 1
+    c1.tote_items.each do |tote_item|            
+      tote_item.update(state: ToteItem.states[:ADDED])
+      tote_item.transition(:customer_authorized)
+      tote_item.transition(:commitment_zone_started)          
+      tote_item.transition(:tote_item_filled)      
     end
 
     now_count = c1.tote_items.joins(:posting).where("postings.delivery_date < ?", Time.zone.now).count

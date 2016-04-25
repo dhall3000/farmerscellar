@@ -13,7 +13,7 @@ class Rtauthorization < ActiveRecord::Base
 
   def deauthorize  	
   	tote_items.each do |ti|
-  		ti.deauthorize
+  		ti.transition(:billing_agreement_inactive)
   	end
   end
 

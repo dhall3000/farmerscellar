@@ -13,7 +13,12 @@ class PostingsControllerTest < ActionController::TestCase
     #but if i initialize them to this in the yml file it breaks other tests so just setting the values here
     #so i don't have to fix lots of other tests
     posting = postings(:postingf5apples)
-    posting.tote_items.update_all(state: ToteItem.states[:COMMITTED])
+    
+    posting.tote_items.each do |tote_item|
+      tote_item.update(state: ToteItem.states[:ADDED])
+      tote_item.transition(:customer_authorized)
+      tote_item.transition(:commitment_zone_started)    
+    end
 
     #now in order for these tests to come out right i have to set the quantities according to the id number progression
     i = 1

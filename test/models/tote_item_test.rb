@@ -31,8 +31,10 @@ class ToteItemTest < ActiveSupport::TestCase
 
   test "should return some users as having zero deliveries later this week" do
     
-    #make all items' state be AUTHORIZED
-    ToteItem.all.update_all(state: ToteItem.states[:AUTHORIZED])
+    #make all items' state be AUTHORIZED    
+    ToteItem.all.each do |tote_item|
+      tote_item.transition(:customer_authorized)
+    end
     #move delivery date to 1 day before one of the posting delivery dates
     travel_to ToteItem.first.posting.delivery_date - 1.day
     #verify that some users have delivery later this week
@@ -45,7 +47,9 @@ class ToteItemTest < ActiveSupport::TestCase
 
   test "should create purchase receivable object" do
     pr_count = PurchaseReceivable.count
-    @tote_item.update(state: ToteItem.states[:COMMITTED])
+    @tote_item.update(state: ToteItem.states[:ADDED])
+    @tote_item.transition(:customer_authorized)
+    @tote_item.transition(:commitment_zone_started)    
     @tote_item.reload
     @tote_item.transition(:tote_item_filled)
     assert_equal pr_count + 1, PurchaseReceivable.count    
@@ -70,11 +74,12 @@ class ToteItemTest < ActiveSupport::TestCase
   end
 
   test "should deauthorize" do
-    @tote_item.update(state: ToteItem.states[:AUTHORIZED])
+    assert_equal ToteItem.states[:ADDED], @tote_item.state
+    @tote_item.transition(:customer_authorized)
     @tote_item.save
     ti = @tote_item.reload
     assert_equal ToteItem.states[:AUTHORIZED], @tote_item.state
-    ti.deauthorize
+    ti.transition(:billing_agreement_inactive)
     ti = @tote_item.reload
     assert_equal ToteItem.states[:ADDED], @tote_item.state
   end
@@ -82,7 +87,7 @@ class ToteItemTest < ActiveSupport::TestCase
   test "should not deauthorize" do
     @tote_item.state = ToteItem.states[:COMMITTED]
     assert @tote_item.state?(:COMMITTED)    
-    @tote_item.deauthorize
+    @tote_item.transition(:billing_agreement_inactive)
     assert_not @tote_item.state?(:ADDED)
   end
 

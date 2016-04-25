@@ -311,8 +311,15 @@ class RakeTasksTest < BulkBuyer
 
     #make sure some totes are authorized
     assert_equal 0, ToteItem.where(state: ToteItem.states[:AUTHORIZED]).count
-    @posting_apples.tote_items.update_all(state: ToteItem.states[:AUTHORIZED])    
-    @posting_milk.tote_items.update_all(state: ToteItem.states[:AUTHORIZED])
+    
+    @posting_apples.tote_items.each do |tote_item|
+      tote_item.transition(:customer_authorized)
+    end
+
+    @posting_milk.tote_items.each do |tote_item|
+      tote_item.transition(:customer_authorized)
+    end
+
     authorized_tote_items_count = @posting_apples.tote_items.count + @posting_milk.tote_items.count
     assert_equal authorized_tote_items_count, ToteItem.where(state: ToteItem.states[:AUTHORIZED]).count
     
