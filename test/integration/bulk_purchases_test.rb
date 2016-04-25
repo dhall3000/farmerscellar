@@ -512,7 +512,6 @@ class BulkPurchasesTest < BulkBuyer
           assert_match "There was a problem with your purchase transaction.", mail.body.encoded
           assert_match "Please contact", mail.body.encoded
           assert_match "to ensure your account balance is paid in full.", mail.body.encoded
-        elsif pr.kind == PurchaseReceivable.kind[:DONTCOLLECT]
         else
         end            
 

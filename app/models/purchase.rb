@@ -54,8 +54,7 @@ class Purchase < ActiveRecord::Base
       purchase_receivables.each do |pr|
         
         if pr.amount_outstanding <= purchase_gross_amount_remaining
-          pr.apply(pr.amount_outstanding)          
-          pr.save        
+          pr.apply(pr.amount_outstanding)                    
           purchase_gross_amount_remaining = (purchase_gross_amount_remaining - pr.amount_outstanding).round(2)
         end
       end

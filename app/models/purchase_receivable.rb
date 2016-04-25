@@ -20,12 +20,37 @@ class PurchaseReceivable < ActiveRecord::Base
   has_many :purchases, through: :purchase_purchase_receivables
 
   def self.kind
-    {NORMAL: 0, PURCHASEFAILED: 1, DONTCOLLECT: 2}
+    {NORMAL: 0, PURCHASEFAILED: 1}
   end
 
-  def self.load_unpurchased_purchase_receivables_for_users(users)
-    #TODO(Future): this will probably be really inefficient as the db grows. maybe want a boolean for when each record's amount is fully purchased
-    all_prs = where("amount_purchased < amount and (kind is null or kind = ?)", PurchaseReceivable.kind[:NORMAL])
+  def self.states
+    {READY: 0, COMPLETE: 1}
+  end
+
+  def self.transition(input, params = {})    
+    transition_normal(input, params)
+    transition_purchase_failed(input, params)
+  end
+
+  def self.transition_normal(input, params = {})    
+    case input
+    when :do_purchase
+      #get all prs that are in state READY
+    when :completed
+      if params != nil && params[:purchase_receivables] != nil
+        params[:purchase_receivables].each do |pr|
+          pr.update(state: PurchaseReceivable.states[:COMPLETE])
+        end
+      end
+    end    
+  end
+
+  def self.transition_purchase_failed(input, params = {})
+    #TODO: implement this some day?
+  end
+
+  def self.load_unpurchased_purchase_receivables_for_users(users)    
+    all_prs = where(state: states[:READY], kind: kind[:NORMAL])
     uprs = UserPurchaseReceivable.select(:purchase_receivable_id).where(user_id: users, purchase_receivable_id: all_prs)
     prs = PurchaseReceivable.where(id: uprs)
 
@@ -62,7 +87,10 @@ class PurchaseReceivable < ActiveRecord::Base
 
     if amount_outstanding == 0
       tote_items.where(state: ToteItem.states[:PURCHASEPENDING]).update_all(state: ToteItem.states[:PURCHASED])
+      PurchaseReceivable.transition(:completed, {purchase_receivables: [self]})
     end
+
+    save
 
   end
 
