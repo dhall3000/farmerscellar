@@ -40,9 +40,6 @@ class UserMailerTest < ActionMailer::TestCase
       tote_items << ti
     end
 
-    tote_items[0].state = ToteItem.states[:PURCHASED]
-    tote_items[1].state = ToteItem.states[:PURCHASEFAILED]
-
     #this actually is a little wonky because this toteitem doesn't belong to c1, it belongs to another user
     #but oh well, we're using it here to test the mailer
     tote_items[2].state = ToteItem.states[:NOTFILLED]
