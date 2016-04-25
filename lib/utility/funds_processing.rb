@@ -33,30 +33,12 @@ class FundsProcessing
 
 	end
 
-  #these are all the users who currently have filled tote item (or actually we're about to change it sot hat it doesn't matter
-  #the state of the toteitem, but rather they have more than zero unpurchased purchase receivables) that don't have any more
-  #deliveries scheduled for later this week. in other words, we should pull funds off these users' accounts
-  def self.get_purchase_users
-
-    #get all filled tote items where the users of such have no deliveries scheduled later this week
-    num_days_till_end_of_week = ENDOFWEEK - Time.zone.today.wday
-    time_range = Time.zone.today.midnight..(Time.zone.today.midnight + num_days_till_end_of_week.days)
-    #these are the users that have some filled tote items
-    filled_users = User.select(:id).joins(:tote_items).where("tote_items.state = ?", ToteItem.states[:FILLED]).distinct
-    #among these users, which also have toteitems in either AUTHORIZED or COMMITTED states?
-    delivery_later_this_week_users = User.select(:id).joins(tote_items: :posting).where("tote_items.state" => [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED]], 'postings.delivery_date' => time_range).distinct
-    purchase_users = filled_users.where.not(id: delivery_later_this_week_users)
-
-    return purchase_users
-
-  end
-
 	def self.bulk_purchase_new
 
     puts "FundsProcessing.bulk_purchase_new start"
 
 		bulk_purchase = BulkPurchase.new(gross: 0, payment_processor_fee_withheld_from_us: 0, commission: 0, net: 0)
-  	bulk_purchase.load_unpurchased_receivables_for_users(get_purchase_users)
+  	bulk_purchase.load_unpurchased_receivables_for_users(ToteItem.get_users_with_no_deliveries_later_this_week)
 
     if bulk_purchase.purchase_receivables.size < 1
       puts "zero purchase_receivables"
