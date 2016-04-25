@@ -29,7 +29,7 @@ class ToteItem < ActiveRecord::Base
   #user's tote shoudl show all the items they're on the hook for and when they do payment account stuff the funds should go straight through
   #rather than just authorizing for later capture.
   def self.states
-  	{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLED: 4, NOTFILLED: 5, REMOVED: 6, PURCHASED: 8, PURCHASEFAILED: 9, DELIVERED: 10, NOTIFIED: 11}
+  	{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLED: 4, NOTFILLED: 5, REMOVED: 6, PURCHASED: 8, PURCHASEFAILED: 9}
   end
 
   validates :state, inclusion: { in: ToteItem.states.values }
@@ -77,33 +77,23 @@ class ToteItem < ActiveRecord::Base
       end
 
 
-    when ToteItem.states[:FILLED]
-      case input
-      when :delivered
-        new_state = ToteItem.states[:DELIVERED]
-      end
+    #as of now there is not transition away from this state. it is a final state.
+    #when ToteItem.states[:FILLED]
+      #case input      
+      #end
 
 
-    when ToteItem.states[:NOTFILLED]
-      case input
-      when :notified
-        new_state = ToteItem.states[:NOTIFIED]
-      end
+    #as of now there is not transition away from this state. it is a final state.
+    #when ToteItem.states[:NOTFILLED]
+      #case input      
+      #end
 
 
-    when ToteItem.states[:REMOVED]
-      
-      #end state
+    #as of now there is not transition away from this state. it is a final state.
+    #when ToteItem.states[:REMOVED]            
+      #case input
+      #end
 
-    when ToteItem.states[:DELIVERED]
-      case input
-      when :notified
-      end
-
-
-    when ToteItem.states[:NOTIFIED]
-
-      #end state
 
     end
 

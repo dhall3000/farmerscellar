@@ -57,8 +57,6 @@ class PostingTest < ActiveSupport::TestCase
     posting.tote_items[4].state = ToteItem.states[:FILLED]
     posting.tote_items[5].state = ToteItem.states[:NOTFILLED]
     posting.tote_items[6].state = ToteItem.states[:REMOVED]
-    posting.tote_items[8].state = ToteItem.states[:PURCHASED]
-    posting.tote_items[9].state = ToteItem.states[:PURCHASEFAILED]
 
     posting.tote_items[0].save
     posting.tote_items[1].save
@@ -66,10 +64,8 @@ class PostingTest < ActiveSupport::TestCase
     posting.tote_items[4].save
     posting.tote_items[5].save
     posting.tote_items[6].save
-    posting.tote_items[8].save
-    posting.tote_items[9].save
 
-    assert_equal 10, posting.total_quantity_ordered
+    assert_equal 8, posting.total_quantity_ordered
 
   end
 

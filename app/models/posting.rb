@@ -88,13 +88,16 @@ class Posting < ActiveRecord::Base
   end
 
   def total_quantity_ordered
-    #{AUTHORIZED: 1, COMMITTED: 2, FILLED: 4, PURCHASED: 8, PURCHASEFAILED: 9}    
-    ordered_tote_items = tote_items.where("state = ? or state = ? or state = ? or state = ? or state = ?",
+    #{AUTHORIZED: 1, COMMITTED: 2, FILLED: 4
+    #we also want NOTFILLED because after the delivery date the farmer might want to review past postings and
+    #see how much quantity was ordered. although he might also want to review historical sales. we'll change that
+    #down the road. for now we're going to add NOTFILLED because the name of the method is 'ordered' and anything
+    #that ended up in state NOTFILLED was at one point 'ordered'.
+    ordered_tote_items = tote_items.where("state = ? or state = ? or state = ? or state = ?",
       ToteItem.states[:AUTHORIZED],
       ToteItem.states[:COMMITTED],
       ToteItem.states[:FILLED],
-      ToteItem.states[:PURCHASED],
-      ToteItem.states[:PURCHASEFAILED])
+      ToteItem.states[:NOTFILLED])
 
     unit_count = 0
 

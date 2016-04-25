@@ -32,7 +32,7 @@ Here is the status of products you recently ordered that were set for delivery t
         <td align="left"><%= tote_item.posting.unit_kind.name %></td>
         <td align="center"><%= tote_item.quantity %></td>
         <td align="center">
-          <% if tote_item.state == ToteItem.states[:FILLED] || tote_item.state == ToteItem.states[:PURCHASED] || tote_item.state == ToteItem.states[:PURCHASEFAILED] %>
+          <% if tote_item.state == ToteItem.states[:FILLED] %>
             DELIVERED
             <% products_delivered = true %>
           <% elsif tote_item.state == ToteItem.states[:NOTFILLED] %>
