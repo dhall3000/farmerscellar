@@ -9,6 +9,40 @@ class ToteItemTest < ActiveSupport::TestCase
   	@tote_item = tote_items(:c1apple)
   end
 
+  test "should return all users as having zero deliveries later this week" do
+
+    #make all items' state be ADDED
+    ToteItem.all.update_all(state: ToteItem.states[:ADDED])
+    #move delivery date
+    travel_to Time.zone.now - 1000.days
+    #verify method returns nothing
+    users = ToteItem.get_users_with_no_deliveries_later_this_week
+    assert_equal User.count, users.count
+    #rinse and repeat 
+    travel_back
+    travel_to Time.zone.now + 1000.days
+    #verify method returns nothing
+    users = ToteItem.get_users_with_no_deliveries_later_this_week
+    assert_equal User.count, users.count
+
+    travel_back
+
+  end
+
+  test "should return some users as having zero deliveries later this week" do
+    
+    #make all items' state be AUTHORIZED
+    ToteItem.all.update_all(state: ToteItem.states[:AUTHORIZED])
+    #move delivery date to 1 day before one of the posting delivery dates
+    travel_to ToteItem.first.posting.delivery_date - 1.day
+    #verify that some users have delivery later this week
+    users = ToteItem.get_users_with_no_deliveries_later_this_week
+    assert users.count < User.count
+
+    travel_back    
+
+  end
+
   test "should create purchase receivable object" do
     pr_count = PurchaseReceivable.count
     @tote_item.update(state: ToteItem.states[:COMMITTED])

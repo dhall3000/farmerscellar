@@ -113,6 +113,18 @@ class ToteItem < ActiveRecord::Base
 
   end
 
+  def self.get_users_with_no_deliveries_later_this_week
+
+    num_days_till_end_of_week = ENDOFWEEK - Time.zone.today.wday
+    time_range = Time.zone.today.midnight..(Time.zone.today.midnight + num_days_till_end_of_week.days)
+    #among these users, which also have toteitems in either AUTHORIZED or COMMITTED states?
+    delivery_later_this_week_users = User.select(:id).joins(tote_items: :posting).where("tote_items.state" => [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED]], 'postings.delivery_date' => time_range).distinct
+    users_with_no_deliveries_later_this_week = User.all.where.not(id: delivery_later_this_week_users)
+
+    return users_with_no_deliveries_later_this_week
+
+  end  
+
   def deauthorize
     if state?(:AUTHORIZED)
       update(state: ToteItem.states[:ADDED])
