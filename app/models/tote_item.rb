@@ -24,12 +24,8 @@ class ToteItem < ActiveRecord::Base
   validates :price, numericality: { greater_than: 0 }
   validates :quantity, numericality: { greater_than: 0, only_integer: true }
 
-  #PURCHASEFAILED: this state is for when we process a bulk buy and someone's purchase fails. we kick all their toteitems in to this
-  #state, empty out their tote and cut off their account so that they can't order anything more until they square up. when in this state
-  #user's tote shoudl show all the items they're on the hook for and when they do payment account stuff the funds should go straight through
-  #rather than just authorizing for later capture.
   def self.states
-  	{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLED: 4, NOTFILLED: 5, REMOVED: 6, PURCHASED: 8, PURCHASEFAILED: 9}
+  	{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLED: 4, NOTFILLED: 5, REMOVED: 6}
   end
 
   validates :state, inclusion: { in: ToteItem.states.values }

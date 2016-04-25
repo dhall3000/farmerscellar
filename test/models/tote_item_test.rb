@@ -154,6 +154,10 @@ class ToteItemTest < ActiveSupport::TestCase
   	@tote_item.state = 2
   	assert @tote_item.valid?
   	@tote_item.state = 3
+    #NOTE: this assert_not is accidentally brilliant. leaving this here will ensure that down the road no dev
+    #wanting to add a new state to ToteItem class will use the value '3'. Using 3 would be bad because, since it
+    #was once upon a time used, there will be 3's in the production database so if you (Mr. Dev, whoever you are),
+    #in the future use 3 again, your logic will work great in dev but break in production
   	assert_not @tote_item.valid?
   	@tote_item.state = 4
   	assert @tote_item.valid?
@@ -162,11 +166,23 @@ class ToteItemTest < ActiveSupport::TestCase
   	@tote_item.state = 6
   	assert @tote_item.valid?
   	@tote_item.state = 7
+    #NOTE: this assert_not is accidentally brilliant. leaving this here will ensure that down the road no dev
+    #wanting to add a new state to ToteItem class will use the value '7'. Using 7 would be bad because, since it
+    #was once upon a time used, there will be 7's in the production database so if you (Mr. Dev, whoever you are),
+    #in the future use 8 again, your logic will work great in dev but break in production    
   	assert_not @tote_item.valid?
   	@tote_item.state = 8
-  	assert @tote_item.valid?
+    #NOTE: this assert_not is accidentally brilliant. leaving this here will ensure that down the road no dev
+    #wanting to add a new state to ToteItem class will use the value '8'. Using 8 would be bad because, since it
+    #was once upon a time used, there will be 8's in the production database so if you (Mr. Dev, whoever you are),
+    #in the future use 8 again, your logic will work great in dev but break in production    
+  	assert_not @tote_item.valid?
     @tote_item.state = 9
-    assert @tote_item.valid?
+    #NOTE: this assert_not is accidentally brilliant. leaving this here will ensure that down the road no dev
+    #wanting to add a new state to ToteItem class will use the value '9'. Using 9 would be bad because, since it
+    #was once upon a time used, there will be 9's in the production database so if you (Mr. Dev, whoever you are),
+    #in the future use 9 again, your logic will work great in dev but break in production    
+    assert_not @tote_item.valid?
 
   	@tote_item.state = -1
   	assert_not @tote_item.valid?
