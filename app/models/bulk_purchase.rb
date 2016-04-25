@@ -49,7 +49,7 @@ class BulkPurchase < ActiveRecord::Base
         #loop through the authorizations and create a single purchase for each one, based off the associated group of purchase receivables
         prs_by_auth.each do |authorization, prs|
           purchase = Purchase.new
-          purchase.go2(authorization, prs)
+          purchase.go(authorization, prs)
 
           if purchase.response.success?
             self.payment_processor_fee_withheld_from_us = (self.payment_processor_fee_withheld_from_us + purchase.payment_processor_fee_withheld_from_us).round(2)
