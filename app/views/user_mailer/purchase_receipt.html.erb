@@ -28,7 +28,8 @@ Here is your Farmer's Cellar purchase receipt.
   </thead>
   <tbody>
     <% @tote_items.each do |tote_item| %>
-      <% if tote_item.state == ToteItem.states[:PURCHASEFAILED] %>
+      <% pr = tote_item.purchase_receivables.last %>
+      <% if pr.state == PurchaseReceivable.states[:READY] && pr.kind == PurchaseReceivable.kind[:PURCHASEFAILED] %>
         <% purchase_failed = true %>
       <% end %>
       <tr>
@@ -39,9 +40,9 @@ Here is your Farmer's Cellar purchase receipt.
         <td align="center"><%= number_to_currency(tote_item.price) %> / <%= tote_item.posting.unit_kind.name %></td>
         <td align="center"><%= tote_item.quantity %></td>
         <td align="center">
-          <% if tote_item.state == ToteItem.states[:PURCHASED] %>
+          <% if pr.state == PurchaseReceivable.states[:COMPLETE] %>
             <%= number_to_currency(get_gross_item(tote_item)) %>
-          <% elsif %>
+          <% else %>
             PURCHASEFAILED
           <% end %>          
         </td>

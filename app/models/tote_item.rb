@@ -29,7 +29,7 @@ class ToteItem < ActiveRecord::Base
   #user's tote shoudl show all the items they're on the hook for and when they do payment account stuff the funds should go straight through
   #rather than just authorizing for later capture.
   def self.states
-  	{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLED: 4, NOTFILLED: 5, REMOVED: 6, PURCHASEPENDING: 7, PURCHASED: 8, PURCHASEFAILED: 9, DELIVERED: 10, NOTIFIED: 11}
+  	{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLED: 4, NOTFILLED: 5, REMOVED: 6, PURCHASED: 8, PURCHASEFAILED: 9, DELIVERED: 10, NOTIFIED: 11}
   end
 
   validates :state, inclusion: { in: ToteItem.states.values }

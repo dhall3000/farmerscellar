@@ -58,9 +58,6 @@ class FundsProcessing
 
     bulk_purchase.purchase_receivables.each do |pr|
       puts "PurchaseReceivable id: " + pr.id.to_s + " amount: " + number_to_currency(pr.amount) + " amount_purchased: " + number_to_currency(pr.amount_purchased)
-      pr.tote_items.each do |ti|
-        ti.update(state: ToteItem.states[:PURCHASEPENDING])
-      end
     end    
       
     puts "FundsProcessing.bulk_purchase_new end"

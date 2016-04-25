@@ -538,14 +538,16 @@ class BulkPurchasesTest < BulkBuyer
       assert pr.amount_purchased <= pr.amount
       
       for ti in pr.tote_items
-        #toteitems state should not be PURCHASEPENDING anymore
-        assert_not ti.state == ToteItem.states[:PURCHASEPENDING]
-        #toteitems state should be either PURCHASE or PURCHASEFAILED
+        #once upon a time it was the case that toteitems state should not be PURCHASEPENDING anymore.
+        #this means that they should (once upon a time) have been IN ppending. now that we've
+        #yanked ppending from the list of available states that a toteitem can be in, these ti's should
+        #now all be simply in the FILLED state while its associated purchasereceivable should be
+        #in the PURCHASEFAILED state if there was a problem
         if pr.kind == PurchaseReceivable.kind[:NORMAL]
-          assert_equal ti.state, ToteItem.states[:PURCHASED]          
+          assert_equal pr.state, PurchaseReceivable.states[:COMPLETE]          
         end
         if pr.kind == PurchaseReceivable.kind[:PURCHASEFAILED]
-          assert_equal ti.state, ToteItem.states[:PURCHASEFAILED]                    
+          assert_equal pr.state, PurchaseReceivable.states[:READY]
         end
       end      
     end  
@@ -560,7 +562,7 @@ class BulkPurchasesTest < BulkBuyer
         assert_equal purchase_receivable.amount, purchase_receivable.amount_purchased
 
         for tote_item in purchase_receivable.tote_items
-          assert_equal tote_item.state, ToteItem.states[:PURCHASED]
+          assert_equal tote_item.state, ToteItem.states[:FILLED]
         end        
       end
 
@@ -571,7 +573,7 @@ class BulkPurchasesTest < BulkBuyer
         assert purchase_receivable.amount > 0
 
         for tote_item in purchase_receivable.tote_items
-          assert_equal tote_item.state, ToteItem.states[:PURCHASEFAILED]
+          assert_equal tote_item.state, ToteItem.states[:FILLED]
         end        
       end            
     end
@@ -621,8 +623,8 @@ class BulkPurchasesTest < BulkBuyer
 
     assert Purchase.count > 0
 
-    assert_equal Purchase.count, ToteItem.select(:user_id).where(state: [ToteItem.states[:PURCHASEFAILED], ToteItem.states[:PURCHASED]]).distinct.count
-    assert_equal PurchaseReceivable.count, ToteItem.where(state: [ToteItem.states[:PURCHASEFAILED], ToteItem.states[:PURCHASED]]).distinct.count
+    assert_equal Purchase.count, ToteItem.select(:user_id).where(state: [ToteItem.states[:FILLED]]).distinct.count
+    assert_equal PurchaseReceivable.count, ToteItem.where(state: [ToteItem.states[:FILLED]]).distinct.count
 
     purchase_receivables = assigns(:purchase_receivables)
 
@@ -695,6 +697,7 @@ class BulkPurchasesTest < BulkBuyer
       assert purchase_receivable.amount > 0
       #this should be zero here because we haven't done the producer payments yet
       assert_equal purchase_receivable.amount_purchased, 0
+      assert_equal PurchaseReceivable.states[:READY], purchase_receivable.state
       assert_not_nil purchase_receivable.bulk_buys
 
       puts "purchase_receivable.bulk_buys.count: #{purchase_receivable.bulk_buys.count}"
@@ -709,9 +712,9 @@ class BulkPurchasesTest < BulkBuyer
 
       puts "purchase_receivable.tote_items.count: #{purchase_receivable.tote_items.count}"
 
-      #the filled tote items should all be marked as PURCHASEPENDING by now
+      #the filled tote items should all be marked as FILLED
       for tote_item in purchase_receivable.tote_items
-        assert_equal tote_item.state, ToteItem.states[:PURCHASEPENDING]
+        assert_equal tote_item.state, ToteItem.states[:FILLED]
       end
 
     end

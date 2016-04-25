@@ -14,7 +14,7 @@ module ToteItemsHelper
     #2016-04-06 NEW DESCRIPTION!:
     #Ok, enough confuddling things. From now on (until this hack gets yanked/redid) this method is ONLY for fetching tote items that are progressing along the
     #path of getting FILLED, but not FILLED itself. That is, FILLED is not on the "progression" path to getting filled. It is FILLED> So it doesn't count. Neither
-    #does NOTFILLED, REMOVED, PURCHASEPENDING, PURCHASED or PURCHASEFAILED
+    #does NOTFILLED, REMOVED, PURCHASED or PURCHASEFAILED
 
     #DESCRIPTION: the intent of this method is to get a collection of toteitems that are currently in the abstract, virtual 'tote'. so, old/expired
     #toteitems are not included, nor are those in states REMOVED, FILLED, NOTFILLED etc.
@@ -23,7 +23,6 @@ module ToteItemsHelper
     #should we display them all except REMOVED? no. we should display all things that are on track to becoming purchased, strictly.
     #in other words, we should display in the tote all the following items:
     #ADDED, AUTHORIZED, COMMITTED and FILLED
-    #a new toteitem state was added....PURCHASEPENDING. this should be displayed to the user as well.
 
     #here's all the toteitems associated with this user
     all = ToteItem.joins(posting: [:user, :product]).where(user_id: user.id)
@@ -38,7 +37,7 @@ module ToteItemsHelper
       #however there is one exception to this rule and that is when an item has progressed to the FILLED state but then does not make
       #it to the PURCHASED state, for whatever reason. in this case, the customer owes money but has not yet purchased so we want it to
       #remain in their tote forever until it's purchased
-      #current = displayable.where("postings.delivery_date >= ? or state = ? or state = ?", Time.zone.today, ToteItem.states[:FILLED], ToteItem.states[:PURCHASEPENDING])
+      #current = displayable.where("postings.delivery_date >= ? or state = ? or state = ?", Time.zone.today, ToteItem.states[:FILLED])
 
       #the above was a good thought. however, we changed the funds collecting model. when the above was in place our funds-collecting model was to pull from customer
       #credit cards every night. we had to change that to reduce transaction fees though. we changed to where we only pull funds after all a customer's products

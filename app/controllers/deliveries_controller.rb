@@ -128,7 +128,7 @@ class DeliveriesController < ApplicationController
     end
 
     def get_tote_item_states
-      return [ToteItem.states[:FILLED], ToteItem.states[:NOTFILLED], ToteItem.states[:PURCHASEPENDING], ToteItem.states[:PURCHASED], ToteItem.states[:PURCHASEFAILED]]
+      return [ToteItem.states[:FILLED], ToteItem.states[:NOTFILLED], ToteItem.states[:PURCHASED], ToteItem.states[:PURCHASEFAILED]]
     end
 
     #returns an array of dropsites from the given postings

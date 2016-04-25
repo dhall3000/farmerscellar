@@ -395,10 +395,6 @@ class RakeTasksTest < BulkBuyer
       return "@db_snapshot_before[:num_tote_items_filled] == " + @db_snapshot_before[:num_tote_items_filled].to_s + ", @db_snapshot_after[:num_tote_items_filled] == " + @db_snapshot_after[:num_tote_items_filled].to_s
     end
 
-    if @db_snapshot_before[:num_tote_items_purchasepending] != @db_snapshot_after[:num_tote_items_purchasepending]
-      return "@db_snapshot_before[:num_tote_items_purchasepending] == " + @db_snapshot_before[:num_tote_items_purchasepending].to_s + ", @db_snapshot_after[:num_tote_items_purchasepending] == " + @db_snapshot_after[:num_tote_items_purchasepending].to_s
-    end
-
     if @db_snapshot_before[:num_purchase_receivables] != @db_snapshot_after[:num_purchase_receivables]
       return "@db_snapshot_before[:num_purchase_receivables] == " + @db_snapshot_before[:num_purchase_receivables].to_s + ", @db_snapshot_after[:num_purchase_receivables] == " + @db_snapshot_after[:num_purchase_receivables].to_s
     end
@@ -431,8 +427,7 @@ class RakeTasksTest < BulkBuyer
 
     db_snapshot = {}
 
-    db_snapshot[:num_tote_items_filled] = ToteItem.where(state: ToteItem.states[:FILLED]).count
-    db_snapshot[:num_tote_items_purchasepending] = ToteItem.where(state: ToteItem.states[:PURCHASEPENDING]).count
+    db_snapshot[:num_tote_items_filled] = ToteItem.where(state: ToteItem.states[:FILLED]).count    
     db_snapshot[:num_purchase_receivables] = PurchaseReceivable.count
     db_snapshot[:num_purchases] = Purchase.count
     db_snapshot[:num_bulk_buys] = BulkBuy.count
@@ -443,14 +438,13 @@ class RakeTasksTest < BulkBuyer
   end
 
   def tote_items_set
-    #{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLED: 4, NOTFILLED: 5, REMOVED: 6, PURCHASEPENDING: 7, PURCHASED: 8, PURCHASEFAILED: 9}
+    #{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLED: 4, NOTFILLED: 5, REMOVED: 6, PURCHASED: 8, PURCHASEFAILED: 9}
     @added_count = ToteItem.where(state: ToteItem.states[:ADDED]).count
     @authorized_count = ToteItem.where(state: ToteItem.states[:AUTHORIZED]).count
     @committed_count = ToteItem.where(state: ToteItem.states[:COMMITTED]).count
     @filled_count = ToteItem.where(state: ToteItem.states[:FILLED]).count
     @notfilled_count = ToteItem.where(state: ToteItem.states[:NOTFILLED]).count
-    @removed_count = ToteItem.where(state: ToteItem.states[:REMOVED]).count
-    @purchasepending_count = ToteItem.where(state: ToteItem.states[:PURCHASEPENDING]).count
+    @removed_count = ToteItem.where(state: ToteItem.states[:REMOVED]).count    
     @purchased_count = ToteItem.where(state: ToteItem.states[:PURCHASED]).count
     @purchasefailed_count = ToteItem.where(state: ToteItem.states[:PURCHASEFAILED]).count
   end
@@ -461,8 +455,7 @@ class RakeTasksTest < BulkBuyer
     assert_equal @committed_count, ToteItem.where(state: ToteItem.states[:COMMITTED]).count
     assert_equal @filled_count, ToteItem.where(state: ToteItem.states[:FILLED]).count
     assert_equal @notfilled_count, ToteItem.where(state: ToteItem.states[:NOTFILLED]).count
-    assert_equal @removed_count, ToteItem.where(state: ToteItem.states[:REMOVED]).count
-    assert_equal @purchasepending_count, ToteItem.where(state: ToteItem.states[:PURCHASEPENDING]).count
+    assert_equal @removed_count, ToteItem.where(state: ToteItem.states[:REMOVED]).count    
     assert_equal @purchased_count, ToteItem.where(state: ToteItem.states[:PURCHASED]).count
     assert_equal @purchasefailed_count, ToteItem.where(state: ToteItem.states[:PURCHASEFAILED]).count
   end

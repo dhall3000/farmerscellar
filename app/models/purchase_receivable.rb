@@ -42,7 +42,13 @@ class PurchaseReceivable < ActiveRecord::Base
           pr.update(state: PurchaseReceivable.states[:COMPLETE])
         end
       end
-    end    
+    when :purchase_failed
+      if params != nil && params[:purchase_receivables] != nil
+        params[:purchase_receivables].each do |pr|
+          pr.update(kind: PurchaseReceivable.kind[:PURCHASEFAILED], state: PurchaseReceivable.states[:READY])
+        end
+      end
+    end
   end
 
   def self.transition_purchase_failed(input, params = {})
@@ -86,7 +92,6 @@ class PurchaseReceivable < ActiveRecord::Base
     self.amount_purchased = (self.amount_purchased + amount).round(2)
 
     if amount_outstanding == 0
-      tote_items.where(state: ToteItem.states[:PURCHASEPENDING]).update_all(state: ToteItem.states[:PURCHASED])
       PurchaseReceivable.transition(:completed, {purchase_receivables: [self]})
     end
 
@@ -135,10 +140,7 @@ class PurchaseReceivable < ActiveRecord::Base
 
   end
 
-  def purchase_failed
-    tote_items.where(state: ToteItem.states[:PURCHASEPENDING]).update_all(state: ToteItem.states[:PURCHASEFAILED])    
-    self.kind = PurchaseReceivable.kind[:PURCHASEFAILED]
-
+  def purchase_failed    
     #we want to prevent work from beginning on any tote_items in this customer's pipeline for which work hasn't yet begun
     #in other words, empty out their tote. however, if something is already committed then the customer is on the hook for
     #that if it gets filled.
@@ -148,7 +150,9 @@ class PurchaseReceivable < ActiveRecord::Base
       current_tote_items.where("tote_items.state = ? or tote_items.state = ?", ToteItem.states[:ADDED], ToteItem.states[:AUTHORIZED]).update_all(state: ToteItem.states[:REMOVED])
     end
 
+    PurchaseReceivable.transition(:purchase_failed, {purchase_receivables: [self]})
     save
+
   end
 
 end

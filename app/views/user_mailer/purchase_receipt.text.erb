@@ -7,15 +7,16 @@ Hello <%= @user.name %>,
 Here is your Farmer's Cellar purchase receipt.
 
 <% purchase_failed = false %>
-    <% @tote_items.each do |tote_item| %>
-      <% if tote_item.state == ToteItem.states[:PURCHASEFAILED] %>
-        <% purchase_failed = true %>
-        <% sub_total = "PURCHASEFAILED" %>
-      <% elsif %>
-        <% sub_total = number_to_currency(get_gross_item(tote_item)).to_s %>
-      <% end %>
+<% @tote_items.each do |tote_item| %>
+  <% pr = tote_item.purchase_receivables.last %>
+  <% if pr.state == PurchaseReceivable.states[:READY] && pr.kind == PurchaseReceivable.kind[:PURCHASEFAILED] %>
+    <% purchase_failed = true %>
+    <% sub_total = "PURCHASEFAILED" %>
+  <% else %>
+    <% sub_total = number_to_currency(get_gross_item(tote_item)).to_s %>
+  <% end %>
 ID=<%= tote_item.id %>,Producer=<%= tote_item.posting.user.farm_name %>,Product=<%= tote_item.posting.product.name %>,Delivery Date=<%= tote_item.posting.delivery_date.strftime("%A %b %d, %Y") %>,Price=<%= number_to_currency(tote_item.price) %> / <%= tote_item.posting.unit_kind.name %>,Quantity=<%= tote_item.quantity %>,Sub Total=<%= sub_total %>
-    <% end %>
+<% end %>
 
 <% if purchase_failed %>
 There was a problem with your purchase transaction. Please contact <%= contact_url %> to ensure your account balance is paid in full.
