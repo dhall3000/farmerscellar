@@ -14,7 +14,7 @@ module ToteItemsHelper
     #2016-04-06 NEW DESCRIPTION!:
     #Ok, enough confuddling things. From now on (until this hack gets yanked/redid) this method is ONLY for fetching tote items that are progressing along the
     #path of getting FILLED, but not FILLED itself. That is, FILLED is not on the "progression" path to getting filled. It is FILLED> So it doesn't count. Neither
-    #does NOTFILLED, REMOVED, PURCHASED or PURCHASEFAILED
+    #does NOTFILLED or REMOVED
 
     #DESCRIPTION: the intent of this method is to get a collection of toteitems that are currently in the abstract, virtual 'tote'. so, old/expired
     #toteitems are not included, nor are those in states REMOVED, FILLED, NOTFILLED etc.

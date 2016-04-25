@@ -45,7 +45,20 @@ class PurchaseReceivable < ActiveRecord::Base
     when :purchase_failed
       if params != nil && params[:purchase_receivables] != nil
         params[:purchase_receivables].each do |pr|
+
           pr.update(kind: PurchaseReceivable.kind[:PURCHASEFAILED], state: PurchaseReceivable.states[:READY])
+
+          #we want to prevent work from beginning on any tote_items in this customer's pipeline for which work hasn't yet begun
+          #in other words, empty out their tote. however, if something is already committed then the customer is on the hook for
+          #that if it gets filled.
+          #TODO: make a test to verify that when a purchase fails the shopping tote gets emptied
+          current_tote_items = ToteItemsController.helpers.current_tote_items_for_user(pr.users.last)
+          if current_tote_items != nil && current_tote_items.any?
+            current_tote_items.where("tote_items.state = ? or tote_items.state = ?", ToteItem.states[:ADDED], ToteItem.states[:AUTHORIZED]).each do |tote_item|
+              tote_item.transition(:system_removed)
+            end
+          end          
+
         end
       end
     end
@@ -137,21 +150,6 @@ class PurchaseReceivable < ActiveRecord::Base
     end
 
     return producer_ids.uniq
-
-  end
-
-  def purchase_failed    
-    #we want to prevent work from beginning on any tote_items in this customer's pipeline for which work hasn't yet begun
-    #in other words, empty out their tote. however, if something is already committed then the customer is on the hook for
-    #that if it gets filled.
-    #TODO: make a test to verify that when a purchase fails the shopping tote gets emptied
-    current_tote_items = ToteItemsController.helpers.current_tote_items_for_user(users.last)
-    if current_tote_items != nil && current_tote_items.any?
-      current_tote_items.where("tote_items.state = ? or tote_items.state = ?", ToteItem.states[:ADDED], ToteItem.states[:AUTHORIZED]).update_all(state: ToteItem.states[:REMOVED])
-    end
-
-    PurchaseReceivable.transition(:purchase_failed, {purchase_receivables: [self]})
-    save
 
   end
 

@@ -64,7 +64,7 @@ class Purchase < ActiveRecord::Base
 
     else
       purchase_receivables.each do |pr|
-        pr.purchase_failed
+        PurchaseReceivable.transition(:purchase_failed, {purchase_receivables: [pr]})  
       end
     end    
 

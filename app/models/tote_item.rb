@@ -48,6 +48,8 @@ class ToteItem < ActiveRecord::Base
         new_state = ToteItem.states[:AUTHORIZED]
       when :customer_removed
         new_state = ToteItem.states[:REMOVED]
+      when :system_removed
+        new_state = ToteItem.states[:REMOVED]
       end
 
 
@@ -56,6 +58,8 @@ class ToteItem < ActiveRecord::Base
       when :billing_agreement_inactive
         new_state = ToteItem.states[:ADDED]
       when :customer_removed
+        new_state = ToteItem.states[:REMOVED]
+      when :system_removed
         new_state = ToteItem.states[:REMOVED]
       when :commitment_zone_started
         new_state = ToteItem.states[:COMMITTED]
