@@ -3,11 +3,7 @@ Hello,
 </p>
 
 <p>
-This email is your Farmer's Cellar delivery notification. Your pickup code is <%= @user.pickup_code.code %>. Please enter this at the kiosk when you arrive to pick up your products. Doing so provides you with a list of your products and lets us know you picked up.
-</p>
-
-<p>
-Here is the status of products you recently ordered that were set for delivery today:
+This email is your Farmer's Cellar delivery notification.
 </p>
 
 <% products_delivered = false %>
@@ -63,6 +59,8 @@ Here is the status of products you recently ordered that were set for delivery t
       <%= @dropsite.access_instructions %>
     </p>
   <% end %>
+
+  <p>There is a kiosk at the dropsite. If you need help remembering what you ordered just enter your pickup code at the kiosk and your product list will pop up. Your pickup code is <%= @user.pickup_code.code %>.</p>
 <% else %>
 <p>Unfortunately we were unable to fill your order for today's delivery.</p>
 <% end %>
