@@ -13,6 +13,7 @@ module SampleApp
     #so query against this like so:
     #if Time.zone.today.wday == ENDOFWEEK
     ::ENDOFWEEK = 6
+    ::SHOWSUBSCRIPTIONSTUFF = false
     
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers

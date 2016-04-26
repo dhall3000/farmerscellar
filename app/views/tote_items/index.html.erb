@@ -19,8 +19,6 @@
         </table>                  
 
 
-<% show_subscription_stuff = false %>
-
 
         <%= form_tag(checkouts_path) do %>
 
@@ -28,7 +26,7 @@
 
           
 
-            <% if show_subscription_stuff == true %>
+            <% if SHOWSUBSCRIPTIONSTUFF %>
 
               <div class="text-center">
                 <div class="btn-group" data-toggle="buttons">
