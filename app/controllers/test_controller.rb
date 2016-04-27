@@ -31,7 +31,7 @@ class TestController < ApplicationController
 
   def capture
   	amount = params[:amount].to_f * 100
-  	response = GATEWAY.capture(amount, PAYPALDATASTORE[:transaction_id])
+  	response = GATEWAY.capture(amount, PAYPALDATASTORE[:transaction_id], complete_type: "NotComplete")
   	PAYPALDATASTORE[:capture_response] = response
   end
 
