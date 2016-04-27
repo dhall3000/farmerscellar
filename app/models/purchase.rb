@@ -34,7 +34,7 @@ class Purchase < ActiveRecord::Base
     amount_to_capture_in_cents = (@amount_to_capture * 100).round(2)
     
     if USEGATEWAY
-      self.response = GATEWAY.capture(amount_to_capture_in_cents, authorization.transaction_id)
+      self.response = GATEWAY.capture(amount_to_capture_in_cents, authorization.transaction_id, complete_type: "NotComplete")
     else
       self.response = FakeCaptureResponse.new(amount_to_capture_in_cents, authorization.transaction_id)
     end
