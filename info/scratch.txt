@@ -1,0 +1,68 @@
+
+
+hello
+-more than one person has tried to close the garage door by entering the code
+-get weights/measures license
+-when do we check if the BA is legit and what do we do when it isn't?
+-how do we make sure that everything in the tote has the same legit BA?
+-
+
+
+When we verify BA legitimacy:
+check with pp
+if good, all done
+else 
+	mark rtba.active = false
+	foreach subscription and toteitem
+		call .authorization_canceled
+			move state AUTHORIZED -> ADDED
+			save
+		end
+	end
+	rtba.save
+end
+
+When we transition AUTHORIZED -> COMMITTED:
+again verify the BA
+if legit, proceed to done
+if BA not active
+	rtba.turn_off
+		for each subscription and toteitem
+			transition AUTHORIZED -> ADDED
+	active = false
+	save
+end
+
+-when posting gets turned off we need to loop through all subscriptions and turn them off
+-toteitem helper needs a method called current_user_current_tote or something that returns items and subscriptions
+-create tests for posting_recurrence & subscription turn_off methods
+-create subscription model test verify that generate does nothing if either subscription or recurrence is not on
+-implement this method active_on_paypals_end?. it's just stubbed out right now
+-implement this method deactivate_with_paypal. it's just stubbed out right now
+-test sub.generates ADDED ti when on && rtauth.nil?
+-test sub.generates ADDED ti when on && !rtauth.active
+-how to specify default subscription setting, so that if a person specifies "every two weeks" but then hits the "add to tote" button without specifying a custom quantity, we want the errors to pop up with the form values specying not "just once" but rather "every two weeks".
+
+-punt: right now all one time auths are separate. so if on one day a user auths 3 items and then later that day auths 2 items, all 5 set for delivery on the same day, we'll pull funds in 2 transactions. we want to batch this. however, if we nix the first auth and set up a large 2nd auth for all 5 items, this might confuse the user. does paypal offer a feature around this? string search "Batch Capture" on this link: https://developer.paypal.com/docs/classic/paypal-payments-standard/integration-guide/authcapture/
+Possibly. We don't now know how much of a bottom line difference this will make. Realistically, probably not much. Best bet is to for now leave this alone and make a note to check 6 months down the road how much this issue is affecting our bottom line. If it is significant, then implement a change @ that time. For now, to mitigate the possiblity of a significant adverse bottom line effect, let's make "Set up One Time Purchasing" prominent during the checkout process to try to steer people towards reference transactions.
+
+-make radio buttons same size
+
+-write test for generate_next_tote_item. it appears this line:
+tote_items.last.posting.delivery_date < posting_recurrence.current_posting.delivery_date
+should instead be like this:
+tote_items.last.posting.delivery_date < posting_recurrence.next_delivery_date(frequency)
+
+-messup management tactic: this needs to get documented somewhere but just scratching it out for now. the kiosk should be sold as a way to contribute to keeping FC cool and as a possible convenience for heavy users. we shouldn't try to cajole folks in to using it...just a dead end road. we should adopt an ambush strategy where we hit the problem from many ways. here's one possible way: say a PJ messup happens where a customer comes to pick up and doesn't have the total quantity they ordered. they go to the kiosk and click "i have a problem" | "my order wasn't filled properly", then a list of products they should have pops up from which they can select the offending product. then they can click option buttons of "my product isn't here at all" or "the quantity remaining is less than my order". this brings up a page apologizing for the inconvenience and saying that the best way is our automated notification system that sends a message to all that week's PJ customers informing them that janegoodall@example.com got shafted most likely due to someone taking more than they ordered. here is how much you ordered (show each customer the quantity they ordered). if you took more than you ordered could you please contact janegoodall@example.com directly and work out a solution to her satisfaction. please be careful when picking up to only get the amount you ordered. if you ever forget how much you ordered or are unsure you can use your 4 digit pickup code or your email address at the kiosk to review your order quantities. doing this is a more tangible way of educating and raising awareness that carelessness at pickup time has a very real downstream negative effect. it also builds a sense of community and ownership. it offloads the work to customers and absolves us of risk because two private parties are working out a solution. we should also have options for the offended person to notify us if things were worked out satisfactorily or if they need further assistance resolving the matter. VERSION 2: actually perhaps make the email text read more like "hey community, one of our fellow apple buyers didn't get their apples, probably because someone accidentally took more than they ordered. would you be willing to share some of your order with them? or perhaps did you accidentally take more than you ordered? for your review, here is what you ordered: XXXXXXX. if you would like to share with janegoodall, please contact her directly to make arrangements. Thanks so much for participating in our community!" ok here are some more thoughts coming a couple days later. kellye has an adult piano student who owns a retail health store down in california. i got to talking to her, asking about how they made the transition from hands on local to hands off remote management of the operation. she said the primary thing was inducing her employees to a sense of ownership in the business and liking the economic arrangement they have so much that they wanted to ensure its continued success. what were these economic advantageous factors? very generous pay and the ability to buy whatever health products they want for their own personal consumption at wholesale, no markup whatsoever. so i got to thinking we should do something similar as an overall strategy to provide superior service. make it the best economic arrangement for the employees so they want to see its continued success. but here's how it could weave in to messup management: say we make it so that all employees can buy at wholesale. now by "wholesale" i mean arrange with the farmers that our employees get the farmer's actual wholesale price, not the FC retail price. helen the hen, for example, wholesales his eggs to PCC for 5.25 and retails them on FC for 6.25. we arrange with the farmers that our employees can buy at wholesale price of 5.25. we sell this to the producers as a critical component of our strategy to provide superior service. now, how does this help the farmer? explain that it helps the employees put their 100% in to the business and really take ownership because they love the arrangement so much that they really want to see it succeed. in this way our service is superior. the messup management kiosk flow should have the last button be "send" or something like that so that the user knows clicking it will ping the whole community. The response page will be something like "ok great, thanks for informing the community of your need. We will pray (to the only God of Heaven and Earth, the Lord, Jesus, the Christ) that the community will supply your need. We will follow up with you in 48 hours to make sure things are to your satisfaction." When they click this button we are bcc'd on it and this serves as our notification to pray about the issue. In this way, our business absolutely depends on prayer, because Messup Management is key. After 48 hours an automated email goes out to the needy customer asking "Earlier this week you reported being short 3 lbs of apples. If the community supplied your needs to your satisfaction there's nothing left for you to do. Otherwise, click here (button) and we'll follow up to see what else we can do to get you taken care of". Of course, if they click the button then we get notified and we need to jump in to action. I also like the idea of putting a "prayer" link in the pages footer. When they click there they can find out about our prayer ministry and submit a prayer request, both anonymously and not.
+
+-launch in other urban markets before FC Seattle gets "on the radar" of competitors.
+
+-the following line's 2 where clauses should be reversed in sequence to speed up the query
+return tote_items.joins(:posting).where("postings.delivery_date > ? and postings.delivery_date < ?", cutoff, Time.zone.now).where(state: ToteItem.states[:FILLED])
+
+-people don't konw which are freezers and which are fridges
+-people don't always think to look in all fridges for their stuff
+-people don't know that the kiosk is only for fc.com orders
+-upgrade git
+-put a note on the kiosk that tells people what it's for and how to use it
+-authorization.payment_date appears to serve no good purpose and probably could be yanked from the auth table

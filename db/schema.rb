@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160425193908) do
+ActiveRecord::Schema.define(version: 20160428201946) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -420,6 +420,16 @@ ActiveRecord::Schema.define(version: 20160425193908) do
     t.datetime "updated_at",     null: false
   end
 
+  create_table "subscription_rtauthorizations", id: false, force: :cascade do |t|
+    t.integer  "rtauthorization_id"
+    t.integer  "subscription_id"
+    t.datetime "created_at",         null: false
+    t.datetime "updated_at",         null: false
+  end
+
+  add_index "subscription_rtauthorizations", ["rtauthorization_id"], name: "index_subscription_rtauthorizations_on_rtauthorization_id"
+  add_index "subscription_rtauthorizations", ["subscription_id"], name: "index_subscription_rtauthorizations_on_subscription_id"
+
   create_table "subscription_skip_dates", force: :cascade do |t|
     t.datetime "skip_date",       null: false
     t.integer  "subscription_id", null: false
@@ -438,11 +448,9 @@ ActiveRecord::Schema.define(version: 20160425193908) do
     t.datetime "created_at",                        null: false
     t.datetime "updated_at",                        null: false
     t.integer  "quantity",                          null: false
-    t.integer  "rtauthorization_id"
   end
 
   add_index "subscriptions", ["posting_recurrence_id"], name: "index_subscriptions_on_posting_recurrence_id"
-  add_index "subscriptions", ["rtauthorization_id"], name: "index_subscriptions_on_rtauthorization_id"
   add_index "subscriptions", ["user_id"], name: "index_subscriptions_on_user_id"
 
   create_table "tote_item_checkouts", id: false, force: :cascade do |t|

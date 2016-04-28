@@ -2,9 +2,11 @@ class Subscription < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :posting_recurrence
-  belongs_to :rtauthorization
   has_many :subscription_skip_dates
   has_many :tote_items
+
+  has_many :subscription_rtauthorizations
+  has_many :rtauthorizations, through: :subscription_rtauthorizations
 
   validates :frequency, :quantity, presence: true
   validates :frequency, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
@@ -16,7 +18,7 @@ class Subscription < ActiveRecord::Base
   end
 
   def authorized?
-    return rtauthorization && rtauthorization.authorized?
+    return rtauthorizations && rtauthorizations.last && rtauthorizations.last.authorized?
   end
 
   def generate_next_tote_item
@@ -50,13 +52,13 @@ class Subscription < ActiveRecord::Base
         tote_item.transition(:subscription_authorized)
       end
 
-  		if !rtauthorization.nil?
+  		if !rtauthorizations.nil? && !rtauthorizations.last.nil?
 
 	  		#i don't think we really NEED need this. but doing it anyway. why is it that toteitems have_many rtauths and a subscription also has an auth? isn't one or the other
 	  		#sufficient. indeed, wouldn't it be cleaner to only have the subscription hold the reference to the rtauth parent? no, because toteitems can be atttached to an rtauth
 	  		#by means other than through subscriptions. as in, a person with a billing agreement can add a subscription to the auth but they can also add a single one-time-buy tote item
-	  		rtauthorization.tote_items << tote_item
-        rtauthorization.save
+	  		rtauthorizations.last.tote_items << tote_item
+        rtauthorizations.last.save
 
   		end
   		
