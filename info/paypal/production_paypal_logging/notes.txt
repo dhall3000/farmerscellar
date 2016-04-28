@@ -1,0 +1,26 @@
+2016-04-28 Thursday
+we had a production issue where we tried to tap a customer's authorization on two different occasions because they made a single auth covering products delivered on diffeent weeks. we had a failure to capture on the second capture. this was so because we didn't have this set on the .capture call: complete_type: "NotComplete"
+so, we added that complete_type param and verified it worked great in dev. but then i wanted to ensure it works in production. coincidentally, we needed additional funds put in to the fc paypal account so i figured i'd take the opportunity kill two birds with one stone, testing the TestController's checkout, authorize and capture methods. there is a commit whose sha is d79a2327f96d464d7b84023d2bc6abeb26e36218. it won't surprise me if this has been nuked between now and whenever you're reading this. anyway, it was nothing special. i just modified the production environment config file to add the PAYPALDATASTORE global hash. then i ran tests in production.
+
+There are two files alongside these notes...attempt00 and attempt01. the former is on a previous commit where i had a copy/paste mistake. i put these lines at the top of each TestController action...
+-------------checkout-------------
+-------------authorize-------------
+-------------capture-------------
+however, i accidentally committed with 'authorize' both at the top of the authiorize AND capture actions. so when you peruse attempt00 you'll see erroneous -------------authorize------------- log lines. the first is legit, the rest are actually 'capture' actions.
+
+furthermore, for whatever reason, we had two successful captures followed by a failure. i started out by authorizing $40 and then attempted to do captures like this:
+
+$10
+$10
+$20
+
+The first two $10 captures worked great. then the $20 capture failed. you can see this in attempt00 with these log lines:
+
+151 <190>1 2016-04-28T17:56:40.735762+00:00 app web.1 - -   message: 'AuthorizationID : Required parameter missing'
+116 <190>1 2016-04-28T17:56:40.735763+00:00 app web.1 - -   error_codes: '81128'
+
+this didn't make sense to me investigating the code. i didn't see how this was possible. but i took a stab that the PAYPALDATASTORE object must somehow have gotten wiped between capture calls, plus i botched the logging and never printed out the transaction id (that which the paypal response reports above in the log lines as "AuthorizationID"). i further reckoned there might be a chance the outstanding $20 was still valid on the authorization so i modified the code and deployed again and tried some more captures. these subsequent captures are recorded in file attempt01.log. the code changes were to change the log to say -----capture-----, print out the transaction id and i also hardcoded the transaction id to be thus:
+
+transactionid 68075085UJ698852U
+
+i hard coded the transaction id because after pushing new code the PAYPALDATASTORE would definitely have gotten wiped. so i did this and then attempted a $5 and $15 capture, both of which went off without a hitch, as evidenced by attempt01. I also verified in fc paypal account that funds arrived appropriately.
