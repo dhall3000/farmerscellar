@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160428201946) do
+ActiveRecord::Schema.define(version: 20160429161929) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -155,10 +155,12 @@ ActiveRecord::Schema.define(version: 20160428201946) do
     t.float    "amount"
     t.string   "client_ip"
     t.text     "response"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+    t.boolean  "is_rt",      default: false
   end
 
+  add_index "checkouts", ["is_rt"], name: "index_checkouts_on_is_rt"
   add_index "checkouts", ["token"], name: "index_checkouts_on_token"
 
   create_table "deliveries", force: :cascade do |t|

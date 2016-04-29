@@ -4,10 +4,10 @@
  <office:meta><meta:creation-date>2016-04-28T14:01:45.120105858</meta:creation-date><meta:generator>LibreOffice/4.2.8.2$Linux_x86 LibreOffice_project/420m0$Build-2</meta:generator><meta:document-statistic meta:object-count="36"/></office:meta>
  <office:settings>
   <config:config-item-set config:name="ooo:view-settings">
-   <config:config-item config:name="VisibleAreaTop" config:type="int">-1010</config:config-item>
-   <config:config-item config:name="VisibleAreaLeft" config:type="int">-22369</config:config-item>
-   <config:config-item config:name="VisibleAreaWidth" config:type="int">50549</config:config-item>
-   <config:config-item config:name="VisibleAreaHeight" config:type="int">24091</config:config-item>
+   <config:config-item config:name="VisibleAreaTop" config:type="int">-1552</config:config-item>
+   <config:config-item config:name="VisibleAreaLeft" config:type="int">-11853</config:config-item>
+   <config:config-item config:name="VisibleAreaWidth" config:type="int">66322</config:config-item>
+   <config:config-item config:name="VisibleAreaHeight" config:type="int">30515</config:config-item>
    <config:config-item-map-indexed config:name="Views">
     <config:config-item-map-entry>
      <config:config-item config:name="ViewId" config:type="string">view1</config:config-item>
@@ -37,10 +37,10 @@
      <config:config-item config:name="EditModeStandard" config:type="int">0</config:config-item>
      <config:config-item config:name="EditModeNotes" config:type="int">0</config:config-item>
      <config:config-item config:name="EditModeHandout" config:type="int">1</config:config-item>
-     <config:config-item config:name="VisibleAreaTop" config:type="int">-1010</config:config-item>
-     <config:config-item config:name="VisibleAreaLeft" config:type="int">-22369</config:config-item>
-     <config:config-item config:name="VisibleAreaWidth" config:type="int">87314</config:config-item>
-     <config:config-item config:name="VisibleAreaHeight" config:type="int">41613</config:config-item>
+     <config:config-item config:name="VisibleAreaTop" config:type="int">-1552</config:config-item>
+     <config:config-item config:name="VisibleAreaLeft" config:type="int">-11853</config:config-item>
+     <config:config-item config:name="VisibleAreaWidth" config:type="int">66323</config:config-item>
+     <config:config-item config:name="VisibleAreaHeight" config:type="int">30516</config:config-item>
      <config:config-item config:name="GridCoarseWidth" config:type="int">1270</config:config-item>
      <config:config-item config:name="GridCoarseHeight" config:type="int">1270</config:config-item>
      <config:config-item config:name="GridFineWidth" config:type="int">127</config:config-item>
@@ -395,7 +395,7 @@
      <text:p/>
     </draw:connector>
     <draw:custom-shape draw:style-name="gr4" draw:text-style-name="P1" xml:id="id5" draw:id="id5" draw:layer="layout" svg:width="5.715cm" svg:height="1.143cm" svg:x="9.509cm" svg:y="8.62cm">
-     <text:p text:style-name="P1">Checkout w/Paypal</text:p>
+     <text:p text:style-name="P1">Checkout</text:p>
      <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:path-stretchpoint-x="10800" draw:path-stretchpoint-y="10800" draw:text-areas="?f3 ?f4 ?f5 ?f6" draw:type="round-rectangle" draw:modifiers="3600" draw:enhanced-path="M ?f7 0 X 0 ?f8 L 0 ?f9 Y ?f7 21600 L ?f10 21600 X 21600 ?f9 L 21600 ?f8 Y ?f10 0 Z N">
       <draw:equation draw:name="f0" draw:formula="45"/>
       <draw:equation draw:name="f1" draw:formula="$0 *sin(?f0 *(pi/180))"/>

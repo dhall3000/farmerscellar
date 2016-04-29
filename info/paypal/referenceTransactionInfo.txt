@@ -1,3 +1,6 @@
+GATEWAY.details_for calls GetExpressCheckoutDetails
+GATEWAY.agreement_details calls BAUpdate
+
 https://www.paypal-knowledge.com/infocenter/index?page=content&id=FAQ1502&actp=LIST
 detailed walkthrough of reference transaction (mentions setting amount to zero)
 

@@ -3,3 +3,6 @@ Paypal Merchant Technical Support
 
 Paypal buttons
 https://developer.paypal.com/docs/classic/archive/buttons/US-UK/
+
+Active Merchant Docs
+http://www.rubydoc.info/github/Shopify/active_merchant/ActiveMerchant/Billing/PaypalExpressGateway

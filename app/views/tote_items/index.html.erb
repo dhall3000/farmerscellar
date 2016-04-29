@@ -32,11 +32,11 @@
                 <div class="btn-group" data-toggle="buttons">
                   <%= label_tag :use_reference_transaction, class: "btn btn-default active" do %>
                     <%= radio_button_tag :use_reference_transaction, "1", checked: true %>
-                    <span>One-click checkout</span>
+                    <span>Setup one-click checkout</span>
                   <% end %>
                   <%= label_tag :use_reference_transaction, class: "btn btn-default" do %>
                     <%= radio_button_tag :use_reference_transaction, "0" %>
-                    <span>Guest checkout</span>
+                    <span>Use guest checkout</span>
                   <% end %>
                 </div>
               </div>          
@@ -55,9 +55,19 @@
 
           <%= hidden_field_tag(:amount, @total_amount_to_authorize) %>
 
-          <div id="paypal-div">
-            <%= image_submit_tag "https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif", disabled: @dropsite.nil?, id: "paypal-button" %>
-          </div>
+
+
+
+
+          
+          <%= image_tag "https://www.paypalobjects.com/en_US/i/btn/x-click-but02.gif" %>
+          <%= submit_tag "Checkout", class: 'btn btn-lg btn-primary', disabled: @dropsite.nil? %>
+          
+
+
+
+
+
           
         <% end %>
 

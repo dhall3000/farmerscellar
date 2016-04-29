@@ -1,4 +1,10 @@
 class CheckoutsController < ApplicationController
+
+#TODO: implement
+#Get active BA (get one if we don't have one, or if we do have one, verify with pp that it's still legit)
+#Derive an authorization from that BA
+#Stamp all tote items and subscriptions with authorization
+
   def create
 
     if params[:use_reference_transaction].nil?
@@ -6,9 +12,11 @@ class CheckoutsController < ApplicationController
       puts "CheckoutsController#create: unexpected form value for use_reference_transaction. value was nil."
     else
       if params[:use_reference_transaction].to_i == 1
-        create_rt_checkout
+        is_rt = true
+        create_checkout(is_rt)
       elsif params[:use_reference_transaction].to_i == 0
-        create_guest_checkout
+        is_rt = false
+        create_checkout(is_rt)
       else
         flash[:danger] = "Problem checking out. Please contact us if this persists."
         puts "CheckoutsController#create: unexpected form value for use_reference_transaction. was " + params[:use_reference_transaction].to_s
@@ -20,16 +28,7 @@ class CheckoutsController < ApplicationController
 
   private
 
-    def create_rt_checkout
-
-#TODO: implement
-#Get active BA (get one if we don't have one, or if we do have one, verify with pp that it's still legit)
-#Derive an authorization from that BA
-#Stamp all tote items and subscriptions with authorization
-      
-    end
-
-    def create_guest_checkout
+    def create_checkout(is_rt)
 
       if current_user.dropsites.nil? || !current_user.dropsites.any?
         flash[:danger] = "Can't checkout until you specify a delivery dropsite."
@@ -37,35 +36,60 @@ class CheckoutsController < ApplicationController
         return
       end
 
-      @unauthorized_tote_items = current_user_current_unauthorized_tote_items
+      if is_rt
+        checkout_tote_items = current_user_current_tote_items
+      else
+        checkout_tote_items = current_user_current_unauthorized_tote_items
+      end      
 
-      if @unauthorized_tote_items == nil || !@unauthorized_tote_items.any?
+      if checkout_tote_items == nil || !checkout_tote_items.any?
         flash[:danger] = "Can't checkout until you have some product in your tote"
         redirect_to postings_path
         return
       end
 
-      if USEGATEWAY      
-        response = GATEWAY.setup_authorization(
-          params[:amount].to_f * 100,
-          ip: request.remote_ip,
-          items: get_order_summary_details_for_paypal_display(@unauthorized_tote_items),
-          return_url: new_authorization_url,
-          cancel_return_url: root_url,
-          allow_guest_checkout: true
-          )      
+      if USEGATEWAY
+
+        options = {
+            ip: request.remote_ip,            
+            return_url: new_authorization_url,
+            cancel_return_url: tote_items_url,
+            allow_guest_checkout: true,
+            currency: 'USD'            
+          }
+
+        if is_rt
+          money = 0
+          options = options.merge({
+            billing_agreement: {
+              type: 'MerchantInitiatedBillingSingleAgreement',
+              description: "Farmer's Cellar billing agreement"
+            },
+            description: "Farmer's Cellar billing agreement"
+          })          
+        else
+          money = params[:amount].to_f * 100          
+          options = options.merge({
+              items: get_order_summary_details_for_paypal_display(checkout_tote_items),
+              description: "One time authorization"
+            }
+          )
+        end
+
+        response = GATEWAY.setup_authorization(money, options)
+
       else
         response = FakeCheckoutResponse.new
       end
 
-      @checkout = Checkout.new(token: response.token, amount: params[:amount].to_f, client_ip: request.remote_ip, response: response)       
+      checkout = Checkout.new(token: response.token, amount: params[:amount].to_f, client_ip: request.remote_ip, response: response, is_rt: is_rt)
 
-      @unauthorized_tote_items.each do |unauthorized_tote_item|
-        @checkout.tote_items << unauthorized_tote_item
+      checkout_tote_items.each do |current_tote_item|
+        checkout.tote_items << current_tote_item
       end
 
       #save the AS to the db
-      if @checkout.save
+      if checkout.save
         if USEGATEWAY
           redirect_to GATEWAY.redirect_url_for(response.token)
         else                
@@ -73,7 +97,7 @@ class CheckoutsController < ApplicationController
         end
       else
         flash[:danger] = "Payment checkout error."
-      end    
+      end   
 
     end
 
