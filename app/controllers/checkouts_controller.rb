@@ -37,12 +37,12 @@ class CheckoutsController < ApplicationController
       end
 
       if is_rt
-        checkout_tote_items = current_user_current_tote_items
+        @checkout_tote_items = current_user_current_tote_items
       else
-        checkout_tote_items = current_user_current_unauthorized_tote_items
+        @checkout_tote_items = current_user_current_unauthorized_tote_items
       end      
 
-      if checkout_tote_items == nil || !checkout_tote_items.any?
+      if @checkout_tote_items == nil || !@checkout_tote_items.any?
         flash[:danger] = "Can't checkout until you have some product in your tote"
         redirect_to postings_path
         return
@@ -70,7 +70,7 @@ class CheckoutsController < ApplicationController
         else
           money = params[:amount].to_f * 100          
           options = options.merge({
-              items: get_order_summary_details_for_paypal_display(checkout_tote_items),
+              items: get_order_summary_details_for_paypal_display(@checkout_tote_items),
               description: "One time authorization"
             }
           )
@@ -82,14 +82,14 @@ class CheckoutsController < ApplicationController
         response = FakeCheckoutResponse.new
       end
 
-      checkout = Checkout.new(token: response.token, amount: params[:amount].to_f, client_ip: request.remote_ip, response: response, is_rt: is_rt)
+      @checkout = Checkout.new(token: response.token, amount: params[:amount].to_f, client_ip: request.remote_ip, response: response, is_rt: is_rt)
 
-      checkout_tote_items.each do |current_tote_item|
-        checkout.tote_items << current_tote_item
+      @checkout_tote_items.each do |current_tote_item|
+        @checkout.tote_items << current_tote_item
       end
 
       #save the AS to the db
-      if checkout.save
+      if @checkout.save
         if USEGATEWAY
           redirect_to GATEWAY.redirect_url_for(response.token)
         else                

@@ -60,9 +60,9 @@ class Authorizer < ActionDispatch::IntegrationTest
     assert total_amount_to_authorize > 0, "total amount of tote items is not greater than zero"
     puts "total_amount_to_authorize = $#{total_amount_to_authorize}"
     post checkouts_path, amount: total_amount_to_authorize, use_reference_transaction: "0"
-    unauthorized_tote_items = assigns(:unauthorized_tote_items)
-    assert_not_nil unauthorized_tote_items
-    assert unauthorized_tote_items.any?
+    checkout_tote_items = assigns(:checkout_tote_items)
+    assert_not_nil checkout_tote_items
+    assert checkout_tote_items.any?
     checkout = assigns(:checkout)
     assert_not_nil checkout
     puts "checkout token: #{checkout.token}"
