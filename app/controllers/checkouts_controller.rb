@@ -1,10 +1,5 @@
 class CheckoutsController < ApplicationController
 
-#TODO: implement
-#Get active BA (get one if we don't have one, or if we do have one, verify with pp that it's still legit)
-#Derive an authorization from that BA
-#Stamp all tote items and subscriptions with authorization
-
   def create
 
     if params[:use_reference_transaction].nil?
@@ -51,8 +46,7 @@ class CheckoutsController < ApplicationController
       if USEGATEWAY
 
         options = {
-            ip: request.remote_ip,            
-            return_url: new_authorization_url,
+            ip: request.remote_ip,                        
             cancel_return_url: tote_items_url,
             allow_guest_checkout: true,
             currency: 'USD'            
@@ -65,18 +59,20 @@ class CheckoutsController < ApplicationController
               type: 'MerchantInitiatedBillingSingleAgreement',
               description: "Farmer's Cellar billing agreement"
             },
+            return_url: rtauthorizations_new_url,
             description: "Farmer's Cellar billing agreement"
           })          
         else
           money = params[:amount].to_f * 100          
           options = options.merge({
               items: get_order_summary_details_for_paypal_display(@checkout_tote_items),
+              return_url: new_authorization_url,
               description: "One time authorization"
             }
           )
         end
 
-        response = GATEWAY.setup_authorization(money, options)
+        response = GATEWAY.setup_authorization(money, options)        
 
       else
         response = FakeCheckoutResponse.new
