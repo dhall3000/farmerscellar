@@ -8,15 +8,17 @@ class Rtba < ActiveRecord::Base
   #'valid' means we've verified with paypal that the ba is still intact / legit
   def ba_valid?
 
-  	#TODO:implement
-    #if !active
-    #return false
+    if !active
+      return false
+    end
 
-    #if !valid
-      #active = false
+    agreement_details = GATEWAY.agreement_details(ba_id, {})
 
-    #return active
-  	return true
+    if !agreement_details || !agreement_details.params || agreement_details.params["billing_agreement_status"] != "Active"
+      deactivate
+    end
+
+    return active
 
   end
 
@@ -27,7 +29,8 @@ class Rtba < ActiveRecord::Base
       return
     end
     
-    #TODO: cancel ba with pp
+    #TODO: cancel ba with pp?
+    
     update(active: false)
     deauthorize_rtauthorizations
     

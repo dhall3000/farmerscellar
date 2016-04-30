@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160429161929) do
+ActiveRecord::Schema.define(version: 20160429232348) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -397,6 +397,7 @@ ActiveRecord::Schema.define(version: 20160429161929) do
     t.boolean  "active",     default: false, null: false
   end
 
+  add_index "rtbas", ["token"], name: "index_rtbas_on_token"
   add_index "rtbas", ["user_id"], name: "index_rtbas_on_user_id"
 
   create_table "rtpurchase_prs", id: false, force: :cascade do |t|

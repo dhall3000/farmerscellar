@@ -1,0 +1,24 @@
+<h1>Billing Agreement and Authorization</h1>
+
+<% if @tote_items_authorizable.count < 1 %>
+  <p>There is nothing to authorize payment for. Either your shopping tote is empty or everything in your shopping tote has already been authorized.</p>
+<% else %>
+  <%= render partial: "shared/tote", locals: { tote_items: @tote_items_authorizable } %>
+
+  <% if tote_has_items(@tote_items_authorizable) %>
+    <div class="row">
+
+      <div class="col-xs-12 col-sm-5">
+        <p><span class="small">I want to use Paypal for all future purchases with Farmer's Cellar. I understand this lets me check out faster by not having to log in to PayPal to finish my purchase. I can change my preferred payment method or cancel this authorization at any time in my Account Profile at PayPal.com.</span></p>
+        <p></p>
+ 				<%= form_tag rtauthorizations_create_path do %>
+        	<%= hidden_field_tag :token, @token %>
+        	<%= submit_tag "Agree & Authorize", class: "btn btn-primary btn-lg" %>        
+       	<% end %>
+      </div>
+
+      <div class="col-xs-0 col-sm-7">          
+      </div>
+    </div>
+  <% end %>
+<% end %>
