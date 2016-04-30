@@ -6,6 +6,13 @@ class ActiveSupport::TestCase
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
   fixtures :all
 
+  def assert_appropriate_email(mail, to, subject, body)
+    assert_equal subject, mail.subject
+    assert_equal [to], mail.to
+    assert_equal ["david@farmerscellar.com"], mail.from
+    assert_match body, mail.body.encoded
+  end
+
   # Add more helper methods to be used by all tests here...
   def is_logged_in?
   	!session[:user_id].nil?

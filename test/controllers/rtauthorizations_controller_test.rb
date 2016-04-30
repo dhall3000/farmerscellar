@@ -31,11 +31,4 @@ class RtauthorizationsControllerTest < ActionController::TestCase
 		assert_appropriate_email(ActionMailer::Base.deliveries[0], "david@farmerscellar.com", "User billing agreement signup failure!", "success: false")
 	end
 
-  def assert_appropriate_email(mail, to, subject, body)
-    assert_equal subject, mail.subject
-    assert_equal [to], mail.to
-    assert_equal ["david@farmerscellar.com"], mail.from
-    assert_match body, mail.body.encoded
- 	end
-
 end

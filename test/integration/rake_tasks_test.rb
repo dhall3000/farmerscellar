@@ -381,13 +381,6 @@ class RakeTasksTest < BulkBuyer
 
   end
 
-  def assert_appropriate_email(mail, to, subject, body)
-    assert_equal subject, mail.subject
-    assert_equal [to], mail.to
-    assert_equal ["david@farmerscellar.com"], mail.from
-    assert_match body, mail.body.encoded
-  end
-
   def verify_db_snapshot_equal
     assert_equal "true", db_snapshot_equal
   end
