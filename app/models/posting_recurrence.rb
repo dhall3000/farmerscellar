@@ -113,7 +113,7 @@ class PostingRecurrence < ActiveRecord::Base
       body_lines << "Posting id: " + old_post.id.to_s
       body_lines << "Producer: " + old_post.user.farm_name
       body_lines << "Product: " + old_post.product.name
-      AdminNotificationMailer.general_message("old post couldn't be 'unlive'd'", "false body line", body_lines).delivery_now
+      AdminNotificationMailer.general_message("old post couldn't be 'unlive'd'", "false body line", body_lines).deliver_now
     end
 
     #copy old_post
