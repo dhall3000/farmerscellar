@@ -1,4 +1,6 @@
 class Rtba < ActiveRecord::Base
+  attr_accessor :test_params
+
   belongs_to :user
   has_many :rtauthorizations
 
@@ -12,7 +14,15 @@ class Rtba < ActiveRecord::Base
       return false
     end
 
-    agreement_details = GATEWAY.agreement_details(ba_id, {})
+    if USEGATEWAY
+      agreement_details = GATEWAY.agreement_details(ba_id, {})
+    else
+      if test_params && test_params == "failure"
+        agreement_details = FakeAgreementDetails.new("failure")
+      else
+        agreement_details = FakeAgreementDetails.new("success")
+      end
+    end    
 
     if !agreement_details || !agreement_details.params || agreement_details.params["billing_agreement_status"] != "Active"
       deactivate
@@ -44,4 +54,25 @@ class Rtba < ActiveRecord::Base
     	end
     end
 
+end
+
+class FakeAgreementDetails
+  attr_reader :params
+
+  def initialize(type)
+    case type
+    when "success"
+      @params = {
+        "billing_agreement_status": "Active"
+      }
+    when "failure"
+      @params = {
+        "billing_agreement_status": nil
+      }
+    end
+
+    @params = @params.stringify_keys
+
+  end
+  
 end

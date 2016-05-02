@@ -8,10 +8,10 @@ class RtauthorizationsController < ApplicationController
   	if USEGATEWAY
   		details = GATEWAY.details_for(params[:token])
   	else
-  		if params[:success]
-  			details = RtauthorizationsHelper::FakeDetailsFor.new("success")
-  		else
+  		if params[:testparam_fail_fakedetailsfor]
   			details = RtauthorizationsHelper::FakeDetailsFor.new("failure")
+  		else
+  			details = RtauthorizationsHelper::FakeDetailsFor.new("success")
   		end  		
   	end  	
 
@@ -40,36 +40,51 @@ class RtauthorizationsController < ApplicationController
   	if rtba.nil?
   		#if we come from view/rtauth/new.html this means we're trying to set up a new billing agreement
 			#this calls Paypal's CreateBillingAgreement API
-			ba = GATEWAY.store(token, {})
+			if USEGATEWAY
+				ba = GATEWAY.store(token, {})
+			else
+				if params[:testparam_fail_fakestore]
+					ba = RtauthorizationsHelper::FakeStore.new("failure")
+				else
+					ba = RtauthorizationsHelper::FakeStore.new("success")
+				end				
+			end
+			
 			if ba.success?				
-				rtba = Rtba.new(token: token, ba_id: ba.authorization, user: current_user, active: true)
+
+				if params[:testparam_fail_rtba_creation]
+					rtba = Rtba.new(token: token, user: current_user, active: true)					
+				else
+					rtba = Rtba.new(token: token, ba_id: ba.authorization, user: current_user, active: true)
+				end
+				
 				if !rtba.valid?
 					AdminNotificationMailer.general_message("Problem creating rtba!", rtba.errors.to_yaml).deliver_now
-					#TODO RtauthorizationsController 2: problem saving Rtba
-					#flash problem
-					#redirect
+					flash.now[:danger] = "Couldn't establish billing agreement. Please try checking out again. If this problem persists please contact us."
+					redirect_to tote_items_path
+					return
 				end				
+
 				rtba.save	
+
 			else
 				AdminNotificationMailer.general_message("Problem creating paypal billing agreement!", ba.to_yaml).deliver_now
-				#TODO RtauthorizationsController 3: Problem creating paypal billing agreement
-				#flash problem
-				#redirect
+				flash.now[:danger] = "Couldn't establish billing agreement. Please try checking out again. If this problem persists please contact us."
+				redirect_to tote_items_path
+				return
 			end
   	end
 
-  	if rtba.nil?
-  		#TODO RtauthorizationsController 4: rtba is nil
-  		#communicate problems to user
-  		#redirect
-  	end
+		if params[:testparam_fail_rtba_invalid]
+			rtba.test_params = "failure"
+		end					
   	
 		#is ba legit?
 		if !rtba.ba_valid?
-			#TODO RtauthorizationsController 5: billing agreement on file is not valid
-			#flash danger "The Billing Agreement we have on file is no longer valid. Please try to establish a new one by checking out again below. If you continue to have problems please contact us"
-			#email admin
-			#redirect to tote			
+			flash.now[:danger] = "The Billing Agreement we have on file is no longer valid. Please try to establish a new one by checking out again. If you continue to have problems please contact us."
+			AdminNotificationMailer.general_message("Billing agreement invalid!", rtba.ba_id).deliver_now
+			redirect_to tote_items_path
+			return
 		end
 
 		#we have a legit billing agreement in place so now create a new authorization object and associate it with all appropriate other objects
@@ -86,8 +101,10 @@ class RtauthorizationsController < ApplicationController
 				tote_item.transition(:customer_authorized)
 			end
 
-			#associate this tote_item with the new authorization
-			@rtauthorization.tote_items << tote_item
+			if !params[:testparam_fail_rtauthsave]
+				#associate this tote_item with the new authorization
+				@rtauthorization.tote_items << tote_item
+			end
 
 			#if this item came from a subscription, associate the subscription with this authorization
 			if !tote_item.subscription.nil?
@@ -97,9 +114,7 @@ class RtauthorizationsController < ApplicationController
 		end
 
 		if !@rtauthorization.save
-			problem_string = "problem: a new @rtauthorization did not save. Probably better investigate why before Commitment Zone Starts hit."
-			puts problem_string
-			AdminNotificationMailer.general_message("Problem saving Rtauthorization!", problem_string).deliver_now
+			AdminNotificationMailer.general_message("Problem saving Rtauthorization!", @rtauthorization.errors.to_yaml).deliver_now
 		end
   	
   	flash.now[:success] = "Payment authorized!"		

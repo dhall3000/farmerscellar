@@ -1,6 +1,6 @@
 module RtauthorizationsHelper
 
-	class FakeDetailsFor
+	class FakeSuccessMethod
 
 		@success = true
 
@@ -18,6 +18,20 @@ module RtauthorizationsHelper
 	  def success?
 	  	@success
 	  end
+
+	end
+
+	class FakeDetailsFor < FakeSuccessMethod
+
+	end
+
+	class FakeStore < FakeSuccessMethod
+		attr_reader :authorization
+
+		def initialize(type)
+			super(type)
+			@authorization = "fakebillingagreementid"
+		end
 
 	end
 

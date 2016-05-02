@@ -1,3 +1,9 @@
+----------------------------------------------------------------------------------------------------------------
+this is a dump after calling ba = GATEWAY.store(token, {})
+calling ba.success? after returning appears to work ok
+#<ActiveMerchant::Billing::PaypalExpressResponse:0xbb2f13fc @params={"timestamp"=>"2016-05-02T18:34:58Z", "ack"=>"Success", "correlation_id"=>"8b587c81a9076", "version"=>"72", "build"=>"21669447", "billing_agreement_id"=>"B-8YB64509CG673884M", "Timestamp"=>"2016-05-02T18:34:58Z", "Ack"=>"Success", "CorrelationID"=>"8b587c81a9076", "Version"=>"72", "Build"=>"21669447", "BillingAgreementID"=>"B-8YB64509CG673884M"}, @message="Success", @success=true, @test=true, @authorization="B-8YB64509CG673884M", @fraud_review=false, @error_code=nil, @emv_authorization=nil, @avs_result={"code"=>nil, "message"=>nil, "street_match"=>nil, "postal_match"=>nil}, @cvv_result={"code"=>nil, "message"=>nil}>
+----------------------------------------------------------------------------------------------------------------
+
 this is after calling setup authorization but before redirecting to paypal to get user's authorization for billing agreement'
 
 (byebug) GATEWAY.details_for(response.params["token"])
