@@ -7,7 +7,7 @@ class Rtba < ActiveRecord::Base
   validates_presence_of :user
   validates :token, :ba_id, presence: true
 
-  #'valid' means we've verified with paypal that the ba is still intact / legit
+  #'valid' means we've verified with paypal that the ba is still intact / legit  
   def ba_valid?
 
     if !active
@@ -32,6 +32,8 @@ class Rtba < ActiveRecord::Base
 
   end
 
+  #this method is tested by this:
+  #test "should deauthorize rtauthorizations when paypal says billing agreement is inactive" do
   def deactivate
 
     #if we're already marked as inactive on our end there's nothing to do
