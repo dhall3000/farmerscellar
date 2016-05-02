@@ -17,7 +17,7 @@ class RtauthorizationsController < ApplicationController
 
   	if details && details.success?
   		#display tote and 'agree & authorize' button
-	  	@tote_items_authorizable = current_user_current_tote_items
+	  	@tote_items_authorizable = current_user_current_unauthorized_tote_items	  	
   		@token = params[:token]
 		else
 			#flash danger 'please contact us, there was a problem'
@@ -74,15 +74,26 @@ class RtauthorizationsController < ApplicationController
 
 		#we have a legit billing agreement in place so now create a new authorization object and associate it with all appropriate other objects
 		@rtauthorization = Rtauthorization.new(rtba: rtba)
-		@tote_items_authorizable = current_user_current_tote_items
+		@current_tote_items = current_user_current_tote_items
 
-		@tote_items_authorizable.each do |tote_item|
+		#TODO RtauthorizationsController 6: send authorization receipt email. when you send the email it should be sent by using current_user_current_unauthorized_tote_items. the email
+		#should list subtotal and totals for all items that are now moving from ADDED to AUTHORIZED as well as a summary sentence for each new subscription being added
+
+		@current_tote_items.each do |tote_item|
+
+			#transition the tote_item to AUTHORIZED
+			if tote_item.state?(:ADDED)
+				tote_item.transition(:customer_authorized)
+			end
+
 			#associate this tote_item with the new authorization
 			@rtauthorization.tote_items << tote_item
+
 			#if this item came from a subscription, associate the subscription with this authorization
 			if !tote_item.subscription.nil?
 				@rtauthorization.subscriptions << tote_item.subscription
 			end
+
 		end
 
 		if !@rtauthorization.save
@@ -91,14 +102,7 @@ class RtauthorizationsController < ApplicationController
 			AdminNotificationMailer.general_message("Problem saving Rtauthorization!", problem_string).deliver_now
 		end
   	
-  	flash.now[:success] = "Payment authorized!"
-
-		#TODO RtauthorizationsController 6: send authorization receipt email
-
-  	#transition tote_items
-		@tote_items_authorizable.where(state: ToteItem.states[:ADDED]).each do |tote_item|
-      tote_item.transition(:customer_authorized)
-    end
+  	flash.now[:success] = "Payment authorized!"		
 
   end
 end

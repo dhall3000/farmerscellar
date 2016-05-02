@@ -14,6 +14,13 @@ class SubscriptionTest < ActiveSupport::TestCase
 		@subscription.save
 	end
 
+	test "should provide correct description" do
+		@subscription.quantity = 2
+		@subscription.frequency = 2
+		@subscription.save
+		assert_match "2 Pounds of F1 FARM Fuji Apples delivered every 2 weeks for a subtotal of $5.50 each delivery",	@subscription.description
+	end
+
 	test "should not generate new tote item when off" do
 		assert @subscription.on
 		@subscription.turn_off

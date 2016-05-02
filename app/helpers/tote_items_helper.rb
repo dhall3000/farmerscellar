@@ -97,8 +97,12 @@ module ToteItemsHelper
       return 0
     end
 
-    return (tote_item.price * tote_item.quantity).round(2)
+    return get_gross_cost(tote_item.quantity, tote_item.price)
 
+  end
+
+  def get_gross_cost(quantity, price)
+    return (quantity * price).round(2)
   end
 
   def get_commission_tote(tote_items)

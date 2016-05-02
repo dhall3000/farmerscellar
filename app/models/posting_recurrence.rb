@@ -85,6 +85,11 @@ class PostingRecurrence < ActiveRecord::Base
 
   end
 
+  def subscription_description(subscription_frequency)
+    options = subscription_options
+    return options[subscription_frequency][:text]
+  end
+
   def recur
 
     #if there is no recurrence, just quit
