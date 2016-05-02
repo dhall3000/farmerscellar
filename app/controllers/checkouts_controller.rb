@@ -7,16 +7,16 @@ class CheckoutsController < ApplicationController
       puts "CheckoutsController#create: unexpected form value for use_reference_transaction. value was nil."
     else
       if params[:use_reference_transaction].to_i == 1
-        is_rt = true
-        create_checkout(is_rt)
+        is_rt = true        
       elsif params[:use_reference_transaction].to_i == 0
-        is_rt = false
-        create_checkout(is_rt)
+        is_rt = false        
       else
         flash[:danger] = "Problem checking out. Please contact us if this persists."
         puts "CheckoutsController#create: unexpected form value for use_reference_transaction. was " + params[:use_reference_transaction].to_s
         redirect_to tote_items
+        return
       end
+      create_checkout(is_rt)
     end
 
   end

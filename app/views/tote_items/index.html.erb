@@ -19,57 +19,72 @@
         </table>                  
 
 
+        <% if @rtba %>
 
-        <%= form_tag(checkouts_path) do %>
-
-          <% if @provide_guest_checkout_option %> 
-
-          
-
-            <% if SHOWSUBSCRIPTIONSTUFF %>
-
-              <div class="text-center">
-                <div class="btn-group" data-toggle="buttons">
-                  <%= label_tag :use_reference_transaction, class: "btn btn-default active" do %>
-                    <%= radio_button_tag :use_reference_transaction, "1", checked: true %>
-                    <span>Setup one-click checkout</span>
-                  <% end %>
-                  <%= label_tag :use_reference_transaction, class: "btn btn-default" do %>
-                    <%= radio_button_tag :use_reference_transaction, "0" %>
-                    <span>Use guest checkout</span>
-                  <% end %>
-                </div>
-              </div>          
-
-            <% else %>
-              <%= hidden_field_tag(:use_reference_transaction, "0") %>
-            <% end %>
-
-
-
-
-
-          <% else %>
-              <%= hidden_field_tag(:use_reference_transaction, "1") %>
+          <%= form_tag rtauthorizations_create_path do %>
+            <%= hidden_field_tag(:token, @rtba.token) %>
+            <%= image_tag "https://www.paypalobjects.com/en_US/i/btn/x-click-but02.gif" %>
+            <%= submit_tag "Authorize payment", class: 'btn btn-lg btn-primary', id: "paypal-button", disabled: @dropsite.nil? %>
           <% end %>
 
-          <%= hidden_field_tag(:amount, @total_amount_to_authorize) %>
+        <% else %>
+
+          <%= form_tag(checkouts_path) do %>
+
+            <% if @provide_guest_checkout_option %> 
+
+            
+
+              <% if SHOWSUBSCRIPTIONSTUFF %>
+
+                <div class="text-center">
+                  <div class="btn-group" data-toggle="buttons">
+                    <%= label_tag :use_reference_transaction, class: "btn btn-default active" do %>
+                      <%= radio_button_tag :use_reference_transaction, "1", checked: true %>
+                      <span>Setup one-click checkout</span>
+                    <% end %>
+                    <%= label_tag :use_reference_transaction, class: "btn btn-default" do %>
+                      <%= radio_button_tag :use_reference_transaction, "0" %>
+                      <span>Use guest checkout</span>
+                    <% end %>
+                  </div>
+                </div>          
+
+              <% else %>
+                <%= hidden_field_tag(:use_reference_transaction, "0") %>
+              <% end %>
 
 
 
 
 
-          
-          <%= image_tag "https://www.paypalobjects.com/en_US/i/btn/x-click-but02.gif" %>
-          <%= submit_tag "Checkout", class: 'btn btn-lg btn-primary', id: "paypal-button", disabled: @dropsite.nil? %>
-          
+            <% else %>
+                <%= hidden_field_tag(:use_reference_transaction, "1") %>
+            <% end %>
+
+            <%= hidden_field_tag(:amount, @total_amount_to_authorize) %>
 
 
 
 
 
-          
+            
+            <%= image_tag "https://www.paypalobjects.com/en_US/i/btn/x-click-but02.gif" %>
+            <%= submit_tag "Checkout", class: 'btn btn-lg btn-primary', id: "paypal-button", disabled: @dropsite.nil? %>
+            
+
+
+
+
+
+            
+          <% end %>
+
         <% end %>
+
+
+
+
 
         <% if @dropsite.nil? %>
           <p class="alert alert-danger">No delivery dropsite specified.</p>
