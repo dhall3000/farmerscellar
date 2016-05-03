@@ -61,4 +61,86 @@ class RtauthorizationTest < ActiveSupport::TestCase
 		assert_not @rtauthorization.valid?
 	end
 
+	test "should add tote items and subscriptions and transition tote items too" do
+
+    user = users(:c1)
+    rtba = Rtba.new(token: "token", ba_id: "ba_id", active: true)
+    rtba.user = user
+    assert rtba.valid?
+    assert rtba.save
+    #add a subscription and generate a toteitem off of it
+    add_subscription_and_item_to_c1
+
+    #how many ADDED items do we have?
+    num_added_items = user.tote_items.where(state: ToteItem.states[:ADDED]).count
+    #we should have at least 1
+    assert num_added_items > 0
+    #now transition the 1st item to COMMITTED
+    user.tote_items.first.update(state: ToteItem.states[:COMMITTED])
+    #and now the number of ADDED items should have gone down by 1
+    assert num_added_items - 1, user.tote_items.where(state: ToteItem.states[:ADDED]).count
+
+    #verify subscription is not authorized
+    subscriptions = get_subscriptions_from(user.tote_items)
+    assert_equal 1, subscriptions.count
+
+    assert_not subscriptions.last.authorized?
+    
+    rtauthorization = Rtauthorization.new(rtba: rtba)    
+    rtauthorization.authorize_items_and_subscriptions(user.tote_items)   
+    assert rtauthorization.valid?
+    assert rtauthorization.save
+
+    assert subscriptions.last.authorized?
+    assert_equal ToteItem.states[:COMMITTED], user.tote_items.first.state
+    assert_equal ToteItem.states[:AUTHORIZED], user.tote_items.last.state
+		
+	end
+
+	test "should not authorize tote items if self not authorized" do
+    user = users(:c1)
+    rtba = Rtba.new(token: "token", ba_id: "ba_id", active: false)
+    rtba.user = user
+    assert rtba.valid?
+    assert rtba.save
+    #add a subscription and generate a toteitem off of it
+    add_subscription_and_item_to_c1
+
+    #how many ADDED items do we have?
+    num_added_items = user.tote_items.where(state: ToteItem.states[:ADDED]).count
+    #we should have at least 1
+    assert num_added_items > 0
+    #now transition the 1st item to COMMITTED
+    user.tote_items.first.update(state: ToteItem.states[:COMMITTED])
+    #and now the number of ADDED items should have gone down by 1
+    assert num_added_items - 1, user.tote_items.where(state: ToteItem.states[:ADDED]).count
+
+    #verify subscription is not authorized
+    subscriptions = get_subscriptions_from(user.tote_items)
+    assert_equal 1, subscriptions.count
+
+    assert_not subscriptions.last.authorized?
+    
+    rtauthorization = Rtauthorization.new(rtba: rtba)    
+    rtauthorization.authorize_items_and_subscriptions(user.tote_items)   
+
+    #should not be valid because the above .authorize_items_and_subscriptions should have accomplished nothing
+    #because the rtauth isn't authorized because the rtba is not active
+    assert_not rtauthorization.valid?, rtauthorization.errors.full_messages
+    assert_not rtauthorization.save
+
+    #verify no state changed
+    assert_not subscriptions.last.authorized?    
+    assert_equal ToteItem.states[:COMMITTED], user.tote_items.first.state
+    assert_equal ToteItem.states[:ADDED], user.tote_items.last.state
+
+	end
+
+  def add_subscription_and_item_to_c1
+    posting_recurrence = posting_recurrences(:one)
+    subscription = Subscription.new(frequency: 1, on: true, user: users(:c1), posting_recurrence: posting_recurrence, quantity: 2)
+    subscription.save
+    subscription.generate_next_tote_item
+  end
+
 end

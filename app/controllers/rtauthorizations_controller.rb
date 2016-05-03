@@ -92,24 +92,9 @@ class RtauthorizationsController < ApplicationController
 		@current_tote_items = current_user_current_tote_items
 		tote_items_authorizable = current_user_current_unauthorized_tote_items.to_a
 
-		@current_tote_items.each do |tote_item|
-
-			#transition the tote_item to AUTHORIZED
-			if tote_item.state?(:ADDED)
-				tote_item.transition(:customer_authorized)
-			end
-
-			if !params[:testparam_fail_rtauthsave]
-				#associate this tote_item with the new authorization
-				@rtauthorization.tote_items << tote_item
-			end
-
-			#if this item came from a subscription, associate the subscription with this authorization
-			if !tote_item.subscription.nil?
-				@rtauthorization.subscriptions << tote_item.subscription
-			end
-
-		end
+    if !params[:testparam_fail_rtauthsave]
+      @rtauthorization.authorize_items_and_subscriptions(@current_tote_items)
+    end
 
 		if @rtauthorization.save
 			UserMailer.authorization_receipt(current_user, @rtauthorization, tote_items_authorizable).deliver_now			

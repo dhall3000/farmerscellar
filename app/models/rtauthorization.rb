@@ -19,4 +19,29 @@ class Rtauthorization < ActiveRecord::Base
   	end
   end
 
+  def authorize_items_and_subscriptions(tote_items_to_authorize)
+
+    if !authorized?
+      return
+    end
+
+    tote_items_to_authorize.each do |tote_item|
+
+      #transition the tote_item to AUTHORIZED
+      if tote_item.state?(:ADDED)
+        tote_item.transition(:customer_authorized)
+      end
+
+      #associate this tote_item with the new authorization
+      self.tote_items << tote_item      
+
+      #if this item came from a subscription, associate the subscription with this authorization
+      if !tote_item.subscription.nil?
+        self.subscriptions << tote_item.subscription        
+      end
+
+    end
+
+  end
+
 end
