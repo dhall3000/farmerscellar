@@ -92,7 +92,7 @@ class Authorizer < ActionDispatch::IntegrationTest
     mail = ActionMailer::Base.deliveries.last
     assert_equal [user.email], mail.to
     assert_match "Authorization receipt", mail.subject    
-    assert_match "payment authorization receipt for", mail.body.encoded
+    assert_match "This is your Farmer's Cellar receipt for payment authorization", mail.body.encoded
     
     assert_match authorization.checkouts.last.tote_items.last.posting.user.farm_name, mail.body.encoded
     assert_match authorization.checkouts.last.tote_items.last.posting.product.name, mail.body.encoded

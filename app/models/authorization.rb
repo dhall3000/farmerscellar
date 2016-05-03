@@ -19,7 +19,7 @@ class Authorization < ActiveRecord::Base
   		return nil
   	end
 
-  	return checkout.tote_items.where(state: ToteItem.states[:AUTHORIZED])
+  	return checkout.tote_items
 
   end
 

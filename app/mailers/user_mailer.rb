@@ -23,9 +23,27 @@ class UserMailer < ApplicationMailer
   end
 
   def authorization_receipt(user, authorization)
-    @user = user
-    @authorization = authorization
-    mail to: user.email, subject: "Authorization receipt"
+    authorization_receipt2(user, authorization)
+  end
+
+  #the 'authorization' param can be either a Authorization or a Rtauthorization
+  def authorization_receipt2(user, authorization, tote_items_getting_authorized = nil)
+    
+    @user = user    
+
+    if tote_items_getting_authorized
+      @id = "Z#{authorization.id.to_s}"
+      @amount = get_gross_tote(tote_items_getting_authorized)      
+      @tote_items = tote_items_getting_authorized
+      @subscriptions = get_subscriptions_from(tote_items_getting_authorized)
+    else
+      @id = authorization.id.to_s
+      @amount = authorization.amount
+      @tote_items = authorization.tote_items
+    end
+
+    mail to: user.email, subject: "Authorization receipt"    
+
   end
 
   def delivery_notification(user, dropsite, tote_items)
