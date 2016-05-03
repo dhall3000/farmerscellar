@@ -5,9 +5,32 @@ class AuthorizationTest < ActiveSupport::TestCase
   #   assert true
   # end
   def setup    
+
+    t8 = tote_items(:t8)
+    t8.update(state: ToteItem.states[:AUTHORIZED])
+    t9 = tote_items(:t9)
+    t9.update(state: ToteItem.states[:AUTHORIZED])
+    t10 = tote_items(:t10)
+    t10.update(state: ToteItem.states[:AUTHORIZED])
+
     @checkout = checkouts(:checkout1)
+    @checkout.tote_items << t8
+    @checkout.tote_items << t9
+    @checkout.tote_items << t10
+    @checkout.save
+
     @authorization = Authorization.new(token: "faketoken", payer_id: "ED-127", amount: 22.75, correlation_id: "correlationid", transaction_id: "transactionid", payment_date: Date.today, gross_amount: 22.75, response: "responsetext", ack: "ackstring")
     @authorization2 = Authorization.new(token: "faketoken", payer_id: "ED-127", amount: 22.75, correlation_id: "correlationid", transaction_id: "transactionid", payment_date: Date.today, gross_amount: 22.75, response: "responsetext", ack: "ackstring")
+
+  end
+
+  test "should return all authorized tote items" do
+    assert_not @authorization.checkouts.any?
+    assert_equal nil, @authorization.tote_items
+    @authorization.checkouts << @checkout
+    assert @authorization.save
+    tote_items = @authorization.tote_items
+    assert_equal 3, tote_items.count
   end
 
   test "authorization should save" do

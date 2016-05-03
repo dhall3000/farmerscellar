@@ -41,8 +41,6 @@ class Rtba < ActiveRecord::Base
       return
     end
     
-    #TODO: cancel ba with pp?
-    
     update(active: false)
     deauthorize_rtauthorizations
     
