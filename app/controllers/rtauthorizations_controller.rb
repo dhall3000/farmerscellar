@@ -90,9 +90,7 @@ class RtauthorizationsController < ApplicationController
 		#we have a legit billing agreement in place so now create a new authorization object and associate it with all appropriate other objects
 		@rtauthorization = Rtauthorization.new(rtba: rtba)
 		@current_tote_items = current_user_current_tote_items
-
-		#TODO RtauthorizationsController 6: send authorization receipt email. when you send the email it should be sent by using current_user_current_unauthorized_tote_items. the email
-		#should list subtotal and totals for all items that are now moving from ADDED to AUTHORIZED as well as a summary sentence for each new subscription being added
+		tote_items_authorizable = current_user_current_unauthorized_tote_items.to_a
 
 		@current_tote_items.each do |tote_item|
 
@@ -113,7 +111,9 @@ class RtauthorizationsController < ApplicationController
 
 		end
 
-		if !@rtauthorization.save
+		if @rtauthorization.save
+			UserMailer.authorization_receipt(current_user, @rtauthorization, tote_items_authorizable).deliver_now			
+		else
 			AdminNotificationMailer.general_message("Problem saving Rtauthorization!", @rtauthorization.errors.to_yaml).deliver_now
 		end
   	

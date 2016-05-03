@@ -40,16 +40,14 @@ Here is the product information for which you authorized payment:
 <% if @subscriptions %>
 
   <p>
-    The total payment amount authorized currently set for delivery is <%= number_to_currency(@amount) %>. Additionally, you authorized payment for the following subscriptions:
+    The total payment amount authorized for the products listed above is <%= number_to_currency(@amount) %>. Additionally, you authorized future charges to your payment account associated with the following <%= "subscription".pluralize(@subscriptions.count) %>:
   </p>
 
-  <p>
-    <ul>
-      <li>TODO: subscription 1</li>
-      <li>TODO: subscription 2</li>
-      <li>TODO: subscription 3</li>
-    </ul>
-  </p>
+  <ul>
+    <% @subscriptions.each do |subscription| %>
+      <li><%= subscription.description %></li>
+    <% end %>
+  </ul>  
 
 <% else %>
 

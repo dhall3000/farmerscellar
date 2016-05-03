@@ -10,10 +10,11 @@ ID=<%= tote_item.id %>, <%= tote_item.posting.user.farm_name %> <%= tote_item.po
 <% end %>
 
 <% if @subscriptions %>
-The total payment amount authorized currently set for delivery is <%= number_to_currency(@amount) %>. Additionally, you authorized payment for the following subscriptions:
-	TODO: subscription 1
-    TODO: subscription 2
-    TODO: subscription 3
+The total payment amount authorized for the products listed above is <%= number_to_currency(@amount) %>. Additionally, you authorized future charges to your payment account associated with the following <%= "subscription".pluralize(@subscriptions.count) %>:
+
+	<% @subscriptions.each do |subscription| %>
+    <%= subscription.description %>
+  <% end %>
 <% else %>
 The total payment amount authorized is <%= number_to_currency(@amount) %>.
 <% end %>

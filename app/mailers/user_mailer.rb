@@ -22,12 +22,8 @@ class UserMailer < ApplicationMailer
     mail to: user.email, subject: "Password reset"
   end
 
-  def authorization_receipt(user, authorization)
-    authorization_receipt2(user, authorization)
-  end
-
   #the 'authorization' param can be either a Authorization or a Rtauthorization
-  def authorization_receipt2(user, authorization, tote_items_getting_authorized = nil)
+  def authorization_receipt(user, authorization, tote_items_getting_authorized = nil)
     
     @user = user    
 
