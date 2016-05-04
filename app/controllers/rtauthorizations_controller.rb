@@ -90,19 +90,22 @@ class RtauthorizationsController < ApplicationController
 		#we have a legit billing agreement in place so now create a new authorization object and associate it with all appropriate other objects
 		@rtauthorization = Rtauthorization.new(rtba: rtba)
 		@current_tote_items = current_user_current_tote_items
-		tote_items_authorizable = current_user_current_unauthorized_tote_items.to_a
+		@successfully_authorized_tote_items = current_user_current_unauthorized_tote_items.to_a
+    @subscriptions = get_subscriptions_from(@successfully_authorized_tote_items)
 
     if !params[:testparam_fail_rtauthsave]
       @rtauthorization.authorize_items_and_subscriptions(@current_tote_items)
     end
 
 		if @rtauthorization.save
-			UserMailer.authorization_receipt(current_user, @rtauthorization, tote_items_authorizable).deliver_now			
+			UserMailer.authorization_receipt(current_user, @rtauthorization, @successfully_authorized_tote_items).deliver_now			
 		else
 			AdminNotificationMailer.general_message("Problem saving Rtauthorization!", @rtauthorization.errors.to_yaml).deliver_now
 		end
   	
   	flash.now[:success] = "Payment authorized!"		
+    @authorization_succeeded = true
+    render 'authorizations/create'    
 
   end
 end

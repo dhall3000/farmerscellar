@@ -2,9 +2,23 @@
 <h1>Payment Authorization Complete</h1>
   <div>
     <p>You just successfully completed payment authorization for the items listed below. A receipt has been emailed to you.</p>
-  </div>
-  <% @authorization.amount = get_gross_tote(@successfully_authorized_tote_items) %>
+  </div>  
   <%= render partial: "shared/tote", locals: { tote_items: @successfully_authorized_tote_items, authorization_adjective: "successful" } %>
+
+	<% if @subscriptions %>
+
+	  <p>
+	    Additionally, you authorized future charges to your payment account associated with the following <%= "subscription".pluralize(@subscriptions.count) %>:
+	  </p>
+
+	  <ul>
+	    <% @subscriptions.each do |subscription| %>
+	      <li><%= subscription.description %></li>
+	    <% end %>
+	  </ul>  
+
+	<% end %>
+
 <% else %>
 <h1>Payment Authorization Error</h1>
   Something seemed to have gone wrong with your payment authorization. Please <%= link_to "contact us", contact_path %> to get this issue corrected. Thank you!

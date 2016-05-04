@@ -2,8 +2,7 @@
 
 <% if @unauthorized_tote_items.count < 1 %>
   <p>There is nothing to authorize payment for. Either your shopping tote is empty or everything in your shopping tote has already been authorized.</p>
-<% else %>
-  <% @authorization.amount = get_gross_tote(@unauthorized_tote_items) %>
+<% else %>  
   <%= render partial: "shared/tote", locals: { tote_items: @unauthorized_tote_items } %>
 
   <% if tote_has_items(@unauthorized_tote_items) %>

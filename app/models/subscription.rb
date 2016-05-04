@@ -1,4 +1,6 @@
 class Subscription < ActiveRecord::Base
+  include ToteItemsHelper
+  include ActionView::Helpers::NumberHelper
 
   belongs_to :user
   belongs_to :posting_recurrence

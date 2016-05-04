@@ -13,6 +13,9 @@ class AuthorizationsController < ApplicationController
     else
       @authorization = Authorization.new(token: params[:token], payer_id: ('a'..'z').to_a.shuffle[0..10].join)
     end
+
+    @authorization.amount = get_gross_tote(@unauthorized_tote_items)
+
   end
 
   def create
@@ -52,6 +55,7 @@ class AuthorizationsController < ApplicationController
         flash.now[:danger] = "Payment not authorized."
       end
 
+      @authorization.amount = get_gross_tote(@successfully_authorized_tote_items)
       @authorization.save
 
       #placing this here is a hack. it's more appropriate location woudl be in the if @authorization_succeeded... block
