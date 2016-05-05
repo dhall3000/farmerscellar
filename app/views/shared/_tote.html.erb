@@ -12,10 +12,10 @@
     <table class="table">
       <thead>
         <tr>
-          <th class="text-center">Product</th>          
-          <th class="text-center">Quantity</th>
-          <th class="text-center">Cost</th>
-          <th class="text-center">Remove</th>
+          <th></th>
+          <th>Product</th>          
+          <th>Delivery</th>
+          <th>Cost</th>
         </tr>
       </thead>
       <tbody>
@@ -27,22 +27,28 @@
             <% tote_items_authorized << tote_item %>
             <tr>
           <% end %>        
-            <td class="text-center">
+
+            <td>
+              <% if tote_item.state == ToteItem.states[:ADDED] || tote_item.state == ToteItem.states[:AUTHORIZED] %>
+                <%= link_to "", tote_item, class: "glyphicon glyphicon-remove", method: :delete, data: { confirm: "Remove item from tote?" } %>
+              <% else %>
+                <% data_content = "This item is not removable because it is in the " + link_to("Commitment Zone", how_things_work_path(anchor: "commitment_zone")) %>
+                <a tabindex="0" role="button" data-container="body" data-placement="right" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=data_content%>"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+              <% end %>
+            </td>          
+
+
+            <td>
               <%= link_to tote_item.posting.product.name, new_tote_item_path(posting_id: tote_item.posting_id) %>
+            </td>            
+            <td>
+              <%= tote_item.posting.delivery_date.strftime("%a %m/%y") %>
               <% if tote_item.subscription && tote_item.subscription.on %>
                 <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>
               <% end %>
-            </td>            
-            <td class="text-center"><%= pluralize(tote_item.quantity, tote_item.posting.unit_kind.name)%></td>
-            <td class="text-center"><%= number_to_currency(tote_item.price * tote_item.quantity) %></td>
-            <td class="text-center">
-            <% if tote_item.state == ToteItem.states[:ADDED] || tote_item.state == ToteItem.states[:AUTHORIZED] %>
-              <%= link_to "-", tote_item, class: "btn btn-primary", method: :delete %>
-            <% else %>
-              <% data_content = "This item is not removable because it is in the " + link_to("Commitment Zone", how_things_work_path(anchor: "commitment_zone")) %>
-              <a tabindex="0" class="btn btn-primary" role="button" data-container="body" data-placement="left" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=data_content%>">-</a>
-              <% end %>
-            </td>          
+            </td>
+            <td><%= number_to_currency(tote_item.price * tote_item.quantity) %></td>
+
           </tr>        
 
             <% if tote_item.state == ToteItem.states[:ADDED] %>              
@@ -53,7 +59,7 @@
             
                 <td colspan="4" class="borderless">
                   <div>
-                    <a href="#<%= 'toteItemDetails' + tote_item.id.to_s %>" data-toggle="collapse"><span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span></a>
+                    <a href="#<%= 'toteItemDetails' + tote_item.id.to_s %>" data-toggle="collapse"><span class="glyphicon glyphicon-expand" aria-hidden="true"></span></a>
                   </div>
 
                   <div id="<%= 'toteItemDetails' + tote_item.id.to_s %>" class="collapse">

@@ -1,6 +1,10 @@
 $(function(){
 	$('.popover_init').popover();
 
+	$(function () {
+	  $('[data-toggle="popover"]').popover()
+	})
+
 	$('#frequency_dropdown').change(function() {
 
 		var subscriptionFrequency = $('#frequency_dropdown option:selected').val();
