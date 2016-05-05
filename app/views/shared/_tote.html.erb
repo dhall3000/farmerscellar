@@ -44,6 +44,24 @@
               <% end %>
             </td>          
           </tr>        
+
+            <% if tote_item.state == ToteItem.states[:ADDED] %>              
+              <tr class="action_needed">
+            <% else %>
+              <tr>
+            <% end %>
+            
+                <td colspan="4" class="borderless">
+                  <div>
+                    <a href="#<%= 'toteItemDetails' + tote_item.id.to_s %>" data-toggle="collapse"><span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span></a>
+                  </div>
+
+                  <div id="<%= 'toteItemDetails' + tote_item.id.to_s %>" class="collapse">
+                    hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello 
+                  </div>
+                </td>                             
+              </tr>
+          
         <% end %>
       </tbody>
     </table>

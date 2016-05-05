@@ -21,4 +21,10 @@ class StaticPagesController < ApplicationController
 
   def test_page
   end
+
+  #this 'm' is for 'mobile'. the idea is i can have anybody (e.g. Jason Meyering) hit this page in production
+  #and they can read the text to me and this could help me diagnose why they're having display problems
+  def m
+  end
+
 end
