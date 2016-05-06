@@ -1,0 +1,46 @@
+<% if !tote_item.nil? %>  
+  <div class="panel-group" role="tablist" aria-multiselectable="true">      
+
+  <% if tote_item.state == ToteItem.states[:ADDED] %>
+    
+  <% else %>
+    
+  <% end %>
+
+    <div class="panel panel-default">
+      <div class="panel-heading" role="tab">
+        <h4 class="panel-title">Order Info</h4>
+      </div>                
+      <div class="panel-body">
+        <ul>
+          <div class="hidden-sm hidden-md hidden-lg">
+            <li>Quantity: <%= tote_item.quantity.to_s + " " + UnitKind.find_by(id: tote_item.posting.unit_kind_id).name.pluralize(tote_item.quantity) %> </li>
+            <li>Price: <%= number_to_currency(tote_item.posting.price) %> / <%= UnitKind.find_by(id: tote_item.posting.unit_kind_id).name %></li>
+          </div>
+          <li><%= link_to("Commitment Zone Start", how_things_work_path(anchor: "commitment_zone")) %>: <%= tote_item.posting.commitment_zone_start.strftime("%a %m/%d %l:%M %p") %></li>
+          <% if !tote_item.subscription.nil? %>
+            <li>This is a subscription for <%= tote_item.subscription.description %></li>          
+          <% end %>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading" role="tab">
+        <h4 class="panel-title">Product Info</h4>
+      </div>                
+      <div class="panel-body">
+        <ul>
+          <li>Product Description: <%= tote_item.posting.description %></li>
+          <li>Producer: <%= tote_item.posting.user.farm_name %></li>
+          <li>Producer Description: <%= tote_item.posting.user.description %></li>
+          <% if !tote_item.posting.user.website.nil? %>
+            <li>Producer Website:  <%= link_to tote_item.posting.user.website, url_with_protocol(tote_item.posting.user.website), target: "_blank" %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+
+
+  </div>
+<% end %>

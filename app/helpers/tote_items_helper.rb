@@ -9,6 +9,10 @@ module ToteItemsHelper
     return unauthorized_tote_items
   end
 
+  def url_with_protocol(url)
+    /^http/i.match(url) ? url : "http://#{url}"
+  end  
+
   def current_tote_items_for_user(user)
 
     #2016-04-06 NEW DESCRIPTION!:

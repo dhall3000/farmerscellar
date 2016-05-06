@@ -14,8 +14,10 @@
         <tr>
           <th></th>
           <th>Product</th>          
+          <th class="text-center hidden-xs">Quantity</th>
+          <th class="text-center hidden-xs">Price</th>
+          <th class="text-center">Sub total</th>
           <th>Delivery</th>
-          <th>Cost</th>
         </tr>
       </thead>
       <tbody>
@@ -36,18 +38,18 @@
                 <a tabindex="0" role="button" data-container="body" data-placement="right" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=data_content%>"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
               <% end %>
             </td>          
-
-
             <td>
-              <%= link_to tote_item.posting.product.name, new_tote_item_path(posting_id: tote_item.posting_id) %>
-            </td>            
+              <%= tote_item.posting.product.name %>
+            </td>
+            <td class="text-center hidden-xs"><%= tote_item.quantity.to_s %></td>
+            <td class="text-center hidden-xs"><%= number_to_currency(tote_item.posting.price) %> / <%= UnitKind.find_by(id: tote_item.posting.unit_kind_id).name %></td>
+            <td class="text-center"><%= number_to_currency(get_gross_item(tote_item)) %></td>
             <td>
-              <%= tote_item.posting.delivery_date.strftime("%a %m/%y") %>
+              <%= tote_item.posting.delivery_date.strftime("%a %m/%d") %>
               <% if tote_item.subscription && tote_item.subscription.on %>
                 <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>
               <% end %>
-            </td>
-            <td><%= number_to_currency(tote_item.price * tote_item.quantity) %></td>
+            </td>            
 
           </tr>        
 
@@ -56,16 +58,25 @@
             <% else %>
               <tr>
             <% end %>
-            
-                <td colspan="4" class="borderless">
+
+                <td colspan="6" class="hidden-xs borderless">
                   <div>
                     <a href="#<%= 'toteItemDetails' + tote_item.id.to_s %>" data-toggle="collapse"><span class="glyphicon glyphicon-expand" aria-hidden="true"></span></a>
                   </div>
-
                   <div id="<%= 'toteItemDetails' + tote_item.id.to_s %>" class="collapse">
-                    hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello 
+                    <%= render partial: "shared/tote_expansion_row", locals: { tote_item: tote_item } %>
+                  </div>
+                </td>            
+            
+                <td colspan="4" class="hidden-sm hidden-md hidden-lg borderless">
+                  <div>
+                    <a href="#xs<%= 'toteItemDetails' + tote_item.id.to_s %>" data-toggle="collapse"><span class="glyphicon glyphicon-expand" aria-hidden="true"></span></a>
+                  </div>
+                  <div id="xs<%= 'toteItemDetails' + tote_item.id.to_s %>" class="collapse">
+                    <%= render partial: "shared/tote_expansion_row", locals: { tote_item: tote_item } %>
                   </div>
                 </td>                             
+
               </tr>
           
         <% end %>
