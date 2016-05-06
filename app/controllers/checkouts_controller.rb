@@ -88,8 +88,16 @@ class CheckoutsController < ApplicationController
       if @checkout.save
         if USEGATEWAY
           redirect_to GATEWAY.redirect_url_for(response.token)
-        else                
-          redirect_to(new_authorization_path(token: response.token))
+        else
+          
+          if is_rt
+            redirection_path = rtauthorizations_new_path(token: response.token)
+          else
+            redirection_path = new_authorization_path(token: response.token)
+          end
+          
+          redirect_to(redirection_path)
+
         end
       else
         flash[:danger] = "Payment checkout error."

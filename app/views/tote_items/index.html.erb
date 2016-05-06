@@ -2,9 +2,8 @@
 
 <% if logged_in? %>
 
-  <%= render partial: "shared/tote", locals: { tote_items: @tote_items } %>
-  
-
+  <% show_remove_button = true %>
+  <%= render partial: "shared/tote", locals: { tote_items: @tote_items, show_remove_button: show_remove_button } %>  
 
   <% if @total_amount_to_authorize > 0 %>
     <h2>Checkout</h2>
