@@ -13,11 +13,11 @@
       <thead>
         <tr>
           <th></th>
-          <th>Product</th>          
+          <th class="text-left">Product</th>          
           <th class="text-center hidden-xs">Quantity</th>
           <th class="text-center hidden-xs">Price</th>
           <th class="text-center">Sub total</th>
-          <th>Delivery</th>
+          <th class="text-right">Delivery</th>
         </tr>
       </thead>
       <tbody>
@@ -38,17 +38,17 @@
                 <a tabindex="0" role="button" data-container="body" data-placement="right" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=data_content%>"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
               <% end %>
             </td>          
-            <td>
+            <td class="text-left">
               <%= tote_item.posting.product.name %>
             </td>
             <td class="text-center hidden-xs"><%= tote_item.quantity.to_s %></td>
             <td class="text-center hidden-xs"><%= number_to_currency(tote_item.posting.price) %> / <%= UnitKind.find_by(id: tote_item.posting.unit_kind_id).name %></td>
             <td class="text-center"><%= number_to_currency(get_gross_item(tote_item)) %></td>
-            <td>
-              <%= tote_item.posting.delivery_date.strftime("%a %m/%d") %>
+            <td class="text-right">              
               <% if tote_item.subscription && tote_item.subscription.on %>
                 <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>
               <% end %>
+              <%= tote_item.posting.delivery_date.strftime("%a %m/%d") %>
             </td>            
 
           </tr>        
