@@ -20,10 +20,11 @@ class ToteItemsController < ApplicationController
 
       @tote_items = current_user_current_tote_items
 
-      if @tote_items == nil
+      if @tote_items.nil?
         @total_amount_to_authorize = 0
       else
-        @total_amount_to_authorize = get_gross_tote(@tote_items.where(state: ToteItem.states[:ADDED]))      
+        @tote_items = @tote_items.order("postings.delivery_date")
+        @total_amount_to_authorize = get_gross_tote(@tote_items.where(state: ToteItem.states[:ADDED]))
       end
 
       @rtba = current_user.get_active_rtba

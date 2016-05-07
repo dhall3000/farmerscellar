@@ -7,8 +7,9 @@
 
   <% if @total_amount_to_authorize > 0 %>
     <h2>Checkout</h2>
+    
     <div class="row">
-      <div class="col-sm-4 col-sm-offset-right-8">
+      <div class="col-sm-6 col-md-4">
         <table class="table">
           <tbody>          
             <tr>
@@ -16,24 +17,28 @@
             </tr>
           </tbody>
         </table>                  
+      </div>
+    </div>
 
+    <div class="row">
+    
+      <div class="col-xs-3 col-sm-2 col-md-1">
+        <span><%= image_tag "https://www.paypalobjects.com/en_US/i/btn/x-click-but02.gif" %></span>
+      </div>
 
+      <div class="col-xs-9 col-sm-4 col-md-3">
         <% if @rtba %>
 
           <%= form_tag rtauthorizations_create_path do %>
             <%= hidden_field_tag(:token, @rtba.token) %>
-            <%= image_tag "https://www.paypalobjects.com/en_US/i/btn/x-click-but02.gif" %>
+            
             <%= submit_tag "Authorize payment", class: 'btn btn-lg btn-primary', id: "paypal-button", disabled: @dropsite.nil? %>
           <% end %>
 
         <% else %>
 
           <%= form_tag(checkouts_path) do %>
-
-            <% if @provide_guest_checkout_option %> 
-
-            
-
+            <% if @provide_guest_checkout_option %>             
               <% if SHOWSUBSCRIPTIONSTUFF %>
 
                 <div class="text-center">
@@ -52,60 +57,35 @@
               <% else %>
                 <%= hidden_field_tag(:use_reference_transaction, "0") %>
               <% end %>
-
-
-
-
-
             <% else %>
                 <%= hidden_field_tag(:use_reference_transaction, "1") %>
             <% end %>
 
-            <%= hidden_field_tag(:amount, @total_amount_to_authorize) %>
-
-
-
-
-
-            
-            <%= image_tag "https://www.paypalobjects.com/en_US/i/btn/x-click-but02.gif" %>
-            <%= submit_tag "Checkout", class: 'btn btn-lg btn-primary', id: "paypal-button", disabled: @dropsite.nil? %>
-            
-
-
-
-
-
-            
+            <%= hidden_field_tag(:amount, @total_amount_to_authorize) %>                        
+            <%= submit_tag "Checkout", class: 'btn btn-lg btn-primary', id: "paypal-button", disabled: @dropsite.nil? %>                        
           <% end %>
-
         <% end %>
 
 
+      </div>
+      
+    </div>
 
-
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-4">
 
         <% if @dropsite.nil? %>
           <p class="alert alert-danger">No delivery dropsite specified.</p>
           <p>You must specify a <%= link_to "delivery dropsite", dropsites_path %> before checking out.</p>
+        <% else %>
+          <p>(By proceeding with checkout you agree to transact with and through Farmer's Cellar in accordance with our operational policies and procedures outlined on our <%= link_to "How Things Work", how_things_work_path %> page)</p>
         <% end %>
-
-        <p>(By proceeding with checkout you agree to transact with and through Farmer's Cellar in accordance with our operational policies and procedures outlined on our <%= link_to "How Things Work", how_things_work_path %> page)</p>
-
-
-
 
       </div>
     </div>
-
   <% end %>
 
-
-
-
-
   <% if tote_has_items(@tote_items) %>
-
 
     <h2>Delivery Dropsite</h2>
     <% if @dropsite.nil? %>
@@ -118,12 +98,9 @@
       <% end %>
     <% end %>
 
-
-
   <% else %>
     <p>Your shopping tote is empty so there is nothing to view here. You need to <%= link_to "add some items to your tote", postings_path %>, then you will see them listed here.</p>
   <% end %>
-
 
 <% else %>
   <p>Sorry, you need to log in before you can view the contents of your tote</p>
