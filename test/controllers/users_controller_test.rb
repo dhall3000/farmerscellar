@@ -3,6 +3,7 @@ require 'test_helper'
 class UsersControllerTest < ActionController::TestCase
 
   def setup
+    @admin = users(:a1)
     @user = users(:c1)
     @other_user = users(:c2)
   end
@@ -10,6 +11,22 @@ class UsersControllerTest < ActionController::TestCase
   test "should get new" do
     get :new
     assert_response :success
+  end
+
+  test "should not get show for a different customer" do
+    log_in_as(@user)
+    other_user = users(:c2)
+    WebsiteSetting.create(new_customer_access_code_required: false, recurring_postings_enabled: true)
+    get :show, id: other_user
+    assert :redirect
+  end
+
+  test "should get show for farmer when logged in as admin" do
+    log_in_as(@admin)
+    other_user = users(:f1)
+    WebsiteSetting.create(new_customer_access_code_required: false, recurring_postings_enabled: true)
+    get :show, id: other_user
+    assert :success
   end
 
   test "should redirect edit when not logged in" do

@@ -34,12 +34,6 @@ module SessionsHelper
     end
   end
 
-  def redirect_to_root_if_not_logged_in
-    if !logged_in?
-      redirect_to(root_url)
-    end
-  end
-
   def redirect_to_root_if_user_lacks_access
     if !user_has_access?
       redirect_to(root_url)
@@ -118,10 +112,11 @@ module SessionsHelper
 
   # Confirms a logged-in user.
   def logged_in_user
-    unless logged_in?
+    if !logged_in?
       store_location
       flash[:danger] = "Please log in."
       redirect_to login_url
     end
   end
+
 end

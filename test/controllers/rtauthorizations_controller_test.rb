@@ -4,6 +4,7 @@ class RtauthorizationsControllerTest < ActionController::TestCase
 
 	def setup
 		@c1 = users(:c1)
+		@c2 = users(:c2)
 		ActionMailer::Base.deliveries.clear
 	end
 
@@ -36,7 +37,7 @@ class RtauthorizationsControllerTest < ActionController::TestCase
 
 	test "should show authorization of part of the tote" do
 		log_in_as(@c1)
-		add_subscription_and_item_to_c1
+		add_subscription_and_item_to_user(@c1)
 		authorize_part_of_tote(@c1)
 		get :new, token: "token"
 		tote_items_authorizable = assigns(:tote_items_authorizable)
@@ -49,7 +50,7 @@ class RtauthorizationsControllerTest < ActionController::TestCase
 
 	test "should notify admin and user if billing agreement establishment fails" do
 		log_in_as(@c1)		
-		add_subscription_and_item_to_c1
+		add_subscription_and_item_to_user(@c1)
 		assert_equal 0, ActionMailer::Base.deliveries.count
 		post :create, token: "token", testparam_fail_fakestore: true
 		assert_equal 1, ActionMailer::Base.deliveries.count
@@ -61,7 +62,7 @@ class RtauthorizationsControllerTest < ActionController::TestCase
 
 	test "should notify admin and user if rtba creation fails" do
 		log_in_as(@c1)		
-		add_subscription_and_item_to_c1
+		add_subscription_and_item_to_user(@c1)
 		assert_equal 0, ActionMailer::Base.deliveries.count
 		post :create, token: "token", testparam_fail_rtba_creation: true
 		assert_equal 1, ActionMailer::Base.deliveries.count
@@ -73,7 +74,7 @@ class RtauthorizationsControllerTest < ActionController::TestCase
 
 	test "should notify admin and user if billing agreement invalid" do
 		log_in_as(@c1)		
-		add_subscription_and_item_to_c1
+		add_subscription_and_item_to_user(@c1)
 		assert_equal 0, ActionMailer::Base.deliveries.count
 		post :create, token: "token", testparam_fail_rtba_invalid: true
 		assert_equal 1, ActionMailer::Base.deliveries.count
@@ -86,7 +87,7 @@ class RtauthorizationsControllerTest < ActionController::TestCase
 	test "should not create if rtauthorization does not save" do		
 
 		log_in_as(@c1)
-		add_subscription_and_item_to_c1
+		add_subscription_and_item_to_user(@c1)
 		authorize_part_of_tote(@c1)
 
 		#verify subscription exists
@@ -118,10 +119,39 @@ class RtauthorizationsControllerTest < ActionController::TestCase
 
 	end
 
+	test "should not authorize off billing agreement belonging to another user" do
+		log_in_as(@c2)
+		add_subscription_and_item_to_user(@c2)
+		#verify subscription exists
+		subscriptions = get_subscriptions_from(@c2.tote_items)
+		assert_equal 1, subscriptions.count
+		#verify no items or subscriptions associated with rtauth
+		@c2.tote_items.each do |tote_item|
+			assert_equal 0, tote_item.rtauthorizations.count
+		end
+
+		assert_equal 0, subscriptions[0].rtauthorizations.count
+
+		#this token is in the rtba yml file and belongs to c1 so this post operation should fail
+		#because we're trying to authorize a tote full of c2's items off of c1's billing agreement
+		post :create, token: "faketoken"
+
+		#verify rtauthorization is nil
+		rtauthorization = assigns(:rtauthorization)
+		assert rtauthorization.nil?
+		#verify flash
+		assert_equal "Payment not authorized. Please try again or contact us if this continues.", flash[:danger]		
+		#verify redirect
+		assert_redirected_to tote_items_path
+		#verify admin email
+		assert_equal 1, ActionMailer::Base.deliveries.count
+		assert_appropriate_email(ActionMailer::Base.deliveries[0], "david@farmerscellar.com", "Billing agreement hack potential!", "rtba.user.id")		
+	end
+
 	test "create should stamp all items and subscriptions with rtauthorization" do		
 
 		log_in_as(@c1)
-		add_subscription_and_item_to_c1
+		add_subscription_and_item_to_user(@c1)
 		authorize_part_of_tote(@c1)
 
 		#verify subscription exists
@@ -149,9 +179,9 @@ class RtauthorizationsControllerTest < ActionController::TestCase
 
 	end
 
-	def add_subscription_and_item_to_c1
+	def add_subscription_and_item_to_user(user)
 		posting_recurrence = posting_recurrences(:one)
-		subscription = Subscription.new(frequency: 1, on: true, user: @c1, posting_recurrence: posting_recurrence, quantity: 2)
+		subscription = Subscription.new(frequency: 1, on: true, user: user, posting_recurrence: posting_recurrence, quantity: 2)
 		subscription.save
 		subscription.generate_next_tote_item
 	end

@@ -98,18 +98,11 @@ class ToteItemsControllerTest < ActionController::TestCase
   end
 
   test "should display help text when not logged in for index" do
-
     get :index
-    assert_response :success
-    assert_select 'p', "Sorry, you need to log in before you can view the contents of your tote"
-
-    dropsite = assigns(:dropsite)
-    assert dropsite.nil?
-    tote_items = assigns(:tote_items)
-    assert tote_items.nil?
-    total_amount_to_authorize = assigns(:total_amount_to_authorize)
-    assert total_amount_to_authorize.nil?
-
+    assert_response :redirect
+    assert_redirected_to login_path
+    assert_not flash.empty?
+    assert_equal "Please log in.", flash[:danger]    
   end
 
   test "should get create" do

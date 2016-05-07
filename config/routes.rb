@@ -30,7 +30,7 @@ Rails.application.routes.draw do
   resources :account_activations, only: [:edit]
   resources :password_resets,     only: [:new, :create, :edit, :update]
   resources :postings
-  resources :tote_items
+  resources :tote_items, only: [:index, :new, :create, :destroy]
   resources :authorizations, only: [:new, :create]
   resources :bulk_buys, only: [:new, :create]
   resources :checkouts, only: [:create]

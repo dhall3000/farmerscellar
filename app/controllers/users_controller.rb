@@ -4,6 +4,7 @@ class UsersController < ApplicationController
   before_action :correct_user,   only: [:edit, :update]
   before_action :redirect_to_root_if_user_not_admin,     only: [:destroy, :index]
   before_action :redirect_to_root_if_user_lacks_access, only: [:destroy, :index, :show, :edit]
+  before_action :correct_user_or_admin, only: [:show]
 
   def destroy
     User.find(params[:id]).destroy
@@ -20,6 +21,7 @@ class UsersController < ApplicationController
   end
 
   def show
+
   	@user = User.find(params[:id])
 
     #we want farmer to be able to see all his past postings
@@ -102,7 +104,16 @@ class UsersController < ApplicationController
     # Confirms the correct user.
     def correct_user
       @user = User.find(params[:id])
-      redirect_to(root_url) unless current_user?(@user)
+      if !current_user?(@user)
+        redirect_to(root_url)
+      end
+    end
+
+    def correct_user_or_admin
+      @user = User.find(params[:id])
+      if !current_user?(@user) && !@user.account_type_is?(:ADMIN)
+        redirect_to(root_url)
+      end
     end
 
 end

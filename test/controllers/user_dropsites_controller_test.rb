@@ -8,7 +8,7 @@ class UserDropsitesControllerTest < ActionController::TestCase
 
 	test "should redirect if not logged in" do		
 		post :create, user_dropsite: {dropsite_id: 1}
-		assert_redirected_to root_url
+		assert_redirected_to login_path
 	end
 
 	test "should change dropsites" do		

@@ -1,4 +1,6 @@
 class AuthorizationsController < ApplicationController
+  before_action :logged_in_user
+  
   def new
 
     @unauthorized_tote_items = current_user_current_unauthorized_tote_items

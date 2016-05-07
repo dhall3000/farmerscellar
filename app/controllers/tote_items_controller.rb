@@ -1,40 +1,36 @@
 class ToteItemsController < ApplicationController
   before_action :correct_user,   only: [:destroy]
+  before_action :logged_in_user
 
   def index
-    if logged_in?
 
-      @dropsite = nil
+    @dropsite = nil
 
-      if current_user.dropsites.any?        
-        @dropsite = current_user.dropsite
-      else
-        #here the logic is if we only have one dropsite (which is the case for awhile after initial business launch)
-        #then we don't need to ask user to specify dropsite. Just assign the current dropsite (for this checkout) to
-        #be the only dropsite and proceed
-        if Dropsite.count == 1
-          @dropsite = Dropsite.first
-          current_user.set_dropsite(@dropsite)
-        end
+    if current_user.dropsites.any?        
+      @dropsite = current_user.dropsite
+    else
+      #here the logic is if we only have one dropsite (which is the case for awhile after initial business launch)
+      #then we don't need to ask user to specify dropsite. Just assign the current dropsite (for this checkout) to
+      #be the only dropsite and proceed
+      if Dropsite.count == 1
+        @dropsite = Dropsite.first
+        current_user.set_dropsite(@dropsite)
       end
-
-      @tote_items = current_user_current_tote_items
-
-      if @tote_items.nil?
-        @total_amount_to_authorize = 0
-      else
-        @tote_items = @tote_items.order("postings.delivery_date")
-        @total_amount_to_authorize = get_gross_tote(@tote_items.where(state: ToteItem.states[:ADDED]))
-      end
-
-      @rtba = current_user.get_active_rtba
-      @subscriptions = get_subscriptions_from(@tote_items)
-      @provide_guest_checkout_option = !@rtba && !@subscriptions      
-
     end
-  end
 
-  def show
+    @tote_items = current_user_current_tote_items
+
+    if @tote_items.nil?
+      @total_amount_to_authorize = 0
+    else
+      @tote_items = @tote_items.order("postings.delivery_date")
+      @total_amount_to_authorize = get_gross_tote(@tote_items.where(state: ToteItem.states[:ADDED]))
+    end
+
+    @rtba = current_user.get_active_rtba
+    @subscriptions = get_subscriptions_from(@tote_items)
+    @provide_guest_checkout_option = !@rtba && !@subscriptions      
+
   end
 
   def new
@@ -111,12 +107,6 @@ class ToteItemsController < ApplicationController
       flash.now[:danger] = "Item not saved to shopping tote. See errors below."
       render 'new'
     end
-  end
-
-  def edit
-  end
-
-  def update
   end
 
   def destroy

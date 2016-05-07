@@ -1,4 +1,6 @@
 class RtauthorizationsController < ApplicationController
+  before_action :logged_in_user
+
   def new
 
   	#note: this is a bit of a misnomer. this #new action might make you think we're creating a new Rtauthorization. We're not. It's a hack
@@ -86,6 +88,20 @@ class RtauthorizationsController < ApplicationController
 			redirect_to tote_items_path
 			return
 		end
+
+    #does this ba belong to current_user?
+    if rtba.user.id != current_user.id
+      #MAJOR PROBLEM!!
+      #this is a serious problem. either there's a major problem with the code or someone's hacking, attempting to authorize payment off of someone
+      #else's billing agreement
+      body_lines = []
+      body_lines << "rtba.user.id: #{rtba.user.id.to_s}"
+      body_lines << "current_user.id: #{current_user.id.to_s}"
+      AdminNotificationMailer.general_message("Billing agreement hack potential!", "fake body", body_lines).deliver_now      
+      flash[:danger] = "Payment not authorized. Please try again or contact us if this continues."
+      redirect_to tote_items_path
+      return
+    end    
 
 		#we have a legit billing agreement in place so now create a new authorization object and associate it with all appropriate other objects
 		@rtauthorization = Rtauthorization.new(rtba: rtba)
