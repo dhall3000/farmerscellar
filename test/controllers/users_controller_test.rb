@@ -19,6 +19,7 @@ class UsersControllerTest < ActionController::TestCase
     WebsiteSetting.create(new_customer_access_code_required: false, recurring_postings_enabled: true)
     get :show, id: other_user
     assert :redirect
+    assert_redirected_to root_url
   end
 
   test "should get show for farmer when logged in as admin" do
@@ -27,6 +28,7 @@ class UsersControllerTest < ActionController::TestCase
     WebsiteSetting.create(new_customer_access_code_required: false, recurring_postings_enabled: true)
     get :show, id: other_user
     assert :success
+    assert_template 'users/show'
   end
 
   test "should redirect edit when not logged in" do
