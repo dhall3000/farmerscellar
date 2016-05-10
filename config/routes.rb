@@ -22,6 +22,8 @@ Rails.application.routes.draw do
   get 'reference_transactions/new_ba'
   get 'reference_transactions/create_ba'
   post 'reference_transactions/create_capture'
+  get 'reference_transactions/do_rtpurchase'
+  get 'reference_transactions/do_bulk_purchase'
 
   resources :producer_product_commissions
   resources :products
