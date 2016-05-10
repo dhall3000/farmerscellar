@@ -6,7 +6,6 @@ one:
   correlation_id: MyString
   ba_id: MyString
   gross_amount: 1.5
-  fee_amount: 1.5
   ack: MyString
   error_code: MyString
 
@@ -16,6 +15,5 @@ two:
   correlation_id: MyString
   ba_id: MyString
   gross_amount: 1.5
-  fee_amount: 1.5
   ack: MyString
   error_code: MyString

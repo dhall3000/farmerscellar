@@ -21,69 +21,58 @@ class BulkPurchase < ActiveRecord::Base
   	if purchase_receivables && purchase_receivables.any?            
 
       @num_payment_payables_created = 0
-
-      total_amount_of_failed_purchases = 0
-      failed_purchases = []
+      @total_amount_of_failed_purchases = 0
+      @failed_purchases = []      
+      @total_amount_of_underamount_purchases = 0
+      @under_amount_purchases = []      
       
-      total_amount_of_underamount_purchases = 0
-      underamount_purchases = []    
-
       prs_by_auth = {}
+      prs_by_rtauth = {}
 
       #there's one pr for every tote_item. loop through and batch them up according to authorization
       #so that we can batch purchases and not get overly dinged by payment processor transaction fees
       purchase_receivables.each do |pr|
 
-        auth = pr.tote_items.first.authorization
+        if rtauth = pr.tote_items.first.rtauthorization
 
-        if !prs_by_auth.has_key?(auth)
-          prs_by_auth[auth] = []
+          if !prs_by_rtauth.has_key?(rtauth)
+            prs_by_rtauth[rtauth] = []
+          end
+
+          prs_by_rtauth[rtauth] << pr
+
+        elsif auth = pr.tote_items.first.authorization            
+
+          if !prs_by_auth.has_key?(auth)
+            prs_by_auth[auth] = []
+          end
+
+          prs_by_auth[auth] << pr
+          
         end
-
-        prs_by_auth[auth] << pr
 
       end
 
       #loop through the authorizations and create a single purchase for each one, based off the associated group of purchase receivables
       prs_by_auth.each do |authorization, prs|
-        purchase = Purchase.new
+        purchase = Purchase.new(payment_processor_fee_withheld_from_producer: 0)
         purchase.go(authorization, prs)
-
-        if purchase.response.success?
-          self.payment_processor_fee_withheld_from_us = (self.payment_processor_fee_withheld_from_us + purchase.payment_processor_fee_withheld_from_us).round(2)
-          self.gross = (self.gross + purchase.gross_amount).round(2)
-
-          prs.each do |pr|
-            create_payment_payables(pr, purchase)      
-          end
-          
-          self.payment_processor_fee_withheld_from_producer = (self.payment_processor_fee_withheld_from_producer + purchase.payment_processor_fee_withheld_from_producer).round(2)
-
-          if purchase.gross_amount < purchase.amount_to_capture
-            underamount = (purchase.amount_to_capture - purchase.gross_amount).round(2)
-            puts JunkCloset.puts_helper("Purchase underamount.", "underamount", number_to_currency(underamount))
-            total_amount_of_underamount_purchases = (total_amount_of_underamount_purchases + underamount).round(2)
-            underamount_purchases << purchase
-          end
-
-        else
-          #put this user's account on hold so they can't order again until they clear up this failed purchase        
-          UserAccountState.add_new_state(purchase.user, :HOLD, "purchase failed")
-          puts JunkCloset.puts_helper("Purchase failure.", "amount_to_capture", number_to_currency(purchase.amount_to_capture))
-          total_amount_of_failed_purchases = (total_amount_of_failed_purchases + purchase.amount_to_capture).round(2)
-          failed_purchases << purchase
-        end
-
-        purchase.save
-        
+        after_purchase(purchase, prs)
+        purchase.save        
       end
 
+      prs_by_rtauth.each do |rtauth, prs|
+        rtpurchase = Rtpurchase.new(payment_processor_fee_withheld_from_producer: 0)
+        rtpurchase.go(rtauth, prs)
+        after_purchase(rtpurchase, prs)
+        rtpurchase.save
+      end
 
   	end
 
     save
 
-    create_admin_report(total_amount_of_failed_purchases, total_amount_of_underamount_purchases, failed_purchases)
+    create_admin_report(@total_amount_of_failed_purchases, @total_amount_of_underamount_purchases, @failed_purchases, @under_amount_purchases)
     puts "---BULKPURCHASE ADMIN REPORT START---"
     dump_admin_report_to_log
     puts "---BULKPURCHASE ADMIN REPORT END---"
@@ -98,6 +87,35 @@ class BulkPurchase < ActiveRecord::Base
   end
 
   private
+
+    def after_purchase(purchase, prs)
+
+      if purchase.success?
+        self.payment_processor_fee_withheld_from_us = (self.payment_processor_fee_withheld_from_us + purchase.payment_processor_fee_withheld_from_us).round(2)
+        self.gross = (self.gross + purchase.gross_amount).round(2)
+
+        prs.each do |pr|
+          create_payment_payables(pr, purchase)      
+        end
+
+        self.payment_processor_fee_withheld_from_producer = (self.payment_processor_fee_withheld_from_producer + purchase.payment_processor_fee_withheld_from_producer).round(2)
+
+        if purchase.gross_amount < purchase.amount_to_capture
+          underamount = (purchase.amount_to_capture - purchase.gross_amount).round(2)
+          puts "Purchase underamount: #{underamount.to_s}"
+          @total_amount_of_underamount_purchases = (@total_amount_of_underamount_purchases + underamount).round(2)
+          @underamount_purchases << purchase
+        end
+
+      else
+        #put this user's account on hold so they can't order again until they clear up this failed purchase        
+        UserAccountState.add_new_state(purchase.user, :HOLD, "purchase failed")        
+        puts "Purchase failure: #{purchase.amount_to_capture.to_s}"
+        @total_amount_of_failed_purchases = (@total_amount_of_failed_purchases + purchase.amount_to_capture).round(2)
+        @failed_purchases << purchase
+      end
+
+    end
 
     def send_admin_report
 
@@ -156,26 +174,26 @@ class BulkPurchase < ActiveRecord::Base
 
     end
 
-    def create_admin_report(total_amount_of_failed_purchases, total_amount_of_underamount_purchases, failed_purchases)
+    def create_admin_report(total_amount_of_failed_purchases, total_amount_of_underamount_purchases, failed_purchases, under_amount_purchases)
 
       @admin_report = []
 
-      @admin_report << JunkCloset.puts_helper("", "BulkPurchase id", id.to_s) + " report:"
-      @admin_report << JunkCloset.puts_helper("", "gross", gross.to_s)    
-      @admin_report << JunkCloset.puts_helper("", "net", net.to_s)
-      @admin_report << JunkCloset.puts_helper("", "payment_processor_fee_withheld_from_producer", payment_processor_fee_withheld_from_producer.to_s)
-      @admin_report << JunkCloset.puts_helper("", "payment_processor_fee_withheld_from_us", payment_processor_fee_withheld_from_us.to_s)    
-      @admin_report << JunkCloset.puts_helper("", "net on payment processor fees", (payment_processor_fee_withheld_from_producer - payment_processor_fee_withheld_from_us).round(2).to_s)    
-      @admin_report << JunkCloset.puts_helper("", "commission", commission.to_s)
-      @admin_report << JunkCloset.puts_helper("", "sales", (gross - payment_processor_fee_withheld_from_us - net).round(2).to_s)
+      @admin_report << "BulkPurchase id: #{id.to_s} report:"
+      @admin_report << "gross #{gross.to_s}"
+      @admin_report << "net #{net.to_s}"
+      @admin_report << "payment_processor_fee_withheld_from_producer #{payment_processor_fee_withheld_from_producer.to_s}"
+      @admin_report << "payment_processor_fee_withheld_from_us #{payment_processor_fee_withheld_from_us.to_s}"
+      @admin_report << "net on payment processor fees #{(payment_processor_fee_withheld_from_producer - payment_processor_fee_withheld_from_us).round(2).to_s}" 
+      @admin_report << "commission #{commission.to_s}"
+      @admin_report << "sales #{(gross - payment_processor_fee_withheld_from_us - net).round(2).to_s}"
 
       if total_amount_of_failed_purchases > 0
 
-        @admin_report << JunkCloset.puts_helper("", "total_amount_of_failed_purchases", total_amount_of_failed_purchases.to_s)
+        @admin_report << "total_amount_of_failed_purchases #{total_amount_of_failed_purchases.to_s}"
         failed_purchases.each do |purchase|
-          s = JunkCloset.puts_helper("", "Failed Purchase id", purchase.id.to_s)
-          s = JunkCloset.puts_helper(s, "amount to capture", purchase.amount_to_capture.to_s)
-          s = JunkCloset.puts_helper(s, "gross amount", purchase.gross_amount.to_s)
+          s = "Failed Purchase id #{purchase.id.to_s}"
+          s = s + " amount to capture #{purchase.amount_to_capture.to_s}"
+          s = s + " gross amount #{purchase.gross_amount.to_s}"
           @admin_report << s
         end
 
@@ -183,11 +201,11 @@ class BulkPurchase < ActiveRecord::Base
 
       if total_amount_of_underamount_purchases > 0
 
-        @admin_report << JunkCloset.puts_helper("", "total_amount_of_underamount_purchases", total_amount_of_underamount_purchases.to_s)
+        @admin_report << "total_amount_of_underamount_purchases #{total_amount_of_underamount_purchases.to_s}"
         underamount_purchases.each do |purchase|
-          s = JunkCloset.puts_helper("", "Underamount Purchase id", purchase.id.to_s)
-          s = JunkCloset.puts_helper(s, "amount to capture", purchase.amount_to_capture.to_s)
-          s = JunkCloset.puts_helper(s, "gross amount", purchase.gross_amount.to_s)
+          s = "Underamount Purchase id #{purchase.id.to_s}"
+          s = s + " amount to capture #{purchase.amount_to_capture.to_s}"
+          s = s + " gross amount #{purchase.gross_amount.to_s}"
           @admin_report << s
         end      
 

@@ -154,6 +154,10 @@ class PostingRecurrence < ActiveRecord::Base
       if new_post.save
         #add to posting_recurrence.postings
         postings << new_post
+        #kick the subscriptions
+        subscriptions.each do |subscription|
+          subscription.generate_next_tote_item
+        end
       end
     end
     

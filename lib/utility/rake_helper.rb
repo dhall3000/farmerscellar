@@ -17,49 +17,49 @@ class RakeHelper
 
 	end
 
-	def self.do_nightly_tasks
-
-		now = Time.zone.now
-
-		if NightlyTaskRun.last
-			last_run = NightlyTaskRun.last.created_at
-		else
-			last_run = now - 1.day
-		end
-
-		num_seconds_in_23_and_a_half_hours = 23.5 * 60 * 60
-		time_since_last_run = now - last_run
-
-		if time_since_last_run < num_seconds_in_23_and_a_half_hours
-			s = JunkCloset.puts_helper("do_nightly_tasks - short circuit - too little time elapsed since last run", "time_since_last_run", time_since_last_run.to_s)
-			JunkCloset.puts_helper(s, "last_run", last_run.to_s)
-			puts s			
-			return
-		end
-
-		#we want to do nightly tasks once at 10pm. production wiggles a bit on the exact time the task
-		#runs so give a 35 minute window in which to get things done
-		min = Time.zone.local(now.year, now.month, now.day, 21, 55)
-		max = Time.zone.local(now.year, now.month, now.day, 22, 30)
-
-		if now < min || now > max
-			puts JunkCloset.puts_helper("do_nightly_tasks - short circuit - not in the right time window at night", "now", now.to_s)
-			return
-		end
-
-		#time stamp this run
-		NightlyTaskRun.create
-		
-		puts "do_nightly_tasks start"
-
-		FundsProcessing.do_bulk_customer_purchase
-		BulkPaymentProcessing.do_bulk_producer_payment
-
-		puts "do_nightly_tasks end"
-
-	end
-
 	private
+
+		def self.do_nightly_tasks
+
+			now = Time.zone.now
+
+			if NightlyTaskRun.last
+				last_run = NightlyTaskRun.last.created_at
+			else
+				last_run = now - 1.day
+			end
+
+			num_seconds_in_23_and_a_half_hours = 23.5 * 60 * 60
+			time_since_last_run = now - last_run
+
+			if time_since_last_run < num_seconds_in_23_and_a_half_hours
+				s = JunkCloset.puts_helper("do_nightly_tasks - short circuit - too little time elapsed since last run", "time_since_last_run", time_since_last_run.to_s)
+				JunkCloset.puts_helper(s, "last_run", last_run.to_s)
+				puts s			
+				return
+			end
+
+			#we want to do nightly tasks once at 10pm. production wiggles a bit on the exact time the task
+			#runs so give a 35 minute window in which to get things done
+			min = Time.zone.local(now.year, now.month, now.day, 21, 55)
+			max = Time.zone.local(now.year, now.month, now.day, 22, 30)
+
+			if now < min || now > max
+				puts JunkCloset.puts_helper("do_nightly_tasks - short circuit - not in the right time window at night", "now", now.to_s)
+				return
+			end
+
+			#time stamp this run
+			NightlyTaskRun.create
+			
+			puts "do_nightly_tasks start"
+
+			FundsProcessing.do_bulk_customer_purchase
+			BulkPaymentProcessing.do_bulk_producer_payment
+
+			puts "do_nightly_tasks end"
+
+		end	
 
 		#posting_ids are the ids of all postings that just rolled past their commitment zone start, not
 		#just the rolled postings that have recurrences

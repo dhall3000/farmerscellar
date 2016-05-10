@@ -42,19 +42,103 @@ class ReferenceTransactionsController < ApplicationController
 
   def create_capture
 
-  	amount = (params[:amount].to_f) * 100
+    amount = params[:amount].to_f
 
-  	@details = GATEWAY.details_for(PAYPALDATASTORE[:token])
-  	@agreement_details = GATEWAY.agreement_details(PAYPALDATASTORE[:ba], {})
+    if false
+      #if all you want to do is a simple capture (e.g. for inspecting responses) do
+      #this code branch
+      do_simple_purchase(amount)
+    elsif false
+      #if you want to push execution through the Rtpurchase object's .go method
+      #do this code branch    
+      #create a purchase receivable object
+      pr = create_purchase_receivable(amount)
+      #make prs array
+      prs = [pr]
+      #create rtba object
+      rtba = nil
+      if current_user.rtbas.any? && current_user.rtbas.last.active
+        rtba = current_user.rtbas.last
+      else
+        rtba = Rtba.new(user: current_user, token: "faketoken", ba_id: PAYPALDATASTORE[:ba], active: true)
+        rtba.save
+      end
+      #create the rtauthorization object
+      rtauthorization = nil
+      if rtba.rtauthorizations.any?
+        rtauthorization = rtba.rtauthorizations.last
+      else
+        #validates_presence_of :rtba, :tote_items
+        rtauthorization = Rtauthorization.new(rtba: rtba)                
+        ti = ToteItem.new(quantity: 1, price: 1, state: 2, posting: Posting.first, user: current_user)
+        ti.save
+        rtauthorization.tote_items << ti
+        rtauthorization.save
+      end      
 
-		@purchase = GATEWAY.reference_transaction(
-		  amount,
-		  reference_id: PAYPALDATASTORE[:ba],
-		  description: 'Sample',
-		  currency: 'USD',
-		  items: [{ name: 'Sample item', quantity: 1, amount: amount }]
-		)		
+      #create rtpurchase object
+      rtpurchase = Rtpurchase.new
+      #call rtpurchase.go
+      rtpurchase.go(rtauthorization, prs)
+
+    else
+
+      pr = create_purchase_receivable(amount)
+      bulk_purchase = BulkPurchase.new(gross: 0, payment_processor_fee_withheld_from_us: 0, commission: 0, net: 0)
+      bulk_purchase.load_unpurchased_receivables_for_users(User.all)
+      bulk_purchase.go
+
+    end    
 
   end
+
+  private
+
+    def create_purchase_receivable(amount)
+
+      #PurchaseReceivable.update_all(kind: 1)
+      
+      pr = PurchaseReceivable.new(amount: amount, amount_purchased: 0, kind: PurchaseReceivable.kind[:NORMAL], state: PurchaseReceivable.states[:READY])
+      pr.users << current_user
+      ti = ToteItem.new(quantity: 1, price: 1, state: 2, posting: Posting.first, user: current_user)
+      ti.save
+      pr.tote_items << ti
+
+      rtba = nil
+      if current_user.rtbas.any? && current_user.rtbas.last.active
+        rtba = current_user.rtbas.last
+      else
+        rtba = Rtba.new(user: current_user, token: "faketoken", ba_id: PAYPALDATASTORE[:ba], active: true)
+        rtba.save
+      end
+      #create the rtauthorization object
+      rtauthorization = nil
+      if rtba.rtauthorizations.any?
+        rtauthorization = rtba.rtauthorizations.last
+      else
+        #validates_presence_of :rtba, :tote_items
+        rtauthorization = Rtauthorization.new(rtba: rtba)
+      end
+
+      rtauthorization.tote_items << ti
+      rtauthorization.save
+
+      pr.save
+
+      return pr
+
+    end
+
+    def do_simple_purchase(amount)
+      amount_in_cents = (amount) * 100
+      @details = GATEWAY.details_for(PAYPALDATASTORE[:token])
+      @agreement_details = GATEWAY.agreement_details(PAYPALDATASTORE[:ba], {})
+
+      @purchase = GATEWAY.reference_transaction(
+        amount_in_cents,
+        reference_id: PAYPALDATASTORE[:ba],
+        currency: 'USD'
+      )
+    end
 
 end

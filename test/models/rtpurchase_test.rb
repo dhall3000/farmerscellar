@@ -9,7 +9,6 @@ class RtpurchaseTest < ActiveSupport::TestCase
 			correlation_id: "fakecorrelation_id",
 			ba_id: "fakeba_id",
 			gross_amount: "10.00",
-			fee_amount: "1.00",
 			ack: "fakeack",
 			error_code: "fakeerror_code"
 			)

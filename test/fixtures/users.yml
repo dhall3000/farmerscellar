@@ -1,5 +1,36 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
+c17:
+  name: c17
+  email: c17@c.com
+  password_digest: <%= User.digest('dogdog') %>
+  account_type: 0
+  activated: true
+  activated_at: Time.zone.now
+  address: 4415 21st St. SW
+  city: Redmond
+  state: Washington
+  zip: 98008
+  phone: 206-594-6579
+
+f_subscriptions:
+  name: sf
+  email: sf@f.com
+  password_digest: <%= User.digest('dogdog') %>
+  account_type: 1
+  activated: true
+  activated_at: Time.zone.now
+  description: producers of dog food
+  address: 9206 Yaksak Rd
+  city: Gnarlston
+  state: Washington
+  zip: 98139
+  phone: 206-199-6579
+  website: www.sf.com
+  agreement: 1
+  farmer_approval: t
+  farm_name: Subscription Farms
+
 f5:
   name: f5
   email: f5@f.com

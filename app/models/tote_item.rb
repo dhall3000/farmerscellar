@@ -127,6 +127,18 @@ class ToteItem < ActiveRecord::Base
     end
   end
 
+  def rtauthorization
+    
+    rtauth = nil
+
+    if !rtauthorizations.nil? && rtauthorizations.any?
+      rtauth = rtauthorizations.last
+    end
+
+    return rtauth
+    
+  end
+
   private
 
     def create_purchase_receivable

@@ -5,6 +5,10 @@ class Purchase < ActiveRecord::Base
   has_many :purchase_purchase_receivables
   has_many :purchase_receivables, through: :purchase_purchase_receivables    
 
+  def success?
+    response.success?
+  end
+
   def user
 
     if purchase_receivables.nil?

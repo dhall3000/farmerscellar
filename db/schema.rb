@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160429232348) do
+ActiveRecord::Schema.define(version: 20160510225719) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -412,15 +412,17 @@ ActiveRecord::Schema.define(version: 20160429232348) do
 
   create_table "rtpurchases", force: :cascade do |t|
     t.boolean  "success"
-    t.string   "message",        null: false
-    t.string   "correlation_id", null: false
+    t.string   "message",                                      null: false
+    t.string   "correlation_id",                               null: false
     t.string   "ba_id"
     t.float    "gross_amount"
-    t.float    "fee_amount"
     t.string   "ack"
     t.string   "error_code"
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
+    t.datetime "created_at",                                   null: false
+    t.datetime "updated_at",                                   null: false
+    t.float    "payment_processor_fee_withheld_from_us"
+    t.float    "payment_processor_fee_withheld_from_producer"
+    t.string   "transaction_id"
   end
 
   create_table "subscription_rtauthorizations", id: false, force: :cascade do |t|

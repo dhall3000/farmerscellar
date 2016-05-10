@@ -1,5 +1,20 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
+ppc1:
+  product: apples
+  commission: 0.10
+  user: f_subscriptions
+
+ppc2:
+  product: lettuce
+  commission: 0.10
+  user: f_subscriptions
+
+ppc3:
+  product: tomato
+  commission: 0.10
+  user: f_subscriptions
+
 f5apples:
   product: apples
   commission: 0.05
