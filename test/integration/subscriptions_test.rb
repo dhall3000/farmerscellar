@@ -11,7 +11,13 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
   test "subscriptions" do    
     postings = setup_posting_recurrences
     posting_recurrences = get_posting_recurrences(postings)
-    add_subscription(users(:c17), postings[0], 2, 1)
+
+    user = users(:c17)
+    quantity = 2
+    frequency = 1
+    apples_posting = postings[0]
+    add_subscription(user, apples_posting, quantity, frequency)
+
     time_loop(posting_recurrences)
   end
 
@@ -53,6 +59,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     farmer = users(:f_subscriptions)
     log_in_as(farmer)
 
+    #apples, deliverable weekly on mondays
     delivery_date = next_day_of_week_after(Time.zone.now, 1, 7)    
     post postings_path, posting: {
       description: "apples description",
@@ -69,6 +76,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     }
     postings << assigns(:posting)
 
+    #lettuce, deliverable weekly on wednesdays
     delivery_date = next_day_of_week_after(Time.zone.now, 3, 7)
     post postings_path, posting: {
       description: "lettuce description",
@@ -85,6 +93,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     }
     postings << assigns(:posting)
 
+    #tomatos, deliverable weekly on fridays
     delivery_date = next_day_of_week_after(Time.zone.now, 5, 7)
     post postings_path, posting: {
       description: "tomato description",
@@ -107,10 +116,10 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
 
   def time_loop(posting_recurrences)
     
-    last_minute = Time.zone.now.midnight
+    current_time = Time.zone.now.midnight
     end_minute = Time.zone.now.midnight + 20.days
 
-    travel_to last_minute
+    travel_to current_time
 
     while Time.zone.now < end_minute
       top_of_hour = Time.zone.now.min == 0
@@ -119,22 +128,30 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
         RakeHelper.do_hourly_tasks        
       end
 
+      #do fills for any postings for whom it's presently noon on delivery day
       if Time.zone.now == Time.zone.today.noon
 
-        pr = PostingRecurrence.find(posting_recurrences.first.id)
-
-        pr.postings.each do |posting|          
-          if posting.delivery_date.midnight == Time.zone.now.midnight
-            #it is now noon on delivery_date of this posting so do some fills
-            log_in_as(users(:a1))
-            post postings_fill_path, posting_id: posting.id, quantity: 1000
-          end
-        end        
+        #do fills for any postings for whom it's presently noon on delivery day        
+        posting_recurrences.each do |pr|
+          pr.reload
+          pr.postings.each do |posting|          
+            posting.reload
+            if posting.delivery_date.midnight == Time.zone.now.midnight
+              if posting.total_quantity_authorized_or_committed > 0
+                puts Time.zone.now.strftime("%A %B %d")
+                #it is now noon on delivery_date of this posting so do some fills
+                log_in_as(users(:a1))
+                post postings_fill_path, posting_id: posting.id, quantity: posting.total_quantity_authorized_or_committed
+              end              
+            end
+          end        
+        end
 
       end
 
-      last_minute = Time.zone.now
       travel 60.minutes
+      current_time = Time.zone.now
+            
     end
        
     travel_back

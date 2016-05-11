@@ -9,8 +9,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     @posting_recurrence.save
     @posting_recurrence.recur
 
-    @subscription = Subscription.new(frequency: 1, on: true, quantity: 1)   
-    @subscription.posting_recurrence = @posting_recurrence    
+    @subscription = @posting_recurrence.subscriptions.create(frequency: 1, on: true, quantity: 1)        
     @subscription.user = users(:c1)
     @subscription.save
     @subscription.generate_next_tote_item    
@@ -30,7 +29,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
 
     @posting_recurrence.turn_off    
     assert_not @posting_recurrence.subscribable?
-    assert_not @posting_recurrence.on
+    assert_not @posting_recurrence.on    
     assert_not @posting_recurrence.subscriptions.first.on
 
     pr = @posting_recurrence.reload
