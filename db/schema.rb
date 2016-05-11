@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160510225719) do
+ActiveRecord::Schema.define(version: 20160511211245) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -417,7 +417,7 @@ ActiveRecord::Schema.define(version: 20160510225719) do
     t.string   "ba_id"
     t.float    "gross_amount"
     t.string   "ack"
-    t.string   "error_code"
+    t.string   "error_codes"
     t.datetime "created_at",                                   null: false
     t.datetime "updated_at",                                   null: false
     t.float    "payment_processor_fee_withheld_from_us"
