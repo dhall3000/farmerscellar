@@ -8,12 +8,10 @@ Bundler.require(*Rails.groups)
 
 module SampleApp
   class Application < Rails::Application
-
     #the end of the week for Farmer's Cellar is Saturday which is day 6: http://apidock.com/ruby/Date/wday
     #so query against this like so:
     #if Time.zone.today.wday == ENDOFWEEK
     ::ENDOFWEEK = 6
-    ::SHOWSUBSCRIPTIONSTUFF = false
     
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers

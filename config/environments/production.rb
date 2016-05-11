@@ -101,6 +101,8 @@ Rails.application.configure do
       )
 
     ::USEGATEWAY = true
-    ::PAYPALMASSPAYENDPOINT = "https://api-3t.paypal.com"
+    ::PAYPALMASSPAYENDPOINT = "https://api-3t.paypal.com"    
+    ::SUBSCRIPTIONUSERS = eval(ENV['SUBSCRIPTIONUSERS'])
+
   end
 end

@@ -69,7 +69,7 @@
 
 
 
-<% if SHOWSUBSCRIPTIONSTUFF %>
+      <% if SUBSCRIPTIONUSERS.nil? || SUBSCRIPTIONUSERS.include?(current_user.id) %>
 
         <% if @subscription != nil && posting.posting_recurrence != nil %>
 
@@ -101,7 +101,7 @@
 
         <% end %>
 
-<% end %>
+      <% end %>
 
 
 

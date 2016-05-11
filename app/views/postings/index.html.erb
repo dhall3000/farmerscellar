@@ -45,9 +45,9 @@
           <td class="text-center"><a tabindex="0" class="btn" role="button" data-html="true" data-toggle="popover" data-trigger="click" data-content="<%=farmInfo%>"> <p class="lead"> <%= Product.find_by(id: posting.product_id).name %> </p> <p class="small"> <%= User.find_by(id: posting.user_id).farm_name %> </p></a>
           <% if posting.posting_recurrence != nil && posting.posting_recurrence.on == true && posting.posting_recurrence.frequency > 0 %>                        
 
-<% if SHOWSUBSCRIPTIONSTUFF %>          
+          <% if SUBSCRIPTIONUSERS.nil? || SUBSCRIPTIONUSERS.include?(current_user.id) %>          
             <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>
-<% end %>
+          <% end %>
 
           <% end %>
           </td>

@@ -39,7 +39,7 @@
 
           <%= form_tag(checkouts_path) do %>
             <% if @provide_guest_checkout_option %>             
-              <% if SHOWSUBSCRIPTIONSTUFF %>
+              <% if SUBSCRIPTIONUSERS.nil? || SUBSCRIPTIONUSERS.include?(current_user.id) %>
 
                 <div class="text-center">
                   <div class="btn-group" data-toggle="buttons">
