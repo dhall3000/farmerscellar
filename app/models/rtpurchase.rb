@@ -39,13 +39,9 @@ class Rtpurchase < ActiveRecord::Base
     amount_to_capture_in_cents = (@amount_to_capture * 100).round(2)
     
     if USEGATEWAY
-
-      if rtauthorization.rtba.ba_valid?
-        response = GATEWAY.reference_transaction(amount_to_capture_in_cents, reference_id: rtauthorization.rtba.ba_id, currency: 'USD')
-      end
-          
+      response = GATEWAY.reference_transaction(amount_to_capture_in_cents, reference_id: rtauthorization.rtba.ba_id, currency: 'USD')          
     else      
-      response = FakeRtpurchaseResponseSuccess.new
+      response = FakeRtpurchaseResponseSuccess.new(@amount_to_capture)      
     end
 
     if response
@@ -62,7 +58,7 @@ class Rtpurchase < ActiveRecord::Base
       #nil to the database. if you want to see an example of this look in file 'referenceTransactionResponses.txt' for this:
       #"error_codes"=>"10201"
       #there's actually 2 instances of that string in that file. the 2nd one is of interest.
-      self.error_code = response.params["error_codes"]      
+      self.error_codes = response.params["error_codes"]      
     else
 
     end
@@ -82,9 +78,15 @@ class Rtpurchase < ActiveRecord::Base
       end
 
     else
+   
       purchase_receivables.each do |pr|
         PurchaseReceivable.transition(:purchase_failed, {purchase_receivables: [pr]})  
       end
+
+      #TODO:
+      #-invalidate the rtba / rtauth?
+      #-put user account on hold?
+
     end    
 
     puts "@amount_to_capture: #{@amount_to_capture.to_s}, gross_amount: #{gross_amount}"    
@@ -99,13 +101,17 @@ end
 class FakeRtpurchaseResponseSuccess
   attr_reader :params
 
-  def initialize
+  def initialize(amount_to_capture)
+
+    percentage = 0.029
+    flat_fee = 0.3
+    fee_amount = ((amount_to_capture * percentage) + flat_fee).round(2)
 
     @params = {
       "correlation_id" => "correlation_id",
       "billing_agreement_id" => "billing_agreement_id",
-      "gross_amount" => "21.24",
-      "fee_amount" => "0.63",
+      "gross_amount" => amount_to_capture.to_s,
+      "fee_amount" => fee_amount.to_s,
       "ack" => "Success",
       "transaction_id" => "transaction_id"
     }

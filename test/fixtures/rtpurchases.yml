@@ -7,7 +7,7 @@ one:
   ba_id: MyString
   gross_amount: 1.5
   ack: MyString
-  error_code: MyString
+  error_codes: MyString
 
 two:
   success: false
@@ -16,4 +16,4 @@ two:
   ba_id: MyString
   gross_amount: 1.5
   ack: MyString
-  error_code: MyString
+  error_codes: MyString

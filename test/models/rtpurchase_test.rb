@@ -10,7 +10,7 @@ class RtpurchaseTest < ActiveSupport::TestCase
 			ba_id: "fakeba_id",
 			gross_amount: "10.00",
 			ack: "fakeack",
-			error_code: "fakeerror_code"
+			error_codes: "fakeerror_code"
 			)
 		@purchase_receivable = PurchaseReceivable.new(amount: 10, amount_purchased: 0, kind: 0)		
 		@rtpurchase.purchase_receivables << @purchase_receivable

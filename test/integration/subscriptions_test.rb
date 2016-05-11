@@ -9,16 +9,48 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
   #to add new product/posting to this farmer create a producer_product_commission
 
   test "subscriptions" do    
+
     postings = setup_posting_recurrences
     posting_recurrences = get_posting_recurrences(postings)
 
     user = users(:c17)
+    assert_equal 0, ToteItem.where(user_id: user.id).count
+
     quantity = 2
     frequency = 1
     apples_posting = postings[0]
     add_subscription(user, apples_posting, quantity, frequency)
 
-    time_loop(posting_recurrences)
+    assert_equal 1, ToteItem.where(user_id: user.id).count
+    assert_equal ToteItem.states[:AUTHORIZED], ToteItem.where(user_id: user.id).first.state
+
+    num_days = 20
+    time_loop(posting_recurrences, num_days)
+
+    num_c17_deliveries = num_days / (frequency * 7)
+    #however many deliveries there are this user should have 1 more because after the test stops there whould be 
+    #remaining a single tote item in the AUTHORIZED state
+    assert_equal num_c17_deliveries + 1, ToteItem.where(user_id: user.id).count
+    assert_equal num_c17_deliveries, ToteItem.where(user_id: user.id, state: ToteItem.states[:FILLED]).count
+    assert_equal 1, ToteItem.where(user_id: user.id, state: ToteItem.states[:AUTHORIZED]).count
+
+    delivery_cost = (quantity * apples_posting.price).round(2)
+    total_cost = (delivery_cost * num_c17_deliveries).round(2)
+
+    sum = 0
+
+    UserPurchaseReceivable.where(user: user).each do |upr|
+      rtp = upr.purchase_receivable.rtpurchases.last
+      sum += rtp.gross_amount
+    end
+    
+    assert_equal total_cost, sum
+
+    #TODO:
+    #-make sure payment payables are in proper amounts
+    #-verify proper emails sent, with proper text
+    #-step through the whole code path and look for trouble. yes, this is a big task, but it's a good thing to do.
+
   end
 
   def get_posting_recurrences(postings)
@@ -114,10 +146,10 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
 
   end
 
-  def time_loop(posting_recurrences)
+  def time_loop(posting_recurrences, num_days)
     
     current_time = Time.zone.now.midnight
-    end_minute = Time.zone.now.midnight + 20.days
+    end_minute = Time.zone.now.midnight + num_days.days
 
     travel_to current_time
 
