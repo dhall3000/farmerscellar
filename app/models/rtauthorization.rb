@@ -5,8 +5,12 @@ class Rtauthorization < ActiveRecord::Base
   has_many :tote_items, through: :tote_item_rtauthorizations
 
   has_many :subscription_rtauthorizations
-  has_many :subscriptions, through: :subscription_rtauthorizations  
+  has_many :subscriptions, through: :subscription_rtauthorizations
 
+  #perhaps down the road one might want to yank the tote_items requirement. this might be so if you want to make it so that a subscription
+  #can be authorized without having yet generated any tote items off of it. for now, the way subscriptions work is user adds the
+  #sx and in that process .generate_new_tote_item gets called so that a toteitem and sx always go in the tote at the same time. therefore
+  #it's presently impossible to attemp to authorize without tote items in the tote, hence the validation.
   validates_presence_of :rtba, :tote_items
 
   def authorized?
@@ -19,6 +23,7 @@ class Rtauthorization < ActiveRecord::Base
   	end
   end
 
+  #TODO: test this
   def authorize_items_and_subscriptions(tote_items_to_authorize)
 
     if !authorized?

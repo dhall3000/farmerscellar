@@ -65,7 +65,7 @@ class Subscription < ActiveRecord::Base
 
   		if !rtauthorizations.nil? && !rtauthorizations.last.nil?
 
-	  		#i don't think we really NEED need this. but doing it anyway. why is it that toteitems have_many rtauths and a subscription also has an auth? isn't one or the other
+	  		#TODO: i don't think we really NEED need this. but doing it anyway. why is it that toteitems have_many rtauths and a subscription also has an auth? isn't one or the other
 	  		#sufficient. indeed, wouldn't it be cleaner to only have the subscription hold the reference to the rtauth parent? no, because toteitems can be atttached to an rtauth
 	  		#by means other than through subscriptions. as in, a person with a billing agreement can add a subscription to the auth but they can also add a single one-time-buy tote item
 	  		rtauthorizations.last.tote_items << tote_item

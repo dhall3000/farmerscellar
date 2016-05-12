@@ -1,3 +1,10 @@
+---------------------------20160512 - 20160513---------------------------
+Test-making
+
+Models
+
+---------------------------20160512 - 20160513---------------------------
+
 -when a person's account goes on hold due to failed purchase we need to turn off subscriptions so they don't keep pumping out 'authorized' tote items. see method 'after_purchase' in bulk_purchase.rb
 -gotta finish the NOTUSEGATEWAY path in rtpurchase.rb
 -need to finish the purchase failure path
