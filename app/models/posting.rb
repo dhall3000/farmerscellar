@@ -24,6 +24,10 @@ class Posting < ActiveRecord::Base
     {OPEN: 0, COMMITMENTZONE: 1, CLOSED: 2}
   end
 
+  def state?(state_key)
+    return state == Posting.states[state_key]
+  end
+
   def transition(input)
     
     new_state = state
@@ -47,7 +51,14 @@ class Posting < ActiveRecord::Base
     when Posting.states[:COMMITMENTZONE]      
       case input
       when :past_delivery_date
-        new_state = Posting.states[:CLOSED]
+
+        #this time is somewhat arbitrary. probably would be better to mark this as closed once delivery happened. but what if no product was
+        #delivered (either cause producer didn't come through or nobody ordered). also, if you specify a time of after delivery date to
+        #arbitrarily transition to CLOSED you'll bump in to the delivery_date_must_be_after_today custom validation
+        if Time.zone.now >= delivery_date + 12.hours
+          new_state = Posting.states[:CLOSED]
+        end
+
       end
       
 

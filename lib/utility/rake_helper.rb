@@ -90,7 +90,7 @@ class RakeHelper
 			transitioned_postings = []
 
 			postings.each do |posting|
-				if Time.zone.now >= (posting.delivery_date + 24.hours)
+				if Time.zone.now >= (posting.delivery_date + 12.hours)
 					posting.transition(:past_delivery_date)
 					transitioned_postings << posting.id
 				end
