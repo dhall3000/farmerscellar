@@ -7,10 +7,7 @@ class RakeHelper
 
 	  puts "beginning hourly scheduled tasks..."
 
-	  transitioned_tote_items_and_postings = transition_tote_items_to_committed_state
-		report_committed_tote_items_to_admin(transitioned_tote_items_and_postings[:tote_item_ids])
-		send_orders_to_producers(transitioned_tote_items_and_postings[:posting_ids])
-		roll_recurring_postings(transitioned_tote_items_and_postings[:posting_ids])
+	  roll_postings
 		do_nightly_tasks
 
 	  puts "finished with hourly tasks."
@@ -18,6 +15,13 @@ class RakeHelper
 	end
 
 	private
+
+		def self.roll_postings			
+		  transition_posting_ids = transition_postings
+		  transitioned_tote_item_ids = transition_tote_items_to_committed(transition_posting_ids)	  
+			report_committed_tote_items_to_admin(transitioned_tote_item_ids)
+			send_orders_to_producers(transition_posting_ids)		
+		end
 
 		def self.do_nightly_tasks
 
@@ -61,19 +65,59 @@ class RakeHelper
 
 		end	
 
-		#posting_ids are the ids of all postings that just rolled past their commitment zone start, not
-		#just the rolled postings that have recurrences
-		def self.roll_recurring_postings(posting_ids)
+		def self.transition_postings
 
-			rolled_postings = Posting.where(id: posting_ids)
+			postings = Posting.where(state: Posting.states[:OPEN])
 
-			rolled_postings.each do |rp|
+			transitioned_postings = []
 
-				if rp.posting_recurrence != nil && rp.posting_recurrence.on
-					rp.posting_recurrence.recur					
+			postings.each do |posting|
+				if Time.zone.now >= posting.commitment_zone_start
+					posting.transition(:commitment_zone_started)
+					transitioned_postings << posting.id
 				end
 			end
 
+			return transitioned_postings.uniq
+
+		end
+
+		def self.transition_tote_items_to_committed(transitioned_postings)
+
+			postings = Posting.where(id: transitioned_postings)
+
+			transitioned_tote_item_ids = []
+
+			postings.each do |posting|
+				
+				tote_items_to_transition = posting.tote_items.where(state: ToteItem.states[:AUTHORIZED])
+				tote_items_to_transition.each do |tote_item_to_transition|
+
+					if tote_item_to_transition.posting.commitment_zone_start.nil?
+		      	next
+		    	end
+
+			    if Time.zone.now >= tote_item_to_transition.posting.commitment_zone_start
+					  tote_item_to_transition.transition(:commitment_zone_started)
+					  transitioned_tote_item_ids << tote_item_to_transition.id
+			    end
+				end
+
+			end
+
+			return transitioned_tote_item_ids
+
+		end
+
+		def self.report_committed_tote_items_to_admin(tote_item_ids)
+
+			if !tote_item_ids.nil? && tote_item_ids.any?
+		    #send job summary report to admin
+		    subject = "commit_totes job summary report"
+		    body = get_commit_totes_email_body(tote_item_ids)
+		    AdminNotificationMailer.general_message(subject, body).deliver_now
+		  end
+		  
 		end
 
 		def self.send_orders_to_producers(posting_ids)
@@ -102,48 +146,6 @@ class RakeHelper
 		    ProducerNotificationsMailer.current_orders(email, postings).deliver_now    
 		  end  
 
-		end
-
-		def self.transition_tote_items_to_committed_state
-
- 		  tote_item_ids = []
-		  posting_ids = []
-			transitioned_tote_items_and_postings = {tote_item_ids: tote_item_ids, posting_ids: posting_ids}
-
-		  tote_items = ToteItem.where(state: ToteItem.states[:AUTHORIZED])
-
-		  if tote_items.count == 0
-		    puts "transition_tote_items_to_committed_state: no authorized totes so nothing to transition to committed. all done."
-		    return transitioned_tote_items_and_postings
-		  end
-
-		  tote_items.each do |tote_item|
-
-		    if tote_item.posting.commitment_zone_start.nil?
-		      next
-		    end
-
-		    if Time.zone.now >= tote_item.posting.commitment_zone_start
-				  tote_item.transition(:commitment_zone_started)
-				  tote_item_ids << tote_item.id
-				  posting_ids << tote_item.posting.id
-		    end
-
-		  end
-
-		  return transitioned_tote_items_and_postings
-
-		end
-
-		def self.report_committed_tote_items_to_admin(tote_item_ids)
-
-			if !tote_item_ids.nil? && tote_item_ids.any?
-		    #send job summary report to admin
-		    subject = "commit_totes job summary report"
-		    body = get_commit_totes_email_body(tote_item_ids)
-		    AdminNotificationMailer.general_message(subject, body).deliver_now
-		  end
-		  
 		end
 
 		def self.get_commit_totes_email_body(tote_item_ids)

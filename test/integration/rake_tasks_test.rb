@@ -356,9 +356,9 @@ class RakeTasksTest < BulkBuyer
         #verify the proper emails were sent
         assert_equal 3, ActionMailer::Base.deliveries.count        
         assert_equal "david@farmerscellar.com", ActionMailer::Base.deliveries[0].to[0]
-        assert_equal "f2@f.com", ActionMailer::Base.deliveries[1].to[0]
+        assert_equal "f2@f.com", ActionMailer::Base.deliveries[2].to[0]
         assert_equal "david@farmerscellar.com", ActionMailer::Base.deliveries[1].bcc[0]
-        assert_equal "f1@f.com", ActionMailer::Base.deliveries[2].to[0]
+        assert_equal "f1@f.com", ActionMailer::Base.deliveries[1].to[0]
         assert_equal "david@farmerscellar.com", ActionMailer::Base.deliveries[2].bcc[0]
         ActionMailer::Base.deliveries.clear    
       else         

@@ -20,6 +20,41 @@ class Posting < ActiveRecord::Base
   validate :delivery_date_not_sunday, :delivery_date_must_be_after_today, :commitment_zone_start_must_be_before_delivery_date
   validates_presence_of :user, :product, :unit_kind, :unit_category
 
+  def self.states
+    {OPEN: 0, COMMITMENTZONE: 1, CLOSED: 2}
+  end
+
+  def transition(input)
+    
+    new_state = state
+
+    case state
+
+
+    when Posting.states[:OPEN]
+      case input
+      when :commitment_zone_started
+        if Time.zone.now >= commitment_zone_start
+          new_state = Posting.states[:COMMITMENTZONE]
+          if !posting_recurrence.nil?
+            posting_recurrence.recur
+          end
+        end        
+      
+      end
+
+
+    when Posting.states[:COMMITMENTZONE]      
+    when Posting.states[:CLOSED]
+
+    end
+
+    if new_state != state
+      update(state: new_state)
+    end
+
+  end
+
   def fill(quantity)
 
     quantity_remaining = quantity
