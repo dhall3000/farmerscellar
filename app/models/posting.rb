@@ -45,6 +45,12 @@ class Posting < ActiveRecord::Base
 
 
     when Posting.states[:COMMITMENTZONE]      
+      case input
+      when :past_delivery_date
+        new_state = Posting.states[:CLOSED]
+      end
+      
+
     when Posting.states[:CLOSED]
 
     end

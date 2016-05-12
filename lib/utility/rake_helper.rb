@@ -17,7 +17,8 @@ class RakeHelper
 	private
 
 		def self.roll_postings			
-		  transition_posting_ids = transition_postings
+			transition_commitment_zone_postings
+		  transition_posting_ids = transition_open_postings
 		  transitioned_tote_item_ids = transition_tote_items_to_committed(transition_posting_ids)	  
 			report_committed_tote_items_to_admin(transitioned_tote_item_ids)
 			send_orders_to_producers(transition_posting_ids)		
@@ -65,7 +66,7 @@ class RakeHelper
 
 		end	
 
-		def self.transition_postings
+		def self.transition_open_postings
 
 			postings = Posting.where(state: Posting.states[:OPEN])
 
@@ -74,6 +75,23 @@ class RakeHelper
 			postings.each do |posting|
 				if Time.zone.now >= posting.commitment_zone_start
 					posting.transition(:commitment_zone_started)
+					transitioned_postings << posting.id
+				end
+			end
+
+			return transitioned_postings.uniq
+
+		end
+
+		def self.transition_commitment_zone_postings
+
+			postings = Posting.where(state: Posting.states[:COMMITMENTZONE])
+
+			transitioned_postings = []
+
+			postings.each do |posting|
+				if Time.zone.now >= (posting.delivery_date + 24.hours)
+					posting.transition(:past_delivery_date)
 					transitioned_postings << posting.id
 				end
 			end
