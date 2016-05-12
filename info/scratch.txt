@@ -1,3 +1,22 @@
+-when a person's account goes on hold due to failed purchase we need to turn off subscriptions so they don't keep pumping out 'authorized' tote items. see method 'after_purchase' in bulk_purchase.rb
+-gotta finish the NOTUSEGATEWAY path in rtpurchase.rb
+-need to finish the purchase failure path
+-make a test where a toteitem gets authorized with a one time auth, then later a billing agreement gets established. verify that the toteitem gets billed to the agreement
+-remove ToteItem.states[:ADDED] from toteitemsconrtoller and also from tote_item_params
+-will a posting recur if if it has no tote items?
+-confirm dlg says "remove item from tote?" one could easily remove the wrong item and then after discovering this not know/remember which was removed to re-add it so could result in reduced sales. make confirm dlg say "remove item from tote?" and then newline and say "2 lbs of Bob's Farms Oranges"
+-make product names small
+-is there a pattern in these high response time alerts?
+-add allow_late_orders boolean flag to posting
+-make allow_late_orders off by default
+-make it so that when CZS strikes if !allow_late_orders, all ADDED tote items get REMOVED and posting.live = false
+-here is current delivery notification text:
+"There is a kiosk at the dropsite. If you need help remembering what you ordered just enter your pickup code at the kiosk and your product list will pop up. Your pickup code is 9235."
+It should be:
+"There is a kiosk inside the dropsite. If you need help remembering what you ordered just enter your pickup code (9235) at the kiosk and your product list will pop up."
+-why did i never get a logentries alert when i had a crash the other day? this is not good. i need to get this sorted out so that i know if / when people are seeing crashes
+-add disabled: @dropsite.nil? to checkout button
+-add trello card to handle TODO in subscriptions_test.rb
 -get weights/measures license
 
 -punt: right now all one time auths are separate. so if on one day a user auths 3 items and then later that day auths 2 items, all 5 set for delivery on the same day, we'll pull funds in 2 transactions. we want to batch this. however, if we nix the first auth and set up a large 2nd auth for all 5 items, this might confuse the user. does paypal offer a feature around this? string search "Batch Capture" on this link: https://developer.paypal.com/docs/classic/paypal-payments-standard/integration-guide/authcapture/

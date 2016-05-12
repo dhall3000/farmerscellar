@@ -108,7 +108,7 @@ class ToteItemsControllerTest < ActionController::TestCase
   test "should get create" do
 
     log_in_as(@c1)
-    post :create, tote_item: {quantity: 1, price: 2, state: ToteItem.states[:ADDED], posting_id: @posting_apples, user_id: @c1}
+    post :create, tote_item: {quantity: 1, posting_id: @posting_apples.id}
 
     assert_equal "Item saved to shopping tote.", flash[:success]
     assert :redirected
@@ -129,10 +129,7 @@ class ToteItemsControllerTest < ActionController::TestCase
     {
       subscription_frequency: subscription_frequency,
       quantity: 0,
-      price: 5.21,
-      state: ToteItem.states[:ADDED],
-      posting_id: postings(:p_recurrence_on),
-      user_id: @c1
+      posting_id: postings(:p_recurrence_on)      
     }
 
     subscription = assigns(:subscription)
@@ -148,7 +145,7 @@ class ToteItemsControllerTest < ActionController::TestCase
     @posting_apples.update(live: false)
 
     log_in_as(@c1)
-    post :create, tote_item: {quantity: 1, price: 2, state: ToteItem.states[:ADDED], posting_id: @posting_apples, user_id: @c1}
+    post :create, tote_item: {quantity: 1, posting_id: @posting_apples}
 
     assert_equal "Oops, it appears that posting is no longer live. Item not created.", flash[:danger]
     assert_redirected_to postings_path
@@ -160,7 +157,7 @@ class ToteItemsControllerTest < ActionController::TestCase
     log_in_as(@c1)
 
     #zero quantity should fail
-    post :create, tote_item: {quantity: 0, price: 2, state: ToteItem.states[:ADDED], posting_id: @posting_apples, user_id: @c1}
+    post :create, tote_item: {quantity: 0, posting_id: @posting_apples}
 
     assert_equal "Item not saved to shopping tote. See errors below.", flash.now[:danger]
     assert_template 'tote_items/new'
@@ -179,10 +176,7 @@ class ToteItemsControllerTest < ActionController::TestCase
       {
         subscription_frequency: subscription_frequency,
         quantity: 2,
-        price: 5.21,
-        state: ToteItem.states[:ADDED],
-        posting_id: postings(:p_recurrence_on),
-        user_id: @c1
+        posting_id: postings(:p_recurrence_on)        
       }
 
     subscription = assigns(:subscription)
@@ -218,10 +212,7 @@ class ToteItemsControllerTest < ActionController::TestCase
       {
         subscription_frequency: subscription_frequency,
         quantity: 2,
-        price: 5.21,
-        state: ToteItem.states[:ADDED],
-        posting_id: postings(:p_recurrence_off),
-        user_id: @c1
+        posting_id: postings(:p_recurrence_off)        
       }
 
     subscription = assigns(:subscription)
@@ -243,7 +234,7 @@ class ToteItemsControllerTest < ActionController::TestCase
   test "should do hold behavior on create" do
 
     log_in_as(users(:c_account_on_hold))
-    post :create #COME BACK HERE AND PUT LEGIT PARAMETERS HERE
+    post :create #TODO: COME BACK HERE AND PUT LEGIT PARAMETERS HERE
 
     assert :redirected
     assert_equal flash[:danger], "Your account is on hold. Please contact Farmer's Cellar."

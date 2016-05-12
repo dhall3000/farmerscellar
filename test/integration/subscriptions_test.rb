@@ -65,7 +65,12 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
   end
 
   def add_subscription(user, posting, quantity, frequency)
-    
+    #TODO tests:
+    #verify a subscription was added
+    #verify subscription points to postingrecurrence
+    #verify postingrecurrence points to posting
+    #verify tote item points to subscription
+
     log_in_as(user)
     post user_dropsites_path, user_dropsite: {dropsite_id: dropsites(:dropsite1).id}
 
@@ -81,6 +86,13 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     post checkouts_path, use_reference_transaction: 1
     checkout = assigns(:checkout)
     post rtauthorizations_create_path, token: checkout.token
+
+    #TODO: tests
+    #verify ba points to user
+    #verify rtauth points to ba
+    #verify rtauth points to subscription
+    #verify rtauth points to toteitem
+    #verify authorization receipt sent out
 
   end
 

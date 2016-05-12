@@ -60,7 +60,10 @@ class ToteItemsController < ApplicationController
     end
 
     @tote_item = ToteItem.new(tote_item_params)
+    @tote_item.user_id = current_user.id
     @tote_item.set_initial_state
+    posting = Posting.find_by(@tote_item.posting_id)
+    @tote_item.price = posting.price
 
     if !correct_user_create(@tote_item)
       redirect_to(root_url)
@@ -73,14 +76,15 @@ class ToteItemsController < ApplicationController
       #is there a posting? is the posting live? does the posting have a recurrence? is the posting recurrence turned on?
       if @tote_item.posting != nil && @tote_item.posting.live && @tote_item.posting.posting_recurrence != nil && @tote_item.posting.posting_recurrence.on
         
-        frequency = params[:tote_item][:subscription_frequency].to_i      
-        @subscription = Subscription.new(
+        frequency = params[:tote_item][:subscription_frequency].to_i
+        new_subscription_params = {
           frequency: frequency,
           on: true,
-          user_id: @tote_item.user_id,
-          posting_recurrence_id: @tote_item.posting.posting_recurrence.id,
-          quantity: @tote_item.quantity
-          )
+          user_id: current_user.id,
+          quantity: @tote_item.quantity          
+        }
+
+        @subscription = @tote_item.posting.posting_recurrence.subscriptions.create(new_subscription_params)
 
         if @subscription.save
           @subscription.generate_next_tote_item
@@ -145,7 +149,7 @@ class ToteItemsController < ApplicationController
 
   private
     def tote_item_params
-      params.require(:tote_item).permit(:quantity, :price, :state, :posting_id, :user_id)
+      params.require(:tote_item).permit(:quantity, :posting_id)
     end
 
     def account_on_hold
