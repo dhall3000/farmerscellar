@@ -55,7 +55,7 @@ class ProducerNotificationsMailer < ApplicationMailer
     @total = total
     @posting_infos = posting_infos
 
-    mail to: producer.email, subject: "Payment invoice"
+    mail to: producer.email, subject: "Payment receipt"
 
   end
 

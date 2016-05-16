@@ -25,7 +25,7 @@ posting_subscription_farmer:
   product: apples
   quantity_available: 1000
   price: 4.29
-  user: f5
+  user: f_subscriptions
   unit_category: weight
   unit_kind: pound
   description: crisp, crunchy organic apples. you'll love them.

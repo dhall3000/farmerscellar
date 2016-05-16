@@ -245,9 +245,9 @@ f4.producer_product_commissions.create(product: avocado, commission: 0.08)
 f4.producer_product_commissions.create(product: basil, commission: 0.06)
 
 #Apples
-Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 1, quantity_available: 1000, price: 2.75, user_id: f1.id, unit_category_id: 2, unit_kind_id: 8, description: "these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
+apples = Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 1, quantity_available: 1000, price: 2.75, user_id: f1.id, unit_category_id: 2, unit_kind_id: 8, description: "these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
 #Asparagus
-Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 6, quantity_available: 100, price: 3.25, user_id: f1.id, unit_category_id: 2, unit_kind_id: 8, description: "these Asparagus are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
+asparagus = Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 6, quantity_available: 100, price: 3.25, user_id: f1.id, unit_category_id: 2, unit_kind_id: 8, description: "these Asparagus are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
 #Milk
 Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 3, quantity_available: 25, price: 2.00, user_id: f2.id, unit_category_id: 1, unit_kind_id: 5, description: "these milks are all organic grown with no pesticides. they are raw. no homogeneization. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
 #Beef
@@ -265,6 +265,14 @@ Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: ne
 Posting.create(live: true, delivery_date: Time.zone.today, commitment_zone_start: Time.zone.today - 2.days, product_id: avocado.id, quantity_available: 100, price: 2.29, user_id: f4.id, unit_category_id: count.id, unit_kind_id: whole.id, description: "best avocado ever!")
 #Basil
 Posting.create(live: true, delivery_date: Time.zone.today, commitment_zone_start: Time.zone.today - 2.days, product_id: basil.id, quantity_available: 100, price: 2.97, user_id: f4.id, unit_category_id: count.id, unit_kind_id: bunch.id, description: "best basil ever!")
+
+posting_recurrence = PostingRecurrence.new(on: true, frequency: 6)
+posting_recurrence.postings << apples
+posting_recurrence.save
+
+posting_recurrence = PostingRecurrence.new(on: true, frequency: 5)
+posting_recurrence.postings << asparagus
+posting_recurrence.save
 
 #Apples
 ToteItem.create(quantity: 2, price: 2.75, state: ToteItem.states[:AUTHORIZED], user_id: 7, posting_id: 1)

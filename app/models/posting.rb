@@ -40,7 +40,7 @@ class Posting < ActiveRecord::Base
       when :commitment_zone_started
         if Time.zone.now >= commitment_zone_start
           new_state = Posting.states[:COMMITMENTZONE]
-          if !posting_recurrence.nil?
+          if !posting_recurrence.nil? && posting_recurrence.on
             posting_recurrence.recur
           end
         end        

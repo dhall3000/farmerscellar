@@ -9,20 +9,87 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
   #i'm wanting to make a general test framework where i can crank out the implementations for 
   #posting recurrence and subscription frequency permutations
   #puts Time.zone.now.strftime("%A, %B %d, %H")
+  #error loading meta info from Packages/Default/Icon (Source).tmPreferences: Unable to open Packages/Default/Icon (Source).tmPreferences
 
-  test "new tote item generation" do
-    #create posting recurrence
-    posting_recurrence = PostingRecurrence.new(frequency: 1, on: true)
-    posting = postings(:postingf1apples)
-    posting_recurrence.postings << posting
-    posting_recurrence.save
+  test "frequency permutation 1 and 1" do    
+    do_frequencies_permutation(1, 1)
+  end
 
+  test "frequency permutation 1 and 2" do
+    do_frequencies_permutation(1, 2)
+  end
+
+  test "frequency permutation 1 and 3" do    
+    do_frequencies_permutation(1, 3)
+  end
+
+  test "frequency permutation 1 and 4" do
+    do_frequencies_permutation(1, 4)
+  end
+
+  test "frequency permutation 2 and 1" do    
+    do_frequencies_permutation(2, 1)
+  end
+
+  test "frequency permutation 2 and 2" do
+    do_frequencies_permutation(2, 2)
+  end
+
+  test "frequency permutation 2 and 3" do    
+    do_frequencies_permutation(2, 3)
+  end
+
+  test "frequency permutation 2 and 4" do
+    do_frequencies_permutation(2, 4)
+  end
+
+  test "frequency permutation 3 and 1" do    
+    do_frequencies_permutation(3, 1)
+  end
+
+  test "frequency permutation 3 and 2" do
+    do_frequencies_permutation(3, 2)
+  end
+
+  test "frequency permutation 4 and 1" do    
+    do_frequencies_permutation(4, 1)
+  end
+
+  test "frequency permutation 4 and 2" do
+    do_frequencies_permutation(4, 2)
+  end
+
+  #posting: 3 on, 1 off. subscription: every delivery
+  test "frequency permutation 6 and 1" do
+    do_frequencies_permutation(6, 1)
+  end
+
+  #posting: 3 on, 1 off. subscription: every other week
+  test "frequency permutation 6 and 2" do
+    do_frequencies_permutation(6, 2)
+  end
+
+  #posting: 3 on, 1 off. subscription: every 4 weeks
+  test "frequency permutation 6 and 3" do
+    do_frequencies_permutation(6, 3)
+  end
+
+  def do_frequencies_permutation(posting_frequency, subscription_frequency)
+
+    product = products(:apples)
+    posting = setup_posting_recurrence(product, posting_frequency)
+
+    user = users(:c1)    
+    quantity = 2    
+    add_subscription(user, posting, quantity, subscription_frequency)
+
+    posting_recurrence = posting.posting_recurrence
     travel_to posting_recurrence.postings.last.commitment_zone_start - 1.hour
+    
+    num_tote_items_end = user.tote_items.count + 4
 
-    num_days = 20
-    end_time = Time.zone.now + num_days.days
+    while user.tote_items.count < num_tote_items_end
 
-    while Time.zone.now < end_time
       top_of_hour = Time.zone.now.min == 0
 
       if top_of_hour
@@ -63,6 +130,104 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     end
 
     travel_back
+
+    do_posting_spacing(posting_recurrence)
+    do_tote_item_spacing(posting_recurrence)    
+
+  end
+
+  def do_tote_item_spacing(posting_recurrence)
+
+    num_seconds_per_week = 7 * 24 * 60 * 60
+    postings = posting_recurrence.postings
+    subscription = posting_recurrence.subscriptions.last
+    tote_items = subscription.tote_items
+
+    assert postings.count > 1, "there aren't enough postings in this recurrence to test the tote items spacing"
+    assert tote_items.count > 1, "there aren't enough tote_items in this subscription to test the tote items spacing"
+
+    if posting_recurrence.frequency <= 4
+
+      i = 1
+      while i < tote_items.count
+        spacing = tote_items[i].posting.delivery_date - tote_items[i - 1].posting.delivery_date
+        assert_equal num_seconds_per_week * posting_recurrence.frequency * subscription.frequency, spacing
+        i += 1
+      end
+
+    elsif posting_recurrence.frequency == 5
+      assert false, "do_tote_item_spacing doesn't test frequency 5 yet"
+    elsif posting_recurrence.frequency == 6
+      case subscription.frequency
+      when 1 #every delivery
+
+        #NOTE: this algo isn't 100% great. we shouldn't be looping over the postings and then indexing in to the tote_items
+        #we should be looping over the tote_items and doing some logic there. the current test setup has it so that we
+        #keep traveling through time until we have 4 toteitems. but for this recurrence/frequency combo that doesn't give
+        #us enough data to work with. what we really want to do is check that things go:
+        #nogap, nogap, nogap, gap, nogap, nogap, nogap, gap etc
+        #for now i'm just going to leave it as is. but if the test ever gets changed it might break here and just want to
+        #document here/now in case that comes to pass.
+      
+        i = 1
+        while i < postings.count
+          if i % 3 == 0
+            #there should be a two week gap
+            expected_gap = 2.weeks
+          else
+            #there should be a 1 week gap
+            expected_gap = 1.week
+          end
+          actual_gap = tote_items[i].posting.delivery_date - tote_items[i - 1].posting.delivery_date
+          assert_equal expected_gap, actual_gap        
+          i += 1
+        end
+
+      when 2 #every other week
+        assert false, "do_tote_item_spacing doesn't test posting recurrence frequency 6 with subscription frequency 2 yet"
+      when 3 #every 4 weeks
+        assert false, "do_tote_item_spacing doesn't test posting recurrence frequency 6 with subscription frequency 3 yet"
+      end
+      
+    end
+
+  end
+
+  def do_posting_spacing(posting_recurrence)
+
+    postings = posting_recurrence.postings
+    assert postings.count > 1, "there aren't enough postings in this recurrence to test the spacing"
+
+    num_seconds_per_week = 7 * 24 * 60 * 60    
+
+    if posting_recurrence.frequency <= 4      
+
+      i = 1
+      while i < postings.count
+        spacing = postings[i].delivery_date - postings[i - 1].delivery_date
+        assert_equal num_seconds_per_week * posting_recurrence.frequency, spacing
+        i += 1
+      end
+
+    elsif posting_recurrence.frequency == 5
+      assert false, "do_posting_spacing doesn't test frequency 5 yet"
+    elsif posting_recurrence.frequency == 6
+
+      i = 1
+      while i < postings.count
+        if i % 3 == 0
+          #there should be a two week gap
+          expected_gap = 2.weeks
+        else
+          #there should be a 1 week gap
+          expected_gap = 1.week
+        end
+        actual_gap = postings[i].delivery_date - postings[i - 1].delivery_date
+        assert_equal expected_gap, actual_gap
+        i += 1
+      end
+      
+    end
 
   end
 
@@ -135,11 +300,8 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     post user_dropsites_path, user_dropsite: {dropsite_id: dropsites(:dropsite1).id}
 
     post tote_items_path, tote_item: {
-      quantity: quantity,
-      price: posting.price,
-      state: ToteItem.states[:ADDED],
+      quantity: quantity,      
       posting_id: posting.id,
-      user_id: user.id,
       subscription_frequency: frequency
     }
 
@@ -156,63 +318,41 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
 
   end
 
+  def setup_posting_recurrence(product, frequency)
+
+    farmer = users(:f_subscriptions)
+    log_in_as(farmer)
+    
+    delivery_date = next_day_of_week_after(Time.zone.now, 1, 7)    
+    post postings_path, posting: {
+      description: "#{product.name} description",
+      quantity_available: 100,
+      price: 2,
+      user_id: farmer.id,
+      product_id: product.id,
+      unit_category_id: unit_categories(:weight).id,
+      unit_kind_id: unit_kinds(:pound).id,
+      live: true,
+      delivery_date: delivery_date,
+      commitment_zone_start: delivery_date - 2.days,
+      posting_recurrence: {frequency: frequency, on: true}
+    }
+
+    posting = assigns(:posting)
+
+    return posting
+
+  end
+
   def setup_posting_recurrences
 
     postings = []
+
+    frequency = 1
     
-    farmer = users(:f_subscriptions)
-    log_in_as(farmer)
-
-    #apples, deliverable weekly on mondays
-    delivery_date = next_day_of_week_after(Time.zone.now, 1, 7)    
-    post postings_path, posting: {
-      description: "apples description",
-      quantity_available: 100,
-      price: 1.99,
-      user_id: farmer.id,
-      product_id: products(:apples).id,
-      unit_category_id: unit_categories(:weight).id,
-      unit_kind_id: unit_kinds(:pound).id,
-      live: true,
-      delivery_date: delivery_date,
-      commitment_zone_start: delivery_date - 2.days,
-      posting_recurrence: {frequency: 1, on: true}
-    }
-    postings << assigns(:posting)
-
-    #lettuce, deliverable weekly on wednesdays
-    delivery_date = next_day_of_week_after(Time.zone.now, 3, 7)
-    post postings_path, posting: {
-      description: "lettuce description",
-      quantity_available: 100,
-      price: 2.99,
-      user_id: farmer.id,
-      product_id: products(:lettuce).id,
-      unit_category_id: unit_categories(:weight).id,
-      unit_kind_id: unit_kinds(:pound).id,
-      live: true,
-      delivery_date: delivery_date,
-      commitment_zone_start: delivery_date - 2.days,
-      posting_recurrence: {frequency: 1, on: true}
-    }
-    postings << assigns(:posting)
-
-    #tomatos, deliverable weekly on fridays
-    delivery_date = next_day_of_week_after(Time.zone.now, 5, 7)
-    post postings_path, posting: {
-      description: "tomato description",
-      quantity_available: 100,
-      price: 3.99,
-      user_id: farmer.id,
-      product_id: products(:tomato).id,
-      unit_category_id: unit_categories(:weight).id,
-      unit_kind_id: unit_kinds(:pound).id,
-      live: true,
-      delivery_date: delivery_date,
-      commitment_zone_start: delivery_date - 2.days,
-      posting_recurrence: {frequency: 1, on: true}
-    }
-    postings << assigns(:posting)
+    postings << setup_posting_recurrence(products(:apples), frequency)
+    postings << setup_posting_recurrence(products(:lettuce), frequency)
+    postings << setup_posting_recurrence(products(:tomato), frequency)
 
     return postings
 

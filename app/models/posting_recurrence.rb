@@ -61,7 +61,7 @@ class PostingRecurrence < ActiveRecord::Base
       options << {subscription_frequency: 1, text: @@every_2_weeks, next_delivery_date: next_delivery_date(1)}
       options << {subscription_frequency: 2, text: @@every_4_weeks, next_delivery_date: next_delivery_date(2)}
       options << {subscription_frequency: 3, text: @@every_6_weeks, next_delivery_date: next_delivery_date(3)}
-      options << {subscription_frequency: 3, text: @@every_8_weeks, next_delivery_date: next_delivery_date(4)}
+      options << {subscription_frequency: 4, text: @@every_8_weeks, next_delivery_date: next_delivery_date(4)}
     when 3 #every 3 weeks posting frequency
       options << {subscription_frequency: 1, text: @@every_3_weeks, next_delivery_date: next_delivery_date(1)}
       options << {subscription_frequency: 2, text: @@every_6_weeks, next_delivery_date: next_delivery_date(2)}
@@ -69,19 +69,43 @@ class PostingRecurrence < ActiveRecord::Base
       options << {subscription_frequency: 1, text: @@every_4_weeks, next_delivery_date: next_delivery_date(1)}
       options << {subscription_frequency: 2, text: @@every_8_weeks, next_delivery_date: next_delivery_date(2)}
     when 5 #monthly posting frequency
-      #TODO: the :text label below needs to say something like "The last Tuesday of every month" or "The 2nd Tuesday of every month"
-      options << {subscription_frequency: 1, text: "Every month", next_delivery_date: next_delivery_date(1)}
-      #TODO: the :text label below needs to say something like "Every 2 months on the last Tuesday"
-      options << {subscription_frequency: 2, text: "Every 2 months", next_delivery_date: next_delivery_date(2)}
+      options << {subscription_frequency: 1, text: get_text_for(next_delivery_date(1), 5, 1), next_delivery_date: next_delivery_date(1)}
+      options << {subscription_frequency: 2, text: get_text_for(next_delivery_date(2), 5, 2), next_delivery_date: next_delivery_date(2)}
     when 6 #3 weeks on, 1 week off posting frequency
       options << {subscription_frequency: 1, text: "3 weeks on, 1 week off", next_delivery_date: next_delivery_date(1)}
-      #TODO: need to implement the subscription schedules every_2_weeks and every_4_weeks
-      #PostingRecurrence.frequency[6][1] => [[@@just_once, 0], ["3 weeks on, 1 week off", 1], [@@every_2_weeks, 2], [@@every_4_weeks, 3]]
-      #There are more notes in trello regarding this. you should be able to find the trello card by using the above line of code options <<
-      #to search in Trello
+      options << {subscription_frequency: 2, text: "Every other week", next_delivery_date: next_delivery_date(2)}
+      options << {subscription_frequency: 3, text: "Every 4 weeks", next_delivery_date: next_delivery_date(3)}
     end    
 
     return options
+
+  end
+
+  def get_text_for(date, posting_recurrence_frequency, subscription_frequency)
+
+    if posting_recurrence_frequency != 5
+      return
+    end
+
+    if ![1, 2].include?(subscription_frequency)
+      return
+    end
+
+    week_number = get_week_number(date)
+
+    if week_number < 4
+      week_number = week_number.ordinalize
+    else
+      week_number = "last"
+    end
+
+    other = ""
+
+    if subscription_frequency == 2      
+      other = " other"
+    end
+
+    return "Every#{other} #{week_number} #{date.strftime("%A")} of the month"
 
   end
 
@@ -150,14 +174,20 @@ class PostingRecurrence < ActiveRecord::Base
     new_post.commitment_zone_start = new_post.delivery_date - commitment_zone_window
     new_post.live = true
     #if there doesn't already exist a post with these parameters
+    reload
     if postings.where(delivery_date: new_post.delivery_date).count == 0
       if new_post.save
+        
         #add to posting_recurrence.postings
         postings << new_post
+
         #kick the subscriptions
         subscriptions.each do |subscription|
           subscription.generate_next_tote_item
         end
+
+        save
+
       end
     end
     
@@ -206,6 +236,24 @@ class PostingRecurrence < ActiveRecord::Base
 
   end
 
+  def current_posting
+
+    if postings == nil || postings.count < 1
+      return nil
+    end
+
+    return postings.last
+
+  end
+
+  #NOTE: the way to understand this method is from the front end perspective. when user is going to add a new subscription to their 
+  #tote we want to display some help text. most of the time (for all posting frequencies < 5) the "next delivery date" is going to
+  #simply be the date of the .last posting. it will only vary from that (in this front-end usage scenario) if a person is adding
+  #a subscription to a funky delivery schedule (e.g. Marty / Helen the Hen's 3 weeks on, one week off schedule) and specifying
+  #every other week. actually, i think subscribing to a every-other-week of Helen the Hen is the ONLY (for now) case in which
+  #next delivery date would be other than postings.last.delivery_date. even for a every-4-weeks subscription of Helen the Hen the
+  #next delivery date would be postings.last.delivery_date.
+
   #this method envisions a day when we have tons of posting frequency and subscription frequency options. at that time we might have to
   #do some fancy calculation to determine when the next delivery date is. for example, Marty (Helen the Hen) delivery 3 weeks on, 1 week off.
   #this theoretically could support an "every delivery" subscription as well as "every other week" and "every 4 weeks". however, to implement
@@ -217,31 +265,35 @@ class PostingRecurrence < ActiveRecord::Base
   #discussed in this comment we just need to throw a few codes in the case statements below and we should be off to the races.
   def next_delivery_date(subscription_frequency)
 
-    next_delivery_date = postings.last.delivery_date
+    next_delivery_date = current_posting.delivery_date
 
-    case frequency
-    when 6 #marty's "3 on, 1 off" posting/delivery schedule
-      case subscription_frequency      
-      when 2 #every 2 weeks
-        #NOT IMPLEMENTED AS OF NOW: 2016-03-05
-        #at implementation time, put code here that figures out when the start date is
-      when 3 #every 4 weeks
-        #NOT IMPLEMENTED AS OF NOW: 2016-03-05
-        #at implementation time, put code here that figures out when the start date is
-      end    
+    if frequency == 6 && subscription_frequency == 2
+
+      #this is the case where customer wants "every other week" subscription to Marty / Helen the Hen's 3 on, 1 off schedule
+      one_week_of_seconds = 7 * 24 * 60 * 60
+      week_num = 1
+      i = postings.count - 1
+      
+      while i > 0
+      
+        gap = postings[i].delivery_date - postings[i - 1].delivery_date
+      
+        if gap == one_week_of_seconds
+          week_num += 1
+        else
+          i = 0
+        end
+        i -= 1
+
+      end
+
+      if week_num == 2
+        next_delivery_date = get_next_delivery_dates(1, current_posting.delivery_date)[0]
+      end
+
     end
 
     return next_delivery_date
-
-  end
-
-  def current_posting
-
-    if postings == nil || postings.count < 1
-      return nil
-    end
-
-    return postings.last
 
   end
 

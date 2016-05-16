@@ -38,21 +38,21 @@ class Subscription < ActiveRecord::Base
       return nil
     end
 
-  	#try to add the next tote item in the series. it can be called any number of times successively and will only
-  	#add a single tote item at most because it does its own logic to tell when is the right time to add.
-  	
-  	current_posting = posting_recurrence.current_posting
-    next_delivery_date = posting_recurrence.next_delivery_date(frequency)
+    #try to add the next tote item in the series. it can be called any number of times successively and will only
+    #add a single tote item at most because it does its own logic to tell when is the right time to add.
 
-  	#if the next delivery date in the series for this subscription frequency is beyond (datewise) the currently
-  	#posted posting in the posting_recurrence postings series, we don't generate a new tote_item here
-  	if current_posting.delivery_date < next_delivery_date
-  		return nil
-  	end
+    current_posting = posting_recurrence.current_posting
+    expected_next_delivery_date = get_expected_next_delivery_date
+
+    #if the next delivery date in the series for this subscription frequency is beyond (datewise) the currently
+    #posted posting in the posting_recurrence postings series, we don't generate a new tote_item here
+    if expected_next_delivery_date > current_posting.delivery_date
+      return nil
+    end
 
   	#if there are no tote items in this series yet or if the last tote item delivery date is behind the
   	#current posting, create a new tote item
-    if (current_posting.delivery_date == next_delivery_date) && (!tote_items.any? || (tote_items.last.posting.delivery_date < next_delivery_date))
+    if current_posting.delivery_date == expected_next_delivery_date
   		  		
   		tote_item = ToteItem.new(quantity: quantity, price: current_posting.price, posting_id: current_posting.id, user_id: user.id, subscription_id: id)
       tote_item.set_initial_state
@@ -80,6 +80,39 @@ class Subscription < ActiveRecord::Base
   	end
 
   	return nil
+
+  end
+
+  def get_expected_next_delivery_date
+
+    expected_next_delivery_date = posting_recurrence.next_delivery_date(frequency)
+
+    if !tote_items || !tote_items.any?
+      return expected_next_delivery_date
+    end
+
+    if posting_recurrence.frequency < 5 #weekly-based subscriptions
+      weeks_between_postings = posting_recurrence.frequency * self.frequency
+      expected_next_delivery_date = tote_items.last.posting.delivery_date + weeks_between_postings.weeks
+    elsif posting_recurrence.frequency == 5 #monthly-based subscriptions
+      case self.frequency
+        when 1 #monthly
+          #TODO: finish
+        when 2 #every other month
+          #TODO: finish
+        end
+    elsif posting_recurrence.frequency == 6 #this is Marty/Helen the Hen's "3 weeks on, 1 week off" schedule
+      case self.frequency
+        when 1 #every delivery
+          #nothing to do, just return default value from above
+        when 2 #every other week
+          #nothing to do, just return default value from above
+        when 3 #every 4 weeks
+          expected_next_delivery_date = tote_items.last.posting.delivery_date + 4.weeks
+        end
+    end
+
+    return expected_next_delivery_date
 
   end
 
