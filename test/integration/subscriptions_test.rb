@@ -136,6 +136,44 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
 
   end
 
+  def do_posting_spacing(posting_recurrence)
+
+    postings = posting_recurrence.postings
+    assert postings.count > 1, "there aren't enough postings in this recurrence to test the spacing"
+
+    num_seconds_per_week = 7 * 24 * 60 * 60    
+
+    if posting_recurrence.frequency <= 4      
+
+      i = 1
+      while i < postings.count
+        spacing = postings[i].delivery_date - postings[i - 1].delivery_date
+        assert_equal num_seconds_per_week * posting_recurrence.frequency, spacing
+        i += 1
+      end
+
+    elsif posting_recurrence.frequency == 5
+      assert false, "do_posting_spacing doesn't test frequency 5 yet"
+    elsif posting_recurrence.frequency == 6
+
+      i = 1
+      while i < postings.count
+        if i % 3 == 0
+          #there should be a two week gap
+          expected_gap = 2.weeks
+        else
+          #there should be a 1 week gap
+          expected_gap = 1.week
+        end
+        actual_gap = postings[i].delivery_date - postings[i - 1].delivery_date
+        assert_equal expected_gap, actual_gap
+        i += 1
+      end
+      
+    end
+
+  end
+
   def do_tote_item_spacing(posting_recurrence)
 
     num_seconds_per_week = 7 * 24 * 60 * 60
@@ -187,44 +225,6 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
         assert false, "do_tote_item_spacing doesn't test posting recurrence frequency 6 with subscription frequency 2 yet"
       when 3 #every 4 weeks
         assert false, "do_tote_item_spacing doesn't test posting recurrence frequency 6 with subscription frequency 3 yet"
-      end
-      
-    end
-
-  end
-
-  def do_posting_spacing(posting_recurrence)
-
-    postings = posting_recurrence.postings
-    assert postings.count > 1, "there aren't enough postings in this recurrence to test the spacing"
-
-    num_seconds_per_week = 7 * 24 * 60 * 60    
-
-    if posting_recurrence.frequency <= 4      
-
-      i = 1
-      while i < postings.count
-        spacing = postings[i].delivery_date - postings[i - 1].delivery_date
-        assert_equal num_seconds_per_week * posting_recurrence.frequency, spacing
-        i += 1
-      end
-
-    elsif posting_recurrence.frequency == 5
-      assert false, "do_posting_spacing doesn't test frequency 5 yet"
-    elsif posting_recurrence.frequency == 6
-
-      i = 1
-      while i < postings.count
-        if i % 3 == 0
-          #there should be a two week gap
-          expected_gap = 2.weeks
-        else
-          #there should be a 1 week gap
-          expected_gap = 1.week
-        end
-        actual_gap = postings[i].delivery_date - postings[i - 1].delivery_date
-        assert_equal expected_gap, actual_gap
-        i += 1
       end
       
     end
