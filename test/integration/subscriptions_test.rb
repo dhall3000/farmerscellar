@@ -15,6 +15,65 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     do_frequencies_permutation(1, 1)
   end
 
+  test "frequency permutation 1 and 2" do
+    do_frequencies_permutation(1, 2)
+  end
+
+  test "frequency permutation 1 and 3" do    
+    do_frequencies_permutation(1, 3)
+  end
+
+  test "frequency permutation 1 and 4" do
+    do_frequencies_permutation(1, 4)
+  end
+
+  test "frequency permutation 2 and 1" do    
+    do_frequencies_permutation(2, 1)
+  end
+
+  test "frequency permutation 2 and 2" do
+    do_frequencies_permutation(2, 2)
+  end
+
+  test "frequency permutation 2 and 3" do    
+    do_frequencies_permutation(2, 3)
+  end
+
+  test "frequency permutation 2 and 4" do
+    do_frequencies_permutation(2, 4)
+  end
+
+  test "frequency permutation 3 and 1" do    
+    do_frequencies_permutation(3, 1)
+  end
+
+  test "frequency permutation 3 and 2" do
+    do_frequencies_permutation(3, 2)
+  end
+
+  test "frequency permutation 4 and 1" do    
+    do_frequencies_permutation(4, 1)
+  end
+
+  test "frequency permutation 4 and 2" do
+    do_frequencies_permutation(4, 2)
+  end
+
+  #posting: 3 on, 1 off. subscription: every delivery
+  test "frequency permutation 6 and 1" do
+    do_frequencies_permutation(6, 1)
+  end
+
+  #posting: 3 on, 1 off. subscription: every other week
+#  test "frequency permutation 6 and 2" do
+#    do_frequencies_permutation(6, 2)
+#  end
+
+  #posting: 3 on, 1 off. subscription: every 4 weeks
+  test "frequency permutation 6 and 3" do
+    do_frequencies_permutation(6, 3)
+  end
+
   def do_frequencies_permutation(posting_frequency, subscription_frequency)
 
     product = products(:apples)
@@ -22,15 +81,17 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
 
     user = users(:c1)    
     quantity = 2    
-    add_subscription(user, posting, quantity, subscription_frequency)
 
     posting_recurrence = posting.posting_recurrence
     travel_to posting_recurrence.postings.last.commitment_zone_start - 1.hour
-    
+
+    num_tote_items_start = user.tote_items.count    
     num_tote_items_end = user.tote_items.count + 4
 
     while user.tote_items.count < num_tote_items_end
 
+      puts Time.zone.now.strftime("%A, %B %d, %H")
+      puts "Number of tote items: #{user.tote_items.count.to_s}"
       top_of_hour = Time.zone.now.min == 0
 
       if top_of_hour
@@ -38,6 +99,10 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
       end
 
       posting_recurrence.reload
+
+      if posting_recurrence.postings.count == 2 && user.tote_items.count == num_tote_items_start
+        add_subscription(user, posting_recurrence.postings.last, quantity, subscription_frequency)
+      end      
 
       #if you draw out a postings series you'll see that the last inthe series is always open because the moment time enters the 
       #commitment zone of the last we generate the next posting, which becomes the 'last', which is OPEN
@@ -140,32 +205,33 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
       case subscription.frequency
       when 1 #every delivery
 
-        #NOTE: this algo isn't 100% great. we shouldn't be looping over the postings and then indexing in to the tote_items
-        #we should be looping over the tote_items and doing some logic there. the current test setup has it so that we
-        #keep traveling through time until we have 4 toteitems. but for this recurrence/frequency combo that doesn't give
-        #us enough data to work with. what we really want to do is check that things go:
-        #nogap, nogap, nogap, gap, nogap, nogap, nogap, gap etc
-        #for now i'm just going to leave it as is. but if the test ever gets changed it might break here and just want to
-        #document here/now in case that comes to pass.
-      
-        i = 1
-        while i < postings.count
-          if i % 3 == 0
-            #there should be a two week gap
-            expected_gap = 2.weeks
-          else
-            #there should be a 1 week gap
-            expected_gap = 1.week
+        if tote_items.count > 3
+          #we should have at least one 2 week gap
+          i = 1
+          num_2_week_gaps = 0
+          while i < tote_items.count            
+            gap = tote_items[i].posting.delivery_date - tote_items[i - 1].posting.delivery_date            
+            if gap > 1.week
+              num_2_week_gaps += 1
+            end
+            i += 1
           end
-          actual_gap = tote_items[i].posting.delivery_date - tote_items[i - 1].posting.delivery_date
-          assert_equal expected_gap, actual_gap        
-          i += 1
-        end
 
+          assert num_2_week_gaps > 0, "num_2_week_gaps should be > 0. It's not. It's #{num_2_week_gaps.to_s}."
+
+        end
+      
       when 2 #every other week
         assert false, "do_tote_item_spacing doesn't test posting recurrence frequency 6 with subscription frequency 2 yet"
       when 3 #every 4 weeks
-        assert false, "do_tote_item_spacing doesn't test posting recurrence frequency 6 with subscription frequency 3 yet"
+
+        i = 1
+        while i < tote_items.count
+          gap = tote_items[i].posting.delivery_date - tote_items[i - 1].posting.delivery_date
+          assert_equal num_seconds_per_week * 4, gap
+          i += 1
+        end
+
       end
       
     end
