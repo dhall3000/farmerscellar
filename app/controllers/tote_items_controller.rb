@@ -42,7 +42,6 @@ class ToteItemsController < ApplicationController
 
     @account_on_hold = account_on_hold
     @tote_item = ToteItem.new
-    @tote_item.set_initial_state
 
     if !posting.posting_recurrence.nil? && posting.posting_recurrence.subscribable?
       @subscription = Subscription.new(frequency: 0, on: true, user_id: current_user.id, posting_recurrence_id: posting.posting_recurrence.id)
@@ -61,7 +60,6 @@ class ToteItemsController < ApplicationController
 
     @tote_item = ToteItem.new(tote_item_params)
     @tote_item.user_id = current_user.id
-    @tote_item.set_initial_state
     posting = Posting.find_by(@tote_item.posting_id)
     @tote_item.price = posting.price
 

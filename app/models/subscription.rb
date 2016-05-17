@@ -55,7 +55,6 @@ class Subscription < ActiveRecord::Base
     if current_posting.delivery_date == expected_next_delivery_date
   		  		
   		tote_item = ToteItem.new(quantity: quantity, price: current_posting.price, posting_id: current_posting.id, user_id: user.id, subscription_id: id)
-      tote_item.set_initial_state
 
       #if there is no authorization for this subscription or the authorization is not active, add the
       #tote item in the ADDED state. otherwise, if everything's good to go and we're all authorized, add in state AUTHORIZED
