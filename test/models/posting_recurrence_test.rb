@@ -153,10 +153,10 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
 
     old_post = posting_recurrence.postings.last
 
-    travel_to old_post.commitment_zone_start + 1
+    travel_to old_post.commitment_zone_start + 1    
 
     assert_equal 1, posting_recurrence.postings.count
-    posting_recurrence.recur
+     old_post.transition(:commitment_zone_started)
     assert_equal 2, posting_recurrence.postings.count
     assert_equal false, old_post.live
     assert_equal true, posting_recurrence.postings.last.live

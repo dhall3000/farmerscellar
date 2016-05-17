@@ -139,6 +139,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
 
       last_posting = posting_recurrence.postings.last
       assert last_posting.state?(:OPEN)
+      assert last_posting.live
 
       #if you draw out a postings series you'll see that if there are more than 1 postings in the series, the second to last
       #is either in its commitment zone or closed. and all the other postings will be closed
@@ -158,6 +159,8 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
           #assert num CLOSED postings is postings.count - 1
           assert_equal posting_recurrence.postings.count - 1, num_closed_postings
         end
+
+        assert_not second_last.live
 
       end
 

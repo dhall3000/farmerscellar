@@ -134,17 +134,6 @@ class PostingRecurrence < ActiveRecord::Base
       return
     end
 
-    #set old_post.live = false
-    old_post.live = false
-
-    if !old_post.save
-      body_lines = []
-      body_lines << "Posting id: " + old_post.id.to_s
-      body_lines << "Producer: " + old_post.user.farm_name
-      body_lines << "Product: " + old_post.product.name
-      AdminNotificationMailer.general_message("old post couldn't be 'unlive'd'", "false body line", body_lines).deliver_now
-    end
-
     #copy old_post
     new_post = old_post.dup       
     #set new_post delivery_date
