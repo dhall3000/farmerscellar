@@ -48,33 +48,33 @@ class PostingRecurrence < ActiveRecord::Base
 
   def subscription_options
 
-    options = [{subscription_frequency: 0, text: @@just_once, next_delivery_date: next_delivery_date(0)}]
+    options = [{subscription_frequency: 0, text: @@just_once, next_delivery_date: get_new_subscription_start_delivery_date(0)}]
 
     case frequency
     when 0 #just once posting frequency      
     when 1 #weekly posting frequency
-      options << {subscription_frequency: 1, text: @@every_week, next_delivery_date: next_delivery_date(1)}
-      options << {subscription_frequency: 2, text: @@every_2_weeks, next_delivery_date: next_delivery_date(2)}
-      options << {subscription_frequency: 3, text: @@every_3_weeks, next_delivery_date: next_delivery_date(3)}
-      options << {subscription_frequency: 4, text: @@every_4_weeks, next_delivery_date: next_delivery_date(4)}
+      options << {subscription_frequency: 1, text: @@every_week, next_delivery_date: get_new_subscription_start_delivery_date(1)}
+      options << {subscription_frequency: 2, text: @@every_2_weeks, next_delivery_date: get_new_subscription_start_delivery_date(2)}
+      options << {subscription_frequency: 3, text: @@every_3_weeks, next_delivery_date: get_new_subscription_start_delivery_date(3)}
+      options << {subscription_frequency: 4, text: @@every_4_weeks, next_delivery_date: get_new_subscription_start_delivery_date(4)}
     when 2 #every 2 weeks posting frequency
-      options << {subscription_frequency: 1, text: @@every_2_weeks, next_delivery_date: next_delivery_date(1)}
-      options << {subscription_frequency: 2, text: @@every_4_weeks, next_delivery_date: next_delivery_date(2)}
-      options << {subscription_frequency: 3, text: @@every_6_weeks, next_delivery_date: next_delivery_date(3)}
-      options << {subscription_frequency: 4, text: @@every_8_weeks, next_delivery_date: next_delivery_date(4)}
+      options << {subscription_frequency: 1, text: @@every_2_weeks, next_delivery_date: get_new_subscription_start_delivery_date(1)}
+      options << {subscription_frequency: 2, text: @@every_4_weeks, next_delivery_date: get_new_subscription_start_delivery_date(2)}
+      options << {subscription_frequency: 3, text: @@every_6_weeks, next_delivery_date: get_new_subscription_start_delivery_date(3)}
+      options << {subscription_frequency: 4, text: @@every_8_weeks, next_delivery_date: get_new_subscription_start_delivery_date(4)}
     when 3 #every 3 weeks posting frequency
-      options << {subscription_frequency: 1, text: @@every_3_weeks, next_delivery_date: next_delivery_date(1)}
-      options << {subscription_frequency: 2, text: @@every_6_weeks, next_delivery_date: next_delivery_date(2)}
+      options << {subscription_frequency: 1, text: @@every_3_weeks, next_delivery_date: get_new_subscription_start_delivery_date(1)}
+      options << {subscription_frequency: 2, text: @@every_6_weeks, next_delivery_date: get_new_subscription_start_delivery_date(2)}
     when 4 #every 4 weeks posting frequency
-      options << {subscription_frequency: 1, text: @@every_4_weeks, next_delivery_date: next_delivery_date(1)}
-      options << {subscription_frequency: 2, text: @@every_8_weeks, next_delivery_date: next_delivery_date(2)}
+      options << {subscription_frequency: 1, text: @@every_4_weeks, next_delivery_date: get_new_subscription_start_delivery_date(1)}
+      options << {subscription_frequency: 2, text: @@every_8_weeks, next_delivery_date: get_new_subscription_start_delivery_date(2)}
     when 5 #monthly posting frequency
-      options << {subscription_frequency: 1, text: get_text_for(next_delivery_date(1), 5, 1), next_delivery_date: next_delivery_date(1)}
-      options << {subscription_frequency: 2, text: get_text_for(next_delivery_date(2), 5, 2), next_delivery_date: next_delivery_date(2)}
+      options << {subscription_frequency: 1, text: get_text_for(get_new_subscription_start_delivery_date(1), 5, 1), next_delivery_date: get_new_subscription_start_delivery_date(1)}
+      options << {subscription_frequency: 2, text: get_text_for(get_new_subscription_start_delivery_date(2), 5, 2), next_delivery_date: get_new_subscription_start_delivery_date(2)}
     when 6 #3 weeks on, 1 week off posting frequency
-      options << {subscription_frequency: 1, text: "3 weeks on, 1 week off", next_delivery_date: next_delivery_date(1)}
-      options << {subscription_frequency: 2, text: "Every other week", next_delivery_date: next_delivery_date(2)}
-      options << {subscription_frequency: 3, text: "Every 4 weeks", next_delivery_date: next_delivery_date(3)}
+      options << {subscription_frequency: 1, text: "3 weeks on, 1 week off", next_delivery_date: get_new_subscription_start_delivery_date(1)}
+      options << {subscription_frequency: 2, text: "Every other week", next_delivery_date: get_new_subscription_start_delivery_date(2)}
+      options << {subscription_frequency: 3, text: "Every 4 weeks", next_delivery_date: get_new_subscription_start_delivery_date(3)}
     end    
 
     return options
@@ -180,6 +180,7 @@ class PostingRecurrence < ActiveRecord::Base
         
         #add to posting_recurrence.postings
         postings << new_post
+        save
 
         #kick the subscriptions
         subscriptions.each do |subscription|
@@ -263,9 +264,9 @@ class PostingRecurrence < ActiveRecord::Base
   #for now we're not going to implement subscription frequencies that require special treatment because they're not the lowest hanging fruit.
   #so the thinking with this method is to basically stub it out and call in to it so that down the road if/when we want to implement the things
   #discussed in this comment we just need to throw a few codes in the case statements below and we should be off to the races.
-  def next_delivery_date(subscription_frequency)
+  def get_new_subscription_start_delivery_date(subscription_frequency)
 
-    next_delivery_date = current_posting.delivery_date
+    new_subscription_start_delivery_date = current_posting.delivery_date
 
     if frequency == 6 && subscription_frequency == 2
 
@@ -288,12 +289,12 @@ class PostingRecurrence < ActiveRecord::Base
       end
 
       if week_num == 2
-        next_delivery_date = get_next_delivery_dates(1, current_posting.delivery_date)[0]
+        new_subscription_start_delivery_date = get_next_delivery_dates(1, current_posting.delivery_date)[0]
       end
 
     end
 
-    return next_delivery_date
+    return new_subscription_start_delivery_date
 
   end
 

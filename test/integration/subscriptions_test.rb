@@ -15,65 +15,6 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     do_frequencies_permutation(1, 1)
   end
 
-  test "frequency permutation 1 and 2" do
-    do_frequencies_permutation(1, 2)
-  end
-
-  test "frequency permutation 1 and 3" do    
-    do_frequencies_permutation(1, 3)
-  end
-
-  test "frequency permutation 1 and 4" do
-    do_frequencies_permutation(1, 4)
-  end
-
-  test "frequency permutation 2 and 1" do    
-    do_frequencies_permutation(2, 1)
-  end
-
-  test "frequency permutation 2 and 2" do
-    do_frequencies_permutation(2, 2)
-  end
-
-  test "frequency permutation 2 and 3" do    
-    do_frequencies_permutation(2, 3)
-  end
-
-  test "frequency permutation 2 and 4" do
-    do_frequencies_permutation(2, 4)
-  end
-
-  test "frequency permutation 3 and 1" do    
-    do_frequencies_permutation(3, 1)
-  end
-
-  test "frequency permutation 3 and 2" do
-    do_frequencies_permutation(3, 2)
-  end
-
-  test "frequency permutation 4 and 1" do    
-    do_frequencies_permutation(4, 1)
-  end
-
-  test "frequency permutation 4 and 2" do
-    do_frequencies_permutation(4, 2)
-  end
-
-  #posting: 3 on, 1 off. subscription: every delivery
-  test "frequency permutation 6 and 1" do
-    do_frequencies_permutation(6, 1)
-  end
-
-  #posting: 3 on, 1 off. subscription: every other week
-  test "frequency permutation 6 and 2" do
-    do_frequencies_permutation(6, 2)
-  end
-
-  #posting: 3 on, 1 off. subscription: every 4 weeks
-  test "frequency permutation 6 and 3" do
-    do_frequencies_permutation(6, 3)
-  end
-
   def do_frequencies_permutation(posting_frequency, subscription_frequency)
 
     product = products(:apples)
@@ -252,7 +193,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     num_days = 20
     time_loop(posting_recurrences, num_days)
 
-    num_c17_deliveries = num_days / (frequency * 7)
+    num_c17_deliveries = posting_recurrences.first.postings.where(state: Posting.states[:CLOSED]).count
     #however many deliveries there are this user should have 1 more because after the test stops there whould be 
     #remaining a single tote item in the AUTHORIZED state
     assert_equal num_c17_deliveries + 1, ToteItem.where(user_id: user.id).count
@@ -323,7 +264,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     farmer = users(:f_subscriptions)
     log_in_as(farmer)
     
-    delivery_date = next_day_of_week_after(Time.zone.now, 1, 7)    
+    delivery_date = next_day_of_week_after(Time.zone.now, 5, 7)
     post postings_path, posting: {
       description: "#{product.name} description",
       quantity_available: 100,
@@ -358,12 +299,31 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
 
   end
 
+  def get_nearest_posting(posting_recurrences)
+
+    nearest_posting = posting_recurrences.first.postings.first
+
+    posting_recurrences.each do |pr|
+      pr.reload
+      pr.postings.each do |posting|          
+        posting.reload
+        if posting.delivery_date < nearest_posting.delivery_date
+          nearest_posting = posting          
+        end
+      end        
+    end    
+
+    return nearest_posting
+
+  end
+
   def time_loop(posting_recurrences, num_days)
-    
-    current_time = Time.zone.now.midnight
-    end_minute = Time.zone.now.midnight + num_days.days
+
+    current_time = get_nearest_posting(posting_recurrences).commitment_zone_start - 1.hour
+    end_minute = current_time + num_days.days
 
     travel_to current_time
+    num_loops = 0
 
     while Time.zone.now < end_minute
       top_of_hour = Time.zone.now.min == 0
@@ -390,14 +350,19 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
             end
           end        
         end
-
       end
 
       travel 60.minutes
       current_time = Time.zone.now
+
+      num_loops += 1
+
+      if num_loops % 24 == 0                
+        puts Time.zone.now.strftime("%A, %B %d, %H")
+      end
             
     end
-       
+
     travel_back
 
   end

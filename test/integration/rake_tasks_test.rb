@@ -219,8 +219,8 @@ class RakeTasksTest < BulkBuyer
 
         assert_appropriate_email(emails[1], "c6@c.com", "Purchase receipt", "Here is your Farmer's Cellar purchase receipt.")          
         assert_appropriate_email(emails[2], "david@farmerscellar.com", "bulk purchase report", "BulkPurchase id: 2")
-        assert_appropriate_email(emails[3], "f1@f.com", "Payment invoice", "We just sent you a total of")
-        assert_appropriate_email(emails[4], "f2@f.com", "Payment invoice", "We just sent you a total of")
+        assert_appropriate_email(emails[3], "f1@f.com", "Payment receipt", "We just sent you a total of")
+        assert_appropriate_email(emails[4], "f2@f.com", "Payment receipt", "We just sent you a total of")
         assert_appropriate_email(emails[5], "david@farmerscellar.com", "BulkPayment report", "The sum of these payments is")
       end
 
@@ -230,7 +230,7 @@ class RakeTasksTest < BulkBuyer
         assert_equal 4, ActionMailer::Base.deliveries.count
         assert_appropriate_email(emails[0], "c5@c.com", "Purchase receipt", "Here is your Farmer's Cellar purchase receipt.")
         assert_appropriate_email(emails[1], "david@farmerscellar.com", "bulk purchase report", "BulkPurchase id: 3")
-        assert_appropriate_email(emails[2], "f2@f.com", "Payment invoice", "We just sent you a total of")
+        assert_appropriate_email(emails[2], "f2@f.com", "Payment receipt", "We just sent you a total of")
         assert_appropriate_email(emails[3], "david@farmerscellar.com", "BulkPayment report", "The sum of these payments is")
       end
 

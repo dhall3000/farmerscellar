@@ -85,7 +85,7 @@ class Subscription < ActiveRecord::Base
 
   def get_expected_next_delivery_date
 
-    expected_next_delivery_date = posting_recurrence.next_delivery_date(frequency)
+    expected_next_delivery_date = posting_recurrence.get_new_subscription_start_delivery_date(frequency)
 
     if !tote_items || !tote_items.any?
       return expected_next_delivery_date
