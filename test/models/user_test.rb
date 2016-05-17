@@ -41,12 +41,6 @@ class UserTest < ActiveSupport::TestCase
 
     assert_equal 0, c1.tote_items_to_pickup.count
     
-    #update a couple toteitems to be PURCHASED
-    #TODO: note that this is only going to work for now. it will probalby hav eto change once we clean up the
-    #tote item state machine
-    c1.tote_items[0].update(state: ToteItem.states[:PURCHASED])
-    c1.tote_items[1].update(state: ToteItem.states[:PURCHASED])
-
     travel_back
    
   end

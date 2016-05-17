@@ -16,6 +16,24 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
 
   end
 
+  test "should recur even with no orders" do
+
+    posting_recurrence = PostingRecurrence.new(frequency: 1, on: true)
+    posting_recurrence.postings << postings(:posting_subscription_farmer)
+    posting_recurrence.save
+    assert_equal 1, posting_recurrence.postings.count
+
+    travel_to posting_recurrence.postings.last.commitment_zone_start + 1
+    posting_recurrence.postings.last.transition(:commitment_zone_started)
+    assert_equal 2, posting_recurrence.postings.count
+
+    assert_equal 0, posting_recurrence.postings.first.tote_items.count
+    assert_equal 0, posting_recurrence.postings.last.tote_items.count
+
+    travel_back
+
+  end
+
   test "should turn off" do
 
     #this should not only turn off the recurrence itself but also ripple through to turn off
