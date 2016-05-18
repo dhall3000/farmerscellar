@@ -73,7 +73,7 @@ class PostingRecurrence < ActiveRecord::Base
       options << {subscription_frequency: 2, text: get_text_for(get_new_subscription_start_delivery_date(2), 5, 2), next_delivery_date: get_new_subscription_start_delivery_date(2)}
     when 6 #3 weeks on, 1 week off posting frequency
       options << {subscription_frequency: 1, text: "3 weeks on, 1 week off", next_delivery_date: get_new_subscription_start_delivery_date(1)}
-      options << {subscription_frequency: 2, text: "Every other week", next_delivery_date: get_new_subscription_start_delivery_date(2)}
+      #options << {subscription_frequency: 2, text: "Every other week", next_delivery_date: get_new_subscription_start_delivery_date(2)}
       options << {subscription_frequency: 3, text: "Every 4 weeks", next_delivery_date: get_new_subscription_start_delivery_date(3)}
     end    
 
