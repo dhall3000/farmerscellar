@@ -5,8 +5,13 @@
   <% show_remove_button = true %>
   <%= render partial: "shared/tote", locals: { tote_items: @tote_items, show_remove_button: show_remove_button } %>  
 
+  <% action = "Checkout" %>
+  <% if @rtba %>
+    <% action = "Authorization" %>          
+  <% end %>
+
   <% if @total_amount_to_authorize > 0 %>
-    <h2>Checkout</h2>
+    <h2><%= action %></h2>
     
     <div class="row">
       <div class="col-sm-6 col-md-4">
@@ -91,7 +96,7 @@
           <p class="alert alert-danger">No delivery dropsite specified.</p>
           <p>You must specify a <%= link_to "delivery dropsite", dropsites_path %> before checking out.</p>
         <% else %>
-          <p>(By proceeding with checkout you agree to transact with and through Farmer's Cellar in accordance with our operational policies and procedures outlined on our <%= link_to "How Things Work", how_things_work_path %> page)</p>
+          <p>(By proceeding with <%= action.downcase %> you agree to transact with and through Farmer's Cellar in accordance with our operational policies and procedures outlined on our <%= link_to "How Things Work", how_things_work_path %> page)</p>
         <% end %>
 
       </div>
