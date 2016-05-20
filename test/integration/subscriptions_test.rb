@@ -104,6 +104,41 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     end    
   end
 
+  test "should tell user the desired subscription frequency is not available this week" do
+
+    product = products(:apples)
+    posting_frequency = 6
+    subscription_frequency = 2
+    posting = setup_posting_recurrence(product, posting_frequency)
+
+    user = users(:c1)    
+    quantity = 2    
+
+    posting_recurrence = posting.posting_recurrence
+    travel_to posting_recurrence.postings.last.commitment_zone_start
+    RakeHelper.do_hourly_tasks
+    posting_recurrence.reload
+    assert_equal 2, posting_recurrence.postings.count
+    posting = posting_recurrence.postings.last
+
+    log_in_as(user)
+    post user_dropsites_path, user_dropsite: {dropsite_id: dropsites(:dropsite1).id}
+
+    post tote_items_path, tote_item: {
+      quantity: quantity,      
+      posting_id: posting.id,
+      subscription_frequency: subscription_frequency
+    }
+
+    assert :success
+    assert_template 'tote_items/new'
+    assert_not flash.empty?
+    assert_equal "Apologies...every other week delivery for this product is not available at the moment but will be in less than a week. Please check back later.", flash.now[:danger]
+
+    travel_back
+    
+  end
+
   def do_frequencies_permutation(posting_frequency, subscription_frequency)
 
     product = products(:apples)
