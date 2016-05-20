@@ -147,7 +147,7 @@ class ToteItemsController < ApplicationController
       else
         ti.transition(:customer_removed)        
         if ti.state?(:REMOVED)
-          flash[:success] = "Shopping tote item removed."
+          flash[:success] = "#{ti.posting.user.farm_name} #{ti.posting.product.name} removed from tote"
         else
           flash[:danger] = "This item could not be removed. Please contact Farmer's Cellar for help."
         end
