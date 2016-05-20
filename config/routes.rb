@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   get 'test/authorize'
   post 'test/capture'
   get 'test_page' => 'static_pages#test_page'
+  get 'test_exception' => 'static_pages#test_exception'
   get 'm' => 'static_pages#m'
   get 'about' => 'static_pages#about'
   get 'contact' => 'static_pages#contact'
