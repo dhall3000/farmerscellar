@@ -60,7 +60,7 @@ class ToteItemsController < ApplicationController
 
     @tote_item = ToteItem.new(tote_item_params)
     @tote_item.user_id = current_user.id
-    posting = Posting.find_by(@tote_item.posting_id)
+    posting = Posting.find(@tote_item.posting_id)
     @tote_item.price = posting.price
 
     if !correct_user_create(@tote_item)
