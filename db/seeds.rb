@@ -260,7 +260,6 @@ Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: ne
 Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 7, quantity_available: 100, price: 1.25, user_id: f4.id, unit_category_id: 2, unit_kind_id: 8, description: "best oranges ever!")
 #Celery
 Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 8, quantity_available: 100, price: 2.50, user_id: f4.id, unit_category_id: 2, unit_kind_id: 8, description: "best celery ever!")
-
 #Avocado
 Posting.create(live: true, delivery_date: Time.zone.today, commitment_zone_start: Time.zone.today - 2.days, product_id: avocado.id, quantity_available: 100, price: 2.29, user_id: f4.id, unit_category_id: count.id, unit_kind_id: whole.id, description: "best avocado ever!")
 #Basil
@@ -273,6 +272,24 @@ posting_recurrence.save
 posting_recurrence = PostingRecurrence.new(on: true, frequency: 5)
 posting_recurrence.postings << asparagus
 posting_recurrence.save
+
+milk = Posting.create(
+      live: true,
+      delivery_date: Time.zone.tomorrow,
+      commitment_zone_start: Time.zone.yesterday,
+      product_id: 3,
+      quantity_available: 25,
+      price: 2.00,
+      user_id: f2.id,
+      unit_category_id: 1,
+      unit_kind_id: 5,
+      description: "these milks are all organic grown with no pesticides. they are raw. no homogeneization. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too."
+      )
+
+posting_recurrence = PostingRecurrence.new(on: true, frequency: 6)
+posting_recurrence.postings << milk
+posting_recurrence.save
+milk.transition(:commitment_zone_started)
 
 #Apples
 ToteItem.create(quantity: 2, price: 2.75, state: ToteItem.states[:AUTHORIZED], user_id: 7, posting_id: 1)
