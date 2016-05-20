@@ -232,7 +232,7 @@ class PostingRecurrence < ActiveRecord::Base
       return nil
     end
 
-    return postings.last
+    return postings.order(:delivery_date).last
 
   end
 
