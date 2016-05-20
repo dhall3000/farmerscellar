@@ -106,6 +106,9 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
 
   test "should tell user the desired subscription frequency is not available this week" do
 
+    num_tote_items = ToteItem.count
+    num_subscriptions = Subscription.count
+
     product = products(:apples)
     posting_frequency = 6
     subscription_frequency = 2
@@ -136,6 +139,9 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     assert_equal "Apologies...every other week delivery for this product is not available at the moment but will be in less than a week. Please check back later.", flash.now[:danger]
 
     travel_back
+
+    assert_equal num_tote_items, ToteItem.count
+    assert_equal num_subscriptions, Subscription.count
     
   end
 
