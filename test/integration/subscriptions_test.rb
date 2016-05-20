@@ -91,11 +91,11 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
   end
 
   #posting: 3 on, 1 off. subscription: every other week
-#  test "frequency permutation 6 and 2" do
-#    if @on
-#      do_frequencies_permutation(6, 2)
-#    end
-#  end
+  test "frequency permutation 6 and 2" do
+    if @on
+      do_frequencies_permutation(6, 2)
+    end
+  end
 
   #posting: 3 on, 1 off. subscription: every 4 weeks
   test "frequency permutation 6 and 3" do
@@ -130,8 +130,8 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
 
       posting_recurrence.reload
 
-      if posting_recurrence.postings.count == 2 && user.tote_items.count == num_tote_items_start
-        add_subscription(user, posting_recurrence.postings.last, quantity, subscription_frequency)
+      if posting_recurrence.postings.count >= 2 && user.tote_items.count == num_tote_items_start
+        add_subscription(user, posting_recurrence.postings.last, quantity, subscription_frequency)      
       end      
 
       #if you draw out a postings series you'll see that the last inthe series is always open because the moment time enters the 
@@ -255,7 +255,14 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
         end
       
       when 2 #every other week
-        assert false, "do_tote_item_spacing doesn't test posting recurrence frequency 6 with subscription frequency 2 yet"
+
+        i = 1
+        while i < tote_items.count
+          gap = tote_items[i].posting.delivery_date - tote_items[i - 1].posting.delivery_date
+          assert_equal num_seconds_per_week * 2, gap
+          i += 1
+        end        
+
       when 3 #every 4 weeks
 
         i = 1
@@ -349,9 +356,16 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
       subscription_frequency: frequency
     }
 
-    post checkouts_path, use_reference_transaction: 1
-    checkout = assigns(:checkout)
-    post rtauthorizations_create_path, token: checkout.token
+    get tote_items_path
+    assert :success
+    assert_template 'tote_items/index'
+    total_amount_to_authorize = assigns(:total_amount_to_authorize)
+
+    if total_amount_to_authorize > 0
+      post checkouts_path, use_reference_transaction: 1
+      checkout = assigns(:checkout)
+      post rtauthorizations_create_path, token: checkout.token
+    end
 
     #TODO: tests
     #verify ba points to user

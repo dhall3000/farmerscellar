@@ -85,9 +85,22 @@ class ToteItemsController < ApplicationController
         @subscription = @tote_item.posting.posting_recurrence.subscriptions.create(new_subscription_params)
 
         if @subscription.save
-          @subscription.generate_next_tote_item
-          flash[:success] = "New subscription created."
-          redirect_to postings_path
+
+          tote_item = @subscription.generate_next_tote_item
+
+          if tote_item
+            flash[:success] = "New subscription created."
+            redirect_to postings_path
+          else
+            #NOTE: this else case is being created as a quick workaround to a helen the hen 3 on 1 off issue. in the case where someone specifies a bi weekly delivery
+            #and it happens to be week #2 of the cycle there won't be a tote item returned from the @subscription.generate_next_tote_item call above. in
+            #this case we want the user to just see a flash that says this option will be available in less than a week so please check back.
+            Subscription.destroy(@subscription.id)
+            flash.now[:danger] = "Apologies...every other week delivery for this product is not available at the moment but will be in less than a week. Please check back later."
+            render 'new' 
+            return           
+          end
+
         else
           flash.now[:danger] = "Subscription not saved. See errors below."
           render 'new'
