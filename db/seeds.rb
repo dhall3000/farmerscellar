@@ -273,9 +273,15 @@ posting_recurrence = PostingRecurrence.new(on: true, frequency: 5)
 posting_recurrence.postings << asparagus
 posting_recurrence.save
 
+delivery_date = Time.zone.tomorrow
+
+if delivery_date.sunday?
+  delivery_date = delivery_date + 1.day
+end
+
 milk = Posting.create(
       live: true,
-      delivery_date: Time.zone.tomorrow,
+      delivery_date: delivery_date,
       commitment_zone_start: Time.zone.yesterday,
       product_id: 3,
       quantity_available: 25,

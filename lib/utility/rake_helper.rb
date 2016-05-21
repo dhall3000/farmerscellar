@@ -68,16 +68,27 @@ class RakeHelper
 
 		def self.transition_open_postings
 
+			puts "transition_open_postings: start"
+
 			postings = Posting.where(state: Posting.states[:OPEN])
+
+			if postings.any?
+				puts "transition_open_postings: #{postings.count.to_s} posting(s) to transition to COMMITMENTZONE"
+			else
+				puts "transition_open_postings: no postings to transition to COMMITMENTZONE"
+			end
 
 			transitioned_postings = []
 
 			postings.each do |posting|
 				if Time.zone.now >= posting.commitment_zone_start
+					puts "transition_open_postings: transitioning posting id #{posting.id.to_s} to COMMITMENTZONE"
 					posting.transition(:commitment_zone_started)
 					transitioned_postings << posting.id
 				end
 			end
+
+			puts "transition_open_postings: end "
 
 			return transitioned_postings.uniq
 
@@ -85,16 +96,27 @@ class RakeHelper
 
 		def self.transition_commitment_zone_postings
 
+			puts "transition_commitment_zone_postings: start"
+
 			postings = Posting.where(state: Posting.states[:COMMITMENTZONE])
+
+			if postings.any?
+				puts "transition_commitment_zone_postings: #{postings.count.to_s} posting(s) to close"
+			else
+				puts "transition_commitment_zone_postings: no postings to close"
+			end
 
 			transitioned_postings = []
 
 			postings.each do |posting|
 				if Time.zone.now >= (posting.delivery_date + 12.hours)
+					puts "transition_commitment_zone_postings: transitioning posting id #{posting.id.to_s} to CLOSED state"
 					posting.transition(:past_delivery_date)
 					transitioned_postings << posting.id
 				end
 			end
+
+			puts "transition_commitment_zone_postings: end"
 
 			return transitioned_postings.uniq
 
@@ -102,13 +124,22 @@ class RakeHelper
 
 		def self.transition_tote_items_to_committed(transitioned_postings)
 
+			puts "transition_tote_items_to_committed: start"
+
 			postings = Posting.where(id: transitioned_postings)
 
 			transitioned_tote_item_ids = []
 
 			postings.each do |posting|
+
+				puts "transition_tote_items_to_committed: now transitioning tote items to COMMITTED for posting id #{posting.id.to_s}"
 				
 				tote_items_to_transition = posting.tote_items.where(state: ToteItem.states[:AUTHORIZED])
+
+				if !tote_items_to_transition.any?
+					puts "transition_tote_items_to_committed: there are no tote items associated with posting id #{posting.id.to_s} that need to be transitioned to COMMITTED"
+				end
+
 				tote_items_to_transition.each do |tote_item_to_transition|
 
 					if tote_item_to_transition.posting.commitment_zone_start.nil?
@@ -116,12 +147,15 @@ class RakeHelper
 		    	end
 
 			    if Time.zone.now >= tote_item_to_transition.posting.commitment_zone_start
+			    	puts "transition_tote_items_to_committed: transitioning tote_item id #{tote_item_to_transition.id.to_s} to COMMITTED"
 					  tote_item_to_transition.transition(:commitment_zone_started)
 					  transitioned_tote_item_ids << tote_item_to_transition.id
 			    end
 				end
 
 			end
+
+			puts "transition_tote_items_to_committed: end"
 
 			return transitioned_tote_item_ids
 
@@ -139,6 +173,8 @@ class RakeHelper
 		end
 
 		def self.send_orders_to_producers(posting_ids)
+
+			puts "send_orders_to_producers: start"
 
 		  if posting_ids.nil? || !posting_ids.any?
 		    puts "send_orders_to_producers: no postings transitioned. all done."
@@ -161,8 +197,11 @@ class RakeHelper
 		  end
 
 		  producers.each do |email, postings|
+		  	puts "send_orders_to_producers: sending order for #{postings.count.to_s} posting(s) to #{email}"
 		    ProducerNotificationsMailer.current_orders(email, postings).deliver_now    
 		  end  
+
+		  puts "send_orders_to_producers: end"
 
 		end
 
