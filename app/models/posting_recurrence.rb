@@ -137,26 +137,7 @@ class PostingRecurrence < ActiveRecord::Base
     #copy old_post
     new_post = old_post.dup       
     #set new_post delivery_date
-    if frequency >= 1 && frequency <= 4
-      new_post.delivery_date = old_post.delivery_date + frequency.weeks
-    elsif frequency == 5
-      #this is a monthly recurrence. we have to find out which weeknumber of the month the old_post is on so that we can
-      #set the new_post delivery date to the same weeknumber of the following month
-      week_number = get_week_number(old_post.delivery_date)
-
-      if week_number < 4
-        #handle the 1st, 2nd or 3rd week_of_day of the month
-        new_post.delivery_date = get_nth_weekday_of_next_month(old_post.delivery_date, week_number)
-      else
-        #we're doing the last Xday of the month
-        #handle the last week_of_day of the month
-        new_post.delivery_date = get_last_weekday_occurence_of_next_month(old_post.delivery_date)
-      end
-
-    elsif frequency == 6
-      #we're doing marty's 3 weeks on, 1 week off recurrence
-      new_post.delivery_date = get_next_delivery_dates(1, old_post.delivery_date)[0]
-    end
+    new_post.delivery_date = get_next_delivery_dates(1, old_post.delivery_date)[0]
 
     #set new_post commitment zone start
     commitment_zone_window = old_post.delivery_date - old_post.commitment_zone_start
@@ -193,7 +174,39 @@ class PostingRecurrence < ActiveRecord::Base
       return future_delivery_dates
     end
 
-    if frequency == 6
+    case frequency
+    when 1..4
+      future_delivery_date = current_posting.delivery_date
+      while future_delivery_dates.count < num_future_dates
+        future_delivery_date += frequency.weeks
+        if future_delivery_date > beyond_date
+          future_delivery_dates << future_delivery_date
+        end
+      end
+    when 5
+
+      future_delivery_date = current_posting.delivery_date
+      while future_delivery_dates.count < num_future_dates
+
+        #this is a monthly recurrence. we have to find out which weeknumber of the month the old_post is on so that we can
+        #set the new_post delivery date to the same weeknumber of the following month
+        week_number = get_week_number(future_delivery_date)
+
+        if week_number < 4
+          #handle the 1st, 2nd or 3rd week_of_day of the month
+          future_delivery_date = get_nth_weekday_of_next_month(future_delivery_date, week_number)
+        else
+          #we're doing the last Xday of the month
+          #handle the last week_of_day of the month
+          future_delivery_date = get_last_weekday_occurence_of_next_month(future_delivery_date)
+        end
+
+        if future_delivery_date > beyond_date
+          future_delivery_dates << future_delivery_date
+        end
+      end
+
+    when 6
 
       date = postings.first.delivery_date
 
@@ -339,7 +352,7 @@ class PostingRecurrence < ActiveRecord::Base
 
       #advance days until we get to the first of the month
       while first_day_of_next_month.month == month_num
-        first_day_of_next_month = first_day_of_next_month.to_date.next
+        first_day_of_next_month = first_day_of_next_month + 1.day
       end
 
       return first_day_of_next_month
