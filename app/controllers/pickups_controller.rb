@@ -2,10 +2,12 @@ class PickupsController < ApplicationController
 	before_action :redirect_to_root_if_user_not_dropsite_user
 
   def new
+    @is_dropsite_user = true
   end
 
   def create
 
+    @is_dropsite_user = true
   	entered_code = params[:pickup_code]
   	@pickup_code = PickupCode.new(code: entered_code, user: current_user)
 
