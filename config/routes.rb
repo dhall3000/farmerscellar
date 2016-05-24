@@ -1,5 +1,4 @@
 Rails.application.routes.draw do
-
   root 'static_pages#home'
   get 'rtauthorizations/new'
   post 'rtauthorizations/create'
@@ -25,7 +24,9 @@ Rails.application.routes.draw do
   post 'reference_transactions/create_capture'
   get 'reference_transactions/do_rtpurchase'
   get 'reference_transactions/do_bulk_purchase'
-
+  
+  post 'subscriptions/skip_dates'
+  resources :subscriptions, only: [:index, :show, :edit, :update, :destroy]
   resources :producer_product_commissions
   resources :products
   resources :website_settings, only: [:edit, :update]

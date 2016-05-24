@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160517223308) do
+ActiveRecord::Schema.define(version: 20160520231834) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -448,13 +448,14 @@ ActiveRecord::Schema.define(version: 20160517223308) do
   add_index "subscription_skip_dates", ["subscription_id"], name: "index_subscription_skip_dates_on_subscription_id"
 
   create_table "subscriptions", force: :cascade do |t|
-    t.integer  "frequency",             default: 0, null: false
+    t.integer  "frequency",             default: 0,     null: false
     t.boolean  "on"
     t.integer  "user_id"
     t.integer  "posting_recurrence_id"
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
-    t.integer  "quantity",                          null: false
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+    t.integer  "quantity",                              null: false
+    t.boolean  "paused",                default: false
   end
 
   add_index "subscriptions", ["posting_recurrence_id"], name: "index_subscriptions_on_posting_recurrence_id"
