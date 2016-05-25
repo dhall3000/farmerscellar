@@ -4,14 +4,13 @@ class SubscriptionsController < ApplicationController
   def index
 
     @subscriptions = Subscription.where(user_id: current_user.id, on: true)
-
     @num_dates = 1
 
     if params[:num_dates]
-      @num_dates = constrain_num_dates(params[:num_dates].to_i + 3)
+      @num_dates = constrain_num_dates(params[:num_dates].to_i)
     end
 
-    farthest_existing_skip_date = SubscriptionSkipDate.joins(subscription: :user).order("subscription_skip_dates.skip_date").last
+    farthest_existing_skip_date = SubscriptionSkipDate.joins(subscription: :user).where("subscriptions.on" => true).order("subscription_skip_dates.skip_date").last
     @skip_dates = get_skip_dates_for(@subscriptions.select(:id), @num_dates)
 
     while farthest_existing_skip_date && farthest_existing_skip_date.skip_date > @skip_dates.last[:date]
@@ -47,12 +46,70 @@ class SubscriptionsController < ApplicationController
   end
 
   def show
+
+    @subscription = Subscription.find_by(id: params[:id])
+
+    if @subscription.nil? || !@subscription.on
+      redirect_to subscriptions_path
+      return
+    end
+
   end
 
   def edit
+
+    @subscription = Subscription.find_by(id: params[:id])
+
+    if @subscription.nil? || !@subscription.on
+      redirect_to subscriptions_path
+      return
+    end
+
   end
 
   def update
+
+    @subscription = Subscription.find_by(id: params[:id])
+
+    if @subscription.nil? || !@subscription.on
+      redirect_to subscriptions_path
+      return
+    end
+
+    on = params[:subscription][:on].to_i
+    if on == 0
+      
+      if @subscription.turn_off
+        flash[:success] = "Subscription canceled"
+      else
+        flash[:danger] = "Subscription not canceled"
+      end
+
+      redirect_to subscriptions_path
+      return
+
+    end
+
+    paused = params[:subscription][:paused].to_i
+    flash_message = "Subscription is now "
+
+    if paused == 0
+      pause_value = false            
+    elsif paused == 1
+      pause_value = true      
+    else
+      redirect_to subscriptions_path
+      return
+    end
+
+    if @subscription.pause(pause_value)
+      flash[:success] = "Subscription updated"
+    else
+      flash[:danger] = "Subscription not updated"
+    end
+
+    redirect_to edit_subscription_path(@subscription)
+
   end
 
   def destroy

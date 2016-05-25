@@ -1,2 +1,75 @@
-<h1>Subscriptions#show</h1>
-<p>Find me in app/views/subscriptions/show.html.erb</p>
+<h1>Subscription</h1>
+
+  <div class="row">
+    <div class="col-xs-12 col-md-4 col-md-offset-4">
+      <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+
+
+
+        <div class="panel panel-default">
+          <div class="panel-heading" role="tab" id="subscribeHeading">
+            <h4 class="panel-title">Subscription Info</h4>
+          </div>          
+          <div class="panel-body">           
+
+            <p>
+              <%= @subscription.description %>
+            </p>
+
+            <% if @subscription.paused %>
+
+              <p class="alert alert-danger">
+                This subscription is paused
+                <span class="glyphicon glyphicon-pause" aria-hidden="true"></span>
+              </p>
+
+            <% else %>
+
+              <p class="alert alert-success">
+                This subscription is active
+                <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+              </p>
+              
+            <% end %>
+
+            <%= link_to "Edit", edit_subscription_path(@subscription), class: "btn btn-primary btn-lg btn-block" %>
+
+          </div>          
+        </div>
+
+
+
+
+        <div class="panel panel-default">
+          <div class="panel-heading" role="tab" id="detailsHeading">
+            <h4 class="panel-title">              
+              <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#detailsBody" aria-expanded="false" aria-controls="detailsBody">
+                <span class="glyphicon glyphicon-expand" aria-hidden="true"></span>Product Info
+              </a>
+            </h4>  
+          </div>          
+          <div id="detailsBody" class="panel-collapse collapse" role="tabpanel" aria-labelledby="detailsHeading">
+            <div class="panel-body">
+
+              <% posting = @subscription.posting_recurrence.current_posting %>
+
+              <p><%= "#{posting.user.farm_name} #{posting.product.name}" %></p>
+
+              <ul>
+                <li>Producer Description: <%= posting.user.description %></li>
+                <li>Product Description: <%= posting.description %></li>               
+                <% if !posting.user.website.nil? %>
+                  <li>More info:  <%= link_to posting.user.website, url_with_protocol(posting.user.website), target: "_blank" %></li>
+                <% end %>
+              </ul>
+
+            </div>
+          </div>
+        </div>
+
+
+
+
+      </div>
+    </div>
+  </div>

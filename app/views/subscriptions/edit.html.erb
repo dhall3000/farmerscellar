@@ -1,2 +1,136 @@
-<h1>Subscriptions#edit</h1>
-<p>Find me in app/views/subscriptions/edit.html.erb</p>
+<h1>Edit Subscription</h1>
+
+  <div class="row">
+    <div class="col-xs-12 col-md-4 col-md-offset-4">
+      <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+
+
+
+        <div class="panel panel-default">
+          <div class="panel-heading" role="tab" id="subscribeHeading">
+            <h4 class="panel-title">Subscription Info</h4>
+          </div>          
+          <div class="panel-body">           
+
+            <p>
+              <%= @subscription.description %>
+            </p>
+
+            <% if @subscription.paused %>
+
+              <p class="alert alert-danger">
+                This subscription is paused
+                <span class="glyphicon glyphicon-pause" aria-hidden="true"></span>
+              </p>
+
+              <%
+              	paused_button_text = "Play"
+              	paused_button_value = 0
+              %>
+
+            <% else %>
+
+              <p class="alert alert-success">
+                This subscription is active
+                <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+              </p>
+
+              <%
+              	paused_button_text = "Pause"
+              	paused_button_value = 1
+              %>
+
+            <% end %>
+
+
+
+					  <div class="row">
+					    
+					    <div class="col-xs-6">
+	              <%= form_for @subscription do |f| %>
+	              	<%= f.hidden_field :paused, value: paused_button_value %>
+	              	<%= f.hidden_field :on, value: 1 %>
+	              	<%= f.submit paused_button_text, class: "btn btn-primary btn-lg" %>
+	              <% end %>
+					    </div>
+
+					    <div class="col-xs-6">
+	              <%= form_for @subscription do |f| %>
+	              	<%= f.hidden_field :paused %>
+	              	<%= f.hidden_field :on, value: 0 %>
+	              	<%= f.submit "Cancel", class: "btn btn-primary btn-lg" %>
+	              <% end %>				             
+					    </div>
+					    
+						</div>
+
+
+
+          </div>          
+        </div>
+
+
+        <% if !@subscription.paused %>
+
+
+
+	        <div class="panel panel-default">
+	          <div class="panel-heading" role="tab" id="subscribeHeading">
+	            <h4 class="panel-title">Delivery Skips</h4>
+	          </div>          
+	          <div class="panel-body">
+
+	<% if false %>
+
+	            <%= form_tag subscriptions_skip_dates_path do %>
+
+	              <table class="table">
+	                <thead>
+	                  <tr>
+	                    <td class="text-left">Product</td>
+	                    <td class="text-center">Delivery</td>
+	                    <td class="text-right">Skip</td>
+	                  </tr>
+	                </thead>
+	                <tbody>
+	                  <% subscription_ids = [] %>
+	                  <% @skip_dates.each do |skip_date| %>                
+	                    <% if skip_date[:skip] %>
+	                      <tr class="alert-danger">
+	                    <% else %>
+	                      <tr>
+	                    <% end %>
+	                    
+	                      <% subscription_ids << skip_date[:subscription].id %>
+	                      <% posting = skip_date[:subscription].posting_recurrence.current_posting %>
+	                      <td><%= "#{posting.user.farm_name} #{posting.product.name}" %></td>
+	                      <td class="text-center"><%= skip_date[:date].strftime("%a %b %d") %></td>
+	                      <td class="text-right"><%= check_box_tag "skip_dates[#{skip_date[:subscription].id.to_s}][]", skip_date[:date], skip_date[:skip] %></td>
+	                    </tr>
+	                  <% end %>
+	                </tbody>
+	              </table>
+
+	              <% subscription_ids.uniq!
+	                subscription_ids.each do |subscription_id| %>
+	                  <%= hidden_field_tag "subscription_ids[]", subscription_id %>
+	                <% end %>                              
+
+	              <%= hidden_field_tag :num_dates, @num_dates %>
+
+	              <%= submit_tag "Update", class: "btn btn-primary btn-lg form-control fat-finger-spacing" %>
+	              <%= link_to "Show more delivery dates", subscriptions_path(num_dates: @num_dates), class: "btn btn-primary btn-lg btn-block" %>
+	              
+	            <% end %>
+
+	<% end %>
+
+	          </div>          
+	        </div>
+
+				<% end %>
+
+
+      </div>
+    </div>
+  </div>

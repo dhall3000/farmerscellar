@@ -19,6 +19,10 @@ class Subscription < ActiveRecord::Base
     update(on: false)
   end
 
+  def pause(paused_value)
+    update(paused: paused_value)
+  end  
+
   def authorized?
     return rtauthorizations && rtauthorizations.last && rtauthorizations.last.authorized?
   end

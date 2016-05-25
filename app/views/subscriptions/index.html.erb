@@ -93,8 +93,8 @@
 
               <%= hidden_field_tag :num_dates, @num_dates %>
 
-              <%= submit_tag "Update", class: "btn btn-primary btn-lg form-control fat-finger-spacing" %>
-              <%= link_to "Show more delivery dates", subscriptions_path(num_dates: @num_dates), class: "btn btn-primary btn-lg btn-block" %>
+              <%= submit_tag "Update delivery skips", class: "btn btn-primary btn-lg form-control fat-finger-spacing" %>
+              <%= link_to "Show more delivery dates", subscriptions_path(num_dates: @num_dates + 3), class: "btn btn-primary btn-lg btn-block" %>
               
             <% end %>
 
@@ -109,5 +109,5 @@
 
 
 <% else %>
-	<p>no subscriptions</p>	
+	<p class="text-center">You do not have any subscriptions</p>	
 <% end %>
