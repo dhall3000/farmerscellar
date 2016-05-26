@@ -71,8 +71,11 @@ class UserMailer < ApplicationMailer
 
       tote_items.each do |tote_item|
 
-        if !tote_item.nil? && !tote_item.checkouts.nil? && tote_item.checkouts.any? && !tote_item.checkouts.last.authorizations.nil? && tote_item.checkouts.last.authorizations.any?
-          auths << tote_item.checkouts.last.authorizations.last.id
+        if !tote_item.nil?
+          auth = tote_item.authorization
+          if !auth.nil?
+            auths << auth
+          end
         end
       
       end    
