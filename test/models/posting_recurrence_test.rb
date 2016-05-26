@@ -95,6 +95,165 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     @posting_recurrence.reload
   end
 
+  test "verify get delivery dates method 1" do
+    
+    posting_recurrence = PostingRecurrence.new(frequency: 1, on: true)
+    posting = postings(:postingf1apples)
+    mar29 = Time.zone.local(2016,3,29)    
+    posting.delivery_date = mar29
+    posting.commitment_zone_start = mar29 - 2.days
+    posting.save
+    posting_recurrence.postings << posting
+    posting_recurrence.save
+    
+    delivery_dates = posting_recurrence.get_delivery_dates_for(posting.delivery_date, posting.delivery_date + 8.weeks)
+
+    assert_equal 8, delivery_dates.count
+    
+    assert_equal Time.zone.local(2016,4,5), delivery_dates[0]
+    assert_equal Time.zone.local(2016,4,12), delivery_dates[1]
+    assert_equal Time.zone.local(2016,4,19), delivery_dates[2]
+    assert_equal Time.zone.local(2016,4,26), delivery_dates[3]
+    assert_equal Time.zone.local(2016,5,3), delivery_dates[4]
+    assert_equal Time.zone.local(2016,5,10), delivery_dates[5]
+    assert_equal Time.zone.local(2016,5,17), delivery_dates[6]
+    assert_equal Time.zone.local(2016,5,24), delivery_dates[7]
+
+  end
+
+  test "verify get delivery dates method 2" do
+
+    posting_recurrence = PostingRecurrence.new(frequency: 2, on: true)
+    posting = postings(:postingf1apples)
+    mar29 = Time.zone.local(2016,3,29)    
+    posting.delivery_date = mar29
+    posting.commitment_zone_start = mar29 - 2.days
+    posting.save
+    posting_recurrence.postings << posting
+    posting_recurrence.save
+    
+    delivery_dates = posting_recurrence.get_delivery_dates_for(posting.delivery_date, posting.delivery_date + 8.weeks)
+
+    assert_equal 4, delivery_dates.count
+        
+    assert_equal Time.zone.local(2016,4,12), delivery_dates[0]
+    assert_equal Time.zone.local(2016,4,26), delivery_dates[1]    
+    assert_equal Time.zone.local(2016,5,10), delivery_dates[2]
+    assert_equal Time.zone.local(2016,5,24), delivery_dates[3]
+
+  end
+
+  test "verify get delivery dates method 3" do
+
+    posting_recurrence = PostingRecurrence.new(frequency: 3, on: true)
+    posting = postings(:postingf1apples)
+    mar29 = Time.zone.local(2016,3,29)    
+    posting.delivery_date = mar29
+    posting.commitment_zone_start = mar29 - 2.days
+    posting.save
+    posting_recurrence.postings << posting
+    posting_recurrence.save
+    
+    delivery_dates = posting_recurrence.get_delivery_dates_for(posting.delivery_date, posting.delivery_date + 8.weeks)
+
+    assert_equal 2, delivery_dates.count
+        
+    assert_equal Time.zone.local(2016,4,19), delivery_dates[0]
+    assert_equal Time.zone.local(2016,5,10), delivery_dates[1]
+
+  end
+
+  test "verify get delivery dates method 4" do
+
+    posting_recurrence = PostingRecurrence.new(frequency: 4, on: true)
+    posting = postings(:postingf1apples)
+    mar29 = Time.zone.local(2016,3,29)    
+    posting.delivery_date = mar29
+    posting.commitment_zone_start = mar29 - 2.days
+    posting.save
+    posting_recurrence.postings << posting
+    posting_recurrence.save
+    
+    delivery_dates = posting_recurrence.get_delivery_dates_for(posting.delivery_date, posting.delivery_date + 8.weeks)
+
+    assert_equal 2, delivery_dates.count
+        
+    assert_equal Time.zone.local(2016,4,26), delivery_dates[0]
+    assert_equal Time.zone.local(2016,5,24), delivery_dates[1]
+
+  end
+
+  test "verify get delivery dates method 5 last" do
+
+    posting_recurrence = PostingRecurrence.new(frequency: 5, on: true)
+    posting = postings(:postingf1apples)
+    mar29 = Time.zone.local(2016,3,29)    
+    posting.delivery_date = mar29
+    posting.commitment_zone_start = mar29 - 2.days
+    posting.save
+    posting_recurrence.postings << posting
+    posting_recurrence.save
+    
+    delivery_dates = posting_recurrence.get_delivery_dates_for(posting.delivery_date, posting.delivery_date + 4.months)
+
+    assert_equal 4, delivery_dates.count
+
+    #4/26, 5/31, 6/28, 7/26
+    assert_equal Time.zone.local(2016,4,26), delivery_dates[0]
+    assert_equal Time.zone.local(2016,5,31), delivery_dates[1]
+    assert_equal Time.zone.local(2016,6,28), delivery_dates[2]
+    assert_equal Time.zone.local(2016,7,26), delivery_dates[3]
+
+  end
+
+  test "verify get delivery dates method 5 not last" do
+
+    posting_recurrence = PostingRecurrence.new(frequency: 5, on: true)
+    posting = postings(:postingf1apples)
+    mar15 = Time.zone.local(2016,3,15)    
+    posting.delivery_date = mar15
+    posting.commitment_zone_start = mar15 - 2.days
+    posting.save
+    posting_recurrence.postings << posting
+    posting_recurrence.save
+    
+    delivery_dates = posting_recurrence.get_delivery_dates_for(posting.delivery_date, posting.delivery_date + 4.months)
+
+    assert_equal 3, delivery_dates.count
+
+    #4/19, 5/17, 6/21, 7/19
+    assert_equal Time.zone.local(2016,4,19), delivery_dates[0]
+    assert_equal Time.zone.local(2016,5,17), delivery_dates[1]
+    assert_equal Time.zone.local(2016,6,21), delivery_dates[2]
+
+  end
+
+  test "verify get delivery dates method 6" do
+
+    posting_recurrence = PostingRecurrence.new(frequency: 6, on: true)
+    posting = postings(:postingf1apples)
+    mar29 = Time.zone.local(2016,3,29)    
+    posting.delivery_date = mar29
+    posting.commitment_zone_start = mar29 - 2.days
+    posting.save
+    posting_recurrence.postings << posting
+    posting_recurrence.save
+    
+    delivery_dates = posting_recurrence.get_delivery_dates_for(posting.delivery_date, posting.delivery_date + 9.weeks)
+    
+    assert_equal 7, delivery_dates.count
+
+    #5, 12, 26, 3, 10, 24, 31
+    assert_equal Time.zone.local(2016,4,5), delivery_dates[0]
+    assert_equal Time.zone.local(2016,4,12), delivery_dates[1]
+    assert_equal Time.zone.local(2016,4,26), delivery_dates[2]
+    assert_equal Time.zone.local(2016,5,3), delivery_dates[3]
+    assert_equal Time.zone.local(2016,5,10), delivery_dates[4]
+    assert_equal Time.zone.local(2016,5,24), delivery_dates[5]
+    assert_equal Time.zone.local(2016,5,31), delivery_dates[6]
+
+  end
+
   test "should return proper future delivery dates for martys schedule" do
 
     posting_recurrence = PostingRecurrence.new(frequency: 6, on: true)
@@ -107,7 +266,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     posting_recurrence.save
     
     may10 = Time.zone.local(2016,5,10)
-    delivery_dates = posting_recurrence.get_next_delivery_dates(3, may10)
+    delivery_dates = posting_recurrence.get_delivery_dates_for(may10, may10 + 4.weeks)
 
     assert_equal Time.zone.local(2016,5,24), delivery_dates[0]
     assert_equal Time.zone.local(2016,5,31), delivery_dates[1]
@@ -174,7 +333,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     travel_to old_post.commitment_zone_start + 1    
 
     assert_equal 1, posting_recurrence.postings.count
-     old_post.transition(:commitment_zone_started)
+    old_post.transition(:commitment_zone_started)
     assert_equal 2, posting_recurrence.postings.count
     assert_equal false, old_post.live
     assert_equal true, posting_recurrence.postings.last.live

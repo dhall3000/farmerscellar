@@ -6,6 +6,8 @@ class SubscriptionSkipDateTest < ActiveSupport::TestCase
 		@subscription = Subscription.new(frequency: 1, on: true, quantity: 1)		
 		@user = users(:c1)
 		@posting_recurrence = PostingRecurrence.new(frequency: 1, on: true)
+		posting = postings(:postingf1apples)
+		@posting_recurrence.postings << posting
 		@subscription.user = @user
 		@subscription.posting_recurrence = @posting_recurrence				
 		@ssd = SubscriptionSkipDate.new(skip_date: Time.zone.now)

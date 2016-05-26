@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160520231834) do
+ActiveRecord::Schema.define(version: 20160525172553) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -259,10 +259,11 @@ ActiveRecord::Schema.define(version: 20160520231834) do
   add_index "pickups", ["user_id"], name: "index_pickups_on_user_id"
 
   create_table "posting_recurrences", force: :cascade do |t|
-    t.integer  "frequency",  default: 0,     null: false
-    t.boolean  "on",         default: false, null: false
-    t.datetime "created_at",                 null: false
-    t.datetime "updated_at",                 null: false
+    t.integer  "frequency",      default: 0,     null: false
+    t.boolean  "on",             default: false, null: false
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+    t.datetime "reference_date",                 null: false
   end
 
   create_table "postings", force: :cascade do |t|

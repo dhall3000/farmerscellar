@@ -14,6 +14,118 @@ class SubscriptionTest < ActiveSupport::TestCase
 		@subscription.save
 	end
 
+	def get_delivery_dates_setup(recurrence_frequency, subscription_frequency)
+		@posting_recurrence = PostingRecurrence.new(frequency: recurrence_frequency, on: true)
+		@posting_recurrence.postings << postings(:postingf1apples)
+		@subscription = Subscription.new(frequency: subscription_frequency, on: true, quantity: 1)
+		@subscription.posting_recurrence = @posting_recurrence
+		@user = users(:c1)
+		@subscription.user = @user
+
+		@posting_recurrence.save
+		@subscription.save
+		@subscription.generate_next_tote_item
+
+	end
+
+	def verify_posting_recurrence_with_various_frequencies(posting_frequency, subscription_frequency)
+		
+		get_delivery_dates_setup(posting_frequency, subscription_frequency)
+
+		current_delivery_date = @posting_recurrence.current_posting.delivery_date
+		end_date = current_delivery_date + (3 * posting_frequency * subscription_frequency).weeks
+		delivery_dates = @subscription.get_delivery_dates(current_delivery_date, end_date)
+
+		assert_equal 3, delivery_dates.count
+
+		assert_equal current_delivery_date + (1 * posting_frequency * subscription_frequency).weeks, delivery_dates[0]
+		assert_equal current_delivery_date + (2 * posting_frequency * subscription_frequency).weeks, delivery_dates[1]
+		assert_equal current_delivery_date + (3 * posting_frequency * subscription_frequency).weeks, delivery_dates[2]
+
+	end
+
+	def verify_posting_recurrence_five_with_various_subscription_frequencies(subscription_frequency)
+		
+		posting_frequency = 5
+		get_delivery_dates_setup(posting_frequency, subscription_frequency)
+
+		current_delivery_date = @posting_recurrence.current_posting.delivery_date
+		end_date = current_delivery_date + (3 * posting_frequency * subscription_frequency).weeks
+		delivery_dates = @subscription.get_delivery_dates(current_delivery_date, end_date)
+
+		assert_equal 3, delivery_dates.count
+		#assert between 28 - 31 days between postings
+		gap = delivery_dates[1] - delivery_dates[0]
+		assert gap > (subscription_frequency * 27).days
+		assert gap < (subscription_frequency * 39).days
+
+		gap = delivery_dates[2] - delivery_dates[1]
+		assert gap > (subscription_frequency * 27).days
+		assert gap < (subscription_frequency * 39).days
+
+		#assert all on a friday
+		assert_equal 5, delivery_dates[0].wday
+		assert_equal 5, delivery_dates[1].wday
+		assert_equal 5, delivery_dates[2].wday
+
+	end
+
+	test "should generate appropriate delivery dates 5 and 1" do
+		verify_posting_recurrence_five_with_various_subscription_frequencies(1)
+	end
+
+	test "should generate appropriate delivery dates 5 and 2" do
+		verify_posting_recurrence_five_with_various_subscription_frequencies(2)
+	end
+
+	test "should generate appropriate delivery dates 1 and 1" do
+		verify_posting_recurrence_with_various_frequencies(1, 1)
+	end
+
+	test "should generate appropriate delivery dates 1 and 2" do
+		verify_posting_recurrence_with_various_frequencies(1, 2)
+	end
+
+	test "should generate appropriate delivery dates 1 and 3" do
+		verify_posting_recurrence_with_various_frequencies(1, 3)
+	end
+
+	test "should generate appropriate delivery dates 1 and 4" do
+		verify_posting_recurrence_with_various_frequencies(1, 4)
+	end
+
+	test "should generate appropriate delivery dates 2 and 1" do
+		verify_posting_recurrence_with_various_frequencies(2, 1)
+	end
+
+	test "should generate appropriate delivery dates 2 and 2" do
+		verify_posting_recurrence_with_various_frequencies(2, 2)
+	end	
+
+	test "should generate appropriate delivery dates 2 and 3" do
+		verify_posting_recurrence_with_various_frequencies(2, 3)
+	end
+
+	test "should generate appropriate delivery dates 2 and 4" do
+		verify_posting_recurrence_with_various_frequencies(2, 4)
+	end
+
+	test "should generate appropriate delivery dates 3 and 1" do
+		verify_posting_recurrence_with_various_frequencies(3, 1)
+	end
+
+	test "should generate appropriate delivery dates 3 and 2" do
+		verify_posting_recurrence_with_various_frequencies(3, 2)
+	end	
+
+	test "should generate appropriate delivery dates 4 and 1" do
+		verify_posting_recurrence_with_various_frequencies(4, 1)
+	end
+
+	test "should generate appropriate delivery dates 4 and 2" do
+		verify_posting_recurrence_with_various_frequencies(4, 2)
+	end
+
 	test "should generate new added tote item when rtauthorization is inactive" do
 		#create new billing agreement
 		rtba = Rtba.new(token: "faketoken", ba_id: "fake_ba_id", user_id: @user.id, active: true)

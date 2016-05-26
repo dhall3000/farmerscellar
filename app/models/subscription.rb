@@ -42,17 +42,16 @@ class Subscription < ActiveRecord::Base
       return nil
     end
 
-    #try to add the next tote item in the series. it can be called any number of times successively and will only
-    #add a single tote item at most because it does its own logic to tell when is the right time to add.
-
-    current_posting = posting_recurrence.current_posting
-    expected_next_delivery_date = get_expected_next_delivery_date
-
-    #if the next delivery date in the series for this subscription frequency is beyond (datewise) the currently
-    #posted posting in the posting_recurrence postings series, we don't generate a new tote_item here
-    if expected_next_delivery_date > current_posting.delivery_date
+    #as of this writing (2016-05-25) there's only one case where this could ever fail; marty's 3 on 1 off delivery schedule
+    #when a customer is trying to add a every-other-week subscription on week #2 of his delivery cycle
+    if !posting_recurrence.can_add_tote_item?(frequency)      
       return nil
     end
+
+    #try to add the next tote item in the series. it can be called any number of times successively and will only
+    #add a single tote item at most because it does its own logic to tell when is the right time to add.
+    current_posting = posting_recurrence.current_posting
+    expected_next_delivery_date = get_expected_next_delivery_date
 
   	#if there are no tote items in this series yet or if the last tote item delivery date is behind the
   	#current posting, create a new tote item
@@ -86,9 +85,65 @@ class Subscription < ActiveRecord::Base
 
   end
 
+  #this should return all dates regardless of skip dates
+  #exclude start_date
+  #include end_date
+  def get_delivery_dates(start_date, end_date)
+
+    delivery_dates = []
+
+    if end_date < start_date
+      return delivery_dates
+    end
+
+    if !tote_items || !tote_items.any?
+      return delivery_dates
+    end
+
+    #start at tote_items.first and compute forward
+    delivery_date = tote_items.first.posting.delivery_date
+    #quit when computed date is beyond end_date
+    while delivery_date <= end_date
+
+      #for each computed date include it if it falls within the parameterized date range
+      if delivery_date > start_date
+        delivery_dates << delivery_date
+      end
+
+      #compute next scheduled delivery date
+      delivery_date = get_next_delivery_date(delivery_date)
+
+    end
+
+    return delivery_dates
+
+  end
+
+  def get_next_delivery_date(prev_delivery_date)
+
+    if posting_recurrence.frequency < 5 #weekly-based subscriptions
+      next_delivery_date = posting_recurrence.get_delivery_dates_for(prev_delivery_date, prev_delivery_date + (frequency * posting_recurrence.frequency).weeks)[frequency - 1]
+    elsif posting_recurrence.frequency == 5 #monthly-based subscriptions
+      next_delivery_date = posting_recurrence.get_delivery_dates_for(prev_delivery_date, prev_delivery_date + (2 * frequency).months)[frequency - 1]
+    elsif posting_recurrence.frequency == 6 #this is Marty/Helen the Hen's "3 weeks on, 1 week off" schedule
+      case self.frequency
+        when 1 #every delivery
+          #nothing to do, just return default value from above
+        when 2 #every other week
+          #nothing to do, just return default value from above
+        when 3 #every 4 weeks
+          expected_next_delivery_date = tote_items.last.posting.delivery_date + 4.weeks
+        end
+    end
+
+    return next_delivery_date
+
+  end
+
+  #NUKE
   def get_expected_next_delivery_date
 
-    expected_next_delivery_date = posting_recurrence.get_new_subscription_start_delivery_date(frequency)
+    expected_next_delivery_date = posting_recurrence.current_posting.delivery_date
 
     if !tote_items || !tote_items.any?
       return expected_next_delivery_date

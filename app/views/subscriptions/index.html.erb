@@ -91,10 +91,10 @@
                   <%= hidden_field_tag "subscription_ids[]", subscription_id %>
                 <% end %>                              
 
-              <%= hidden_field_tag :num_dates, @num_dates %>
+              <%= hidden_field_tag :end_date, @end_date %>
 
               <%= submit_tag "Update delivery skips", class: "btn btn-primary btn-lg form-control fat-finger-spacing" %>
-              <%= link_to "Show more delivery dates", subscriptions_path(num_dates: @num_dates + 3), class: "btn btn-primary btn-lg btn-block" %>
+              <%= link_to "Show more delivery dates", subscriptions_path(end_date: @end_date + 4.weeks), class: "btn btn-primary btn-lg btn-block" %>
               
             <% end %>
 

@@ -4,19 +4,22 @@ class SubscriptionsController < ApplicationController
   def index
 
     @subscriptions = Subscription.where(user_id: current_user.id, on: true)
-    @num_dates = 1
+    @end_date = Time.zone.now.midnight + 3.weeks
 
-    if params[:num_dates]
-      @num_dates = constrain_num_dates(params[:num_dates].to_i)
+    if params[:end_date]
+      @end_date = constrain_end_date(Time.zone.parse(params[:end_date]))
     end
 
     farthest_existing_skip_date = SubscriptionSkipDate.joins(subscription: :user).where("subscriptions.on" => true).order("subscription_skip_dates.skip_date").last
-    @skip_dates = get_skip_dates_for(@subscriptions.select(:id), @num_dates)
+    @skip_dates = get_skip_dates_through(@subscriptions.select(:id), @end_date)
+
+    while @skip_dates.count == 0
+      get_more_skip_dates
+    end
 
     while farthest_existing_skip_date && farthest_existing_skip_date.skip_date > @skip_dates.last[:date]
-      @num_dates += 3
-      @skip_dates = get_skip_dates_for(@subscriptions.select(:id), @num_dates)
-    end    
+      get_more_skip_dates
+    end
 
   end
 
@@ -24,8 +27,9 @@ class SubscriptionsController < ApplicationController
 
     #the idea here is that when someone clicks the 'Update' button we're going to unconditionally blast all the 
     #previously saved skip dates and then write these new ones. Yes, not as db efficient but more davidhall coder faster
-    num_dates = constrain_num_dates(params[:num_dates].to_i)
-    old_skip_dates = get_skip_dates_for(params[:subscription_ids], num_dates)
+    end_date = constrain_end_date(Time.zone.parse(params[:end_date]))
+    old_skip_dates = get_skip_dates_through(params[:subscription_ids], end_date)
+
     old_skip_dates.each do |old_skip_date|
       SubscriptionSkipDate.where(subscription_id: old_skip_date[:subscription].id, skip_date: old_skip_date[:date]).delete_all
     end
@@ -41,7 +45,7 @@ class SubscriptionsController < ApplicationController
     end
 
     flash[:success] = "Delivery skip dates updated"
-    redirect_to subscriptions_path(num_dates: num_dates)
+    redirect_to subscriptions_path(end_date: end_date)
 
   end
 
@@ -117,29 +121,36 @@ class SubscriptionsController < ApplicationController
 
   private
 
-    def constrain_num_dates(num_dates)
+    def get_more_skip_dates
+      @end_date += 4.weeks
+      @skip_dates = get_skip_dates_through(@subscriptions.select(:id), @end_date)
+    end
 
-      if num_dates < 1
-        num_dates = 1
+    def constrain_end_date(end_date)
+
+      if end_date < Time.zone.now
+        return Time.zone.tomorrow.midnight
       end
 
-      if num_dates > 20
-        num_dates = 20
+      max = Time.zone.now.midnight + 6.months
+
+      if end_date > max
+        end_date = max
       end
 
-      return num_dates
+      return end_date
 
     end
 
-
-    def get_skip_dates_for(subscription_ids, num_future_delivery_dates_per_subscription)
-
+    def get_skip_dates_through(subscription_ids, end_date)
       subscriptions = Subscription.where(id: subscription_ids)
       skip_dates = []
 
       subscriptions.each do |subscription|
+
+        posting_recurrence = subscription.posting_recurrence
         #for each subscription get the next 10 delivery dates (exclude the delivery date of the current posting)
-        delivery_dates = subscription.posting_recurrence.get_next_delivery_dates(num_future_delivery_dates_per_subscription, subscription.posting_recurrence.current_posting.delivery_date)
+        delivery_dates = posting_recurrence.get_delivery_dates_for(posting_recurrence.current_posting.delivery_date, end_date)
         #see if any of the delivery dates exist in the skip dates table
         delivery_dates.each do |delivery_date|
 
@@ -159,7 +170,7 @@ class SubscriptionsController < ApplicationController
       skip_dates.sort_by! { |hash| hash[:date]}
 
       return skip_dates
-   
+
     end
 
 end
