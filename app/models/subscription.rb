@@ -128,11 +128,11 @@ class Subscription < ActiveRecord::Base
     elsif posting_recurrence.frequency == 6 #this is Marty/Helen the Hen's "3 weeks on, 1 week off" schedule
       case self.frequency
         when 1 #every delivery
-          #nothing to do, just return default value from above
+          next_delivery_date = posting_recurrence.get_delivery_dates_for(prev_delivery_date, prev_delivery_date + 3.weeks)[0]
         when 2 #every other week
-          #nothing to do, just return default value from above
+          next_delivery_date = prev_delivery_date + 2.weeks
         when 3 #every 4 weeks
-          expected_next_delivery_date = tote_items.last.posting.delivery_date + 4.weeks
+          next_delivery_date = prev_delivery_date + 4.weeks
         end
     end
 

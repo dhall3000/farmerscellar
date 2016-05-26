@@ -25,7 +25,6 @@ class SubscriptionTest < ActiveSupport::TestCase
 		@posting_recurrence.save
 		@subscription.save
 		@subscription.generate_next_tote_item
-
 	end
 
 	def verify_posting_recurrence_with_various_frequencies(posting_frequency, subscription_frequency)
@@ -70,12 +69,69 @@ class SubscriptionTest < ActiveSupport::TestCase
 
 	end
 
-	test "should generate appropriate delivery dates 5 and 1" do
-		verify_posting_recurrence_five_with_various_subscription_frequencies(1)
-	end
+	def verify_posting_recurrence_six_with_various_subscription_frequencies(subscription_frequency)
+		
+		posting_frequency = 6
+		get_delivery_dates_setup(posting_frequency, subscription_frequency)
 
-	test "should generate appropriate delivery dates 5 and 2" do
-		verify_posting_recurrence_five_with_various_subscription_frequencies(2)
+		current_delivery_date = @posting_recurrence.current_posting.delivery_date
+
+		case subscription_frequency
+		when 1
+			end_date = current_delivery_date + 4.weeks
+			delivery_dates = @subscription.get_delivery_dates(current_delivery_date, end_date)
+			assert_equal 3, delivery_dates.count
+
+			gap = delivery_dates[0] - current_delivery_date
+			assert_equal 1.week, gap
+			gap = delivery_dates[1] - delivery_dates[0]
+			assert_equal 1.week, gap
+			gap = delivery_dates[2] - delivery_dates[1]
+			assert_equal 2.weeks, gap
+
+			#assert all on a friday
+			assert_equal 5, delivery_dates[0].wday
+			assert_equal 5, delivery_dates[1].wday
+			assert_equal 5, delivery_dates[2].wday
+
+		when 2
+			end_date = current_delivery_date + 6.weeks
+			delivery_dates = @subscription.get_delivery_dates(current_delivery_date, end_date)
+			assert_equal 3, delivery_dates.count
+			
+			gap = delivery_dates[0] - current_delivery_date
+			assert_equal 2.weeks, gap
+
+			gap = delivery_dates[1] - delivery_dates[0]
+			assert_equal 2.weeks, gap
+
+			gap = delivery_dates[2] - delivery_dates[1]
+			assert_equal 2.weeks, gap
+
+			#assert all on a friday
+			assert_equal 5, delivery_dates[0].wday
+			assert_equal 5, delivery_dates[1].wday
+			assert_equal 5, delivery_dates[2].wday
+		when 3
+			end_date = current_delivery_date + 12.weeks
+			delivery_dates = @subscription.get_delivery_dates(current_delivery_date, end_date)
+			assert_equal 3, delivery_dates.count
+			
+			gap = delivery_dates[0] - current_delivery_date
+			assert_equal 4.weeks, gap
+
+			gap = delivery_dates[1] - delivery_dates[0]
+			assert_equal 4.weeks, gap
+
+			gap = delivery_dates[2] - delivery_dates[1]
+			assert_equal 4.weeks, gap
+
+			#assert all on a friday
+			assert_equal 5, delivery_dates[0].wday
+			assert_equal 5, delivery_dates[1].wday
+			assert_equal 5, delivery_dates[2].wday
+		end
+
 	end
 
 	test "should generate appropriate delivery dates 1 and 1" do
@@ -124,6 +180,26 @@ class SubscriptionTest < ActiveSupport::TestCase
 
 	test "should generate appropriate delivery dates 4 and 2" do
 		verify_posting_recurrence_with_various_frequencies(4, 2)
+	end
+
+	test "should generate appropriate delivery dates 5 and 1" do
+		verify_posting_recurrence_five_with_various_subscription_frequencies(1)
+	end
+
+	test "should generate appropriate delivery dates 5 and 2" do
+		verify_posting_recurrence_five_with_various_subscription_frequencies(2)
+	end
+
+	test "should generate appropriate delivery dates 6 and 1" do
+		verify_posting_recurrence_six_with_various_subscription_frequencies(1)
+	end
+
+	test "should generate appropriate delivery dates 6 and 2" do
+		verify_posting_recurrence_six_with_various_subscription_frequencies(2)
+	end
+
+	test "should generate appropriate delivery dates 6 and 3" do
+		verify_posting_recurrence_six_with_various_subscription_frequencies(3)
 	end
 
 	test "should generate new added tote item when rtauthorization is inactive" do
