@@ -118,9 +118,42 @@ class ToteItem < ActiveRecord::Base
   end
 
   def authorization
-    if checkouts && checkouts.any? && checkouts.last.authorizations && checkouts.last.authorizations.any?
-      checkouts.last.authorizations.last
+
+    if !checkouts
+      return nil
     end
+
+    if !checkouts.any?
+      return nil
+    end
+
+    #algo explanation:
+    #BACKGROUND:
+    #we now have two different kinds of checkouts flows; "one-time" and "billing agreement".
+    #we had a production bug where user did one time checkout + authorization of a certain tote item (id # 156). later they
+    #added a different tote item then clicked on billing agreement checkout button to begin the process of initially
+    #setting up a billing agreement. this created a 2nd Checkout object associated with ti 156. however, user did not follow
+    #through and create the billing agreement. instead, they went back to the tote and did a second one time checkout + auth.
+    #this second auth object created was only associated with the new ti, not the old, since the old ti's state was already
+    #marked as AUTHORIZED. anyhow, when purchase time came the machine looked at tote_item(156).checkouts.last.authorizations.last
+    #and came up empty handed because there were no .authorizations associated with .checkouts.last since user didn't follow through
+    #EXPLANATION:
+    #we want to march down a list of the tote item's checkouts reverse of the order in which they were created and pluck the first one
+    #we come across that is not a reference transaction checkout that has an authorization associated with it    
+
+    reverse_checkouts = checkouts.order(created_at: :desc)
+    auth = nil
+
+    reverse_checkouts.each do |co|
+      if !co.is_rt
+        if co.authorizations && co.authorizations.any?
+          auth = co.authorizations.last
+        end
+      end
+    end
+
+    return auth
+
   end
 
   def rtauthorization
