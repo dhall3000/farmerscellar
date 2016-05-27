@@ -47,41 +47,32 @@ class Subscription < ActiveRecord::Base
     if !posting_recurrence.can_add_tote_item?(frequency)      
       return nil
     end
-
-    #try to add the next tote item in the series. it can be called any number of times successively and will only
-    #add a single tote item at most because it does its own logic to tell when is the right time to add.
-    current_posting = posting_recurrence.current_posting
-    expected_next_delivery_date = get_expected_next_delivery_date
-
-  	#if there are no tote items in this series yet or if the last tote item delivery date is behind the
-  	#current posting, create a new tote item
-    if current_posting.delivery_date == expected_next_delivery_date
+       
+    if !generate_tote_item_for_current_posting?
+      return nil
+    end
   		  		
-  		tote_item = ToteItem.new(quantity: quantity, price: current_posting.price, posting_id: current_posting.id, user_id: user.id, subscription_id: id)
+		tote_item = ToteItem.new(quantity: quantity, price: posting_recurrence.current_posting.price, posting_id: posting_recurrence.current_posting.id, user_id: user.id, subscription_id: id)
 
-      #if there is no authorization for this subscription or the authorization is not active, add the
-      #tote item in the ADDED state. otherwise, if everything's good to go and we're all authorized, add in state AUTHORIZED
-      if authorized?
-        tote_item.transition(:subscription_authorized)
-      end
+    #if there is no authorization for this subscription or the authorization is not active, add the
+    #tote item in the ADDED state. otherwise, if everything's good to go and we're all authorized, add in state AUTHORIZED
+    if authorized?
+      tote_item.transition(:subscription_authorized)
+    end
 
-  		if !rtauthorizations.nil? && !rtauthorizations.last.nil?
+		if !rtauthorizations.nil? && !rtauthorizations.last.nil?
 
-	  		#TODO: i don't think we really NEED need this. but doing it anyway. why is it that toteitems have_many rtauths and a subscription also has an auth? isn't one or the other
-	  		#sufficient. indeed, wouldn't it be cleaner to only have the subscription hold the reference to the rtauth parent? no, because toteitems can be atttached to an rtauth
-	  		#by means other than through subscriptions. as in, a person with a billing agreement can add a subscription to the auth but they can also add a single one-time-buy tote item
-	  		rtauthorizations.last.tote_items << tote_item
-        rtauthorizations.last.save
+  		#TODO: i don't think we really NEED need this. but doing it anyway. why is it that toteitems have_many rtauths and a subscription also has an auth? isn't one or the other
+  		#sufficient. indeed, wouldn't it be cleaner to only have the subscription hold the reference to the rtauth parent? no, because toteitems can be atttached to an rtauth
+  		#by means other than through subscriptions. as in, a person with a billing agreement can add a subscription to the auth but they can also add a single one-time-buy tote item
+  		rtauthorizations.last.tote_items << tote_item
+      rtauthorizations.last.save
 
-  		end
-  		
-  		tote_item.save
+		end
+		
+		tote_item.save
 
-  		return tote_item
-
-  	end
-
-  	return nil
+		return tote_item  	
 
   end
 
@@ -96,12 +87,13 @@ class Subscription < ActiveRecord::Base
       return delivery_dates
     end
 
-    if !tote_items || !tote_items.any?
-      return delivery_dates
+    if tote_items && tote_items.any?
+      #start at tote_items.first and compute forward
+      delivery_date = tote_items.first.posting.delivery_date
+    else
+      delivery_date = posting_recurrence.current_posting.delivery_date
     end
 
-    #start at tote_items.first and compute forward
-    delivery_date = tote_items.first.posting.delivery_date
     #quit when computed date is beyond end_date
     while delivery_date <= end_date
 
@@ -140,37 +132,34 @@ class Subscription < ActiveRecord::Base
 
   end
 
-  #NUKE
-  def get_expected_next_delivery_date
+  def generate_tote_item_for_current_posting?
 
-    expected_next_delivery_date = posting_recurrence.current_posting.delivery_date
+    delivery_date = posting_recurrence.current_posting.delivery_date
+    delivery_dates = get_delivery_dates(delivery_date - 1.day, delivery_date + 1.day)
 
-    if !tote_items || !tote_items.any?
-      return expected_next_delivery_date
+    #is this a normally deliverable date 
+    if !delivery_dates.any?
+      return false
     end
 
-    if posting_recurrence.frequency < 5 #weekly-based subscriptions
-      weeks_between_postings = posting_recurrence.frequency * self.frequency
-      expected_next_delivery_date = tote_items.last.posting.delivery_date + weeks_between_postings.weeks
-    elsif posting_recurrence.frequency == 5 #monthly-based subscriptions
-      case self.frequency
-        when 1 #monthly
-          #TODO: finish
-        when 2 #every other month
-          #TODO: finish
-        end
-    elsif posting_recurrence.frequency == 6 #this is Marty/Helen the Hen's "3 weeks on, 1 week off" schedule
-      case self.frequency
-        when 1 #every delivery
-          #nothing to do, just return default value from above
-        when 2 #every other week
-          #nothing to do, just return default value from above
-        when 3 #every 4 weeks
-          expected_next_delivery_date = tote_items.last.posting.delivery_date + 4.weeks
-        end
+    delivery_date = delivery_dates[0]
+
+    #do we already have a tote item for this delivery date?
+    if tote_items && tote_items.any?
+      if tote_items.joins(:posting).order("postings.delivery_date").last.posting.delivery_date == delivery_date
+        return false
+      end
     end
 
-    return expected_next_delivery_date
+    #TODO: is subscription paused?
+    #TODO: is subscription off?
+
+    #did user specify to skip this delivery?
+    if subscription_skip_dates.find_by(skip_date: delivery_date)
+      return false
+    end
+
+    return true
 
   end
 

@@ -1,11 +1,29 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
+<% i = 1 %>
+<% while !(Time.zone.today.midnight + i.days).friday? %>
+  <% i += 1 %>
+<% end %>
+<% delivery_date = Time.zone.today.midnight + i.days %>
+<% delivery_date_next = delivery_date + 7.days %>
+
+<% days_out_to_start = 14 %>
+<% base_monday = Time.zone.today.midnight + days_out_to_start.days %>
+<% i = 1 %>
+<% while !(base_monday + i.days).monday? %>
+  <% i += 1 %>
+<% end %>
+<% base_monday = Time.zone.today.midnight + days_out_to_start.days + i.days %>
+<% wednesday_after_base_monday = base_monday + 2.days %>
+<% friday_after_base_monday = wednesday_after_base_monday + 2.days %>
+<% monday_after_base_monday = base_monday + 7.days %>
+
 one:
   frequency: 1
   'on': true
-  reference_date: Time.zone.today
+  reference_date: <%= monday_after_base_monday + 7.days %>
 
 two:
   frequency: 1
   'on': false
-  reference_date: Time.zone.today
+  reference_date: <%= monday_after_base_monday + 7.days %>
