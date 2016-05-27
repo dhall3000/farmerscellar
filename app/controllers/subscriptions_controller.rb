@@ -52,7 +52,8 @@ class SubscriptionsController < ApplicationController
 
   def update
 
-    @subscription = Subscription.find_by(id: params[:id])
+    id = params[:id].to_i
+    @subscription = Subscription.find_by(id: id)
 
     if @subscription.nil? || !@subscription.on
       redirect_to subscriptions_path
@@ -79,7 +80,9 @@ class SubscriptionsController < ApplicationController
     if paused == 0
       pause_value = false            
     elsif paused == 1
-      pause_value = true      
+      pause_value = true
+      #blast all skip dates ahead of the present moment
+      SubscriptionSkipDate.where("subscription_id = ? and skip_date > ?", id, Time.zone.now).delete_all
     else
       redirect_to subscriptions_path
       return
