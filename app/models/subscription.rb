@@ -130,6 +130,7 @@ class Subscription < ActiveRecord::Base
 
   def generate_tote_item_for_current_posting?
 
+    #is subscription or posting recurrence off?
     if !on || !posting_recurrence.on
       return false
     end
@@ -138,8 +139,6 @@ class Subscription < ActiveRecord::Base
     if paused
       return false
     end
-
-    #TODO: is subscription off?
 
     delivery_date = posting_recurrence.current_posting.delivery_date
     delivery_dates = get_delivery_dates(delivery_date - 1.day, delivery_date + 1.day)

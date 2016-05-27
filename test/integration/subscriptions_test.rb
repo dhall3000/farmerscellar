@@ -11,6 +11,63 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
   #puts Time.zone.now.strftime("%A, %B %d, %H")
   #error loading meta info from Packages/Default/Icon (Source).tmPreferences: Unable to open Packages/Default/Icon (Source).tmPreferences
 
+  test "should not generate tote items for skip dates" do
+
+    postings = setup_posting_recurrences
+    
+    user = users(:c17)
+    assert_equal 0, ToteItem.where(user_id: user.id).count
+
+    quantity = 2
+    frequency = 1
+    apples_posting = postings[0]
+
+    num_tote_items = ToteItem.count
+    subscription = add_subscription(user, apples_posting, quantity, frequency)
+    tote_item = subscription.tote_items.first
+
+    assert_equal 1, ToteItem.where(user_id: user.id).count
+    assert_equal ToteItem.states[:AUTHORIZED], ToteItem.where(user_id: user.id).first.state
+
+    #let nature take its course. purchase should occur off the first checkout
+    travel_to tote_item.posting.commitment_zone_start    
+    has_created_skip_dates = false
+
+    30.times do
+
+      RakeHelper.do_hourly_tasks
+
+      #enter a skip date after one tote items has been generated
+      if !has_created_skip_dates && (ToteItem.count == (num_tote_items + 3))
+
+        log_in_as(user)
+        #view the index
+        get subscriptions_path
+        #get the computed skip dates
+        skip_dates = assigns(:skip_dates)
+        #send one of the skip dates back up to the controller to program in to the db
+        post subscriptions_skip_dates_path, skip_dates: {subscription.id.to_s => [skip_dates.first[:date].to_s]}, subscription_ids: [subscription.id.to_s], end_date: (skip_dates.first[:date] + 1.week).to_s
+        subscription.reload        
+        has_created_skip_dates = true
+      end
+
+      travel 1.day
+
+    end
+
+    travel_back
+
+    subscription.posting_recurrence.reload
+
+    num_tote_items_generated = ToteItem.count - num_tote_items
+    assert num_tote_items_generated > 0
+    num_tote_items_skipped = subscription.posting_recurrence.postings.count - subscription.tote_items.count
+    assert_equal 1, num_tote_items_skipped
+    assert_equal num_tote_items_generated, subscription.tote_items.count
+    assert_equal num_tote_items + num_tote_items_generated, ToteItem.count
+
+  end
+
   test "should not generate tote items after subscription is paused" do
 
     postings = setup_posting_recurrences
@@ -69,6 +126,12 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     travel_back
 
     assert_equal num_tote_items + apples_posting.posting_recurrence.postings.count - 2, ToteItem.count
+    gap = subscription.tote_items[1].posting.delivery_date - subscription.tote_items[0].posting.delivery_date
+    assert_equal 1.week, gap
+    gap = subscription.tote_items[2].posting.delivery_date - subscription.tote_items[1].posting.delivery_date
+    assert_equal 2.weeks, gap
+    gap = subscription.tote_items[3].posting.delivery_date - subscription.tote_items[2].posting.delivery_date
+    assert_equal 1.week, gap
 
   end
 
@@ -120,6 +183,15 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     travel_back
 
     assert_equal num_tote_items + 1, ToteItem.count
+
+    #as of this writing only two items should have been generated in this series. they should be without gap (i.e. 7 day spacing)
+    #right at the beginning of the posting recurrence series. then the turn_off method gets called so their shoudl be no further
+    #tote items. but the pr should keep chugging so there should be a big gap between the last posting in the pr series vs the ti series
+    gap = subscription.tote_items[1].posting.delivery_date - subscription.tote_items[0].posting.delivery_date
+    assert_equal 1.week, gap
+    apples_posting.reload
+    gap = apples_posting.posting_recurrence.postings.last.delivery_date - subscription.tote_items.last.posting.delivery_date
+    assert gap > 1.week    
 
   end
 

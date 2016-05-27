@@ -64,7 +64,7 @@
                   <tr>
                     <td class="text-left">Product</td>
                     <td class="text-center">Delivery</td>
-                    <td class="text-right">Skip</td>
+                    <td class="text-center">Skip</td>
                   </tr>
                 </thead>
                 <tbody>
@@ -80,7 +80,7 @@
                       <% posting = skip_date[:subscription].posting_recurrence.current_posting %>
                       <td><%= "#{posting.user.farm_name} #{posting.product.name}" %></td>
                       <td class="text-center"><%= skip_date[:date].strftime("%a %b %d") %></td>
-                      <td class="text-right"><%= check_box_tag "skip_dates[#{skip_date[:subscription].id.to_s}][]", skip_date[:date], skip_date[:skip] %></td>
+                      <td class="text-center"><%= check_box_tag "skip_dates[#{skip_date[:subscription].id.to_s}][]", skip_date[:date], skip_date[:skip] %></td>
                     </tr>
                   <% end %>
                 </tbody>
@@ -93,8 +93,8 @@
 
               <%= hidden_field_tag :end_date, @end_date %>
 
-              <%= submit_tag "Update delivery skips", class: "btn btn-primary btn-lg form-control fat-finger-spacing" %>
-              <%= link_to "Show more delivery dates", subscriptions_path(end_date: @end_date + 4.weeks), class: "btn btn-primary btn-lg btn-block" %>
+              <%= submit_tag "Update skips", class: "btn btn-primary btn-lg form-control fat-finger-spacing" %>
+              <%= link_to "More dates", subscriptions_path(end_date: @end_date + 4.weeks), class: "btn btn-primary btn-lg btn-block" %>
               
             <% end %>
 

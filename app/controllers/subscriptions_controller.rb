@@ -13,7 +13,7 @@ class SubscriptionsController < ApplicationController
     farthest_existing_skip_date = SubscriptionSkipDate.joins(subscription: :user).where("subscriptions.on" => true).order("subscription_skip_dates.skip_date").last
     @skip_dates = get_skip_dates_through(@subscriptions.select(:id), @end_date)
 
-    while @skip_dates.count == 0
+    while @skip_dates.count == 0 && @subscriptions.count > 0
       get_more_skip_dates
     end
 
