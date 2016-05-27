@@ -34,27 +34,20 @@ class SubscriptionsController < ApplicationController
 
   def show
 
-    @subscription = Subscription.find_by(id: params[:id])
+    get_show_or_edit_data
 
-    if @subscription.nil? || !@subscription.on
-      redirect_to subscriptions_path
-      return
-    end
+    @show_skip_dates = false
+
+    @skip_dates.each do |skip_date|
+      if skip_date[:skip]
+        @show_skip_dates = true
+      end
+    end                
 
   end
 
   def edit
-
-    @subscriptions = Subscription.where(id: params[:id])
-    @subscription = @subscriptions.last
-
-    if @subscription.nil? || !@subscription.on
-      redirect_to subscriptions_path
-      return
-    end
-
-    get_view_data_for_subscriptions(@subscriptions)
-
+    get_show_or_edit_data
   end
 
   def update
@@ -98,14 +91,28 @@ class SubscriptionsController < ApplicationController
       flash[:danger] = "Subscription not updated"
     end
 
-    redirect_to edit_subscription_path(@subscription)
-
+    redirect_to subscription_path(@subscription)
+    
   end
 
   def destroy
   end
 
   private
+
+    def get_show_or_edit_data
+
+      @subscriptions = Subscription.where(id: params[:id])
+      @subscription = @subscriptions.last
+
+      if @subscription.nil? || !@subscription.on
+        redirect_to subscriptions_path
+        return
+      end
+
+      get_view_data_for_subscriptions(@subscriptions)
+
+    end
 
     def get_view_data_for_subscriptions(subscriptions)
 

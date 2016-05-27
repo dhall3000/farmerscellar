@@ -7,40 +7,6 @@
 
 
         <div class="panel panel-default">
-          <div class="panel-heading" role="tab" id="subscribeHeading">
-            <h4 class="panel-title">Subscription Info</h4>
-          </div>          
-          <div class="panel-body">           
-
-            <p>
-              <%= @subscription.description %>
-            </p>
-
-            <% if @subscription.paused %>
-
-              <p class="alert alert-danger">
-                This subscription is paused
-                <span class="glyphicon glyphicon-pause" aria-hidden="true"></span>
-              </p>
-
-            <% else %>
-
-              <p class="alert alert-success">
-                This subscription is active
-                <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
-              </p>
-              
-            <% end %>
-
-            <%= link_to "Edit", edit_subscription_path(@subscription), class: "btn btn-primary btn-lg btn-block" %>
-
-          </div>          
-        </div>
-
-
-
-
-        <div class="panel panel-default">
           <div class="panel-heading" role="tab" id="detailsHeading">
             <h4 class="panel-title">              
               <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#detailsBody" aria-expanded="false" aria-controls="detailsBody">
@@ -66,6 +32,55 @@
             </div>
           </div>
         </div>
+
+
+
+        <div class="panel panel-default">
+          <div class="panel-heading" role="tab" id="subscribeHeading">
+            <h4 class="panel-title">Subscription Info</h4>
+          </div>          
+          <div class="panel-body">           
+            <h3>Description</h3>
+            <ul>
+              <li><%= @subscription.description %></li>
+            </ul>
+
+            <h3>Status</h3>
+            <% if @subscription.paused %>
+
+              <p class="alert alert-danger">
+                This subscription is paused
+                <span class="glyphicon glyphicon-pause" aria-hidden="true"></span>
+              </p>
+
+            <% else %>
+
+              <p class="alert alert-success">
+                This subscription is active
+                <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+              </p>
+              
+            <% end %>
+
+            <% if @show_skip_dates %>
+
+              <h3>Delivery Skips</h3>
+              <p class="small">(product will <u>not</u> be delivered on these dates:)</p>
+              <ul>
+                <% @skip_dates.each do |skip_date| %>                
+                  <% if skip_date[:skip] %>
+                    <li><%= skip_date[:date].strftime("%A, %B %d") %></li>
+                  <% end %>                     
+                <% end %>
+              </ul>
+
+              <%= link_to "Edit", edit_subscription_path(@subscription), class: "btn btn-primary btn-lg btn-block" %>
+
+            <% end %>
+
+          </div>          
+        </div>
+
 
 
 
