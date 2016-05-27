@@ -2,25 +2,8 @@ class SubscriptionsController < ApplicationController
   before_action :logged_in_user
 
   def index
-
     @subscriptions = Subscription.where(user_id: current_user.id, on: true)
-    @end_date = Time.zone.now.midnight + 3.weeks
-
-    if params[:end_date]
-      @end_date = constrain_end_date(Time.zone.parse(params[:end_date]))
-    end
-
-    farthest_existing_skip_date = SubscriptionSkipDate.joins(subscription: :user).where("subscriptions.on" => true).order("subscription_skip_dates.skip_date").last
-    @skip_dates = get_skip_dates_through(@subscriptions.select(:id), @end_date)
-
-    while @skip_dates.count == 0 && @subscriptions.count > 0
-      get_more_skip_dates
-    end
-
-    while farthest_existing_skip_date && farthest_existing_skip_date.skip_date > @skip_dates.last[:date]
-      get_more_skip_dates
-    end
-
+    get_view_data_for_subscriptions(@subscriptions)
   end
 
   def skip_dates
@@ -62,12 +45,15 @@ class SubscriptionsController < ApplicationController
 
   def edit
 
-    @subscription = Subscription.find_by(id: params[:id])
+    @subscriptions = Subscription.where(id: params[:id])
+    @subscription = @subscriptions.last
 
     if @subscription.nil? || !@subscription.on
       redirect_to subscriptions_path
       return
     end
+
+    get_view_data_for_subscriptions(@subscriptions)
 
   end
 
@@ -120,6 +106,27 @@ class SubscriptionsController < ApplicationController
   end
 
   private
+
+    def get_view_data_for_subscriptions(subscriptions)
+
+      @end_date = Time.zone.now.midnight + 3.weeks
+
+      if params[:end_date]
+        @end_date = constrain_end_date(Time.zone.parse(params[:end_date]))
+      end
+
+      farthest_existing_skip_date = SubscriptionSkipDate.joins(subscription: :user).where("subscriptions.on" => true).order("subscription_skip_dates.skip_date").last
+      @skip_dates = get_skip_dates_through(subscriptions.select(:id), @end_date)
+
+      while @skip_dates.count == 0 && subscriptions.count > 0
+        get_more_skip_dates
+      end
+
+      while farthest_existing_skip_date && farthest_existing_skip_date.skip_date > @skip_dates.last[:date]
+        get_more_skip_dates
+      end
+
+    end
 
     def get_more_skip_dates
       @end_date += 4.weeks

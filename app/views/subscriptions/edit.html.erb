@@ -80,16 +80,13 @@
 	          </div>          
 	          <div class="panel-body">
 
-	<% if false %>
-
 	            <%= form_tag subscriptions_skip_dates_path do %>
 
 	              <table class="table">
 	                <thead>
-	                  <tr>
-	                    <td class="text-left">Product</td>
-	                    <td class="text-center">Delivery</td>
-	                    <td class="text-right">Skip</td>
+	                  <tr>	                    
+	                    <td class="text-center">Scheduled Delivery</td>
+	                    <td class="text-center">Skip</td>
 	                  </tr>
 	                </thead>
 	                <tbody>
@@ -99,13 +96,10 @@
 	                      <tr class="alert-danger">
 	                    <% else %>
 	                      <tr>
-	                    <% end %>
-	                    
+	                    <% end %>	                    
 	                      <% subscription_ids << skip_date[:subscription].id %>
-	                      <% posting = skip_date[:subscription].posting_recurrence.current_posting %>
-	                      <td><%= "#{posting.user.farm_name} #{posting.product.name}" %></td>
 	                      <td class="text-center"><%= skip_date[:date].strftime("%a %b %d") %></td>
-	                      <td class="text-right"><%= check_box_tag "skip_dates[#{skip_date[:subscription].id.to_s}][]", skip_date[:date], skip_date[:skip] %></td>
+	                      <td class="text-center"><%= check_box_tag "skip_dates[#{skip_date[:subscription].id.to_s}][]", skip_date[:date], skip_date[:skip] %></td>
 	                    </tr>
 	                  <% end %>
 	                </tbody>
@@ -116,14 +110,13 @@
 	                  <%= hidden_field_tag "subscription_ids[]", subscription_id %>
 	                <% end %>                              
 
-	              <%= hidden_field_tag :num_dates, @num_dates %>
+	              <%= hidden_field_tag :end_date, @end_date %>
 
 	              <%= submit_tag "Update skips", class: "btn btn-primary btn-lg form-control fat-finger-spacing" %>
-	              <%= link_to "More dates", subscriptions_path(num_dates: @num_dates), class: "btn btn-primary btn-lg btn-block" %>
+	              <%= link_to "More dates", edit_subscription_path(@subscription, end_date: @end_date + 4.weeks), class: "btn btn-primary btn-lg btn-block" %>
 	              
 	            <% end %>
 
-	<% end %>
 
 	          </div>          
 	        </div>
