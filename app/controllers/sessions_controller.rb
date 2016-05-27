@@ -11,7 +11,7 @@ class SessionsController < ApplicationController
         if user.account_type_is?(:DROPSITE)
           redirect_to new_pickup_path
         else
-          redirect_back_or user
+          redirect_back_or postings_path
         end        
       else
         message  = "Account not activated. "

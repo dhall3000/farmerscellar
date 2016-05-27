@@ -176,16 +176,16 @@ class PostingsTest < ActionDispatch::IntegrationTest
     get_access_for(user)
     get login_path
     post login_path, session: { email: @farmer.email, password: 'dogdog' }
-    assert_redirected_to @farmer
+    assert_redirected_to postings_path
     follow_redirect!
   end
 
   def create_new_posting
     login_for(@farmer)
-    assert_template 'users/show'
+    assert_template 'postings/index'
     assert_select "a[href=?]", login_path, count: 0
     assert_select "a[href=?]", logout_path
-    assert_select "a[href=?]", user_path(@farmer)
+    assert_select "a[href=?]", subscriptions_path
     get new_posting_path
 
     delivery_date = Time.zone.today + 5.days
