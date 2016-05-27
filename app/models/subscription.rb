@@ -38,10 +38,6 @@ class Subscription < ActiveRecord::Base
 
   def generate_next_tote_item
 
-    if !on || !posting_recurrence.on
-      return nil
-    end
-
     #as of this writing (2016-05-25) there's only one case where this could ever fail; marty's 3 on 1 off delivery schedule
     #when a customer is trying to add a every-other-week subscription on week #2 of his delivery cycle
     if !posting_recurrence.can_add_tote_item?(frequency)      
@@ -134,11 +130,15 @@ class Subscription < ActiveRecord::Base
 
   def generate_tote_item_for_current_posting?
 
+    if !on || !posting_recurrence.on
+      return false
+    end
+
     #subscription paused?
     if paused
       return false
     end
-    
+
     #TODO: is subscription off?
 
     delivery_date = posting_recurrence.current_posting.delivery_date

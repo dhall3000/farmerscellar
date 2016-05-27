@@ -33,6 +33,9 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     travel_to tote_item.posting.commitment_zone_start
 
     num_tote_items = ToteItem.count
+    pause_time = Time.zone.now - 1.year
+    regular_tote_item_delivery_gap = 1.minute
+    has_paused = false
 
     30.times do
 
@@ -42,11 +45,72 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
       RakeHelper.do_hourly_tasks
 
       #pause the subscription after one tote item has been generated
-      if !subscription.paused && (ToteItem.count == (num_tote_items + 1))
+      if !has_paused && !subscription.paused && (ToteItem.count == (num_tote_items + 1))
         log_in_as(user)
         patch subscription_path(subscription), subscription: { paused: "1", on: "1" }
         subscription.reload
         assert subscription.paused
+        pause_time = Time.zone.now
+        regular_tote_item_delivery_gap = subscription.tote_items.last.posting.delivery_date - subscription.tote_items.first.posting.delivery_date
+        has_paused = true
+      end
+
+      #unpause subscription one delivery cycle after pausing it
+      if subscription.paused && (Time.zone.now == (pause_time + regular_tote_item_delivery_gap))
+        patch subscription_path(subscription), subscription: { paused: "0", on: "1" }
+        subscription.reload
+        assert_not subscription.paused
+      end
+
+      travel 1.day
+
+    end
+
+    travel_back
+
+    assert_equal num_tote_items + apples_posting.posting_recurrence.postings.count - 2, ToteItem.count
+
+  end
+
+  test "should not generate tote items after subscription is turned off" do
+
+    postings = setup_posting_recurrences
+    posting_recurrences = get_posting_recurrences(postings)
+
+    user = users(:c17)
+    assert_equal 0, ToteItem.where(user_id: user.id).count
+
+    quantity = 2
+    frequency = 1
+    apples_posting = postings[0]
+
+    subscription = add_subscription(user, apples_posting, quantity, frequency)
+    tote_item = subscription.tote_items.first
+
+    assert_equal 1, ToteItem.where(user_id: user.id).count
+    assert_equal ToteItem.states[:AUTHORIZED], ToteItem.where(user_id: user.id).first.state
+
+    #let nature take its course. purchase should occur off the first checkout
+    travel_to tote_item.posting.commitment_zone_start
+
+    num_tote_items = ToteItem.count
+    pause_time = Time.zone.now - 1.year
+    regular_tote_item_delivery_gap = 1.minute
+    has_paused = false
+
+    30.times do
+
+      top_of_hour = Time.zone.now.min == 0
+      is_noon_hour = Time.zone.now.hour == 12
+
+      RakeHelper.do_hourly_tasks
+
+      #turn the subscription off after one tote item has been generated
+      if subscription.on && ToteItem.count == (num_tote_items + 1)
+        log_in_as(user)
+        patch subscription_path(subscription), subscription: { paused: "0", on: "0" }
+        subscription.reload
+        assert_not subscription.on        
       end
 
       travel 1.day
