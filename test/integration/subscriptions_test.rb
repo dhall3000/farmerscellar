@@ -11,6 +11,54 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
   #puts Time.zone.now.strftime("%A, %B %d, %H")
   #error loading meta info from Packages/Default/Icon (Source).tmPreferences: Unable to open Packages/Default/Icon (Source).tmPreferences
 
+  test "should not generate tote items after subscription is paused" do
+
+    postings = setup_posting_recurrences
+    posting_recurrences = get_posting_recurrences(postings)
+
+    user = users(:c17)
+    assert_equal 0, ToteItem.where(user_id: user.id).count
+
+    quantity = 2
+    frequency = 1
+    apples_posting = postings[0]
+
+    subscription = add_subscription(user, apples_posting, quantity, frequency)
+    tote_item = subscription.tote_items.first
+
+    assert_equal 1, ToteItem.where(user_id: user.id).count
+    assert_equal ToteItem.states[:AUTHORIZED], ToteItem.where(user_id: user.id).first.state
+
+    #let nature take its course. purchase should occur off the first checkout
+    travel_to tote_item.posting.commitment_zone_start
+
+    num_tote_items = ToteItem.count
+
+    30.times do
+
+      top_of_hour = Time.zone.now.min == 0
+      is_noon_hour = Time.zone.now.hour == 12
+
+      RakeHelper.do_hourly_tasks
+
+      #pause the subscription after one tote item has been generated
+      if !subscription.paused && (ToteItem.count == (num_tote_items + 1))
+        log_in_as(user)
+        patch subscription_path(subscription), subscription: { paused: "1", on: "1" }
+        subscription.reload
+        assert subscription.paused
+      end
+
+      travel 1.day
+
+    end
+
+    travel_back
+
+    assert_equal num_tote_items + 1, ToteItem.count
+
+  end
+
   test "frequency permutation 1 and 1" do    
     if @on
       do_frequencies_permutation(1, 1)
@@ -397,6 +445,9 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
       subscription_frequency: frequency
     }
 
+    subscription = assigns(:subscription)
+    assert_not subscription.nil?
+
     get tote_items_path
     assert :success
     assert_template 'tote_items/index'
@@ -414,6 +465,8 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     #verify rtauth points to subscription
     #verify rtauth points to toteitem
     #verify authorization receipt sent out
+
+    return subscription
 
   end
 

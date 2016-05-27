@@ -134,6 +134,13 @@ class Subscription < ActiveRecord::Base
 
   def generate_tote_item_for_current_posting?
 
+    #subscription paused?
+    if paused
+      return false
+    end
+    
+    #TODO: is subscription off?
+
     delivery_date = posting_recurrence.current_posting.delivery_date
     delivery_dates = get_delivery_dates(delivery_date - 1.day, delivery_date + 1.day)
 
@@ -150,9 +157,6 @@ class Subscription < ActiveRecord::Base
         return false
       end
     end
-
-    #TODO: is subscription paused?
-    #TODO: is subscription off?
 
     #did user specify to skip this delivery?
     if subscription_skip_dates.find_by(skip_date: delivery_date)
