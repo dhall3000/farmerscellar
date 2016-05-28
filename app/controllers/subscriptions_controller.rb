@@ -64,7 +64,15 @@ class SubscriptionsController < ApplicationController
     if on == 0
       
       if @subscription.turn_off
-        flash[:success] = "Subscription canceled"
+
+        SubscriptionSkipDate.where("subscription_id = ? and skip_date > ?", id, Time.zone.now).delete_all      
+        unremovable_items = remove_items_from_tote_for_this_subscription
+        if unremovable_items.any?
+          flash[:info] = "Subscription canceled. Note that your tote still has some items scheduled for delivery."
+        else
+          flash[:success] = "Subscription canceled"
+        end
+        
       else
         flash[:danger] = "Subscription not canceled"
       end
@@ -75,21 +83,26 @@ class SubscriptionsController < ApplicationController
     end
 
     paused = params[:subscription][:paused].to_i
-    flash_message = "Subscription is now "
-
     if paused == 0
       pause_value = false            
     elsif paused == 1
       pause_value = true
       #blast all skip dates ahead of the present moment
-      SubscriptionSkipDate.where("subscription_id = ? and skip_date > ?", id, Time.zone.now).delete_all
+      SubscriptionSkipDate.where("subscription_id = ? and skip_date > ?", id, Time.zone.now).delete_all      
+      unremovable_items = remove_items_from_tote_for_this_subscription
     else
       redirect_to subscriptions_path
       return
     end
 
     if @subscription.pause(pause_value)
-      flash[:success] = "Subscription updated"
+
+      if pause_value && unremovable_items.any?
+        flash[:info] = "Subscription paused. Note that your tote still has some items scheduled for delivery."
+      else
+        flash[:success] = "Subscription updated"
+      end
+      
     else
       flash[:danger] = "Subscription not updated"
     end
@@ -102,6 +115,24 @@ class SubscriptionsController < ApplicationController
   end
 
   private
+
+    def remove_items_from_tote_for_this_subscription
+
+      items = @subscription.tote_items.joins(:posting).where("postings.delivery_date >= ?", Time.zone.now.midnight)
+      unremovable_items = []
+
+      items.each do |item|
+        case item.state
+        when ToteItem.states[:ADDED], ToteItem.states[:AUTHORIZED]
+          item.transition(:customer_removed)
+        when ToteItem.states[:COMMITTED]
+          unremovable_items << item
+        end
+      end
+
+      return unremovable_items
+
+    end
 
     def get_show_or_edit_data
 
