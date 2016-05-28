@@ -97,6 +97,10 @@ class SubscriptionsController < ApplicationController
 
     if @subscription.pause(pause_value)
 
+      if !@subscription.paused
+        tote_item = @subscription.generate_next_tote_item
+      end            
+
       if pause_value && unremovable_items.any?
         flash[:info] = "Subscription paused. Note that your tote still has some items scheduled for delivery."
       else

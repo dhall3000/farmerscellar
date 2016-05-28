@@ -152,7 +152,8 @@ class Subscription < ActiveRecord::Base
 
     #do we already have a tote item for this delivery date?
     if tote_items && tote_items.any?
-      if tote_items.joins(:posting).order("postings.delivery_date").last.posting.delivery_date == delivery_date
+      last_live_tote_item = tote_items.where.not(state: ToteItem.states[:REMOVED]).joins(:posting).order("postings.delivery_date").last
+      if last_live_tote_item && last_live_tote_item.posting.delivery_date == delivery_date
         return false
       end
     end

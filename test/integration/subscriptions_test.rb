@@ -125,11 +125,17 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
 
     travel_back
 
-    assert_equal num_tote_items + apples_posting.posting_recurrence.postings.count - 2, ToteItem.count
+    assert_equal ToteItem.count, num_tote_items + subscription.tote_items.count - 1
+    assert_equal subscription.tote_items.count, apples_posting.posting_recurrence.postings.count
     gap = subscription.tote_items[1].posting.delivery_date - subscription.tote_items[0].posting.delivery_date
-    assert_equal 1.week, gap
-    gap = subscription.tote_items[2].posting.delivery_date - subscription.tote_items[1].posting.delivery_date
+    assert_equal 1.week, gap    
+
+    assert_equal ToteItem.states[:COMMITTED], subscription.tote_items[0].state
+    assert_equal ToteItem.states[:REMOVED], subscription.tote_items[1].state
+    assert_equal ToteItem.states[:COMMITTED], subscription.tote_items[2].state
+    gap = subscription.tote_items[2].posting.delivery_date - subscription.tote_items[0].posting.delivery_date    
     assert_equal 2.weeks, gap
+    
     gap = subscription.tote_items[3].posting.delivery_date - subscription.tote_items[2].posting.delivery_date
     assert_equal 1.week, gap
 
