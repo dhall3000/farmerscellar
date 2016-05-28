@@ -65,7 +65,7 @@
             <% if @show_skip_dates %>
 
               <h3>Delivery Skips</h3>
-              <p class="small">(product will <u>not</u> be delivered on these dates:)</p>
+              <p>product will <u>not</u> be delivered on these dates</p>
               <ul>
                 <% @skip_dates.each do |skip_date| %>                
                   <% if skip_date[:skip] %>
