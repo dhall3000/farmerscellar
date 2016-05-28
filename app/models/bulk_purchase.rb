@@ -48,7 +48,12 @@ class BulkPurchase < ActiveRecord::Base
           end
 
           prs_by_auth[auth] << pr
-          
+
+        else
+          #there is a problem here. a pr doesn't have an authorization. this will result in a failure to collect funds which will result
+          #in a failure to pay a farmer. send an email to admin here so we know about it right off the bat          
+          msg_body = "BulkPurchase.go could not find an authorization for PurchaseReceivable ID #{pr.id.to_s}. This means that no attempt will be made to capture funds for the tote items therein associated. The customer's purchase receipt will say 'PURCHASEFAILED'. The farmer also won't get paid for this pr. An admin should begin an investigation on this matter ASAP."
+          AdminNotificationMailer.general_message("BulkPurchase error", msg_body).deliver_now
         end
 
       end
