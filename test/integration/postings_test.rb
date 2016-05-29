@@ -20,7 +20,12 @@ class PostingsTest < ActionDispatch::IntegrationTest
     verify_post_presence(price, @unit_kind, exists = false)
     #create the post, with recurrence
     login_for(@farmer)
+    
     delivery_date = Time.zone.today.midnight + 14.days
+    if delivery_date.sunday?
+      delivery_date += 1.day
+    end
+
     commitment_zone_start = delivery_date - 2.days
     post postings_path, posting: {
       description: "my recurring posting",

@@ -21,6 +21,7 @@ class AuthorizationsController < ApplicationController
   end
 
   def create
+
   	@authorization = Authorization.new(authorization_params)
     @authorization.amount_purchased = 0
   	options = { ip:  request.remote_ip, token: @authorization.token, payer_id: @authorization.payer_id }  	
@@ -33,7 +34,16 @@ class AuthorizationsController < ApplicationController
 
     @authorization.correlation_id = response.params["correlation_id"]
     @authorization.transaction_id = response.params["transaction_id"]
-    @authorization.payment_date = DateTime.parse(response.params["payment_date"])
+    
+    payment_date = response.params["payment_date"]
+    if payment_date
+      @authorization.payment_date = Time.zone.parse(payment_date)
+    else
+      #add a bogus date
+      @authorization.payment_date = Time.zone.local(1900, 1, 1, 00, 00)
+      AdminNotificationMailer.general_message("Authorization 'payment_date' param is nil", "admin, search for '#add a bogus date' in the code").deliver_now
+    end
+    
     @authorization.gross_amount = response.params["gross_amount"].to_f
     @authorization.gross_amount_currency_id = response.params["gross_amount_currency_id"]
     @authorization.payment_status = response.params["payment_status"]
@@ -42,9 +52,14 @@ class AuthorizationsController < ApplicationController
     @authorization.response = response
 
     @authorization_succeeded = response.params["ack"] == "Success" && @authorization.gross_amount > 0
+    if !@authorization_succeeded
+      AdminNotificationMailer.general_message("One time authorization failed", response.to_yaml).deliver_now
+    end
 
     checkout = Checkout.find_by(token: authorization_params[:token])
-    if checkout != nil      
+
+    if checkout
+
       @authorization.checkouts << checkout
 
       if @authorization_succeeded && @authorization.checkouts.last.tote_items.any?        
@@ -55,6 +70,7 @@ class AuthorizationsController < ApplicationController
         end
       else
         flash.now[:danger] = "Payment not authorized."
+        AdminNotificationMailer.general_message("One time authorization failed", response.to_yaml).deliver_now
       end
 
       @authorization.amount = get_gross_tote(@successfully_authorized_tote_items)
@@ -67,7 +83,11 @@ class AuthorizationsController < ApplicationController
       if @authorization_succeeded
         current_user.send_authorization_receipt(@authorization)        
       end
-    end    
+
+    else
+      AdminNotificationMailer.general_message("Checkout is nil", "admin, something went seriously wrong. The Checkout object is nil for the following authorization: #{response.to_yaml}").deliver_now      
+      flash.now[:danger] = "Payment not authorized"
+    end
 
   end
 
