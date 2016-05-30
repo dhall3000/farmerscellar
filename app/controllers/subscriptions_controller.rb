@@ -36,13 +36,15 @@ class SubscriptionsController < ApplicationController
 
     get_show_or_edit_data
 
-    @show_skip_dates = false
+    actual_skip_dates = []
 
     @skip_dates.each do |skip_date|
       if skip_date[:skip]
-        @show_skip_dates = true
+        actual_skip_dates << skip_date
       end
-    end                
+    end        
+
+    @skip_dates = actual_skip_dates        
 
   end
 
@@ -115,9 +117,6 @@ class SubscriptionsController < ApplicationController
     
   end
 
-  def destroy
-  end
-
   private
 
     def remove_items_from_tote_for_this_subscription
@@ -153,6 +152,12 @@ class SubscriptionsController < ApplicationController
     end
 
     def get_view_data_for_subscriptions(subscriptions)
+
+      if !subscriptions || !subscriptions.any?
+        @end_date = nil
+        @skip_dates = nil
+        return
+      end
 
       @end_date = Time.zone.now.midnight + 3.weeks
 

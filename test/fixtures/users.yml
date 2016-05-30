@@ -31,6 +31,19 @@ f_subscriptions:
   farmer_approval: t
   farm_name: Subscription Farms
 
+c_subscription:
+  name: c_subscription
+  email: c_subscription@c.com
+  password_digest: <%= User.digest('dogdog') %>
+  account_type: 0
+  activated: true
+  activated_at: Time.zone.now
+  address: 229178 21st St. SW
+  city: Redmond
+  state: Washington
+  zip: 98008
+  phone: 206-464-1975
+
 f5:
   name: f5
   email: f5@f.com

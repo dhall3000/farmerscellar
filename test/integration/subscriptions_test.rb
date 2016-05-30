@@ -22,7 +22,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     frequency = 1
     apples_posting = postings[0]
 
-    num_tote_items = ToteItem.count
+    num_tote_items = user.tote_items.count
     subscription = add_subscription(user, apples_posting, quantity, frequency)
     tote_item = subscription.tote_items.first
 
@@ -37,8 +37,10 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
 
       RakeHelper.do_hourly_tasks
 
+      user.reload
+
       #enter a skip date after one tote items has been generated
-      if !has_created_skip_dates && (ToteItem.count == (num_tote_items + 3))
+      if !has_created_skip_dates && (user.tote_items.count == (num_tote_items + 3))
 
         log_in_as(user)
         #view the index
@@ -58,13 +60,14 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     travel_back
 
     subscription.posting_recurrence.reload
+    user.reload
 
-    num_tote_items_generated = ToteItem.count - num_tote_items
+    num_tote_items_generated = user.tote_items.count - num_tote_items
     assert num_tote_items_generated > 0
     num_tote_items_skipped = subscription.posting_recurrence.postings.count - subscription.tote_items.count
     assert_equal 1, num_tote_items_skipped
     assert_equal num_tote_items_generated, subscription.tote_items.count
-    assert_equal num_tote_items + num_tote_items_generated, ToteItem.count
+    assert_equal num_tote_items + num_tote_items_generated, user.tote_items.count
 
   end
 
@@ -89,7 +92,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     #let nature take its course. purchase should occur off the first checkout
     travel_to tote_item.posting.commitment_zone_start
 
-    num_tote_items = ToteItem.count
+    num_tote_items = user.tote_items.count
     pause_time = Time.zone.now - 1.year
     regular_tote_item_delivery_gap = 1.minute
     has_paused = false
@@ -101,8 +104,10 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
 
       RakeHelper.do_hourly_tasks
 
+      user.reload
+
       #pause the subscription after one tote item has been generated
-      if !has_paused && !subscription.paused && (ToteItem.count == (num_tote_items + 1))
+      if !has_paused && !subscription.paused && (user.tote_items.count == (num_tote_items + 1))
         log_in_as(user)
         patch subscription_path(subscription), subscription: { paused: "1", on: "1" }
         subscription.reload
@@ -125,7 +130,8 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
 
     travel_back
 
-    assert_equal ToteItem.count, num_tote_items + subscription.tote_items.count - 1
+    user.reload
+    assert_equal user.tote_items.count, num_tote_items + subscription.tote_items.count - 1
     assert_equal subscription.tote_items.count, apples_posting.posting_recurrence.postings.count
     gap = subscription.tote_items[1].posting.delivery_date - subscription.tote_items[0].posting.delivery_date
     assert_equal 1.week, gap    
@@ -162,7 +168,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     #let nature take its course. purchase should occur off the first checkout
     travel_to tote_item.posting.commitment_zone_start
 
-    num_tote_items = ToteItem.count
+    num_tote_items = user.tote_items.count
     pause_time = Time.zone.now - 1.year
     regular_tote_item_delivery_gap = 1.minute
     has_paused = false
@@ -174,8 +180,10 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
 
       RakeHelper.do_hourly_tasks
 
+      user.reload
+
       #turn the subscription off after one tote item has been generated
-      if subscription.on && ToteItem.count == (num_tote_items + 1)
+      if subscription.on && user.tote_items.count == (num_tote_items + 1)
         log_in_as(user)
         patch subscription_path(subscription), subscription: { paused: "0", on: "0" }
         subscription.reload
@@ -188,7 +196,8 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
 
     travel_back
 
-    assert_equal num_tote_items + 1, ToteItem.count
+    user.reload
+    assert_equal num_tote_items + 1, user.tote_items.count
 
     #as of this writing only two items should have been generated in this series. they should be without gap (i.e. 7 day spacing)
     #right at the beginning of the posting recurrence series. then the turn_off method gets called so their shoudl be no further

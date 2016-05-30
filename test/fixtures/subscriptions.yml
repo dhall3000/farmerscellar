@@ -1,2 +1,8 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
+one:
+  frequency: 1
+  'on': true
+  user: c_subscription
+  posting_recurrence: one
+  quantity: 2
+  paused: false
