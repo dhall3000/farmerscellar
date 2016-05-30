@@ -13,6 +13,38 @@ class PostingsTest < ActionDispatch::IntegrationTest
     @posting = postings(:postingf1apples)
   end  
 
+  test "posting should remove unauthorized tote items when it transitions from open to closed when late adds not allowed" do
+    
+    c = users(:c_one_tote_item)
+    tote_item = c.tote_items.first
+    posting = tote_item.posting
+    posting.update(late_adds_allowed: false)
+    
+    #let nature take its course. purchase should occur off the first checkout
+    travel_to tote_item.posting.commitment_zone_start - 1.hour
+
+    assert_equal ToteItem.states[:ADDED], tote_item.state
+    assert_not posting.late_adds_allowed
+
+    100.times do
+
+      RakeHelper.do_hourly_tasks
+
+      if Time.zone.now == tote_item.posting.commitment_zone_start
+        tote_item.reload
+        assert_equal ToteItem.states[:REMOVED], tote_item.state
+      end
+      
+      travel 1.hour
+
+    end
+
+    travel_back    
+
+    posting.update(late_adds_allowed: true)
+
+  end
+
   test "posting should recur" do
     
     price = 12.31

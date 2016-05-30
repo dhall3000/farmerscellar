@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160525172553) do
+ActiveRecord::Schema.define(version: 20160530211129) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -281,6 +281,7 @@ ActiveRecord::Schema.define(version: 20160525172553) do
     t.datetime "commitment_zone_start",                 null: false
     t.integer  "posting_recurrence_id"
     t.integer  "state",                 default: 0,     null: false
+    t.boolean  "late_adds_allowed",     default: false
   end
 
   add_index "postings", ["posting_recurrence_id"], name: "index_postings_on_posting_recurrence_id"

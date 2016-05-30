@@ -44,6 +44,23 @@ class Posting < ActiveRecord::Base
           if !posting_recurrence.nil? && posting_recurrence.on
             posting_recurrence.recur
           end
+
+          #'late adds' are a customer authorizing a tote item in between commitment zone start and delivery date.
+          #(FYI by default late adds are not allowed)
+          #if late adds are not allowed, here - when transitioning the posting from OPEN to COMMITMENTZONE - we need
+          #to give all non-authorized tote items the boot...transition them from ADDED to REMOVED. otherwise it will
+          #happen that user will add a tote item before the CZS but not auth it. they'll wait a day or two, then come
+          #back to their tote (now in the commitment zone) and just authorize it. when customer does this an email goes
+          #out at the top of the next hour to the producer telling them they have more order. this is confusing if they
+          #aren't expecting it. so we just boot the customer here so they can't authorize late.
+          if !late_adds_allowed
+            tote_items.each do |tote_item|
+              if tote_item.state?(:ADDED)
+                tote_item.transition(:system_removed)                
+              end
+            end
+          end
+
         end        
       
       end
