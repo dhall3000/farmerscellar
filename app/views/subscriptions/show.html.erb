@@ -40,11 +40,8 @@
             <h4 class="panel-title">Subscription Info</h4>
           </div>          
           <div class="panel-body">           
-            <h3>Description</h3>
-            <ul>
-              <li><%= @subscription.description %></li>
-            </ul>
-
+            <h3>Description</h3>            
+            <%= @subscription.description %>
             <h3>Status</h3>
             <% if @subscription.paused %>
 

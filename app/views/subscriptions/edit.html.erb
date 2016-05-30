@@ -11,11 +11,11 @@
             <h4 class="panel-title">Subscription Info</h4>
           </div>          
           <div class="panel-body">           
-
+          	<h3>Description</h3>
             <p>
               <%= @subscription.description %>
             </p>
-
+            <h3>Status</h3>
             <% if @subscription.paused %>
 
               <p class="alert alert-danger">
@@ -112,8 +112,8 @@
 
 	              <%= hidden_field_tag :end_date, @end_date %>
 
-	              <%= submit_tag "Update skips", class: "btn btn-primary btn-lg form-control fat-finger-spacing" %>
-	              <%= link_to "More dates", edit_subscription_path(@subscription, end_date: @end_date + 4.weeks), class: "btn btn-primary btn-lg btn-block" %>
+	              <%= submit_tag "Update skips", class: "btn btn-primary btn-lg form-control" %>
+	              <%= link_to "Show more skip dates", edit_subscription_path(@subscription, end_date: @end_date + 4.weeks) %>
 	              
 	            <% end %>
 
