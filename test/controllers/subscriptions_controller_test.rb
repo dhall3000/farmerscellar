@@ -33,6 +33,19 @@ class SubscriptionsControllerTest < ActionController::TestCase
     assert_equal nil, assigns(:skip_dates)
   end
 
+  test "index should show info when user has subscription" do
+    user = @c_subscription
+    assert_equal 1, user.subscriptions.count
+    log_in_as(user)
+    get :index
+    assert_response :success
+    assert_template 'subscriptions/index'
+
+    sd = assigns(:skip_dates)
+    assert sd.count > 0
+    assert assigns(:end_date) > user.subscriptions.last.posting_recurrence.reference_date    
+  end
+
   test "should not get show when user not logged in" do
     get :show, id: @subscription.id
     assert_response :redirect
@@ -53,6 +66,13 @@ class SubscriptionsControllerTest < ActionController::TestCase
 
     skip_dates = assigns(:skip_dates)
     assert_equal 0, skip_dates.count
+  end
+
+  test "should not show subscription if incorrect user" do
+    log_in_as(@c1)
+    get :show, id: @subscription.id
+    assert_response :redirect
+    assert_redirected_to subscriptions_path
   end
 
   test "should not get edit when user not logged in" do

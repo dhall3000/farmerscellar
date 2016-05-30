@@ -1,5 +1,6 @@
 class SubscriptionsController < ApplicationController
   before_action :logged_in_user
+  before_action :correct_user, only: [:show, :edit, :update]
 
   def index
     @subscriptions = Subscription.where(user_id: current_user.id, on: true)
@@ -14,15 +15,29 @@ class SubscriptionsController < ApplicationController
     old_skip_dates = get_skip_dates_through(params[:subscription_ids], end_date)
 
     old_skip_dates.each do |old_skip_date|
-      SubscriptionSkipDate.where(subscription_id: old_skip_date[:subscription].id, skip_date: old_skip_date[:date]).delete_all
+
+      #before nuking this skip date, pull up the subscription from the id and verify it really belongs to the current user
+      subscription_id = old_skip_date[:subscription].id
+      subscription = Subscription.find_by(id: subscription_id)
+
+      if subscription && subscription.user.id == current_user.id
+        #ok, subscription exists and belongs to current user...nuke the skip date
+        SubscriptionSkipDate.where(subscription_id: subscription_id, skip_date: old_skip_date[:date]).delete_all
+      end
+
     end
 
     if params[:skip_dates]
       params[:skip_dates].each do |subscription_id, dates|
 
-        dates.each do |date|
-          SubscriptionSkipDate.create(subscription_id: subscription_id, skip_date: date)
-        end      
+        #before programming in the skip dates, verify the subscription really belongs to current_user
+        subscription = Subscription.find_by(id: subscription_id)
+
+        if subscription && subscription.user.id == current_user.id
+          dates.each do |date|
+            SubscriptionSkipDate.create(subscription_id: subscription_id, skip_date: date)
+          end      
+        end
         
       end
     end
@@ -36,15 +51,19 @@ class SubscriptionsController < ApplicationController
 
     get_show_or_edit_data
 
-    actual_skip_dates = []
+    if @skip_dates && @skip_dates.any?
 
-    @skip_dates.each do |skip_date|
-      if skip_date[:skip]
-        actual_skip_dates << skip_date
-      end
-    end        
+      actual_skip_dates = []
 
-    @skip_dates = actual_skip_dates        
+      @skip_dates.each do |skip_date|
+        if skip_date[:skip]
+          actual_skip_dates << skip_date
+        end
+      end        
+
+      @skip_dates = actual_skip_dates        
+
+    end
 
   end
 
@@ -119,6 +138,16 @@ class SubscriptionsController < ApplicationController
 
   private
 
+    def correct_user
+      
+      subscription = Subscription.find_by(id: params[:id])
+
+      if !subscription || !current_user?(subscription.user)
+        redirect_to subscriptions_path
+      end      
+
+    end
+
     def remove_items_from_tote_for_this_subscription
 
       items = @subscription.tote_items.joins(:posting).where("postings.delivery_date >= ?", Time.zone.now.midnight)
@@ -165,7 +194,7 @@ class SubscriptionsController < ApplicationController
         @end_date = constrain_end_date(Time.zone.parse(params[:end_date]))
       end
 
-      farthest_existing_skip_date = SubscriptionSkipDate.joins(subscription: :user).where("subscriptions.on" => true).order("subscription_skip_dates.skip_date").last
+      farthest_existing_skip_date = SubscriptionSkipDate.joins(subscription: :user).where("subscriptions.on" => true, "subscriptions.user_id" => current_user.id).order("subscription_skip_dates.skip_date").last
       @skip_dates = get_skip_dates_through(subscriptions.select(:id), @end_date)
 
       while @skip_dates.count == 0 && subscriptions.count > 0

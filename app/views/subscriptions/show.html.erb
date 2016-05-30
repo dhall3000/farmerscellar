@@ -59,7 +59,7 @@
               
             <% end %>
 
-            <% if @show_skip_dates %>
+            <% if @skip_dates && @skip_dates.any? %>
 
               <h3>Delivery Skips</h3>
               <p>product will <u>not</u> be delivered on these dates</p>
