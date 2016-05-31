@@ -112,7 +112,7 @@
 
 	              <%= hidden_field_tag :end_date, @end_date %>
 
-	              <%= submit_tag "Update skips", class: "btn btn-primary btn-lg form-control" %>
+	              <%= submit_tag "Update skips", class: "btn btn-primary btn-lg form-control fat-finger-spacing" %>
 	              <%= link_to "Show more skip dates", edit_subscription_path(@subscription, end_date: @end_date + 4.weeks) %>
 	              
 	            <% end %>

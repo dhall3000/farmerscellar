@@ -76,7 +76,6 @@ Rails.application.configure do
 
     #this is intended to function a bit like a database so that i don't have to create new models just to fiddle with features like paypal reference transactions
     ::PAYPALDATASTORE = {}
-    ::SUBSCRIPTIONUSERS = [6,7]
 
   end
 
