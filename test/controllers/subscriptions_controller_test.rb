@@ -8,6 +8,158 @@ class SubscriptionsControllerTest < ActionController::TestCase
     @subscription = subscriptions(:one)
   end
 
+  test "should create" do
+    log_in_as(@c1)
+    posting = postings(:p_recurrence_on)
+    ti = ToteItem.new(quantity: 1, price: posting.price, posting_id: posting.id, user_id: @c1.id)
+    assert ti.valid?
+    assert ti.save        
+    subscription_count = @c1.subscriptions.count
+    post :create, tote_item_id: ti.id, frequency: 1
+    assert_response :redirect    
+    assert_redirected_to postings_path    
+    @c1.reload
+    assert_equal subscription_count + 1, @c1.subscriptions.count
+    assert_not flash.empty?
+    assert_equal "Subscription created", flash.now[:success]
+    subscription = assigns(:subscription)
+    assert_equal 1, subscription.tote_items.count
+    assert_equal @c1.id, subscription.tote_items.last.user.id
+  end
+
+  test "should not create subscription when frequency is 0" do
+    log_in_as(@c1)
+    posting = postings(:p_recurrence_on)
+    ti = ToteItem.new(quantity: 1, price: posting.price, posting_id: posting.id, user_id: @c1.id)
+    assert ti.valid?
+    assert ti.save        
+    subscription_count = @c1.subscriptions.count
+    post :create, tote_item_id: ti.id, frequency: 0
+    assert_response :redirect    
+    assert_redirected_to postings_path
+    assert_not flash.empty?
+    assert_equal "Tote item created", flash[:success]
+    @c1.reload
+    assert_equal subscription_count, @c1.subscriptions.count
+  end
+
+  test "should not create when posting recurrence is off" do
+    log_in_as(@c1)
+    posting = postings(:p_recurrence_off)
+    ti = ToteItem.new(quantity: 1, price: posting.price, posting_id: posting.id, user_id: @c1.id)
+    assert ti.valid?
+    assert ti.save        
+    post :create, tote_item_id: ti.id, frequency: 1
+    assert_response :redirect    
+    assert_redirected_to postings_path
+  end
+
+  test "should not create when posting does not recur" do
+    log_in_as(@c1)
+    c1apple = tote_items(:c1apple)
+    assert c1apple.valid?
+    post :create, tote_item_id: c1apple.id, frequency: 1
+    assert_response :redirect    
+    assert_redirected_to postings_path
+  end
+
+  test "should not create when frequency not in recurrence options" do
+    log_in_as(@c1)
+    posting = postings(:p_recurrence_on)
+    ti = ToteItem.new(quantity: 1, price: posting.price, posting_id: posting.id, user_id: @c1.id)
+    assert ti.valid?
+    assert ti.save        
+    post :create, tote_item_id: ti.id, frequency: 100
+    assert_response :redirect
+    assert_redirected_to postings_path
+  end
+
+  test "should not create when frequency not in params" do
+    log_in_as(@c1)
+    posting = postings(:p_recurrence_on)
+    ti = ToteItem.new(quantity: 1, price: posting.price, posting_id: posting.id, user_id: @c1.id)
+    assert ti.valid?
+    assert ti.save        
+    post :create, tote_item_id: ti.id
+    assert_response :redirect
+    assert_redirected_to postings_path
+  end
+
+  test "should not create when user not logged in" do
+    post :create
+    assert_response :redirect
+    assert_redirected_to login_path
+  end
+
+  test "should not create when tote item id not in params" do
+    log_in_as(@c1)
+    post :create
+    assert_response :redirect
+    assert_redirected_to postings_path
+  end
+
+  test "should not create when tote item id does not belong to current user" do
+    log_in_as(@c1)
+    t18 = tote_items(:t18)
+    assert t18.valid?
+    post :create, tote_item_id: t18.id
+    assert_response :redirect    
+    assert_redirected_to postings_path
+  end
+
+  test "should get new" do
+    log_in_as(@c1)
+    posting = postings(:p_recurrence_on)
+    ti = ToteItem.new(quantity: 1, price: posting.price, posting_id: posting.id, user_id: @c1.id)
+    assert ti.valid?
+    assert ti.save        
+    get :new, tote_item_id: ti.id
+    assert_response :success
+    assert_template 'subscriptions/new'
+  end
+
+  test "should not get new when posting recurrence is off" do
+    log_in_as(@c1)
+    posting = postings(:p_recurrence_off)
+    ti = ToteItem.new(quantity: 1, price: posting.price, posting_id: posting.id, user_id: @c1.id)
+    assert ti.valid?
+    assert ti.save        
+    get :new, tote_item_id: ti.id
+    assert_response :redirect    
+    assert_redirected_to postings_path
+  end
+
+  test "should not get new when posting does not recur" do
+    log_in_as(@c1)
+    c1apple = tote_items(:c1apple)
+    assert c1apple.valid?
+    get :new, tote_item_id: c1apple.id
+    assert_response :redirect    
+    assert_redirected_to postings_path
+  end
+
+  test "should not get new when tote item id does not belong to current user" do
+    log_in_as(@c1)
+    t18 = tote_items(:t18)
+    assert t18.valid?
+    get :new, tote_item_id: t18.id
+    assert_response :redirect    
+    assert_redirected_to postings_path
+  end
+
+  test "should not get new when not logged in" do
+    get :new
+    assert_response :redirect    
+    assert_redirected_to login_path
+  end
+
+  test "should not get new when tote item id not in params" do
+    log_in_as(@c1)
+    get :new
+    assert_response :redirect    
+    assert_redirected_to postings_path    
+  end  
+
   test "should get index when user logged in" do
     log_in_as(@c1)
     get :index

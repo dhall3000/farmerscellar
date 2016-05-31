@@ -34,18 +34,22 @@ class ToteItemsController < ApplicationController
   end
 
   def new
-    posting = Posting.find(params[:posting_id])
-    @sanitized_producer_url = posting.user.website
+
+    @posting = Posting.find(params[:posting_id])
+
+    if !@posting || !@posting.live
+      flash[:danger] = "Oops, please try adding that again"
+      redirect_to postings_path
+      return
+    end
+
+    @sanitized_producer_url = @posting.user.website
     if @sanitized_producer_url != nil
       @sanitized_producer_url = url_with_protocol(@sanitized_producer_url)
     end
 
     @account_on_hold = account_on_hold
     @tote_item = ToteItem.new
-
-    if !posting.posting_recurrence.nil? && posting.posting_recurrence.subscribable?
-      @subscription = Subscription.new(frequency: 0, on: true, user_id: current_user.id, posting_recurrence_id: posting.posting_recurrence.id)
-    end
 
   end
 
@@ -68,56 +72,19 @@ class ToteItemsController < ApplicationController
       return
     end
 
-    #is the user trying to create a new subscription?
-    if params[:tote_item][:subscription_frequency].to_i > 0
+    if !@tote_item.posting.live
+      flash[:danger] = "Oops, please try adding that again"
+      redirect_to postings_path
+    elsif @tote_item.save
 
-      #is there a posting? is the posting live? does the posting have a recurrence? is the posting recurrence turned on?
-      if @tote_item.posting != nil && @tote_item.posting.live && @tote_item.posting.posting_recurrence != nil && @tote_item.posting.posting_recurrence.on
-        
-        frequency = params[:tote_item][:subscription_frequency].to_i
-        new_subscription_params = {
-          frequency: frequency,
-          on: true,
-          user_id: current_user.id,
-          quantity: @tote_item.quantity          
-        }
-
-        @subscription = @tote_item.posting.posting_recurrence.subscriptions.create(new_subscription_params)
-
-        if @subscription.save
-
-          tote_item = @subscription.generate_next_tote_item
-
-          if tote_item
-            flash[:success] = "New subscription created."
-            redirect_to postings_path
-          else
-            #NOTE: this else case is being created as a quick workaround to a helen the hen 3 on 1 off issue. in the case where someone specifies a bi weekly delivery
-            #and it happens to be week #2 of the cycle there won't be a tote item returned from the @subscription.generate_next_tote_item call above. in
-            #this case we want the user to just see a flash that says this option will be available in less than a week so please check back.
-            Subscription.destroy(@subscription.id)
-            flash.now[:danger] = "Apologies...every other week delivery for this product is not available at the moment but will be in less than a week. Please check back later."
-            render 'new' 
-            return           
-          end
-
-        else
-          flash.now[:danger] = "Subscription not saved. See errors below."
-          render 'new'
-        end
-
-      else
-        #we need a live posting and a 'on' posting recurrence. that isn't the case to inform the user constructively.
-        flash[:danger] = "Oops, it appears that posting is no longer live. Subscription not created."
+      if @tote_item.posting.posting_recurrence && @tote_item.posting.posting_recurrence.on
+        #this posting is subscribable. attempt subscription upsell.
+        redirect_to new_subscription_path(tote_item_id: @tote_item.id)
+      else        
+        flash[:success] = "Item saved to shopping tote."
         redirect_to postings_path
       end
 
-    elsif !@tote_item.posting.live
-      flash[:danger] = "Oops, it appears that posting is no longer live. Item not created."
-      redirect_to postings_path
-    elsif @tote_item.save
-      flash[:success] = "Item saved to shopping tote."
-      redirect_to postings_path
     else
       flash.now[:danger] = "Item not saved to shopping tote. See errors below."
       render 'new'

@@ -4,12 +4,79 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
   
   def setup
     @on = false
+    @farmer = users(:f1)
+    @product = products(:apples)
+    @unit_category = unit_categories(:weight)
+    @unit_kind = unit_kinds(:pound)    
+    @posting = postings(:postingf1apples)
   end  
 
   #i'm wanting to make a general test framework where i can crank out the implementations for 
   #posting recurrence and subscription frequency permutations
   #puts Time.zone.now.strftime("%A, %B %d, %H")
   #error loading meta info from Packages/Default/Icon (Source).tmPreferences: Unable to open Packages/Default/Icon (Source).tmPreferences
+
+  test "should neither show frequency 2 as option nor allow subscription creation with frequency 2 during martys week number 2" do
+    #log in as farmer    
+    log_in_as(@farmer)
+    #create posting with posting recurrence frequency of 6
+
+    delivery_date = Time.zone.today.midnight + 14.days
+    if delivery_date.sunday?
+      delivery_date += 1.day
+    end
+    commitment_zone_start = delivery_date - 2.days
+    posting_recurrence_count = PostingRecurrence.joins(postings: :user).where("users.id = ?", @farmer.id).count
+
+    post postings_path, posting: {
+      description: "my recurring posting",
+      quantity_available: 100,
+      price: 2,
+      user_id: @farmer.id,
+      product_id: @product.id,
+      unit_category_id: @unit_category.id,
+      unit_kind_id: @unit_kind.id,
+      live: true,
+      delivery_date: delivery_date,
+      commitment_zone_start: commitment_zone_start,
+      posting_recurrence: {frequency: 6, on: true}
+    }
+
+    posting = assigns(:posting)
+    posting_recurrence = posting.posting_recurrence
+    assert_not posting.nil?
+    assert posting.id > 0
+    assert_equal posting_recurrence_count + 1, PostingRecurrence.joins(postings: :user).where("users.id = ?", @farmer.id).count
+    assert_equal 1, posting_recurrence.postings.count
+
+    #wind clock forward into first posting's cz. this will put us smack in the middle of "week #2", which is a no-no for
+    #subscription frequency #2 (i.e. every other week)
+    travel_to posting.commitment_zone_start
+    RakeHelper.do_hourly_tasks
+    travel 1.hour
+    #have user create a new tote item
+    posting_recurrence.reload
+    c1 = users(:c1)
+    subscriptions_count = c1.subscriptions.count
+    log_in_as(c1)
+    post tote_items_path, tote_item: {quantity: 1, posting_id: posting_recurrence.postings.last.id}
+    tote_item = assigns(:tote_item)
+    assert_redirected_to new_subscription_path(tote_item_id: tote_item.id)
+    follow_redirect!
+    #verify every-other-week option is not available
+    subscription_options = assigns(:subscription_options)
+    subscription_options.each do |subscription_option|
+      assert_not_equal 2, subscription_option[:subscription_frequency]
+    end
+    #despite every-other-week option not being available, attempt to create every-other-week frequency subscription
+    post subscriptions_path, tote_item_id: tote_item.id, frequency: 2
+    #verify subscription creation attempt failed
+    c1.reload
+    assert_equal subscriptions_count, c1.subscriptions.count
+
+    travel_back
+
+  end
 
   test "should not generate tote items for skip dates" do
 
@@ -303,47 +370,6 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     end    
   end
 
-  test "should tell user the desired subscription frequency is not available this week" do
-
-    num_tote_items = ToteItem.count
-    num_subscriptions = Subscription.count
-
-    product = products(:apples)
-    posting_frequency = 6
-    subscription_frequency = 2
-    posting = setup_posting_recurrence(product, posting_frequency)
-
-    user = users(:c1)    
-    quantity = 2    
-
-    posting_recurrence = posting.posting_recurrence
-    travel_to posting_recurrence.postings.last.commitment_zone_start
-    RakeHelper.do_hourly_tasks
-    posting_recurrence.reload
-    assert_equal 2, posting_recurrence.postings.count
-    posting = posting_recurrence.postings.last
-
-    log_in_as(user)
-    post user_dropsites_path, user_dropsite: {dropsite_id: dropsites(:dropsite1).id}
-
-    post tote_items_path, tote_item: {
-      quantity: quantity,      
-      posting_id: posting.id,
-      subscription_frequency: subscription_frequency
-    }
-
-    assert :success
-    assert_template 'tote_items/new'
-    assert_not flash.empty?
-    assert_equal "Apologies...every other week delivery for this product is not available at the moment but will be in less than a week. Please check back later.", flash.now[:danger]
-
-    travel_back
-
-    assert_equal num_tote_items, ToteItem.count
-    assert_equal num_subscriptions, Subscription.count
-    
-  end
-
   def do_frequencies_permutation(posting_frequency, subscription_frequency)
 
     product = products(:apples)
@@ -589,12 +615,9 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
 
     log_in_as(user)
     post user_dropsites_path, user_dropsite: {dropsite_id: dropsites(:dropsite1).id}
-
-    post tote_items_path, tote_item: {
-      quantity: quantity,      
-      posting_id: posting.id,
-      subscription_frequency: frequency
-    }
+    post tote_items_path, tote_item: {quantity: quantity, posting_id: posting.id}
+    tote_item = assigns(:tote_item)
+    post subscriptions_path, tote_item_id: tote_item.id, frequency: frequency
 
     subscription = assigns(:subscription)
     assert_not subscription.nil?

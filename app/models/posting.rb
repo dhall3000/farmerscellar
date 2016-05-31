@@ -40,10 +40,6 @@ class Posting < ActiveRecord::Base
       when :commitment_zone_started
         if Time.zone.now >= commitment_zone_start
           new_state = Posting.states[:COMMITMENTZONE]
-          update(live: false)
-          if !posting_recurrence.nil? && posting_recurrence.on
-            posting_recurrence.recur
-          end
 
           #'late adds' are a customer authorizing a tote item in between commitment zone start and delivery date.
           #(FYI by default late adds are not allowed)
@@ -54,11 +50,16 @@ class Posting < ActiveRecord::Base
           #out at the top of the next hour to the producer telling them they have more order. this is confusing if they
           #aren't expecting it. so we just boot the customer here so they can't authorize late.
           if !late_adds_allowed
+            update(live: false)
             tote_items.each do |tote_item|
               if tote_item.state?(:ADDED)
                 tote_item.transition(:system_removed)                
               end
             end
+          end
+
+          if !posting_recurrence.nil? && posting_recurrence.on
+            posting_recurrence.recur
           end
 
         end        

@@ -55,28 +55,104 @@ class PostingRecurrence < ActiveRecord::Base
     case frequency
     when 0 #just once posting frequency      
     when 1 #weekly posting frequency
-      options << {subscription_frequency: 1, text: @@every_week, next_delivery_date: current_posting.delivery_date}
-      options << {subscription_frequency: 2, text: @@every_2_weeks, next_delivery_date: current_posting.delivery_date}
-      options << {subscription_frequency: 3, text: @@every_3_weeks, next_delivery_date: current_posting.delivery_date}
-      options << {subscription_frequency: 4, text: @@every_4_weeks, next_delivery_date: current_posting.delivery_date}
+
+      subscription_frequency = 1
+      if can_add_tote_item?(subscription_frequency)
+        options << {subscription_frequency: subscription_frequency, text: @@every_week, next_delivery_date: current_posting.delivery_date}
+      end
+
+      subscription_frequency = 2
+      if can_add_tote_item?(subscription_frequency)
+        options << {subscription_frequency: subscription_frequency, text: @@every_2_weeks, next_delivery_date: current_posting.delivery_date}
+      end
+
+      subscription_frequency = 3
+      if can_add_tote_item?(subscription_frequency)
+        options << {subscription_frequency: subscription_frequency, text: @@every_3_weeks, next_delivery_date: current_posting.delivery_date}
+      end
+
+      subscription_frequency = 4
+      if can_add_tote_item?(subscription_frequency)
+        options << {subscription_frequency: subscription_frequency, text: @@every_4_weeks, next_delivery_date: current_posting.delivery_date}
+      end           
+      
     when 2 #every 2 weeks posting frequency
-      options << {subscription_frequency: 1, text: @@every_2_weeks, next_delivery_date: current_posting.delivery_date}
-      options << {subscription_frequency: 2, text: @@every_4_weeks, next_delivery_date: current_posting.delivery_date}
-      options << {subscription_frequency: 3, text: @@every_6_weeks, next_delivery_date: current_posting.delivery_date}
-      options << {subscription_frequency: 4, text: @@every_8_weeks, next_delivery_date: current_posting.delivery_date}
+
+      subscription_frequency = 1
+      if can_add_tote_item?(subscription_frequency)
+        options << {subscription_frequency: subscription_frequency, text: @@every_2_weeks, next_delivery_date: current_posting.delivery_date}
+      end
+
+      subscription_frequency = 2
+      if can_add_tote_item?(subscription_frequency)
+        options << {subscription_frequency: subscription_frequency, text: @@every_4_weeks, next_delivery_date: current_posting.delivery_date}
+      end
+
+      subscription_frequency = 3
+      if can_add_tote_item?(subscription_frequency)
+        options << {subscription_frequency: subscription_frequency, text: @@every_6_weeks, next_delivery_date: current_posting.delivery_date}
+      end
+
+      subscription_frequency = 4
+      if can_add_tote_item?(subscription_frequency)
+        options << {subscription_frequency: subscription_frequency, text: @@every_8_weeks, next_delivery_date: current_posting.delivery_date}
+      end
+
     when 3 #every 3 weeks posting frequency
-      options << {subscription_frequency: 1, text: @@every_3_weeks, next_delivery_date: current_posting.delivery_date}
-      options << {subscription_frequency: 2, text: @@every_6_weeks, next_delivery_date: current_posting.delivery_date}
+
+      subscription_frequency = 1
+      if can_add_tote_item?(subscription_frequency)
+        options << {subscription_frequency: subscription_frequency, text: @@every_3_weeks, next_delivery_date: current_posting.delivery_date}
+      end
+
+      subscription_frequency = 2
+      if can_add_tote_item?(subscription_frequency)
+        options << {subscription_frequency: subscription_frequency, text: @@every_6_weeks, next_delivery_date: current_posting.delivery_date}
+      end      
+      
     when 4 #every 4 weeks posting frequency
-      options << {subscription_frequency: 1, text: @@every_4_weeks, next_delivery_date: current_posting.delivery_date}
-      options << {subscription_frequency: 2, text: @@every_8_weeks, next_delivery_date: current_posting.delivery_date}
+
+      subscription_frequency = 1
+      if can_add_tote_item?(subscription_frequency)
+        options << {subscription_frequency: subscription_frequency, text: @@every_4_weeks, next_delivery_date: current_posting.delivery_date}
+      end
+
+      subscription_frequency = 2
+      if can_add_tote_item?(subscription_frequency)
+        options << {subscription_frequency: subscription_frequency, text: @@every_8_weeks, next_delivery_date: current_posting.delivery_date}
+      end      
+      
     when 5 #monthly posting frequency
-      options << {subscription_frequency: 1, text: get_text_for(current_posting.delivery_date, 5, 1), next_delivery_date: current_posting.delivery_date}
-      options << {subscription_frequency: 2, text: get_text_for(current_posting.delivery_date, 5, 2), next_delivery_date: current_posting.delivery_date}
+
+      subscription_frequency = 1
+      if can_add_tote_item?(subscription_frequency)
+        options << {subscription_frequency: subscription_frequency, text: get_text_for(current_posting.delivery_date, 5, 1), next_delivery_date: current_posting.delivery_date}
+      end
+
+      subscription_frequency = 2
+      if can_add_tote_item?(subscription_frequency)
+        options << {subscription_frequency: subscription_frequency, text: get_text_for(current_posting.delivery_date, 5, 2), next_delivery_date: current_posting.delivery_date}
+      end      
+      
     when 6 #3 weeks on, 1 week off posting frequency
-      options << {subscription_frequency: 1, text: "3 weeks on, 1 week off", next_delivery_date: current_posting.delivery_date}
-      options << {subscription_frequency: 2, text: "Every other week", next_delivery_date: current_posting.delivery_date}
-      options << {subscription_frequency: 3, text: "Every 4 weeks", next_delivery_date: current_posting.delivery_date}
+
+      subscription_frequency = 1
+      if can_add_tote_item?(subscription_frequency)
+        options << {subscription_frequency: subscription_frequency, text: "3 weeks on, 1 week off", next_delivery_date: current_posting.delivery_date}
+      end
+
+      #this gets tested by the following:
+      #test "should neither show frequency 2 as option nor allow subscription creation with frequency 2 during martys week number 2" do
+      subscription_frequency = 2
+      if can_add_tote_item?(subscription_frequency)
+        options << {subscription_frequency: subscription_frequency, text: "Every other week", next_delivery_date: current_posting.delivery_date}
+      end
+
+      subscription_frequency = 3
+      if can_add_tote_item?(subscription_frequency)
+        options << {subscription_frequency: subscription_frequency, text: "Every 4 weeks", next_delivery_date: current_posting.delivery_date}
+      end            
+
     end    
 
     return options

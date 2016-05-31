@@ -2,6 +2,57 @@ class SubscriptionsController < ApplicationController
   before_action :logged_in_user
   before_action :correct_user, only: [:show, :edit, :update]
 
+  def new
+
+    if !new_conditions_met?
+      return
+    end
+
+    @subscription_options = @tote_item.posting.posting_recurrence.subscription_options
+    
+  end
+
+  def create
+
+    if !new_conditions_met?
+      return
+    end
+
+    if params[:frequency].nil?
+      redirect_to postings_path
+      return
+    end
+
+    frequency = params[:frequency].to_i
+    frequency_is_legit = frequency_is_legit?(@tote_item, frequency)
+
+    if !frequency_is_legit
+      redirect_to postings_path
+      return
+    end
+
+    if frequency == 0
+      flash[:success] = "Tote item created"
+      redirect_to postings_path
+      return
+    end
+
+    @subscription = Subscription.new(frequency: frequency, on: true, user_id: current_user.id, posting_recurrence_id: @posting_recurrence.id, quantity: @tote_item.quantity, paused: false)
+    if @subscription.save
+      @subscription.tote_items << @tote_item
+      @subscription.save
+      flash[:success] = "Subscription created"
+      redirect_to postings_path
+      return
+    else
+      AdminNotificationMailer.general_message("Subscription failed to create", @subscription.to_yaml).deliver_now
+      flash[:danger] = "Subscription not created"
+      redirect_to postings_path
+      return
+    end
+
+  end
+
   def index
     @subscriptions = Subscription.where(user_id: current_user.id, on: true)
     get_view_data_for_subscriptions(@subscriptions)
@@ -138,6 +189,32 @@ class SubscriptionsController < ApplicationController
 
   private
 
+    def new_conditions_met?
+
+      #if tote_item_id is not in params, redirect to postings page
+      if params[:tote_item_id].nil?
+        redirect_to postings_path
+        return false
+      end
+
+      @tote_item = ToteItem.find_by(id: params[:tote_item_id])
+
+      #if tote_item_id does not belong to current user, redirect to postings page
+      if !@tote_item || @tote_item.user.id != current_user.id
+        redirect_to postings_path
+        return false
+      end
+
+      #if tote item's posting is not subscribable, redirect to postings page
+      if @tote_item.posting.posting_recurrence.nil? || !@tote_item.posting.posting_recurrence.subscribable?
+        redirect_to postings_path
+        return false
+      end
+
+      return true
+
+    end
+
     def correct_user
       
       subscription = Subscription.find_by(id: params[:id])
@@ -256,6 +333,23 @@ class SubscriptionsController < ApplicationController
       skip_dates.sort_by! { |hash| hash[:date]}
 
       return skip_dates
+
+    end
+
+    def frequency_is_legit?(tote_item, frequency)
+
+      frequency_is_legit = false
+
+      @posting_recurrence = tote_item.posting.posting_recurrence
+
+      subscription_options = @posting_recurrence.subscription_options
+      subscription_options.each do |subscription_option|
+        if subscription_option[:subscription_frequency] == frequency
+          frequency_is_legit = true
+        end
+      end
+
+      return frequency_is_legit
 
     end
 

@@ -26,7 +26,7 @@ Rails.application.routes.draw do
   get 'reference_transactions/do_bulk_purchase'
   
   post 'subscriptions/skip_dates'
-  resources :subscriptions, only: [:index, :show, :edit, :update]
+  resources :subscriptions, only: [:new, :create, :index, :show, :edit, :update]
   resources :producer_product_commissions
   resources :products
   resources :website_settings, only: [:edit, :update]

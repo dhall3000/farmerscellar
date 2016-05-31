@@ -7,6 +7,38 @@ class ToteItemsControllerTest < ActionController::TestCase
     @posting_apples = postings(:postingf1apples)
   end
 
+  test "should not create tote item for unlive posting" do
+    @posting_apples.update(live: false)
+    @posting_apples.reload
+    assert_not @posting_apples.live
+
+    log_in_as(@c1)
+
+    tote_items_count = @c1.tote_items.count
+    post :create, tote_item: {quantity: 1, posting_id: @posting_apples.id}
+    @c1.reload
+    assert_equal tote_items_count, @c1.tote_items.count
+    assert_response :redirect
+    assert_redirected_to postings_path
+
+    assert_not flash.empty?
+    assert_equal "Oops, please try adding that again", flash[:danger]    
+  end
+
+  test "should not get new for unlive posting" do
+    @posting_apples.update(live: false)
+    @posting_apples.reload
+    assert_not @posting_apples.live
+
+    log_in_as(@c1)
+    get :new, posting_id: @posting_apples.id
+    assert_response :redirect
+    assert_redirected_to postings_path
+
+    assert_not flash.empty?
+    assert_equal "Oops, please try adding that again", flash[:danger]    
+  end
+
   test "should auto assign dropsite if only one dropsite exists and user has not specified a dropsite" do    
     #verify only one dropsite exists
     dropsite = dropsites(:dropsite2)
@@ -117,29 +149,6 @@ class ToteItemsControllerTest < ActionController::TestCase
 
   end
     
-  test "should not create subscription if quantity not positive" do
-
-    log_in_as(@c1)    
-    subscription_frequency = 1
-    c1_tote_items = ToteItem.where(user_id: @c1.id)
-    ti_count = c1_tote_items.count
-    subscription_count = Subscription.where(user_id: @c1.id).count
-
-    post :create, tote_item:
-    {
-      subscription_frequency: subscription_frequency,
-      quantity: 0,
-      posting_id: postings(:p_recurrence_on)      
-    }
-
-    subscription = assigns(:subscription)
-    assert_not subscription.nil?
-    assert_not subscription.valid?
-    assert_template 'tote_items/new'
-    assert_equal "Subscription not saved. See errors below.", flash.now[:danger]
-
-  end
-
   test "should not create tote item when posting is not live" do
 
     @posting_apples.update(live: false)
@@ -147,7 +156,7 @@ class ToteItemsControllerTest < ActionController::TestCase
     log_in_as(@c1)
     post :create, tote_item: {quantity: 1, posting_id: @posting_apples}
 
-    assert_equal "Oops, it appears that posting is no longer live. Item not created.", flash[:danger]
+    assert_equal "Oops, please try adding that again", flash[:danger]
     assert_redirected_to postings_path
     
   end
@@ -164,7 +173,7 @@ class ToteItemsControllerTest < ActionController::TestCase
 
   end
 
-  test "should create subscription" do
+  test "should redirect to subscription new" do
 
     log_in_as(@c1)    
     subscription_frequency = 1
@@ -172,61 +181,34 @@ class ToteItemsControllerTest < ActionController::TestCase
     ti_count = c1_tote_items.count
     subscription_count = Subscription.where(user_id: @c1.id).count
 
-    post :create, tote_item:
-      {
-        subscription_frequency: subscription_frequency,
-        quantity: 2,
-        posting_id: postings(:p_recurrence_on)        
-      }
-
-    subscription = assigns(:subscription)
-    assert_not subscription.nil?
-    assert subscription.valid?
+    post :create, tote_item: {quantity: 2, posting_id: postings(:p_recurrence_on) }
 
     c1_tote_items = ToteItem.where(user_id: @c1.id)
     #verify there's exactly one additional tote item in the database after the post operation
     assert_equal ti_count + 1 , c1_tote_items.count
     new_ti = c1_tote_items.last
-    #verify new tote item refers to the proper subscription
-    assert_equal new_ti.subscription.id, subscription.id
     assert_equal ToteItem.states[:ADDED], new_ti.state
-    #verify this user has exactly one more subscription object since the post operation
-    assert_equal subscription_count + 1, Subscription.where(user_id: @c1.id).count
-    assert_equal true, subscription.on
-    assert_equal subscription_frequency, subscription.frequency
-
-    assert_equal "New subscription created.", flash[:success]
-    assert_redirected_to postings_path
+    
+    assert_response :redirect
+    assert_redirected_to new_subscription_path(tote_item_id: new_ti.id)
 
   end
-
-  test "should not create subscription when posting recurrence is off" do
+  
+  test "should not redirect to new subscription when posting recurrence is off" do
 
     log_in_as(@c1)    
     subscription_frequency = 1
     c1_tote_items = ToteItem.where(user_id: @c1.id)
     ti_count = c1_tote_items.count
-    subscription_count = Subscription.where(user_id: @c1.id).count
-
-    post :create, tote_item:
-      {
-        subscription_frequency: subscription_frequency,
-        quantity: 2,
-        posting_id: postings(:p_recurrence_off)        
-      }
-
-    subscription = assigns(:subscription)
-    assert subscription.nil?
+    posting = postings(:p_recurrence_off)
+    post :create, tote_item: {quantity: 2, posting_id: postings(:p_recurrence_off) }
     
     c1_tote_items = ToteItem.where(user_id: @c1.id)
     #verify there's exactly one additional tote item in the database after the post operation
-    assert_equal ti_count, c1_tote_items.count
+    assert_equal ti_count + 1, c1_tote_items.count
     new_ti = c1_tote_items.last
     
-    #verify this user has exactly one more subscription object since the post operation
-    assert_equal subscription_count, Subscription.where(user_id: @c1.id).count    
-
-    assert_equal flash[:danger] = "Oops, it appears that posting is no longer live. Subscription not created.", flash[:danger]
+    assert_equal flash[:success], "Item saved to shopping tote."
     assert_redirected_to postings_path
 
   end
