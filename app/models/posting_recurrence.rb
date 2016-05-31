@@ -48,9 +48,15 @@ class PostingRecurrence < ActiveRecord::Base
     return on == true
   end
 
-  def subscription_options
+  def subscription_description(subscription_frequency)
+    subscription_create_options    
+    return @descriptions[subscription_frequency]
+  end
+
+  def subscription_create_options
 
     options = [{subscription_frequency: 0, text: @@just_once, next_delivery_date: current_posting.delivery_date}]
+    @descriptions = [@@just_once]
 
     case frequency
     when 0 #just once posting frequency      
@@ -60,21 +66,25 @@ class PostingRecurrence < ActiveRecord::Base
       if can_add_tote_item?(subscription_frequency)
         options << {subscription_frequency: subscription_frequency, text: @@every_week, next_delivery_date: current_posting.delivery_date}
       end
+      @descriptions << @@every_week
 
       subscription_frequency = 2
       if can_add_tote_item?(subscription_frequency)
         options << {subscription_frequency: subscription_frequency, text: @@every_2_weeks, next_delivery_date: current_posting.delivery_date}
       end
+      @descriptions << @@every_2_weeks
 
       subscription_frequency = 3
       if can_add_tote_item?(subscription_frequency)
         options << {subscription_frequency: subscription_frequency, text: @@every_3_weeks, next_delivery_date: current_posting.delivery_date}
       end
+      @descriptions << @@every_3_weeks
 
       subscription_frequency = 4
       if can_add_tote_item?(subscription_frequency)
         options << {subscription_frequency: subscription_frequency, text: @@every_4_weeks, next_delivery_date: current_posting.delivery_date}
       end           
+      @descriptions << @@every_4_weeks
       
     when 2 #every 2 weeks posting frequency
 
@@ -82,21 +92,25 @@ class PostingRecurrence < ActiveRecord::Base
       if can_add_tote_item?(subscription_frequency)
         options << {subscription_frequency: subscription_frequency, text: @@every_2_weeks, next_delivery_date: current_posting.delivery_date}
       end
+      @descriptions << @@every_2_weeks
 
       subscription_frequency = 2
       if can_add_tote_item?(subscription_frequency)
         options << {subscription_frequency: subscription_frequency, text: @@every_4_weeks, next_delivery_date: current_posting.delivery_date}
       end
+      @descriptions << @@every_4_weeks
 
       subscription_frequency = 3
       if can_add_tote_item?(subscription_frequency)
         options << {subscription_frequency: subscription_frequency, text: @@every_6_weeks, next_delivery_date: current_posting.delivery_date}
       end
+      @descriptions << @@every_6_weeks
 
       subscription_frequency = 4
       if can_add_tote_item?(subscription_frequency)
         options << {subscription_frequency: subscription_frequency, text: @@every_8_weeks, next_delivery_date: current_posting.delivery_date}
       end
+      @descriptions << @@every_8_weeks
 
     when 3 #every 3 weeks posting frequency
 
@@ -104,11 +118,13 @@ class PostingRecurrence < ActiveRecord::Base
       if can_add_tote_item?(subscription_frequency)
         options << {subscription_frequency: subscription_frequency, text: @@every_3_weeks, next_delivery_date: current_posting.delivery_date}
       end
+      @descriptions << @@every_3_weeks
 
       subscription_frequency = 2
       if can_add_tote_item?(subscription_frequency)
         options << {subscription_frequency: subscription_frequency, text: @@every_6_weeks, next_delivery_date: current_posting.delivery_date}
       end      
+      @descriptions << @@every_6_weeks
       
     when 4 #every 4 weeks posting frequency
 
@@ -116,11 +132,13 @@ class PostingRecurrence < ActiveRecord::Base
       if can_add_tote_item?(subscription_frequency)
         options << {subscription_frequency: subscription_frequency, text: @@every_4_weeks, next_delivery_date: current_posting.delivery_date}
       end
+      @descriptions << @@every_4_weeks
 
       subscription_frequency = 2
       if can_add_tote_item?(subscription_frequency)
         options << {subscription_frequency: subscription_frequency, text: @@every_8_weeks, next_delivery_date: current_posting.delivery_date}
       end      
+      @descriptions << @@every_8_weeks
       
     when 5 #monthly posting frequency
 
@@ -128,30 +146,38 @@ class PostingRecurrence < ActiveRecord::Base
       if can_add_tote_item?(subscription_frequency)
         options << {subscription_frequency: subscription_frequency, text: get_text_for(current_posting.delivery_date, 5, 1), next_delivery_date: current_posting.delivery_date}
       end
+      @descriptions << get_text_for(current_posting.delivery_date, 5, 1)
 
       subscription_frequency = 2
       if can_add_tote_item?(subscription_frequency)
         options << {subscription_frequency: subscription_frequency, text: get_text_for(current_posting.delivery_date, 5, 2), next_delivery_date: current_posting.delivery_date}
       end      
-      
+      @descriptions << get_text_for(current_posting.delivery_date, 5, 2)
+
     when 6 #3 weeks on, 1 week off posting frequency
 
       subscription_frequency = 1
+      text = "3 weeks on, 1 week off"
       if can_add_tote_item?(subscription_frequency)
-        options << {subscription_frequency: subscription_frequency, text: "3 weeks on, 1 week off", next_delivery_date: current_posting.delivery_date}
+        options << {subscription_frequency: subscription_frequency, text: text, next_delivery_date: current_posting.delivery_date}
       end
+      @descriptions << text
 
       #this gets tested by the following:
       #test "should neither show frequency 2 as option nor allow subscription creation with frequency 2 during martys week number 2" do
       subscription_frequency = 2
+      text = "Every other week"
       if can_add_tote_item?(subscription_frequency)
-        options << {subscription_frequency: subscription_frequency, text: "Every other week", next_delivery_date: current_posting.delivery_date}
+        options << {subscription_frequency: subscription_frequency, text: text, next_delivery_date: current_posting.delivery_date}
       end
+      @descriptions << text
 
       subscription_frequency = 3
+      text = "Every 4 weeks"
       if can_add_tote_item?(subscription_frequency)
-        options << {subscription_frequency: subscription_frequency, text: "Every 4 weeks", next_delivery_date: current_posting.delivery_date}
+        options << {subscription_frequency: subscription_frequency, text: text, next_delivery_date: current_posting.delivery_date}
       end            
+      @descriptions << text
 
     end    
 
@@ -185,11 +211,6 @@ class PostingRecurrence < ActiveRecord::Base
 
     return "The #{week_number} #{date.strftime("%A")} of every#{other} month"
 
-  end
-
-  def subscription_description(subscription_frequency)
-    options = subscription_options
-    return options[subscription_frequency][:text]
   end
 
   def recur

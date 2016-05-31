@@ -8,7 +8,7 @@ class SubscriptionsController < ApplicationController
       return
     end
 
-    @subscription_options = @tote_item.posting.posting_recurrence.subscription_options
+    @subscription_create_options = @tote_item.posting.posting_recurrence.subscription_create_options
     
   end
 
@@ -336,15 +336,17 @@ class SubscriptionsController < ApplicationController
 
     end
 
+    #find the posting recurrence associted with the given tote item and determine if the frequency parameter
+    #is actually an option for that posting recurrence
     def frequency_is_legit?(tote_item, frequency)
 
       frequency_is_legit = false
 
       @posting_recurrence = tote_item.posting.posting_recurrence
 
-      subscription_options = @posting_recurrence.subscription_options
-      subscription_options.each do |subscription_option|
-        if subscription_option[:subscription_frequency] == frequency
+      subscription_create_options = @posting_recurrence.subscription_create_options
+      subscription_create_options.each do |subscription_create_option|
+        if subscription_create_option[:subscription_frequency] == frequency
           frequency_is_legit = true
         end
       end

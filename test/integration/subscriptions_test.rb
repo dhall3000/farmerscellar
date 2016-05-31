@@ -49,24 +49,52 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     assert_equal posting_recurrence_count + 1, PostingRecurrence.joins(postings: :user).where("users.id = ?", @farmer.id).count
     assert_equal 1, posting_recurrence.postings.count
 
+    #wind the clock to just prior to the commitment zone
+    travel_to posting.commitment_zone_start - 1.hour
+    #verify the shopping pages can be loaded
+    c1 = users(:c1)
+    log_in_as(c1)
+    get postings_path
+    #verify the shopping tote can be loaded
+    get tote_items_path
+
+    #now have c2 add a bi-weekly subscription
+    c2 = users(:c2)
+    c2_subscription_count = c2.subscriptions.count
+    c2_tote_items_count = c2.tote_items.count
+    
+    add_subscription(c2, posting, quantity = 1, frequency = 2)    
+    
+    c2.reload
+    assert_equal c2_tote_items_count + 1, c2.tote_items.count
+    assert_equal c2_subscription_count + 1, c2.subscriptions.count
+
     #wind clock forward into first posting's cz. this will put us smack in the middle of "week #2", which is a no-no for
     #subscription frequency #2 (i.e. every other week)
     travel_to posting.commitment_zone_start
     RakeHelper.do_hourly_tasks
     travel 1.hour
+
+    #the whole purpose of c2 is to verify that he can see the description for his subscription even during week 2. so this test is multi-purpose:
+    #to verify that c1 cannot ADD a subscription during week 2 but also to ensure that users with existing bi-weekly sx can still see a description
+    #verify c2 can load shopping pages and tote
+    get postings_path    
+    get tote_items_path
+    tote_items = assigns(:tote_items)
+    assert_match "This is a subscription for 1 Pound of F1 FARM Fuji Apples delivered every other week for a subtotal of $2.00 each delivery", response.body
+
     #have user create a new tote item
     posting_recurrence.reload
-    c1 = users(:c1)
-    subscriptions_count = c1.subscriptions.count
-    log_in_as(c1)
+    log_in_as(c1)    
+    subscriptions_count = c1.subscriptions.count    
     post tote_items_path, tote_item: {quantity: 1, posting_id: posting_recurrence.postings.last.id}
     tote_item = assigns(:tote_item)
     assert_redirected_to new_subscription_path(tote_item_id: tote_item.id)
     follow_redirect!
     #verify every-other-week option is not available
-    subscription_options = assigns(:subscription_options)
-    subscription_options.each do |subscription_option|
-      assert_not_equal 2, subscription_option[:subscription_frequency]
+    subscription_create_options = assigns(:subscription_create_options)
+    subscription_create_options.each do |subscription_create_option|
+      assert_not_equal 2, subscription_create_option[:subscription_frequency]
     end
     #despite every-other-week option not being available, attempt to create every-other-week frequency subscription
     post subscriptions_path, tote_item_id: tote_item.id, frequency: 2

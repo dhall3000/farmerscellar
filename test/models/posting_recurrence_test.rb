@@ -64,7 +64,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
   end
 
   test "should have legit subscription options" do
-    options = @posting_recurrence.subscription_options
+    options = @posting_recurrence.subscription_create_options
 
     assert_not options.nil?
     assert_equal "Just once", options[0][:text]
