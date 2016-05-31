@@ -200,16 +200,16 @@ class PostingRecurrence < ActiveRecord::Base
     if week_number < 4
       week_number = week_number.ordinalize
     else
-      week_number = "last"
+      week_number = "Last"
     end
 
     other = ""
 
     if subscription_frequency == 2      
-      other = " other"
+      other = " 2nd"
     end
 
-    return "The #{week_number} #{date.strftime("%A")} of every#{other} month"
+    return "#{week_number} #{date.strftime("%A")} every#{other} month"
 
   end
 

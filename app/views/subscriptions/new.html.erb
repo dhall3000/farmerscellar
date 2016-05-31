@@ -1,2 +1,19 @@
-<h1>Subscriptions#new</h1>
-<p>Find me in app/views/subscriptions/new.html.erb</p>
+<h1>How Often?</h1>
+
+<% if @subscription_create_options && @subscription_create_options.any? %>
+	<% @subscription_create_options.each do |subscription_create_option| %>
+		<div class="row">
+			<div class="col-sm-offset-4 col-sm-4">
+
+				<div class="fat-finger-spacing">
+					<%= form_tag subscriptions_path do %>
+						<%= hidden_field_tag :frequency, subscription_create_option[:subscription_frequency] %>
+						<%= hidden_field_tag :tote_item_id, @tote_item.id %>
+						<%= submit_tag subscription_create_option[:text], class: "btn btn-primary btn-lg" %>
+					<% end %>
+				</div>			
+
+			</div>
+		</div>
+	<% end %>
+<% end %>
