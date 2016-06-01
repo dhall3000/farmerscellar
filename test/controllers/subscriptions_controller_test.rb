@@ -248,31 +248,49 @@ class SubscriptionsControllerTest < ActionController::TestCase
     skip_dates = assigns(:skip_dates)
     assert skip_dates.count > 0
   end
-  
-  #have no sx
-  #have one sx
-  #have many sx
-  #have no sd
-  #have 1 sd
-  #have many sd
-  #remove 1 sd
-  #remove all sd
-  #test security
 
+  test "edit should only show subscription delivery dates and not posting recurrence delivery dates" do
 
-  test "should get show" do
-#    get :show
-#    assert_response :success
-  end
+    c_subscription_1 = users(:c_subscription_1)
+    subscription = subscriptions(:two)
+    log_in_as(c_subscription_1)
+    get :edit, id: subscription.id, end_date: subscription.posting_recurrence.postings.first.delivery_date + 20.weeks
+    skip_dates = assigns(:skip_dates)
+    pr = subscription.posting_recurrence
 
-  test "should get edit" do
-#    get :edit
-#    assert_response :success
-  end
+    #there should be a 2 week gap between pr's first posting and the first skip date
 
-  test "should get update" do
-#    get :update
-#    assert_response :success
+    seconds_per_hour = 60 * 60
+    num_seconds_per_week = 7 * 24 * seconds_per_hour
+
+    pr_first_delivery_date = pr.postings.first.delivery_date
+    first_subscription_skip_date = skip_dates[0][:date]
+
+    gap = first_subscription_skip_date - pr_first_delivery_date
+    spacing_should_be = 2 * num_seconds_per_week
+
+    if pr_first_delivery_date.dst? != first_subscription_skip_date.dst?
+      spacing_should_be += seconds_per_hour
+    end
+
+    assert_equal spacing_should_be, gap
+
+    #there should be 2 week gaps between all skip_dates
+    count = 1
+    while count < skip_dates.count
+
+      gap = skip_dates[count][:date] - skip_dates[count - 1][:date]
+      spacing_should_be = 2 * num_seconds_per_week
+
+      if skip_dates[count][:date].dst? != skip_dates[count - 1][:date].dst?
+        spacing_should_be += seconds_per_hour
+      end            
+      
+      assert_equal spacing_should_be, gap
+      count += 1
+      
+    end
+
   end
 
 end

@@ -6,3 +6,11 @@ one:
   posting_recurrence: one
   quantity: 2
   paused: false
+
+two:
+  frequency: 2
+  'on': true
+  user: c_subscription_1
+  posting_recurrence: one
+  quantity: 2
+  paused: false

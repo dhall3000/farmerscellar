@@ -416,6 +416,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
 
       puts Time.zone.now.strftime("%A, %B %d, %H")
       puts "Number of tote items: #{user.tote_items.count.to_s}"
+
       top_of_hour = Time.zone.now.min == 0
 
       if top_of_hour
@@ -424,9 +425,16 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
 
       posting_recurrence.reload
 
-      if posting_recurrence.postings.count >= 2 && user.tote_items.count == num_tote_items_start
-        add_subscription(user, posting_recurrence.postings.last, quantity, subscription_frequency)      
-      end      
+      if posting_frequency == 6 && subscription_frequency == 2
+        #scabbed this garbage in because 6/2 can't add sx on week number 2 of marty's cycle so have to wiat until the next posting comes out
+        if posting_recurrence.postings.count >= 3 && user.tote_items.count == num_tote_items_start
+          add_subscription(user, posting_recurrence.postings.last, quantity, subscription_frequency)      
+        end      
+      else
+        if posting_recurrence.postings.count >= 2 && user.tote_items.count == num_tote_items_start
+          add_subscription(user, posting_recurrence.postings.last, quantity, subscription_frequency)      
+        end                
+      end
 
       #if you draw out a postings series you'll see that the last inthe series is always open because the moment time enters the 
       #commitment zone of the last we generate the next posting, which becomes the 'last', which is OPEN
@@ -648,7 +656,12 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     post subscriptions_path, tote_item_id: tote_item.id, frequency: frequency
 
     subscription = assigns(:subscription)
-    assert_not subscription.nil?
+
+    if frequency == 2 && posting.posting_recurrence.frequency == 6 && !posting.posting_recurrence.can_add_tote_item?(frequency)
+      assert subscription.nil?
+    else
+      assert_not subscription.nil?
+    end    
 
     get tote_items_path
     assert :success

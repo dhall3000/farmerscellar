@@ -306,6 +306,7 @@ class SubscriptionsController < ApplicationController
     end
 
     def get_skip_dates_through(subscription_ids, end_date)
+      
       subscriptions = Subscription.where(id: subscription_ids)
       skip_dates = []
 
@@ -313,17 +314,21 @@ class SubscriptionsController < ApplicationController
 
         posting_recurrence = subscription.posting_recurrence
         #for each subscription get the next 10 delivery dates (exclude the delivery date of the current posting)
-        delivery_dates = posting_recurrence.get_delivery_dates_for(posting_recurrence.current_posting.delivery_date, end_date)
+        posting_recurrence_delivery_dates = posting_recurrence.get_delivery_dates_for(posting_recurrence.current_posting.delivery_date, end_date)
         #see if any of the delivery dates exist in the skip dates table
-        delivery_dates.each do |delivery_date|
+        posting_recurrence_delivery_dates.each do |posting_recurrence_delivery_date|
 
-          if SubscriptionSkipDate.find_by(subscription_id: subscription.id, skip_date: delivery_date)
+          if !subscription.is_future_delivery_date?(posting_recurrence_delivery_date)
+            next
+          end
+
+          if SubscriptionSkipDate.find_by(subscription_id: subscription.id, skip_date: posting_recurrence_delivery_date)
             skip = true
           else
             skip = false
           end        
 
-          skip_date = {subscription: subscription, date: delivery_date, skip: skip}
+          skip_date = {subscription: subscription, date: posting_recurrence_delivery_date, skip: skip}
           skip_dates << skip_date
 
         end      

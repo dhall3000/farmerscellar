@@ -72,6 +72,24 @@ class Subscription < ActiveRecord::Base
 
   end
 
+  def is_future_delivery_date?(date)
+
+    delivery_dates = get_delivery_dates(date - 1.day, date + 1.day)
+
+    if delivery_dates.nil?
+      return false
+    end
+
+    if !delivery_dates.any?
+      return false
+    end
+
+    delivery_date = delivery_dates[0]
+
+    return delivery_date == date
+
+  end
+
   #this should return all dates regardless of skip dates
   #exclude start_date
   #include end_date
@@ -107,64 +125,66 @@ class Subscription < ActiveRecord::Base
 
   end
 
-  def get_next_delivery_date(prev_delivery_date)
+  private
 
-    if posting_recurrence.frequency < 5 #weekly-based subscriptions
-      next_delivery_date = posting_recurrence.get_delivery_dates_for(prev_delivery_date, prev_delivery_date + (frequency * posting_recurrence.frequency).weeks)[frequency - 1]
-    elsif posting_recurrence.frequency == 5 #monthly-based subscriptions
-      next_delivery_date = posting_recurrence.get_delivery_dates_for(prev_delivery_date, prev_delivery_date + (2 * frequency).months)[frequency - 1]
-    elsif posting_recurrence.frequency == 6 #this is Marty/Helen the Hen's "3 weeks on, 1 week off" schedule
-      case self.frequency
-        when 1 #every delivery
-          next_delivery_date = posting_recurrence.get_delivery_dates_for(prev_delivery_date, prev_delivery_date + 3.weeks)[0]
-        when 2 #every other week
-          next_delivery_date = prev_delivery_date + 2.weeks
-        when 3 #every 4 weeks
-          next_delivery_date = prev_delivery_date + 4.weeks
-        end
+    def get_next_delivery_date(prev_delivery_date)
+
+      if posting_recurrence.frequency < 5 #weekly-based subscriptions
+        next_delivery_date = posting_recurrence.get_delivery_dates_for(prev_delivery_date, prev_delivery_date + (frequency * posting_recurrence.frequency).weeks)[frequency - 1]
+      elsif posting_recurrence.frequency == 5 #monthly-based subscriptions
+        next_delivery_date = posting_recurrence.get_delivery_dates_for(prev_delivery_date, prev_delivery_date + (2 * frequency).months)[frequency - 1]
+      elsif posting_recurrence.frequency == 6 #this is Marty/Helen the Hen's "3 weeks on, 1 week off" schedule
+        case self.frequency
+          when 1 #every delivery
+            next_delivery_date = posting_recurrence.get_delivery_dates_for(prev_delivery_date, prev_delivery_date + 3.weeks)[0]
+          when 2 #every other week
+            next_delivery_date = prev_delivery_date + 2.weeks
+          when 3 #every 4 weeks
+            next_delivery_date = prev_delivery_date + 4.weeks
+          end
+      end
+
+      return next_delivery_date
+
     end
 
-    return next_delivery_date
+    def generate_tote_item_for_current_posting?
 
-  end
-
-  def generate_tote_item_for_current_posting?
-
-    #is subscription or posting recurrence off?
-    if !on || !posting_recurrence.on
-      return false
-    end
-
-    #subscription paused?
-    if paused
-      return false
-    end
-
-    delivery_date = posting_recurrence.current_posting.delivery_date
-    delivery_dates = get_delivery_dates(delivery_date - 1.day, delivery_date + 1.day)
-
-    #is this a normally deliverable date 
-    if !delivery_dates.any?
-      return false
-    end
-
-    delivery_date = delivery_dates[0]
-
-    #do we already have a tote item for this delivery date?
-    if tote_items && tote_items.any?
-      last_live_tote_item = tote_items.where.not(state: ToteItem.states[:REMOVED]).joins(:posting).order("postings.delivery_date").last
-      if last_live_tote_item && last_live_tote_item.posting.delivery_date == delivery_date
+      #is subscription or posting recurrence off?
+      if !on || !posting_recurrence.on
         return false
       end
+
+      #subscription paused?
+      if paused
+        return false
+      end
+
+      delivery_date = posting_recurrence.current_posting.delivery_date
+      delivery_dates = get_delivery_dates(delivery_date - 1.day, delivery_date + 1.day)
+
+      #is this a normally deliverable date 
+      if !delivery_dates.any?
+        return false
+      end
+
+      delivery_date = delivery_dates[0]
+
+      #do we already have a tote item for this delivery date?
+      if tote_items && tote_items.any?
+        last_live_tote_item = tote_items.where.not(state: ToteItem.states[:REMOVED]).joins(:posting).order("postings.delivery_date").last
+        if last_live_tote_item && last_live_tote_item.posting.delivery_date == delivery_date
+          return false
+        end
+      end
+
+      #did user specify to skip this delivery?
+      if subscription_skip_dates.find_by(skip_date: delivery_date)
+        return false
+      end
+
+      return true
+
     end
-
-    #did user specify to skip this delivery?
-    if subscription_skip_dates.find_by(skip_date: delivery_date)
-      return false
-    end
-
-    return true
-
-  end
 
 end
