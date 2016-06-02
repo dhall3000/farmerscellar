@@ -11,6 +11,45 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     @posting = postings(:postingf1apples)
   end  
 
+  test "skip dates should be spaced 2 weeks apart for a 6 and 2 subscription" do
+
+    user = users(:c1)
+    pr = posting_recurrences(:three)
+
+    travel_to pr.postings.first.commitment_zone_start - 24.hours
+    time_of_this_writing = Time.zone.local(2016, 6, 1, 12, 0)
+
+    while Time.zone.now < (time_of_this_writing - 1.day)
+      RakeHelper.do_hourly_tasks
+      travel 24.hours
+    end
+
+    log_in_as(user)
+    add_subscription(user, pr.postings.last, quantity = 1, frequency = 2)
+    user.reload
+    subscription = user.subscriptions.last
+    
+    get edit_subscription_path(id: subscription.id, end_date: pr.postings.first.delivery_date + 20.weeks)
+    skip_dates = assigns(:skip_dates)
+
+    #should be 2 week gap between first tote item and first skip date
+    ti_dd = subscription.tote_items.last.delivery_date
+    sd = skip_dates[0][:date]
+    gap = sd - ti_dd
+    assert_equal 2.weeks, gap
+
+    #should be 2 week gap between all the skip dates    
+    count = 1
+    while count < skip_dates.count
+      gap = skip_dates[count][:date] - skip_dates[count - 1][:date]
+      assert_equal 2.weeks, gap
+      count += 1
+    end
+
+    travel_back
+
+  end
+
   #i'm wanting to make a general test framework where i can crank out the implementations for 
   #posting recurrence and subscription frequency permutations
   #puts Time.zone.now.strftime("%A, %B %d, %H")
@@ -482,15 +521,27 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     postings = posting_recurrence.postings
     assert postings.count > 1, "there aren't enough postings in this recurrence to test the spacing"
 
-    num_seconds_per_week = 7 * 24 * 60 * 60    
+    seconds_per_hour = 60 * 60
+    num_seconds_per_week = 7 * 24 * seconds_per_hour
 
     if posting_recurrence.frequency <= 4      
 
-      i = 1
-      while i < postings.count
-        spacing = postings[i].delivery_date - postings[i - 1].delivery_date
+      count = 1
+      while count < postings.count
+
+        spacing = postings[count].delivery_date - postings[count - 1].delivery_date
+
+        if !postings[count].delivery_date.dst? && postings[count - 1].delivery_date.dst?
+          spacing -= seconds_per_hour
+        end
+
+        if postings[count].delivery_date.dst? && !postings[count - 1].delivery_date.dst?
+          spacing += seconds_per_hour
+        end        
+
         assert_equal num_seconds_per_week * posting_recurrence.frequency, spacing
-        i += 1
+        count += 1
+
       end
 
     elsif posting_recurrence.frequency == 5
@@ -517,7 +568,8 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
 
   def do_tote_item_spacing(posting_recurrence)
 
-    num_seconds_per_week = 7 * 24 * 60 * 60
+    seconds_per_hour = 60 * 60
+    num_seconds_per_week = 7 * 24 * seconds_per_hour
     postings = posting_recurrence.postings
     subscription = posting_recurrence.subscriptions.last
     tote_items = subscription.tote_items
@@ -527,11 +579,22 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
 
     if posting_recurrence.frequency <= 4
 
-      i = 1
-      while i < tote_items.count
-        spacing = tote_items[i].posting.delivery_date - tote_items[i - 1].posting.delivery_date
-        assert_equal num_seconds_per_week * posting_recurrence.frequency * subscription.frequency, spacing
-        i += 1
+      count = 1
+      while count < tote_items.count
+
+        actual_spacing = tote_items[count].posting.delivery_date - tote_items[count - 1].posting.delivery_date
+        expected_spacing = num_seconds_per_week * posting_recurrence.frequency * subscription.frequency
+
+        if !tote_items[count].posting.delivery_date.dst? && tote_items[count - 1].posting.delivery_date.dst?
+          expected_spacing += seconds_per_hour
+        end
+
+        if tote_items[count].posting.delivery_date.dst? && !tote_items[count - 1].posting.delivery_date.dst?
+          expected_spacing -= seconds_per_hour
+        end
+
+        assert_equal expected_spacing, actual_spacing
+        count += 1
       end
 
     elsif posting_recurrence.frequency == 5

@@ -75,6 +75,20 @@ p_recurrence_on:
   posting_recurrence: one
   late_adds_allowed: true
 
+p_recurrence_three:
+  delivery_date: <%= Time.zone.local(2016, 4, 26, 0, 0) %>
+  commitment_zone_start: <%= Time.zone.local(2016, 4, 26, 0, 0) - 15.hours %>
+  product: beef
+  quantity_available: 1000
+  price: 5.21
+  user: f2
+  unit_category: weight
+  unit_kind: pound
+  description: beef description
+  live: true  
+  posting_recurrence: three
+  late_adds_allowed: true
+
 #--------------------------------------------------------------
 p5:
   delivery_date: <%= delivery_date %>

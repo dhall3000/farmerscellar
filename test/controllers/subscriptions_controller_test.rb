@@ -282,9 +282,13 @@ class SubscriptionsControllerTest < ActionController::TestCase
       gap = skip_dates[count][:date] - skip_dates[count - 1][:date]
       spacing_should_be = 2 * num_seconds_per_week
 
-      if skip_dates[count][:date].dst? != skip_dates[count - 1][:date].dst?
+      if !skip_dates[count][:date].dst? && skip_dates[count - 1][:date].dst?
         spacing_should_be += seconds_per_hour
-      end            
+      end
+
+      if skip_dates[count][:date].dst? && !skip_dates[count - 1][:date].dst?
+        spacing_should_be -= seconds_per_hour
+      end        
       
       assert_equal spacing_should_be, gap
       count += 1

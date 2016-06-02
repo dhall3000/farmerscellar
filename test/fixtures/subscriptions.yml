@@ -14,3 +14,11 @@ two:
   posting_recurrence: one
   quantity: 2
   paused: false
+
+three:
+  frequency: 2
+  'on': true
+  user: c_subscription_2
+  posting_recurrence: three
+  quantity: 2
+  paused: false
