@@ -8,6 +8,7 @@ class RakeTasksTest < BulkBuyer
     super
     ActionMailer::Base.deliveries.clear    
     @posting_apples = postings(:postingf1apples)
+    @posting_asparagus = postings(:postingf1asparagus)
     @posting_milk = postings(:postingf2milk)
     @p1 = postings(:p1)
     @p2 = postings(:p2)
@@ -16,6 +17,22 @@ class RakeTasksTest < BulkBuyer
     @c5 = users(:c5)
     @c6 = users(:c6)
     @c7 = users(:c7)
+  end
+
+  test "producer should not get order email if no product ordered from him" do
+
+    assert_equal 0, ToteItem.where(state: ToteItem.states[:FILLED]).count, "This test requires there be no FILLED tote items as a pre-condition."    
+
+    ActionMailer::Base.deliveries.clear
+    assert_equal 0, ActionMailer::Base.deliveries.count
+
+    travel_to @posting_apples.commitment_zone_start
+    RakeHelper.do_hourly_tasks    
+    assert_equal 0, ActionMailer::Base.deliveries.count
+    ActionMailer::Base.deliveries.clear
+
+    travel_back
+
   end
 
   test "nightly tasks should not change state or send emails" do
