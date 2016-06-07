@@ -97,34 +97,6 @@ class RakeHelper
 
 		end
 
-		def self.transition_commitment_zone_postings
-
-			puts "transition_commitment_zone_postings: start"
-
-			postings = Posting.where(state: Posting.states[:COMMITMENTZONE])
-
-			if postings.any?
-				puts "transition_commitment_zone_postings: #{postings.count.to_s} posting(s) to close"
-			else
-				puts "transition_commitment_zone_postings: no postings to close"
-			end
-
-			transitioned_postings = []
-
-			postings.each do |posting|
-				if Time.zone.now >= (posting.delivery_date + 12.hours)
-					puts "transition_commitment_zone_postings: transitioning posting id #{posting.id.to_s} to CLOSED state"
-					posting.transition(:past_delivery_date)
-					transitioned_postings << posting.id
-				end
-			end
-
-			puts "transition_commitment_zone_postings: end"
-
-			return transitioned_postings.uniq
-
-		end
-
 		def self.transition_tote_items_to_committed(transitioned_postings)
 
 			puts "transition_tote_items_to_committed: start"
