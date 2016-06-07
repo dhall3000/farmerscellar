@@ -4,9 +4,10 @@ class PostingTest < ActiveSupport::TestCase
 
   def setup
     user = users(:c1)
-    product = products(:apples)
-    unit_kind = unit_kinds(:pound)
-    unit_category = unit_categories(:weight)
+    @farmer = users(:f1)
+    @product = products(:apples)
+    @unit_kind = unit_kinds(:pound)
+    @unit_category = unit_categories(:weight)
 
     delivery_date = Time.zone.today + 3.days
 
@@ -14,7 +15,7 @@ class PostingTest < ActiveSupport::TestCase
       delivery_date = Time.zone.today + 4.days
     end
 
-    @posting = Posting.new(unit_category: unit_category, unit_kind: unit_kind, product: product, user: user, description: "descrip", quantity_available: 100, price: 1.25, live: true, commitment_zone_start: delivery_date - 2.days, delivery_date: delivery_date)
+    @posting = Posting.new(unit_category: @unit_category, unit_kind: @unit_kind, product: @product, user: user, description: "descrip", quantity_available: 100, price: 1.25, live: true, commitment_zone_start: delivery_date - 2.days, delivery_date: delivery_date)
     @posting.save
   end
 
@@ -104,6 +105,87 @@ class PostingTest < ActiveSupport::TestCase
       @posting.delivery_date += 1.day
     end
     assert_not @posting.valid?, get_error_messages(@posting)
+  end
+
+  test "posting should not be created with past delivery date" do
+    
+    delivery_date = Time.zone.tomorrow.midnight
+    if delivery_date.sunday?
+      delivery_date += 3.days
+    end
+
+    posting = Posting.new(
+      delivery_date: delivery_date,
+      commitment_zone_start: delivery_date - 1.day,
+      product: @product,
+      quantity_available: 100,
+      price: 10,
+      user: @farmer,
+      unit_category: @unit_category,
+      unit_kind: @unit_kind,
+      description: "crisp, crunchy organic apples. you'll love them.",
+      live: true,
+      late_adds_allowed: false
+      )
+
+    #as the object is now it could be created
+    assert posting.valid?
+
+    #but now let's make and assign an invalid delivery date...a date in the past
+
+    new_delivery_date = Time.zone.now.midnight - 1.day
+    if new_delivery_date.sunday?
+      new_delivery_date -= 1.days
+    end
+
+    posting.delivery_date = new_delivery_date
+
+    #now this save should not work because the delivery date is in the past
+    assert_not posting.save
+    assert_not posting.id    
+
+  end
+
+  test "posting should be updatable with past delivery date" do
+
+    delivery_date = Time.zone.tomorrow.midnight
+    if delivery_date.sunday?
+      delivery_date += 3.days
+    end
+
+    posting = Posting.new(
+      delivery_date: delivery_date,
+      commitment_zone_start: delivery_date - 1.day,
+      product: @product,
+      quantity_available: 100,
+      price: 10,
+      user: @farmer,
+      unit_category: @unit_category,
+      unit_kind: @unit_kind,
+      description: "crisp, crunchy organic apples. you'll love them.",
+      live: true,
+      late_adds_allowed: false
+      )
+
+    #as the object is now it could be created
+    assert posting.valid?
+    assert posting.save
+    assert posting.id > 0
+
+    #now let's travel to the future, such that the delivery date will be in the past
+    travel_to posting.delivery_date + 3.days
+
+    #now let's update a value
+    assert posting.update(state: 0)
+    posting.reload
+    assert_equal 0, posting.state
+
+    assert posting.update(state: 1)
+    posting.reload
+    assert_equal 1, posting.state
+
+    travel_back
+
   end
 
   test "posting should have user" do

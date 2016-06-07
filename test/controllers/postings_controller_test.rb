@@ -33,6 +33,40 @@ class PostingsControllerTest < ActionController::TestCase
 
   end
 
+  test "should display non closed postings for admin well after delivery day" do
+
+    #assert this posting is OPEN
+    assert_equal Posting.states[:OPEN], @posting.state
+
+    @posting.tote_items.update_all(state: 2)
+    travel_to @posting.delivery_date + 3.days
+
+    #transitions the posting from OPEN to COMMITMENTZONE
+    #this one is a bit artificial. this will happen automatically right at CZS
+    #it should work the same here though
+    RakeHelper.do_hourly_tasks
+    @posting.reload
+    assert_equal Posting.states[:COMMITMENTZONE], @posting.state
+
+    #in the old manner this next call would have transitioned the posting to CLOSED because it was automatically, unconditionally, arbitrarily
+    #transitioning to CLOSED at noon on delivery day
+    #we're now no longer doing that
+    RakeHelper.do_hourly_tasks
+    @posting.reload
+    assert_equal Posting.states[:COMMITMENTZONE], @posting.state
+
+    admin = users(:a1)
+    log_in_as(admin)
+    get :index
+    postings = assigns(:postings)
+
+    #even though we're well past delivery day admin should still see the posting cause it wasn't closed
+    assert_equal 1, postings.where(id: @posting.id).count
+    
+    travel_back
+
+  end
+
 #NEW TESTS
 
   test "should fill all tote items in this posting" do
@@ -92,6 +126,11 @@ class PostingsControllerTest < ActionController::TestCase
     end
     
     assert_equal 0, PurchaseReceivable.count
+    assert_equal Posting.states[:OPEN], posting.state
+    travel_to posting.commitment_zone_start + 1
+    RakeHelper.do_hourly_tasks
+    posting.reload
+    assert_equal Posting.states[:COMMITMENTZONE], posting.state
 
     travel_to posting.delivery_date + 1
 
@@ -148,6 +187,9 @@ class PostingsControllerTest < ActionController::TestCase
     end            
 
     travel_back
+
+    posting.reload
+    assert_equal Posting.states[:CLOSED], posting.state    
 
   end
 

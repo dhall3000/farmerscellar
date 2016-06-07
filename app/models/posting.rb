@@ -17,9 +17,17 @@ class Posting < ActiveRecord::Base
   #the weird syntax below is due to some serious gotchas having to do with how booleans are stores or something? I have no idea. See here:
   #http://stackoverflow.com/questions/10506575/rails-database-defaults-and-model-validation-for-boolean-fields
   validates :live, inclusion: { in: [true, false] }
-  validate :delivery_date_not_sunday, :delivery_date_must_be_after_today, :commitment_zone_start_must_be_before_delivery_date
+  validate :delivery_date_not_sunday, :commitment_zone_start_must_be_before_delivery_date
+  before_create :delivery_date_must_be_after_today
+
   validates_presence_of :user, :product, :unit_kind, :unit_category
 
+  #OPEN means open for customers to place orders. but that's somewhat confusing because if late_adds_allowed then customer can place order even in the COMMITMENTZONE
+  #so really all OPEN means right now is the period of time before commitment_zone_start. the meaning isn't even yet comingled/intermingled iwth the concept of 'live'.
+  #yuck. it is what it is. we'll clean it up eventually
+  #COMMITMENTZONE is the period of time between commitment_zone_start and when product is CLOSED
+  #CLOSED is either when the posting is canceled or filled. we don't even have 'canceled' built in. eventually we'll put a control for the admin (or producer, i guess) to
+  #cancel the posting. if/when you want to 'cancel' a posting we'll probably need to implement it. it will depend on if there are outstanding orders or not.
   def self.states
     {OPEN: 0, COMMITMENTZONE: 1, CLOSED: 2}
   end
@@ -38,6 +46,7 @@ class Posting < ActiveRecord::Base
     when Posting.states[:OPEN]
       case input
       when :commitment_zone_started
+
         if Time.zone.now >= commitment_zone_start
           new_state = Posting.states[:COMMITMENTZONE]
 
@@ -77,9 +86,10 @@ class Posting < ActiveRecord::Base
         if Time.zone.now >= delivery_date + 12.hours
           new_state = Posting.states[:CLOSED]
         end
-
+      when :filled
+        new_state = Posting.states[:CLOSED]        
       end
-      
+
 
     when Posting.states[:CLOSED]
 
@@ -123,6 +133,8 @@ class Posting < ActiveRecord::Base
       first_committed_tote_item = get_first_committed_tote_item
 
     end
+
+    transition(:filled)
 
     return {
       quantity_filled: quantity_filled,
@@ -193,9 +205,14 @@ class Posting < ActiveRecord::Base
     end
 
     def delivery_date_must_be_after_today      
+
       if delivery_date.nil? || delivery_date <= Time.zone.today
         errors.add(:delivery_date, "Delivery date must be after today")
+        return false
       end
+
+      return true
+
     end
 
     def commitment_zone_start_must_be_before_delivery_date

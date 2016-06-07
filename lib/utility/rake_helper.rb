@@ -17,7 +17,6 @@ class RakeHelper
 	private
 
 		def self.roll_postings			
-			transition_commitment_zone_postings
 		  transition_posting_ids = transition_open_postings
 		  transitioned_tote_item_ids = transition_tote_items_to_committed(transition_posting_ids)	  
 			report_committed_tote_items_to_admin(transitioned_tote_item_ids)
@@ -73,6 +72,8 @@ class RakeHelper
 			puts "transition_open_postings: start"
 
 			postings = Posting.where(state: Posting.states[:OPEN])
+
+
 
 			if postings.any?
 				puts "transition_open_postings: #{postings.count.to_s} posting(s) to transition to COMMITMENTZONE"
