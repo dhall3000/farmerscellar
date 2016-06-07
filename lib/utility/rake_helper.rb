@@ -28,10 +28,12 @@ class RakeHelper
 
 			now = Time.zone.now
 
-			if NightlyTaskRun.last
-				last_run = NightlyTaskRun.last.created_at
-			else
+			last_run = NightlyTaskRun.order("nightly_task_runs.id").last
+
+			if last_run.nil?
 				last_run = now - 1.day
+			else
+				last_run = last_run.created_at
 			end
 
 			num_seconds_in_23_and_a_half_hours = 23.5 * 60 * 60

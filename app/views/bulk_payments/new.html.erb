@@ -14,7 +14,7 @@
     </thead>
     <tbody>
       <% @unpaid_payment_payables.each do |unpaid_payment_payable| %>
-        <% producer = unpaid_payment_payable.users.last %>
+        <% producer = unpaid_payment_payable.users.order("users.id").last %>
         <tr>
           <td><%= producer.farm_name %></td>
           <td><%= producer.email %></td>          

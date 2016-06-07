@@ -50,7 +50,7 @@
 
 	    <%= f.hidden_field :live %>
 
-	    <% if WebsiteSetting.last.recurring_postings_enabled %>
+	    <% if WebsiteSetting.order("website_settings.id").last.recurring_postings_enabled %>
 		    <div>
 			    <%= f.fields_for @posting.posting_recurrence do |posting_recurrence_f| %>
 			      <%= posting_recurrence_f.label :frequency, id: "posting_recurrence_label" %>	      

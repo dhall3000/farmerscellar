@@ -52,7 +52,7 @@ class PurchaseReceivable < ActiveRecord::Base
           #in other words, empty out their tote. however, if something is already committed then the customer is on the hook for
           #that if it gets filled.
           #TODO: make a test to verify that when a purchase fails the shopping tote gets emptied
-          current_tote_items = ToteItemsController.helpers.current_tote_items_for_user(pr.users.last)
+          current_tote_items = ToteItemsController.helpers.current_tote_items_for_user(pr.users.order("users.id").last)
           if current_tote_items != nil && current_tote_items.any?
             current_tote_items.where("tote_items.state = ? or tote_items.state = ?", ToteItem.states[:ADDED], ToteItem.states[:AUTHORIZED]).each do |tote_item|
               tote_item.transition(:system_removed)

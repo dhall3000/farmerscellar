@@ -13,7 +13,7 @@ class Authorization < ActiveRecord::Base
   		return nil
   	end
 
-  	checkout = checkouts.last
+  	checkout = checkouts.order("checkouts.id").last
 
   	if !checkout.tote_items || !checkout.tote_items.any?
   		return nil

@@ -24,12 +24,12 @@ class Subscription < ActiveRecord::Base
   end  
 
   def authorized?
-    return rtauthorizations && rtauthorizations.last && rtauthorizations.last.authorized?
+    return rtauthorizations && rtauthorizations.order("rtauthorizations.id").last && rtauthorizations.order("rtauthorizations.id").last.authorized?
   end
 
   def description
     #this should return a string like: "3 dozens of Helen the Hen eggs every other week for a subtotal of $18.75 each delivery"
-    posting = posting_recurrence.postings.last
+    posting = posting_recurrence.postings.order("postings.id").last
     friendly_frequency = posting_recurrence.subscription_description(frequency).downcase
     subtotal = number_to_currency(get_gross_cost(quantity, posting.price))
     text = "#{quantity.to_s} #{posting.unit_kind.name.pluralize(quantity)} of #{posting.user.farm_name} #{posting.product.name} delivered #{friendly_frequency} for a subtotal of #{subtotal} each delivery"
@@ -56,13 +56,15 @@ class Subscription < ActiveRecord::Base
       tote_item.transition(:subscription_authorized)
     end
 
-		if !rtauthorizations.nil? && !rtauthorizations.last.nil?
+    last_auth = rtauthorizations.order("rtauthorizations.id").last
+
+		if !rtauthorizations.nil? && !last_auth.nil?
 
   		#TODO: i don't think we really NEED need this. but doing it anyway. why is it that toteitems have_many rtauths and a subscription also has an auth? isn't one or the other
   		#sufficient. indeed, wouldn't it be cleaner to only have the subscription hold the reference to the rtauth parent? no, because toteitems can be atttached to an rtauth
-  		#by means other than through subscriptions. as in, a person with a billing agreement can add a subscription to the auth but they can also add a single one-time-buy tote item
-  		rtauthorizations.last.tote_items << tote_item
-      rtauthorizations.last.save
+  		#by means other than through subscriptions. as in, a person with a billing agreement can add a subscription to the auth but they can also add a single one-time-buy tote item      
+  		last_auth.tote_items << tote_item
+      last_auth.save
 
 		end
 		
@@ -103,7 +105,7 @@ class Subscription < ActiveRecord::Base
 
     if tote_items && tote_items.any?
       #start at tote_items.first and compute forward
-      delivery_date = tote_items.first.posting.delivery_date
+      delivery_date = tote_items.order("tote_items.id").first.posting.delivery_date
     else
       delivery_date = posting_recurrence.current_posting.delivery_date
     end

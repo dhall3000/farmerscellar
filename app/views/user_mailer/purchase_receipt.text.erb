@@ -8,7 +8,7 @@ Here is your Farmer's Cellar purchase receipt.
 
 <% purchase_failed = false %>
 <% @tote_items.each do |tote_item| %>
-  <% pr = tote_item.purchase_receivables.last %>
+  <% pr = tote_item.purchase_receivables.order("purchase_receivables.id").last %>
   <% if pr.state == PurchaseReceivable.states[:READY] && pr.kind == PurchaseReceivable.kind[:PURCHASEFAILED] %>
     <% purchase_failed = true %>
     <% sub_total = "PURCHASEFAILED" %>

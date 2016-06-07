@@ -20,7 +20,7 @@ class PickupsController < ApplicationController
   			@user = @pickup_code.user
   			#get a product list of everything that's been delivered since the last pickup (or 7 days, whichever is more recent)
   			@tote_items = @user.tote_items_to_pickup
-  			@last_pickup = @user.pickups.last
+  			@last_pickup = @user.pickups.order("pickups.id").last
 
   			#now create a new pickup to represent the current pickup  				 				
  				@user.pickups.create

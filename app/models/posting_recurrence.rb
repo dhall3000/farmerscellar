@@ -225,7 +225,7 @@ class PostingRecurrence < ActiveRecord::Base
       return
     end
 
-    old_post = postings.last
+    old_post = postings.order("postings.id").last
     now = Time.zone.now
 
     #if we're not between the most recently posted post's commit zone and delivery date, just quit
@@ -378,6 +378,10 @@ class PostingRecurrence < ActiveRecord::Base
         return
       end
 
+      #I wanted to do something like:
+      #self.reference_date = postings.order("postings.id").last.delivery_date
+      #but can't because the .order forces a sql call but since this method is called before_validation the self
+      #object isn't save to db yet so the .order.last call returns nil
       self.reference_date = postings.last.delivery_date
 
     end

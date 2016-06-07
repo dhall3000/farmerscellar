@@ -246,7 +246,7 @@ class SubscriptionsController < ApplicationController
     def get_show_or_edit_data
 
       @subscriptions = Subscription.where(id: params[:id])
-      @subscription = @subscriptions.last
+      @subscription = @subscriptions.order("subscriptions.id").last
 
       if @subscription.nil? || !@subscription.on
         redirect_to subscriptions_path

@@ -94,7 +94,7 @@ class UserMailer < ApplicationMailer
 
       tote_items.each do |tote_item|
 
-        pr = tote_item.purchase_receivables.last
+        pr = tote_item.purchase_receivables.order("purchase_receivables.id").last
 
         if pr.kind == PurchaseReceivable.kind[:NORMAL] && pr.state == PurchaseReceivable.states[:COMPLETE]        
           purchase_total = (purchase_total + get_gross_item(tote_item)).round(2)

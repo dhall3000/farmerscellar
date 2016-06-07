@@ -38,7 +38,7 @@ class BulkPaymentProcessing
   	payment_info_by_producer_id = {}
 
   	unpaid_payment_payables.each do |p|
-  	  producer = p.users.last
+  	  producer = p.users.order("users.id").last
   	  if payment_info_by_producer_id[producer.id] == nil
   	  	payment_info_by_producer_id[producer.id] = {amount: 0, payment_payable_ids: []}
   	  end

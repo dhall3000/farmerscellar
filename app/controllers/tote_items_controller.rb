@@ -13,7 +13,7 @@ class ToteItemsController < ApplicationController
       #then we don't need to ask user to specify dropsite. Just assign the current dropsite (for this checkout) to
       #be the only dropsite and proceed
       if Dropsite.count == 1
-        @dropsite = Dropsite.first
+        @dropsite = Dropsite.order("dropsites.id").first
         current_user.set_dropsite(@dropsite)
       end
     end

@@ -61,27 +61,19 @@ class AuthorizationsController < ApplicationController
     if checkout
 
       @authorization.checkouts << checkout
+      @authorization.save
 
-      if @authorization_succeeded && @authorization.checkouts.last.tote_items.any?        
+      if @authorization_succeeded && @authorization.checkouts.order("checkouts.id").last.tote_items.any?        
         flash.now[:success] = "Payment authorized!"
         @successfully_authorized_tote_items = current_user_current_unauthorized_tote_items.to_a
-        @authorization.checkouts.last.tote_items.where(state: ToteItem.states[:ADDED]).each do |tote_item|
+        @authorization.checkouts.order("checkouts.id").last.tote_items.where(state: ToteItem.states[:ADDED]).each do |tote_item|
           tote_item.transition(:customer_authorized)
         end
+        @authorization.update(amount: get_gross_tote(@successfully_authorized_tote_items))
+        current_user.send_authorization_receipt(@authorization)
       else
         flash.now[:danger] = "Payment not authorized."
         AdminNotificationMailer.general_message("One time authorization failed", response.to_yaml).deliver_now
-      end
-
-      @authorization.amount = get_gross_tote(@successfully_authorized_tote_items)
-      @authorization.save
-
-      #placing this here is a hack. it's more appropriate location woudl be in the if @authorization_succeeded... block
-      #above. however, we're currently using the auth id as an order number displayed to the user in their email receipt
-      #so if we send the email receipt before saving there is nil for the id so it shows an error to the user. eventually
-      #we need to have some other number besides id displayed to the user for reference back to us in case of a problem.
-      if @authorization_succeeded
-        current_user.send_authorization_receipt(@authorization)        
       end
 
     else

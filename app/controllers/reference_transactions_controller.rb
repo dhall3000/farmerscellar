@@ -67,8 +67,8 @@ class ReferenceTransactionsController < ApplicationController
     prs = [pr]
     #create rtba object
     rtba = nil
-    if current_user.rtbas.any? && current_user.rtbas.last.active
-      rtba = current_user.rtbas.last
+    if current_user.rtbas.any? && current_user.rtbas.order("rtbas.id").last.active
+      rtba = current_user.rtbas.order("rtbas.id").last
     else
       rtba = Rtba.new(user: current_user, token: "faketoken", ba_id: PAYPALDATASTORE[:ba], active: true)
       rtba.save
@@ -76,7 +76,7 @@ class ReferenceTransactionsController < ApplicationController
     #create the rtauthorization object
     rtauthorization = nil
     if rtba.rtauthorizations.any?
-      rtauthorization = rtba.rtauthorizations.last
+      rtauthorization = rtba.rtauthorizations.order("rtauthorizations.id").last
     else
       #validates_presence_of :rtba, :tote_items
       rtauthorization = Rtauthorization.new(rtba: rtba)                
@@ -125,8 +125,8 @@ class ReferenceTransactionsController < ApplicationController
       pr.tote_items << ti
 
       rtba = nil
-      if current_user.rtbas.any? && current_user.rtbas.last.active
-        rtba = current_user.rtbas.last
+      if current_user.rtbas.any? && current_user.rtbas.order("rtbas.id").last.active
+        rtba = current_user.rtbas.order("rtbas.id").last
       else
         rtba = Rtba.new(user: current_user, token: "faketoken", ba_id: PAYPALDATASTORE[:ba], active: true)
         rtba.save
@@ -134,7 +134,7 @@ class ReferenceTransactionsController < ApplicationController
       #create the rtauthorization object
       rtauthorization = nil
       if rtba.rtauthorizations.any?
-        rtauthorization = rtba.rtauthorizations.last
+        rtauthorization = rtba.rtauthorizations.order("rtauthorizations.id").last
       else
         #validates_presence_of :rtba, :tote_items
         rtauthorization = Rtauthorization.new(rtba: rtba)

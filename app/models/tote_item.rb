@@ -157,7 +157,7 @@ class ToteItem < ActiveRecord::Base
     reverse_checkouts.each do |co|
       if !co.is_rt
         if co.authorizations && co.authorizations.any?
-          auth = co.authorizations.last
+          auth = co.authorizations.order("authorizations.id").last
         end
       end
     end
@@ -171,7 +171,7 @@ class ToteItem < ActiveRecord::Base
     rtauth = nil
 
     if !rtauthorizations.nil? && rtauthorizations.any?
-      rtauth = rtauthorizations.last
+      rtauth = rtauthorizations.order("rtauthorizations.id").last
     end
 
     return rtauth

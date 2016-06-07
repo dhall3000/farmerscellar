@@ -4,7 +4,7 @@ class StaticPagesController < ApplicationController
   before_action :redirect_to_root_if_user_lacks_access, only: [:how_things_work]
   
   def home
-    @website_settings = WebsiteSetting.last
+    @website_settings = WebsiteSetting.order("website_settings.id").last
   end
 
   def about

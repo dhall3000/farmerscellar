@@ -183,7 +183,7 @@ class Posting < ActiveRecord::Base
   private
 
     def get_first_committed_tote_item
-      return tote_items.where(state: ToteItem.states[:COMMITTED]).first    
+      return tote_items.where(state: ToteItem.states[:COMMITTED]).order("tote_items.id").first    
     end  
     
     def delivery_date_not_sunday

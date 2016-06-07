@@ -17,7 +17,14 @@ class Rtpurchase < ActiveRecord::Base
     end
 
     if purchase_receivables.any?
-      return purchase_receivables.first.users.last
+
+      #you can't make the .order call below with an uncreated self object
+      if id.nil?
+        save
+      end
+
+      return purchase_receivables.order("purchase_receivables.id").first.users.order("users.id").last
+
     end
 
     return nil

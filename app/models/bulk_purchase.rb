@@ -33,7 +33,7 @@ class BulkPurchase < ActiveRecord::Base
       #so that we can batch purchases and not get overly dinged by payment processor transaction fees
       purchase_receivables.each do |pr|
 
-        if rtauth = pr.tote_items.first.rtauthorization
+        if rtauth = pr.tote_items.order("tote_items.id").first.rtauthorization
 
           if !prs_by_rtauth.has_key?(rtauth)
             prs_by_rtauth[rtauth] = []
@@ -41,7 +41,7 @@ class BulkPurchase < ActiveRecord::Base
 
           prs_by_rtauth[rtauth] << pr
 
-        elsif auth = pr.tote_items.first.authorization            
+        elsif auth = pr.tote_items.order("tote_items.id").first.authorization            
 
           if !prs_by_auth.has_key?(auth)
             prs_by_auth[auth] = []
@@ -113,7 +113,7 @@ class BulkPurchase < ActiveRecord::Base
         end
 
       else
-        #put this user's account on hold so they can't order again until they clear up this failed purchase        
+        #put this user's account on hold so they can't order again until they clear up this failed purchase                
         UserAccountState.add_new_state(purchase.user, :HOLD, "purchase failed")        
         puts "Purchase failure: #{purchase.amount_to_capture.to_s}"
         @total_amount_of_failed_purchases = (@total_amount_of_failed_purchases + purchase.amount_to_capture).round(2)

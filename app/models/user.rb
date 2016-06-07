@@ -46,7 +46,7 @@ class User < ActiveRecord::Base
     if pickups.any?
       #or...
       #B) the last pickup
-      last_pickup = pickups.last.created_at
+      last_pickup = pickups.order("pickups.id").last.created_at
     end
 
     #whichever is more recent
@@ -105,7 +105,7 @@ class User < ActiveRecord::Base
       return nil
     end
 
-    rtba = rtbas.last
+    rtba = rtbas.order("rtbas.id").last
 
     if rtba.active == false
       return nil
