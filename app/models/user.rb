@@ -35,6 +35,37 @@ class User < ActiveRecord::Base
   has_one :access_code
   has_one :pickup_code
 
+  #these are for if the account_type is either PRODUCER or DISTRIBUTOR
+  #a distributor must a BusinessInterface
+  #a producer must have either a DISTRIBUTOR or a BusinessInterface
+  has_one :business_interface
+  #if this object is type PRODUCER than it might have a distributor
+  belongs_to :distributor, class_name: "User", foreign_key: "distributor_id"
+  #if this object is type DISTRIBUTOR it might have many PRODUCERs
+  has_many :producers, class_name: "User", foreign_key: "distributor_id"
+
+  #PRODUCERs can have DISTRIBUTORs that have DISTRIBUTORs that have DISTRIBUTORs...
+  #this method is recursive. it will start at the current level and traverse up the DISTRIBUTOR parenthood,
+  #returning the first BusinessInterface it sees. So...if you start a relationship by dealing directly with
+  #a PRODUCER and so have a BI associated, then later you fetch product for them through a DISTRIBUTOR, you 
+  #have to not only set up the new DISTRIBUTOR association but you also have to nuke the PRODUCER's BI object
+  #more likely though is that you'll 1st deal with a DISTRIBUTOR and then later deal directly with PRODUCER.
+  #in that case you don't necessarily have to nuke the DISTRIBUTOR's BI for things to work correctly. Of course
+  #for cleanliness' sake you should nuke the DISTRIBUTOR association altogether.
+  def get_business_interface
+
+    if !account_type_is?(:PRODUCER) && !account_type_is?(:DISTRIBUTOR)
+      return nil
+    end
+
+    if business_interface
+      return business_interface
+    else
+      return distributor.get_business_interface
+    end
+
+  end
+
   def tote_items_to_pickup
     #this should return a set of toteitems that have been delivered but not picked up yet
 
@@ -120,7 +151,7 @@ class User < ActiveRecord::Base
   end
 
   def self.types
-    {CUSTOMER: 0, PRODUCER: 1, ADMIN: 2, DROPSITE: 3}
+    {CUSTOMER: 0, PRODUCER: 1, ADMIN: 2, DROPSITE: 3, DISTRIBUTOR: 4}
   end
 
   def account_type_is?(type_key)

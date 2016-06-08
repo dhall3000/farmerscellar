@@ -257,6 +257,21 @@ c8:
   zip: 98008
   phone: 206-564-6579
 
+d1:
+  name: Bigtime Distributor
+  email: d1@d.com
+  password_digest: <%= User.digest('dogdog') %>
+  account_type: 4
+  activated: true
+  activated_at: Time.zone.now
+  description: the biggest, the baddest, distributor all over town
+  address: 1234 main st
+  city: Kirkland
+  state: Washington
+  zip: 98033
+  phone: 206-588-6579
+  website: www.d1.com  
+
 f1:
   name: f1
   email: f1@f.com
@@ -274,6 +289,7 @@ f1:
   agreement: 1
   farmer_approval: t
   farm_name: F1 FARM
+  distributor: d1
 
 f2:
   name: f2
@@ -292,6 +308,7 @@ f2:
   agreement: 1
   farmer_approval: t
   farm_name: F2 FARM
+  distributor: d1
 
 f3:
   name: f3

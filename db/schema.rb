@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160530211129) do
+ActiveRecord::Schema.define(version: 20160608210702) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -139,6 +139,20 @@ ActiveRecord::Schema.define(version: 20160530211129) do
     t.float    "net"
     t.float    "payment_processor_fee_withheld_from_producer", default: 0.0
   end
+
+  create_table "business_interfaces", force: :cascade do |t|
+    t.boolean  "order_email_accepted"
+    t.string   "order_email"
+    t.string   "order_instructions"
+    t.boolean  "paypal_accepted"
+    t.string   "paypal_email"
+    t.string   "payment_instructions"
+    t.integer  "user_id"
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+  end
+
+  add_index "business_interfaces", ["user_id"], name: "index_business_interfaces_on_user_id"
 
   create_table "checkout_authorizations", id: false, force: :cascade do |t|
     t.integer  "checkout_id"
@@ -578,9 +592,11 @@ ActiveRecord::Schema.define(version: 20160530211129) do
     t.string   "farm_name"
     t.boolean  "beta"
     t.integer  "zip"
+    t.integer  "distributor_id"
   end
 
   add_index "users", ["account_type"], name: "index_users_on_account_type"
+  add_index "users", ["distributor_id"], name: "index_users_on_distributor_id"
   add_index "users", ["email"], name: "index_users_on_email", unique: true
 
   create_table "website_settings", force: :cascade do |t|
