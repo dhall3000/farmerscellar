@@ -10,6 +10,27 @@
 #postingf4celery: 2.50
 
 #----------------------------------------------------------------
+t26:
+  quantity: 1
+  price: 1
+  state: <%= ToteItem.states[:ADDED] %>
+  user: c18
+  posting: f6posting
+
+t27:
+  quantity: 1
+  price: 2
+  state: <%= ToteItem.states[:ADDED] %>
+  user: c18
+  posting: f7posting
+
+t28:
+  quantity: 1
+  price: 4
+  state: <%= ToteItem.states[:ADDED] %>
+  user: c18
+  posting: f8posting
+#----------------------------------------------------------------
 t18:
   quantity: 1
   price: 4.29

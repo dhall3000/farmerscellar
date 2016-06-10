@@ -6,7 +6,7 @@ class ProducerNotificationsMailer < ApplicationMailer
   #
   #   en.producer_notifications_mailer.current_orders.subject
   #
-  def current_orders(email, postings)
+  def current_orders(creditor, postings)
 
   	if postings.nil? || !postings.any?
   	  return
@@ -15,11 +15,24 @@ class ProducerNotificationsMailer < ApplicationMailer
   	@posting_infos = {}
     @total = 0
 
-  	postings.each do |posting|  		
+    @business_interface = creditor.get_business_interface
 
-      if posting.user.email != email
-        next
-      end
+    if !@business_interface
+      #this is a major problem. order email didn't go out. admin needs to be notified
+      AdminNotificationMailer.general_message("major problem. order email didn't go out.", "creditor id #{creditor.id.to_s}").deliver_now
+      return
+    end
+
+    subject = "Current orders for upcoming deliveries"
+
+    if @business_interface.order_email_accepted
+      @email = @business_interface.order_email      
+    else
+      @email = "david@farmerscellar.com"
+      subject = "admin action required: " + subject
+    end
+
+  	postings.each do |posting|  		
 
       committed_items = posting.tote_items.where(state: ToteItem.states[:COMMITTED])
   	  if committed_items.count < 1
@@ -45,17 +58,17 @@ class ProducerNotificationsMailer < ApplicationMailer
   	  return
   	end
 
-    mail to: email, subject: "Current orders for upcoming deliveries"
+    mail to: @email, subject: subject
 
   end
 
-  def payment_invoice(producer, total, posting_infos)
+  def payment_invoice(creditor, total, posting_infos)
 
-    @producer = producer
+    @business_interface = creditor.get_business_interface
     @total = total
     @posting_infos = posting_infos
 
-    mail to: producer.email, subject: "Payment receipt"
+    mail to: @business_interface.paypal_email, subject: "Payment receipt"
 
   end
 

@@ -1,6 +1,7 @@
 class CreateBusinessInterfaces < ActiveRecord::Migration
   def change
     create_table :business_interfaces do |t|
+      t.string :name, null: false
       t.boolean :order_email_accepted
       t.string :order_email
       t.string :order_instructions
@@ -16,7 +17,7 @@ class CreateBusinessInterfaces < ActiveRecord::Migration
     #for initial migration just populate the necessary business interface class with existing producer's info
     producers = User.where(account_type: User.types[:PRODUCER])
     producers.each do |producer|
-      producer.create_business_interface(order_email_accepted: true, order_email: producer.email, paypal_accepted: true, paypal_email: producer.email)
+      producer.create_business_interface(name: producer.farm_name, order_email_accepted: true, order_email: producer.email, paypal_accepted: true, paypal_email: producer.email)
     end    
 
   end

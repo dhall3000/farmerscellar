@@ -258,7 +258,8 @@ class BulkPurchase < ActiveRecord::Base
 
         payment_payable = PaymentPayable.new(amount: net.round(2), amount_paid: 0)
         producer = User.find(producer_id)
-        payment_payable.users << producer
+
+        payment_payable.users << producer.get_creditor
 
         for tote_item in value[:sub_tote]
           payment_payable.tote_items << tote_item

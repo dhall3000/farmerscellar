@@ -1,15 +1,67 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
+  name: Bigtime Distributor Business Interface
   order_email_accepted: true
-  order_email: d1@d.com
+  order_email: d1order_email@d.com
   order_instructions: nil
   paypal_accepted: true
-  paypal_email: d1@d.com
+  paypal_email: d1paypal_email@d.com
   payment_instructions: nil
   user: d1
 
 two:
+  name: F8 FARM Business Interface
+  order_email_accepted: true
+  order_email: f8order_email@f.com
+  order_instructions: nil
+  paypal_accepted: true
+  paypal_email: f8paypal_email@f.com
+  payment_instructions: nil
+  user: f8
+
+f_subscriptions:
+  name: Subscription Farms
+  order_email_accepted: true
+  order_email: sf@f.com
+  order_instructions: nil
+  paypal_accepted: true
+  paypal_email: sf@f.com
+  payment_instructions: nil
+  user: f_subscriptions
+
+f5:  
+  name: F5 FARM
+  order_email_accepted: true
+  order_email: f5@f.com
+  order_instructions: nil
+  paypal_accepted: true
+  paypal_email: f5@f.com
+  payment_instructions: nil
+  user: f5
+
+f1:
+  name: F1 FARM
+  order_email_accepted: true
+  order_email: f1@f.com
+  order_instructions: nil
+  paypal_accepted: true
+  paypal_email: f1@f.com
+  payment_instructions: nil
+  user: f1
+
+f2:
+  name: F2 FARM
+  order_email_accepted: true
+  order_email: f2@f.com
+  order_instructions: nil
+  paypal_accepted: true
+  paypal_email: f2@f.com
+  payment_instructions: nil
+  user: f2
+
+f3:
+  name: F3 FARM
   order_email_accepted: true
   order_email: f3@f.com
   order_instructions: nil
@@ -17,3 +69,33 @@ two:
   paypal_email: f3@f.com
   payment_instructions: nil
   user: f3
+
+f4:
+  name: F4 FARM
+  order_email_accepted: true
+  order_email: f4@f.com
+  order_instructions: nil
+  paypal_accepted: true
+  paypal_email: f4@f.com
+  payment_instructions: nil
+  user: f4
+
+baron_farms:
+  name: Baron Farms
+  order_email_accepted: true
+  order_email: martydavis@gmail.com
+  order_instructions: nil
+  paypal_accepted: true
+  paypal_email: martydavis@gmail.com
+  payment_instructions: nil
+  user: baron_farms
+
+pride_and_joy:
+  name: Pride and Joy Dairy
+  order_email_accepted: true
+  order_email: ricky@prideandjoydairy.com
+  order_instructions: nil
+  paypal_accepted: true
+  paypal_email: ricky@prideandjoydairy.com
+  payment_instructions: nil
+  user: pride_and_joy

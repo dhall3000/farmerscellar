@@ -73,8 +73,6 @@ class RakeHelper
 
 			postings = Posting.where(state: Posting.states[:OPEN])
 
-
-
 			if postings.any?
 				puts "transition_open_postings: #{postings.count.to_s} posting(s) to transition to COMMITMENTZONE"
 			else
@@ -157,24 +155,24 @@ class RakeHelper
 		  end
 
 		  postings = Posting.find(posting_ids.uniq)
-		  producers = {}
 
+		  creditors = {}
 		  postings.each do |posting|
 
-		    email = posting.user.email
+		  	creditor = posting.user.get_creditor
 
-		    if !producers.has_key?(email)
-		      producers[email] = []
-		    end
+		  	if !creditors.has_key?(creditor)
+		  		creditors[creditor] = []
+		  	end
 
-		    producers[email] << posting
-		    
+		  	creditors[creditor] << posting
+
 		  end
 
-		  producers.each do |email, postings|
-		  	puts "send_orders_to_producers: sending order for #{postings.count.to_s} posting(s) to #{email}"
-		    ProducerNotificationsMailer.current_orders(email, postings).deliver_now    
-		  end  
+		  creditors.each do |creditor, postings|
+		  	puts "send_orders_to_producers: sending order for #{postings.count.to_s} posting(s) to #{creditor.email}"
+		  	ProducerNotificationsMailer.current_orders(creditor, postings).deliver_now
+		  end
 
 		  puts "send_orders_to_producers: end"
 

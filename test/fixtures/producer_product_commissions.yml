@@ -1,5 +1,20 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
+f6:
+  product: apples
+  commission: 0.10
+  user: f6
+
+f7:
+  product: asparagus
+  commission: 0.10
+  user: f7
+
+f8:
+  product: milk
+  commission: 0.10
+  user: f8
+
 ppc1:
   product: apples
   commission: 0.10

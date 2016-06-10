@@ -4,30 +4,30 @@ class UserTest < ActiveSupport::TestCase
 
   def setup
     @user = User.new(name: "Example User", email: "user@example.com", password: "foobar", password_confirmation: "foobar", zip: 98033, account_type: 0)
-    @f1 = users(:f1)
-    @f2 = users(:f2)
-    @f3 = users(:f3)
+    @f6 = users(:f6)
+    @f7 = users(:f7)
+    @f8 = users(:f8)
     @d1 = users(:d1)
   end
 
   test "producer without distributor should have business interface" do
-    assert_not @f3.get_business_interface.nil?
-    assert_equal @f3.email, @f3.get_business_interface.order_email
+    assert_not @f8.get_business_interface.nil?
+    assert_equal "f8order_email@f.com", @f8.get_business_interface.order_email
   end
 
   test "distributor should have multiple producers" do
     assert_equal 2, @d1.producers.count
-    assert_equal 1, @d1.producers.where(email: @f1.email).count
-    assert_equal 1, @d1.producers.where(email: @f2.email).count
+    assert_equal 1, @d1.producers.where(email: @f6.email).count
+    assert_equal 1, @d1.producers.where(email: @f7.email).count
   end
 
   test "producer should have distributor" do
-    assert @f1.get_business_interface
+    assert @f6.get_business_interface
   end
 
   test "producer should be able to access distributor order email address" do
-    assert @f1.get_business_interface
-    assert_equal @d1.email, @f1.get_business_interface.order_email
+    assert @f6.get_business_interface
+    assert_equal "d1order_email@d.com", @f6.get_business_interface.order_email
   end
 
   test "should get tote items to pickup" do

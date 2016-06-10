@@ -1,4 +1,8 @@
-Hi <%= @posting_infos.first[0].user.farm_name %>,
+<% if @business_interface.order_email_accepted %>
+Hi <%= @business_interface.name %>,
+<% else %>
+Hi <%= @business_interface.order_email %>,
+<% end %>
 
 Below are orders for your upcoming delivery. If all orders are filled total sales will be <%= number_to_currency(@total) %>.
 

@@ -1,6 +1,12 @@
-<p>
-  Hi <%= @posting_infos.first[0].user.farm_name %>,
-</p>
+<% if @business_interface.order_email_accepted %>
+  <p>
+    Hi <%= @business_interface.name %>,
+  </p>
+<% else %>
+  <p>
+    Hi <%= @email %>,
+  </p>
+<% end %>
 
 <p>
   Below are orders for your upcoming delivery. If all orders are filled total sales will be <%= number_to_currency(@total) %>.
@@ -10,6 +16,9 @@
   <thead>
     <tr>		    
       <th align="left">ID</th>
+      <% if @business_interface.distributor? %>
+        <th align="center">Producer</th>
+      <% end %>
       <th align="center">Product</th>
       <th align="center">Delivery Date</th>
       <th align="center">Units</th>        
@@ -22,6 +31,9 @@
     <% @posting_infos.each do |posting, value| %>
       <tr>
         <td align="left"><%= posting.id %></td>
+        <% if @business_interface.distributor? %>
+          <td align="left"><%= posting.user.farm_name %></td>
+        <% end %>
         <td align="center"><%= posting.product.name %></td>
         <td align="center"><%= posting.delivery_date.strftime("%A %b %d, %Y") %></td>
         <td align="center"><%= posting.unit_kind.name %></td>        
@@ -32,6 +44,10 @@
     <% end %>
   </tbody>
 </table>
+
+<% if !@business_interface.order_email_accepted && !@business_interface.order_instructions.empty? %>
+<p>Order Instructions: <%= @business_interface.order_instructions %></p>
+<% end %>
 
 <p>
 Thanks!

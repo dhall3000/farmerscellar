@@ -18,6 +18,45 @@
 <% friday_after_base_monday = wednesday_after_base_monday + 2.days %>
 <% monday_after_base_monday = base_monday + 7.days %>
 
+f6posting:
+  delivery_date: <%= delivery_date %>
+  commitment_zone_start: <%= delivery_date - 2.days %>  
+  product: apples
+  quantity_available: 1000
+  price: 1
+  user: f6
+  unit_category: weight
+  unit_kind: pound
+  description: crisp, crunchy organic apples. you'll love them.
+  live: true
+  late_adds_allowed: false
+
+f7posting:
+  delivery_date: <%= delivery_date %>
+  commitment_zone_start: <%= delivery_date - 2.days %>  
+  product: asparagus
+  quantity_available: 1000
+  price: 2
+  user: f7
+  unit_category: weight
+  unit_kind: pound
+  description: asparagus description...yum!
+  live: true
+  late_adds_allowed: false
+
+f8posting:
+  delivery_date: <%= delivery_date %>
+  commitment_zone_start: <%= delivery_date - 2.days %>  
+  product: milk
+  quantity_available: 1000
+  price: 4
+  user: f8
+  unit_category: volume
+  unit_kind: gallon
+  description: raw milk description
+  live: true
+  late_adds_allowed: false
+
 #--------------------------------------------------------------
 posting_subscription_farmer:
   delivery_date: <%= delivery_date %>

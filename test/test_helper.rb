@@ -13,6 +13,46 @@ class ActiveSupport::TestCase
     assert_match body, mail.body.encoded
   end
 
+  def assert_not_email_to(not_to)
+    ActionMailer::Base.deliveries.each do |mail|
+      assert_not_equal not_to, mail.to[0]
+    end
+  end
+
+  def assert_appropriate_email_exists(to, subject, body)
+
+    email_exists = false
+
+    ActionMailer::Base.deliveries.each do |mail|
+      
+      all_conditions_met = true
+
+      if mail.from[0] != "david@farmerscellar.com"
+        all_conditions_met = false
+      end
+
+      if mail.to[0] != to
+        all_conditions_met = false
+      end
+
+      if mail.subject != subject
+        all_conditions_met = false
+      end
+
+      if !mail.body.encoded.include?(body)
+        all_conditions_met = false
+      end
+
+      if all_conditions_met
+        email_exists = true
+      end
+
+    end
+
+    assert email_exists, "Email does not exist - from: david@farmerscellar.com, to: #{to}, subject: #{subject}, body: #{body}"
+
+  end
+
   # Add more helper methods to be used by all tests here...
   def is_logged_in?
   	!session[:user_id].nil?

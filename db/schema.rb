@@ -141,6 +141,7 @@ ActiveRecord::Schema.define(version: 20160608210702) do
   end
 
   create_table "business_interfaces", force: :cascade do |t|
+    t.string   "name",                 null: false
     t.boolean  "order_email_accepted"
     t.string   "order_email"
     t.string   "order_instructions"
