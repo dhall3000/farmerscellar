@@ -30,6 +30,16 @@ f_subscriptions:
   payment_instructions: nil
   user: f_subscriptions
 
+f9:  
+  name: F9 FARM
+  order_email_accepted: true
+  order_email: f9@f.com
+  order_instructions: nil
+  paypal_accepted: true
+  paypal_email: f9@f.com
+  payment_instructions: nil
+  user: f9
+
 f5:  
   name: F5 FARM
   order_email_accepted: true
