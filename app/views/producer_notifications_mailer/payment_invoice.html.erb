@@ -1,16 +1,10 @@
-<% if @business_interface.order_email_accepted %>
-  <p>
-    Hi <%= @business_interface.name %>,
-  </p>
+<% if @business_interface.paypal_accepted %>
+  <p>Hi <%= @business_interface.name %>,</p>
+  <p>We just sent you a total of <%= number_to_currency(@payment.amount) %> as payment for the following products / quantities:</p>
 <% else %>
-  <p>
-    Hi <%= @email %>,
-  </p>
+  <p>Hi <%= @email %>,</p>
+  <p>Get payment of <%= number_to_currency(@payment.amount) %> to <%= @business_interface.name %> for the following products / quantities:</p>
 <% end %>
-
-<p>
-  We just sent you a total of <%= number_to_currency(@total) %> as payment for the following products / quantities:
-</p>
 
 <table border="1">
   <thead>
@@ -44,6 +38,11 @@
     <% end %>
   </tbody>
 </table>
+
+<p>Payment ID# <%= @payment.id.to_s %></p>
+<% if !@business_interface.paypal_accepted %>
+  <p>Payment Instructions: <%= @business_interface.payment_instructions %></p>
+<% end %>
 
 <p>
 Thanks!

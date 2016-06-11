@@ -61,7 +61,7 @@ class RakeHelper
 			puts "do_nightly_tasks start"
 
 			FundsProcessing.do_bulk_customer_purchase
-			BulkPaymentProcessing.do_bulk_producer_payment
+			BulkPaymentProcessing.do_bulk_creditor_payment
 
 			puts "do_nightly_tasks end"
 

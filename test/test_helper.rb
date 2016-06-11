@@ -6,6 +6,20 @@ class ActiveSupport::TestCase
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
   fixtures :all
 
+  def get_mail_by_subject(subject)
+
+    mail = nil
+
+    ActionMailer::Base.deliveries.each do |m|
+      if m.subject == subject
+        mail = m
+      end      
+    end
+
+    return mail
+
+  end
+
   def assert_appropriate_email(mail, to, subject, body)
     assert_equal subject, mail.subject
     assert_equal [to], mail.to

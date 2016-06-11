@@ -6,19 +6,19 @@ include ActionView::Helpers::NumberHelper
 
 class BulkPaymentProcessing
 
-	def self.do_bulk_producer_payment
+	def self.do_bulk_creditor_payment
     
-    puts "BulkPaymentProcessing.do_bulk_producer_payment start"
+    puts "BulkPaymentProcessing.do_bulk_creditor_payment start"
 
     if deliveries_remaining_this_week
-      puts "BulkPaymentProcessing.do_bulk_producer_payment: there are still deliveries outstanding this week so we're not going to do a bulk payment today. quitting."
+      puts "BulkPaymentProcessing.do_bulk_creditor_payment: there are still deliveries outstanding this week so we're not going to do a bulk payment today. quitting."
     else      
       values = bulk_payment_new
       values = bulk_payment_create(values)      
-      email_report_to_admin(values[:bulk_payment], values[:payment_info_by_producer_id])
+      email_report_to_admin(values[:bulk_payment], values[:payment_info_by_creditor_id])
     end
 
-    puts "BulkPaymentProcessing.do_bulk_producer_payment end"
+    puts "BulkPaymentProcessing.do_bulk_creditor_payment end"
 
 	end
 
@@ -35,55 +35,83 @@ class BulkPaymentProcessing
   	end
 
   	grand_total_payout = 0
-  	payment_info_by_producer_id = {}
+  	payment_info_by_creditor_id = {}
 
   	unpaid_payment_payables.each do |p|
-  	  producer = p.users.order("users.id").last
-  	  if payment_info_by_producer_id[producer.id] == nil
-  	  	payment_info_by_producer_id[producer.id] = {amount: 0, payment_payable_ids: []}
+  	  creditor = p.users.order("users.id").last
+  	  if payment_info_by_creditor_id[creditor.id] == nil
+  	  	payment_info_by_creditor_id[creditor.id] = {amount: 0, payment_payable_ids: []}
   	  end
   	  amount_unpaid_on_this_payment_payable = p.amount - p.amount_paid  	  
-      payment_info_by_producer_id[producer.id][:amount] = (payment_info_by_producer_id[producer.id][:amount] + amount_unpaid_on_this_payment_payable).round(2)
-  	  payment_info_by_producer_id[producer.id][:payment_payable_ids] << p.id
+      payment_info_by_creditor_id[creditor.id][:amount] = (payment_info_by_creditor_id[creditor.id][:amount] + amount_unpaid_on_this_payment_payable).round(2)
+  	  payment_info_by_creditor_id[creditor.id][:payment_payable_ids] << p.id
       grand_total_payout = (grand_total_payout + amount_unpaid_on_this_payment_payable).round(2)
   	end
 
     puts "BulkPaymentProcessing.bulk_payment_new end"
 
-  	return {unpaid_payment_payables: unpaid_payment_payables, grand_total_payout: grand_total_payout, payment_info_by_producer_id: payment_info_by_producer_id}
+  	return {unpaid_payment_payables: unpaid_payment_payables, grand_total_payout: grand_total_payout, payment_info_by_creditor_id: payment_info_by_creditor_id}
 
 	end
+
+  def self.get_payment_infos_by_payment_method(payment_info_by_creditor_id)
+
+    paypal_payment_info_by_creditor_id = {}
+    manual_payment_info_by_creditor_id = {}
+
+    payment_info_by_creditor_id.each do |creditor_id, payment_info|
+      creditor = User.find(creditor_id)
+      if creditor.nil?
+        next
+      end
+      bi = creditor.get_business_interface
+      if bi.paypal_accepted
+        paypal_payment_info_by_creditor_id[creditor_id] = payment_info
+      else
+        manual_payment_info_by_creditor_id[creditor_id] = payment_info
+      end
+    end
+
+    return {paypal_payment_info_by_creditor_id: paypal_payment_info_by_creditor_id, manual_payment_info_by_creditor_id: manual_payment_info_by_creditor_id}
+
+  end
+
+  
 
 	def self.bulk_payment_create(params)
 
     puts "BulkPaymentProcessing.bulk_payment_create start"
 
-    if params.nil? || params[:payment_info_by_producer_id].nil?
-      puts "payment_info_by_producer_id is nil. quitting."
+    if params.nil? || params[:payment_info_by_creditor_id].nil?
+      puts "payment_info_by_creditor_id is nil. quitting."
       puts "BulkPaymentProcessing.bulk_payment_create end"
-      return {payment_info_by_producer_id: nil, messages: ["payment_info_by_producer_id is nil. We cannot proceed with this bulk payment. Please do not touch the system any further until you can report this to a developer."]}
+      return {payment_info_by_creditor_id: nil, messages: ["payment_info_by_creditor_id is nil. We cannot proceed with this bulk payment. Please do not touch the system any further until you can report this to a developer."]}
     end
 
-    payment_info_by_producer_id = params[:payment_info_by_producer_id]
+    payment_info_by_creditor_id = params[:payment_info_by_creditor_id]
 
-    if payment_info_by_producer_id.is_a? String
-      payment_info_by_producer_id = eval payment_info_by_producer_id
+    if payment_info_by_creditor_id.is_a? String
+      payment_info_by_creditor_id = eval payment_info_by_creditor_id
     end
 
-  	num_payees = payment_info_by_producer_id.keys.count
+  	num_payees = payment_info_by_creditor_id.keys.count
   	cumulative_total_payout = 0
-  	payment_info_by_producer_id.each do |producer_id, payment_info|
+  	payment_info_by_creditor_id.each do |creditor_id, payment_info|
   	  cumulative_total_payout = (cumulative_total_payout + payment_info[:amount].to_f).round(2)
   	end
 
-  	response = send_payments(payment_info_by_producer_id)
-    payment_invoice_infos = send_payment_invoices(payment_info_by_producer_id)
+    payment_infos_by_payment_method = get_payment_infos_by_payment_method(payment_info_by_creditor_id)
+    paypal_payment_info_by_creditor_id = payment_infos_by_payment_method[:paypal_payment_info_by_creditor_id]
+    manual_payment_info_by_creditor_id = payment_infos_by_payment_method[:manual_payment_info_by_creditor_id]
+
+  	response = send_payments(paypal_payment_info_by_creditor_id)
   	
     puts "BulkPaymentProcessing.bulk_payment_create: returned from sending payments. now building a BulkPayment object to save to db."
 	  #create a BulkPayment object
 	  #create a Payment object for each payment in the BulkPayment
-	  bulk_payment = BulkPayment.new(num_payees: payment_info_by_producer_id.keys.count, total_payments_amount: cumulative_total_payout)
-	  payment_info_by_producer_id.each do |producer_id, payment_info|
+    payment_invoice_infos = []
+	  bulk_payment = BulkPayment.new(num_payees: payment_info_by_creditor_id.keys.count, total_payments_amount: cumulative_total_payout)    
+	  payment_info_by_creditor_id.each do |creditor_id, payment_info|
 	  	payment = Payment.new(amount: payment_info[:amount])  	  	
 	  	payment_info[:payment_payable_ids].each do |payment_payable_id|
 	  	  payment_payable = PaymentPayable.find(payment_payable_id.to_i)
@@ -99,13 +127,24 @@ class BulkPaymentProcessing
 	  	  bulk_payment.payment_payables << payment_payable
 	  	end
 	  	payment.save
+      
+      creditor = User.find(creditor_id)
+      posting_infos = get_posting_infos(payment_info[:payment_payable_ids])
+      #NOTE: DO NOT REMOVE THIS ARRAY! it's used in test for verification
+      payment_invoice_infos << {total: payment.amount, posting_infos: posting_infos}
+      ProducerNotificationsMailer.payment_invoice(creditor, payment, posting_infos).deliver_now
+
 	  end
-    save_response(response, bulk_payment)
+
+    if response
+      save_response(response, bulk_payment)
+    end
+    
 	  bulk_payment.save  	
 
     puts "BulkPaymentProcessing.bulk_payment_create end"
 
-  	return {payment_invoice_infos: payment_invoice_infos, messages: [], payment_info_by_producer_id: payment_info_by_producer_id, num_payees: num_payees, cumulative_total_payout: cumulative_total_payout, bulk_payment: bulk_payment}
+  	return {payment_invoice_infos: payment_invoice_infos, messages: [], payment_info_by_creditor_id: payment_info_by_creditor_id, num_payees: num_payees, cumulative_total_payout: cumulative_total_payout, bulk_payment: bulk_payment}
 
 	end
 
@@ -127,28 +166,62 @@ class BulkPaymentProcessing
 
 	private
 
-    def self.email_report_to_admin(bulk_payment, payment_info_by_producer_id)
+    def self.email_report_to_admin(bulk_payment, payment_info_by_creditor_id)
 
       puts "BulkPaymentProcessing.email_report_to_admin start"
 
+      if payment_info_by_creditor_id.nil?
+        puts "payment_info_by_creditor_id is nil"
+        puts "BulkPaymentProcessing.email_report_to_admin end"
+        return
+      end
+
+      payment_infos_by_payment_method = get_payment_infos_by_payment_method(payment_info_by_creditor_id)
+      paypal_payment_info_by_creditor_id = payment_infos_by_payment_method[:paypal_payment_info_by_creditor_id]
+      manual_payment_info_by_creditor_id = payment_infos_by_payment_method[:manual_payment_info_by_creditor_id]
+
       body_lines = []
+      paypal_payment_amount_sum = 0      
 
-      if !payment_info_by_producer_id.nil?
+      if paypal_payment_info_by_creditor_id.count > 0        
 
-        payment_amount_sum = 0
+        body_lines << "PAYPAL PAYMENTS"
 
-        payment_info_by_producer_id.each do |producer_id, payment_info|
-          producer = User.find(producer_id)
-          body_lines << number_to_currency(payment_info[:amount]) + " sent to " + producer.farm_name + " via email address " + producer.email + "."
-          payment_amount_sum = (payment_amount_sum + payment_info[:amount]).round(2)
+        paypal_payment_info_by_creditor_id.each do |creditor_id, payment_info|
+          creditor = User.find(creditor_id)
+          body_lines << number_to_currency(payment_info[:amount]) + " sent to " + creditor.farm_name + " via email address " + creditor.email + "."
+          paypal_payment_amount_sum = (paypal_payment_amount_sum + payment_info[:amount]).round(2)
         end
 
-        body_lines << "The sum of these payments is " + number_to_currency(payment_amount_sum) + "."
+        body_lines << "The sum of paypal payments is " + number_to_currency(paypal_payment_amount_sum) + "."
 
       end
 
-      if !bulk_payment.nil?
-        body_lines << "BulkPayment id: " + bulk_payment.id.to_s + ". num_payees " + bulk_payment.num_payees.to_s + ". total_payments_amount " + number_to_currency(bulk_payment.total_payments_amount)
+      manual_payment_amount_sum = 0
+
+      if manual_payment_info_by_creditor_id.count > 0        
+
+        body_lines << "MANUAL PAYMENTS"
+        
+        manual_payment_info_by_creditor_id.each do |creditor_id, payment_info|
+          creditor = User.find(creditor_id)
+          body_lines << number_to_currency(payment_info[:amount]) + " to " + creditor.get_business_interface.name + "."
+          manual_payment_amount_sum = (manual_payment_amount_sum + payment_info[:amount]).round(2)
+        end
+
+        body_lines << "The sum of manual payments is " + number_to_currency(manual_payment_amount_sum) + "."
+
+      end
+
+      if paypal_payment_amount_sum > 0 && manual_payment_amount_sum > 0
+        total_sum = (paypal_payment_amount_sum + manual_payment_amount_sum).round(2)
+        body_lines << "The sum of all payments is " + number_to_currency(total_sum) + "."
+      end
+
+      if bulk_payment.nil?
+        body_lines << "bulk_payment is nil"
+      else
+        body_lines << "BulkPayment id: " + bulk_payment.id.to_s + ". num_payees " + bulk_payment.num_payees.to_s + "."
       end
 
       if body_lines.count > 0
@@ -306,42 +379,28 @@ class BulkPaymentProcessing
 
     end
 
-    def self.send_payments(payment_info_by_producer_id)
+    def self.send_payments(payment_info_by_creditor_id)
 
       puts "BulkPaymentProcessing.send_payments start"
+
+      if payment_info_by_creditor_id.count < 1
+        puts "not sending paypal payments because payment_info_by_creditor_id.count < 1"
+        puts "BulkPaymentProcessing.send_payments end"
+        return nil
+      end
 
       if !USEGATEWAY
         response = FakeMasspayResponse.new
         return response
       end
 
-      email_amount_pairs = get_email_amount_pairs(payment_info_by_producer_id)
+      email_amount_pairs = get_email_amount_pairs(payment_info_by_creditor_id)
       payouts_params = get_payout_params(email_amount_pairs)
       response = send_paypal_masspay(PAYPALCREDENTIALS, payouts_params)
 
       puts "BulkPaymentProcessing.send_payments end"
 
       return response
-
-    end
-
-    def self.send_payment_invoices(payment_info_by_producer_id)
-
-      payment_invoice_infos = []
-
-      payment_info_by_producer_id.each do |producer_id, payment_info|
-
-        producer = User.find(producer_id)
-        total_amount = payment_info[:amount]
-        payment_payable_ids = payment_info[:payment_payable_ids]
-        posting_infos = get_posting_infos(payment_payable_ids)
-        payment_invoice_infos << {total: total_amount, posting_infos: posting_infos}
-
-        ProducerNotificationsMailer.payment_invoice(producer, total_amount, posting_infos).deliver_now
-                
-      end
-
-      return payment_invoice_infos
 
     end
 
@@ -358,11 +417,11 @@ class BulkPaymentProcessing
             posting_infos[tote_item.posting] = {unit_count: 0, unit_price: 0, sub_total: 0}
           end
 
-          producer_net_item = get_producer_net_item(tote_item)
+          creditor_net_item = get_producer_net_item(tote_item)
 
           posting_infos[tote_item.posting][:unit_count] += tote_item.quantity
-          posting_infos[tote_item.posting][:sub_total] = (posting_infos[tote_item.posting][:sub_total] + producer_net_item).round(2)
-          posting_infos[tote_item.posting][:unit_price] = (producer_net_item / tote_item.quantity).round(2)
+          posting_infos[tote_item.posting][:sub_total] = (posting_infos[tote_item.posting][:sub_total] + creditor_net_item).round(2)
+          posting_infos[tote_item.posting][:unit_price] = (creditor_net_item / tote_item.quantity).round(2)
 
         end
 
@@ -390,12 +449,14 @@ class BulkPaymentProcessing
 
     end
 
-    def self.get_email_amount_pairs(payment_info_by_producer_id)
+    def self.get_email_amount_pairs(payment_info_by_creditor_id)
 
       email_amount_pairs = []
 
-      payment_info_by_producer_id.each do |producer_id, payment_info|
-        email_amount_pairs << {email: User.find(producer_id).email, amount: payment_info[:amount]}                                
+      payment_info_by_creditor_id.each do |creditor_id, payment_info|
+        creditor = User.find(creditor_id)
+        business_interface = creditor.get_business_interface        
+        email_amount_pairs << {email: business_interface.paypal_email, amount: payment_info[:amount]}                                
       end
 
       return email_amount_pairs

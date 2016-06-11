@@ -47,9 +47,9 @@ class BulkPurchasesTest < BulkBuyer
     unpaid_payment_payables = assigns(:unpaid_payment_payables)
     assert_not_nil unpaid_payment_payables
     grand_total_payout = assigns(:grand_total_payout)
-    payment_info_by_producer_id = assigns(:payment_info_by_producer_id)    
-    assert_not_nil payment_info_by_producer_id
-    post bulk_payments_path, payment_info_by_producer_id: payment_info_by_producer_id
+    payment_info_by_creditor_id = assigns(:payment_info_by_creditor_id)    
+    assert_not_nil payment_info_by_creditor_id
+    post bulk_payments_path, payment_info_by_creditor_id: payment_info_by_creditor_id
     bulk_payment = assigns(:bulk_payment)
 
     assert_equal bulk_purchase.net, bulk_payment.total_payments_amount    
@@ -173,9 +173,9 @@ class BulkPurchasesTest < BulkBuyer
     unpaid_payment_payables = assigns(:unpaid_payment_payables)
     assert_not_nil unpaid_payment_payables
     grand_total_payout = assigns(:grand_total_payout)
-    payment_info_by_producer_id = assigns(:payment_info_by_producer_id)    
-    assert_not_nil payment_info_by_producer_id
-    post bulk_payments_path, payment_info_by_producer_id: payment_info_by_producer_id
+    payment_info_by_creditor_id = assigns(:payment_info_by_creditor_id)    
+    assert_not_nil payment_info_by_creditor_id
+    post bulk_payments_path, payment_info_by_creditor_id: payment_info_by_creditor_id
     bulk_payment = assigns(:bulk_payment)
 
     assert_equal bulk_purchase.net, bulk_payment.total_payments_amount    
@@ -316,9 +316,9 @@ class BulkPurchasesTest < BulkBuyer
     unpaid_payment_payables = assigns(:unpaid_payment_payables)
     assert_not_nil unpaid_payment_payables
     grand_total_payout = assigns(:grand_total_payout)
-    payment_info_by_producer_id = assigns(:payment_info_by_producer_id)    
-    assert_not_nil payment_info_by_producer_id
-    post bulk_payments_path, payment_info_by_producer_id: payment_info_by_producer_id
+    payment_info_by_creditor_id = assigns(:payment_info_by_creditor_id)    
+    assert_not_nil payment_info_by_creditor_id
+    post bulk_payments_path, payment_info_by_creditor_id: payment_info_by_creditor_id
     bulk_payment = assigns(:bulk_payment)
 
     assert_equal bulk_purchase.net, bulk_payment.total_payments_amount    
@@ -343,9 +343,9 @@ class BulkPurchasesTest < BulkBuyer
     unpaid_payment_payables = assigns(:unpaid_payment_payables)
     assert_not_nil unpaid_payment_payables
     grand_total_payout = assigns(:grand_total_payout)
-    payment_info_by_producer_id = assigns(:payment_info_by_producer_id)    
-    assert_not_nil payment_info_by_producer_id
-    post bulk_payments_path, payment_info_by_producer_id: payment_info_by_producer_id
+    payment_info_by_creditor_id = assigns(:payment_info_by_creditor_id)    
+    assert_not_nil payment_info_by_creditor_id
+    post bulk_payments_path, payment_info_by_creditor_id: payment_info_by_creditor_id
     bulk_payment = assigns(:bulk_payment)
     assert_equal bulk_purchase.net, bulk_payment.total_payments_amount
 
@@ -370,9 +370,9 @@ class BulkPurchasesTest < BulkBuyer
     unpaid_payment_payables = assigns(:unpaid_payment_payables)
     assert_not_nil unpaid_payment_payables
     grand_total_payout = assigns(:grand_total_payout)
-    payment_info_by_producer_id = assigns(:payment_info_by_producer_id)    
-    assert_not_nil payment_info_by_producer_id
-    post bulk_payments_path, payment_info_by_producer_id: payment_info_by_producer_id
+    payment_info_by_creditor_id = assigns(:payment_info_by_creditor_id)    
+    assert_not_nil payment_info_by_creditor_id
+    post bulk_payments_path, payment_info_by_creditor_id: payment_info_by_creditor_id
     bulk_payment = assigns(:bulk_payment)
     assert_equal bulk_purchase.net, bulk_payment.total_payments_amount
 
