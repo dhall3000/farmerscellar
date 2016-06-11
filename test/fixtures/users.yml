@@ -1,5 +1,23 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
+f9:
+  name: f9
+  email: f9@f.com
+  password_digest: <%= User.digest('dogdog') %>
+  account_type: 1
+  activated: true
+  activated_at: Time.zone.now
+  description: producers of dog food
+  address: 9876 Yipsam Rd
+  city: Gnarly
+  state: Washington
+  zip: 98119
+  phone: 206-150-6579
+  website: www.f9.com
+  agreement: 1
+  farmer_approval: t
+  farm_name: F9 FARM
+
 c18:
   name: c18
   email: c18@c.com

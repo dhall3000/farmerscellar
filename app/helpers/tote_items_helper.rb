@@ -157,11 +157,16 @@ module ToteItemsHelper
       return 0
     end
 
-    unit_fee = (0.035 * tote_item.price).round(2)
+    unit_fee = get_payment_processor_fee_unit(tote_item.price)    
     item_fee = (unit_fee * tote_item.quantity).round(2)
     
     return item_fee
 
+  end
+
+  def get_payment_processor_fee_unit(unit_price)
+    unit_fee = (0.035 * unit_price).round(2)
+    return unit_fee
   end
 
   def get_producer_net_tote(tote_items)
@@ -183,6 +188,15 @@ module ToteItemsHelper
   def get_producer_net_item(tote_item)
     producer_net_item = (get_gross_item(tote_item) - get_payment_processor_fee_item(tote_item) - get_commission_item(tote_item)).round(2)
     return producer_net_item
+  end
+
+  def make_commission_factor(retail, producer_net)
+
+    commission = retail - producer_net - get_payment_processor_fee_unit(retail)
+    commission_factor = commission / retail
+
+    return commission_factor
+
   end
 
   def get_commission_factor(producer, product)

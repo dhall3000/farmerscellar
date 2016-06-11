@@ -1,23 +1,63 @@
 <h1>New ProducerProductCommission</h1>
 
 <div class="row">
-  <div class="col-md-4 col-md-offset-4">  
-  
-    <%= form_for @ppc do |f| %>
-      <%= render partial: 'shared/error_messages_general', locals: { active_record_object: @ppc } %>
+  <div class="col-md-8 col-md-offset-2">  
 
-      <%= f.label :user_id %>
-      <%= f.collection_select(:user_id, @producers, :id, :farm_name, prompt: true) %>
+    <div class="panel-group" role="tablist" aria-multiselectable="true">        
+      <div class="panel panel-default">
+        <div class="panel-heading" role="tab">
+          <h4 class="panel-title">Set Commission Directly</h4>
+        </div>                
+        <div class="panel-body">
+          
+          <%= form_for @ppc do |f| %>
+            <%= render partial: 'shared/error_messages_general', locals: { active_record_object: @ppc } %>
 
-      <%= f.label :product_id %>
-      <%= f.collection_select(:product_id, @products, :id, :name, prompt: true) %>
+            <%= f.label :user_id %>
+            <%= f.collection_select(:user_id, @producers, :id, :farm_name, prompt: true) %>
 
-      <%= f.label :commission %>
-      <%= f.text_field :commission, class: "form-control" %>
+            <%= f.label :product_id %>
+            <%= f.collection_select(:product_id, @products, :id, :name, prompt: true) %>
 
-      <%= f.submit class: "btn btn-primary" %>
+            <%= f.label :commission %>
+            <%= f.text_field :commission, class: "form-control" %>
 
-    <% end %>
+            <%= f.submit class: "btn btn-primary" %>
+
+          <% end %>
+
+        </div>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading" role="tab">
+          <h4 class="panel-title">Set Commission by Retail and Producer Net Price</h4>
+        </div>                
+        <div class="panel-body">
+
+          <%= form_for @ppc do |f| %>
+            <%= render partial: 'shared/error_messages_general', locals: { active_record_object: @ppc } %>
+
+            <%= f.label :user_id %>
+            <%= f.collection_select(:user_id, @producers, :id, :farm_name, prompt: true) %>
+
+            <%= f.label :product_id %>
+            <%= f.collection_select(:product_id, @products, :id, :name, prompt: true) %>
+
+            <%= label_tag :retail %>
+            <%= text_field_tag :retail, class: "form-control" %>
+
+            <%= label_tag :producer_net %>
+            <%= text_field_tag :producer_net, class: "form-control" %>
+
+            <%= f.submit class: "btn btn-primary" %>
+
+          <% end %>
+
+        </div>
+      </div>
+
+    </div>
 
   </div>
 </div>

@@ -6,6 +6,63 @@ class ProducerProductCommissionsControllerTest < ActionController::TestCase
     @admin = users(:a1)
     @farmer = users(:f1)
     @product = products(:apples)
+    @posting = postings(:f9posting)    
+  end
+
+  test "should show ppc" do
+
+    log_in_as(@admin)
+    #NOTE: the "id: 1" is a hack...there is no id on ppc but the url generator won't allow a non-id param set
+    get :show, id: 1, product_id: @product.id, user_id: @farmer.id
+    assert_response :success
+    ppc = assigns(:ppc)
+    assert_not ppc.nil?
+    assert ppc.commission > 0
+
+  end
+
+  test "should create ppc by commission" do
+
+    log_in_as(@admin)
+    new_commission = 0.05
+    post :create, producer_product_commission: {product_id: @product.id, user_id: @farmer.id, commission: new_commission}
+    assert_redirected_to producer_product_commission_path(id: 1, product_id: @product.id, user_id: @farmer.id)    
+
+    ppc = assigns(:ppc)
+    assert_not ppc.nil?
+    assert_equal new_commission, ppc.commission
+
+    #NOTE: the "id: 1" is a hack...there is no id on ppc but the url generator won't allow a non-id param set
+    get :show, id: 1, product_id: @product.id, user_id: @farmer.id
+    assert_response :success
+    ppc = assigns(:ppc)
+    assert_not ppc.nil?
+    assert_equal new_commission, ppc.commission
+
+  end
+ 
+  test "should create ppc by retail and producer net" do
+
+    log_in_as(@admin)
+    @farmer = users(:f9)
+
+    post :create, producer_product_commission: {product_id: @product.id, user_id: @farmer.id}, retail: 11, producer_net: 10
+    assert_redirected_to producer_product_commission_path(id: 1, product_id: @product.id, user_id: @farmer.id)
+
+    ppc = assigns(:ppc)
+    assert_not ppc.nil?
+
+    #NOTE: the "id: 1" is a hack...there is no id on ppc but the url generator won't allow a non-id param set
+    get :show, id: 1, product_id: @product.id, user_id: @farmer.id
+    assert_response :success
+    ppc = assigns(:ppc)
+    assert_not ppc.nil?
+
+    ti = ToteItem.new(price: 11, quantity: 1, posting_id: @posting.id)
+    computed_producer_net = get_producer_net_item(ti)
+    expected_producer_net = 10
+    assert_equal expected_producer_net, computed_producer_net
+
   end
 
   test "should get index" do
@@ -26,7 +83,7 @@ class ProducerProductCommissionsControllerTest < ActionController::TestCase
   test "should create new commission" do
     log_in_as(@admin)
     post :create, producer_product_commission: { user_id: @farmer.id, product_id: @product.id, commission: 0.02 }
-    assert_response :success    
+    assert_redirected_to producer_product_commission_path(id: 1, product_id: @product.id, user_id: @farmer.id)    
   end
 
   test "should not create new commission" do

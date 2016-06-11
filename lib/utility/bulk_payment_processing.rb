@@ -53,31 +53,7 @@ class BulkPaymentProcessing
   	return {unpaid_payment_payables: unpaid_payment_payables, grand_total_payout: grand_total_payout, payment_info_by_creditor_id: payment_info_by_creditor_id}
 
 	end
-
-  def self.get_payment_infos_by_payment_method(payment_info_by_creditor_id)
-
-    paypal_payment_info_by_creditor_id = {}
-    manual_payment_info_by_creditor_id = {}
-
-    payment_info_by_creditor_id.each do |creditor_id, payment_info|
-      creditor = User.find(creditor_id)
-      if creditor.nil?
-        next
-      end
-      bi = creditor.get_business_interface
-      if bi.paypal_accepted
-        paypal_payment_info_by_creditor_id[creditor_id] = payment_info
-      else
-        manual_payment_info_by_creditor_id[creditor_id] = payment_info
-      end
-    end
-
-    return {paypal_payment_info_by_creditor_id: paypal_payment_info_by_creditor_id, manual_payment_info_by_creditor_id: manual_payment_info_by_creditor_id}
-
-  end
-
   
-
 	def self.bulk_payment_create(params)
 
     puts "BulkPaymentProcessing.bulk_payment_create start"
@@ -166,6 +142,28 @@ class BulkPaymentProcessing
 
 	private
 
+    def self.get_payment_infos_by_payment_method(payment_info_by_creditor_id)
+
+      paypal_payment_info_by_creditor_id = {}
+      manual_payment_info_by_creditor_id = {}
+
+      payment_info_by_creditor_id.each do |creditor_id, payment_info|
+        creditor = User.find(creditor_id)
+        if creditor.nil?
+          next
+        end
+        bi = creditor.get_business_interface
+        if bi.paypal_accepted
+          paypal_payment_info_by_creditor_id[creditor_id] = payment_info
+        else
+          manual_payment_info_by_creditor_id[creditor_id] = payment_info
+        end
+      end
+
+      return {paypal_payment_info_by_creditor_id: paypal_payment_info_by_creditor_id, manual_payment_info_by_creditor_id: manual_payment_info_by_creditor_id}
+
+    end
+
     def self.email_report_to_admin(bulk_payment, payment_info_by_creditor_id)
 
       puts "BulkPaymentProcessing.email_report_to_admin start"
@@ -189,7 +187,8 @@ class BulkPaymentProcessing
 
         paypal_payment_info_by_creditor_id.each do |creditor_id, payment_info|
           creditor = User.find(creditor_id)
-          body_lines << number_to_currency(payment_info[:amount]) + " sent to " + creditor.farm_name + " via email address " + creditor.email + "."
+          business_interface = creditor.get_business_interface
+          body_lines << number_to_currency(payment_info[:amount]) + " sent to " + business_interface.name + " via email address " + business_interface.paypal_email + "."
           paypal_payment_amount_sum = (paypal_payment_amount_sum + payment_info[:amount]).round(2)
         end
 

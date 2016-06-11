@@ -496,6 +496,13 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
           #assert num CLOSED postings is postings.count - 2
           assert_equal posting_recurrence.postings.count - 2, num_closed_postings          
         elsif Time.zone.now > second_last.delivery_date + 12.hours
+
+          if !second_last.state?(:CLOSED)
+            second_last.fill(1000)
+            #refresh
+            num_closed_postings = posting_recurrence.postings.where(state: Posting.states[:CLOSED]).count
+          end
+
           assert second_last.state?(:CLOSED)
           #assert num CLOSED postings is postings.count - 1
           assert_equal posting_recurrence.postings.count - 1, num_closed_postings

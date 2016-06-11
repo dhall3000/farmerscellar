@@ -18,6 +18,20 @@
 <% friday_after_base_monday = wednesday_after_base_monday + 2.days %>
 <% monday_after_base_monday = base_monday + 7.days %>
 
+f9posting:
+  delivery_date: <%= delivery_date %>
+  commitment_zone_start: <%= delivery_date - 2.days %>  
+  product: apples
+  quantity_available: 1000
+  price: 4
+  user: f9
+  unit_category: weight
+  unit_kind: pound
+  description: crispy apples
+  live: true
+  late_adds_allowed: false
+
+#------------------------------------------------------------
 f6posting:
   delivery_date: <%= delivery_date %>
   commitment_zone_start: <%= delivery_date - 2.days %>  
