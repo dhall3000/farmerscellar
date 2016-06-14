@@ -18,7 +18,5 @@ class AddUnitReferenceToProducerProductUnitCommission < ActiveRecord::Migration
 
     end
 
-    change_column :producer_product_unit_commissions, :unit_id, :integer, null: false
-
   end
 end
