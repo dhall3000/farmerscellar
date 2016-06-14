@@ -45,10 +45,10 @@
             <%= f.collection_select(:product_id, @products, :id, :name, prompt: true) %>
 
             <%= label_tag :retail %>
-            <%= text_field_tag :retail, class: "form-control" %>
+            <%= text_field_tag :retail, nil, class: "form-control" %>
 
             <%= label_tag :producer_net %>
-            <%= text_field_tag :producer_net, class: "form-control" %>
+            <%= text_field_tag :producer_net, nil, class: "form-control" %>
 
             <%= f.submit class: "btn btn-primary" %>
 
