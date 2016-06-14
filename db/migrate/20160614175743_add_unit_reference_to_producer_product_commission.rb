@@ -10,7 +10,7 @@ class AddUnitReferenceToProducerProductCommission < ActiveRecord::Migration
       product = posting.product
       unit = posting.unit
 
-      rows = ProducerProductCommission.where(user: producer, product: product)
+      rows = ProducerProductUnitCommission.where(user: producer, product: product)
 
       rows.each do |row|
         row.update(unit_id: unit.id)        
