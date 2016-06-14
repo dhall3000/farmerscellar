@@ -206,12 +206,12 @@ basil = Product.create(name: "Basil")
 Unit.create(name: "Fluid Ounce")
 Unit.create(name: "Pint")
 Unit.create(name: "Quart")
-Unit.create(name: "Half Gallon")
-Unit.create(name: "Gallon")
+half_gallon = Unit.create(name: "Half Gallon")
+gallon = Unit.create(name: "Gallon")
 
 Unit.create(name: "Grain")
 Unit.create(name: "Ounce")
-Unit.create(name: "Pound")
+pound = Unit.create(name: "Pound")
 Unit.create(name: "Ton")
 
 whole = Unit.create(name: "Whole")
@@ -229,16 +229,16 @@ def next_friday
   return (Time.zone.now + i.days).midnight
 end
 
-f1.producer_product_unit_commissions.create(product: apples, commission: 0.05)
-f1.producer_product_unit_commissions.create(product: asparagus, commission: 0.15)
-f2.producer_product_unit_commissions.create(product: milk, commission: 0.10)
-f2.producer_product_unit_commissions.create(product: beef, commission: 0.03)
-f3.producer_product_unit_commissions.create(product: carrots, commission: 0.04)
-f3.producer_product_unit_commissions.create(product: chicken, commission: 0.07)
-f4.producer_product_unit_commissions.create(product: oranges, commission: 0.08)
-f4.producer_product_unit_commissions.create(product: celery, commission: 0.12)
-f4.producer_product_unit_commissions.create(product: avocado, commission: 0.08)
-f4.producer_product_unit_commissions.create(product: basil, commission: 0.06)
+f1.producer_product_unit_commissions.create(product: apples, commission: 0.05, unit: pound)
+f1.producer_product_unit_commissions.create(product: asparagus, commission: 0.15, unit: pound)
+f2.producer_product_unit_commissions.create(product: milk, commission: 0.10, unit: gallon)
+f2.producer_product_unit_commissions.create(product: beef, commission: 0.03, unit: pound)
+f3.producer_product_unit_commissions.create(product: carrots, commission: 0.04, unit: pound)
+f3.producer_product_unit_commissions.create(product: chicken, commission: 0.07, unit: pound)
+f4.producer_product_unit_commissions.create(product: oranges, commission: 0.08, unit: pound)
+f4.producer_product_unit_commissions.create(product: celery, commission: 0.12, unit: pound)
+f4.producer_product_unit_commissions.create(product: avocado, commission: 0.08, unit: pound)
+f4.producer_product_unit_commissions.create(product: basil, commission: 0.06, unit: pound)
 
 #Apples
 apples = Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 1, quantity_available: 1000, price: 2.75, user_id: f1.id, unit_id: 8, description: "these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
