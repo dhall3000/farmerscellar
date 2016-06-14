@@ -16,6 +16,13 @@ class ProducerProductUnitCommissionsControllerTest < ActionController::TestCase
     #going to create commission #1 for producer/product/unit1, then create commission #2 for producer/product/unit2. then we want to
     #pull up the commission for unit 1 and verify that, although unit2's commission was added later in time, we still do get unit1's commission
 
+    #add 5% commission for ton
+    log_in_as(@admin)    
+    post :create, producer_product_unit_commission: {product_id: @product.id, unit_id: units(:ton), user_id: @farmer.id, commission: 0.05}
+    #add 10% commission for pound
+    post :create, producer_product_unit_commission: {product_id: @product.id, unit_id: units(:pound), user_id: @farmer.id, commission: 0.10}
+
+    #create the postings
     postingTon = Posting.new(
       description: "good apples",
       quantity_available: 100,
@@ -42,13 +49,8 @@ class ProducerProductUnitCommissionsControllerTest < ActionController::TestCase
       commitment_zone_start: Time.zone.now.midnight + 1.day
       )
 
-    assert postingPound.save    
+    assert postingPound.save
 
-    #add 5% commission for ton
-    log_in_as(@admin)    
-    post :create, producer_product_unit_commission: {product_id: @product.id, unit_id: units(:ton), user_id: @farmer.id, commission: 0.05}
-    #add 10% commission for pound
-    post :create, producer_product_unit_commission: {product_id: @product.id, unit_id: units(:pound), user_id: @farmer.id, commission: 0.10}
     #pull up ton commission
     tiTon = ToteItem.new(posting_id: postingTon.id, quantity: 1, price: postingTon.price)
     commission = get_commission_item(tiTon)

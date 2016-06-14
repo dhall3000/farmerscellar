@@ -14,7 +14,7 @@ class PostingTest < ActiveSupport::TestCase
       delivery_date = Time.zone.today + 4.days
     end
 
-    @posting = Posting.new(unit: @unit, product: @product, user: user, description: "descrip", quantity_available: 100, price: 1.25, live: true, commitment_zone_start: delivery_date - 2.days, delivery_date: delivery_date)
+    @posting = Posting.new(unit: @unit, product: @product, user: @farmer, description: "descrip", quantity_available: 100, price: 1.25, live: true, commitment_zone_start: delivery_date - 2.days, delivery_date: delivery_date)
     @posting.save
   end
 

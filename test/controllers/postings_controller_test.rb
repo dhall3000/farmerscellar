@@ -33,6 +33,26 @@ class PostingsControllerTest < ActionController::TestCase
 
   end
 
+  test "do not create if commission not set for producer product unit" do
+
+    #this producer does not have a commission set for this product
+    product = products(:milk)
+
+    #log in
+    log_in_as(@farmer)
+    #make a posting that doesn't have price set
+    posting_params = get_posting_params_hash
+    posting_params[:product_id] = product.id
+    commission = ProducerProductUnitCommission.where(user: @farmer, product: product, unit_id: posting_params[:unit_id])
+    assert_equal 0, commission.count
+    post :create, id: @farmer.id, posting: posting_params
+    posting = assigns(:posting)
+    assert_not posting.valid?
+    assert_not flash.empty?
+    assert_equal "No commission is set for that product and unit. Please contact Farmer's Cellar to get a commission set.", flash.now[:danger]
+
+  end
+
   test "should display non closed postings for admin well after delivery day" do
 
     #assert this posting is OPEN

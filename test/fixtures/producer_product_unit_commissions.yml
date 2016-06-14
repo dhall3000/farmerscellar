@@ -42,56 +42,54 @@ f5apples:
   user: f5
   unit: pound
 
-#f1.producer_product_commissions.create(product: apples, commission: 0.05)
 f1apples:
   product: apples
   commission: 0.05
   user: f1
   unit: pound
 
-#f1.producer_product_commissions.create(product: asparagus, commission: 0.15)
 f1asparagus:
   product: asparagus
   commission: 0.15
   user: f1
   unit: bunch
 
-#f2.producer_product_commissions.create(product: milk, commission: 0.10)
+f1asparagus:
+  product: asparagus
+  commission: 0.15
+  user: f1
+  unit: pound
+
 f2milk:
   product: milk
   commission: 0.10
   user: f2
   unit: gallon
 
-#f2.producer_product_commissions.create(product: beef, commission: 0.045)
 f2beef:
   product: beef
   commission: 0.045
   user: f2
   unit: pound
 
-#f3.producer_product_commissions.create(product: carrots, commission: 0.04)
 f3carrots:
   product: carrots
   commission: 0.04
   user: f3
   unit: pound
 
-#f3.producer_product_commissions.create(product: chicken, commission: 0.07)
 f3chicken:
   product: chicken
   commission: 0.07
   user: f3
   unit: whole
 
-#f4.producer_product_commissions.create(product: oranges, commission: 0.08)
 f4oranges:
   product: oranges
   commission: 0.08
   user: f4
   unit: pound
 
-#f4.producer_product_commissions.create(product: celery, commission: 0.12)
 f4celery:
   product: celery
   commission: 0.12

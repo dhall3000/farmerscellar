@@ -16,7 +16,7 @@ class Posting < ActiveRecord::Base
   #the weird syntax below is due to some serious gotchas having to do with how booleans are stores or something? I have no idea. See here:
   #http://stackoverflow.com/questions/10506575/rails-database-defaults-and-model-validation-for-boolean-fields
   validates :live, inclusion: { in: [true, false] }
-  validate :delivery_date_not_sunday, :commitment_zone_start_must_be_before_delivery_date
+  validate :delivery_date_not_sunday, :commitment_zone_start_must_be_before_delivery_date, :commission_is_set
   before_create :delivery_date_must_be_after_today
 
   validates_presence_of :user, :product, :unit
@@ -209,13 +209,26 @@ class Posting < ActiveRecord::Base
     def commitment_zone_start_must_be_before_delivery_date
 
       if delivery_date.nil?
-        errors.add(:delivery_date, "Delivery date must not be specified")
+        errors.add(:delivery_date, "Delivery date must be specified")
         return
       end
 
       if delivery_date.nil? || commitment_zone_start.nil? || commitment_zone_start > delivery_date
         errors.add(:commitment_zone_start, "Commitment zone must start prior to delivery date")
       end
+
+    end
+
+    def commission_is_set
+
+      commission = ProducerProductUnitCommission.where(user: user, product: product, unit: unit)
+
+      if commission.count == 0
+        errors.add(:commission_is_set, "Commission must be set for producer/product/unit")
+        return false
+      end
+
+      return true
 
     end
 

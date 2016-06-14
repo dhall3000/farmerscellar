@@ -56,6 +56,21 @@ class PostingsController < ApplicationController
             
     end
 
+    #first check to see if we have a commission set for this creation attempt
+    commission = ProducerProductUnitCommission.where(user_id: posting_params[:user_id], product_id: posting_params[:product_id], unit_id: posting_params[:unit_id])
+
+    if commission.count == 0
+      #there is no commission set for this user/product/unit. tell the user and fail.
+      if @posting.posting_recurrence.nil?
+        @posting.build_posting_recurrence(posting_recurrence_params)
+      end
+
+      load_posting_choices
+      flash.now[:danger] = "No commission is set for that product and unit. Please contact Farmer's Cellar to get a commission set."
+      render 'new'
+      return
+    end
+
   	if @posting.save
       if @posting.live
         flash[:info] = "Your new posting is now live!"
