@@ -1,7 +1,7 @@
 <h1>New ProducerProductCommission</h1>
 
 <div class="row">
-  <div class="col-md-8 col-md-offset-2">  
+  <div class="col-md-6 col-md-offset-3">  
 
     <div class="panel-group" role="tablist" aria-multiselectable="true">        
       <div class="panel panel-default">
@@ -14,10 +14,13 @@
             <%= render partial: 'shared/error_messages_general', locals: { active_record_object: @ppc } %>
 
             <%= f.label :user_id %>
-            <%= f.collection_select(:user_id, @producers, :id, :farm_name, prompt: true) %>
+            <%= f.collection_select(:user_id, @producers, :id, :farm_name, {prompt: true}, {class: "form-control"}) %>
 
             <%= f.label :product_id %>
-            <%= f.collection_select(:product_id, @products, :id, :name, prompt: true) %>
+            <%= f.collection_select(:product_id, @products, :id, :name, {prompt: true}, {class: "form-control"}) %>
+
+            <%= f.label :unit_id %>
+            <%= f.collection_select(:unit_id, @units, :id, :name, {prompt: true}, {class: "form-control"}) %>
 
             <%= f.label :commission %>
             <%= f.text_field :commission, class: "form-control" %>
@@ -39,10 +42,13 @@
             <%= render partial: 'shared/error_messages_general', locals: { active_record_object: @ppc } %>
 
             <%= f.label :user_id %>
-            <%= f.collection_select(:user_id, @producers, :id, :farm_name, prompt: true) %>
+            <%= f.collection_select(:user_id, @producers, :id, :farm_name, {prompt: true}, {class: "form-control"}) %>
 
             <%= f.label :product_id %>
-            <%= f.collection_select(:product_id, @products, :id, :name, prompt: true) %>
+            <%= f.collection_select(:product_id, @products, :id, :name, {prompt: true}, {class: "form-control"}) %>
+
+            <%= f.label :unit_id %>
+            <%= f.collection_select(:unit_id, @units, :id, :name, {prompt: true}, {class: "form-control"}) %>
 
             <%= label_tag :retail %>
             <%= text_field_tag :retail, nil, class: "form-control" %>

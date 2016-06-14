@@ -25,7 +25,7 @@ class ProducerProductCommissionsControllerTest < ActionController::TestCase
 
     log_in_as(@admin)
     new_commission = 0.05
-    post :create, producer_product_commission: {product_id: @product.id, user_id: @farmer.id, commission: new_commission}
+    post :create, producer_product_commission: {product_id: @product.id, unit_id: units(:pound), user_id: @farmer.id, commission: new_commission}
     assert_redirected_to producer_product_commission_path(id: 1, product_id: @product.id, user_id: @farmer.id)    
 
     ppc = assigns(:ppc)
@@ -46,7 +46,7 @@ class ProducerProductCommissionsControllerTest < ActionController::TestCase
     log_in_as(@admin)
     @farmer = users(:f9)
 
-    post :create, producer_product_commission: {product_id: @product.id, user_id: @farmer.id}, retail: 11, producer_net: 10
+    post :create, producer_product_commission: {product_id: @product.id, unit_id: units(:pound), user_id: @farmer.id}, retail: 11, producer_net: 10
     assert_redirected_to producer_product_commission_path(id: 1, product_id: @product.id, user_id: @farmer.id)
 
     ppc = assigns(:ppc)
@@ -82,7 +82,7 @@ class ProducerProductCommissionsControllerTest < ActionController::TestCase
 
   test "should create new commission" do
     log_in_as(@admin)
-    post :create, producer_product_commission: { user_id: @farmer.id, product_id: @product.id, commission: 0.02 }
+    post :create, producer_product_commission: { user_id: @farmer.id, product_id: @product.id, unit_id: units(:pound), commission: 0.02 }
     assert_redirected_to producer_product_commission_path(id: 1, product_id: @product.id, user_id: @farmer.id)    
   end
 

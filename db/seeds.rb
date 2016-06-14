@@ -203,27 +203,23 @@ celery = Product.create(name: "Celery")
 avocado = Product.create(name: "Avocado")
 basil = Product.create(name: "Basil")
 
-volume = UnitCategory.create(name: "Volume")
-weight = UnitCategory.create(name: "Weight")
-count = UnitCategory.create(name: "Count")
+Unit.create(name: "Fluid Ounce")
+Unit.create(name: "Pint")
+Unit.create(name: "Quart")
+Unit.create(name: "Half Gallon")
+Unit.create(name: "Gallon")
 
-volume.unit_kinds.create(name: "Fluid Ounce")
-volume.unit_kinds.create(name: "Pint")
-volume.unit_kinds.create(name: "Quart")
-volume.unit_kinds.create(name: "Half Gallon")
-volume.unit_kinds.create(name: "Gallon")
+Unit.create(name: "Grain")
+Unit.create(name: "Ounce")
+Unit.create(name: "Pound")
+Unit.create(name: "Ton")
 
-weight.unit_kinds.create(name: "Grain")
-weight.unit_kinds.create(name: "Ounce")
-weight.unit_kinds.create(name: "Pound")
-weight.unit_kinds.create(name: "Ton")
-
-whole = count.unit_kinds.create(name: "Whole")
-count.unit_kinds.create(name: "Half")
-count.unit_kinds.create(name: "Quarter")
-count.unit_kinds.create(name: "8th")
-count.unit_kinds.create(name: "16th")
-bunch = count.unit_kinds.create(name: "Bunch")
+whole = Unit.create(name: "Whole")
+Unit.create(name: "Half")
+Unit.create(name: "Quarter")
+Unit.create(name: "8th")
+Unit.create(name: "16th")
+bunch = Unit.create(name: "Bunch")
 
 def next_friday
   i = 1
@@ -245,25 +241,25 @@ f4.producer_product_commissions.create(product: avocado, commission: 0.08)
 f4.producer_product_commissions.create(product: basil, commission: 0.06)
 
 #Apples
-apples = Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 1, quantity_available: 1000, price: 2.75, user_id: f1.id, unit_category_id: 2, unit_kind_id: 8, description: "these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
+apples = Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 1, quantity_available: 1000, price: 2.75, user_id: f1.id, unit_id: 8, description: "these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
 #Asparagus
-asparagus = Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 6, quantity_available: 100, price: 3.25, user_id: f1.id, unit_category_id: 2, unit_kind_id: 8, description: "these Asparagus are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
+asparagus = Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 6, quantity_available: 100, price: 3.25, user_id: f1.id, unit_id: 8, description: "these Asparagus are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
 #Milk
-Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 3, quantity_available: 25, price: 2.00, user_id: f2.id, unit_category_id: 1, unit_kind_id: 5, description: "these milks are all organic grown with no pesticides. they are raw. no homogeneization. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
+Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 3, quantity_available: 25, price: 2.00, user_id: f2.id, unit_id: 5, description: "these milks are all organic grown with no pesticides. they are raw. no homogeneization. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
 #Beef
-Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 4, quantity_available: 10, price: 3.75, user_id: f2.id, unit_category_id: 3, unit_kind_id: 11, description: "these beefs are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
+Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 4, quantity_available: 10, price: 3.75, user_id: f2.id, unit_id: 11, description: "these beefs are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
 #Carrots
-Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 2, quantity_available: 15, price: 2.25, user_id: f3.id, unit_category_id: 2, unit_kind_id: 8, description: "yummy, crunchy carrots. tastiest ever!")
+Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 2, quantity_available: 15, price: 2.25, user_id: f3.id, unit_id: 8, description: "yummy, crunchy carrots. tastiest ever!")
 #Chicken
-Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 5, quantity_available: 50, price: 1.50, user_id: f3.id, unit_category_id: 3, unit_kind_id: 10, description: "best whole chickens around. all grass fed on clean, organic fields. no antibiotics. no supplements. just lots of grass and all the bugs they can eat! :)")
+Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 5, quantity_available: 50, price: 1.50, user_id: f3.id, unit_id: 10, description: "best whole chickens around. all grass fed on clean, organic fields. no antibiotics. no supplements. just lots of grass and all the bugs they can eat! :)")
 #Oranges
-Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 7, quantity_available: 100, price: 1.25, user_id: f4.id, unit_category_id: 2, unit_kind_id: 8, description: "best oranges ever!")
+Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 7, quantity_available: 100, price: 1.25, user_id: f4.id, unit_id: 8, description: "best oranges ever!")
 #Celery
-Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 8, quantity_available: 100, price: 2.50, user_id: f4.id, unit_category_id: 2, unit_kind_id: 8, description: "best celery ever!")
+Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 8, quantity_available: 100, price: 2.50, user_id: f4.id, unit_id: 8, description: "best celery ever!")
 #Avocado
-Posting.create(live: true, delivery_date: Time.zone.today, commitment_zone_start: Time.zone.today - 2.days, product_id: avocado.id, quantity_available: 100, price: 2.29, user_id: f4.id, unit_category_id: count.id, unit_kind_id: whole.id, description: "best avocado ever!")
+Posting.create(live: true, delivery_date: Time.zone.today, commitment_zone_start: Time.zone.today - 2.days, product_id: avocado.id, quantity_available: 100, price: 2.29, user_id: f4.id, unit_id: whole.id, description: "best avocado ever!")
 #Basil
-Posting.create(live: true, delivery_date: Time.zone.today, commitment_zone_start: Time.zone.today - 2.days, product_id: basil.id, quantity_available: 100, price: 2.97, user_id: f4.id, unit_category_id: count.id, unit_kind_id: bunch.id, description: "best basil ever!")
+Posting.create(live: true, delivery_date: Time.zone.today, commitment_zone_start: Time.zone.today - 2.days, product_id: basil.id, quantity_available: 100, price: 2.97, user_id: f4.id, unit_id: bunch.id, description: "best basil ever!")
 
 posting_recurrence = PostingRecurrence.new(on: true, frequency: 6)
 posting_recurrence.postings << apples
@@ -287,8 +283,7 @@ milk = Posting.create(
       quantity_available: 25,
       price: 2.00,
       user_id: f2.id,
-      unit_category_id: 1,
-      unit_kind_id: 5,
+      unit_id: 5,
       description: "these milks are all organic grown with no pesticides. they are raw. no homogeneization. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too."
       )
 
