@@ -1,8 +1,8 @@
-class AddUnitReferenceToProducerProductCommission < ActiveRecord::Migration
+class AddUnitReferenceToProducerProductUnitCommission < ActiveRecord::Migration
   def change
 
-    add_reference :producer_product_commissions, :unit, index: true
-    add_foreign_key :producer_product_commissions, :units
+    add_reference :producer_product_unit_commissions, :unit, index: true
+    add_foreign_key :producer_product_unit_commissions, :units
 
     Posting.all.each do |posting|
 
@@ -18,7 +18,7 @@ class AddUnitReferenceToProducerProductCommission < ActiveRecord::Migration
 
     end
 
-    change_column :producer_product_commissions, :unit_id, :integer, null: false
+    change_column :producer_product_unit_commissions, :unit_id, :integer, null: false
 
   end
 end
