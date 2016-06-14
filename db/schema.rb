@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160614190420) do
+ActiveRecord::Schema.define(version: 20160614192851) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -323,9 +323,9 @@ ActiveRecord::Schema.define(version: 20160614190420) do
   end
 
   create_table "producer_product_unit_commissions", force: :cascade do |t|
-    t.integer  "product_id"
-    t.integer  "user_id"
-    t.float    "commission"
+    t.integer  "product_id", null: false
+    t.integer  "user_id",    null: false
+    t.float    "commission", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer  "unit_id",    null: false
