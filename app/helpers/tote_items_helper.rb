@@ -201,7 +201,7 @@ module ToteItemsHelper
 
   def get_commission_factor(producer, product)
 
-    commission_factors = ProducerProductCommission.where(user: producer, product: product)
+    commission_factors = ProducerProductUnitCommission.where(user: producer, product: product)
 
     #TODO: the following line is superfluous, as far as i can tell. however, i get a sqlliteexception without it. strange!
     #i don't think there's anything magical about calling .to_a. when creating this i was able to get things to succeed

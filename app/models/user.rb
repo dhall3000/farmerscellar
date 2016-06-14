@@ -26,8 +26,8 @@ class User < ActiveRecord::Base
   has_many :user_purchase_receivables
   has_many :purchase_receivables, through: :user_purchase_receivables
 
-  has_many :producer_product_commissions
-  has_many :products, through: :producer_product_commissions
+  has_many :producer_product_unit_commissions
+  has_many :products, through: :producer_product_unit_commissions
 
   has_many :user_dropsites
   has_many :dropsites, through: :user_dropsites

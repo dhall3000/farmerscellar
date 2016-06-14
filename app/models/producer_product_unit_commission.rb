@@ -1,4 +1,4 @@
-class ProducerProductCommission < ActiveRecord::Base
+class ProducerProductUnitCommission < ActiveRecord::Base
   belongs_to :product
   belongs_to :user
   belongs_to :unit

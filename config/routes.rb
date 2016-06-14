@@ -27,7 +27,7 @@ Rails.application.routes.draw do
   
   post 'subscriptions/skip_dates'
   resources :subscriptions, only: [:new, :create, :index, :show, :edit, :update]
-  resources :producer_product_commissions
+  resources :producer_product_unit_commissions
   resources :products
   resources :website_settings, only: [:edit, :update]
   resources :users
