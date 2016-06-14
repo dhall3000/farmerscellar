@@ -7,23 +7,18 @@
 #volume.unit_kinds.create(name: "Gallon")
 fluid_ounce:
   name: Fluid Ounce
-  unit_category: volume
 
 pint:
   name: Pint
-  unit_category: volume
 
 quart:
   name: Quart
-  unit_category: volume
 
 half_gallon:
   name: Half Gallon
-  unit_category: volume
 
 gallon:
   name: Gallon
-  unit_category: volume
 
 #weight.unit_kinds.create(name: "Grain")
 #weight.unit_kinds.create(name: "Ounce")
@@ -31,19 +26,15 @@ gallon:
 #weight.unit_kinds.create(name: "Ton")
 grain:
   name: Grain
-  unit_category: weight
 
 ounce:
   name: Ounce
-  unit_category: weight
 
 pound:
   name: Pound
-  unit_category: weight
 
 ton:
   name: Ton
-  unit_category: weight
 
 #count.unit_kinds.create(name: "Whole")
 #count.unit_kinds.create(name: "Half")
@@ -53,24 +44,18 @@ ton:
 
 whole:
   name: Whole
-  unit_category: count
 
 half:
   name: Half
-  unit_category: count
 
 quarter:
   name: Quarter
-  unit_category: count
 
 eighth:
   name: 8th
-  unit_category: count
 
 sixteenth:
   name: 16th
-  unit_category: count
 
 bunch:
   name: Bunch
-  unit_category: count

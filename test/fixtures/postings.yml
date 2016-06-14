@@ -25,8 +25,7 @@ f9posting:
   quantity_available: 1000
   price: 4
   user: f9
-  unit_category: weight
-  unit_kind: pound
+  unit: pound
   description: crispy apples
   live: true
   late_adds_allowed: false
@@ -39,8 +38,7 @@ f6posting:
   quantity_available: 1000
   price: 1
   user: f6
-  unit_category: weight
-  unit_kind: pound
+  unit: pound
   description: crisp, crunchy organic apples. you'll love them.
   live: true
   late_adds_allowed: false
@@ -52,8 +50,7 @@ f7posting:
   quantity_available: 1000
   price: 2
   user: f7
-  unit_category: weight
-  unit_kind: pound
+  unit: pound
   description: asparagus description...yum!
   live: true
   late_adds_allowed: false
@@ -65,8 +62,7 @@ f8posting:
   quantity_available: 1000
   price: 4
   user: f8
-  unit_category: volume
-  unit_kind: gallon
+  unit: gallon
   description: raw milk description
   live: true
   late_adds_allowed: false
@@ -79,8 +75,7 @@ posting_subscription_farmer:
   quantity_available: 1000
   price: 4.29
   user: f_subscriptions
-  unit_category: weight
-  unit_kind: pound
+  unit: pound
   description: crisp, crunchy organic apples. you'll love them.
   live: true
   late_adds_allowed: true
@@ -94,8 +89,7 @@ postingf5apples:
   quantity_available: 1000
   price: 4.29
   user: f5
-  unit_category: weight
-  unit_kind: pound
+  unit: pound
   description: crisp, crunchy organic apples. you'll love them.
   live: true
   late_adds_allowed: true
@@ -107,8 +101,7 @@ p_recurrence_off:
   quantity_available: 1000
   price: 5.21
   user: f2
-  unit_category: weight
-  unit_kind: pound
+  unit: pound
   description: beef description
   live: true  
   posting_recurrence: two
@@ -121,8 +114,7 @@ p_recurrence_on:
   quantity_available: 1000
   price: 5.21
   user: f2
-  unit_category: weight
-  unit_kind: pound
+  unit: pound
   description: beef description
   live: true  
   posting_recurrence: one
@@ -135,8 +127,7 @@ p_recurrence_three:
   quantity_available: 1000
   price: 5.21
   user: f2
-  unit_category: weight
-  unit_kind: pound
+  unit: pound
   description: beef description
   live: true  
   posting_recurrence: three
@@ -150,8 +141,7 @@ p5:
   quantity_available: 1000
   price: 5.21
   user: f2
-  unit_category: weight
-  unit_kind: pound
+  unit: pound
   description: beef description
   live: true  
   late_adds_allowed: true
@@ -164,8 +154,7 @@ p1:
   quantity_available: 1000
   price: 2.89
   user: f1
-  unit_category: weight
-  unit_kind: pound
+  unit: pound
   description: these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.
   live: true  
   late_adds_allowed: true
@@ -177,8 +166,7 @@ p2:
   quantity_available: 1000
   price: 2.74
   user: f1
-  unit_category: weight
-  unit_kind: pound
+  unit: pound
   description: asparagus description
   live: true  
   late_adds_allowed: true
@@ -190,8 +178,7 @@ p3:
   quantity_available: 1000
   price: 5.00
   user: f2
-  unit_category: volume
-  unit_kind: gallon
+  unit: gallon
   description: milk description
   live: true  
   late_adds_allowed: true
@@ -203,8 +190,7 @@ p4:
   quantity_available: 1000
   price: 5.21
   user: f2
-  unit_category: weight
-  unit_kind: pound
+  unit: pound
   description: beef description
   live: true  
   late_adds_allowed: true
@@ -218,8 +204,7 @@ postingf1apples:
   quantity_available: 1000
   price: 2.75
   user: f1
-  unit_category: weight
-  unit_kind: pound
+  unit: pound
   description: these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.
   live: true
   late_adds_allowed: true
@@ -233,8 +218,7 @@ postingf1asparagus:
   quantity_available: 100
   price: 3.25
   user: f1
-  unit_category: weight
-  unit_kind: pound
+  unit: pound
   description: these Asparagus are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.
   live: true
   late_adds_allowed: true
@@ -247,8 +231,7 @@ postingf1lettuce:
   quantity_available: 100
   price: 4.25
   user: f1
-  unit_category: weight
-  unit_kind: pound
+  unit: pound
   description: delicious lettuce
   live: true
   late_adds_allowed: true
@@ -262,8 +245,7 @@ postingf2milk:
   quantity_available: 25
   price: 2.00
   user: f2
-  unit_category: volume
-  unit_kind: gallon
+  unit: gallon
   description: these milks are all organic grown with no pesticides. they are raw. no homogeneization. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.
   live: true
   late_adds_allowed: true
@@ -277,8 +259,7 @@ postingf2beef:
   quantity_available: 10
   price: 3.75
   user: f2
-  unit_category: count
-  unit_kind: quarter
+  unit: quarter
   description: these beefs are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.
   live: true
   late_adds_allowed: true
@@ -291,8 +272,7 @@ postingf2tomato:
   quantity_available: 10
   price: 2.99
   user: f2
-  unit_category: count
-  unit_kind: whole
+  unit: whole
   description: delicious tomato description
   live: true
   late_adds_allowed: true
@@ -306,8 +286,7 @@ postingf3carrots:
   quantity_available: 15
   price: 2.25
   user: f3
-  unit_category: weight
-  unit_kind: pound
+  unit: pound
   description: yummy, crunchy carrots. tastiest ever!
   live: true
   late_adds_allowed: true
@@ -321,8 +300,7 @@ postingf3chicken:
   quantity_available: 50
   price: 1.50
   user: f3
-  unit_category: count
-  unit_kind: whole
+  unit: whole
   description: best whole chickens around. all grass fed on clean, organic fields. no antibiotics. no supplements. just lots of grass and all the bugs they can eat! :)
   live: true
   late_adds_allowed: true
@@ -336,8 +314,7 @@ postingf4oranges:
   quantity_available: 100
   price: 1.25
   user: f4
-  unit_category: weight
-  unit_kind: pound
+  unit: pound
   description: best oranges ever!
   live: true
   late_adds_allowed: true
@@ -351,8 +328,7 @@ postingf4celery:
   quantity_available: 100
   price: 2.50
   user: f4
-  unit_category: weight
-  unit_kind: pound
+  unit: pound
   description: best celery ever!
   live: true
   late_adds_allowed: true
@@ -365,8 +341,7 @@ postingf4avocado:
   quantity_available: 100
   price: 2.97
   user: f4
-  unit_category: count
-  unit_kind: whole
+  unit: whole
   description: best avocado ever!
   live: true
   late_adds_allowed: true
@@ -379,8 +354,7 @@ postingf4basil:
   quantity_available: 100
   price: 2.27
   user: f4
-  unit_category: count
-  unit_kind: bunch
+  unit: bunch
   description: best basil ever!
   live: true
   late_adds_allowed: true
@@ -392,8 +366,7 @@ baron_farms_eggs:
   quantity_available: 100
   price: 6.25
   user: baron_farms
-  unit_category: count
-  unit_kind: whole
+  unit: whole
   description: pastured eggs
   live: true
   late_adds_allowed: true
@@ -405,8 +378,7 @@ pride_and_joy_milk:
   quantity_available: 100
   price: 10.50
   user: pride_and_joy
-  unit_category: volume
-  unit_kind: gallon
+  unit: gallon
   description: pastured organic raw milk
   live: true
   late_adds_allowed: true

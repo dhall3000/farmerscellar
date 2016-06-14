@@ -47,7 +47,7 @@
               <%= tote_item.posting.product.name %>
             </td>
             <td class="text-center hidden-xs"><%= tote_item.quantity.to_s %></td>
-            <td class="text-center hidden-xs"><%= number_to_currency(tote_item.posting.price) %> / <%= UnitKind.find_by(id: tote_item.posting.unit_kind_id).name %></td>
+            <td class="text-center hidden-xs"><%= number_to_currency(tote_item.posting.price) %> / <%= Unit.find_by(id: tote_item.posting.unit_id).name %></td>
             <td class="text-center"><%= number_to_currency(get_gross_item(tote_item)) %></td>
             <td class="text-right">              
               <% if tote_item.subscription && tote_item.subscription.on %>

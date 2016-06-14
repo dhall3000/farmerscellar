@@ -32,7 +32,7 @@ class Subscription < ActiveRecord::Base
     posting = posting_recurrence.postings.order("postings.id").last
     friendly_frequency = posting_recurrence.subscription_description(frequency).downcase
     subtotal = number_to_currency(get_gross_cost(quantity, posting.price))
-    text = "#{quantity.to_s} #{posting.unit_kind.name.pluralize(quantity)} of #{posting.user.farm_name} #{posting.product.name} delivered #{friendly_frequency} for a subtotal of #{subtotal} each delivery"
+    text = "#{quantity.to_s} #{posting.unit.name.pluralize(quantity)} of #{posting.user.farm_name} #{posting.product.name} delivered #{friendly_frequency} for a subtotal of #{subtotal} each delivery"
     return text
   end
 

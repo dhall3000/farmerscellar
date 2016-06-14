@@ -43,7 +43,7 @@
 				        		<td><%= image_tag "sun.jpg" %></td>
 					        	<td class="text-center"><%= tote_item.posting.user.farm_name %></td>
 					        	<td class="text-center"><%= tote_item.posting.product.name %></td>
-										<td class="text-center"><%= pluralize(tote_item.quantity, tote_item.posting.unit_kind.name) %></td>
+										<td class="text-center"><%= pluralize(tote_item.quantity, tote_item.posting.unit.name) %></td>
 				          </tr>        
 				        <% end %>
 

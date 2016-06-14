@@ -25,7 +25,7 @@ This email is your Farmer's Cellar delivery notification.
         <td align="left"><%= tote_item.id %></td>
         <td align="left"><%= tote_item.posting.user.farm_name %></td>
         <td align="left"><%= tote_item.posting.product.name %></td>
-        <td align="left"><%= tote_item.posting.unit_kind.name %></td>
+        <td align="left"><%= tote_item.posting.unit.name %></td>
         <td align="center"><%= tote_item.quantity %></td>
         <td align="center">
           <% if tote_item.state == ToteItem.states[:FILLED] %>

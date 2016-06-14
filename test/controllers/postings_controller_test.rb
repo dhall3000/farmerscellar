@@ -593,8 +593,7 @@ class PostingsControllerTest < ActionController::TestCase
     post :update, id: @posting.id, posting: {
       user_id: @posting2.user_id,
       product_id: @posting2.product_id,
-      unit_category_id: @posting2.unit_category_id,
-      unit_kind_id: @posting2.unit_kind_id,
+      unit_id: @posting2.unit_id,
       delivery_date: @posting2.delivery_date + 2.days,
       commitment_zone_start: @posting2.commitment_zone_start + 2.days      
     }
@@ -610,8 +609,7 @@ class PostingsControllerTest < ActionController::TestCase
     #these should not be changed
     assert @posting.user_id == posting_old.user_id
     assert @posting.product_id == posting_old.product_id
-    assert @posting.unit_category_id == posting_old.unit_category_id
-    assert @posting.unit_kind_id == posting_old.unit_kind_id
+    assert @posting.unit_id == posting_old.unit_id
     assert @posting.delivery_date == posting_old.delivery_date
     assert @posting.commitment_zone_start == posting_old.commitment_zone_start    
 
@@ -683,8 +681,7 @@ class PostingsControllerTest < ActionController::TestCase
       live: true,
       delivery_date: delivery_date,
       product_id: @posting.product_id,
-      unit_kind_id: @posting.unit_kind.id,
-      unit_category_id: @posting.unit_category.id,
+      unit_id: @posting.unit.id,
       commitment_zone_start: delivery_date - 2.days
     }
 

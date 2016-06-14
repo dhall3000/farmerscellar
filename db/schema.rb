@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160608210702) do
+ActiveRecord::Schema.define(version: 20160614154557) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -287,8 +287,7 @@ ActiveRecord::Schema.define(version: 20160608210702) do
     t.float    "price",                 default: 0.0
     t.integer  "user_id",                               null: false
     t.integer  "product_id",                            null: false
-    t.integer  "unit_category_id",                      null: false
-    t.integer  "unit_kind_id",                          null: false
+    t.integer  "unit_id",                               null: false
     t.datetime "created_at",                            null: false
     t.datetime "updated_at",                            null: false
     t.boolean  "live",                  default: false
@@ -302,8 +301,7 @@ ActiveRecord::Schema.define(version: 20160608210702) do
   add_index "postings", ["posting_recurrence_id"], name: "index_postings_on_posting_recurrence_id"
   add_index "postings", ["product_id"], name: "index_postings_on_product_id"
   add_index "postings", ["state"], name: "index_postings_on_state"
-  add_index "postings", ["unit_category_id"], name: "index_postings_on_unit_category_id"
-  add_index "postings", ["unit_kind_id"], name: "index_postings_on_unit_kind_id"
+  add_index "postings", ["unit_id"], name: "index_postings_on_unit_id"
   add_index "postings", ["user_id"], name: "index_postings_on_user_id"
 
   create_table "pp_mp_commons", force: :cascade do |t|
@@ -513,20 +511,11 @@ ActiveRecord::Schema.define(version: 20160608210702) do
   add_index "tote_items", ["subscription_id"], name: "index_tote_items_on_subscription_id"
   add_index "tote_items", ["user_id"], name: "index_tote_items_on_user_id"
 
-  create_table "unit_categories", force: :cascade do |t|
+  create_table "units", force: :cascade do |t|
     t.string   "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
-
-  create_table "unit_kinds", force: :cascade do |t|
-    t.string   "name"
-    t.integer  "unit_category_id"
-    t.datetime "created_at",       null: false
-    t.datetime "updated_at",       null: false
-  end
-
-  add_index "unit_kinds", ["unit_category_id"], name: "index_unit_kinds_on_unit_category_id"
 
   create_table "user_account_states", id: false, force: :cascade do |t|
     t.integer  "account_state_id"

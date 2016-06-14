@@ -408,8 +408,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
       price: 10,
       user_id: users(:f1).id,
       product_id: products(:apples).id,
-      unit_category_id: unit_categories(:weight).id,
-      unit_kind_id: unit_kinds(:pound).id,
+      unit_id: units(:pound).id,
       live: true,
       delivery_date: delivery_date,
       commitment_zone_start: commitment_zone_start

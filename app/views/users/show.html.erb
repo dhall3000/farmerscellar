@@ -43,7 +43,7 @@
 		    <tr>	                    
 	          <td><a tabindex="0" class="btn btn-primary btn-block" role="button" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%= posting.description %>"><%= Product.find_by(id: posting.product_id).name %></a></td>
 	          <td class="text-center"><%= number_to_currency(posting.price) %></td>
-	          <td class="text-center"><%= UnitKind.find_by(id: posting.unit_kind_id).name %></td>
+	          <td class="text-center"><%= Unit.find_by(id: posting.unit_id).name %></td>
 	          <td class="text-center"><%= posting.total_quantity_ordered %></td>	          
 	          <td class="text-center"><%= posting.delivery_date.strftime("%A %b %d, %Y") %></td>
 	          <td class="text-center"><%= link_to "Copy", new_posting_path(posting_id: posting.id),  class: "glyphicon glyphicon-duplicate" %></td>

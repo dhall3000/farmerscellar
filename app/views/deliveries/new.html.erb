@@ -22,7 +22,7 @@
               <td><%= check_box_tag "posting_ids[]", posting.id, checked: true %></td>
               <td class="text-center"><%= User.find_by(id: posting.user_id).farm_name %></td>
               <td class="text-center"><%= Product.find_by(id: posting.product_id).name %></td>
-              <td class="text-center"><%= posting.unit_kind.name %></td>          
+              <td class="text-center"><%= posting.unit.name %></td>          
               <td class="text-center"><%= posting.delivery_date.strftime("%a %b %d") %></td>                    
             </tr>
           <% end %>

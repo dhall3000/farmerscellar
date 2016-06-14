@@ -1,7 +1,7 @@
 <h2 id="toteAdditionHeading" class="text-center">Add to Tote</h2>
   
 <% if @posting != nil %>
-  <% unit_kind = UnitKind.find_by(id: @posting.unit_kind_id) %>
+  <% unit = Unit.find_by(id: @posting.unit_id) %>
   <% producer = User.find_by(id: @posting.user_id) %>
   <% provide(:title, producer.farm_name) %>
 
@@ -36,7 +36,7 @@
               <h3>Order</h3>
                 <ul>
                   <li><%= User.find_by(id: @posting.user_id).farm_name %> <%= Product.find_by(id: @posting.product_id).name %></li>
-                  <li><%= number_to_currency(@posting.price) %> / <%= UnitKind.find_by(id: @posting.unit_kind_id).name %></li>                
+                  <li><%= number_to_currency(@posting.price) %> / <%= Unit.find_by(id: @posting.unit_id).name %></li>                
                   <li>
                     <% data_content = "This is mostly like an 'order cutoff' but with " + link_to("some important differences", how_things_work_path(anchor: "commitment_zone")) + "." %>
 

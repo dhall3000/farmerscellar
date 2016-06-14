@@ -134,8 +134,7 @@ class PostingsController < ApplicationController
 
     def load_posting_choices
       @products = Product.all.order(:name)
-      @unit_categories = UnitCategory.all
-      @unit_kinds = UnitKind.all
+      @units = Unit.all
       @delivery_dates = next_delivery_dates
       @producers = User.where(account_type: User.types[:PRODUCER])
     end
@@ -170,18 +169,13 @@ class PostingsController < ApplicationController
         :price,
         :user_id,
         :product_id,
-        :unit_category_id,
-        :unit_kind_id,
+        :unit_id,
         :live,
         :delivery_date,
         :commitment_zone_start        
         )
 
-      unit_kind = UnitKind.all.find_by(id: posting[:unit_kind_id])
-
-      if !unit_kind.nil?
-        posting[:unit_category_id] = unit_kind.unit_category.id
-      end
+      unit = Unit.all.find_by(id: posting[:unit_id])
 
       #this hocus pocus has to do with some strange gotchas. a check box sends in a "1" or "0", both of which evaluate to true for a boolean type,
       #which the live attribute is. so i'm just hackishly converting from one to the other to be ridiculously specific

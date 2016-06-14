@@ -6,8 +6,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     @on = false
     @farmer = users(:f1)
     @product = products(:apples)
-    @unit_category = unit_categories(:weight)
-    @unit_kind = unit_kinds(:pound)    
+    @unit = units(:pound)    
     @posting = postings(:postingf1apples)
   end  
 
@@ -73,8 +72,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
       price: 2,
       user_id: @farmer.id,
       product_id: @product.id,
-      unit_category_id: @unit_category.id,
-      unit_kind_id: @unit_kind.id,
+      unit_id: @unit.id,
       live: true,
       delivery_date: delivery_date,
       commitment_zone_start: commitment_zone_start,
@@ -767,8 +765,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
       price: 2,
       user_id: farmer.id,
       product_id: product.id,
-      unit_category_id: unit_categories(:weight).id,
-      unit_kind_id: unit_kinds(:pound).id,
+      unit_id: units(:pound).id,
       live: true,
       delivery_date: delivery_date,
       commitment_zone_start: delivery_date - 2.days,

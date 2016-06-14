@@ -100,7 +100,7 @@ class Authorizer < ActionDispatch::IntegrationTest
     assert authorization.checkouts.last.tote_items.last.price > 0
     assert authorization.checkouts.last.tote_items.last.quantity > 0
     assert_match authorization.checkouts.last.tote_items.last.quantity.to_s, mail.body.encoded
-    assert_match authorization.checkouts.last.tote_items.last.posting.unit_kind.name, mail.body.encoded
+    assert_match authorization.checkouts.last.tote_items.last.posting.unit.name, mail.body.encoded
     assert_match authorization.checkouts.last.tote_items.last.posting.delivery_date.strftime("%A %b %d, %Y"), mail.body.encoded
 
     assert authorization.amount > 0

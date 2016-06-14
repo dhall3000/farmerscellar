@@ -8,8 +8,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
   def setup
     @farmer = users(:f1)
     @product = products(:apples)
-    @unit_category = unit_categories(:weight)
-    @unit_kind = unit_kinds(:pound)    
+    @unit = units(:pound)    
     @posting = postings(:postingf1apples)
   end  
 
@@ -49,7 +48,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
     
     price = 12.31
     #verify the post doesn't exist
-    verify_post_presence(price, @unit_kind, exists = false)
+    verify_post_presence(price, @unit, exists = false)
     #create the post, with recurrence
     login_for(@farmer)
     
@@ -64,16 +63,15 @@ class PostingsTest < ActionDispatch::IntegrationTest
       quantity_available: 100,
       price: price,
       user_id: @farmer.id,
-      product_id: @product.id,
-      unit_category_id: @unit_category.id,
-      unit_kind_id: @unit_kind.id,
+      product_id: @product.id,      
+      unit_id: @unit.id,
       live: true,
       delivery_date: delivery_date,
       commitment_zone_start: commitment_zone_start,
       posting_recurrence: {frequency: 1, on: true}
     }
     #verify exactly one post exists
-    verify_post_presence(price, @unit_kind, exists = true)
+    verify_post_presence(price, @unit, exists = true)
     #wind the clock forward to between the commitment zone start and delivery date
     posting = Posting.where(price: price).last
 
@@ -93,7 +91,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
       #as long as we're prior to the commitment zone start of the first posting we should
       #be able to see the post on the shopping page
       if Time.zone.now < posting.commitment_zone_start
-        verify_post_presence(price, @unit_kind, true, posting.id)
+        verify_post_presence(price, @unit, true, posting.id)
       end
 
       last_minute = Time.zone.now
@@ -107,13 +105,13 @@ class PostingsTest < ActionDispatch::IntegrationTest
     assert_equal false, posting.posting_recurrence.postings.first.live
     assert_equal 2, posting.posting_recurrence.postings.count
     #verify the new post is visible
-    verify_post_visibility(price, @unit_kind, 1)
+    verify_post_visibility(price, @unit, 1)
         
     travel_back
     
   end
 
-  def verify_post_presence(price, unit_kind, exists, posting_id = nil)
+  def verify_post_presence(price, unit, exists, posting_id = nil)
 
     if exists == true
       count = 1
@@ -121,15 +119,15 @@ class PostingsTest < ActionDispatch::IntegrationTest
       count = 0
     end
 
-    verify_post_visibility(price, unit_kind, count)    
+    verify_post_visibility(price, unit, count)    
     verify_post_existence(price, count, posting_id)
 
   end
 
-  def verify_post_visibility(price, unit_kind, count)
+  def verify_post_visibility(price, unit, count)
     get postings_path
     assert :success
-    assert_select 'div.price p', {text: number_to_currency(price) + " / " + unit_kind.name, count: count}
+    assert_select 'div.price p', {text: number_to_currency(price) + " / " + unit.name, count: count}
   end
 
   def verify_post_existence(price, count, posting_id = nil)
@@ -195,9 +193,8 @@ class PostingsTest < ActionDispatch::IntegrationTest
       quantity_available: posting.quantity_available,
       price: posting.price,
       user_id: posting.user_id,
-      product_id: posting.product_id,
-      unit_category_id: posting.unit_category_id,
-      unit_kind_id: posting.unit_kind_id,
+      product_id: posting.product_id,      
+      unit_id: posting.unit_id,
       live: posting.live,
       delivery_date: posting.delivery_date,
       commitment_zone_start: posting.commitment_zone_start
@@ -235,9 +232,8 @@ class PostingsTest < ActionDispatch::IntegrationTest
       quantity_available: 100,
       price: 2.97,
       user_id: @farmer.id,
-      product_id: @product.id,
-      unit_category_id: @unit_category.id,
-      unit_kind_id: @unit_kind.id,
+      product_id: @product.id,      
+      unit_id: @unit.id,
       live: true,
       delivery_date: delivery_date,
       commitment_zone_start: delivery_date - 2.days

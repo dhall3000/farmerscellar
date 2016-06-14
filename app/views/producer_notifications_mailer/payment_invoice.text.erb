@@ -1,7 +1,7 @@
 
 <% @posting_infos.each do |posting, value| %>
 ---------------------------------------------
-Id=<%= posting.id %>,Product=<%= posting.product.name %>,Delivery Date=<%= posting.delivery_date.strftime("%A %b %d, %Y") %>,Units=<%= posting.unit_kind.name %>,Quantity=<%= value[:unit_count] %>,Unit Price=<%= number_to_currency(value[:unit_price]) %>,Sub Total=<%= number_to_currency(value[:sub_total]) %>
+Id=<%= posting.id %>,Product=<%= posting.product.name %>,Delivery Date=<%= posting.delivery_date.strftime("%A %b %d, %Y") %>,Units=<%= posting.unit.name %>,Quantity=<%= value[:unit_count] %>,Unit Price=<%= number_to_currency(value[:unit_price]) %>,Sub Total=<%= number_to_currency(value[:sub_total]) %>
 <% end %>
 
 Thanks!

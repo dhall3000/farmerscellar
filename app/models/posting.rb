@@ -1,8 +1,7 @@
 class Posting < ActiveRecord::Base
   belongs_to :user
   belongs_to :product
-  belongs_to :unit_category
-  belongs_to :unit_kind
+  belongs_to :unit
   belongs_to :posting_recurrence
 
   has_many :tote_items
@@ -20,7 +19,7 @@ class Posting < ActiveRecord::Base
   validate :delivery_date_not_sunday, :commitment_zone_start_must_be_before_delivery_date
   before_create :delivery_date_must_be_after_today
 
-  validates_presence_of :user, :product, :unit_kind, :unit_category
+  validates_presence_of :user, :product, :unit
 
   #OPEN means open for customers to place orders. but that's somewhat confusing because if late_adds_allowed then customer can place order even in the COMMITMENTZONE
   #so really all OPEN means right now is the period of time before commitment_zone_start. the meaning isn't even yet comingled/intermingled iwth the concept of 'live'.

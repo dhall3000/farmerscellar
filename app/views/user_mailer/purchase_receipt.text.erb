@@ -15,7 +15,7 @@ Here is your Farmer's Cellar purchase receipt.
   <% else %>
     <% sub_total = number_to_currency(get_gross_item(tote_item)).to_s %>
   <% end %>
-ID=<%= tote_item.id %>,Producer=<%= tote_item.posting.user.farm_name %>,Product=<%= tote_item.posting.product.name %>,Delivery Date=<%= tote_item.posting.delivery_date.strftime("%A %b %d, %Y") %>,Price=<%= number_to_currency(tote_item.price) %> / <%= tote_item.posting.unit_kind.name %>,Quantity=<%= tote_item.quantity %>,Sub Total=<%= sub_total %>
+ID=<%= tote_item.id %>,Producer=<%= tote_item.posting.user.farm_name %>,Product=<%= tote_item.posting.product.name %>,Delivery Date=<%= tote_item.posting.delivery_date.strftime("%A %b %d, %Y") %>,Price=<%= number_to_currency(tote_item.price) %> / <%= tote_item.posting.unit.name %>,Quantity=<%= tote_item.quantity %>,Sub Total=<%= sub_total %>
 <% end %>
 
 <% if purchase_failed %>

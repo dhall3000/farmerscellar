@@ -6,8 +6,7 @@ class PostingTest < ActiveSupport::TestCase
     user = users(:c1)
     @farmer = users(:f1)
     @product = products(:apples)
-    @unit_kind = unit_kinds(:pound)
-    @unit_category = unit_categories(:weight)
+    @unit = units(:pound)
 
     delivery_date = Time.zone.today + 3.days
 
@@ -15,7 +14,7 @@ class PostingTest < ActiveSupport::TestCase
       delivery_date = Time.zone.today + 4.days
     end
 
-    @posting = Posting.new(unit_category: @unit_category, unit_kind: @unit_kind, product: @product, user: user, description: "descrip", quantity_available: 100, price: 1.25, live: true, commitment_zone_start: delivery_date - 2.days, delivery_date: delivery_date)
+    @posting = Posting.new(unit: @unit, product: @product, user: user, description: "descrip", quantity_available: 100, price: 1.25, live: true, commitment_zone_start: delivery_date - 2.days, delivery_date: delivery_date)
     @posting.save
   end
 
@@ -121,8 +120,7 @@ class PostingTest < ActiveSupport::TestCase
       quantity_available: 100,
       price: 10,
       user: @farmer,
-      unit_category: @unit_category,
-      unit_kind: @unit_kind,
+      unit: @unit,
       description: "crisp, crunchy organic apples. you'll love them.",
       live: true,
       late_adds_allowed: false
@@ -160,8 +158,7 @@ class PostingTest < ActiveSupport::TestCase
       quantity_available: 100,
       price: 10,
       user: @farmer,
-      unit_category: @unit_category,
-      unit_kind: @unit_kind,
+      unit: @unit,
       description: "crisp, crunchy organic apples. you'll love them.",
       live: true,
       late_adds_allowed: false
@@ -198,13 +195,8 @@ class PostingTest < ActiveSupport::TestCase
     assert_not @posting.valid?, get_error_messages(@posting)
   end
 
-  test "posting should have unit category" do
-    @posting.unit_category_id = nil
-    assert_not @posting.valid?, get_error_messages(@posting)
-  end
-
-  test "posting should have unit kind" do
-    @posting.unit_kind_id = nil
+  test "posting should have unit" do
+    @posting.unit_id = nil
     assert_not @posting.valid?, get_error_messages(@posting)
   end
 

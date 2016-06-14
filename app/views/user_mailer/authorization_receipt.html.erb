@@ -29,7 +29,7 @@ Here is the product information for which you authorized payment:
         <td align="left"><%= tote_item.posting.user.farm_name %></td>
         <td align="left"><%= tote_item.posting.product.name %></td>
         <td align="center"><%= tote_item.posting.delivery_date.strftime("%A %b %d, %Y") %></td>
-        <td align="left"><%= number_to_currency(tote_item.price) %> / <%= tote_item.posting.unit_kind.name %></td>
+        <td align="left"><%= number_to_currency(tote_item.price) %> / <%= tote_item.posting.unit.name %></td>
         <td align="center"><%= tote_item.quantity %></td>
         <td align="center"><%= number_to_currency(get_gross_item(tote_item)) %></td>
       </tr>

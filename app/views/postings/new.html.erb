@@ -18,13 +18,13 @@
 		<% end %>
 
 		<%= f.label :product_id %>
-		<%= f.collection_select(:product_id, @products, :id, :name, {prompt: true}, {class: 'form-control'}) %>
+		<%= f.collection_select(:product_id, @products, :id, :name, {prompt: true}, {class: 'form-control'}) %>		
 
 		<%= f.label :description %>
 		<%= f.text_field :description, class: 'form-control' %>
 
-		<%= f.label :unit_kind_id, "Units" %>
-		<%= f.grouped_collection_select :unit_kind_id, UnitCategory.order(:name), :unit_kinds, :name, :id, :name, { include_blank: true, prompt: true }, class: 'form-control' %>
+		<%= f.label :unit_id %>
+		<%= f.collection_select(:unit_id, @units, :id, :name, {prompt: true}, {class: 'form-control'}) %>		
 
 		<%= f.label :quantity_available, "Approximate Number of Units for Sale" %>
 		<%= f.number_field :quantity_available, min: 1, step: 1, class: 'form-control' %>

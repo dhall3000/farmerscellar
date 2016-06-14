@@ -14,8 +14,8 @@
       <div class="panel-body">
         <ul>
           <div class="hidden-sm hidden-md hidden-lg">
-            <li>Quantity: <%= tote_item.quantity.to_s + " " + UnitKind.find_by(id: tote_item.posting.unit_kind_id).name.pluralize(tote_item.quantity) %> </li>
-            <li>Price: <%= number_to_currency(tote_item.posting.price) %> / <%= UnitKind.find_by(id: tote_item.posting.unit_kind_id).name %></li>
+            <li>Quantity: <%= tote_item.quantity.to_s + " " + Unit.find_by(id: tote_item.posting.unit_id).name.pluralize(tote_item.quantity) %> </li>
+            <li>Price: <%= number_to_currency(tote_item.posting.price) %> / <%= Unit.find_by(id: tote_item.posting.unit_id).name %></li>
           </div>
           <li><%= link_to("Commitment Zone Start", how_things_work_path(anchor: "commitment_zone")) %>: <%= tote_item.posting.commitment_zone_start.strftime("%a %m/%d %l:%M %p") %></li>
           <% if !tote_item.subscription.nil? %>
