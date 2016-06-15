@@ -10,16 +10,7 @@
       <table class="table">
         <thead>
           <tr>
-            <% if current_user.account_type == User.types[:ADMIN] %>
-              <th class="col-xs-3"></th>
-              <th class="col-xs-3"></th>
-              <th class="text-center col-xs-1">Delivery Date</th>
-              <th class="text-center col-xs-2"></th>
-              <th class="text-center col-xs-3">Fills</th>
-            <% else %>
-              <th class="col-xs-7"></th>
-              <th class="col-xs-5"></th>
-            <% end %>
+            <th class="col-xs-12 col-sm-offset-6 col-sm-6"></th>
           </tr>
         </thead>
         <tbody>
@@ -75,36 +66,79 @@
                     </div>                
                   </div>
 
+
+                  <% if posting.unit_equivalency_description || posting.price_equivalency_description %>
+
+                    <div class="panel panel-default">
+                      <div class="panel-heading" role="tab" id=<%= "#{count.to_s}price" %>>
+                        <h4 class="panel-title">
+                          <a class="collapsed" role="button" data-toggle="collapse" data-parent=<%= "##{count.to_s}accordion" %> href=<%= "##{count.to_s}priceDetails" %> aria-expanded="false" aria-controls=<%= "#{count.to_s}priceDetails" %>>
+                            <span class="glyphicon glyphicon-expand" aria-hidden="true"></span> <%= number_to_currency(posting.price) %> / <%= Unit.find_by(id: posting.unit_id).name %>
+                          </a>
+                        </h4>
+                      </div>          
+                      <div id=<%= "#{count.to_s}priceDetails" %> class="panel-collapse collapse" role="tabpanel" aria-labelledby=<%= "#{count.to_s}price" %>>
+                        <div class="panel-body">
+                          <ul class="list-group">
+                            <% if posting.unit_equivalency_description %>
+                              <li class="list-group-item"><%= posting.unit_equivalency_description %></li>
+                            <% end %>
+                            <% if posting.price_equivalency_description %>
+                              <li class="list-group-item"><%= posting.price_equivalency_description %></li>
+                            <% end %>
+                          </ul>
+                        </div>
+                      </div>                
+                    </div>
+
+                  <% else %>
+
+                    <div class="panel panel-default">
+                      <div class="panel-heading" role="tab" id=<%= "#{count.to_s}price" %>>
+                        <h4 class="panel-title">
+                          <a class="collapsed" role="button" data-toggle="collapse" data-parent=<%= "##{count.to_s}accordion" %> href=<%= "##{count.to_s}priceDetails" %> aria-expanded="false" aria-controls=<%= "#{count.to_s}priceDetails" %>>
+                             <%= number_to_currency(posting.price) %> / <%= Unit.find_by(id: posting.unit_id).name %>
+                          </a>
+                        </h4>
+                      </div>          
+                    </div>
+
+                  <% end %>
+
+                    <div class="panel panel-default">
+                      <div class="panel-heading" role="tab" id=<%= "#{count.to_s}price" %>>
+                        <h4 class="panel-title">
+                          <a class="collapsed" role="button" data-toggle="collapse" data-parent=<%= "##{count.to_s}accordion" %> href=<%= "##{count.to_s}priceDetails" %> aria-expanded="false" aria-controls=<%= "#{count.to_s}priceDetails" %>>
+                            Delivery <%= posting.delivery_date.strftime("%A %b %d") %>
+                          </a>
+                        </h4>
+                      </div>          
+                    </div>
+
                 </div>            
-              </td>
-              
-              <td class="text-right">
-                <div>
-                  <p>Delivery <%= posting.delivery_date.strftime("%a %m/%d") %></p>
-                  <p><%= number_to_currency(posting.price) %> / <%= Unit.find_by(id: posting.unit_id).name %></p>
-                  <% if posting.unit_equivalency_description %>
-                    <p><%= posting.unit_equivalency_description %></p>
-                  <% end %>
-                  <% if posting.price_equivalency_description %>
-                    <p><%= posting.price_equivalency_description %></p>
-                  <% end %>
-                  <p><%= link_to "Buy", new_tote_item_path(posting_id: posting.id), class: "btn btn-primary" %></p>
+
+                <div>                                                      
+                  <p><%= link_to "Buy", new_tote_item_path(posting_id: posting.id), class: "btn btn-primary btn-lg fat-finger-spacing" %></p>
                 </div>
+
+                <% if current_user.account_type == User.types[:ADMIN] %>
+                  <div>
+                    <%= link_to "Edit", edit_posting_path(posting), class: "btn btn-primary btn-lg fat-finger-spacing" %>
+                  </div>
+                  <div>
+                    <%= form_tag postings_fill_path do %>
+                      <% quantity_id = "quantity" + posting.id.to_s %>
+                      <% units = Unit.find_by(id: posting.unit_id).name + "s" %>
+                      <%= hidden_field_tag :posting_id, posting.id %>                
+                      <%= number_field_tag :quantity, nil, {id: quantity_id, class: "input-lg", placeholder: "Enter quantity received"} %>
+                      <%= submit_tag "Fill", class: 'btn btn-lg btn-primary', onclick: "return confirm('Are you sure you want to fill ' + document.getElementById('" + quantity_id + "').value + ' " + units + "?' )" %>
+                    <% end %>
+                  </div>                               
+                <% end %>
+
               </td>
               
-              <% if current_user.account_type == User.types[:ADMIN] %>
-                <td class="text-center"><%= posting.delivery_date.strftime("%a %b %d") %></td>
-                <td class="text-center"><%= link_to "Edit", edit_posting_path(posting) %></td>
-                <td>
-                  <%= form_tag postings_fill_path do %>
-                    <% quantity_id = "quantity" + posting.id.to_s %>
-                    <% units = Unit.find_by(id: posting.unit_id).name + "s" %>
-                    <%= hidden_field_tag :posting_id, posting.id %>                
-                    <%= number_field_tag :quantity, nil, {id: quantity_id, class: "input-lg", placeholder: "Enter quantity received"} %>
-                    <%= submit_tag "Fill", class: 'btn btn-lg btn-primary', onclick: "return confirm('Are you sure you want to fill ' + document.getElementById('" + quantity_id + "').value + ' " + units + "?' )" %>
-                  <% end %>              
-                </td>
-              <% end %>
+
 
             </tr>
 
