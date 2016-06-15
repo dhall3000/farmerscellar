@@ -187,7 +187,10 @@ class PostingsController < ApplicationController
         :unit_id,
         :live,
         :delivery_date,
-        :commitment_zone_start        
+        :commitment_zone_start,
+        :product_attributes,
+        :price_equivalency_description,
+        :unit_equivalency_description
         )
 
       unit = Unit.all.find_by(id: posting[:unit_id])

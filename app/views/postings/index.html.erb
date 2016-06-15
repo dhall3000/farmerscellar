@@ -64,6 +64,9 @@
                     <div id=<%= "#{count.to_s}productDetails" %> class="panel-collapse collapse" role="tabpanel" aria-labelledby=<%= "#{count.to_s}product" %>>
                       <div class="panel-body">
                         <ul class="list-group">
+                          <% if posting.product_attributes != nil %>
+                            <li class="list-group-item"><%= posting.product_attributes %></li>                
+                          <% end %>
                           <% if posting.description != nil %>
                             <li class="list-group-item"><%= posting.description %></li>                
                           <% end %>
@@ -79,6 +82,12 @@
                 <div>
                   <p>Delivery <%= posting.delivery_date.strftime("%a %m/%d") %></p>
                   <p><%= number_to_currency(posting.price) %> / <%= Unit.find_by(id: posting.unit_id).name %></p>
+                  <% if posting.unit_equivalency_description %>
+                    <p><%= posting.unit_equivalency_description %></p>
+                  <% end %>
+                  <% if posting.price_equivalency_description %>
+                    <p><%= posting.price_equivalency_description %></p>
+                  <% end %>
                   <p><%= link_to "Buy", new_tote_item_path(posting_id: posting.id), class: "btn btn-primary" %></p>
                 </div>
               </td>
