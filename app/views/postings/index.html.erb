@@ -6,73 +6,104 @@
 
 <div class="row">
   <div class="col-xs-12">
+    <div class="row">
+      <table class="table">
+        <thead>
+          <tr>
+            <% if current_user.account_type == User.types[:ADMIN] %>
+              <th class="col-xs-3"></th>
+              <th class="col-xs-3"></th>
+              <th class="text-center col-xs-1">Delivery Date</th>
+              <th class="text-center col-xs-2"></th>
+              <th class="text-center col-xs-3">Fills</th>
+            <% else %>
+              <th class="col-xs-7"></th>
+              <th class="col-xs-5"></th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody>
+          <% count = 0 %>
+          <% @postings.each do |posting| %> 
+            
+            <tr>
+            
+              <td>
+                <div class="panel-group block" id=<%= "#{count.to_s}accordion" %> role="tablist" aria-multiselectable="true">
+                  
+                  <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id=<%= "#{count.to_s}producer_name" %>>
+                      <h4 class="panel-title">              
+                        <a class="collapsed" role="button" data-toggle="collapse" data-parent=<%= "##{count.to_s}accordion" %> href=<%= "##{count.to_s}producerDetails" %> aria-expanded="false" aria-controls=<%= "#{count.to_s}producerDetails" %>>
+                          <span class="glyphicon glyphicon-expand" aria-hidden="true"></span> <%= User.find_by(id: posting.user_id).farm_name %>
+                        </a>
+                      </h4>  
+                    </div>          
+                    <div id=<%= "#{count.to_s}producerDetails" %> class="panel-collapse collapse" role="tabpanel" aria-labelledby=<%= "#{count.to_s}producer_name" %>>
+                      <div class="panel-body">
+                        <ul class="list-group">
+                          <% if !posting.user.website.blank? %>
+                            <li class="list-group-item">Producer Website: <a href=<%= "#{posting.user.website}" %> target='_blank'><%= posting.user.website %></a></li>              
+                          <% end %>   
+                          <% if posting.user.description != nil %>                       
+                            <li class="list-group-item"><%= posting.user.description %></li>
+                          <% end %>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
 
-  <table class="table">
-    <thead>
-      <tr>
-        <th class="text-center"><h2></h2></th>        
-        <th class="text-center"><h2></h2></th>   
-        <% if current_user.account_type == User.types[:ADMIN] %>
-          <th class="text-center">Delivery Date</th>
-          <th class="text-center"></th>
-          <th class="text-center">Fills</th>
-        <% end %>
-      </tr>
-    </thead>
-    <tbody>
-      <% @postings.each do |posting| %> 
+                  <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id=<%= "#{count.to_s}product" %>>
+                      <h4 class="panel-title">              
+                        <a class="collapsed" role="button" data-toggle="collapse" data-parent=<%= "##{count.to_s}accordion" %> href=<%= "##{count.to_s}productDetails" %> aria-expanded="false" aria-controls=<%= "#{count.to_s}productDetails" %>>
+                          <span class="glyphicon glyphicon-expand" aria-hidden="true"></span> <%= Product.find_by(id: posting.product_id).name %>
+                        </a>
+                      </h4>  
+                    </div>          
+                    <div id=<%= "#{count.to_s}productDetails" %> class="panel-collapse collapse" role="tabpanel" aria-labelledby=<%= "#{count.to_s}product" %>>
+                      <div class="panel-body">
+                        <ul class="list-group">
+                          <% if posting.description != nil %>
+                            <li class="list-group-item"><%= posting.description %></li>                
+                          <% end %>
+                        </ul>
+                      </div>
+                    </div>                
+                  </div>
 
-        <% farmInfo = "" %>
+                </div>            
+              </td>
+              
+              <td class="text-right">
+                <div>
+                  <p>Delivery <%= posting.delivery_date.strftime("%a %m/%d") %></p>
+                  <p><%= number_to_currency(posting.price) %> / <%= Unit.find_by(id: posting.unit_id).name %></p>
+                  <p><%= link_to "Buy", new_tote_item_path(posting_id: posting.id), class: "btn btn-primary" %></p>
+                </div>
+              </td>
+              
+              <% if current_user.account_type == User.types[:ADMIN] %>
+                <td class="text-center"><%= posting.delivery_date.strftime("%a %b %d") %></td>
+                <td class="text-center"><%= link_to "Edit", edit_posting_path(posting) %></td>
+                <td>
+                  <%= form_tag postings_fill_path do %>
+                    <% quantity_id = "quantity" + posting.id.to_s %>
+                    <% units = Unit.find_by(id: posting.unit_id).name + "s" %>
+                    <%= hidden_field_tag :posting_id, posting.id %>                
+                    <%= number_field_tag :quantity, nil, {id: quantity_id, class: "input-lg", placeholder: "Enter quantity received"} %>
+                    <%= submit_tag "Fill", class: 'btn btn-lg btn-primary', onclick: "return confirm('Are you sure you want to fill ' + document.getElementById('" + quantity_id + "').value + ' " + units + "?' )" %>
+                  <% end %>              
+                </td>
+              <% end %>
 
-        <% if posting.description != nil %>
-          <% farmInfo = "<u>Product Info</u><p>" + posting.description %>
-        <% end %>
+            </tr>
 
-        <% if posting.user.description != nil %>
-          <% farmInfo = farmInfo + "<p><u>Producer Description</u><p>" + posting.user.description %>
-        <% end %>        
-
-        <% if !posting.user.website.blank? %>
-          <% farmInfo = farmInfo + "<p>" + "<u>Producer Website</u><p><a href='" + posting.user.website + "' target='_blank'>" + posting.user.website + "</a>"%>
-        <% end %>
-
-        <% if farmInfo == "" %>
-          <% farmInfo = "Producer has not provided info about their operation" %>
-        <% end %>
-
-        <tr>
-        
-          <td class="text-center"><a tabindex="0" class="btn" role="button" data-html="true" data-toggle="popover" data-trigger="click" data-content="<%=farmInfo%>"> <p class="lead"> <%= Product.find_by(id: posting.product_id).name %> </p> <p class="small"> <%= User.find_by(id: posting.user_id).farm_name %> </p></a>
-          </td>
-          
-          <td class="text-center">
-            <div>
-              <div class="price">
-                <p><%= number_to_currency(posting.price) %> / <%= Unit.find_by(id: posting.unit_id).name %></p>
-              </div>
-              <p><%= link_to "Buy", new_tote_item_path(posting_id: posting.id), class: "btn btn-primary" %></p>
-            </div>
-          </td>
-          
-          <% if current_user.account_type == User.types[:ADMIN] %>
-            <td class="text-center"><%= posting.delivery_date.strftime("%a %b %d") %></td>
-            <td class="text-center"><%= link_to "Edit", edit_posting_path(posting) %></td>
-            <td>
-              <%= form_tag postings_fill_path do %>
-                <% quantity_id = "quantity" + posting.id.to_s %>
-                <% units = Unit.find_by(id: posting.unit_id).name + "s" %>
-                <%= hidden_field_tag :posting_id, posting.id %>                
-                <%= number_field_tag :quantity, nil, {id: quantity_id, class: "input-lg", placeholder: "Enter quantity received"} %>
-                <%= submit_tag "Fill", class: 'btn btn-lg btn-primary', onclick: "return confirm('Are you sure you want to fill ' + document.getElementById('" + quantity_id + "').value + ' " + units + "?' )" %>
-              <% end %>              
-            </td>
+            <% count = count + 1 %>
           <% end %>
-
-        </tr>
-      <% end %>
-    </tbody>
-  </table>  
-
-</div>
+        </tbody>
+      </table>  
+    </div>
+  </div>
 </div>  
 <% end %>
