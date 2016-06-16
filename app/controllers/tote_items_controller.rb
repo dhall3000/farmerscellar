@@ -64,8 +64,8 @@ class ToteItemsController < ApplicationController
 
     @tote_item = ToteItem.new(tote_item_params)
     @tote_item.user_id = current_user.id
-    posting = Posting.find(@tote_item.posting_id)
-    @tote_item.price = posting.price
+    @posting = Posting.find(@tote_item.posting_id)
+    @tote_item.price = @posting.price
 
     if !correct_user_create(@tote_item)
       redirect_to(root_url)
@@ -87,6 +87,12 @@ class ToteItemsController < ApplicationController
 
     else
       flash.now[:danger] = "Item not saved to shopping tote. See errors below."
+      @sanitized_producer_url = @posting.user.website
+      if @sanitized_producer_url != nil
+        @sanitized_producer_url = url_with_protocol(@sanitized_producer_url)
+      end
+
+      @account_on_hold = account_on_hold
       render 'new'
     end
   end
