@@ -22,6 +22,13 @@ class ProducerProductUnitCommissionsControllerTest < ActionController::TestCase
     #add 10% commission for pound
     post :create, producer_product_unit_commission: {product_id: @product.id, unit_id: units(:pound), user_id: @farmer.id, commission: 0.10}
 
+    delivery_date = Time.zone.now.midnight + 3.days
+    if delivery_date.sunday?
+      delivery_date += 1.day
+    end
+
+    czs = delivery_date - 2.days
+
     #create the postings
     postingTon = Posting.new(
       description: "good apples",
@@ -31,8 +38,8 @@ class ProducerProductUnitCommissionsControllerTest < ActionController::TestCase
       product_id: @product.id,
       unit_id: units(:ton).id,
       live: true,
-      delivery_date: Time.zone.now.midnight + 3.days,
-      commitment_zone_start: Time.zone.now.midnight + 1.day
+      delivery_date: delivery_date,
+      commitment_zone_start: czs
       )
 
     assert postingTon.save
@@ -45,8 +52,8 @@ class ProducerProductUnitCommissionsControllerTest < ActionController::TestCase
       product_id: @product.id,
       unit_id: units(:pound).id,
       live: true,
-      delivery_date: Time.zone.now.midnight + 3.days,
-      commitment_zone_start: Time.zone.now.midnight + 1.day
+      delivery_date: delivery_date,
+      commitment_zone_start: czs
       )
 
     assert postingPound.save

@@ -127,7 +127,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
   def verify_post_visibility(price, unit, count)
     get postings_path
     assert :success
-    assert_select 'div.price p', {text: number_to_currency(price) + " / " + unit.name, count: count}
+    assert_select "body div.panel h4.panel-title a", {text: number_to_currency(price) + " / " + unit.name, count: count}
   end
 
   def verify_post_existence(price, count, posting_id = nil)
@@ -169,7 +169,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
 
     get postings_path
     assert :success
-    assert_select '.price', {text: "$2.75 / Pound", count: 1}
+    assert_select "body div.panel h4.panel-title a", {text: number_to_currency("2.75") + " / " + "Pound", count: 1}
     
     #turn off the existing posting
     patch posting_path(@posting), posting: {
@@ -202,7 +202,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
 
     get postings_path
     assert :success
-    assert_select '.price', {text: "$2.75 / Pound", count: 1}
+    assert_select "body div.panel h4.panel-title a", {text: number_to_currency("2.75") + " / " + "Pound", count: 1}
 
   end
 
@@ -244,7 +244,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
     assert_redirected_to postings_path
     follow_redirect!
     assert_template 'postings/index'
-    assert_select '.price', "$2.97 / Pound"
+    assert_select "body div.panel h4.panel-title a", {text: "$2.97 / Pound", count: 1}
     
     return posting
 

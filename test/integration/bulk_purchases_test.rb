@@ -239,11 +239,14 @@ class BulkPurchasesTest < BulkBuyer
 
     #check for the existence of nasty-gram related to account state
     if account_ok
-      assert_select 'p', count: 0, text: "Your account is on hold, most likely due to a positive balance on your account. Please contact Farmer's Cellar to pay your balance before continuing to shop."
-      #there should be 6 paragraphs now on the form cause a whole bunch of mini fixed-amount buttons were added to the Add to Tote form
-      assert_select 'p', 2
+      assert_select 'p', count: 0, text: "Your account is on hold, most likely due to a positive balance on your account. Please contact Farmer's Cellar to pay your balance before continuing to shop."      
+      #this is a spot check of what should be healthy functioning row of quantity-add buttons that say "+1", "+2", "+3" and "+4". check to make sure the "+2" button exists and that no buttons are disabled
+      assert_select "table.table tbody tr td form.tote_addition_one_button_form input[value=?]", "+2"      
+      assert_select "table.table tbody tr td form.tote_addition_one_button_form input[disabled=?]", "disabled", 0
     else
       assert_select 'p', "Your account is on hold, most likely due to a positive balance on your account. Please contact Farmer's Cellar to pay your balance before continuing to shop."
+      #verify the existence of disabled buttons. these are the buttons user pokes to add quantity
+      assert_select "table.table tbody tr td form.tote_addition_one_button_form input[disabled=?]", "disabled"
     end    
 
     #verify can't add new tote items

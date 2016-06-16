@@ -5,6 +5,7 @@
   <% i += 1 %>
 <% end %>
 <% delivery_date = Time.zone.today.midnight + i.days %>
+<% delivery_date = delivery_date + 7.days %>
 <% delivery_date_next = delivery_date + 7.days %>
 
 <% days_out_to_start = 14 %>
