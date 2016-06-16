@@ -34,10 +34,10 @@
                       <div class="panel-body">
                         <ul class="list-group">
                           <% if posting.user.city && posting.user.state %>
-                            <li class="list-group-item">Producer Location: <%= "#{posting.user.city}, #{posting.user.state}" %></li>              
+                            <li class="list-group-item">Location: <%= "#{posting.user.city}, #{posting.user.state}" %></li>              
                           <% end %>
                           <% if !posting.user.website.blank? %>
-                            <li class="list-group-item">Producer Website: <a href=<%= "#{posting.user.website}" %> target='_blank'><%= posting.user.website %></a></li>              
+                            <li class="list-group-item">Website: <a href=<%= "#{posting.user.website}" %> target='_blank'><%= posting.user.website %></a></li>              
                           <% end %>   
                           <% if posting.user.description != nil %>                       
                             <li class="list-group-item"><%= posting.user.description %></li>
