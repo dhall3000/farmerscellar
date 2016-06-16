@@ -34,26 +34,48 @@
           <div id="detailsBody" class="panel-collapse collapse" role="tabpanel" aria-labelledby="detailsHeading">
             <div class="panel-body">
               <h3>Order</h3>
-                <ul>
-                  <li><%= User.find_by(id: @posting.user_id).farm_name %> <%= Product.find_by(id: @posting.product_id).name %></li>
-                  <li><%= number_to_currency(@posting.price) %> / <%= Unit.find_by(id: @posting.unit_id).name %></li>                
-                  <li>
-                    <% data_content = "This is mostly like an 'order cutoff' but with " + link_to("some important differences", how_things_work_path(anchor: "commitment_zone")) + "." %>
+              <ul class="list-group">
+                <li class="list-group-item"><%= User.find_by(id: @posting.user_id).farm_name %> <%= Product.find_by(id: @posting.product_id).name %></li>
+                <li class="list-group-item">
+                  <%= number_to_currency(@posting.price) %> / <%= Unit.find_by(id: @posting.unit_id).name %>
+                  <% if @posting.unit_equivalency_description || @posting.price_equivalency_description %>
+                    <ul>
+                      <% if @posting.unit_equivalency_description %>
+                        <li><%= @posting.unit_equivalency_description %></li>
+                      <% end %>
+                      <% if @posting.price_equivalency_description %>
+                        <li><%= @posting.price_equivalency_description %></li>
+                      <% end %>
+                    </ul>
+                <% end %>
+                </li>
+                
+                <li class="list-group-item">
+                  <% data_content = "This is mostly like an 'order cutoff' but with " + link_to("some important differences", how_things_work_path(anchor: "commitment_zone")) + "." %>
 
-                    <a href='#' class="popover_init" tabindex="0" data-container="body" data-toggle="popover" data-trigger="focus" data-placement="top" data-html="true" data-content="<%=data_content%>">Commitment Zone</a>
+                  <a href='#' class="popover_init" tabindex="0" data-container="body" data-toggle="popover" data-trigger="focus" data-placement="top" data-html="true" data-content="<%=data_content%>">Commitment Zone</a>
 
-                    starts <%= @posting.commitment_zone_start.strftime("%A, %B %-d, %l:%M %p") %>
-                  </li>
-                  <li>Delivery <%= @posting.delivery_date.strftime("%A, %B %-d") %></li>
-                </ul>
+                  starts <%= @posting.commitment_zone_start.strftime("%A, %B %-d, %l:%M %p") %>
+                </li>
+                <li class="list-group-item">Delivery <%= @posting.delivery_date.strftime("%A, %B %-d") %></li>
+              </ul>
+
               <h3>Producer</h3>
-              <p><%= @posting.user.description %></p>
-              <% if @posting.user.website != nil %>
-                <%= link_to @posting.user.website, @sanitized_producer_url, target: "_blank" %>
-              <% end %>
+              <ul class="list-group">
+                <% if !@posting.user.website.blank? %>
+                  <li class="list-group-item">Website: <a href=<%= "#{@posting.user.website}" %> target='_blank'><%= @posting.user.website %></a></li>              
+                <% end %>   
+                <% if @posting.user.description != nil %>                       
+                  <li class="list-group-item"><%= @posting.user.description %></li>
+                <% end %>
+              </ul>
+
               <h3>Product</h3>
-              <%= @posting.description %>
-              <p></p>              
+              <ul class="list-group">
+                <% if !@posting.description.blank? %>
+                  <li class="list-group-item"><%= @posting.description %></a></li>              
+                <% end %>                   
+              </ul>      
 
             </div>
           </div>
@@ -86,7 +108,7 @@
                       <%= f.number_field :posting_id, value: @posting.id, hidden: true %>
                       <%= f.number_field :subscription_frequency, value: 0, class: "subscription_frequency", hidden: true %>
 
-                      <%= f.submit "+1", class: "btn btn-primary", disabled: @account_on_hold %>
+                      <%= f.submit "+1", class: "btn btn-primary btn-lg btn-lg", disabled: @account_on_hold %>
                     <% end %>
                   </td>
 
@@ -97,7 +119,7 @@
                       <%= f.number_field :posting_id, value: @posting.id, hidden: true %>
                       <%= f.number_field :subscription_frequency, value: 0, class: "subscription_frequency", hidden: true %>
 
-                      <%= f.submit "+2", class: "btn btn-primary", disabled: @account_on_hold %>
+                      <%= f.submit "+2", class: "btn btn-primary btn-lg", disabled: @account_on_hold %>
                     <% end %>
                   </td>
 
@@ -108,7 +130,7 @@
                       <%= f.number_field :posting_id, value: @posting.id, hidden: true %>
                       <%= f.number_field :subscription_frequency, value: 0, class: "subscription_frequency", hidden: true %>
 
-                      <%= f.submit "+3", class: "btn btn-primary", disabled: @account_on_hold %>
+                      <%= f.submit "+3", class: "btn btn-primary btn-lg", disabled: @account_on_hold %>
                     <% end %>
                   </td>
 
@@ -119,7 +141,7 @@
                       <%= f.number_field :posting_id, value: @posting.id, hidden: true %>
                       <%= f.number_field :subscription_frequency, value: 0, class: "subscription_frequency", hidden: true %>
 
-                      <%= f.submit "+4", class: "btn btn-primary", disabled: @account_on_hold %>
+                      <%= f.submit "+4", class: "btn btn-primary btn-lg", disabled: @account_on_hold %>
                     <% end %>
                   </td>
                 </tr>
@@ -131,11 +153,11 @@
               <%= form_for @tote_item do |f| %>
                 <%= render partial: 'shared/error_messages_general', locals: { active_record_object: @tote_item } %>
                 
-                <%= f.number_field :quantity, class: "form-control", placeholder: "Enter custom quantity" %>
+                <%= f.number_field :quantity, class: "form-control fat-finger-spacing", placeholder: "Enter custom quantity" %>
                 <%= f.number_field :posting_id, value: @posting.id, hidden: true %>                
                 <%= f.number_field :subscription_frequency, value: 0, class: "subscription_frequency", hidden: true %>
 
-                <%= f.submit "Add to Tote", class: "btn btn-primary", disabled: @account_on_hold %>
+                <%= f.submit "Add to Tote", class: "btn btn-primary btn-lg", disabled: @account_on_hold %>
               <% end %>
 
             </div>

@@ -1,25 +1,33 @@
 <% if !tote_item.nil? %>  
   <div class="panel-group" role="tablist" aria-multiselectable="true">      
 
-  <% if tote_item.state == ToteItem.states[:ADDED] %>
-    
-  <% else %>
-    
-  <% end %>
-
     <div class="panel panel-default">
       <div class="panel-heading" role="tab">
         <h4 class="panel-title">Order Info</h4>
       </div>                
       <div class="panel-body">
-        <ul>
+        <ul class="list-group">
           <div class="hidden-sm hidden-md hidden-lg">
-            <li>Quantity: <%= tote_item.quantity.to_s + " " + Unit.find_by(id: tote_item.posting.unit_id).name.pluralize(tote_item.quantity) %> </li>
-            <li>Price: <%= number_to_currency(tote_item.posting.price) %> / <%= Unit.find_by(id: tote_item.posting.unit_id).name %></li>
+            <li class="list-group-item">
+              Quantity: <%= tote_item.quantity.to_s + " " + Unit.find_by(id: tote_item.posting.unit_id).name.pluralize(tote_item.quantity) %>
+              <% if tote_item.posting.unit_equivalency_description %>
+                <ul>
+                  <li><%= tote_item.posting.unit_equivalency_description %></li>
+                </ul>
+              <% end %>
+            </li>
+            <li class="list-group-item">
+              Price: <%= number_to_currency(tote_item.posting.price) %> / <%= Unit.find_by(id: tote_item.posting.unit_id).name %>
+              <% if tote_item.posting.price_equivalency_description %>
+                <ul>
+                  <li><%= tote_item.posting.price_equivalency_description %></li>
+                </ul>
+              <% end %>
+            </li>
           </div>
-          <li><%= link_to("Commitment Zone Start", how_things_work_path(anchor: "commitment_zone")) %>: <%= tote_item.posting.commitment_zone_start.strftime("%a %m/%d %l:%M %p") %></li>
+          <li class="list-group-item"><%= link_to("Commitment Zone Start", how_things_work_path(anchor: "commitment_zone")) %>: <%= tote_item.posting.commitment_zone_start.strftime("%a %m/%d %l:%M %p") %></li>
           <% if !tote_item.subscription.nil? %>
-            <li>This is a subscription for <%= tote_item.subscription.description %></li>          
+            <li class="list-group-item">This is a subscription for <%= tote_item.subscription.description %></li>          
           <% end %>
         </ul>
       </div>
@@ -30,17 +38,19 @@
         <h4 class="panel-title">Product Info</h4>
       </div>                
       <div class="panel-body">
-        <ul>
-          <li>Product Description: <%= tote_item.posting.description %></li>
-          <li>Producer: <%= tote_item.posting.user.farm_name %></li>
-          <li>Producer Description: <%= tote_item.posting.user.description %></li>
+        <ul class="list-group">
+          <li class="list-group-item">Producer: <%= tote_item.posting.user.farm_name %></li>
           <% if !tote_item.posting.user.website.nil? %>
-            <li>Producer Website:  <%= link_to tote_item.posting.user.website, url_with_protocol(tote_item.posting.user.website), target: "_blank" %></li>
+            <li class="list-group-item">Producer Website:  <%= link_to tote_item.posting.user.website, url_with_protocol(tote_item.posting.user.website), target: "_blank" %></li>
           <% end %>
+          <% if tote_item.posting.product_attributes %>
+            <li class="list-group-item">Product Attributes: <%= tote_item.posting.product_attributes %></li>          
+          <% end %>
+          <li class="list-group-item">Product Description: <%= tote_item.posting.description %></li>          
+          <li class="list-group-item">Producer Description: <%= tote_item.posting.user.description %></li>
+
         </ul>
       </div>
     </div>
-
-
   </div>
 <% end %>
