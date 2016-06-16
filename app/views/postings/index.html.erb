@@ -33,6 +33,9 @@
                     <div id=<%= "#{count.to_s}producerDetails" %> class="panel-collapse collapse" role="tabpanel" aria-labelledby=<%= "#{count.to_s}producer_name" %>>
                       <div class="panel-body">
                         <ul class="list-group">
+                          <% if posting.user.city && posting.user.state %>
+                            <li class="list-group-item">Producer Location: <%= "#{posting.user.city}, #{posting.user.state}" %></li>              
+                          <% end %>
                           <% if !posting.user.website.blank? %>
                             <li class="list-group-item">Producer Website: <a href=<%= "#{posting.user.website}" %> target='_blank'><%= posting.user.website %></a></li>              
                           <% end %>   
