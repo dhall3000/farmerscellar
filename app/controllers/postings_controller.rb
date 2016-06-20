@@ -207,6 +207,14 @@ class PostingsController < ApplicationController
         end
       end
 
+      if posting[:unit_equivalency_description].blank?
+        posting[:unit_equivalency_description] = nil
+      end
+
+      if posting[:price_equivalency_description].blank?
+        posting[:price_equivalency_description] = nil
+      end
+
       posting
 
     end

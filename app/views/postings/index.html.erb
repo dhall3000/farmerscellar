@@ -98,9 +98,46 @@
 
                     <div class="panel panel-default">
                       <div class="panel-heading" role="tab" id=<%= "#{count.to_s}price" %>>
+                        <h4 class="panel-title">                          
+                          <%= number_to_currency(posting.price) %> / <%= Unit.find_by(id: posting.unit_id).name %>                          
+                        </h4>
+                      </div>          
+                    </div>
+
+                  <% end %>
+
+
+                  <% if posting.posting_recurrence && posting.posting_recurrence.on %>
+
+                    <div class="panel panel-default">
+                      <div class="panel-heading" role="tab" id=<%= "#{count.to_s}delivery" %>>
                         <h4 class="panel-title">
-                          <a class="collapsed" role="button" data-toggle="collapse" data-parent=<%= "##{count.to_s}accordion" %> href=<%= "##{count.to_s}priceDetails" %> aria-expanded="false" aria-controls=<%= "#{count.to_s}priceDetails" %>>
-                             <%= number_to_currency(posting.price) %> / <%= Unit.find_by(id: posting.unit_id).name %>
+                          <a class="collapsed" role="button" data-toggle="collapse" data-parent=<%= "##{count.to_s}accordion" %> href=<%= "##{count.to_s}deliveryDetails" %> aria-expanded="false" aria-controls=<%= "#{count.to_s}deliveryDetails" %>><span class="glyphicon glyphicon-expand" aria-hidden="true"></span> Next Delivery <%= posting.delivery_date.strftime("%A %b %d") %>
+                          </a>
+                        </h4>
+                      </div>          
+
+
+                      <div id=<%= "#{count.to_s}deliveryDetails" %> class="panel-collapse collapse" role="tabpanel" aria-labelledby=<%= "#{count.to_s}deliveryDetails" %>>
+                        <div class="panel-body">
+                          <ul class="list-group">                            
+                            <li class="list-group-item">
+                              <%= PostingRecurrence.frequency[posting.posting_recurrence.frequency][0] %>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>                
+
+
+
+                    </div>
+
+                  <% else %>
+
+                    <div class="panel panel-default">
+                      <div class="panel-heading" role="tab" id=<%= "#{count.to_s}delivery" %>>
+                        <h4 class="panel-title">                          
+                            Delivery <%= posting.delivery_date.strftime("%A %b %d") %>
                           </a>
                         </h4>
                       </div>          
@@ -108,15 +145,8 @@
 
                   <% end %>
 
-                    <div class="panel panel-default">
-                      <div class="panel-heading" role="tab" id=<%= "#{count.to_s}price" %>>
-                        <h4 class="panel-title">
-                          <a class="collapsed" role="button" data-toggle="collapse" data-parent=<%= "##{count.to_s}accordion" %> href=<%= "##{count.to_s}priceDetails" %> aria-expanded="false" aria-controls=<%= "#{count.to_s}priceDetails" %>>
-                            Delivery <%= posting.delivery_date.strftime("%A %b %d") %>
-                          </a>
-                        </h4>
-                      </div>          
-                    </div>
+
+                    
 
                 </div>            
 
