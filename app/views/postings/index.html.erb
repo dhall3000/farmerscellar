@@ -154,7 +154,7 @@
                   <p><%= link_to "Buy", new_tote_item_path(posting_id: posting.id), class: "btn btn-primary btn-lg fat-finger-spacing" %></p>
                 </div>
 
-                <% if current_user.account_type == User.types[:ADMIN] %>
+                <% if current_user && current_user.account_type == User.types[:ADMIN] %>
                   <div>
                     <%= link_to "Edit", edit_posting_path(posting), class: "btn btn-primary btn-lg fat-finger-spacing" %>
                   </div>

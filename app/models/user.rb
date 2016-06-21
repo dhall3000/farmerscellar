@@ -36,7 +36,7 @@ class User < ActiveRecord::Base
   has_one :pickup_code
 
   #these are for if the account_type is either PRODUCER or DISTRIBUTOR
-  #a distributor must a BusinessInterface
+  #a distributor must have a BusinessInterface
   #a producer must have either a DISTRIBUTOR or a BusinessInterface
   has_one :business_interface
   #if this object is type PRODUCER than it might have a distributor

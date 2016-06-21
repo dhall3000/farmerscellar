@@ -14,9 +14,9 @@
     <nav>
       <ul class="nav navbar-nav navbar-right">        
         <li><%= link_to "Home", root_path %></li>
+        <li><%= link_to "Shop", postings_path %></li>
         <% if logged_in? %>          
-          <% if user_has_access?  %>
-            <li><%= link_to "Shop", postings_path %></li>            
+          <% if user_has_access?  %>            
             <li>
               <%= link_to tote_items_path do %>
                 <span class="glyphicon glyphicon-shopping-cart"></span> Tote

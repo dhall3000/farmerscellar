@@ -415,10 +415,10 @@ class PostingsControllerTest < ActionController::TestCase
 
   end
 
-  test "should not get index for non users" do
+  test "should get index for non users" do
     get :index
-    assert :redirect
-    assert_redirected_to login_url
+    assert :success
+    assert_template 'postings/index'
   end
 
 #CREATE TESTS

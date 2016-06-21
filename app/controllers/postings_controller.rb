@@ -1,5 +1,5 @@
 class PostingsController < ApplicationController
-  before_action :logged_in_user
+  before_action :logged_in_user, only: [:new, :create, :show, :edit, :update]
   before_action :redirect_to_root_if_not_producer, only: [:new, :create, :edit, :update]
   before_action :redirect_to_root_if_user_not_admin, only: :fill
   
@@ -21,7 +21,7 @@ class PostingsController < ApplicationController
 
   def index
 
-    if current_user.account_type == User.types[:CUSTOMER] || current_user.account_type == User.types[:PRODUCER]
+    if current_user.nil? || current_user.account_type == User.types[:CUSTOMER] || current_user.account_type == User.types[:PRODUCER]
       #for customers, we only want to pull postings whose delivery date is >= today and that are 'live'
       @postings = Posting.where("delivery_date >= ? and live = ?", Time.zone.today, true).order(delivery_date: :asc, id: :desc)
     elsif current_user.account_type == User.types[:ADMIN]
