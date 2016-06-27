@@ -70,6 +70,9 @@
                 <tbody>
                   <% subscription_ids = [] %>
                   <% @skip_dates.each do |skip_date| %>                
+                    <% if skip_date[:subscription].paused %>
+                      <% next %>
+                    <% end %>
                     <% if skip_date[:skip] %>
                       <tr class="alert-danger">
                     <% else %>

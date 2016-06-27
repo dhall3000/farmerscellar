@@ -198,6 +198,27 @@ class SubscriptionsControllerTest < ActionController::TestCase
     assert assigns(:end_date) > user.subscriptions.last.posting_recurrence.reference_date    
   end
 
+  test "index should not show skip dates for subscriptions that are paused" do
+    user = @c_subscription
+    assert_equal 1, user.subscriptions.count
+
+    #pause the subscription. after doing this, no skip dates should show up for this subscription in the index.
+    subscription = user.subscriptions.last
+    subscription.update(paused: true)
+    subscription.reload
+    assert subscription.paused
+
+    log_in_as(user)
+    get :index
+    assert_response :success
+    assert_template 'subscriptions/index'
+
+    #this user only had a single subscription. we paused it above. there should be zero skip dates displayed on index. skip dates
+    #are displayed as checkbox inputs
+    assert_select 'input[type=?]', "checkbox", 0
+
+  end
+
   test "should not get show when user not logged in" do
     get :show, id: @subscription.id
     assert_response :redirect
