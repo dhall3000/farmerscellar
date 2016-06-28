@@ -107,7 +107,15 @@ module SessionsHelper
 
   # Stores the URL trying to be accessed.
   def store_location
-    session[:forwarding_url] = request.url if request.get?
+
+    if request.get?
+      session[:forwarding_url] = request.url
+    end
+
+    if request.post?
+      session[:forwarding_url] = request.referer
+    end
+
   end
 
   # Confirms a logged-in user.

@@ -1,6 +1,6 @@
 class ToteItemsController < ApplicationController
   before_action :correct_user,   only: [:destroy]
-  before_action :logged_in_user
+  before_action :logged_in_user, only: [:index, :create, :destroy]
 
   def index
 
@@ -145,6 +145,10 @@ class ToteItemsController < ApplicationController
     end
 
     def account_on_hold
+
+      if current_user.nil?
+        return false
+      end
       
       if current_user.account_states == nil || !current_user.account_states.any?
         account_on_hold = false
