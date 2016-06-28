@@ -190,7 +190,9 @@ class PostingsController < ApplicationController
         :commitment_zone_start,
         :product_attributes,
         :price_equivalency_description,
-        :unit_equivalency_description
+        :unit_equivalency_description,
+        :product_identifier,
+        :units_per_case
         )
 
       unit = Unit.all.find_by(id: posting[:unit_id])

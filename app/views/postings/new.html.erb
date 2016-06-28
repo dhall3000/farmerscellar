@@ -32,6 +32,12 @@
 		<%= f.label :unit_equivalency_description %>
 		<%= f.text_field :unit_equivalency_description, class: 'form-control' %>
 
+		<%= f.label :product_identifier %>
+		<%= f.text_field :product_identifier, class: 'form-control' %>
+
+		<%= f.label :units_per_case %>
+		<%= f.number_field :units_per_case, min: 1, step: 1, class: 'form-control' %>
+
 		<%= f.label :quantity_available, "Approximate Number of Units for Sale" %>
 		<%= f.number_field :quantity_available, min: 1, step: 1, class: 'form-control' %>
 

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160628205627) do
+ActiveRecord::Schema.define(version: 20160628230353) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -299,7 +299,7 @@ ActiveRecord::Schema.define(version: 20160628205627) do
     t.string   "product_attributes"
     t.string   "price_equivalency_description"
     t.string   "unit_equivalency_description"
-    t.string   "source_product_identifier"
+    t.string   "product_identifier"
     t.integer  "units_per_case",                default: 1
   end
 

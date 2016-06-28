@@ -13,6 +13,7 @@ class Posting < ActiveRecord::Base
   validates :description, :quantity_available, :price, :delivery_date, :commitment_zone_start, presence: true
   validates :quantity_available, numericality: { only_integer: true, greater_than: 0 }
   validates :price, numericality: { greater_than: 0 }
+  validates :units_per_case, numericality: {only_integer: true, greater_than_or_equal_to: 0}
   #the weird syntax below is due to some serious gotchas having to do with how booleans are stores or something? I have no idea. See here:
   #http://stackoverflow.com/questions/10506575/rails-database-defaults-and-model-validation-for-boolean-fields
   validates :live, inclusion: { in: [true, false] }
