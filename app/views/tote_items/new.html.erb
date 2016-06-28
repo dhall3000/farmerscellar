@@ -23,65 +23,41 @@
 
 
 
+
+
         <div class="panel panel-default">
-          <div class="panel-heading" role="tab" id="detailsHeading">
-            <h4 class="panel-title">
-              <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#detailsBody" aria-expanded="false" aria-controls="detailsBody">
-                <span class="glyphicon glyphicon-expand" aria-hidden="true"></span> Details
-              </a>
-            </h4>
-          </div>          
-          <div id="detailsBody" class="panel-collapse collapse" role="tabpanel" aria-labelledby="detailsHeading">
-            <div class="panel-body">
-              <h3>Order</h3>
-              <ul class="list-group">
-                <li class="list-group-item"><%= User.find_by(id: @posting.user_id).farm_name %> <%= Product.find_by(id: @posting.product_id).name %></li>
-                <li class="list-group-item">
-                  <%= number_to_currency(@posting.price) %> / <%= Unit.find_by(id: @posting.unit_id).name %>
-                  <% if @posting.unit_equivalency_description || @posting.price_equivalency_description %>
-                    <ul>
-                      <% if @posting.unit_equivalency_description %>
-                        <li><%= @posting.unit_equivalency_description %></li>
-                      <% end %>
-                      <% if @posting.price_equivalency_description %>
-                        <li><%= @posting.price_equivalency_description %></li>
-                      <% end %>
-                    </ul>
-                <% end %>
-                </li>
-                
-                <li class="list-group-item">
-                  <% data_content = "This is mostly like an 'order cutoff' but with " + link_to("some important differences", how_things_work_path(anchor: "commitment_zone")) + "." %>
-
-                  <a href='#' class="popover_init" tabindex="0" data-container="body" data-toggle="popover" data-trigger="focus" data-placement="top" data-html="true" data-content="<%=data_content%>">Commitment Zone</a>
-
-                  starts <%= @posting.commitment_zone_start.strftime("%A, %B %-d, %l:%M %p") %>
-                </li>
-                <li class="list-group-item">Delivery <%= @posting.delivery_date.strftime("%A, %B %-d") %></li>
-              </ul>
-
-              <h3>Producer</h3>
-              <ul class="list-group">
-                <% if !@posting.user.website.blank? %>
-                  <li class="list-group-item">Website: <a href=<%= "#{@posting.user.website}" %> target='_blank'><%= @posting.user.website %></a></li>              
-                <% end %>   
-                <% if @posting.user.description != nil %>                       
-                  <li class="list-group-item"><%= @posting.user.description %></li>
-                <% end %>
-              </ul>
-
-              <h3>Product</h3>
-              <ul class="list-group">
-                <% if !@posting.description.blank? %>
-                  <li class="list-group-item"><%= @posting.description %></a></li>              
-                <% end %>                   
-              </ul>      
-
-            </div>
+          <div class="panel-heading" role="tab" id="overviewHeading">
+            <h4 class="panel-title">Overview</h4>
           </div>
-        </div>
+          <div id="overviewBody" class="panel-body" role="tabpanel" aria-labelledby="overviewHeading">
+            
 
-
+            <ul class="list-group">
+              <li class="list-group-item"><%= User.find_by(id: @posting.user_id).farm_name %> <%= Product.find_by(id: @posting.product_id).name %></li>
+              <li class="list-group-item"><%= "#{@posting.user.city}, #{@posting.user.state}"  %></li>
+              <% if @posting.product_attributes %>
+                <li class="list-group-item"><%= @posting.product_attributes %></li>
+              <% end %>              
+              <li class="list-group-item">
+                <%= number_to_currency(@posting.price) %> / <%= Unit.find_by(id: @posting.unit_id).name %>
+                <% if @posting.unit_equivalency_description || @posting.price_equivalency_description %>
+                  <ul>
+                    <% if @posting.unit_equivalency_description %>
+                      <li><%= @posting.unit_equivalency_description %></li>
+                    <% end %>
+                    <% if @posting.price_equivalency_description %>
+                      <li><%= @posting.price_equivalency_description %></li>
+                    <% end %>
+                  </ul>
+              <% end %>
+              </li>              
+              
+              <li class="list-group-item">Delivery <%= @posting.delivery_date.strftime("%A, %B %-d") %></li>
+            </ul>
+            
+                        
+          </div>
+        </div>    
 
 
 
@@ -163,7 +139,7 @@
             </div>
                         
           </div>
-        </div>    
+        </div>            
 
 
 
@@ -171,6 +147,64 @@
 
 
 
+
+        <div class="panel panel-default">
+          <div class="panel-heading" role="tab" id="detailsHeading">
+            <h4 class="panel-title">
+              <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#detailsBody" aria-expanded="false" aria-controls="detailsBody">
+                <span class="glyphicon glyphicon-expand" aria-hidden="true"></span> Details
+              </a>
+            </h4>
+          </div>          
+          <div id="detailsBody" class="panel-collapse collapse" role="tabpanel" aria-labelledby="detailsHeading">
+            <div class="panel-body">
+              <h3>Order</h3>
+              <ul class="list-group">
+                <li class="list-group-item"><%= User.find_by(id: @posting.user_id).farm_name %> <%= Product.find_by(id: @posting.product_id).name %></li>
+                <li class="list-group-item">
+                  <%= number_to_currency(@posting.price) %> / <%= Unit.find_by(id: @posting.unit_id).name %>
+                  <% if @posting.unit_equivalency_description || @posting.price_equivalency_description %>
+                    <ul>
+                      <% if @posting.unit_equivalency_description %>
+                        <li><%= @posting.unit_equivalency_description %></li>
+                      <% end %>
+                      <% if @posting.price_equivalency_description %>
+                        <li><%= @posting.price_equivalency_description %></li>
+                      <% end %>
+                    </ul>
+                <% end %>
+                </li>
+                
+                <li class="list-group-item">
+                  <% data_content = "This is mostly like an 'order cutoff' but with " + link_to("some important differences", how_things_work_path(anchor: "commitment_zone")) + "." %>
+
+                  <a href='#' class="popover_init" tabindex="0" data-container="body" data-toggle="popover" data-trigger="focus" data-placement="top" data-html="true" data-content="<%=data_content%>">Commitment Zone</a>
+
+                  starts <%= @posting.commitment_zone_start.strftime("%A, %B %-d, %l:%M %p") %>
+                </li>
+                <li class="list-group-item">Delivery <%= @posting.delivery_date.strftime("%A, %B %-d") %></li>
+              </ul>
+
+              <h3>Producer</h3>
+              <ul class="list-group">
+                <% if !@posting.user.website.blank? %>
+                  <li class="list-group-item">Website: <a href=<%= "#{@posting.user.website}" %> target='_blank'><%= @posting.user.website %></a></li>              
+                <% end %>   
+                <% if @posting.user.description != nil %>                       
+                  <li class="list-group-item"><%= @posting.user.description %></li>
+                <% end %>
+              </ul>
+
+              <h3>Product</h3>
+              <ul class="list-group">
+                <% if !@posting.description.blank? %>
+                  <li class="list-group-item"><%= @posting.description %></a></li>              
+                <% end %>                   
+              </ul>      
+
+            </div>
+          </div>
+        </div>
 
 
 
