@@ -134,7 +134,7 @@ class ToteItemsControllerTest < ActionController::TestCase
     assert_response :redirect
     assert_redirected_to login_path
     assert_not flash.empty?
-    assert_equal "Please log in.", flash[:danger]    
+    assert_equal "Please log in or sign up.", flash[:danger]    
   end
 
   test "should get create" do

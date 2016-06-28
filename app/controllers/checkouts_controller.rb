@@ -3,6 +3,12 @@ class CheckoutsController < ApplicationController
   
   def create
 
+    if !current_user.activated?
+      flash[:danger] = "Account not activated."
+      redirect_to new_account_activation_path
+      return
+    end
+
     if params[:use_reference_transaction].nil?
       flash[:danger] = "Problem checking out. Please contact us if this persists."
       puts "CheckoutsController#create: unexpected form value for use_reference_transaction. value was nil."

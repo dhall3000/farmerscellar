@@ -114,7 +114,7 @@ module SessionsHelper
   def logged_in_user
     if !logged_in?
       store_location
-      flash[:danger] = "Please log in."
+      flash[:danger] = "Please log in or sign up."
       redirect_to login_url
     end
   end

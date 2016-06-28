@@ -13,16 +13,6 @@
 		<%= f.label :password %>
 		<%= f.password_field :password, class: 'form-control' %>
 
-    <%= f.label :zip, "Zip code" %>
-    <%= f.number_field :zip, class: 'form-control' %>    
-
-    <%= f.label :beta, class: "inline" do %>
-      <%= f.check_box :beta %>
-      <span>Join beta users group</span>      
-    <% end %>
-
-    <a href='#' id="beta_users_explanation" tabindex="0" data-placement="auto" data-container="body" data-toggle="popover" data-trigger="focus" data-content="Beta users get first shot at new features and give feedback about their experiences. This feedback is integral in shaping Farmer's Cellar. Join us!">(?)</a>
-
     <%= f.label :account_type, class: "radio inline" do %>
     <%= f.radio_button :account_type, "0", checked: true %>
     <span>New customer account</span>
@@ -32,7 +22,6 @@
     <%= f.radio_button :account_type, "1" %>
     <span>New producer account</span>
     <% end %>
-
 
 		<div id="producer_input" hidden="true">
           <%= f.label :farm_name %>

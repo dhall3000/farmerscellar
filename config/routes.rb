@@ -31,7 +31,7 @@ Rails.application.routes.draw do
   resources :products
   resources :website_settings, only: [:edit, :update]
   resources :users
-  resources :account_activations, only: [:edit]
+  resources :account_activations, only: [:new, :create, :edit]
   resources :password_resets,     only: [:new, :create, :edit, :update]
   resources :postings
   resources :tote_items, only: [:index, :new, :create, :destroy]

@@ -27,15 +27,27 @@ class UsersSignupTest < ActionDispatch::IntegrationTest
     assert_equal 1, ActionMailer::Base.deliveries.size
     user = assigns(:user)    
     assert_not user.activated?
-    # Try to log in before activation.
+    #log in before activation.
     log_in_as(user)
-    assert_not is_logged_in?
+
+    #try to checkout before activation.
+    #first add a tote item
+    posting = postings(:p1)
+    post tote_items_path, tote_item: {quantity: 1, posting_id: posting.id}
+    tote_item = assigns(:tote_item)
+    post checkouts_path
+    assert_redirected_to new_account_activation_path
+
     # Invalid activation token
     get edit_account_activation_path("invalid token")
-    assert_not is_logged_in?
+    assert_redirected_to root_url
+    assert_not flash.empty?
+    assert_equal "Invalid activation link", flash[:danger]
+    
     # Valid token, wrong email
     get edit_account_activation_path(user.activation_token, email: 'wrong')
-    assert_not is_logged_in?
+    assert_not user.reload.activated?
+    
     # Valid activation token
     get edit_account_activation_path(user.activation_token, email: user.email)
     assert user.reload.activated?

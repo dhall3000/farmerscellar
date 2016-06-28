@@ -1,0 +1,15 @@
+<% provide(:title, 'Activate account') %>
+
+<h1>Activate account</h1>
+
+<div class="row">
+	<div class="col-md-6 col-md-offset-3">
+	
+    <p>Please check your email to activate your account before checking out. If you do not see an activation email from Farmer's Cellar, check your spam folder or click the button below to re-send activation email.</p>
+
+		<%= form_tag account_activations_path do %>	    
+	    <%= submit_tag "Re-send activation email", class: "btn btn-lg btn-primary btn-block" %>
+	  <% end %>
+
+	</div>
+</div>
