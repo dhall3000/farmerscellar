@@ -147,9 +147,48 @@ class Posting < ActiveRecord::Base
   	end
   end
 
-  def total_quantity_authorized_or_committed
+  def queue_quantity_through_item(tote_item)
+
+    ti = tote_items.find_by(id: tote_item.id)
+
+    if ti.nil?
+      return 0
+    end
+
+    filtered_tote_items = tote_items.where("tote_items.id <= ?", ti.id)
+    return total_quantity_authorized_or_committed(filtered_tote_items)
+
+  end
+
+  def additional_units_required_to_fill_items_case(tote_item)
+
+    if units_per_case.nil? || units_per_case < 2
+      return 0
+    end
+
+    total_quantity = total_quantity_authorized_or_committed
+    up_through_item_quantity = queue_quantity_through_item(tote_item)
+
+    num_full_cases = total_quantity / units_per_case
+    total_units_in_full_cases = num_full_cases * units_per_case
+
+    if total_units_in_full_cases >= up_through_item_quantity
+      return 0
+    end
+
+    additional_units_required_to_fill_items_case = (total_units_in_full_cases + units_per_case) - total_quantity
+
+    return additional_units_required_to_fill_items_case
+
+  end
+
+  def total_quantity_authorized_or_committed(tis = nil)
+
+    if tis.nil?
+      tis = tote_items
+    end
     
-    authorized_or_committed_tote_items = tote_items.where("state = ? or state = ?", ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED])
+    authorized_or_committed_tote_items = tis.where("state = ? or state = ?", ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED])
 
     unit_count = 0
 

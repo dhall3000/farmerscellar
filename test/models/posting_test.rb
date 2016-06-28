@@ -3,7 +3,7 @@ require 'test_helper'
 class PostingTest < ActiveSupport::TestCase
 
   def setup
-    user = users(:c1)
+    @user = users(:c1)
     @farmer = users(:f1)
     @product = products(:apples)
     @unit = units(:pound)
@@ -16,6 +16,41 @@ class PostingTest < ActiveSupport::TestCase
 
     @posting = Posting.new(unit: @unit, product: @product, user: @farmer, description: "descrip", quantity_available: 100, price: 1.25, live: true, commitment_zone_start: delivery_date - 2.days, delivery_date: delivery_date)
     @posting.save
+  end
+
+  test "should require zero units to fill case when tote item far from end of queue" do
+   
+    posting = postings(:postingf5apples)
+    posting.update_attribute(:units_per_case, 10)
+
+    c2 = users(:c2)
+    ti = ToteItem.new(quantity: 5, posting_id: posting.id, state: ToteItem.states[:AUTHORIZED], price: posting.price, user_id: c2.id)
+    assert ti.save
+
+    c1 = @user
+    c1_ti = ToteItem.new(quantity: 2, posting_id: posting.id, state: ToteItem.states[:AUTHORIZED], price: posting.price, user_id: c1.id)
+    assert c1_ti.save    
+
+    ti_temp = ti
+    
+    5.times do
+      ti_temp = ti
+      ti = ToteItem.new(quantity: 6, posting_id: posting.id, state: ToteItem.states[:AUTHORIZED], price: posting.price, user_id: c2.id)
+      assert ti.save
+    end
+    
+    total_quantity = posting.total_quantity_authorized_or_committed
+    queue_quantity_through_item = posting.queue_quantity_through_item(c1_ti)
+
+    assert_equal 7, queue_quantity_through_item
+    assert_equal 0, c1_ti.additional_units_required_to_fill_my_case
+
+    #this is the very last item to get added. the total quantity ordered by all users is 37. we need to hit 40 to fill this last case.
+    assert_equal 3, ti.additional_units_required_to_fill_my_case
+    #this is the 2nd to last item. it's up-through quantity should be 31. the item after this (the .last item) has quantity 6 so
+    #it's up-through quantity should be 37 so both these items should have 'units_required' of 3 to get the case filled
+    assert_equal 3, ti_temp.additional_units_required_to_fill_my_case
+
   end
 
   test "total_quantity_authorized_or_committed should be correct" do

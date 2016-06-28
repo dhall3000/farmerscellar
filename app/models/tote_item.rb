@@ -31,6 +31,10 @@ class ToteItem < ActiveRecord::Base
   validates :state, inclusion: { in: ToteItem.states.values }
   validates :state, numericality: {only_integer: true}
 
+  def additional_units_required_to_fill_my_case
+    return posting.additional_units_required_to_fill_items_case(self)
+  end
+
   def delivery_date
     
     if posting.nil?
