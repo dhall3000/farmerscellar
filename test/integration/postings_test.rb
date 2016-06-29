@@ -10,7 +10,56 @@ class PostingsTest < ActionDispatch::IntegrationTest
     @product = products(:apples)
     @unit = units(:pound)    
     @posting = postings(:postingf1apples)
-  end  
+  end
+
+  test "pout page should tell user more units necessary for order to go through" do
+
+    delivery_date = Time.zone.now.midnight + 7.days
+    if delivery_date.sunday?
+      delivery_date += 1.day
+    end
+
+    commitment_zone_start = delivery_date - 2.days
+
+    posting_params = {
+      description: "describe description",
+      quantity_available: 100,
+      price: 5.25,
+      user_id: @farmer.id,
+      product_id: @product.id,
+      unit_id: @unit.id,
+      live: true,
+      delivery_date: delivery_date,
+      commitment_zone_start: commitment_zone_start,
+      units_per_case: 10
+    }
+
+    posting = create_posting(@farmer, posting_params)
+
+    #create an authorized tote item for c1 with quantity 3
+    c1 = users(:c1)
+    ti = ToteItem.new(quantity: 3, posting_id: posting.id, state: ToteItem.states[:AUTHORIZED], price: posting.price, user_id: c1.id)
+    assert ti.save
+
+    #log in as c2
+    c2 = users(:c2)
+    log_in_as(c2)
+    #add tote item with quantity 4
+    post tote_items_path, tote_item: {quantity: 4, posting_id: posting.id}
+    tote_item = assigns(:tote_item)
+
+    #the case size is 10. c1 added 3 units and c2 just added 4. this is a total of 7 which means the 
+    #additional_units_required_to_fill_my_case should be 3
+    assert_equal 3, tote_item.additional_units_required_to_fill_my_case
+
+    assert_response :redirect
+    follow_redirect!
+    assert_template 'tote_items/pout'
+
+    assert_not flash.empty?
+    assert_equal "Item added but currently won't ship. See explanation below.", flash[:danger]
+    
+  end
 
   test "posting should remove unauthorized tote items when it transitions from open to closed when late adds not allowed" do
     
@@ -212,6 +261,14 @@ class PostingsTest < ActionDispatch::IntegrationTest
     post login_path, session: { email: @farmer.email, password: 'dogdog' }
     assert_redirected_to postings_path
     follow_redirect!
+  end
+
+  def create_posting(producer, params)
+    log_in_as(producer)
+    post postings_path, posting: params
+    posting = assigns(:posting)
+    verify_post_presence(posting.price, posting.unit, exists = true, posting.id)
+    return posting
   end
 
   def create_new_posting

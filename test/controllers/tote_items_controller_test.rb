@@ -142,7 +142,7 @@ class ToteItemsControllerTest < ActionController::TestCase
     log_in_as(@c1)
     post :create, tote_item: {quantity: 1, posting_id: @posting_apples.id}
 
-    assert_equal "Item saved to shopping tote.", flash[:success]
+    assert_equal "Item added to tote.", flash[:success]
     assert :redirected
     assert_response :redirect
     assert_redirected_to postings_path
@@ -168,7 +168,7 @@ class ToteItemsControllerTest < ActionController::TestCase
     #zero quantity should fail
     post :create, tote_item: {quantity: 0, posting_id: @posting_apples}
 
-    assert_equal "Item not saved to shopping tote. See errors below.", flash.now[:danger]
+    assert_equal "Item not added to tote. See errors below.", flash.now[:danger]
     assert_template 'tote_items/new'
 
   end
@@ -208,7 +208,7 @@ class ToteItemsControllerTest < ActionController::TestCase
     assert_equal ti_count + 1, c1_tote_items.count
     new_ti = c1_tote_items.last
     
-    assert_equal flash[:success], "Item saved to shopping tote."
+    assert_equal "Item added to tote.", flash[:success]
     assert_redirected_to postings_path
 
   end

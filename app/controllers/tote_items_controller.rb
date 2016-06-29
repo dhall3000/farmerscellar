@@ -1,6 +1,7 @@
 class ToteItemsController < ApplicationController
-  before_action :correct_user,   only: [:destroy]
-  before_action :logged_in_user, only: [:index, :create, :destroy]
+
+  before_action :correct_user,   only: [:destroy, :pout]
+  before_action :logged_in_user, only: [:index, :create, :destroy, :pout]
 
   def index
 
@@ -76,17 +77,26 @@ class ToteItemsController < ApplicationController
       flash[:danger] = "Oops, please try adding that again"
       redirect_to postings_path
     elsif @tote_item.save
-
       if @tote_item.posting.posting_recurrence && @tote_item.posting.posting_recurrence.on
         #this posting is subscribable. attempt subscription upsell.
         redirect_to new_subscription_path(tote_item_id: @tote_item.id)
-      else        
-        flash[:success] = "Item saved to shopping tote."
-        redirect_to postings_path
+        return
+      else
+
+        if @tote_item.additional_units_required_to_fill_my_case == 0
+          flash[:success] = "Item added to tote."
+          redirect_to postings_path
+          return
+        else
+          flash[:danger] = "Item added but currently won't ship. See explanation below."
+          redirect_to tote_items_pout_path(id: @tote_item.id)
+          return
+        end
+        
       end
 
     else
-      flash.now[:danger] = "Item not saved to shopping tote. See errors below."
+      flash.now[:danger] = "Item not added to tote. See errors below."
       @sanitized_producer_url = @posting.user.website
       if @sanitized_producer_url != nil
         @sanitized_producer_url = url_with_protocol(@sanitized_producer_url)
@@ -95,6 +105,10 @@ class ToteItemsController < ApplicationController
       @account_on_hold = account_on_hold
       render 'new'
     end
+  end
+
+  def pout
+    @tote_item = ToteItem.find_by(id: params[:id])
   end
 
   def destroy

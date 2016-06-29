@@ -168,6 +168,15 @@ class Posting < ActiveRecord::Base
     end
 
     total_quantity = total_quantity_authorized_or_committed
+
+    #this is a bit non-obvious. remember that this computed value is going to be displayed to the user
+    #right after they ADD a tote item. we'll also display this data in the tote. the former won't be authorized
+    #while the latter might be. especially in the former case we want to user to feel the impact of their order so we
+    #need to include in the count this user's ADDED quantity
+    if tote_item.state?(:ADDED)
+      total_quantity += tote_item.quantity
+    end
+
     up_through_item_quantity = queue_quantity_through_item(tote_item)
 
     num_full_cases = total_quantity / units_per_case

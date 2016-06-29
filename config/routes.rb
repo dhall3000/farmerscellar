@@ -24,8 +24,9 @@ Rails.application.routes.draw do
   post 'reference_transactions/create_capture'
   get 'reference_transactions/do_rtpurchase'
   get 'reference_transactions/do_bulk_purchase'
-  
+  get 'tote_items/pout'  
   post 'subscriptions/skip_dates'
+  
   resources :subscriptions, only: [:new, :create, :index, :show, :edit, :update]
   resources :producer_product_unit_commissions
   resources :products
