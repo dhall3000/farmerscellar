@@ -110,7 +110,13 @@ class ToteItem < ActiveRecord::Base
     end
 
     if new_state != state
+      
       update(state: new_state)
+
+      if new_state == ToteItem.states[:AUTHORIZED]
+        update(authorized_at: Time.zone.now)
+      end
+
     end
 
   end

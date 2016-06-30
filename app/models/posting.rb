@@ -148,7 +148,7 @@ class Posting < ActiveRecord::Base
   	end
   end
 
-  def queue_quantity_through_item(tote_item)
+  def queue_quantity_through_item_plus_users_added_items(tote_item)
 
     ti = tote_items.find_by(id: tote_item.id)
 
@@ -156,8 +156,18 @@ class Posting < ActiveRecord::Base
       return 0
     end
 
-    filtered_tote_items = tote_items.where("tote_items.id <= ?", ti.id)
-    return total_quantity_authorized_or_committed(filtered_tote_items)
+    if tote_item.authorized_at.nil?      
+      filtered_tote_items = tote_items
+    else      
+      filtered_tote_items = tote_items.where("authorized_at <= ?", tote_item.authorized_at)
+    end
+    
+    authorized_or_committed_quantity = total_quantity_authorized_or_committed(filtered_tote_items)
+    added_tote_items_for_user_quantity = tote_items.where(user_id: tote_item.user_id, state: ToteItem.states[:ADDED]).sum(:quantity)
+    
+    total_quantity = authorized_or_committed_quantity + added_tote_items_for_user_quantity
+
+    return total_quantity
 
   end
 
@@ -174,11 +184,9 @@ class Posting < ActiveRecord::Base
     #while the latter might be. especially in the former case we want to user to feel the impact of their order so we
     #need to include in the count this user's ADDED quantity
     added_tote_items_for_user = tote_items.where(user_id: tote_item.user_id, state: ToteItem.states[:ADDED])
-    added_tote_items_for_user.each do |ati|
-      total_quantity += ati.quantity
-    end
+    total_quantity += added_tote_items_for_user.sum(:quantity)
 
-    up_through_item_quantity = queue_quantity_through_item(tote_item)
+    up_through_item_quantity = queue_quantity_through_item_plus_users_added_items(tote_item)
 
     num_full_cases = total_quantity / units_per_case
     total_units_in_full_cases = num_full_cases * units_per_case
@@ -200,7 +208,7 @@ class Posting < ActiveRecord::Base
     end
     
     authorized_or_committed_tote_items = tis.where("state = ? or state = ?", ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED])
-    
+
     return authorized_or_committed_tote_items.sum(:quantity)
 
   end

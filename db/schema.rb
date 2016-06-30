@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160628230353) do
+ActiveRecord::Schema.define(version: 20160630163015) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -512,8 +512,10 @@ ActiveRecord::Schema.define(version: 20160628230353) do
     t.datetime "updated_at",                  null: false
     t.integer  "user_id"
     t.integer  "subscription_id"
+    t.datetime "authorized_at"
   end
 
+  add_index "tote_items", ["authorized_at"], name: "index_tote_items_on_authorized_at"
   add_index "tote_items", ["posting_id"], name: "index_tote_items_on_posting_id"
   add_index "tote_items", ["subscription_id"], name: "index_tote_items_on_subscription_id"
   add_index "tote_items", ["user_id"], name: "index_tote_items_on_user_id"

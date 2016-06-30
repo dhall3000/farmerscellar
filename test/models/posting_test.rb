@@ -18,29 +18,107 @@ class PostingTest < ActiveSupport::TestCase
     @posting.save
   end
 
+  test "should require varying additional units until user authorizes tote" do
+
+    posting = postings(:postingf5apples)
+    posting.update_attribute(:units_per_case, 10)
+
+    c2 = users(:c2)
+    ti = ToteItem.new(quantity: 5, posting_id: posting.id, state: ToteItem.states[:ADDED], price: posting.price, user_id: c2.id)    
+    assert ti.save
+    ti.transition(:customer_authorized)
+
+    c1 = @user
+    c1_ti1 = ToteItem.new(quantity: 2, posting_id: posting.id, state: ToteItem.states[:ADDED], price: posting.price, user_id: c1.id)    
+    assert c1_ti1.save    
+    #c1_ti1.transition(:customer_authorized)
+
+    #this is the quantity actually authorized plus c1's ADDED item
+    queue_quantity_through_item = posting.queue_quantity_through_item_plus_users_added_items(c1_ti1)    
+    assert_equal 7, queue_quantity_through_item
+
+    #this is the additional quantity needed to fill the case.
+    #takes in to account actually authorized items and all this user's ADDED items
+    additional_units_required_to_fill_my_case = c1_ti1.additional_units_required_to_fill_my_case
+    assert_equal 3, additional_units_required_to_fill_my_case
+
+    #let's say that c1 doesn't auth 1st item but then ADDs a 2nd but again not quite enough to fill the case. this quantity 2 should 
+    #be short 1 unit
+    c1_ti2 = ToteItem.new(quantity: 2, posting_id: posting.id, state: ToteItem.states[:ADDED], price: posting.price, user_id: c1.id)    
+    assert c1_ti2.save
+
+    #this is the quantity actually authorized which should exclude c1's ADDED items
+    queue_quantity_through_item = posting.queue_quantity_through_item_plus_users_added_items(c1_ti2)    
+    assert_equal 9, queue_quantity_through_item
+
+    #this is the additional quantity needed to fill the case.
+    #takes in to account actually authorized items and all this user's ADDED items
+    additional_units_required_to_fill_my_case = c1_ti2.additional_units_required_to_fill_my_case
+    assert_equal 1, additional_units_required_to_fill_my_case
+
+    #now let's say c2 adds 2 more units. 
+    ti = ToteItem.new(quantity: 2, posting_id: posting.id, state: ToteItem.states[:ADDED], price: posting.price, user_id: c2.id)    
+    assert ti.save
+
+    #c2 then should see 3 more required.
+    additional_units_required_to_fill_my_case = ti.additional_units_required_to_fill_my_case
+    assert_equal 3, additional_units_required_to_fill_my_case
+
+    #c1 should still see 1 more required.
+    additional_units_required_to_fill_my_case = c1_ti2.additional_units_required_to_fill_my_case
+    assert_equal 1, additional_units_required_to_fill_my_case
+
+    #now lets say c2 authorizes these 2 additional units.
+    ti.transition(:customer_authorized)
+
+    #c2 should still see 3 remaining
+    additional_units_required_to_fill_my_case = ti.additional_units_required_to_fill_my_case
+    assert_equal 3, additional_units_required_to_fill_my_case
+
+    #and now c1 should see 9 additional units remaining
+    additional_units_required_to_fill_my_case = c1_ti2.additional_units_required_to_fill_my_case
+    assert_equal 9, additional_units_required_to_fill_my_case
+
+    #now c1 authorizes both items
+    c1_ti1.transition(:customer_authorized)
+    c1_ti2.transition(:customer_authorized)
+
+    #now c1 should still see 9 additional units remaining
+    additional_units_required_to_fill_my_case = c1_ti2.additional_units_required_to_fill_my_case
+    assert_equal 9, additional_units_required_to_fill_my_case
+
+    #c2 should now see 0 additional units remaining
+    additional_units_required_to_fill_my_case = ti.additional_units_required_to_fill_my_case
+    assert_equal 0, additional_units_required_to_fill_my_case
+
+  end
+
   test "should require zero units to fill case when tote item far from end of queue" do
    
     posting = postings(:postingf5apples)
     posting.update_attribute(:units_per_case, 10)
 
     c2 = users(:c2)
-    ti = ToteItem.new(quantity: 5, posting_id: posting.id, state: ToteItem.states[:AUTHORIZED], price: posting.price, user_id: c2.id)
+    ti = ToteItem.new(quantity: 5, posting_id: posting.id, state: ToteItem.states[:ADDED], price: posting.price, user_id: c2.id)    
     assert ti.save
+    ti.transition(:customer_authorized)
 
     c1 = @user
-    c1_ti = ToteItem.new(quantity: 2, posting_id: posting.id, state: ToteItem.states[:AUTHORIZED], price: posting.price, user_id: c1.id)
+    c1_ti = ToteItem.new(quantity: 2, posting_id: posting.id, state: ToteItem.states[:ADDED], price: posting.price, user_id: c1.id)    
     assert c1_ti.save    
+    c1_ti.transition(:customer_authorized)
 
     ti_temp = ti
     
     5.times do
       ti_temp = ti
-      ti = ToteItem.new(quantity: 6, posting_id: posting.id, state: ToteItem.states[:AUTHORIZED], price: posting.price, user_id: c2.id)
+      ti = ToteItem.new(quantity: 6, posting_id: posting.id, state: ToteItem.states[:ADDED], price: posting.price, user_id: c2.id)      
       assert ti.save
+      ti.transition(:customer_authorized)
     end
     
     total_quantity = posting.total_quantity_authorized_or_committed
-    queue_quantity_through_item = posting.queue_quantity_through_item(c1_ti)
+    queue_quantity_through_item = posting.queue_quantity_through_item_plus_users_added_items(c1_ti)
 
     assert_equal 7, queue_quantity_through_item
     assert_equal 0, c1_ti.additional_units_required_to_fill_my_case
