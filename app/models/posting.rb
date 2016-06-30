@@ -200,14 +200,8 @@ class Posting < ActiveRecord::Base
     end
     
     authorized_or_committed_tote_items = tis.where("state = ? or state = ?", ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED])
-
-    unit_count = 0
-
-    authorized_or_committed_tote_items.each do |tote_item|
-      unit_count = unit_count + tote_item.quantity
-    end
-
-    return unit_count
+    
+    return authorized_or_committed_tote_items.sum(:quantity)
 
   end
 
@@ -223,13 +217,7 @@ class Posting < ActiveRecord::Base
       ToteItem.states[:FILLED],
       ToteItem.states[:NOTFILLED])
 
-    unit_count = 0
-
-    ordered_tote_items.each do |tote_item|
-      unit_count = unit_count + tote_item.quantity
-    end
-
-    return unit_count
+    return ordered_tote_items.sum(:quantity)
 
   end
 
