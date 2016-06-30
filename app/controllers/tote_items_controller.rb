@@ -87,8 +87,8 @@ class ToteItemsController < ApplicationController
           flash[:success] = "Item added to tote."
           redirect_to postings_path
           return
-        else
-          flash[:danger] = "Item added but currently won't ship. See explanation below."
+        else          
+          flash[:danger] = "#{@tote_item.additional_units_required_to_fill_my_case.to_s} additional #{"unit".pluralize(@tote_item.additional_units_required_to_fill_my_case)} required to ship. See below."
           redirect_to tote_items_pout_path(id: @tote_item.id)
           return
         end
@@ -108,7 +108,29 @@ class ToteItemsController < ApplicationController
   end
 
   def pout
+    
     @tote_item = ToteItem.find_by(id: params[:id])
+
+    if @tote_item.nil?
+      #this should be impossible. email admin.
+      AdminNotificationMailer.general_message("unknown problem. pout message didn't display", "user id #{current_user.id.to_s} should have seen the pout page but @tote_item was nil. params[:id] = #{params[:id].to_s}").deliver_now
+      flash.discard
+      redirect_to postings_path
+      return    
+    end
+
+    @posting = @tote_item.posting
+    @additional_units_required_to_fill_case = @tote_item.additional_units_required_to_fill_my_case
+
+    if @additional_units_required_to_fill_case < 1
+      AdminNotificationMailer.general_message("unknown problem. pout message action called but @additional_units_required_to_fill_case < 1", "user id #{current_user.id.to_s} should have seen the pout page. @tote_item.id #{@tote_item.id.to_s}. @additional_units_required_to_fill_case = #{@additional_units_required_to_fill_case.to_s}").deliver_now
+      flash.discard
+      redirect_to postings_path
+      return
+    end
+
+    @account_on_hold = account_on_hold
+
   end
 
   def destroy

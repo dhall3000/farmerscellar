@@ -1,1 +1,51 @@
-<p>hi. this is the pout page :(</p>
+<h1>Order Info</h1>
+
+<div class="row">
+  <div class="col-xs-12 col-md-4 col-md-offset-4">
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+
+
+        <div class="panel panel-default">
+          <div class="panel-heading" role="tab">
+            <h4 class="panel-title">Explanation</h4>
+          </div>
+          <div class="panel-body" role="tabpanel">
+						<p>The case that your items are in is not yet full. You can help fill it by recruiting the Farmer's Cellar community or ordering more yourself.</p>                        
+          </div>
+        </div>
+
+
+
+        <div class="panel panel-default">
+          <div class="panel-heading" role="tab">
+            <h4 class="panel-title">Recruit Community</h4>
+          </div>
+          <div class="panel-body" role="tabpanel">
+
+						<div
+						  class="fb-like"						  
+				  		data-href=data-href=<%= new_tote_item_url(posting_id: @posting.id) %>
+				  		data-share="true"
+				  		data-width="200"
+				  		data-size="large"
+						  data-show-faces="true">
+						</div>
+                        
+          </div>
+        </div>
+
+
+
+        <div class="panel panel-default">
+          <div class="panel-heading" role="tab">
+            <h4 class="panel-title">Order more <%= User.find_by(id: @posting.user_id).farm_name %> <%= Product.find_by(id: @posting.product_id).name %></h4>
+          </div>
+          <div id="quantityBody" class="panel-body" role="tabpanel">
+          	<%= render partial: "add_quantity", locals: { tote_item: ToteItem.new, posting: @posting, account_on_hold: @account_on_hold } %>                        
+          </div>
+        </div>
+
+
+    </div>
+	</div>
+</div>

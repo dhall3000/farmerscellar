@@ -12,6 +12,39 @@ class PostingsTest < ActionDispatch::IntegrationTest
     @posting = postings(:postingf1apples)
   end
 
+  test "c2 should fill case that c1 came up short on" do
+    posting = come_up_3_short
+
+    #at this point c1 has 3 authorized and c2 has 4 added for a total of 7
+    #however, from c1's perspective only their own 3 count because c1 doesn't know
+    #if/when c2 is going to authorize. so c1 should still see 7 remaining to fill the case
+    c1 = users(:c1)
+    c1_ti = c1.tote_items.order(:created_at).last
+    assert_equal ToteItem.states[:AUTHORIZED], c1_ti.state
+    assert_equal 7, c1_ti.additional_units_required_to_fill_my_case
+
+    #c1 has 3 auth'd and c2 has 4 added for a total of 7 so there are still 3 remaining that need to be ordered
+    c2 = users(:c2)
+    c2_ti = c2.tote_items.order(:created_at).last
+    assert_equal ToteItem.states[:ADDED], c2_ti.state
+    assert_equal 3, c2_ti.additional_units_required_to_fill_my_case
+
+    #so c1 saw "7 remaining" on the pout page so they add 7 more
+    ti = ToteItem.new(quantity: 7, posting_id: posting.id, state: ToteItem.states[:AUTHORIZED], price: posting.price, user_id: c1.id)
+    assert ti.save
+    #so now c1 shouldn't see the pout page anymore
+    assert_equal 0, ti.additional_units_required_to_fill_my_case
+
+    #but now c2 got kicked in to the next case so they should see 6
+    assert_equal 6, c2_ti.additional_units_required_to_fill_my_case
+
+    #c1 adds some quantity
+    #c1 sees pout page requiring 4 more units
+    #c1 doesn't add anymore and doesn't authorize either
+    #c2 adds 5 units
+    #c1 now sees 9 units required
+  end
+
   test "should get pout page the first add but not the second" do
     posting = come_up_3_short
     #user got sent to the pout page telling them they were three units short of a full case
@@ -54,8 +87,9 @@ class PostingsTest < ActionDispatch::IntegrationTest
 
     #create an authorized tote item for c1 with quantity 3
     c1 = users(:c1)
-    ti = ToteItem.new(quantity: 3, posting_id: posting.id, state: ToteItem.states[:AUTHORIZED], price: posting.price, user_id: c1.id)
+    ti = ToteItem.new(quantity: 3, posting_id: posting.id, state: ToteItem.states[:ADDED], price: posting.price, user_id: c1.id)    
     assert ti.save
+    ti.transition(:customer_authorized)
 
     #log in as c2
     c2 = users(:c2)
@@ -73,7 +107,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
     assert_template 'tote_items/pout'
 
     assert_not flash.empty?
-    assert_equal "Item added but currently won't ship. See explanation below.", flash[:danger]
+    assert_equal "3 additional units required to ship. See below.", flash[:danger]
 
     return posting
 
