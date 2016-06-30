@@ -173,8 +173,9 @@ class Posting < ActiveRecord::Base
     #right after they ADD a tote item. we'll also display this data in the tote. the former won't be authorized
     #while the latter might be. especially in the former case we want to user to feel the impact of their order so we
     #need to include in the count this user's ADDED quantity
-    if tote_item.state?(:ADDED)
-      total_quantity += tote_item.quantity
+    added_tote_items_for_user = tote_items.where(user_id: tote_item.user_id, state: ToteItem.states[:ADDED])
+    added_tote_items_for_user.each do |ati|
+      total_quantity += ati.quantity
     end
 
     up_through_item_quantity = queue_quantity_through_item(tote_item)

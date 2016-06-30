@@ -12,8 +12,24 @@ class PostingsTest < ActionDispatch::IntegrationTest
     @posting = postings(:postingf1apples)
   end
 
-  test "pout page should tell user more units necessary for order to go through" do
+  test "should get pout page the first add but not the second" do
+    posting = come_up_3_short
+    #user got sent to the pout page telling them they were three units short of a full case
+    #so now they just added 3 more. it should not send them to pout page but back to shopping page
+    post tote_items_path, tote_item: {quantity: 3, posting_id: posting.id}
+    tote_item = assigns(:tote_item)
 
+    #the case size is 10. c1 just found out the case was 3 units shy so they added 3 more so
+    #additional_units_required_to_fill_my_case should be 0
+    assert_equal 0, tote_item.additional_units_required_to_fill_my_case
+
+    assert_response :redirect
+    follow_redirect!
+    assert_template 'postings/index'
+
+  end
+
+  def come_up_3_short
     delivery_date = Time.zone.now.midnight + 7.days
     if delivery_date.sunday?
       delivery_date += 1.day
@@ -58,7 +74,13 @@ class PostingsTest < ActionDispatch::IntegrationTest
 
     assert_not flash.empty?
     assert_equal "Item added but currently won't ship. See explanation below.", flash[:danger]
-    
+
+    return posting
+
+  end
+
+  test "pout page should tell user more units necessary for order to go through" do
+    come_up_3_short    
   end
 
   test "posting should remove unauthorized tote items when it transitions from open to closed when late adds not allowed" do
