@@ -66,7 +66,12 @@
 
                 <td colspan="6" class="hidden-xs borderless">
                   <div>
-                    <a href="#<%= 'toteItemDetails' + tote_item.id.to_s %>" data-toggle="collapse"><span class="glyphicon glyphicon-expand" aria-hidden="true"></span></a>
+                    <a href="#<%= 'toteItemDetails' + tote_item.id.to_s %>" data-toggle="collapse">
+                      <span class="glyphicon glyphicon-expand" aria-hidden="true"></span>
+                      <% if tote_item.additional_units_required_to_fill_my_case > 0 %>
+                        <span class="alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                      <% end %>
+                    </a>
                   </div>
                   <div id="<%= 'toteItemDetails' + tote_item.id.to_s %>" class="collapse">
                     <%= render partial: "shared/tote_expansion_row", locals: { tote_item: tote_item } %>
@@ -75,7 +80,12 @@
             
                 <td colspan="4" class="hidden-sm hidden-md hidden-lg borderless">
                   <div>
-                    <a href="#xs<%= 'toteItemDetails' + tote_item.id.to_s %>" data-toggle="collapse"><span class="glyphicon glyphicon-expand" aria-hidden="true"></span></a>
+                    <a href="#xs<%= 'toteItemDetails' + tote_item.id.to_s %>" data-toggle="collapse">
+                      <span class="glyphicon glyphicon-expand" aria-hidden="true"></span>
+                      <% if tote_item.additional_units_required_to_fill_my_case > 0 %>
+                        <span class="alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                      <% end %>
+                    </a>
                   </div>
                   <div id="xs<%= 'toteItemDetails' + tote_item.id.to_s %>" class="collapse">
                     <%= render partial: "shared/tote_expansion_row", locals: { tote_item: tote_item } %>

@@ -122,6 +122,7 @@ c = User.create!(name:  "c1",
              beta: false
              )
 
+c1 = c
 AccessCode.create(user: c, notes: "code for user 5")
 
 c = User.create!(name:  "c2",
@@ -139,6 +140,7 @@ c = User.create!(name:  "c2",
              beta: false
              )
 
+c2 = c
 AccessCode.create(user: c, notes: "code for user 6")
 
 c = User.create!(name:  "c3",
@@ -156,6 +158,7 @@ c = User.create!(name:  "c3",
              beta: false
              )
 
+c3 = c
 AccessCode.create(user: c, notes: "code for user 7")
 
 c = User.create!(name:  "c4",
@@ -173,6 +176,7 @@ c = User.create!(name:  "c4",
              beta: false
              )
 
+c4 = c
 AccessCode.create(user: c, notes: "code for user 8")
 
 c = User.create!(name:  "a1",
@@ -190,18 +194,19 @@ c = User.create!(name:  "a1",
              beta: false
              )
 
+a1 = c
 AccessCode.create(user: c, notes: "code for user 9")
 
-apples = Product.create(name: "Fuji Apples")
-carrots = Product.create(name: "Carrots")
-milk = Product.create(name: "Milk")
-beef = Product.create(name: "Beef")
-chicken = Product.create(name: "Chicken")
-asparagus = Product.create(name: "Asparagus")
-oranges = Product.create(name: "Oranges")
-celery = Product.create(name: "Celery")
-avocado = Product.create(name: "Avocado")
-basil = Product.create(name: "Basil")
+product_apples = Product.create(name: "Fuji Apples")
+product_carrots = Product.create(name: "Carrots")
+product_milk = Product.create(name: "Milk")
+product_beef = Product.create(name: "Beef")
+product_chicken = Product.create(name: "Chicken")
+product_asparagus = Product.create(name: "Asparagus")
+product_oranges = Product.create(name: "Oranges")
+product_celery = Product.create(name: "Celery")
+product_avocado = Product.create(name: "Avocado")
+product_basil = Product.create(name: "Basil")
 
 Unit.create(name: "Fluid Ounce")
 Unit.create(name: "Pint")
@@ -229,44 +234,44 @@ def next_friday
   return (Time.zone.now + i.days).midnight
 end
 
-f1.producer_product_unit_commissions.create(product: apples, commission: 0.05, unit: pound)
-f1.producer_product_unit_commissions.create(product: asparagus, commission: 0.15, unit: pound)
-f2.producer_product_unit_commissions.create(product: milk, commission: 0.10, unit: gallon)
-f2.producer_product_unit_commissions.create(product: beef, commission: 0.03, unit: pound)
-f3.producer_product_unit_commissions.create(product: carrots, commission: 0.04, unit: pound)
-f3.producer_product_unit_commissions.create(product: chicken, commission: 0.07, unit: pound)
-f4.producer_product_unit_commissions.create(product: oranges, commission: 0.08, unit: pound)
-f4.producer_product_unit_commissions.create(product: celery, commission: 0.12, unit: pound)
-f4.producer_product_unit_commissions.create(product: avocado, commission: 0.08, unit: pound)
-f4.producer_product_unit_commissions.create(product: basil, commission: 0.06, unit: pound)
+f1.producer_product_unit_commissions.create(product: product_apples, commission: 0.05, unit: pound)
+f1.producer_product_unit_commissions.create(product: product_asparagus, commission: 0.15, unit: pound)
+f2.producer_product_unit_commissions.create(product: product_milk, commission: 0.10, unit: gallon)
+f2.producer_product_unit_commissions.create(product: product_beef, commission: 0.03, unit: pound)
+f3.producer_product_unit_commissions.create(product: product_carrots, commission: 0.04, unit: pound)
+f3.producer_product_unit_commissions.create(product: product_chicken, commission: 0.07, unit: pound)
+f4.producer_product_unit_commissions.create(product: product_oranges, commission: 0.08, unit: pound)
+f4.producer_product_unit_commissions.create(product: product_celery, commission: 0.12, unit: pound)
+f4.producer_product_unit_commissions.create(product: product_avocado, commission: 0.08, unit: pound)
+f4.producer_product_unit_commissions.create(product: product_basil, commission: 0.06, unit: pound)
 
 #Apples
-apples = Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 1, quantity_available: 1000, price: 2.75, user_id: f1.id, unit_id: 8, description: "these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
+posting_apples = Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: product_apples.id, quantity_available: 1000, price: 2.75, user_id: f1.id, unit_id: 8, description: "these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
 #Asparagus
-asparagus = Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 6, quantity_available: 100, price: 3.25, user_id: f1.id, unit_id: 8, description: "these Asparagus are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
+posting_asparagus = Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: product_asparagus.id, quantity_available: 100, price: 3.25, user_id: f1.id, unit_id: 8, description: "these Asparagus are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
 #Milk
-Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 3, quantity_available: 25, price: 2.00, user_id: f2.id, unit_id: 5, description: "these milks are all organic grown with no pesticides. they are raw. no homogeneization. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
+posting_milk = Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: product_milk.id, quantity_available: 25, price: 2.00, user_id: f2.id, unit_id: 5, description: "these milks are all organic grown with no pesticides. they are raw. no homogeneization. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
 #Beef
-Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 4, quantity_available: 10, price: 3.75, user_id: f2.id, unit_id: 11, description: "these beefs are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
+posting_beef = Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: product_beef.id, quantity_available: 10, price: 3.75, user_id: f2.id, unit_id: 11, description: "these beefs are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
 #Carrots
-Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 2, quantity_available: 15, price: 2.25, user_id: f3.id, unit_id: 8, description: "yummy, crunchy carrots. tastiest ever!")
+posting_carrots = Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: product_carrots.id, quantity_available: 15, price: 2.25, user_id: f3.id, unit_id: 8, description: "yummy, crunchy carrots. tastiest ever!")
 #Chicken
-Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 5, quantity_available: 50, price: 1.50, user_id: f3.id, unit_id: 10, description: "best whole chickens around. all grass fed on clean, organic fields. no antibiotics. no supplements. just lots of grass and all the bugs they can eat! :)")
+posting_chicken = Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: product_chicken.id, quantity_available: 50, price: 1.50, user_id: f3.id, unit_id: 10, description: "best whole chickens around. all grass fed on clean, organic fields. no antibiotics. no supplements. just lots of grass and all the bugs they can eat! :)")
 #Oranges
-Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 7, quantity_available: 100, price: 1.25, user_id: f4.id, unit_id: 8, description: "best oranges ever!")
+posting_oranges = Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: product_oranges.id, quantity_available: 100, price: 1.25, user_id: f4.id, unit_id: 8, description: "best oranges ever!")
 #Celery
-Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: 8, quantity_available: 100, price: 2.50, user_id: f4.id, unit_id: 8, description: "best celery ever!")
+posting_celery = Posting.create(units_per_case: 10, live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: product_celery.id, quantity_available: 100, price: 2.50, user_id: f4.id, unit_id: 8, description: "best celery ever!")
 #Avocado
-Posting.create(live: true, delivery_date: Time.zone.today, commitment_zone_start: Time.zone.today - 2.days, product_id: avocado.id, quantity_available: 100, price: 2.29, user_id: f4.id, unit_id: whole.id, description: "best avocado ever!")
+posting_avocado = Posting.create(live: true, delivery_date: Time.zone.today, commitment_zone_start: Time.zone.today - 2.days, product_id: product_avocado.id, quantity_available: 100, price: 2.29, user_id: f4.id, unit_id: whole.id, description: "best avocado ever!")
 #Basil
-Posting.create(live: true, delivery_date: Time.zone.today, commitment_zone_start: Time.zone.today - 2.days, product_id: basil.id, quantity_available: 100, price: 2.97, user_id: f4.id, unit_id: bunch.id, description: "best basil ever!")
+posting_basil = Posting.create(live: true, delivery_date: Time.zone.today, commitment_zone_start: Time.zone.today - 2.days, product_id: product_basil.id, quantity_available: 100, price: 2.97, user_id: f4.id, unit_id: bunch.id, description: "best basil ever!")
 
 posting_recurrence = PostingRecurrence.new(on: true, frequency: 6)
-posting_recurrence.postings << apples
+posting_recurrence.postings << posting_apples
 posting_recurrence.save
 
 posting_recurrence = PostingRecurrence.new(on: true, frequency: 5)
-posting_recurrence.postings << asparagus
+posting_recurrence.postings << posting_asparagus
 posting_recurrence.save
 
 delivery_date = Time.zone.tomorrow
@@ -293,28 +298,28 @@ posting_recurrence.save
 milk.transition(:commitment_zone_started)
 
 #Apples
-ToteItem.create(quantity: 2, price: 2.75, state: ToteItem.states[:AUTHORIZED], user_id: 7, posting_id: 1)
-ToteItem.create(quantity: 1, price: 2.75, state: ToteItem.states[:AUTHORIZED], user_id: 8, posting_id: 1)
-ToteItem.create(quantity: 5, price: 2.75, state: ToteItem.states[:AUTHORIZED], user_id: 6, posting_id: 1)
-ToteItem.create(quantity: 3, price: 2.75, state: ToteItem.states[:AUTHORIZED], user_id: 5, posting_id: 1)
+ToteItem.create(quantity: 2, price: posting_apples.price, state: ToteItem.states[:ADDED], user_id: c3.id, posting_id: posting_apples.id).transition(:customer_authorized)
+ToteItem.create(quantity: 1, price: posting_apples.price, state: ToteItem.states[:ADDED], user_id: c4.id, posting_id: posting_apples.id).transition(:customer_authorized)
+ToteItem.create(quantity: 5, price: posting_apples.price, state: ToteItem.states[:ADDED], user_id: c2.id, posting_id: posting_apples.id).transition(:customer_authorized)
+ToteItem.create(quantity: 3, price: posting_apples.price, state: ToteItem.states[:ADDED], user_id: c1.id, posting_id: posting_apples.id).transition(:customer_authorized)
 
 #Milk
-ToteItem.create(quantity: 2, price: 2.00, state: ToteItem.states[:AUTHORIZED], user_id: 7, posting_id: 3)
-ToteItem.create(quantity: 3, price: 2.00, state: ToteItem.states[:AUTHORIZED], user_id: 8, posting_id: 3)
-ToteItem.create(quantity: 4, price: 2.00, state: ToteItem.states[:AUTHORIZED], user_id: 6, posting_id: 3)
-ToteItem.create(quantity: 1, price: 2.00, state: ToteItem.states[:AUTHORIZED], user_id: 5, posting_id: 3)
+ToteItem.create(quantity: 2, price: posting_milk.price, state: ToteItem.states[:ADDED], user_id: c3.id, posting_id: posting_milk.id).transition(:customer_authorized)
+ToteItem.create(quantity: 3, price: posting_milk.price, state: ToteItem.states[:ADDED], user_id: c4.id, posting_id: posting_milk.id).transition(:customer_authorized)
+ToteItem.create(quantity: 4, price: posting_milk.price, state: ToteItem.states[:ADDED], user_id: c2.id, posting_id: posting_milk.id).transition(:customer_authorized)
+ToteItem.create(quantity: 1, price: posting_milk.price, state: ToteItem.states[:ADDED], user_id: c1.id, posting_id: posting_milk.id).transition(:customer_authorized)
 
 #Chicken
-ToteItem.create(quantity: 1, price: 1.50, state: ToteItem.states[:AUTHORIZED], user_id: 7, posting_id: 6)
-ToteItem.create(quantity: 4, price: 1.50, state: ToteItem.states[:AUTHORIZED], user_id: 8, posting_id: 6)
-ToteItem.create(quantity: 2, price: 1.50, state: ToteItem.states[:AUTHORIZED], user_id: 6, posting_id: 6)
-ToteItem.create(quantity: 7, price: 1.50, state: ToteItem.states[:AUTHORIZED], user_id: 5, posting_id: 6)
+ToteItem.create(quantity: 1, price: posting_chicken.price, state: ToteItem.states[:ADDED], user_id: c3.id, posting_id: posting_chicken.id).transition(:customer_authorized)
+ToteItem.create(quantity: 4, price: posting_chicken.price, state: ToteItem.states[:ADDED], user_id: c4.id, posting_id: posting_chicken.id).transition(:customer_authorized)
+ToteItem.create(quantity: 2, price: posting_chicken.price, state: ToteItem.states[:ADDED], user_id: c2.id, posting_id: posting_chicken.id).transition(:customer_authorized)
+ToteItem.create(quantity: 7, price: posting_chicken.price, state: ToteItem.states[:ADDED], user_id: c1.id, posting_id: posting_chicken.id).transition(:customer_authorized)
 
 #Celery
-ToteItem.create(quantity: 5, price: 2.50, state: ToteItem.states[:AUTHORIZED], user_id: 7, posting_id: 8)
-ToteItem.create(quantity: 2, price: 2.50, state: ToteItem.states[:AUTHORIZED], user_id: 8, posting_id: 8)
-ToteItem.create(quantity: 1, price: 2.50, state: ToteItem.states[:AUTHORIZED], user_id: 6, posting_id: 8)
-ToteItem.create(quantity: 3, price: 2.50, state: ToteItem.states[:AUTHORIZED], user_id: 5, posting_id: 8)
+ToteItem.create(quantity: 5, price: posting_celery.price, state: ToteItem.states[:ADDED], user_id: c3.id, posting_id: posting_celery.id).transition(:customer_authorized)
+ToteItem.create(quantity: 2, price: posting_celery.price, state: ToteItem.states[:ADDED], user_id: c4.id, posting_id: posting_celery.id).transition(:customer_authorized)
+ToteItem.create(quantity: 1, price: posting_celery.price, state: ToteItem.states[:ADDED], user_id: c2.id, posting_id: posting_celery.id).transition(:customer_authorized)
+ToteItem.create(quantity: 3, price: posting_celery.price, state: ToteItem.states[:ADDED], user_id: c1.id, posting_id: posting_celery.id).transition(:customer_authorized)
 
 Dropsite.create(name: "Farmer's Cellar", phone: "206-588-6579", hours: "8 - 8", address: "9827 128TH AVE NE", city: "Kirkland", state: "WA", zip: 98033, active: true, access_instructions: "punch in 123 and hit enter")
 WebsiteSetting.create(new_customer_access_code_required: false, recurring_postings_enabled: true)

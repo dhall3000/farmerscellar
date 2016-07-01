@@ -88,7 +88,7 @@ class ToteItemsController < ApplicationController
           redirect_to postings_path
           return
         else          
-          flash[:danger] = "#{@tote_item.additional_units_required_to_fill_my_case.to_s} additional #{"unit".pluralize(@tote_item.additional_units_required_to_fill_my_case)} required to ship. See below."
+          flash[:danger] = "#{@tote_item.additional_units_required_to_fill_my_case.to_s} more #{"unit".pluralize(@tote_item.additional_units_required_to_fill_my_case)} required to ship. See below."
           redirect_to tote_items_pout_path(id: @tote_item.id)
           return
         end

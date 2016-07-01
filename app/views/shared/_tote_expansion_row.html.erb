@@ -7,6 +7,18 @@
       </div>                
       <div class="panel-body">
         <ul class="list-group">
+
+          <% if tote_item.additional_units_required_to_fill_my_case > 0 %>
+            <li class="list-group-item">
+              <div>
+                <span class="alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> The case this item ships in is not yet full. <%= tote_item.additional_units_required_to_fill_my_case.to_s %> more <%= "unit".pluralize(tote_item.additional_units_required_to_fill_my_case) %> required to ship.
+              </div>              
+              <div>
+                <%= link_to "More info", tote_items_pout_path(id: tote_item.id), class: "btn btn-primary btn-lg" %>
+              </div>              
+            </li>
+          <% end %>
+
           <div class="hidden-sm hidden-md hidden-lg">
             <li class="list-group-item">
               Quantity: <%= tote_item.quantity.to_s + " " + Unit.find_by(id: tote_item.posting.unit_id).name.pluralize(tote_item.quantity) %>
