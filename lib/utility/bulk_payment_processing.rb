@@ -240,7 +240,7 @@ class BulkPaymentProcessing
         last_day_of_this_week = last_day_of_this_week + 1.day
       end
 
-      outstanding_deliveries_this_week = Posting.where("delivery_date > ? and delivery_date <= ?", Time.zone.today.midnight, last_day_of_this_week)
+      outstanding_deliveries_this_week = Posting.where("delivery_date > ? and delivery_date <= ?", Time.zone.today.midnight, last_day_of_this_week.midnight)
       
       return outstanding_deliveries_this_week.count > 0
 
