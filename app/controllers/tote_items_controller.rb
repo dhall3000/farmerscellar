@@ -152,7 +152,7 @@ class ToteItemsController < ApplicationController
     else
 
       if ti.state?(:COMMITTED)
-        flash[:danger] = "This item is not removable because it is already 'committed'. Please see 'Commitment Zone' on the 'How it Works' page. Shopping tote item not deleted."
+        flash[:danger] = "This item is not removable because it is already 'committed'. Please see 'Order Cancellation' on the 'How it Works' page. Shopping tote item not deleted."
       else
         ti.transition(:customer_removed)        
         if ti.state?(:REMOVED)

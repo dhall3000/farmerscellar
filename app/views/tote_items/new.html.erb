@@ -86,10 +86,7 @@
               <h3>Order</h3>
               <ul class="list-group">                                
                 <li class="list-group-item">
-                  <% data_content = "This is mostly like an 'order cutoff' but with " + link_to("some important differences", how_things_work_path(anchor: "commitment_zone")) + "." %>
-
-                  <a href='#' class="popover_init" tabindex="0" data-container="body" data-toggle="popover" data-trigger="focus" data-placement="top" data-html="true" data-content="<%=data_content%>">Commitment Zone</a>
-                  starts <%= @posting.commitment_zone_start.strftime("%A, %B %-d, %l:%M %p") %>
+                  <%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff") %>: <%= @posting.commitment_zone_start.strftime("%A, %B %-d, %l:%M %p") %>                  
                 </li>
               </ul>
 
