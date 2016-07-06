@@ -25,7 +25,7 @@
               <% end %>
             </li>
           </div>
-          <li class="list-group-item"><%= link_to("Commitment Zone Start", how_things_work_path(anchor: "commitment_zone")) %>: <%= tote_item.posting.commitment_zone_start.strftime("%a %m/%d %l:%M %p") %></li>
+          <li class="list-group-item"><%= link_to("Order Cutoff", how_things_work_path(anchor: "cutoff")) %>: <%= tote_item.posting.commitment_zone_start.strftime("%a %m/%d %l:%M %p") %></li>
           <% if !tote_item.subscription.nil? %>
             <li class="list-group-item">This is a subscription for <%= tote_item.subscription.description %></li>          
           <% end %>
