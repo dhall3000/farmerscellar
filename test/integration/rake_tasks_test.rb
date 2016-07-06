@@ -314,6 +314,9 @@ class RakeTasksTest < BulkBuyer
   test "hourly tasks should not change state or send emails" do
     #make sure no totes are authorized
     assert_equal 0, ToteItem.where(state: ToteItem.states[:AUTHORIZED]).count
+
+    #go to a time way in the past so we don't trigger state change codes
+    travel_to Time.zone.now - 7.days
     #save the state counts of all toteitems
     tote_items_set
     #run the task    
@@ -322,6 +325,8 @@ class RakeTasksTest < BulkBuyer
     tote_items_compare_equal
     #verify no emails sent
     assert_equal 0, ActionMailer::Base.deliveries.count    
+    #time travel home    
+    travel_back
   end
 
   test "hourly tasks should change state and send emails" do

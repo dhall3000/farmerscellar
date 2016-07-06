@@ -13,6 +13,10 @@ $gray-medium-light: #eaeaea;
 
 /* universal */
 
+.anchor:target {
+  padding-top: 60px;
+}
+
 body {
   padding-top: 60px;
 }
@@ -73,10 +77,6 @@ p {
     color: white;
     text-decoration: none;
   }
-}
-
-.anchor {
-  padding-top: 60px;
 }
 
 /* footer */

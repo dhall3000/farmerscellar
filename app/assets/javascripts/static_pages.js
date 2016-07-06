@@ -1,5 +1,5 @@
 $(function(){
   
-  $('body').scrollspy({ target: '#help_navigation' });
+  $('body').scrollspy({ target: '#help_navigation', offset: 90 });
 
 });
