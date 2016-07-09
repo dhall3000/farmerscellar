@@ -100,28 +100,30 @@ class Posting < ActiveRecord::Base
     quantity_not_filled = 0
     tote_items_filled = []
     tote_items_not_filled = []
+    partially_filled_tote_items = []
 
-    #first fill all the toteitems we can with the quantity provided
-    #fill in FIFO order    
-
-    #we only fill a tote item completely or not at all. so as we're running through the queue if we come across
-    #a tote item we can't fill we shouldn't stop there. we should continue all the way through to the end of the
-    #queue as long as we have 'quantity_remaining' looking for a tote item of smaller quantity that we can
-    #completely fill
+    #fill in FIFO order. partially fill if need be.
     first_committed_tote_item = get_first_committed_tote_item
     while first_committed_tote_item
 
-      if quantity_remaining >= first_committed_tote_item.quantity
-        quantity_remaining = quantity_remaining - first_committed_tote_item.quantity
-        quantity_filled = quantity_filled + first_committed_tote_item.quantity        
-        first_committed_tote_item.transition(:tote_item_filled)
+      if quantity_remaining > 0
+        quantity_to_fill = [first_committed_tote_item.quantity, quantity_remaining].min
+        quantity_remaining = quantity_remaining - quantity_to_fill
+        quantity_filled = quantity_filled + quantity_to_fill
+        first_committed_tote_item.transition(:tote_item_filled, {quantity_filled: quantity_to_fill})
         tote_items_filled << first_committed_tote_item
-      else
-        quantity_not_filled = quantity_not_filled + first_committed_tote_item.quantity
+
+        if first_committed_tote_item.partially_filled?
+          partially_filled_tote_items << first_committed_tote_item
+          first_committed_tote_item.reload          
+        end
+
+      else        
         first_committed_tote_item.transition(:tote_item_not_filled)                
         tote_items_not_filled << first_committed_tote_item
       end
-      
+
+      quantity_not_filled += first_committed_tote_item.quantity_not_filled      
       first_committed_tote_item = get_first_committed_tote_item
 
     end
@@ -133,7 +135,8 @@ class Posting < ActiveRecord::Base
       quantity_not_filled: quantity_not_filled,
       quantity_remaining: quantity_remaining,
       tote_items_filled: tote_items_filled,
-      tote_items_not_filled: tote_items_not_filled
+      tote_items_not_filled: tote_items_not_filled,
+      partially_filled_tote_items: partially_filled_tote_items
     }
 
   end

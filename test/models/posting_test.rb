@@ -18,6 +18,81 @@ class PostingTest < ActiveSupport::TestCase
     @posting.save
   end
 
+  test "should fill all items" do
+    num_items = 7
+    quantity_per_item = 6
+    quantity_received_from_producer = num_items * quantity_per_item
+    fills_simulation(num_items, quantity_per_item, quantity_received_from_producer)
+  end
+
+  test "should partially fill last item" do
+    num_items = 7
+    quantity_per_item = 6
+    quantity_received_from_producer = num_items * quantity_per_item - 2
+    fills_simulation(num_items, quantity_per_item, quantity_received_from_producer)
+  end
+
+  test "should fill several items completely and then zero fill the last several items" do
+    num_items = 7
+    quantity_per_item = 6
+    quantity_received_from_producer = (num_items - 3) * quantity_per_item
+    fills_simulation(num_items, quantity_per_item, quantity_received_from_producer)
+  end
+
+  test "should fill several items partially fill one item and zero fill several items" do
+    num_items = 7
+    quantity_per_item = 6
+    quantity_received_from_producer = (num_items / 2) * quantity_per_item + quantity_per_item / 2
+    fills_simulation(num_items, quantity_per_item, quantity_received_from_producer)
+  end
+
+  def fills_simulation(num_items, quantity_per_item, quantity_received_from_producer)
+
+    c1 = @user    
+    assert_equal 0, c1.tote_items.joins(:posting).where("postings.id = ?", @posting.id).count
+
+    num_items.times do      
+      ti = ToteItem.new(quantity: quantity_per_item, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user_id: c1.id)      
+      assert ti.save
+      ti.transition(:customer_authorized)
+      ti.transition(:commitment_zone_started)
+    end
+
+    assert_equal num_items, c1.tote_items.joins(:posting).where("postings.id = ?", @posting.id).count
+
+    @posting.fill(quantity_received_from_producer)
+
+    c1_items = c1.tote_items.joins(:posting).where("postings.id = ?", @posting.id)
+
+    count = 0
+    quantity_remaining = quantity_received_from_producer
+
+    c1_items.each do |tote_item|
+
+      if quantity_remaining >= tote_item.quantity
+        assert tote_item.fully_filled?
+        assert_equal 1, tote_item.purchase_receivables.count
+        assert tote_item.purchase_receivables.last.amount > 0
+        assert_equal tote_item.purchase_receivables.last.amount, get_gross_item(tote_item), "The PurchaseReceivable amount is #{tote_item.purchase_receivables.last.amount.to_s} but should be equal to the get_gross_item amount which is #{get_gross_item(tote_item).to_s}"
+      elsif quantity_remaining > 0
+        assert tote_item.partially_filled?
+        assert_equal 1, tote_item.purchase_receivables.count
+        assert tote_item.purchase_receivables.last.amount > 0
+        assert tote_item.purchase_receivables.last.amount < get_gross_item(tote_item), "The PurchaseReceivable amount is #{tote_item.purchase_receivables.last.amount.to_s} but should be less than the get_gross_item amount which is #{get_gross_item(tote_item).to_s}"
+      else
+        assert tote_item.zero_filled?
+        assert_equal 0, tote_item.purchase_receivables.count        
+      end
+
+      quantity_remaining -= tote_item.quantity_filled                  
+      count += 1
+
+    end
+
+    assert num_items, count
+
+  end
+
   test "should require varying additional units until user authorizes tote" do
 
     posting = postings(:postingf5apples)

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160630163015) do
+ActiveRecord::Schema.define(version: 20160701235150) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -513,6 +513,7 @@ ActiveRecord::Schema.define(version: 20160630163015) do
     t.integer  "user_id"
     t.integer  "subscription_id"
     t.datetime "authorized_at"
+    t.integer  "quantity_filled", default: 0
   end
 
   add_index "tote_items", ["authorized_at"], name: "index_tote_items_on_authorized_at"

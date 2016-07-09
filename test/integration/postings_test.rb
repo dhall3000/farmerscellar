@@ -107,7 +107,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
     assert_template 'tote_items/pout'
 
     assert_not flash.empty?
-    assert_equal "3 additional units required to ship. See below.", flash[:danger]
+    assert_equal "3 more units required to ship. See below.", flash[:danger]
 
     return posting
 

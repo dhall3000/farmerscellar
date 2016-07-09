@@ -45,7 +45,7 @@ class ToteItem < ActiveRecord::Base
 
   end
 
-  def transition(input)
+  def transition(input, params = {})
     
     new_state = state
 
@@ -84,8 +84,11 @@ class ToteItem < ActiveRecord::Base
         new_state = ToteItem.states[:NOTFILLED]
       when :tote_item_filled
         new_state = ToteItem.states[:FILLED]
-        #create new purchaserecievable here
-        create_purchase_receivable
+        update(quantity_filled: params[:quantity_filled])
+        
+        if quantity_filled > 0
+          create_purchase_receivable
+        end
       end
 
 
@@ -119,6 +122,22 @@ class ToteItem < ActiveRecord::Base
 
     end
 
+  end
+
+  def zero_filled?
+    return quantity_filled == 0
+  end
+
+  def partially_filled?
+    return quantity_filled > 0 && quantity_filled < quantity
+  end
+
+  def fully_filled?
+    return quantity_filled == quantity
+  end
+
+  def quantity_not_filled
+    return quantity - quantity_filled
   end
 
   def self.get_users_with_no_deliveries_later_this_week
@@ -191,7 +210,7 @@ class ToteItem < ActiveRecord::Base
   private
 
     def create_purchase_receivable
-      pr = PurchaseReceivable.new(amount: get_gross_item(self), amount_purchased: 0, kind: PurchaseReceivable.kind[:NORMAL], state: PurchaseReceivable.states[:READY])
+      pr = PurchaseReceivable.new(amount: get_gross_item_filled(self), amount_purchased: 0, kind: PurchaseReceivable.kind[:NORMAL], state: PurchaseReceivable.states[:READY])
       pr.users << user
       pr.tote_items << self
       pr.save

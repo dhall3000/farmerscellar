@@ -162,20 +162,22 @@ class PostingsControllerTest < ActionController::TestCase
     assert_template 'postings/fill'
     #TODO: verify proper contents of template displayed
     #verify all tote items got filled
-    filled_quantity = posting.tote_items.where(state: ToteItem.states[:FILLED]).sum(:quantity)
-    not_filled_quantity = posting.tote_items.where(state: ToteItem.states[:NOTFILLED]).sum(:quantity)
+    filled_quantity = posting.tote_items.where(state: ToteItem.states[:FILLED]).sum(:quantity_filled)
+    not_filled_quantity = posting.tote_items.where(state: [ToteItem.states[:NOTFILLED], ToteItem.states[:FILLED]]).sum(:quantity) - filled_quantity
+
     fill_report = assigns(:fill_report)
 
     if quantity == 8
       #if we were given quantity 8 by the producer, our first three tote items are for quantities 1,2 & 3
-      #which is a total of 6. the 4th toteitem has quantity of 4 so we don't have enough to fill it so
-      #we're all done filling at 6
-      assert_equal 6, filled_quantity
-      assert_equal 22, not_filled_quantity
-      assert_equal 2, fill_report[:quantity_remaining]
-      assert_equal 22, fill_report[:quantity_not_filled]
+      #which is a total of 6. the 4th toteitem has quantity of 4
+      #so the first three items should get fully filled and the last should be partially filled
+      assert_equal 8, filled_quantity
+      assert_equal 20, not_filled_quantity
+      assert_equal 0, fill_report[:quantity_remaining]
+      assert_equal 20, fill_report[:quantity_not_filled]
+      assert_equal 1, fill_report[:partially_filled_tote_items].count
       #verify purchasereceivables got created appropriately? there should be 1 PR for each filled tote item
-      assert_equal 3, PurchaseReceivable.count
+      assert_equal 4, PurchaseReceivable.count
     elsif quantity == 30      
       assert_equal committed_quantity, filled_quantity
       assert_equal 0, not_filled_quantity
@@ -198,10 +200,12 @@ class PostingsControllerTest < ActionController::TestCase
       #verify purchasereceivables got created appropriately? there should be 1 PR for each filled tote item
       assert_equal 0, PurchaseReceivable.count      
     elsif quantity == 9
-      assert_equal 8, filled_quantity
-      assert_equal 17, not_filled_quantity
-      assert_equal 1, fill_report[:quantity_remaining]
-      assert_equal 17, fill_report[:quantity_not_filled]
+      assert_equal 9, filled_quantity
+      assert_equal 16, not_filled_quantity
+      assert_equal 1, fill_report[:partially_filled_tote_items].count
+      assert_equal 0, fill_report[:quantity_remaining]
+      assert_equal 16, fill_report[:quantity_not_filled]
+
       #verify purchasereceivables got created appropriately? there should be 1 PR for each filled tote item
       assert_equal 4, PurchaseReceivable.count
     end            

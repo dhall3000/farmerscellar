@@ -105,6 +105,16 @@ module ToteItemsHelper
 
   end
 
+  def get_gross_item_filled(tote_item)
+    
+    if tote_item == nil
+      return 0
+    end
+
+    return get_gross_cost(tote_item.quantity_filled, tote_item.price)
+
+  end
+
   def get_gross_cost(quantity, price)
     return (quantity * price).round(2)
   end

@@ -10,8 +10,13 @@
             <h4 class="panel-title">Explanation</h4>
           </div>
           <div class="panel-body" role="tabpanel">
-						<p>The case that your items are in is not yet full. You can help fill it by recruiting the Farmer's Cellar community or ordering more yourself.</p>
-            <p><%= @tote_item.additional_units_required_to_fill_my_case.to_s %> more <%= "unit".pluralize(@tote_item.additional_units_required_to_fill_my_case) %> required to ship.</p>
+
+            <p class="alert alert-danger">
+              <span class="alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Additional <%= "unit".pluralize(@tote_item.additional_units_required_to_fill_my_case) %> required to ship:  <%= @tote_item.additional_units_required_to_fill_my_case.to_s %>
+            </p>
+
+						<p>The case that your items are in is not yet full. You can help fill it by recruiting your community or ordering more yourself.</p>
+
           </div>
         </div>
 

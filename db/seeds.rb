@@ -243,7 +243,7 @@ f3.producer_product_unit_commissions.create(product: product_chicken, commission
 f4.producer_product_unit_commissions.create(product: product_oranges, commission: 0.08, unit: pound)
 f4.producer_product_unit_commissions.create(product: product_celery, commission: 0.12, unit: pound)
 f4.producer_product_unit_commissions.create(product: product_avocado, commission: 0.08, unit: pound)
-f4.producer_product_unit_commissions.create(product: product_basil, commission: 0.06, unit: pound)
+f4.producer_product_unit_commissions.create(product: product_basil, commission: 0.06, unit: bunch)
 
 #Apples
 posting_apples = Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: product_apples.id, quantity_available: 1000, price: 2.75, user_id: f1.id, unit_id: 8, description: "these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
@@ -316,10 +316,10 @@ ToteItem.create(quantity: 2, price: posting_chicken.price, state: ToteItem.state
 ToteItem.create(quantity: 7, price: posting_chicken.price, state: ToteItem.states[:ADDED], user_id: c1.id, posting_id: posting_chicken.id).transition(:customer_authorized)
 
 #Celery
-ToteItem.create(quantity: 5, price: posting_celery.price, state: ToteItem.states[:ADDED], user_id: c3.id, posting_id: posting_celery.id).transition(:customer_authorized)
-ToteItem.create(quantity: 2, price: posting_celery.price, state: ToteItem.states[:ADDED], user_id: c4.id, posting_id: posting_celery.id).transition(:customer_authorized)
-ToteItem.create(quantity: 1, price: posting_celery.price, state: ToteItem.states[:ADDED], user_id: c2.id, posting_id: posting_celery.id).transition(:customer_authorized)
 ToteItem.create(quantity: 3, price: posting_celery.price, state: ToteItem.states[:ADDED], user_id: c1.id, posting_id: posting_celery.id).transition(:customer_authorized)
+ToteItem.create(quantity: 1, price: posting_celery.price, state: ToteItem.states[:ADDED], user_id: c2.id, posting_id: posting_celery.id).transition(:customer_authorized)
+ToteItem.create(quantity: 5, price: posting_celery.price, state: ToteItem.states[:ADDED], user_id: c3.id, posting_id: posting_celery.id).transition(:customer_authorized)
+ToteItem.create(quantity: 2, price: posting_celery.price, state: ToteItem.states[:ADDED], user_id: c4.id, posting_id: posting_celery.id)
 
 Dropsite.create(name: "Farmer's Cellar", phone: "206-588-6579", hours: "8 - 8", address: "9827 128TH AVE NE", city: "Kirkland", state: "WA", zip: 98033, active: true, access_instructions: "punch in 123 and hit enter")
 WebsiteSetting.create(new_customer_access_code_required: false, recurring_postings_enabled: true)

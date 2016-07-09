@@ -38,7 +38,7 @@ class UserTest < ActiveSupport::TestCase
       tote_item.update(state: ToteItem.states[:ADDED])
       tote_item.transition(:customer_authorized)
       tote_item.transition(:commitment_zone_started)          
-      tote_item.transition(:tote_item_filled)      
+      tote_item.transition(:tote_item_filled, {quantity_filled: tote_item.quantity})      
     end
 
     now_count = c1.tote_items.joins(:posting).where("postings.delivery_date < ?", Time.zone.now).count

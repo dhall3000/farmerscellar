@@ -9,6 +9,26 @@ class ToteItemTest < ActiveSupport::TestCase
   	@tote_item = tote_items(:c1apple)
   end
 
+  test "should partially fill" do
+
+    assert_equal 0, @tote_item.purchase_receivables.count
+
+    assert_equal ToteItem.states[:ADDED], @tote_item.state
+    @tote_item.transition(:customer_authorized)
+    @tote_item.transition(:commitment_zone_started)
+    @tote_item.transition(:tote_item_filled, {quantity_filled: @tote_item.quantity / 2})
+
+    @tote_item.reload
+    assert_equal ToteItem.states[:FILLED], @tote_item.state
+    assert @tote_item.quantity_filled < @tote_item.quantity
+    assert_equal @tote_item.quantity / 2, @tote_item.quantity_filled
+
+    assert_equal 1, @tote_item.purchase_receivables.count
+    assert @tote_item.purchase_receivables.last.amount > 0
+    assert @tote_item.purchase_receivables.last.amount < get_gross_item(@tote_item), "The PurchaseReceivable amount is #{@tote_item.purchase_receivables.last.amount.to_s} but should be less than the get_gross_item amount which is #{get_gross_item(@tote_item).to_s}"
+
+  end
+
   test "should return all users as having zero deliveries later this week" do
 
     #make all items' state be ADDED
@@ -51,7 +71,7 @@ class ToteItemTest < ActiveSupport::TestCase
     @tote_item.transition(:customer_authorized)
     @tote_item.transition(:commitment_zone_started)    
     @tote_item.reload
-    @tote_item.transition(:tote_item_filled)
+    @tote_item.transition(:tote_item_filled, {quantity_filled: @tote_item.quantity})
     assert_equal pr_count + 1, PurchaseReceivable.count    
     tote_item_value = (@tote_item.price * @tote_item.quantity).round(2)
     pr = @tote_item.purchase_receivables.last
