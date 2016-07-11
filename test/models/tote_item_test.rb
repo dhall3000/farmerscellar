@@ -7,6 +7,76 @@ class ToteItemTest < ActiveSupport::TestCase
 
   def setup
   	@tote_item = tote_items(:c1apple)
+
+    @farmer = users(:f1)
+    @product = products(:apples)
+    @unit = units(:pound)
+
+    delivery_date = Time.zone.today + 3.days
+
+    if delivery_date.sunday?
+      delivery_date = Time.zone.today + 4.days
+    end
+
+    @posting = Posting.new(units_per_case: 10, unit: @unit, product: @product, user: @farmer, description: "descrip", quantity_available: 100, price: 1.25, live: true, commitment_zone_start: delivery_date - 2.days, delivery_date: delivery_date)
+    @posting.save
+  end
+
+  test "should tell user first added item will ship but second added item will not ship" do
+    #user auths 3 of a 10-unit-case posting. then c1 adds 3 so that 4 more are needed then c1 adds 5 so that his first item should get
+    #shipped if he authorizes but the second item should report 9 more needed to ship.    
+    assert_equal 0, @posting.tote_items.count
+
+    c4 = users(:c4)
+    ti = create_tote_item(c4, @posting, 3, authorize = true)
+    assert_equal 7, ti.additional_units_required_to_fill_my_case
+    
+    c1 = users(:c1)
+    ti3 = create_tote_item(c1, @posting, 3, authorize = false)
+    assert_equal 4, ti3.additional_units_required_to_fill_my_case
+
+    ti5 = create_tote_item(c1, @posting, 5, authorize = false)
+    assert_equal 9, ti5.additional_units_required_to_fill_my_case
+
+    #if the user auth'd right now ti3 should fully fill. only ti5 should partially fill
+    assert_equal 0, ti3.additional_units_required_to_fill_my_case
+    
+  end
+
+  def create_tote_item(user, posting, quantity, authorize = false)
+    
+    tote_item = ToteItem.new(quantity: quantity, posting: posting, user: user, price: posting.price)
+    assert tote_item.valid?
+    assert tote_item.save
+
+    if authorize
+      tote_item.transition(:customer_authorized)
+      tote_item.reload
+      assert tote_item.state?(:AUTHORIZED)
+    end
+
+    return tote_item
+
+  end
+
+  test "should say authorized item will ship but added item will not ship" do
+    #what happens if user auths an item, then that case fully fills with others' auth'd items. then user comes and adds another item such that
+    #this last item's case isn't filled. will it say that the user's original auth'd item comes up short?
+
+    c1 = users(:c1)
+    ti1 = create_tote_item(c1, @posting, quantity = 3, authorize = true)
+    assert_equal 7, ti1.additional_units_required_to_fill_my_case
+
+    c4 = users(:c4)
+    ti2 = create_tote_item(c4, @posting, quantity = 7, authorize = true)
+    assert_equal 0, ti1.additional_units_required_to_fill_my_case
+    assert_equal 0, ti2.additional_units_required_to_fill_my_case    
+
+    ti3 = create_tote_item(c1, @posting, quantity = 2, authorize = false)
+    assert_equal 0, ti1.additional_units_required_to_fill_my_case
+    assert_equal 0, ti2.additional_units_required_to_fill_my_case
+    assert_equal 8, ti3.additional_units_required_to_fill_my_case
+
   end
 
   test "should partially fill" do

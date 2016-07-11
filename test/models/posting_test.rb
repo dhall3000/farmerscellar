@@ -108,10 +108,6 @@ class PostingTest < ActiveSupport::TestCase
     assert c1_ti1.save    
     #c1_ti1.transition(:customer_authorized)
 
-    #this is the quantity actually authorized plus c1's ADDED item
-    queue_quantity_through_item = posting.queue_quantity_through_item_plus_users_added_items(c1_ti1)    
-    assert_equal 7, queue_quantity_through_item
-
     #this is the additional quantity needed to fill the case.
     #takes in to account actually authorized items and all this user's ADDED items
     additional_units_required_to_fill_my_case = c1_ti1.additional_units_required_to_fill_my_case
@@ -121,10 +117,6 @@ class PostingTest < ActiveSupport::TestCase
     #be short 1 unit
     c1_ti2 = ToteItem.new(quantity: 2, posting_id: posting.id, state: ToteItem.states[:ADDED], price: posting.price, user_id: c1.id)    
     assert c1_ti2.save
-
-    #this is the quantity actually authorized which should exclude c1's ADDED items
-    queue_quantity_through_item = posting.queue_quantity_through_item_plus_users_added_items(c1_ti2)    
-    assert_equal 9, queue_quantity_through_item
 
     #this is the additional quantity needed to fill the case.
     #takes in to account actually authorized items and all this user's ADDED items
@@ -193,9 +185,6 @@ class PostingTest < ActiveSupport::TestCase
     end
     
     total_quantity = posting.total_quantity_authorized_or_committed
-    queue_quantity_through_item = posting.queue_quantity_through_item_plus_users_added_items(c1_ti)
-
-    assert_equal 7, queue_quantity_through_item
     assert_equal 0, c1_ti.additional_units_required_to_fill_my_case
 
     #this is the very last item to get added. the total quantity ordered by all users is 37. we need to hit 40 to fill this last case.

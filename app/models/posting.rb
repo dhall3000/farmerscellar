@@ -151,59 +151,36 @@ class Posting < ActiveRecord::Base
   	end
   end
 
-  def queue_quantity_through_item_plus_users_added_items(tote_item)
-
-    ti = tote_items.find_by(id: tote_item.id)
-
-    if ti.nil?
-      return 0
-    end
-
-    if tote_item.authorized_at.nil?      
-      filtered_tote_items = tote_items
-    else      
-      filtered_tote_items = tote_items.where("authorized_at <= ?", tote_item.authorized_at)
-    end
-    
-    authorized_or_committed_quantity = total_quantity_authorized_or_committed(filtered_tote_items)
-    added_tote_items_for_user_quantity = tote_items.where(user_id: tote_item.user_id, state: ToteItem.states[:ADDED]).sum(:quantity)
-    
-    total_quantity = authorized_or_committed_quantity + added_tote_items_for_user_quantity
-
-    return total_quantity
-
-  end
-
   def additional_units_required_to_fill_items_case(tote_item)
 
-    if units_per_case.nil? || units_per_case < 2
+    if tote_item.state?(:ADDED)
+
+      quantity_all_authorized_or_committed = tote_items.where(state: [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED]]).sum(:quantity)
+      quantity_added_through = tote_items.where(user_id: tote_item.user_id, state: ToteItem.states[:ADDED]).where("created_at <= ?", tote_item.created_at).sum(:quantity)
+
+      queue_quantity_through_item = quantity_all_authorized_or_committed + quantity_added_through
+      queue_quantity_after_item = tote_items.where(user_id: tote_item.user_id, state: ToteItem.states[:ADDED]).where("created_at > ?", tote_item.created_at).sum(:quantity)
+
+    elsif tote_item.state?(:AUTHORIZED) || tote_item.state?(:COMMITTED)      
+
+      quantity_authorized_or_committed_after = tote_items.where(state: [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED]]).where("authorized_at > ?", tote_item.authorized_at).sum(:quantity)
+      quantity_all_added = tote_items.where(user_id: tote_item.user_id, state: ToteItem.states[:ADDED]).sum(:quantity)
+
+      queue_quantity_through_item = tote_items.where(state: [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED]]).where("authorized_at <= ?", tote_item.authorized_at).sum(:quantity)
+      queue_quantity_after_item = quantity_authorized_or_committed_after + quantity_all_added
+
+    else
       return 0
     end
 
-    total_quantity = total_quantity_authorized_or_committed
-
-    #this is a bit non-obvious. remember that this computed value is going to be displayed to the user
-    #right after they ADD a tote item. we'll also display this data in the tote. the former won't be authorized
-    #while the latter might be. especially in the former case we want to user to feel the impact of their order so we
-    #need to include in the count this user's ADDED quantity
-    added_tote_items_for_user = tote_items.where(user_id: tote_item.user_id, state: ToteItem.states[:ADDED])
-    total_quantity += added_tote_items_for_user.sum(:quantity)
-
-    up_through_item_quantity = queue_quantity_through_item_plus_users_added_items(tote_item)
-
-    num_full_cases = total_quantity / units_per_case
-    total_units_in_full_cases = num_full_cases * units_per_case
-
-    if total_units_in_full_cases >= up_through_item_quantity
-      return 0
-    end
-
-    additional_units_required_to_fill_items_case = (total_units_in_full_cases + units_per_case) - total_quantity
+    additional_units_required_to_fill_items_case = units_per_case - (queue_quantity_through_item % units_per_case) - queue_quantity_after_item
+    additional_units_required_to_fill_items_case = [0, additional_units_required_to_fill_items_case].max
+    additional_units_required_to_fill_items_case = additional_units_required_to_fill_items_case % units_per_case
 
     return additional_units_required_to_fill_items_case
 
   end
-
+  
   def total_quantity_authorized_or_committed(tis = nil)
 
     if tis.nil?
