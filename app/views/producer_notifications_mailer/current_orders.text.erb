@@ -8,7 +8,22 @@ Below are orders for your upcoming delivery. If all orders are filled total sale
 
 <% @posting_infos.each do |posting, value| %>
 ---------------------------------------------
-Id=<%= posting.id %>,Product=<%= posting.product.name %>,Delivery Date=<%= posting.delivery_date.strftime("%A %b %d, %Y") %>,Units=<%= posting.unit.name %>,Quantity=<%= value[:unit_count] %>,Unit Price=<%= number_to_currency(value[:unit_price]) %>,Sub Total=<%= number_to_currency(value[:sub_total]) %>
+<% if @business_interface.distributor? %>
+	<% producer = "Producer=#{posting.user.farm_name}," %>
+<% else %>
+	<% producer = "" %>
+<% end %>
+<% if posting.units_per_case.nil? || posting.units_per_case < 2 %>
+	<% case_info = "" %>
+<% else %>
+	<% case_info = "Units per Case=#{posting.units_per_case.to_s},Number of Cases=#{value[:case_count].to_s},Case Price=#{number_to_currency(posting.get_producer_net_case)}," %>
+<% end %>
+<% if posting.product_id_code.nil? %>
+	<% product_id_code = "" %>
+<% else %>
+	<% product_id_code = "Product ID Code=#{posting.product_id_code}," %>
+<% end %>
+Id=<%= posting.id %>,Delivery Date=<%= posting.delivery_date.strftime("%A %b %d, %Y") %>,<%= producer %>Product=<%= posting.product.name %>,Units=<%= posting.unit.name %>,<%= product_id_code %><%= case_info %>Number of Units=<%= value[:unit_count] %>,Unit Price=<%= number_to_currency(posting.get_producer_net_unit) %>,Sub Total=<%= number_to_currency(value[:sub_total]) %>
 <% end %>
 
 Thanks!
