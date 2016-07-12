@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160701235150) do
+ActiveRecord::Schema.define(version: 20160712033355) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -301,6 +301,7 @@ ActiveRecord::Schema.define(version: 20160701235150) do
     t.string   "unit_equivalency_description"
     t.string   "product_identifier"
     t.integer  "units_per_case",                default: 1
+    t.string   "product_id_code"
   end
 
   add_index "postings", ["posting_recurrence_id"], name: "index_postings_on_posting_recurrence_id"

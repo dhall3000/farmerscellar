@@ -260,7 +260,7 @@ posting_chicken = Posting.create(live: true, delivery_date: next_friday, commitm
 #Oranges
 posting_oranges = Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: product_oranges.id, quantity_available: 100, price: 1.25, user_id: f4.id, unit_id: 8, description: "best oranges ever!")
 #Celery
-posting_celery = Posting.create(units_per_case: 10, live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: product_celery.id, quantity_available: 100, price: 2.50, user_id: f4.id, unit_id: 8, description: "best celery ever!")
+posting_celery = Posting.create(product_id_code: "ZXB-9F", units_per_case: 10, live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: product_celery.id, quantity_available: 100, price: 2.50, user_id: f4.id, unit_id: 8, description: "best celery ever!")
 #Avocado
 posting_avocado = Posting.create(live: true, delivery_date: Time.zone.today, commitment_zone_start: Time.zone.today - 2.days, product_id: product_avocado.id, quantity_available: 100, price: 2.29, user_id: f4.id, unit_id: whole.id, description: "best avocado ever!")
 #Basil
@@ -323,3 +323,5 @@ ToteItem.create(quantity: 2, price: posting_celery.price, state: ToteItem.states
 
 Dropsite.create(name: "Farmer's Cellar", phone: "206-588-6579", hours: "8 - 8", address: "9827 128TH AVE NE", city: "Kirkland", state: "WA", zip: 98033, active: true, access_instructions: "punch in 123 and hit enter")
 WebsiteSetting.create(new_customer_access_code_required: false, recurring_postings_enabled: true)
+
+bi = BusinessInterface.create(name: "F1 FARM", order_email_accepted: true, order_email: f1.email, paypal_accepted: true, paypal_email: f1.email, user: f1)

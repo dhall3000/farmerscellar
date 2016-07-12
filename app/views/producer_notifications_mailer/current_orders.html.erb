@@ -14,31 +14,46 @@
 
 <table border="1">
   <thead>
-    <tr>		    
+    <tr>
       <th align="left">ID</th>
+      <th align="center">Delivery Date</th>
       <% if @business_interface.distributor? %>
         <th align="center">Producer</th>
       <% end %>
       <th align="center">Product</th>
-      <th align="center">Delivery Date</th>
-      <th align="center">Units</th>        
-      <th align="center">Quantity</th>
+      <th align="center">Unit</th>
+      <th align="center">Product ID Code</th>
+      <th align="center">Units per Case</th>
+      <th align="center">Number of Cases</th>
+      <th align="center">Case Price</th>
+      <th align="center">Number of Units</th>
       <th align="center">Unit Price</th>
       <th align="center">Sub Total</th>
     </tr>
   </thead>
+
+
   <tbody>
     <% @posting_infos.each do |posting, value| %>
       <tr>
-        <td align="left"><%= posting.id %></td>
+        <td align="left"><%= posting.id.to_s %></td>
+        <td align="center"><%= posting.delivery_date.strftime("%A %b %d, %Y") %></td>
         <% if @business_interface.distributor? %>
           <td align="left"><%= posting.user.farm_name %></td>
         <% end %>
         <td align="center"><%= posting.product.name %></td>
-        <td align="center"><%= posting.delivery_date.strftime("%A %b %d, %Y") %></td>
-        <td align="center"><%= posting.unit.name %></td>        
+        <td align="center"><%= posting.unit.name %></td>
+        <td align="center"><%= posting.product_id_code %></td>
+        <% if posting.units_per_case.nil? || posting.units_per_case < 2 %>
+          <td align="center"></td>
+          <td align="center"></td>
+        <% else %>
+          <td align="center"><%= posting.units_per_case.to_s %></td>
+          <td align="center"><%= value[:case_count].to_s %></td>          
+        <% end %>        
+        <td align="center"><%= number_to_currency(posting.get_producer_net_case) %></td>
         <td align="center"><%= value[:unit_count] %></td>
-        <td align="center"><%= number_to_currency(value[:unit_price]) %></td>
+        <td align="center"><%= number_to_currency(posting.get_producer_net_unit) %></td>        
         <td align="center"><%= number_to_currency(value[:sub_total]) %></td>
       </tr>
     <% end %>

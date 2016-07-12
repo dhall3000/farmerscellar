@@ -22,6 +22,46 @@ class Posting < ActiveRecord::Base
 
   validates_presence_of :user, :product, :unit
 
+  def get_producer_net_unit
+    producer_net_unit = price - commission_per_unit - ToteItemsController.helpers.get_payment_processor_fee_unit(price)
+    return producer_net_unit.round(2)
+  end
+
+  def get_producer_net_case
+    
+    if units_per_case.nil? || units_per_case < 2
+      return nil
+    end
+
+    producer_net_case = (get_producer_net_unit * units_per_case).round(2)
+
+    return producer_net_case
+
+  end
+
+  def commission_per_unit
+    commission_factor = get_commission_factor
+    commission_per_unit = (price * commission_factor).round(2)
+    return commission_per_unit
+  end
+
+  def get_commission_factor
+
+    commission_factors = ProducerProductUnitCommission.where(user: user, product: product, unit: unit)
+
+    #TODO: the following line is superfluous, as far as i can tell. however, i get a sqlliteexception without it. strange!
+    #i don't think there's anything magical about calling .to_a. when creating this i was able to get things to succeed
+    #as intended when i used a variety of reading methods instead of .to_a
+    commission_factors.to_a
+
+    if commission_factors.order(:created_at).last.nil?
+      return 0
+    else
+      return commission_factors.order(:created_at).last.commission
+    end    
+
+  end
+
   #OPEN means open for customers to place orders. but that's somewhat confusing because if late_adds_allowed then customer can place order even in the COMMITMENTZONE
   #so really all OPEN means right now is the period of time before commitment_zone_start. the meaning isn't even yet comingled/intermingled iwth the concept of 'live'.
   #yuck. it is what it is. we'll clean it up eventually

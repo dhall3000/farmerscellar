@@ -137,7 +137,7 @@ module ToteItemsHelper
 
   def get_commission_item(tote_item)
 
-    commission_factor = get_commission_factor(tote_item.posting.user, tote_item.posting.product, tote_item.posting.unit)
+    commission_factor = tote_item.posting.get_commission_factor
     commission_unit = (tote_item.price * commission_factor).round(2)
     commission_item = (commission_unit * tote_item.quantity).round(2)
 
@@ -206,23 +206,6 @@ module ToteItemsHelper
     commission_factor = commission / retail
 
     return commission_factor
-
-  end
-
-  def get_commission_factor(producer, product, unit)
-
-    commission_factors = ProducerProductUnitCommission.where(user: producer, product: product, unit: unit)
-
-    #TODO: the following line is superfluous, as far as i can tell. however, i get a sqlliteexception without it. strange!
-    #i don't think there's anything magical about calling .to_a. when creating this i was able to get things to succeed
-    #as intended when i used a variety of reading methods instead of .to_a
-    commission_factors.to_a
-
-    if commission_factors.order(:created_at).last.nil?
-      return 0
-    else
-      return commission_factors.order(:created_at).last.commission
-    end    
 
   end
 

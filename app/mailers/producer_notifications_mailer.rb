@@ -32,26 +32,35 @@ class ProducerNotificationsMailer < ApplicationMailer
       subject = "admin action required: " + subject
     end
 
-  	postings.each do |posting|  		
+  	postings.each do |posting|
 
       committed_items = posting.tote_items.where(state: ToteItem.states[:COMMITTED])
   	  if committed_items.count < 1
         next
       end
 
-      unit_count = 0
-      sub_total = 0
+      unit_count = 0      
 
       committed_items.each do |tote_item|
         unit_count = unit_count + tote_item.quantity
-        sub_total = (sub_total + get_producer_net_item(tote_item)).round(2)        
+      end
+
+      if posting.units_per_case.nil? || posting.units_per_case < 2
+        case_count = nil
+      else
+        case_count = unit_count / posting.units_per_case
+        unit_count = case_count * posting.units_per_case 
+      end
+
+      sub_total = 0
+      producer_net_unit = posting.get_producer_net_unit
+      unit_count.times do
+        sub_total = (sub_total + producer_net_unit).round(2)
       end
 
       @total = (@total + sub_total).round(2)
+      @posting_infos[posting] = {unit_count: unit_count, case_count: case_count, sub_total: sub_total}
 
-      unit_price = (sub_total / unit_count.to_f).round(2)
-      @posting_infos[posting] = {unit_price: unit_price, unit_count: unit_count, sub_total: sub_total}
-  	  
   	end  	
 
   	if @posting_infos.nil? || !@posting_infos.any?
