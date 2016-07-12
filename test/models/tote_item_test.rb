@@ -59,6 +59,25 @@ class ToteItemTest < ActiveSupport::TestCase
 
   end
 
+  test "users first item should be shippable but not the second" do
+    #make a test where anonymouse user auths 3 of a 10-unit-case posting. then c1 adds 3 so that 4 more are needed then c1 adds 5 so that his first item should
+    #get shipped if he authorizes but the second item should report 9 more needed to ship.
+    c2 = users(:c2)
+    tic2 = create_tote_item(c2, @posting, quantity = 3, authorize = true)
+    assert_equal 7, tic2.additional_units_required_to_fill_my_case
+
+    c1 = users(:c1)
+    tic1_1 = create_tote_item(c1, @posting, quantity = 3, authorize = false)
+    assert_equal 7, tic2.additional_units_required_to_fill_my_case
+    assert_equal 4, tic1_1.additional_units_required_to_fill_my_case  
+
+    tic1_2 = create_tote_item(c1, @posting, quantity = 5, authorize = false)
+    assert_equal 7, tic2.additional_units_required_to_fill_my_case
+    assert_equal 0, tic1_1.additional_units_required_to_fill_my_case  
+    assert_equal 9, tic1_2.additional_units_required_to_fill_my_case  
+
+  end
+
   test "should say authorized item will ship but added item will not ship" do
     #what happens if user auths an item, then that case fully fills with others' auth'd items. then user comes and adds another item such that
     #this last item's case isn't filled. will it say that the user's original auth'd item comes up short?

@@ -10,6 +10,71 @@ class PostingsTest < ActionDispatch::IntegrationTest
     @product = products(:apples)
     @unit = units(:pound)    
     @posting = postings(:postingf1apples)
+
+    delivery_date = Time.zone.today + 3.days
+
+    if delivery_date.sunday?
+      delivery_date = Time.zone.today + 4.days
+    end
+
+    @posting_case = Posting.new(units_per_case: 10, unit: @unit, product: @product, user: @farmer, description: "descrip", quantity_available: 100, price: 1.25, live: true, commitment_zone_start: delivery_date - 2.days, delivery_date: delivery_date)
+    @posting_case.save
+
+  end
+
+  test "user 1 should see pout page then user 2 auths to fill case so user 1 should no longer see pout" do
+
+    #c1 auths. then c2 adds above current case in to the next case. verify c1 now no longer sees pout page.
+
+    posting = come_up_3_short
+    c1 = users(:c1)
+    c1_ti = c1.tote_items.order(:created_at).last
+    assert_equal 7, c1_ti.additional_units_required_to_fill_my_case
+    c2 = users(:c2)
+    c2_ti = c2.tote_items.order(:created_at).last
+    assert_equal ToteItem.states[:ADDED], c2_ti.state    
+    c2_ti.transition(:customer_authorized)
+    c2_ti.reload
+    assert_equal ToteItem.states[:AUTHORIZED], c2_ti.state
+    assert_equal 3, c1_ti.additional_units_required_to_fill_my_case
+
+    #as of right now c1 has 3 auth'd and c2 has 4 auth'd for a total of 7. so if we log in as c1 and go to the tote
+    #we should still see the red exclamation mark telling us the case isn't full yet, we're short 4
+    log_in_as(c1)
+    get tote_items_path
+    assert_response :success
+    assert_template 'tote_items/index'    
+    assert_select "span.glyphicon-exclamation-sign"
+
+    #log in as c2
+    c2 = users(:c2)
+    log_in_as(c2)
+    #add tote item with quantity 4
+    post tote_items_path, tote_item: {quantity: 4, posting_id: posting.id}
+    tote_item = assigns(:tote_item)
+
+    #c2 should now be looking at the pout page
+    assert_response :redirect
+    follow_redirect!
+    assert_template 'tote_items/pout'
+    assert_not flash.empty?
+    assert_equal "9 more units required to ship. See below.", flash[:danger]
+
+    #now authorize
+    tote_item.transition(:customer_authorized)
+    assert_equal ToteItem.states[:AUTHORIZED], tote_item.state
+
+    #the case size is 10. c1 added 3 units and c2 just added 4. this is a total of 7 which means the 
+    #additional_units_required_to_fill_my_case should be 3
+    assert_equal 9, tote_item.additional_units_required_to_fill_my_case
+
+    #now c1 shouldn't see the exclamation mark in the tote
+    log_in_as(c1)
+    get tote_items_path
+    assert_response :success
+    assert_template 'tote_items/index'    
+    assert_select "span.glyphicon-exclamation-sign", count: 0
+
   end
 
   test "c2 should fill case that c1 came up short on" do
