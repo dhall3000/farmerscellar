@@ -145,7 +145,6 @@ class Posting < ActiveRecord::Base
     #fill in FIFO order. partially fill if need be.
     first_committed_tote_item = get_first_committed_tote_item
     while first_committed_tote_item
-
       if quantity_remaining > 0
         quantity_to_fill = [first_committed_tote_item.quantity, quantity_remaining].min
         quantity_remaining = quantity_remaining - quantity_to_fill
@@ -178,6 +177,48 @@ class Posting < ActiveRecord::Base
       tote_items_not_filled: tote_items_not_filled,
       partially_filled_tote_items: partially_filled_tote_items
     }
+
+  end
+
+  def submit_order_to_creditor?
+
+    #above packing minimum (at least one unit (or 1 case if cases are in effect))
+    #above creditor order min?
+    #above run order min?
+
+    return above_packing_minimum?
+    
+  end
+
+  def above_packing_minimum?
+    if units_per_case.nil? || units_per_case < 2
+      return total_quantity_authorized_or_committed > 0
+    else
+      return total_quantity_authorized_or_committed >= units_per_case
+    end
+  end
+
+  def num_units_orderable
+
+    if units_per_case.nil? || units_per_case < 2
+      unit_count = total_quantity_authorized_or_committed
+    else
+      unit_count = num_cases_orderable * units_per_case
+    end
+
+    return unit_count
+    
+  end
+
+  def num_cases_orderable
+    
+    if units_per_case.nil? || units_per_case < 2
+      case_count = nil
+    else
+      case_count = total_quantity_authorized_or_committed / units_per_case
+    end
+
+    return case_count
 
   end
 

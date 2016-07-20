@@ -39,18 +39,8 @@ class ProducerNotificationsMailer < ApplicationMailer
         next
       end
 
-      unit_count = 0      
-
-      committed_items.each do |tote_item|
-        unit_count = unit_count + tote_item.quantity
-      end
-
-      if posting.units_per_case.nil? || posting.units_per_case < 2
-        case_count = nil
-      else
-        case_count = unit_count / posting.units_per_case
-        unit_count = case_count * posting.units_per_case 
-      end
+      unit_count = posting.num_units_orderable
+      case_count = posting.num_cases_orderable
 
       sub_total = 0
       producer_net_unit = posting.get_producer_net_unit

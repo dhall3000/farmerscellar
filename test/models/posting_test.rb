@@ -18,6 +18,85 @@ class PostingTest < ActiveSupport::TestCase
     @posting.save
   end
 
+  test "should not submit order when no quantity is authorized or committed" do
+    assert_equal 0, @posting.tote_items.count
+    ti = ToteItem.new(quantity: 1, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: @user)
+    assert ti.save    
+    assert_equal 1, @posting.tote_items.count
+    assert_equal ToteItem.states[:ADDED], @posting.tote_items.first.state
+    assert_not @posting.submit_order_to_creditor?
+  end
+
+  test "should submit order when quantity is above zero and cases arent in use" do
+    assert_equal 0, @posting.tote_items.count
+    ti = ToteItem.new(quantity: 1, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: @user)
+    assert ti.save
+    ti.transition(:customer_authorized)
+    ti.transition(:commitment_zone_started)
+    assert_equal 1, @posting.tote_items.count
+    assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
+    assert @posting.submit_order_to_creditor?
+  end
+
+  test "should submit order when quantity is at least the size of a case" do
+    case_size = 10
+    @posting.units_per_case = case_size
+    assert @posting.save
+    assert_equal 0, @posting.tote_items.count
+    ti = ToteItem.new(quantity: case_size + 1, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: @user)
+    assert ti.save
+    ti.transition(:customer_authorized)
+    ti.transition(:commitment_zone_started)
+    assert_equal 1, @posting.tote_items.count
+    assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
+    assert @posting.submit_order_to_creditor?
+  end
+
+  test "should only submit order in round case lots when applicable" do    
+    case_size = 10
+    @posting.units_per_case = case_size
+    assert @posting.save
+    assert_equal 0, @posting.tote_items.count
+    ti = ToteItem.new(quantity: case_size + 1, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: @user)
+    assert ti.save
+    ti.transition(:customer_authorized)
+    ti.transition(:commitment_zone_started)
+    assert_equal 1, @posting.tote_items.count
+    assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
+    
+    assert_equal case_size, @posting.num_units_orderable
+    assert_equal 1, @posting.num_cases_orderable
+  end
+
+  test "should submit order for all committed quantity when cases not in use" do
+    unit_count = 11
+    @posting.units_per_case = 0
+    assert @posting.save
+    assert_equal 0, @posting.tote_items.count
+    ti = ToteItem.new(quantity: unit_count, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: @user)
+    assert ti.save
+    ti.transition(:customer_authorized)
+    ti.transition(:commitment_zone_started)
+    assert_equal 1, @posting.tote_items.count
+    assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state    
+    assert_equal unit_count, @posting.num_units_orderable
+    assert_equal nil, @posting.num_cases_orderable
+  end
+
+  test "should not submit order when quantity authorized or committed is less than a case size" do
+    case_size = 10
+    @posting.units_per_case = case_size
+    assert @posting.save
+    assert_equal 0, @posting.tote_items.count
+    ti = ToteItem.new(quantity: case_size - 1, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: @user)
+    assert ti.save
+    ti.transition(:customer_authorized)
+    ti.transition(:commitment_zone_started)
+    assert_equal 1, @posting.tote_items.count
+    assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
+    assert_not @posting.submit_order_to_creditor?
+  end
+
   test "should fill all items" do
     num_items = 7
     quantity_per_item = 6

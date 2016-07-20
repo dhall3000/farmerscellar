@@ -165,7 +165,17 @@ class RakeHelper
 		  		creditors[creditor] = []
 		  	end
 
-		  	creditors[creditor] << posting
+		  	if posting.submit_order_to_creditor?
+		  		creditors[creditor] << posting
+		  	else		  		
+		  		#close out the posting so admin doesn't have to deal with it.
+		  		#here at the order cutoff is the time to close out the posting so that admin doesn't have to see it on their
+		  		#radar screen. or is this the right time? say that order cutoff is on monday and delivery friday. but say on wednesday we also have some
+		  		#products being delivered. if we close out this posting due to insufficient quantity on monday then on wednesday the delivery notification
+		  		#would go out to the user. this might be confusing. on the other hand, the unfilled folks might want to know earlier rather than later so
+		  		#they can take measures to procure similar such food elsehow.
+		  		posting.fill(0)
+		  	end
 
 		  end
 

@@ -1,9 +1,6 @@
 require 'test_helper'
 
 class PostingsTest < ActionDispatch::IntegrationTest
-  # test "the truth" do
-  #   assert true
-  # end
 
   def setup
     @farmer = users(:f1)
@@ -19,6 +16,127 @@ class PostingsTest < ActionDispatch::IntegrationTest
 
     @posting_case = Posting.new(units_per_case: 10, unit: @unit, product: @product, user: @farmer, description: "descrip", quantity_available: 100, price: 1.25, live: true, commitment_zone_start: delivery_date - 2.days, delivery_date: delivery_date)
     @posting_case.save
+
+  end
+
+  test "dont send order email if unit count zero" do
+
+    posting = create_standard_posting
+    posting.units_per_case = 0
+    assert posting.save
+    assert_equal 0, posting.tote_items.count
+    assert_equal Posting.states[:OPEN], posting.state
+
+    travel_to posting.commitment_zone_start
+    ActionMailer::Base.deliveries.clear
+    assert_equal 0, ActionMailer::Base.deliveries.count
+    RakeHelper.do_hourly_tasks
+    assert_equal 0, ActionMailer::Base.deliveries.count
+
+    travel_back
+
+  end
+
+  test "should partially fill an item to complete a case then send correct order to creditor" do
+
+    posting = create_standard_posting
+    posting.units_per_case = 10
+    assert posting.save
+    assert_equal 0, posting.tote_items.count
+    assert_equal Posting.states[:OPEN], posting.state
+
+    c1 = users(:c1)
+    ti = ToteItem.new(quantity: posting.units_per_case + 1, posting_id: posting.id, state: ToteItem.states[:ADDED], price: posting.price, user: c1)
+    assert ti.save    
+    assert_equal ToteItem.states[:ADDED], ti.reload.state
+    ti.transition(:customer_authorized)
+    assert_equal ToteItem.states[:AUTHORIZED], ti.reload.state
+
+    travel_to posting.commitment_zone_start
+    ActionMailer::Base.deliveries.clear
+    assert_equal 0, ActionMailer::Base.deliveries.count
+    RakeHelper.do_hourly_tasks
+
+    assert_equal 1, posting.tote_items.count
+    assert_equal ToteItem.states[:COMMITTED], posting.tote_items.first.state
+    assert posting.submit_order_to_creditor?
+    assert_equal posting.units_per_case + 1, posting.total_quantity_authorized_or_committed
+    assert_equal posting.units_per_case, posting.num_units_orderable
+    assert_equal 1, posting.num_cases_orderable
+
+    assert_equal 2, ActionMailer::Base.deliveries.count
+    #'verify' that the number '10' shows up which is that 10 units were ordered rather than the 11 that were committed
+    assert_appropriate_email(ActionMailer::Base.deliveries[1], posting.user.get_business_interface.order_email, "Current orders for upcoming deliveries", "10")
+    assert_appropriate_email(ActionMailer::Base.deliveries[1], posting.user.get_business_interface.order_email, "Current orders for upcoming deliveries", "1")
+
+    #now once farmer delivers we want to verify we partially filled
+    fill_report = posting.fill(posting.num_units_orderable)
+
+    posting.reload
+    assert_equal 1, posting.tote_items.count
+    ti = posting.tote_items.first
+    ti.reload
+    assert_equal ToteItem.states[:FILLED], ti.state
+    assert ti.partially_filled?
+    assert_not ti.zero_filled?
+    assert_not ti.fully_filled?
+    assert_equal posting.units_per_case + 1, ti.quantity
+    assert_equal posting.units_per_case, ti.quantity_filled
+
+    assert_equal posting.units_per_case, fill_report[:quantity_filled]
+    assert_equal 1, fill_report[:quantity_not_filled]
+    assert_equal 0, fill_report[:quantity_remaining]
+    assert_equal 1, fill_report[:tote_items_filled].count
+    assert_equal 1, fill_report[:partially_filled_tote_items].count    
+    assert_equal 0, fill_report[:tote_items_not_filled].count
+    assert_equal fill_report[:partially_filled_tote_items], fill_report[:tote_items_filled]
+
+    travel_back
+
+  end
+  
+  test "should not send order email if first case does not get filled" do
+    posting = create_standard_posting
+    posting.units_per_case = 10
+    assert posting.save
+    assert_equal 0, posting.tote_items.count
+    assert_equal Posting.states[:OPEN], posting.state
+
+    c1 = users(:c1)
+    ti = ToteItem.new(quantity: posting.units_per_case - 1, posting_id: posting.id, state: ToteItem.states[:ADDED], price: posting.price, user: c1)
+    assert ti.save    
+    assert_equal ToteItem.states[:ADDED], ti.reload.state
+    ti.transition(:customer_authorized)
+    assert_equal ToteItem.states[:AUTHORIZED], ti.reload.state
+
+    travel_to posting.commitment_zone_start
+    ActionMailer::Base.deliveries.clear
+    assert_equal 0, ActionMailer::Base.deliveries.count
+    RakeHelper.do_hourly_tasks
+    posting.reload
+    assert_equal 1, posting.tote_items.count
+    assert_equal ToteItem.states[:NOTFILLED], posting.tote_items.first.state
+    assert_not posting.submit_order_to_creditor?
+    assert_equal 0, posting.total_quantity_authorized_or_committed
+    assert_equal 0, posting.num_units_orderable
+    assert_equal 0, posting.num_cases_orderable
+
+    assert_equal 1, ActionMailer::Base.deliveries.count
+    #verify that no order email (or email of any kind) was sent to producer
+    assert_not_email_to(posting.user.get_business_interface.order_email)    
+
+    posting.reload
+    assert_equal 1, posting.tote_items.count
+    ti = posting.tote_items.first
+    ti.reload
+    assert_equal ToteItem.states[:NOTFILLED], ti.state
+    assert_not ti.partially_filled?
+    assert ti.zero_filled?
+    assert_not ti.fully_filled?
+    assert_equal posting.units_per_case - 1, ti.quantity
+    assert_equal 0, ti.quantity_filled
+
+    travel_back
 
   end
 
@@ -128,28 +246,9 @@ class PostingsTest < ActionDispatch::IntegrationTest
   end
 
   def come_up_3_short
-    delivery_date = Time.zone.now.midnight + 7.days
-    if delivery_date.sunday?
-      delivery_date += 1.day
-    end
 
-    commitment_zone_start = delivery_date - 2.days
-
-    posting_params = {
-      description: "describe description",
-      quantity_available: 100,
-      price: 5.25,
-      user_id: @farmer.id,
-      product_id: @product.id,
-      unit_id: @unit.id,
-      live: true,
-      delivery_date: delivery_date,
-      commitment_zone_start: commitment_zone_start,
-      units_per_case: 10
-    }
-
-    posting = create_posting(@farmer, posting_params)
-
+    posting = create_standard_posting
+    
     #create an authorized tote item for c1 with quantity 3
     c1 = users(:c1)
     ti = ToteItem.new(quantity: 3, posting_id: posting.id, state: ToteItem.states[:ADDED], price: posting.price, user_id: c1.id)    
@@ -382,6 +481,34 @@ class PostingsTest < ActionDispatch::IntegrationTest
     post login_path, session: { email: @farmer.email, password: 'dogdog' }
     assert_redirected_to postings_path
     follow_redirect!
+  end
+
+  def create_standard_posting
+
+    delivery_date = Time.zone.now.midnight + 7.days
+    if delivery_date.sunday?
+      delivery_date += 1.day
+    end
+
+    commitment_zone_start = delivery_date - 2.days
+
+    posting_params = {
+      description: "describe description",
+      quantity_available: 100,
+      price: 5.25,
+      user_id: @farmer.id,
+      product_id: @product.id,
+      unit_id: @unit.id,
+      live: true,
+      delivery_date: delivery_date,
+      commitment_zone_start: commitment_zone_start,
+      units_per_case: 10
+    }
+
+    posting = create_posting(@farmer, posting_params)
+
+    return posting
+
   end
 
   def create_posting(producer, params)
