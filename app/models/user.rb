@@ -93,7 +93,7 @@ class User < ActiveRecord::Base
     #whichever is more recent
     cutoff = [last_pickup, 7.days.ago].max
 
-    return tote_items.joins(:posting).where("postings.delivery_date > ? and postings.delivery_date < ?", cutoff, Time.zone.now).where(state: ToteItem.states[:FILLED])
+    return tote_items.joins(:posting).where("postings.delivery_date > ? and postings.delivery_date < ?", cutoff, Time.zone.now).where(state: [ToteItem.states[:FILLED], ToteItem.states[:NOTFILLED]])
 
   end
 

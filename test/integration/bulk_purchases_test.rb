@@ -124,7 +124,98 @@ class BulkPurchasesTest < BulkBuyer
     #do a pickup
     log_in_as(users(:dropsite1))
     post pickups_path, pickup_code: @c1.pickup_code.code
+    #verify there are no messages informing user of sub-fully-filled items
+    assert_no_match "We couldn't fully fill this order.", response.body
     tote_items = assigns(:tote_items)
+    #verify the number of items is less than the total amount    
+    assert tote_items.count < @c1.tote_items.count
+    #save the number picked up for later comparison
+    num_items_first_pickup_count = tote_items.count
+    assert num_items_first_pickup_count > 0
+    #jump to one day after the last delivery day
+    travel_to latest_delivery_date + 1.day
+    #hit c1's model object for the number of items remaining to pick up
+    num_items_second_pickup_count = @c1.tote_items_to_pickup.count
+    assert num_items_second_pickup_count > 0
+    #compare this remaining-to-pick-up number to the number already picked up to the total number of items
+    assert_equal @c1.tote_items.count, num_items_first_pickup_count + num_items_second_pickup_count
+    #jump forward 7 days from now
+    travel_to Time.zone.now + 7.days
+    #hit c1's model object for the number of items remaining to pick up
+    #verify it's zero since they should all be beyond the 7 day max holding period
+    assert_equal 0, @c1.tote_items_to_pickup.count    
+    #jump back to one day after the last delivery date
+    travel_to latest_delivery_date + 1.day    
+    #post a pickup
+    post pickups_path, pickup_code: @c1.pickup_code.code
+    tote_items = assigns(:tote_items)
+    #verify proper number of items picked up
+    assert_equal num_items_second_pickup_count, tote_items.count
+    #post another pickup
+    post pickups_path, pickup_code: @c1.pickup_code.code
+    tote_items = assigns(:tote_items)
+    #verify no more items picked up
+    assert_equal 0, tote_items.count
+
+    travel_back
+
+  end
+
+  test "pickups should notify user of partially and zero filled items" do    
+    do_bulk_buy
+    do_delivery
+
+    #find the earliest and latest delivery dates among c1's toteitems
+    tote_items = @c1.tote_items
+    earliest_delivery_date = 100.days.from_now
+    latest_delivery_date = 100.days.ago
+    tote_items.each do |ti|
+      if ti.posting.delivery_date < earliest_delivery_date
+        earliest_delivery_date = ti.posting.delivery_date
+      end
+      if ti.posting.delivery_date > latest_delivery_date
+        latest_delivery_date = ti.posting.delivery_date
+      end
+    end
+
+    #split the difference, time wise
+    middle_date = earliest_delivery_date + ((latest_delivery_date - earliest_delivery_date) / 2)    
+    #jump to that middle-ground time
+    travel_to middle_date
+    #do a pickup
+    log_in_as(users(:dropsite1))    
+    #scab in some tote items that aren't fully filled
+    posting = @c1.tote_items_to_pickup.first.posting
+    assert ToteItem.create(quantity: 5, quantity_filled: 3, price: posting.price, posting: posting, user: @c1, state: ToteItem.states[:FILLED])
+    assert ToteItem.create(quantity: 5, price: posting.price, posting: posting, user: @c1, state: ToteItem.states[:NOTFILLED])
+    #user enters their pickup code at kiosk
+    post pickups_path, pickup_code: @c1.pickup_code.code
+    assert_response :success
+    #verify user is looking at the pickups page with a list of product to pick up
+    assert_template 'pickups/create'    
+    #verify that the un-fully filled items exist in the tote_items object
+    tote_items = assigns(:tote_items)
+    partially_filled_found = false
+    not_filled_found = false
+    tote_items.each do |ti|
+      if ti.quantity_filled == 0
+        not_filled_found = true
+      end
+      if ti.quantity_filled < ti.quantity
+        partially_filled_found = true
+      end
+    end
+    assert partially_filled_found
+    assert not_filled_found
+    #verify a message is displayed notifying user of partially filled item
+    assert_select 'div', count: 1, text: "3 Wholes. We couldn't fully fill this order."
+    #verify a message is displayed notifying user of not filled item
+    assert_select 'div', count: 1, text: "0 Wholes. We couldn't fully fill this order."
+
+
+    #the rest of this test is superfluous to the intent of this test. it's just an artifact of copy/pasting test "do pickups" do
+    #as a starting point for this test. leaving it in, whatever...
+
     #verify the number of items is less than the total amount    
     assert tote_items.count < @c1.tote_items.count
     #save the number picked up for later comparison

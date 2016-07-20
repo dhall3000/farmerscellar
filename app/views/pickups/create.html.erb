@@ -33,17 +33,27 @@
 			        	<th class="text-center"></th>
 			          <th class="text-center">Producer</th>
 			          <th class="text-center">Product</th>
-			          <th class="text-center">Quantity</th>
+			          <th class="text-center">Quantity to Pickup</th>
 			        </tr>
 			      </thead>
 			      <tbody>
 
 				        <% @tote_items.each do |tote_item| %>        
-				        	<tr>
+				        	<tr>				        	
 				        		<td><%= image_tag "sun.jpg" %></td>
 					        	<td class="text-center"><%= tote_item.posting.user.farm_name %></td>
 					        	<td class="text-center"><%= tote_item.posting.product.name %></td>
-										<td class="text-center"><%= pluralize(tote_item.quantity, tote_item.posting.unit.name) %></td>
+
+					        	<% if tote_item.quantity_filled < tote_item.quantity || tote_item.state?(:NOTFILLED) %>
+					        		<td class="text-center">
+					        			<div class="alert alert-danger">
+				        					<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> <%= pluralize(tote_item.quantity_filled, tote_item.posting.unit.name) %>. We couldn't fully fill this order.					        				
+				        				</div>
+					        		</td>
+					        	<% else %>
+					        		<td class="text-center"><%= pluralize(tote_item.quantity_filled, tote_item.posting.unit.name) %></td>
+					        	<% end %>
+										
 				          </tr>        
 				        <% end %>
 
@@ -57,6 +67,6 @@
 
 <div class="row">
 	<div class="col-sm-8 col-sm-offset-2">
-	    <%= link_to "All done", new_pickup_path, class: 'btn btn-lg btn-primary btn-block' %>
+	    <%= link_to "All done", new_pickup_path, class: 'btn btn-lg btn-primary btn-block fat-finger-spacing' %>
 	</div>
 </div>
