@@ -1,5 +1,21 @@
 module ToteItemsHelper
 
+  def all_items_fully_filled?(tote_items)
+
+    if tote_items.nil? || !tote_items.any?
+      return true
+    end
+
+    tote_items.each do |tote_item|
+      if tote_item.zero_filled? || tote_item.partially_filled?
+        return false
+      end
+    end
+
+    return true
+
+  end
+
   def current_user_current_unauthorized_tote_items
     all_tote_items = current_user_current_tote_items
     if all_tote_items == nil or all_tote_items.count < 1

@@ -45,9 +45,16 @@ class UserMailer < ApplicationMailer
   def delivery_notification(user, dropsite, tote_items)
     @user = user
     @dropsite = dropsite
-    @tote_items = tote_items        
+    @tote_items = tote_items
+    @all_items_fully_filled = all_items_fully_filled?(tote_items)
 
-    mail to: user.email, subject: "Delivery notification"
+    if @all_items_fully_filled
+      subject = "Delivery notification"
+    else
+      subject = "Unfilled order(s) and delivery notification"
+    end
+
+    mail to: user.email, subject: subject
   end
 
   def purchase_receipt(user, tote_items)

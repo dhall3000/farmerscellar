@@ -40,13 +40,49 @@ class UserMailerTest < ActionMailer::TestCase
       tote_items << ti
     end
 
+    #doing this actually is a little wonky because not all these items belong to c1
+    #but oh well, we're using it here to test the mailer
+    tote_items.each do |ti|
+      ti.update(state: ToteItem.states[:FILLED], quantity_filled: ti.quantity)
+    end
+
+    mail = UserMailer.delivery_notification(user, dropsite, tote_items)
+
+    assert_equal "Delivery notification", mail.subject
+    assert_equal [user.email], mail.to
+    assert_equal ["david@farmerscellar.com"], mail.from
+
+    assert_match basil.unit.name, mail.body.encoded
+    assert_match basil.user.farm_name, mail.body.encoded
+
+    assert_match avocado.unit.name, mail.body.encoded
+    assert_match avocado.user.farm_name, mail.body.encoded
+    
+  end
+
+  test "delivery notification subject should alert user when some tote items arent fully filled" do
+
+    user = users(:c1)
+    dropsite = dropsites(:dropsite1)
+    basil = postings(:postingf4basil)
+    avocado = postings(:postingf4avocado)
+
+    tote_items = []
+    basil.tote_items.each do |ti|
+      tote_items << ti
+    end
+    
+    avocado.tote_items.each do |ti|
+      tote_items << ti
+    end
+
     #this actually is a little wonky because this toteitem doesn't belong to c1, it belongs to another user
     #but oh well, we're using it here to test the mailer
     tote_items[2].state = ToteItem.states[:NOTFILLED]
 
     mail = UserMailer.delivery_notification(user, dropsite, tote_items)
 
-    assert_equal "Delivery notification", mail.subject
+    assert_equal "Unfilled order(s) and delivery notification", mail.subject
     assert_equal [user.email], mail.to
     assert_equal ["david@farmerscellar.com"], mail.from
 

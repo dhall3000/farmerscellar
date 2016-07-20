@@ -1,3 +1,13 @@
+<% if !@all_items_fully_filled %>
+<h1>Important Message!</h1>
+<ol>
+  <li>Not all of your orders were fully filled</li>
+  <li><span style="background-color:yellow;"><u>Please only pick up the quantity that was actually delivered for you</u></span></li>
+  <li>You will only be charged for the quantity that was actually delivered</li>
+</ol>
+
+<p>----------------------------------------------------------------------------------------</p>
+<% end %>
 <p>
 Hello,
 </p>
@@ -15,7 +25,7 @@ This email is your Farmer's Cellar delivery notification.
       <th align="left">Producer</th>
       <th align="left">Product</th>
       <th align="left">Unit</th>
-      <th align="center">Quantity</th>
+      <th align="center">Quantity Delivered</th>
       <th align="center">Status</th>
     </tr>
   </thead>
@@ -26,13 +36,19 @@ This email is your Farmer's Cellar delivery notification.
         <td align="left"><%= tote_item.posting.user.farm_name %></td>
         <td align="left"><%= tote_item.posting.product.name %></td>
         <td align="left"><%= tote_item.posting.unit.name %></td>
-        <td align="center"><%= tote_item.quantity %></td>
+
+        <% if tote_item.fully_filled? %>
+          <td align="center"><%= tote_item.quantity_filled %></td>
+        <% else %>
+          <td bgcolor="yellow" align="center"><%= tote_item.quantity_filled %></td>
+        <% end %>        
+
         <td align="center">
           <% if tote_item.state == ToteItem.states[:FILLED] %>
             DELIVERED
             <% products_delivered = true %>
           <% elsif tote_item.state == ToteItem.states[:NOTFILLED] %>
-            NOT FILLED
+            NOT DELIVERED
           <% else %>
             UNKNOWN
           <% end %>

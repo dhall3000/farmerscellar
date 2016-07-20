@@ -28,18 +28,57 @@ class UserMailerPreview < ActionMailer::Preview
 
   # Preview this email at
   # http://localhost:3000/rails/mailers/user_mailer/delivery_notification
-  def delivery_notification
-    user = User.find_by(email: "c_delivery_notification@c.com")
-    dropsite = user.user_dropsites.order(:created_at).last.dropsite
+  def delivery_notification_unknown_state
+    user = User.find_by(email: "c1@c.com")
+    dropsite = user.dropsite
     tote_items = ToteItem.where(user_id: user.id)
-    
-    #if you want to preview various states you can uncomment below as desired
-    #tote_items[0].state = ToteItem.states[:PURCHASED]
-    #tote_items[1].state = ToteItem.states[:PURCHASEFAILED]
-    #tote_items[2].state = ToteItem.states[:NOTFILLED]
+
+    tote_items[0].state = ToteItem.states[:AUTHORIZED]
+    tote_items[1].state = ToteItem.states[:AUTHORIZED]
+    tote_items[2].state = ToteItem.states[:AUTHORIZED]
 
     UserMailer.delivery_notification(user, dropsite, tote_items)
 
+  end
+
+  #Preview this email at
+  #http://localhost:3000/rails/mailers/user_mailer/delivery_notification_all_fully_filled
+  def delivery_notification_all_fully_filled
+    user = User.find_by(email: "c1@c.com")
+    if user.dropsite.nil?
+      user.set_dropsite(Dropsite.first)
+    end
+    dropsite = user.dropsite
+    tote_items = ToteItem.where(user_id: user.id)
+
+    tote_items.each do |ti|
+      ti.state = ToteItem.states[:FILLED]
+      ti.quantity_filled = ti.quantity
+    end
+
+    UserMailer.delivery_notification(user, dropsite, tote_items)
+  end
+
+  #Preview this email at
+  #http://localhost:3000/rails/mailers/user_mailer/delivery_notification_various_fill_states
+  def delivery_notification_various_fill_states
+    user = User.find_by(email: "c1@c.com")
+    if user.dropsite.nil?
+      user.set_dropsite(Dropsite.first)
+    end
+    dropsite = user.dropsite
+    tote_items = ToteItem.where(user_id: user.id)
+
+    tote_items[0].state = ToteItem.states[:FILLED]
+    tote_items[0].quantity_filled = tote_items[0].quantity
+
+    tote_items[1].state = ToteItem.states[:FILLED]
+    tote_items[1].quantity_filled = tote_items[1].quantity
+    tote_items[1].quantity = tote_items[1].quantity + 1
+
+    tote_items[2].state = ToteItem.states[:NOTFILLED]
+
+    UserMailer.delivery_notification(user, dropsite, tote_items)
   end
 
 end
