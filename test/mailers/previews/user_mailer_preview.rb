@@ -1,5 +1,6 @@
 # Preview all emails at http://localhost:3000/rails/mailers/user_mailer
 class UserMailerPreview < ActionMailer::Preview
+  include ToteItemsHelper
 
   # Preview this email at http://localhost:3000/rails/mailers/user_mailer/account_activation
   def account_activation
@@ -16,14 +17,45 @@ class UserMailerPreview < ActionMailer::Preview
     UserMailer.password_reset(user)
   end
 
-  # Preview this email at
-  # http://localhost:3000/rails/mailers/user_mailer/authorization_receipt
-  #NOTE: when i created this i had to modify the seeds file to change all the AUTHORIZED toteitems to be ADDED.
-  #then i had to use the browser to execute an authorization to get all the db info associated properly for this to work
-  def authorization_receipt
+  #http://localhost:3000/rails/mailers/user_mailer/authorization_receipt_one_time
+  def authorization_receipt_one_time
+    
     user = User.find_by(email: "c1@c.com")
-    authorization = user.tote_items.last.checkouts.last.authorizations.last    
+    posting = Posting.first
+    #create tote items
+    ti1 = ToteItem.new(quantity: 2, posting: posting, user: user, price: posting.price)
+    ti1.save
+    ti2 = ToteItem.new(quantity: 3, posting: posting, user: user, price: posting.price)
+    ti2.save
+    gross_amount = get_gross_tote([ti1, ti2])
+    #create checkout
+    checkout = Checkout.new(token: "fakeresponsetoken", amount: gross_amount, client_ip: "127.0.0.1", response: "fakeresponse", is_rt: false)
+    #attach tote items to checkout
+    checkout.tote_items << ti1
+    checkout.tote_items << ti2
+    #create authorization    
+    authorization = Authorization.new(
+      amount: gross_amount,
+      token: "faketoken",
+      payer_id: "fakepayerid",
+      correlation_id: "correlation_id",
+      transaction_id: "transaction_id",
+      payment_date: Time.zone.now,
+      gross_amount: gross_amount,
+      response: "response",
+      ack: "Success"
+      )
+    authorization.save
+    authorization.checkouts << checkout
+    authorization.save
+
     UserMailer.authorization_receipt(user, authorization)
+
+  end
+
+  #http://localhost:3000/rails/mailers/user_mailer/authorization_receipt_rt
+  def authorization_receipt_rt
+
   end
 
   # Preview this email at

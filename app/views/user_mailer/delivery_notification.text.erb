@@ -1,3 +1,11 @@
+<% if !@all_items_fully_filled %>
+IMPORTANT MESSAGE!
+   -Not all of your orders were fully filled
+   -Please only pick up the quantity that was actually delivered for you
+   -You will only be charged for the quantity that was actually delivered
+----------------------------------------------------------------------------------------
+
+<% end %>
 Hello,
 
 This email is your Farmer's Cellar delivery notification.
@@ -11,9 +19,9 @@ Here is the status of products you recently ordered that were set for delivery t
     <% status = "DELIVERED" %>
     <% products_delivered = true %>
   <% elsif tote_item.state == ToteItem.states[:NOTFILLED] %>
-    <% status = "NOT FILLED" %>
+    <% status = "NOT DELIVERED" %>
   <% end %>
-ID=<%= tote_item.id %>,Producer=<%= tote_item.posting.user.farm_name %>,Product=<%= tote_item.posting.product.name %>,Unit=<%= tote_item.posting.unit.name %>,Quantity=<%= tote_item.quantity %>,Status=<%= status %>
+ID=<%= tote_item.id %>,Producer=<%= tote_item.posting.user.farm_name %>,Product=<%= tote_item.posting.product.name %>,Unit=<%= tote_item.posting.unit.name %>,Quantity Delivered=<%= tote_item.quantity_filled %>,Status=<%= status %>
 ---------------------------------------------------------------------------------
 <% end %>
 

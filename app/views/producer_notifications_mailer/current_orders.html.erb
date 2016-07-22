@@ -22,10 +22,14 @@
       <% end %>
       <th align="center">Product</th>
       <th align="center">Unit</th>
-      <th align="center">Product ID Code</th>
-      <th align="center">Units per Case</th>
-      <th align="center">Number of Cases</th>
-      <th align="center">Case Price</th>
+      <% if @column_product_id_code %>
+        <th align="center">Product ID Code</th>
+      <% end %>
+      <% if @column_cases %>
+        <th align="center">Units per Case</th>
+        <th align="center">Number of Cases</th>
+        <th align="center">Case Price</th>
+      <% end %>
       <th align="center">Number of Units</th>
       <th align="center">Unit Price</th>
       <th align="center">Sub Total</th>
@@ -43,15 +47,14 @@
         <% end %>
         <td align="center"><%= posting.product.name %></td>
         <td align="center"><%= posting.unit.name %></td>
-        <td align="center"><%= posting.product_id_code %></td>
-        <% if posting.units_per_case.nil? || posting.units_per_case < 2 %>
-          <td align="center"></td>
-          <td align="center"></td>
-        <% else %>
+        <% if @column_product_id_code %>
+          <td align="center"><%= posting.product_id_code %></td>
+        <% end %>
+        <% if @column_cases %>
           <td align="center"><%= posting.units_per_case.to_s %></td>
           <td align="center"><%= value[:case_count].to_s %></td>          
-        <% end %>        
-        <td align="center"><%= number_to_currency(posting.get_producer_net_case) %></td>
+          <td align="center"><%= number_to_currency(posting.get_producer_net_case) %></td>
+        <% end %>
         <td align="center"><%= value[:unit_count] %></td>
         <td align="center"><%= number_to_currency(posting.get_producer_net_unit) %></td>        
         <td align="center"><%= number_to_currency(value[:sub_total]) %></td>

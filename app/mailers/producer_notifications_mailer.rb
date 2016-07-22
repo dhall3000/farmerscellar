@@ -32,6 +32,9 @@ class ProducerNotificationsMailer < ApplicationMailer
       subject = "admin action required: " + subject
     end
 
+    @column_product_id_code = false
+    @column_cases = false
+
   	postings.each do |posting|
 
       committed_items = posting.tote_items.where(state: ToteItem.states[:COMMITTED])
@@ -39,8 +42,16 @@ class ProducerNotificationsMailer < ApplicationMailer
         next
       end
 
+      if !posting.product_id_code.nil? && !posting.product_id_code.empty?
+        @column_product_id_code = true
+      end
+
       unit_count = posting.num_units_orderable
       case_count = posting.num_cases_orderable
+
+      if !case_count.nil? && case_count > 0
+        @column_cases = true
+      end
 
       sub_total = 0
       producer_net_unit = posting.get_producer_net_unit
