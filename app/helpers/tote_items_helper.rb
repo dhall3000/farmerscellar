@@ -1,5 +1,5 @@
 module ToteItemsHelper
-
+  
   def all_items_fully_filled?(tote_items)
 
     if tote_items.nil? || !tote_items.any?
@@ -101,33 +101,27 @@ module ToteItemsHelper
 	  tote_items != nil && tote_items.any?
 	end
 
-	def get_gross_tote(tote_items)
+	def get_gross_tote(tote_items, filled = false)
 	  total = 0
 	  if tote_has_items(tote_items)
 	    tote_items.each do |tote_item|
-	      total = (total + get_gross_item(tote_item)).round(2)
+	      total = (total + get_gross_item(tote_item, filled)).round(2)
 	    end	  	  		  	  	
 	  end
 	  total
 	end
 
-  def get_gross_item(tote_item)
+  def get_gross_item(tote_item, filled = false)
     
     if tote_item == nil
       return 0
     end
 
-    return get_gross_cost(tote_item.quantity, tote_item.price)
-
-  end
-
-  def get_gross_item_filled(tote_item)
-    
-    if tote_item == nil
-      return 0
-    end
-
-    return get_gross_cost(tote_item.quantity_filled, tote_item.price)
+    if filled
+      return get_gross_cost(tote_item.quantity_filled, tote_item.price)
+    else
+      return get_gross_cost(tote_item.quantity, tote_item.price)
+    end    
 
   end
 
@@ -135,7 +129,7 @@ module ToteItemsHelper
     return (quantity * price).round(2)
   end
 
-  def get_commission_tote(tote_items)
+  def get_commission_tote(tote_items, filled = false)
 
     if !tote_has_items(tote_items)
       return 0
@@ -144,24 +138,30 @@ module ToteItemsHelper
     total_commission = 0
 
     tote_items.each do |tote_item|
-      total_commission = (total_commission + get_commission_item(tote_item)).round(2)
+      total_commission = (total_commission + get_commission_item(tote_item, filled)).round(2)
     end    
 
     return total_commission
 
   end
 
-  def get_commission_item(tote_item)
+  def get_commission_item(tote_item, filled = false)
+
+    if filled
+      quantity = tote_item.quantity_filled
+    else
+      quantity = tote_item.quantity
+    end
 
     commission_factor = tote_item.posting.get_commission_factor
     commission_unit = (tote_item.price * commission_factor).round(2)
-    commission_item = (commission_unit * tote_item.quantity).round(2)
+    commission_item = (commission_unit * quantity).round(2)
 
     return commission_item
 
   end
 
-  def get_payment_processor_fee_tote(tote_items)
+  def get_payment_processor_fee_tote(tote_items, filled = false)
 
     if tote_items == nil || tote_items.count == 0
       return 0
@@ -170,21 +170,27 @@ module ToteItemsHelper
     payment_processor_fee_tote = 0
 
     tote_items.each do |tote_item|
-      payment_processor_fee_tote = (payment_processor_fee_tote + get_payment_processor_fee_item(tote_item)).round(2)
+      payment_processor_fee_tote = (payment_processor_fee_tote + get_payment_processor_fee_item(tote_item, filled)).round(2)
     end
 
     return payment_processor_fee_tote
 
   end
 
-  def get_payment_processor_fee_item(tote_item)
+  def get_payment_processor_fee_item(tote_item, filled = false)
 
     if tote_item == nil
       return 0
     end
 
+    if filled
+      quantity = tote_item.quantity_filled
+    else
+      quantity = tote_item.quantity
+    end
+
     unit_fee = get_payment_processor_fee_unit(tote_item.price)    
-    item_fee = (unit_fee * tote_item.quantity).round(2)
+    item_fee = (unit_fee * quantity).round(2)
     
     return item_fee
 
@@ -195,7 +201,7 @@ module ToteItemsHelper
     return unit_fee
   end
 
-  def get_producer_net_tote(tote_items)
+  def get_producer_net_tote(tote_items, filled = false)
 
     producer_net_tote = 0
 
@@ -204,16 +210,20 @@ module ToteItemsHelper
     end
 
     tote_items.each do |tote_item|
-      producer_net_tote = (producer_net_tote + get_producer_net_item(tote_item)).round(2)
+      sub_total = get_producer_net_item(tote_item, filled)
+      producer_net_tote = (producer_net_tote + sub_total).round(2)
     end
 
     return producer_net_tote
 
   end
 
-  def get_producer_net_item(tote_item)
-    producer_net_item = (get_gross_item(tote_item) - get_payment_processor_fee_item(tote_item) - get_commission_item(tote_item)).round(2)
+  def get_producer_net_item(tote_item, filled = false)
+
+    producer_net_item = (get_gross_item(tote_item, filled) - get_payment_processor_fee_item(tote_item, filled) - get_commission_item(tote_item, filled)).round(2)
+    
     return producer_net_item
+
   end
 
   def make_commission_factor(retail, producer_net)
@@ -225,10 +235,10 @@ module ToteItemsHelper
 
   end
 
-  def get_commission_factor_tote(tote_items)
+  def get_commission_factor_tote(tote_items, filled = false)
     
-    value = get_gross_tote(tote_items)
-    commission = get_commission_tote(tote_items)
+    value = get_gross_tote(tote_items, filled)
+    commission = get_commission_tote(tote_items, filled)
 
     commission_factor = commission / value
 

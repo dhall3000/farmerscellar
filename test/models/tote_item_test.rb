@@ -22,6 +22,60 @@ class ToteItemTest < ActiveSupport::TestCase
     @posting.save
   end
 
+  test "base level toteitemshelper methods should return correct values" do
+
+    #test get_gross_cost
+    quantity = 13
+    price = 21.07
+    expected_gross_cost = 273.91
+    assert_equal expected_gross_cost, get_gross_cost(quantity, price)    
+
+    #test get_commission_item
+    expected_price = 2.75
+    expected_quantity = 3
+    expected_commission_factor = 0.05
+    #if you use a calculator to multiply the above three numbers you get 0.4125.    
+    #rounded to 2 places you'd get 0.41. so why 0.42 for 'expected'? because we compute
+    #based off a single unit and then multiply from there. so in this example you'd compute
+    #the commission per unit and round that to 2 places. then you'd multiply that result by
+    #the quantity which is 3. like this:
+    #2.75 * 0.05 = 0.1375
+    #0.1375 rounded 2 places is 0.14
+    #0.14 * 3 = 0.42
+    expected_commission = 0.42
+    assert_equal expected_commission_factor, @posting.get_commission_factor    
+    assert_equal expected_price, @tote_item.price
+    assert_equal expected_quantity, @tote_item.quantity
+    assert_equal expected_commission, get_commission_item(@tote_item)
+    
+    #test get_commission_item filled = true
+    expected_price = 2.75
+    expected_commission_factor = 0.05
+    expected_quantity = 4
+    @tote_item.quantity_filled = expected_quantity
+    expected_commission = 0.56
+    assert_equal expected_commission, get_commission_item(@tote_item, filled = true)
+
+    #test get_payment_processor_fee_unit
+    #unit price is 2.75
+    #fee rate is 0.035
+    #multiplied is 0.09625
+    #rounded 2 is 0.10
+    expected_payment_processor_fee_unit = 0.10
+    assert_equal expected_payment_processor_fee_unit, get_payment_processor_fee_unit(@tote_item.price)
+
+    #test get_payment_processor_fee_item
+    expected_payment_processor_fee_item = 0.30
+    assert_equal expected_payment_processor_fee_item, get_payment_processor_fee_item(@tote_item)
+
+    #test get_payment_processor_fee_item filled = true
+    expected_quantity = 4
+    @tote_item.quantity_filled = expected_quantity
+    expected_payment_processor_fee_item = 0.40
+    assert_equal expected_payment_processor_fee_item, get_payment_processor_fee_item(@tote_item, filled = true)
+
+  end
+
   test "should tell user first added item will ship but second added item will not ship" do
     #user auths 3 of a 10-unit-case posting. then c1 adds 3 so that 4 more are needed then c1 adds 5 so that his first item should get
     #shipped if he authorizes but the second item should report 9 more needed to ship.    

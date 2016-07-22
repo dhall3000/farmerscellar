@@ -1,4 +1,6 @@
 class ToteItem < ActiveRecord::Base
+  include ToteItemsHelper
+
   has_many :tote_item_rtauthorizations
   has_many :rtauthorizations, through: :tote_item_rtauthorizations
 
@@ -210,7 +212,7 @@ class ToteItem < ActiveRecord::Base
   private
 
     def create_purchase_receivable
-      pr = PurchaseReceivable.new(amount: get_gross_item_filled(self), amount_purchased: 0, kind: PurchaseReceivable.kind[:NORMAL], state: PurchaseReceivable.states[:READY])
+      pr = PurchaseReceivable.new(amount: get_gross_item(self, filled = true), amount_purchased: 0, kind: PurchaseReceivable.kind[:NORMAL], state: PurchaseReceivable.states[:READY])
       pr.users << user
       pr.tote_items << self
       pr.save

@@ -19,7 +19,6 @@ class RakeHelper
 		def self.roll_postings			
 		  transition_posting_ids = transition_open_postings
 		  transitioned_tote_item_ids = transition_tote_items_to_committed(transition_posting_ids)	  
-			report_committed_tote_items_to_admin(transitioned_tote_item_ids)
 			send_orders_to_producers(transition_posting_ids)		
 		end
 
@@ -132,17 +131,6 @@ class RakeHelper
 
 			return transitioned_tote_item_ids
 
-		end
-
-		def self.report_committed_tote_items_to_admin(tote_item_ids)
-
-			if !tote_item_ids.nil? && tote_item_ids.any?
-		    #send job summary report to admin
-		    subject = "commit_totes job summary report"
-		    body = get_commit_totes_email_body(tote_item_ids)
-		    AdminNotificationMailer.general_message(subject, body).deliver_now
-		  end
-		  
 		end
 
 		def self.send_orders_to_producers(posting_ids)

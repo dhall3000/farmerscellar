@@ -152,7 +152,7 @@ class PostingTest < ActiveSupport::TestCase
         assert tote_item.fully_filled?
         assert_equal 1, tote_item.purchase_receivables.count
         assert tote_item.purchase_receivables.last.amount > 0
-        assert_equal tote_item.purchase_receivables.last.amount, get_gross_item(tote_item), "The PurchaseReceivable amount is #{tote_item.purchase_receivables.last.amount.to_s} but should be equal to the get_gross_item amount which is #{get_gross_item(tote_item).to_s}"
+        assert_equal tote_item.purchase_receivables.last.amount, get_gross_item(tote_item, filled = true), "The PurchaseReceivable amount is #{tote_item.purchase_receivables.last.amount.to_s} but should be equal to the get_gross_item amount which is #{get_gross_item(tote_item).to_s}"
       elsif quantity_remaining > 0
         assert tote_item.partially_filled?
         assert_equal 1, tote_item.purchase_receivables.count

@@ -21,7 +21,7 @@ class DistributorTest < BulkBuyer
     #this should move postings from OPEN to COMMITMENTZONE
     clear_mailer
     RakeHelper.do_hourly_tasks    
-    assert_equal 3, ActionMailer::Base.deliveries.count
+    assert_equal 2, ActionMailer::Base.deliveries.count
     
     assert_appropriate_email_exists("d1order_email@d.com", "Current orders for upcoming deliveries", "Hi Bigtime Distributor Business Interface,")
     assert_appropriate_email_exists("d1order_email@d.com", "Current orders for upcoming deliveries", "Below are orders for your upcoming delivery.")
@@ -30,9 +30,6 @@ class DistributorTest < BulkBuyer
 
     assert_appropriate_email_exists("f8order_email@f.com", "Current orders for upcoming deliveries", "Hi F8 FARM Business Interface,")
     assert_appropriate_email_exists("f8order_email@f.com", "Current orders for upcoming deliveries", "Below are orders for your upcoming delivery.")
-
-    
-    assert_appropriate_email_exists("david@farmerscellar.com", "commit_totes job summary report", "number of tote_items transitioned from AUTHORIZED -> COMMITTED: 3.")
 
     #assert that neither the distributor nor producer got emailed
     customer.tote_items.each do |tote_item|
@@ -70,7 +67,7 @@ class DistributorTest < BulkBuyer
     #this should move postings from OPEN to COMMITMENTZONE
     clear_mailer
     RakeHelper.do_hourly_tasks    
-    assert_equal 3, ActionMailer::Base.deliveries.count
+    assert_equal 2, ActionMailer::Base.deliveries.count
 
     assert_appropriate_email_exists("david@farmerscellar.com", "admin action required: Current orders for upcoming deliveries", "Hi david@farmerscellar.com,")
     assert_appropriate_email_exists("david@farmerscellar.com", "admin action required: Current orders for upcoming deliveries", "Below are orders for your upcoming delivery.")    
@@ -81,8 +78,6 @@ class DistributorTest < BulkBuyer
     assert_appropriate_email_exists("david@farmerscellar.com", "admin action required: Current orders for upcoming deliveries", "Hi david@farmerscellar.com,")
     assert_appropriate_email_exists("david@farmerscellar.com", "admin action required: Current orders for upcoming deliveries", "Below are orders for your upcoming delivery.")    
     assert_appropriate_email_exists("david@farmerscellar.com", "admin action required: Current orders for upcoming deliveries", "Order Instructions: go to www.f8farm.com and manually submit order there. do this before noon!")
-
-    assert_appropriate_email_exists("david@farmerscellar.com", "commit_totes job summary report", "number of tote_items transitioned from AUTHORIZED -> COMMITTED: 3.")
 
     #assert that neither the distributor nor producer got emailed
     customer.tote_items.each do |tote_item|
@@ -105,7 +100,7 @@ class DistributorTest < BulkBuyer
     #this should move postings from OPEN to COMMITMENTZONE
     clear_mailer
     RakeHelper.do_hourly_tasks    
-    assert_equal 3, ActionMailer::Base.deliveries.count
+    assert_equal 2, ActionMailer::Base.deliveries.count
     
     assert_appropriate_email_exists("d1order_email@d.com", "Current orders for upcoming deliveries", "Hi Bigtime Distributor Business Interface,")
     assert_appropriate_email_exists("d1order_email@d.com", "Current orders for upcoming deliveries", "Below are orders for your upcoming delivery.")    
@@ -115,7 +110,6 @@ class DistributorTest < BulkBuyer
     assert_appropriate_email_exists("f8order_email@f.com", "Current orders for upcoming deliveries", "Hi F8 FARM Business Interface,")
     assert_appropriate_email_exists("f8order_email@f.com", "Current orders for upcoming deliveries", "Below are orders for your upcoming delivery.")    
     
-    assert_appropriate_email_exists("david@farmerscellar.com", "commit_totes job summary report", "number of tote_items transitioned from AUTHORIZED -> COMMITTED: 3.")    
     clear_mailer
 
     #now travel to one second past midnight on delivery day
@@ -228,7 +222,7 @@ class DistributorTest < BulkBuyer
     #this should move postings from OPEN to COMMITMENTZONE
     clear_mailer
     RakeHelper.do_hourly_tasks    
-    assert_equal 3, ActionMailer::Base.deliveries.count
+    assert_equal 2, ActionMailer::Base.deliveries.count
     
     assert_appropriate_email_exists("d1order_email@d.com", "Current orders for upcoming deliveries", "Hi Bigtime Distributor Business Interface,")
     assert_appropriate_email_exists("d1order_email@d.com", "Current orders for upcoming deliveries", "Below are orders for your upcoming delivery.")    
@@ -238,7 +232,6 @@ class DistributorTest < BulkBuyer
     assert_appropriate_email_exists("f8order_email@f.com", "Current orders for upcoming deliveries", "Hi F8 FARM Business Interface,")
     assert_appropriate_email_exists("f8order_email@f.com", "Current orders for upcoming deliveries", "Below are orders for your upcoming delivery.")    
     
-    assert_appropriate_email_exists("david@farmerscellar.com", "commit_totes job summary report", "number of tote_items transitioned from AUTHORIZED -> COMMITTED: 3.")    
     clear_mailer
 
     #now travel to one second past midnight on delivery day

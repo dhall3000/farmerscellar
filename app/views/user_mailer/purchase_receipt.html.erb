@@ -38,10 +38,10 @@ Here is your Farmer's Cellar purchase receipt.
         <td align="left"><%= tote_item.posting.product.name %></td>
         <td align="center"><%= tote_item.posting.delivery_date.strftime("%A %b %d, %Y") %></td>
         <td align="center"><%= number_to_currency(tote_item.price) %> / <%= tote_item.posting.unit.name %></td>
-        <td align="center"><%= tote_item.quantity %></td>
+        <td align="center"><%= tote_item.quantity_filled %></td>
         <td align="center">
           <% if pr.state == PurchaseReceivable.states[:COMPLETE] %>
-            <%= number_to_currency(get_gross_item(tote_item)) %>
+            <%= number_to_currency(get_gross_item(tote_item, filled = true)) %>
           <% else %>
             PURCHASEFAILED
           <% end %>          

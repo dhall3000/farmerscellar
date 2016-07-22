@@ -416,7 +416,7 @@ class BulkPaymentProcessing
             posting_infos[tote_item.posting] = {unit_count: 0, unit_price: 0, sub_total: 0}
           end
 
-          creditor_net_item = get_producer_net_item(tote_item)
+          creditor_net_item = get_producer_net_item(tote_item, filled = true)
 
           posting_infos[tote_item.posting][:unit_count] += tote_item.quantity
           posting_infos[tote_item.posting][:sub_total] = (posting_infos[tote_item.posting][:sub_total] + creditor_net_item).round(2)

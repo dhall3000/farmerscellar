@@ -68,7 +68,8 @@ class RtauthorizationssTest < BulkBuyer
     assert PurchaseReceivable.last.amount > 0
     assert_equal PurchaseReceivable.last.amount, PurchaseReceivable.last.amount_purchased
     assert gross_tote_item_value > 0
-    assert_equal get_gross_item(tote_item), PurchaseReceivable.last.amount
+    tote_item.reload
+    assert_equal get_gross_item(tote_item, filled = true), PurchaseReceivable.last.amount
 
     posting.update(late_adds_allowed: true)
 

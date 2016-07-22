@@ -64,10 +64,11 @@ class PostingsTest < ActionDispatch::IntegrationTest
     assert_equal posting.units_per_case, posting.num_units_orderable
     assert_equal 1, posting.num_cases_orderable
 
-    assert_equal 2, ActionMailer::Base.deliveries.count
+    #there should be a single email that went out; the order submission email to the producer
+    assert_equal 1, ActionMailer::Base.deliveries.count
     #'verify' that the number '10' shows up which is that 10 units were ordered rather than the 11 that were committed
-    assert_appropriate_email(ActionMailer::Base.deliveries[1], posting.user.get_business_interface.order_email, "Current orders for upcoming deliveries", "10")
-    assert_appropriate_email(ActionMailer::Base.deliveries[1], posting.user.get_business_interface.order_email, "Current orders for upcoming deliveries", "1")
+    assert_appropriate_email(ActionMailer::Base.deliveries[0], posting.user.get_business_interface.order_email, "Current orders for upcoming deliveries", "10")
+    assert_appropriate_email(ActionMailer::Base.deliveries[0], posting.user.get_business_interface.order_email, "Current orders for upcoming deliveries", "1")
 
     #now once farmer delivers we want to verify we partially filled
     fill_report = posting.fill(posting.num_units_orderable)
@@ -121,7 +122,8 @@ class PostingsTest < ActionDispatch::IntegrationTest
     assert_equal 0, posting.num_units_orderable
     assert_equal 0, posting.num_cases_orderable
 
-    assert_equal 1, ActionMailer::Base.deliveries.count
+    #no emails whatsoever should get sent when a no-order posting rolls to the commitment zone
+    assert_equal 0, ActionMailer::Base.deliveries.count
     #verify that no order email (or email of any kind) was sent to producer
     assert_not_email_to(posting.user.get_business_interface.order_email)    
 

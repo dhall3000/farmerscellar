@@ -97,38 +97,33 @@ class RakeTasksTest < BulkBuyer
         email_count = ActionMailer::Base.deliveries.count
 
         if email_count > 0
-          current_order_mail = ActionMailer::Base.deliveries[1]
-          commit_totes_mail = ActionMailer::Base.deliveries[0]
+          current_order_mail = ActionMailer::Base.deliveries[0]          
         end
 
         #this is the first of the postings to enter the commitment zone so there should only be items related to this
         #posting in the total committed tote item count
         if Time.zone.now == @p1.commitment_zone_start
           assert_equal 3, committed_tote_item_count          
-          assert_equal 2, email_count          
+          assert_equal 1, email_count          
           assert_appropriate_email(current_order_mail, @p1.user.email, "Current orders for upcoming deliveries", "Below are orders for your upcoming delivery")
-          assert_appropriate_email(commit_totes_mail, "david@farmerscellar.com", "commit_totes job summary report", "number of tote_items transitioned from AUTHORIZED -> COMMITTED")
         elsif Time.zone.now == @p2.commitment_zone_start         
           #at the time we enter the commitment zone for posting p2 we won't have delivered the items for p1 yet
           #so the total committed tote item count should be all the items for postings p1 and p2        
           assert_equal 4, committed_tote_item_count
-          assert_equal 2, email_count
+          assert_equal 1, email_count
           assert_appropriate_email(current_order_mail, @p2.user.email, "Current orders for upcoming deliveries", "Below are orders for your upcoming delivery")
-          assert_appropriate_email(commit_totes_mail, "david@farmerscellar.com", "commit_totes job summary report", "number of tote_items transitioned from AUTHORIZED -> COMMITTED")
         elsif Time.zone.now == @p3.commitment_zone_start         
           #by the time we get to p3's commitment zone, p1's items should have been tranitioned out of the COMMITTED state
           #so they no longer contribute to the total committed tote item count. it's only p2 and p3 that contribute.        
           assert_equal 3, committed_tote_item_count
-          assert_equal 2, email_count
+          assert_equal 1, email_count
           assert_appropriate_email(current_order_mail, @p3.user.email, "Current orders for upcoming deliveries", "Below are orders for your upcoming delivery")
-          assert_appropriate_email(commit_totes_mail, "david@farmerscellar.com", "commit_totes job summary report", "number of tote_items transitioned from AUTHORIZED -> COMMITTED")
         elsif Time.zone.now == @p4.commitment_zone_start        
           #the weekend has elapsed since p3's delivery, so by the time we get to this monday - p4's delivery - all other
           #tote items should have transitioned out of the committed state        
           assert_equal 1, committed_tote_item_count
-          assert_equal 2, email_count
+          assert_equal 1, email_count
           assert_appropriate_email(current_order_mail, @p4.user.email, "Current orders for upcoming deliveries", "Below are orders for your upcoming delivery")
-          assert_appropriate_email(commit_totes_mail, "david@farmerscellar.com", "commit_totes job summary report", "number of tote_items transitioned from AUTHORIZED -> COMMITTED")
         else
 
           #if it's 10pm...
@@ -376,12 +371,11 @@ class RakeTasksTest < BulkBuyer
         assert_not_equal @committed_count, committed_count
 
         #verify the proper emails were sent
-        assert_equal 3, ActionMailer::Base.deliveries.count        
-        assert_equal "david@farmerscellar.com", ActionMailer::Base.deliveries[0].to[0]
-        assert_equal "f2@f.com", ActionMailer::Base.deliveries[2].to[0]
+        assert_equal 2, ActionMailer::Base.deliveries.count        
+        assert_equal "f2@f.com", ActionMailer::Base.deliveries[1].to[0]
         assert_equal "david@farmerscellar.com", ActionMailer::Base.deliveries[1].bcc[0]
-        assert_equal "f1@f.com", ActionMailer::Base.deliveries[1].to[0]
-        assert_equal "david@farmerscellar.com", ActionMailer::Base.deliveries[2].bcc[0]
+        assert_equal "f1@f.com", ActionMailer::Base.deliveries[0].to[0]
+        assert_equal "david@farmerscellar.com", ActionMailer::Base.deliveries[1].bcc[0]
         ActionMailer::Base.deliveries.clear    
       else         
         #after transition

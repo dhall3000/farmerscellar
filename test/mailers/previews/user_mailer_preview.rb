@@ -81,4 +81,41 @@ class UserMailerPreview < ActionMailer::Preview
     UserMailer.delivery_notification(user, dropsite, tote_items)
   end
 
+  #Preview this email at
+  #http://localhost:3000/rails/mailers/user_mailer/purchase_receipt_various_fill_states
+  def purchase_receipt_various_fill_states
+
+    user = User.find_by(email: "c1@c.com")
+    if user.dropsite.nil?
+      user.set_dropsite(Dropsite.first)
+    end
+    dropsite = user.dropsite
+    tote_items = ToteItem.where(user_id: user.id)
+
+    ti1 = tote_items[0]
+    ti2 = tote_items[1]
+
+    ti1.state = ToteItem.states[:COMMITTED]
+    ti1.transition(:tote_item_filled, {quantity_filled: ti1.quantity})
+    
+    ti2.state = ToteItem.states[:COMMITTED]    
+    ti2.transition(:tote_item_filled, {quantity_filled: ti2.quantity})
+    ti2.quantity = tote_items[1].quantity + 1
+
+    pr1 = ti1.purchase_receivables.last
+    pr2 = ti2.purchase_receivables.last
+
+    #if pr.kind == PurchaseReceivable.kind[:NORMAL] && pr.state == PurchaseReceivable.states[:COMPLETE]        
+    pr1.kind = PurchaseReceivable.kind[:NORMAL]
+    pr1.state = PurchaseReceivable.states[:COMPLETE]
+    pr1.save
+
+    pr2.kind = PurchaseReceivable.kind[:NORMAL]
+    pr2.state = PurchaseReceivable.states[:COMPLETE]
+    pr2.save
+
+    UserMailer.purchase_receipt(user, [ti1, ti2])
+
+  end
+
 end

@@ -249,9 +249,9 @@ class BulkPurchase < ActiveRecord::Base
         amount_previously_purchased = (amount_previously_purchased + gross_amount_payable_to_this_producer).round(2)
         gross_amount_payable = (gross_amount_payable - gross_amount_payable_to_this_producer).round(2)
 
-        purchase.payment_processor_fee_withheld_from_producer = (purchase.payment_processor_fee_withheld_from_producer + get_payment_processor_fee_tote(value[:sub_tote])).round(2)
-        commission = get_commission_tote(value[:sub_tote])
-        net = get_producer_net_tote(value[:sub_tote])
+        purchase.payment_processor_fee_withheld_from_producer = (purchase.payment_processor_fee_withheld_from_producer + get_payment_processor_fee_tote(value[:sub_tote], filled = true)).round(2)
+        commission = get_commission_tote(value[:sub_tote], filled = true)
+        net = get_producer_net_tote(value[:sub_tote], filled = true)
         
         self.commission = (self.commission + commission).round(2)
         self.net = (self.net + net).round(2)
@@ -282,7 +282,7 @@ class BulkPurchase < ActiveRecord::Base
 
       producer_id_payment_order.each do |producer_id|
         sub_tote = purchase_receivable.get_sub_tote(producer_id)        
-        sub_tote_value = get_gross_tote(sub_tote)        
+        sub_tote_value = get_gross_tote(sub_tote, filled = true)        
         sub_tote_value_by_payment_sequenced_producer_id[producer_id] = { sub_tote: sub_tote, sub_tote_value: sub_tote_value }
       end
 
