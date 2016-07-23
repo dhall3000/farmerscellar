@@ -490,9 +490,16 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
         num_closed_postings = posting_recurrence.postings.where(state: Posting.states[:CLOSED]).count
         
         if Time.zone.now < second_last.delivery_date
-          assert second_last.state?(:COMMITMENTZONE)
-          #assert num CLOSED postings is postings.count - 2
-          assert_equal posting_recurrence.postings.count - 2, num_closed_postings          
+          if second_last.total_quantity_authorized_or_committed == 0
+            assert second_last.state?(:CLOSED)
+            #assert num CLOSED postings is postings.count - 2
+            assert_equal posting_recurrence.postings.count - 1, num_closed_postings
+          else
+            assert second_last.state?(:COMMITMENTZONE)
+            #assert num CLOSED postings is postings.count - 2
+            assert_equal posting_recurrence.postings.count - 2, num_closed_postings          
+          end          
+
         elsif Time.zone.now > second_last.delivery_date + 12.hours
 
           if !second_last.state?(:CLOSED)
@@ -757,6 +764,12 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
 
     farmer = users(:f_subscriptions)
     log_in_as(farmer)
+
+    unit = units(:pound)
+
+    if ProducerProductUnitCommission.where(unit: farmer, product: product, unit: unit).count < 1      
+      ppuc = ProducerProductUnitCommission.create(user: farmer, product: product, unit: unit, commission: 0.05)
+    end
     
     delivery_date = next_day_of_week_after(Time.zone.now, 5, 7)
     post postings_path, posting: {
@@ -765,7 +778,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
       price: 2,
       user_id: farmer.id,
       product_id: product.id,
-      unit_id: units(:pound).id,
+      unit_id: unit.id,
       live: true,
       delivery_date: delivery_date,
       commitment_zone_start: delivery_date - 2.days,
@@ -785,8 +798,11 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     frequency = 1
     
     postings << setup_posting_recurrence(products(:apples), frequency)
+    assert postings.last.valid?
     postings << setup_posting_recurrence(products(:lettuce), frequency)
-    postings << setup_posting_recurrence(products(:tomato), frequency)
+    assert postings.last.valid?
+    postings << setup_posting_recurrence(products(:tomato), frequency)   
+    assert postings.last.valid?
 
     return postings
 
