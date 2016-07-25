@@ -33,23 +33,34 @@ class User < ActiveRecord::Base
   has_one :access_code
   has_one :pickup_code
 
-  #these are for if the account_type is either PRODUCER or DISTRIBUTOR
+  #how do the producer/distributor stuff work: it used to be the distributors were 100% not producers and vice versa. but
+  #that got changed. now a producer can be by itself or it can have a parent producer. this also is a bit of a hack.
+  #it fits ok in a situation like Helen the Hen + Baron Farms or Oxbow and the fruit farm they distribute for. But it's hack'ish
+  #for Select Gourmet Foods because they aren't a producer but now they'll be entered as a producer account. oh well, i guess
+  #can't win 'em' all
+
+  #these are for if the account_type is PRODUCER
   #a distributor must have a BusinessInterface
-  #a producer must have either a DISTRIBUTOR or a BusinessInterface
+  #a producer must have either a distributor or a BusinessInterface
   has_one :business_interface
   #if this object is type PRODUCER than it might have a distributor
   belongs_to :distributor, class_name: "User", foreign_key: "distributor_id"
-  #if this object is type DISTRIBUTOR it might have many PRODUCERs
+  #if this object is a distributor it might have many PRODUCERs
   has_many :producers, class_name: "User", foreign_key: "distributor_id"
 
-  #PRODUCERs can have DISTRIBUTORs that have DISTRIBUTORs that have DISTRIBUTORs...
-  #this method is recursive. it will start at the current level and traverse up the DISTRIBUTOR parenthood,
+  def distributor?
+    return account_type_is?(:PRODUCER) && producers.count > 0
+  end
+  
+  #this method is recursive. it will start at the current level and traverse up the distributor parenthood,
   #returning the first BusinessInterface it sees. So...if you start a relationship by dealing directly with
-  #a PRODUCER and so have a BI associated, then later you fetch product for them through a DISTRIBUTOR, you 
-  #have to not only set up the new DISTRIBUTOR association but you also have to nuke the PRODUCER's BI object
-  #more likely though is that you'll 1st deal with a DISTRIBUTOR and then later deal directly with PRODUCER.
-  #in that case you don't necessarily have to nuke the DISTRIBUTOR's BI for things to work correctly. Of course
-  #for cleanliness' sake you should nuke the DISTRIBUTOR association altogether.
+  #a PRODUCER and so have a BI associated, then later you fetch product for them through a distributor, you 
+  #have to not only set up the new distributor association but you also have to nuke the PRODUCER's BI object
+  #more likely though is that you'll 1st deal with a distributor and then later deal directly with PRODUCER.
+  #in that case you don't necessarily have to nuke the distributor's BI for things to work correctly. Of course
+  #for cleanliness' sake you should nuke the distributor association altogether. well maybe not because you probably
+  #won't nuke the distributor relationship all at once. you'll probably just convert one PRODUCER at a time to
+  #direct sourcing and then eventually do away with the distributor entirely.
   def get_business_interface
 
     creditor = get_creditor
@@ -64,7 +75,7 @@ class User < ActiveRecord::Base
 
   def get_creditor
 
-    if !account_type_is?(:PRODUCER) && !account_type_is?(:DISTRIBUTOR)
+    if !account_type_is?(:PRODUCER)
       return nil
     end
 
@@ -161,7 +172,7 @@ class User < ActiveRecord::Base
   end
 
   def self.types
-    {CUSTOMER: 0, PRODUCER: 1, ADMIN: 2, DROPSITE: 3, DISTRIBUTOR: 4}
+    {CUSTOMER: 0, PRODUCER: 1, ADMIN: 2, DROPSITE: 3}
   end
 
   def account_type_is?(type_key)

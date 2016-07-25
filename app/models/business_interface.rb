@@ -4,7 +4,8 @@ class BusinessInterface < ActiveRecord::Base
 
 #HOW TO USE
 #  consider Marty. he's going to have one user for Helen the Hen and another for Baron Farms. but payment for both need to go to marty.davis@whatever.com.
-#  so while HtH and BF are PRODUCER user accounts, there will be a third DISTRIBUTOR user account which will have a businessinterface whose .paypal_email will be marty.davis@whatever.com. so we need to test for this.
+#  HtH and BF are both PRODUCER user accounts. HtH is also a distributor for BF. HtH must then have a BusinessInterface and BF must have HtH as its creditor. That is
+#  BF's distributor_id must point at the HtH account
 
 #  name: put the name of the salutation that you want on email correspondance. For example, "Select Gourmet Foods". this will show up in order emails and payment receipt
 #  order_email_accepted: if this is true, order will get sent to 'order_email'. if this is false emails are hardcoded to 'david@farmerscellar.com' and the greeting also used that email address
@@ -14,7 +15,4 @@ class BusinessInterface < ActiveRecord::Base
 #  paypal_email: same concept as for order_email_accepted. paypal payment will get sent to this address. also, our payment invoice well get sent to this address.
 #  payment_instructions: same concept as for order_email_accepted
 
-  def distributor?
-    return user.account_type_is?(:DISTRIBUTOR)
-  end
 end

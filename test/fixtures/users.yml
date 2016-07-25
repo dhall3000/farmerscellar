@@ -35,7 +35,7 @@ d1:
   name: Bigtime Distributor
   email: d1@d.com
   password_digest: <%= User.digest('dogdog') %>
-  account_type: 4
+  account_type: 1
   activated: true
   activated_at: Time.zone.now
   description: the biggest, the baddest, distributor all over town
@@ -44,7 +44,8 @@ d1:
   state: Washington
   zip: 98033
   phone: 206-588-6579
-  website: www.d1.com  
+  website: www.d1.com
+  farm_name: Bigtime Distributor
 
 f6:
   name: f6

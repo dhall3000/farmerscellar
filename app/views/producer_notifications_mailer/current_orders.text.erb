@@ -8,7 +8,7 @@ Below are orders for your upcoming delivery. If all orders are filled total sale
 
 <% @posting_infos.each do |posting, value| %>
 ---------------------------------------------
-<% if @business_interface.distributor? %>
+<% if @business_interface.user.distributor? %>
 	<% producer = "Producer=#{posting.user.farm_name}," %>
 <% else %>
 	<% producer = "" %>
