@@ -104,7 +104,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
       assert_equal "Item added to tote.", flash[:success]
       assert_redirected_to postings_path
     else
-      assert_equal "#{additional_units_required_to_fill_my_case.to_s} more #{"unit".pluralize(additional_units_required_to_fill_my_case)} required to ship. See below.", flash[:danger]
+      assert_equal "Tote item created but currently won't ship. See below.", flash[:danger]
       assert_redirected_to tote_items_pout_path(id: tote_item.id)    
     end
 

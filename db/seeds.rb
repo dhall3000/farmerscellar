@@ -102,7 +102,8 @@ f4 = User.create!(name:  "f4",
              website: "www.f4.com",
              agreement: 1,
              farm_name: "F4 FARM",
-             beta: false
+             beta: false,
+             order_minimum: 20
              )
 
 AccessCode.create(user: f4, notes: "code for user 4")
@@ -260,11 +261,15 @@ posting_chicken = Posting.create(live: true, delivery_date: next_friday, commitm
 #Oranges
 posting_oranges = Posting.create(live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: product_oranges.id, quantity_available: 100, price: 1.25, user_id: f4.id, unit_id: 8, description: "best oranges ever!")
 #Celery
-posting_celery = Posting.create(product_id_code: "ZXB-9F", units_per_case: 10, live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: product_celery.id, quantity_available: 100, price: 2.50, user_id: f4.id, unit_id: 8, description: "best celery ever!")
+posting_celery = Posting.create(product_id_code: "ZXB-9F", units_per_case: 10, live: true, delivery_date: next_friday, commitment_zone_start: next_friday - 2.days, product_id: product_celery.id, quantity_available: 100, price: 1.00, user_id: f4.id, unit_id: 8, description: "best celery ever!")
 #Avocado
 posting_avocado = Posting.create(live: true, delivery_date: Time.zone.today, commitment_zone_start: Time.zone.today - 2.days, product_id: product_avocado.id, quantity_available: 100, price: 2.29, user_id: f4.id, unit_id: whole.id, description: "best avocado ever!")
 #Basil
 posting_basil = Posting.create(live: true, delivery_date: Time.zone.today, commitment_zone_start: Time.zone.today - 2.days, product_id: product_basil.id, quantity_available: 100, price: 2.97, user_id: f4.id, unit_id: bunch.id, description: "best basil ever!")
+
+posting_recurrence = PostingRecurrence.new(on: true, frequency: 1)
+posting_recurrence.postings << posting_celery
+posting_recurrence.save
 
 posting_recurrence = PostingRecurrence.new(on: true, frequency: 6)
 posting_recurrence.postings << posting_apples

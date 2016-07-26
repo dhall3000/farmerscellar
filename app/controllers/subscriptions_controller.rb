@@ -32,17 +32,52 @@ class SubscriptionsController < ApplicationController
     end
 
     if frequency == 0
-      flash[:success] = "Tote item created"
-      redirect_to postings_path
-      return
+
+      if @tote_item.additional_units_required_to_fill_my_case == 0
+        flash[:success] = "Tote item created"
+        redirect_to postings_path
+        return
+      else
+
+        if @tote_item.will_partially_fill?
+          flash_message = "Tote item created but currently will only partially ship. See below."
+        else
+          flash_message = "Tote item created but currently won't ship. See below."
+        end
+
+        flash[:danger] = flash_message        
+        redirect_to tote_items_pout_path(id: @tote_item.id)
+
+        return
+
+      end
+
     end
 
     @subscription = Subscription.new(frequency: frequency, on: true, user_id: current_user.id, posting_recurrence_id: @posting_recurrence.id, quantity: @tote_item.quantity, paused: false)
     if @subscription.save
       @subscription.tote_items << @tote_item
       @subscription.save
-      flash[:success] = "Subscription created"
-      redirect_to postings_path
+
+      if @tote_item.additional_units_required_to_fill_my_case == 0
+        flash[:success] = "Subscription created"
+        redirect_to postings_path
+        return
+      else                  
+
+        if @tote_item.will_partially_fill?
+          flash_message = "Subscription created but current delivery will only partially ship. See below."
+        else
+          flash_message = "Subscription created but current delivery won't ship. See below."
+        end
+
+        flash[:danger] = flash_message        
+        redirect_to tote_items_pout_path(id: @tote_item.id)
+
+        return
+        
+      end
+
       return
     else
       AdminNotificationMailer.general_message("Subscription failed to create", @subscription.to_yaml).deliver_now

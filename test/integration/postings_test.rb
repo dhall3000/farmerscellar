@@ -178,7 +178,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_template 'tote_items/pout'
     assert_not flash.empty?
-    assert_equal "9 more units required to ship. See below.", flash[:danger]
+    assert_equal "Tote item created but currently will only partially ship. See below.", flash[:danger]
 
     #now authorize
     tote_item.transition(:customer_authorized)
@@ -273,7 +273,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
     assert_template 'tote_items/pout'
 
     assert_not flash.empty?
-    assert_equal "3 more units required to ship. See below.", flash[:danger]
+    assert_equal "Tote item created but currently won't ship. See below.", flash[:danger]
 
     return posting
 

@@ -37,6 +37,17 @@ class ToteItem < ActiveRecord::Base
     return posting.additional_units_required_to_fill_items_case(self)
   end
 
+  #this will tell you if the tote item is crossing a case boundary and hence will only partially fill of nothing changes
+  def will_partially_fill?
+
+    if posting.nil? || posting.units_per_case.nil? || posting.units_per_case < 2
+      return false
+    end
+
+    return ((quantity % posting.units_per_case) + additional_units_required_to_fill_my_case) > posting.units_per_case
+    
+  end
+
   def delivery_date
     
     if posting.nil?

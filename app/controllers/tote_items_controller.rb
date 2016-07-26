@@ -83,14 +83,25 @@ class ToteItemsController < ApplicationController
         return
       else
 
-        if @tote_item.additional_units_required_to_fill_my_case == 0
+        additional_units_required_to_fill_my_case = @tote_item.additional_units_required_to_fill_my_case
+
+        if additional_units_required_to_fill_my_case == 0
           flash[:success] = "Item added to tote."
           redirect_to postings_path
           return
-        else          
-          flash[:danger] = "#{@tote_item.additional_units_required_to_fill_my_case.to_s} more #{"unit".pluralize(@tote_item.additional_units_required_to_fill_my_case)} required to ship. See below."
+        else
+
+          if @tote_item.will_partially_fill?
+            flash_message = "Tote item created but currently will only partially ship. See below."
+          else
+            flash_message = "Tote item created but currently won't ship. See below."
+          end
+
+          flash[:danger] = flash_message
           redirect_to tote_items_pout_path(id: @tote_item.id)
+          
           return
+
         end
         
       end
@@ -120,10 +131,11 @@ class ToteItemsController < ApplicationController
     end
 
     @posting = @tote_item.posting
-    @additional_units_required_to_fill_case = @tote_item.additional_units_required_to_fill_my_case
+    @additional_units_required_to_fill_my_case = @tote_item.additional_units_required_to_fill_my_case
+    @will_partially_fill = @tote_item.will_partially_fill?
 
-    if @additional_units_required_to_fill_case < 1
-      AdminNotificationMailer.general_message("unknown problem. pout message action called but @additional_units_required_to_fill_case < 1", "user id #{current_user.id.to_s} should have seen the pout page. @tote_item.id #{@tote_item.id.to_s}. @additional_units_required_to_fill_case = #{@additional_units_required_to_fill_case.to_s}").deliver_now
+    if @additional_units_required_to_fill_my_case < 1
+      AdminNotificationMailer.general_message("unknown problem. pout message action called but @additional_units_required_to_fill_my_case < 1", "user id #{current_user.id.to_s} should have seen the pout page. @tote_item.id #{@tote_item.id.to_s}. @additional_units_required_to_fill_my_case = #{@additional_units_required_to_fill_my_case.to_s}").deliver_now
       flash.discard
       redirect_to postings_path
       return

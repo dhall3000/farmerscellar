@@ -11,11 +11,21 @@
           </div>
           <div class="panel-body" role="tabpanel">
 
-            <p class="alert alert-danger">
-              <span class="alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Additional <%= "unit".pluralize(@tote_item.additional_units_required_to_fill_my_case) %> required to ship:  <%= @tote_item.additional_units_required_to_fill_my_case.to_s %>
-            </p>
+            <% if @additional_units_required_to_fill_my_case > 0 %>              
 
-						<p>The case that your items are in is not yet full. You can help fill it by recruiting your community or ordering more yourself.</p>
+              <% if @will_partially_fill %>
+                <% fully = " fully" %>
+              <% else %>
+                <% fully = "" %>
+              <% end %>              
+
+              <p class="alert alert-danger">
+                <span class="alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Additional <%= "unit".pluralize(@additional_units_required_to_fill_my_case) %> required to<%= fully%> ship:  <%= @additional_units_required_to_fill_my_case.to_s %>
+              </p>
+
+              <p>The case that your items are in is not yet full. You can help fill it by recruiting your community or ordering more yourself.</p>
+
+            <% end %>
 
           </div>
         </div>
