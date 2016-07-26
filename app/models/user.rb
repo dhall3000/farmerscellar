@@ -87,6 +87,100 @@ class User < ActiveRecord::Base
 
   end
 
+  def get_postings_orderable(postings_presently_transitioning_to_commitment_zone)
+
+    if !account_type_is?(:PRODUCER)
+      return nil
+    end
+
+    postings_by_producer = {}
+    postings_all = postings_presently_transitioning_to_commitment_zone
+
+    postings_all.each do |posting|
+
+      if !postings_by_producer.has_key?(posting.user)
+        postings_by_producer[posting.user] = []
+      end
+
+      postings_by_producer[posting.user] << posting
+
+    end
+
+    producer_net_total = 0
+    postings_to_order = []
+    postings_to_close = []
+
+    postings_by_producer.each do |producer, postings_for_producer|
+
+      #{postings_to_order: postings_to_order, postings_to_close: postings_to_close, postings_total_producer_net: producer_net_total}
+      ret = producer.get_postings_orderable_for_producer(postings_for_producer)
+
+      if ret != nil        
+        producer_net_total = (producer_net_total + ret[:postings_total_producer_net]).round(2)
+        postings_to_order.concat ret[:postings_to_order]
+        postings_to_close.concat ret[:postings_to_close]
+      end
+
+    end
+
+    if order_minimum_met?(producer_net_total)
+      return {postings_to_order: postings_to_order, postings_to_close: postings_to_close, postings_total_producer_net: producer_net_total}
+    else
+      return {postings_to_order: [], postings_to_close: postings_all, postings_total_producer_net: 0}
+    end
+
+  end
+
+  def get_postings_orderable_for_producer(postings_presently_transitioning_to_commitment_zone)
+
+    if !account_type_is?(:PRODUCER)
+      return nil
+    end
+
+    postings = postings_presently_transitioning_to_commitment_zone
+
+    producer_net_total = 0
+    postings_to_order = []
+    postings_to_close = []
+
+    postings.each do |posting|
+
+      #we only want postings for this producer
+      if posting.user != self
+        next
+      end
+
+      if posting.submit_order_to_creditor?
+        producer_net_total = (producer_net_total + posting.get_producer_net_posting).round(2)
+        postings_to_order << posting          
+      else
+        postings_to_close << posting
+      end
+
+    end
+
+    if order_minimum_met?(producer_net_total)
+      return {postings_to_order: postings_to_order, postings_to_close: postings_to_close, postings_total_producer_net: producer_net_total}
+    else
+      return {postings_to_order: [], postings_to_close: postings, postings_total_producer_net: 0}
+    end
+
+  end
+
+  def order_minimum_met?(producer_net_total)
+
+    if self.order_minimum.nil?            
+      return true
+    end
+
+    if producer_net_total >= self.order_minimum
+      return true
+    end
+
+    return false
+
+  end  
+
   def tote_items_to_pickup
     #this should return a set of toteitems that have been delivered but not picked up yet
 

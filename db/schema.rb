@@ -603,6 +603,7 @@ ActiveRecord::Schema.define(version: 20160725204236) do
     t.boolean  "beta"
     t.integer  "zip"
     t.integer  "distributor_id"
+    t.float    "order_minimum",     default: 0.0,   null: false
   end
 
   add_index "users", ["account_type"], name: "index_users_on_account_type"

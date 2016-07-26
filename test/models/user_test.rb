@@ -10,6 +10,539 @@ class UserTest < ActiveSupport::TestCase
     @d1 = users(:d1)
   end
 
+  test "should submit orders when producer has no order minimum" do
+
+    producer = create_producer("producer", "producer@p.com", "WA", 98033, "www.producer.com", "PRODUCER FARMS")
+
+    #create postings
+    price_celery = 2.50
+    posting_celery = create_posting(producer, price_celery, product = products(:celery))
+
+    price_apples = 2.00
+    posting_apples = create_posting(producer, price_apples, product = products(:apples))    
+
+    #create tote items
+    bob = create_user("bob", "bob@b.com", 98033)
+    chris = create_user("chris", "chris@c.com", 98044)
+
+    ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
+    ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
+    ti_chris_celery = create_tote_item(posting_celery, quantity = 6, chris)
+    ti_chris_celery.update(state: ToteItem.states[:COMMITTED])
+
+    ti_bob_apples = create_tote_item(posting_apples, quantity = 2, bob)
+    ti_bob_apples.update(state: ToteItem.states[:COMMITTED])    
+    ti_chris_apples = create_tote_item(posting_apples, quantity = 4, chris)
+    ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
+
+    #verify get_producer_net_posting value
+    gross_celery = 22.50
+    commission_per_unit_celery = 0.13
+    payment_processor_fee_unit_celery = 0.09
+    producer_net_unit_celery = (price_celery - commission_per_unit_celery - payment_processor_fee_unit_celery).round(2)
+    assert_equal 2.28, producer_net_unit_celery
+    assert_equal producer_net_unit_celery, posting_celery.get_producer_net_unit
+    expected_producer_net_celery = 20.52
+    assert_equal expected_producer_net_celery, posting_celery.get_producer_net_posting
+
+    gross_apples = 12
+    commission_per_unit_apples = 0.10
+    payment_processor_fee_unit_apples = 0.07
+    producer_net_unit_apples = (price_apples - commission_per_unit_apples - payment_processor_fee_unit_apples).round(2)
+    assert_equal 1.83, producer_net_unit_apples
+    assert_equal producer_net_unit_apples, posting_apples.get_producer_net_unit
+    expected_producer_net_apples = 10.98
+    assert_equal expected_producer_net_apples, posting_apples.get_producer_net_posting
+
+    producer_net = posting_apples.get_producer_net_posting + posting_celery.get_producer_net_posting
+    expected_producer_net = 31.50
+    assert_equal expected_producer_net, producer_net
+
+    #get_postings_orderable(postings_presently_transitioning_to_commitment_zone) should return postings
+    report = producer.get_postings_orderable([posting_celery, posting_apples])
+    #verify all postings returned
+    assert_equal report[:postings_to_order].first, posting_celery
+    assert_equal report[:postings_to_order].last, posting_apples
+    assert_equal 0, report[:postings_to_close].count
+    #verify total order amount    
+    assert_equal expected_producer_net, report[:postings_total_producer_net]
+
+  end
+
+  test "should submit orders when total producer net meets producer order minimum" do
+    producer = create_producer("producer", "producer@p.com", "WA", 98033, "www.producer.com", "PRODUCER FARMS")
+
+    order_minimum = 30
+    producer.update(order_minimum: order_minimum)
+    assert_equal order_minimum, producer.reload.order_minimum
+
+    #create postings
+    price_celery = 2.50
+    posting_celery = create_posting(producer, price_celery, product = products(:celery))
+
+    price_apples = 2.00
+    posting_apples = create_posting(producer, price_apples, product = products(:apples))    
+
+    #create tote items
+    bob = create_user("bob", "bob@b.com", 98033)
+    chris = create_user("chris", "chris@c.com", 98044)
+
+    ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
+    ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
+    ti_chris_celery = create_tote_item(posting_celery, quantity = 6, chris)
+    ti_chris_celery.update(state: ToteItem.states[:COMMITTED])
+
+    ti_bob_apples = create_tote_item(posting_apples, quantity = 2, bob)
+    ti_bob_apples.update(state: ToteItem.states[:COMMITTED])    
+    ti_chris_apples = create_tote_item(posting_apples, quantity = 4, chris)
+    ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
+
+    #verify get_producer_net_posting value
+    gross_celery = 22.50
+    commission_per_unit_celery = 0.13
+    payment_processor_fee_unit_celery = 0.09
+    producer_net_unit_celery = (price_celery - commission_per_unit_celery - payment_processor_fee_unit_celery).round(2)
+    assert_equal 2.28, producer_net_unit_celery
+    assert_equal producer_net_unit_celery, posting_celery.get_producer_net_unit
+    expected_producer_net_celery = 20.52
+    assert_equal expected_producer_net_celery, posting_celery.get_producer_net_posting
+
+    gross_apples = 12
+    commission_per_unit_apples = 0.10
+    payment_processor_fee_unit_apples = 0.07
+    producer_net_unit_apples = (price_apples - commission_per_unit_apples - payment_processor_fee_unit_apples).round(2)
+    assert_equal 1.83, producer_net_unit_apples
+    assert_equal producer_net_unit_apples, posting_apples.get_producer_net_unit
+    expected_producer_net_apples = 10.98
+    assert_equal expected_producer_net_apples, posting_apples.get_producer_net_posting
+
+    producer_net = posting_apples.get_producer_net_posting + posting_celery.get_producer_net_posting
+    expected_producer_net = 31.50
+    assert_equal expected_producer_net, producer_net
+
+    #get_postings_orderable(postings_presently_transitioning_to_commitment_zone) should return postings
+    report = producer.get_postings_orderable([posting_celery, posting_apples])
+    #verify all postings returned
+    assert_equal report[:postings_to_order].first, posting_celery
+    assert_equal report[:postings_to_order].last, posting_apples
+    assert_equal 0, report[:postings_to_close].count
+    #verify total order amount    
+    assert_equal expected_producer_net, report[:postings_total_producer_net]
+  end
+
+  test "should not submit orders when total producer net is below producer order minimum" do
+    producer = create_producer("producer", "producer@p.com", "WA", 98033, "www.producer.com", "PRODUCER FARMS")
+
+    order_minimum = 32
+    producer.update(order_minimum: order_minimum)
+    assert_equal order_minimum, producer.reload.order_minimum
+
+    #create postings
+    price_celery = 2.50
+    posting_celery = create_posting(producer, price_celery, product = products(:celery))
+
+    price_apples = 2.00
+    posting_apples = create_posting(producer, price_apples, product = products(:apples))    
+
+    #create tote items
+    bob = create_user("bob", "bob@b.com", 98033)
+    chris = create_user("chris", "chris@c.com", 98044)
+
+    ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
+    ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
+    ti_chris_celery = create_tote_item(posting_celery, quantity = 6, chris)
+    ti_chris_celery.update(state: ToteItem.states[:COMMITTED])
+
+    ti_bob_apples = create_tote_item(posting_apples, quantity = 2, bob)
+    ti_bob_apples.update(state: ToteItem.states[:COMMITTED])    
+    ti_chris_apples = create_tote_item(posting_apples, quantity = 4, chris)
+    ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
+
+    #verify get_producer_net_posting value
+    gross_celery = 22.50
+    commission_per_unit_celery = 0.13
+    payment_processor_fee_unit_celery = 0.09
+    producer_net_unit_celery = (price_celery - commission_per_unit_celery - payment_processor_fee_unit_celery).round(2)
+    assert_equal 2.28, producer_net_unit_celery
+    assert_equal producer_net_unit_celery, posting_celery.get_producer_net_unit
+    expected_producer_net_celery = 20.52
+    assert_equal expected_producer_net_celery, posting_celery.get_producer_net_posting
+
+    gross_apples = 12
+    commission_per_unit_apples = 0.10
+    payment_processor_fee_unit_apples = 0.07
+    producer_net_unit_apples = (price_apples - commission_per_unit_apples - payment_processor_fee_unit_apples).round(2)
+    assert_equal 1.83, producer_net_unit_apples
+    assert_equal producer_net_unit_apples, posting_apples.get_producer_net_unit
+    expected_producer_net_apples = 10.98
+    assert_equal expected_producer_net_apples, posting_apples.get_producer_net_posting
+
+    producer_net = posting_apples.get_producer_net_posting + posting_celery.get_producer_net_posting
+    expected_producer_net = 31.50
+    assert_equal expected_producer_net, producer_net
+
+    #get_postings_orderable(postings_presently_transitioning_to_commitment_zone) should return postings
+    report = producer.get_postings_orderable([posting_celery, posting_apples])
+    #verify all postings returned
+    assert_equal 0, report[:postings_to_order].count
+    assert_equal report[:postings_to_close].first, posting_celery
+    assert_equal report[:postings_to_close].last, posting_apples
+    #verify total order amount    
+    assert_equal 0, report[:postings_total_producer_net]
+  end
+
+  test "should submit orders when distributor has no order minimum" do
+    distributor = create_producer("distributor", "distributor@d.com", "WA", 98033, "www.distributor.com", "BIGTIME DISTRIBUTOR GUY")
+    producer1 = create_producer("producer1", "producer1@p.com", "WA", 98033, "www.producer1.com", "producer1 FARMS")
+    producer1.distributor = distributor
+    producer1.save
+    producer2 = create_producer("producer2", "producer2@p.com", "WA", 98033, "www.producer2.com", "producer2 FARMS")
+    producer2.distributor = distributor
+    producer2.save
+
+    #create postings
+    price_celery = 2.50
+    posting_celery = create_posting(producer1, price_celery, product = products(:celery))
+
+    price_apples = 2.00
+    posting_apples = create_posting(producer2, price_apples, product = products(:apples))    
+
+    #create tote items
+    bob = create_user("bob", "bob@b.com", 98033)
+    chris = create_user("chris", "chris@c.com", 98044)
+
+    ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
+    ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
+    ti_chris_celery = create_tote_item(posting_celery, quantity = 6, chris)
+    ti_chris_celery.update(state: ToteItem.states[:COMMITTED])
+
+    ti_bob_apples = create_tote_item(posting_apples, quantity = 2, bob)
+    ti_bob_apples.update(state: ToteItem.states[:COMMITTED])    
+    ti_chris_apples = create_tote_item(posting_apples, quantity = 4, chris)
+    ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
+
+    #verify get_producer_net_posting value
+    gross_celery = 22.50
+    commission_per_unit_celery = 0.13
+    payment_processor_fee_unit_celery = 0.09
+    producer_net_unit_celery = (price_celery - commission_per_unit_celery - payment_processor_fee_unit_celery).round(2)
+    assert_equal 2.28, producer_net_unit_celery
+    assert_equal producer_net_unit_celery, posting_celery.get_producer_net_unit
+    expected_producer_net_celery = 20.52
+    assert_equal expected_producer_net_celery, posting_celery.get_producer_net_posting
+
+    gross_apples = 12
+    commission_per_unit_apples = 0.10
+    payment_processor_fee_unit_apples = 0.07
+    producer_net_unit_apples = (price_apples - commission_per_unit_apples - payment_processor_fee_unit_apples).round(2)
+    assert_equal 1.83, producer_net_unit_apples
+    assert_equal producer_net_unit_apples, posting_apples.get_producer_net_unit
+    expected_producer_net_apples = 10.98
+    assert_equal expected_producer_net_apples, posting_apples.get_producer_net_posting
+
+    producer_net = posting_apples.get_producer_net_posting + posting_celery.get_producer_net_posting
+    expected_producer_net = 31.50
+    assert_equal expected_producer_net, producer_net
+
+    #get_postings_orderable(postings_presently_transitioning_to_commitment_zone) should return postings
+    report = distributor.get_postings_orderable([posting_celery, posting_apples])
+    #verify all postings returned
+    assert_equal report[:postings_to_order].first, posting_celery
+    assert_equal report[:postings_to_order].last, posting_apples
+    assert_equal 0, report[:postings_to_close].count
+    #verify total order amount    
+    assert_equal expected_producer_net, report[:postings_total_producer_net]
+  end
+
+  test "should submit orders when producer orders meet distributor order minimum" do
+    distributor = create_producer("distributor", "distributor@d.com", "WA", 98033, "www.distributor.com", "BIGTIME DISTRIBUTOR GUY")
+    order_minimum = 30
+    distributor.update(order_minimum: order_minimum)
+    assert_equal order_minimum, distributor.reload.order_minimum
+    producer1 = create_producer("producer1", "producer1@p.com", "WA", 98033, "www.producer1.com", "producer1 FARMS")
+    producer1.distributor = distributor
+    producer1.save
+    producer2 = create_producer("producer2", "producer2@p.com", "WA", 98033, "www.producer2.com", "producer2 FARMS")
+    producer2.distributor = distributor
+    producer2.save
+
+    #create postings
+    price_celery = 2.50
+    posting_celery = create_posting(producer1, price_celery, product = products(:celery))
+
+    price_apples = 2.00
+    posting_apples = create_posting(producer2, price_apples, product = products(:apples))    
+
+    #create tote items
+    bob = create_user("bob", "bob@b.com", 98033)
+    chris = create_user("chris", "chris@c.com", 98044)
+
+    ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
+    ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
+    ti_chris_celery = create_tote_item(posting_celery, quantity = 6, chris)
+    ti_chris_celery.update(state: ToteItem.states[:COMMITTED])
+
+    ti_bob_apples = create_tote_item(posting_apples, quantity = 2, bob)
+    ti_bob_apples.update(state: ToteItem.states[:COMMITTED])    
+    ti_chris_apples = create_tote_item(posting_apples, quantity = 4, chris)
+    ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
+
+    #verify get_producer_net_posting value
+    gross_celery = 22.50
+    commission_per_unit_celery = 0.13
+    payment_processor_fee_unit_celery = 0.09
+    producer_net_unit_celery = (price_celery - commission_per_unit_celery - payment_processor_fee_unit_celery).round(2)
+    assert_equal 2.28, producer_net_unit_celery
+    assert_equal producer_net_unit_celery, posting_celery.get_producer_net_unit
+    expected_producer_net_celery = 20.52
+    assert_equal expected_producer_net_celery, posting_celery.get_producer_net_posting
+
+    gross_apples = 12
+    commission_per_unit_apples = 0.10
+    payment_processor_fee_unit_apples = 0.07
+    producer_net_unit_apples = (price_apples - commission_per_unit_apples - payment_processor_fee_unit_apples).round(2)
+    assert_equal 1.83, producer_net_unit_apples
+    assert_equal producer_net_unit_apples, posting_apples.get_producer_net_unit
+    expected_producer_net_apples = 10.98
+    assert_equal expected_producer_net_apples, posting_apples.get_producer_net_posting
+
+    producer_net = posting_apples.get_producer_net_posting + posting_celery.get_producer_net_posting
+    expected_producer_net = 31.50
+    assert_equal expected_producer_net, producer_net
+
+    #get_postings_orderable(postings_presently_transitioning_to_commitment_zone) should return postings
+    report = distributor.get_postings_orderable([posting_celery, posting_apples])
+    #verify all postings returned
+    assert_equal report[:postings_to_order].first, posting_celery
+    assert_equal report[:postings_to_order].last, posting_apples
+    assert_equal 0, report[:postings_to_close].count
+    #verify total order amount    
+    assert_equal expected_producer_net, report[:postings_total_producer_net]
+  end
+  
+  test "should not submit orders when producer orders do not meet distributor order minimum" do
+    distributor = create_producer("distributor", "distributor@d.com", "WA", 98033, "www.distributor.com", "BIGTIME DISTRIBUTOR GUY")
+    order_minimum = 32
+    distributor.update(order_minimum: order_minimum)
+    assert_equal order_minimum, distributor.reload.order_minimum
+    producer1 = create_producer("producer1", "producer1@p.com", "WA", 98033, "www.producer1.com", "producer1 FARMS")
+    producer1.distributor = distributor
+    producer1.save
+    producer2 = create_producer("producer2", "producer2@p.com", "WA", 98033, "www.producer2.com", "producer2 FARMS")
+    producer2.distributor = distributor
+    producer2.save
+
+    #create postings
+    price_celery = 2.50
+    posting_celery = create_posting(producer1, price_celery, product = products(:celery))
+
+    price_apples = 2.00
+    posting_apples = create_posting(producer2, price_apples, product = products(:apples))    
+
+    #create tote items
+    bob = create_user("bob", "bob@b.com", 98033)
+    chris = create_user("chris", "chris@c.com", 98044)
+
+    ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
+    ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
+    ti_chris_celery = create_tote_item(posting_celery, quantity = 6, chris)
+    ti_chris_celery.update(state: ToteItem.states[:COMMITTED])
+
+    ti_bob_apples = create_tote_item(posting_apples, quantity = 2, bob)
+    ti_bob_apples.update(state: ToteItem.states[:COMMITTED])    
+    ti_chris_apples = create_tote_item(posting_apples, quantity = 4, chris)
+    ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
+
+    #verify get_producer_net_posting value
+    gross_celery = 22.50
+    commission_per_unit_celery = 0.13
+    payment_processor_fee_unit_celery = 0.09
+    producer_net_unit_celery = (price_celery - commission_per_unit_celery - payment_processor_fee_unit_celery).round(2)
+    assert_equal 2.28, producer_net_unit_celery
+    assert_equal producer_net_unit_celery, posting_celery.get_producer_net_unit
+    expected_producer_net_celery = 20.52
+    assert_equal expected_producer_net_celery, posting_celery.get_producer_net_posting
+
+    gross_apples = 12
+    commission_per_unit_apples = 0.10
+    payment_processor_fee_unit_apples = 0.07
+    producer_net_unit_apples = (price_apples - commission_per_unit_apples - payment_processor_fee_unit_apples).round(2)
+    assert_equal 1.83, producer_net_unit_apples
+    assert_equal producer_net_unit_apples, posting_apples.get_producer_net_unit
+    expected_producer_net_apples = 10.98
+    assert_equal expected_producer_net_apples, posting_apples.get_producer_net_posting
+
+    producer_net = posting_apples.get_producer_net_posting + posting_celery.get_producer_net_posting
+    expected_producer_net = 31.50
+    assert_equal expected_producer_net, producer_net
+
+    #get_postings_orderable(postings_presently_transitioning_to_commitment_zone) should return postings
+    report = distributor.get_postings_orderable([posting_celery, posting_apples])
+    #verify all postings returned
+    assert_equal 0, report[:postings_to_order].count
+
+    assert_equal report[:postings_to_close].first, posting_celery
+    assert_equal report[:postings_to_close].last, posting_apples    
+    #verify total order amount    
+    assert_equal 0, report[:postings_total_producer_net]
+  end
+
+  test "should exclude producer from distributor order submission when producer order minimum is not met" do
+    distributor = create_producer("distributor", "distributor@d.com", "WA", 98033, "www.distributor.com", "BIGTIME DISTRIBUTOR GUY")
+    distributor_order_minimum = 10
+    distributor.update(order_minimum: distributor_order_minimum)
+    assert_equal distributor_order_minimum, distributor.reload.order_minimum
+
+    producer1 = create_producer("producer1", "producer1@p.com", "WA", 98033, "www.producer1.com", "producer1 FARMS")
+    producer1.distributor = distributor
+    producer1.save
+    producer1_order_minimum = 25
+    producer1.update(order_minimum: producer1_order_minimum)
+    assert_equal producer1_order_minimum, producer1.reload.order_minimum
+
+    producer2 = create_producer("producer2", "producer2@p.com", "WA", 98033, "www.producer2.com", "producer2 FARMS")
+    producer2.distributor = distributor
+    producer2.save
+
+    #create postings
+    price_celery = 2.50
+    posting_celery = create_posting(producer1, price_celery, product = products(:celery))
+
+    price_apples = 2.00
+    posting_apples = create_posting(producer2, price_apples, product = products(:apples))    
+
+    #create tote items
+    bob = create_user("bob", "bob@b.com", 98033)
+    chris = create_user("chris", "chris@c.com", 98044)
+
+    ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
+    ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
+    ti_chris_celery = create_tote_item(posting_celery, quantity = 6, chris)
+    ti_chris_celery.update(state: ToteItem.states[:COMMITTED])
+
+    ti_bob_apples = create_tote_item(posting_apples, quantity = 2, bob)
+    ti_bob_apples.update(state: ToteItem.states[:COMMITTED])    
+    ti_chris_apples = create_tote_item(posting_apples, quantity = 4, chris)
+    ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
+
+    #verify get_producer_net_posting value
+    gross_celery = 22.50
+    commission_per_unit_celery = 0.13
+    payment_processor_fee_unit_celery = 0.09
+    producer_net_unit_celery = (price_celery - commission_per_unit_celery - payment_processor_fee_unit_celery).round(2)
+    assert_equal 2.28, producer_net_unit_celery
+    assert_equal producer_net_unit_celery, posting_celery.get_producer_net_unit
+    expected_producer_net_celery = 20.52
+    assert_equal expected_producer_net_celery, posting_celery.get_producer_net_posting
+
+    gross_apples = 12
+    commission_per_unit_apples = 0.10
+    payment_processor_fee_unit_apples = 0.07
+    producer_net_unit_apples = (price_apples - commission_per_unit_apples - payment_processor_fee_unit_apples).round(2)
+    assert_equal 1.83, producer_net_unit_apples
+    assert_equal producer_net_unit_apples, posting_apples.get_producer_net_unit
+    expected_producer_net_apples = 10.98
+    assert_equal expected_producer_net_apples, posting_apples.get_producer_net_posting
+
+    producer_net = posting_apples.get_producer_net_posting + posting_celery.get_producer_net_posting
+    expected_producer_net = 31.50
+    assert_equal expected_producer_net, producer_net
+
+    #get_postings_orderable(postings_presently_transitioning_to_commitment_zone) should return postings
+    report = distributor.get_postings_orderable([posting_celery, posting_apples])
+    #verify all postings returned
+    assert_equal 1, report[:postings_to_order].count
+    assert_equal posting_apples, report[:postings_to_order].last
+
+    assert_equal 1, report[:postings_to_close].count
+    assert_equal posting_celery, report[:postings_to_close].last
+
+    #verify total order amount    
+    assert_equal expected_producer_net_apples, report[:postings_total_producer_net]
+  end
+
+  test "should submit orders properly when distributor is itself a producer" do
+    distributor = create_producer("distributor", "distributor@d.com", "WA", 98033, "www.distributor.com", "BIGTIME DISTRIBUTOR GUY")
+    producer1 = create_producer("producer1", "producer1@p.com", "WA", 98033, "www.producer1.com", "producer1 FARMS")
+    producer1.distributor = distributor
+    producer1.save
+    producer2 = create_producer("producer2", "producer2@p.com", "WA", 98033, "www.producer2.com", "producer2 FARMS")
+    producer2.distributor = distributor
+    producer2.save
+
+    #create postings
+    price_milk = 10
+    posting_milk = create_posting(distributor, price_milk, product = products(:milk))
+
+    price_celery = 2.50
+    posting_celery = create_posting(producer1, price_celery, product = products(:celery))
+
+    price_apples = 2.00
+    posting_apples = create_posting(producer2, price_apples, product = products(:apples))    
+
+    #create tote items
+    bob = create_user("bob", "bob@b.com", 98033)
+    chris = create_user("chris", "chris@c.com", 98044)
+
+    ti_bob_milk = create_tote_item(posting_milk, quantity = 1, bob)
+    ti_bob_milk.update(state: ToteItem.states[:COMMITTED])
+
+    ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
+    ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
+    ti_chris_celery = create_tote_item(posting_celery, quantity = 6, chris)
+    ti_chris_celery.update(state: ToteItem.states[:COMMITTED])
+
+    ti_bob_apples = create_tote_item(posting_apples, quantity = 2, bob)
+    ti_bob_apples.update(state: ToteItem.states[:COMMITTED])    
+    ti_chris_apples = create_tote_item(posting_apples, quantity = 4, chris)
+    ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
+
+    #verify get_producer_net_posting value
+    gross_milk = price_milk
+    commission_per_unit_milk = 0.50
+    payment_processor_fee_unit_milk = 0.35
+    producer_net_unit_milk = (price_milk - commission_per_unit_milk - payment_processor_fee_unit_milk).round(2)
+    assert_equal 9.15, producer_net_unit_milk
+    assert_equal producer_net_unit_milk, posting_milk.get_producer_net_unit
+    expected_producer_net_milk = 9.15
+    assert_equal expected_producer_net_milk, posting_milk.get_producer_net_posting    
+
+    gross_celery = 22.50
+    commission_per_unit_celery = 0.13
+    payment_processor_fee_unit_celery = 0.09
+    producer_net_unit_celery = (price_celery - commission_per_unit_celery - payment_processor_fee_unit_celery).round(2)
+    assert_equal 2.28, producer_net_unit_celery
+    assert_equal producer_net_unit_celery, posting_celery.get_producer_net_unit
+    expected_producer_net_celery = 20.52
+    assert_equal expected_producer_net_celery, posting_celery.get_producer_net_posting
+
+    gross_apples = 12
+    commission_per_unit_apples = 0.10
+    payment_processor_fee_unit_apples = 0.07
+    producer_net_unit_apples = (price_apples - commission_per_unit_apples - payment_processor_fee_unit_apples).round(2)
+    assert_equal 1.83, producer_net_unit_apples
+    assert_equal producer_net_unit_apples, posting_apples.get_producer_net_unit
+    expected_producer_net_apples = 10.98
+    assert_equal expected_producer_net_apples, posting_apples.get_producer_net_posting
+
+    producer_net = posting_apples.get_producer_net_posting + posting_celery.get_producer_net_posting + posting_milk.get_producer_net_posting
+    expected_producer_net = 40.65
+    assert_equal expected_producer_net, producer_net
+
+    #get_postings_orderable(postings_presently_transitioning_to_commitment_zone) should return postings
+    report = distributor.get_postings_orderable([posting_celery, posting_apples, posting_milk])
+    #verify all postings returned
+    assert_equal 0, report[:postings_to_close].count
+
+    assert_equal 3, report[:postings_to_order].count
+    assert_equal posting_celery.product.name, report[:postings_to_order].first.product.name
+    assert_equal posting_apples.product.name, report[:postings_to_order].second.product.name
+    assert_equal posting_milk.product.name, report[:postings_to_order].last.product.name
+        
+    #verify total order amount    
+    assert_equal expected_producer_net, report[:postings_total_producer_net]
+  end
+
   test "producer without distributor should have business interface" do
     assert_not @f8.get_business_interface.nil?
     assert_equal "f8order_email@f.com", @f8.get_business_interface.order_email

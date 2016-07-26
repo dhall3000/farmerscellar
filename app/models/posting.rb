@@ -20,7 +20,7 @@ class Posting < ActiveRecord::Base
   validate :delivery_date_not_sunday, :commitment_zone_start_must_be_before_delivery_date, :commission_is_set
   before_create :delivery_date_must_be_after_today
 
-  validates_presence_of :user, :product, :unit
+  validates_presence_of :user, :product, :unit  
 
   def get_producer_net_unit
     producer_net_unit = price - commission_per_unit - ToteItemsController.helpers.get_payment_processor_fee_unit(price)
@@ -37,6 +37,10 @@ class Posting < ActiveRecord::Base
 
     return producer_net_case
 
+  end
+
+  def get_producer_net_posting
+    return (num_units_orderable * get_producer_net_unit).round(2)
   end
 
   def commission_per_unit
@@ -182,15 +186,18 @@ class Posting < ActiveRecord::Base
 
   def submit_order_to_creditor?
 
-    #above packing minimum (at least one unit (or 1 case if cases are in effect))
-    #above creditor order min?
-    #above run order min?
+    #packing minimum met?(at least one unit (or 1 case if cases are in effect))
+    if !packing_minimum_met?
+      return false
+    end
 
-    return above_packing_minimum?
+    #posting order minimum (if any - rare) met? (currently not implemented)
+
+    return true
     
   end
 
-  def above_packing_minimum?
+  def packing_minimum_met?
     if units_per_case.nil? || units_per_case < 2
       return total_quantity_authorized_or_committed > 0
     else
@@ -268,9 +275,17 @@ class Posting < ActiveRecord::Base
       tis = tote_items
     end
     
-    authorized_or_committed_tote_items = tis.where("state = ? or state = ?", ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED])
+    return authorized_or_committed_tote_items(tis).sum(:quantity)    
 
-    return authorized_or_committed_tote_items.sum(:quantity)
+  end
+
+  def authorized_or_committed_tote_items(tis = nil)
+
+    if tis.nil?
+      tis = tote_items
+    end
+
+    return tis.where("state = ? or state = ?", ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED])
 
   end
 

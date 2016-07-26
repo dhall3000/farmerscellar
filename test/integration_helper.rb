@@ -7,30 +7,6 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     assert_equal 0, Posting.count
   end
 
-  #days_from_now can be any integer, positive, zero or negative
-  def get_delivery_date(days_from_now)
-
-    today = Time.zone.now.midnight
-    delivery_date = today + days_from_now.days
-
-    if delivery_date.sunday?
-      delivery_date += 1.day
-    end
-
-    return delivery_date
-
-  end
-
-  def create_commission(farmer, product, unit, commission)    
-    
-    ppuc = ProducerProductUnitCommission.new(user: farmer, product: product, unit: unit, commission: commission)
-    assert ppuc.valid?
-    assert ppuc.save
-
-    return ppuc
-
-  end
-
   def create_posting(farmer, price, product, unit, delivery_date, commitment_zone_start, units_per_case)
 
     posting_params = {
