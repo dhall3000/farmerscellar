@@ -150,7 +150,7 @@ class User < ActiveRecord::Base
         next
       end
 
-      if posting.submit_order_to_creditor?
+      if posting.include_in_order?
         producer_net_total = (producer_net_total + posting.get_producer_net_posting).round(2)
         postings_to_order << posting          
       else

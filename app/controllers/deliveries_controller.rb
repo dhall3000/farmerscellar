@@ -5,9 +5,8 @@ class DeliveriesController < ApplicationController
 
     prod_mode = true
 
-    #get postings that have no deliveries and whose delivery date is before tomorrow and that have toteitems in a deliverable state
-    #-delivery date is before tomorrow
-    postings1 = Posting.where("delivery_date < ?", Time.zone.now)
+    #get postings whose commmitment_zone_start we're already past and who don't have any deliveries and that have toteitems in a deliverable state
+    postings1 = Posting.where("commitment_zone_start < ?", Time.zone.now)
 
     if prod_mode
       #-don't have any delivery objects associated

@@ -59,7 +59,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
 
     assert_equal 1, posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], posting.tote_items.first.state
-    assert posting.submit_order_to_creditor?
+    assert posting.include_in_order?
     assert_equal posting.units_per_case + 1, posting.total_quantity_authorized_or_committed
     assert_equal posting.units_per_case, posting.num_units_orderable
     assert_equal 1, posting.num_cases_orderable
@@ -117,7 +117,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
     posting.reload
     assert_equal 1, posting.tote_items.count
     assert_equal ToteItem.states[:NOTFILLED], posting.tote_items.first.state
-    assert_not posting.submit_order_to_creditor?
+    assert_not posting.include_in_order?
     assert_equal 0, posting.total_quantity_authorized_or_committed
     assert_equal 0, posting.num_units_orderable
     assert_equal 0, posting.num_cases_orderable

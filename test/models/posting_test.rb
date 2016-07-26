@@ -24,7 +24,7 @@ class PostingTest < ActiveSupport::TestCase
     assert ti.save    
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:ADDED], @posting.tote_items.first.state
-    assert_not @posting.submit_order_to_creditor?
+    assert_not @posting.include_in_order?
   end
 
   test "should submit order when quantity is above zero and cases arent in use" do
@@ -35,7 +35,7 @@ class PostingTest < ActiveSupport::TestCase
     ti.transition(:commitment_zone_started)
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
-    assert @posting.submit_order_to_creditor?
+    assert @posting.include_in_order?
   end
 
   test "should submit order when quantity is at least the size of a case" do
@@ -49,7 +49,7 @@ class PostingTest < ActiveSupport::TestCase
     ti.transition(:commitment_zone_started)
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
-    assert @posting.submit_order_to_creditor?
+    assert @posting.include_in_order?
   end
 
   test "should only submit order in round case lots when applicable" do    
@@ -94,7 +94,7 @@ class PostingTest < ActiveSupport::TestCase
     ti.transition(:commitment_zone_started)
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
-    assert_not @posting.submit_order_to_creditor?
+    assert_not @posting.include_in_order?
   end
 
   test "should fill all items" do

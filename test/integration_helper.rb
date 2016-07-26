@@ -254,12 +254,28 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
   end
 
+  def all_tote_items_fully_filled?(tote_items)
+
+    if tote_items.nil?
+      return true
+    end
+
+    tote_items.each do |tote_item|
+      if !tote_item.fully_filled?
+        return false
+      end
+    end
+
+    return true
+
+  end
+
   #the order submission email has columns for Units per Case, Number of Cases and Number of Units
   #you might want to make your test cases such that each value should be an unique number so that
   #the tests are meaningful
-  def verify_proper_delivery_notification_email(mail, tote_item)
+  def verify_proper_delivery_notification_email(mail, tote_item, all_tote_items_in_this_delivery_notification = nil)
 
-    if tote_item.fully_filled?
+    if tote_item.fully_filled? && all_tote_items_fully_filled?(all_tote_items_in_this_delivery_notification)
       subject = "Delivery notification"
     else
       subject = "Unfilled order(s) and delivery notification"

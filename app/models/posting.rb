@@ -184,7 +184,7 @@ class Posting < ActiveRecord::Base
 
   end
 
-  def submit_order_to_creditor?
+  def include_in_order?
 
     #packing minimum met?(at least one unit (or 1 case if cases are in effect))
     if !packing_minimum_met?
