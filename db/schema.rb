@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160725204236) do
+ActiveRecord::Schema.define(version: 20160727204721) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -313,6 +313,7 @@ ActiveRecord::Schema.define(version: 20160725204236) do
     t.string   "product_id_code"
   end
 
+  add_index "postings", ["commitment_zone_start"], name: "index_postings_on_commitment_zone_start"
   add_index "postings", ["posting_recurrence_id"], name: "index_postings_on_posting_recurrence_id"
   add_index "postings", ["product_id"], name: "index_postings_on_product_id"
   add_index "postings", ["state"], name: "index_postings_on_state"

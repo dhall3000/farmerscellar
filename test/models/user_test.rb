@@ -10,6 +10,499 @@ class UserTest < ActiveSupport::TestCase
     @d1 = users(:d1)
   end
 
+  #what if you have a producer that has no distributor. can you call producer.get_postings_orderable(postings_at_order_cutoff) on it and have it do the right thing?
+  test "should return proper orderable report when distributor postings reporter called on a producer with no distributor" do
+
+    nuke_all_postings
+
+    #has many producers
+    producer1 = create_producer("producer1", "producer1@o.com", "WA", 98033, "www.producer1.com", "producer1 FARMS")
+    producer1.save
+    producer1.update(order_minimum: 20)
+
+    #has lots of order cutoffs
+    delivery_date1 = get_delivery_date(days_from_now = 7)
+    delivery_date2 = get_delivery_date(days_from_now = 14)
+
+    delivery_date1_postings = []
+    delivery_date2_postings = []
+
+    assert_equal 0, Posting.count
+   
+    #producer 1 postings, order min: $20
+    price_carrots = 3.00
+    posting_carrots = create_posting(producer1, price_carrots, product = products(:carrots), unit = units(:pound), delivery_date1)
+    delivery_date1_postings << posting_carrots
+    
+    price_milk = 4.00
+    posting_milk = create_posting(producer1, price_milk, product = products(:milk), unit = units(:gallon), delivery_date2)
+    delivery_date2_postings << posting_milk
+
+    assert_equal 2, Posting.count
+
+    #customers
+    bob = create_user("bob", "bob@b.com", 98033)
+    chris = create_user("chris", "chris@c.com", 98044)
+    sam = create_user("sam", "sam@s.com", 98055)
+
+    #tote items producer1 1, price 3.00, order min: $20, contribution: $54
+    ti_bob_carrots = create_tote_item(posting_carrots, quantity = 6, bob)
+    ti_bob_carrots.update(state: ToteItem.states[:COMMITTED])
+    ti_chris_carrots = create_tote_item(posting_carrots, quantity = 12, chris)
+    ti_chris_carrots.update(state: ToteItem.states[:COMMITTED])
+
+    #tote items producer1 2, price 4.00, order min: $20, contribution: $24
+    ti_sam_milk = create_tote_item(posting_milk, quantity = 3, sam)
+    ti_sam_milk.update(state: ToteItem.states[:COMMITTED])
+    ti_chris_milk = create_tote_item(posting_milk, quantity = 3, chris)
+    ti_chris_milk.update(state: ToteItem.states[:COMMITTED])
+
+    report = producer1.get_postings_orderable([posting_carrots])
+    producer1_net_value = 49.32
+    assert_equal producer1_net_value, report[:postings_total_producer_net]
+
+  end
+
+  test "should find orderable postings when distributor has lots of postings with various order cutoffs with case and order minimums are met" do
+
+    nuke_all_postings
+
+    #producing distributor
+    oxbow = create_producer("oxbow", "oxbow@o.com", "WA", 98033, "www.oxbow.com", "OXBOW FARMS")
+    oxbow.update(order_minimum: 50)
+    #has many producers
+    producer1 = create_producer("producer1", "producer1@o.com", "WA", 98033, "www.producer1.com", "producer1 FARMS")
+    producer1.distributor = oxbow    
+    producer1.save
+    producer1.update(order_minimum: 20)
+
+    producer2 = create_producer("producer2", "producer2@o.com", "WA", 98033, "www.producer2.com", "producer2 FARMS")
+    producer2.distributor = oxbow
+    producer2.save
+
+    #has lots of order cutoffs
+    delivery_date1 = get_delivery_date(days_from_now = 7)
+    delivery_date2 = get_delivery_date(days_from_now = 14)
+
+    delivery_date1_postings = []
+    delivery_date2_postings = []
+
+    assert_equal 0, Posting.count
+
+    price_celery = 1.00
+    posting_celery = create_posting(oxbow, price_celery, product = products(:celery), unit = units(:pound), delivery_date1)
+    delivery_date1_postings << posting_celery
+    czs1 = posting_celery.commitment_zone_start
+
+    price_apples = 2.00
+    posting_apples = create_posting(oxbow, price_apples, product = products(:apples), unit = units(:pound), delivery_date2)
+    delivery_date2_postings << posting_apples
+    czs2 = posting_apples.commitment_zone_start
+    
+    #producer 1 postings, order min: $20
+    price_carrots = 3.00
+    posting_carrots = create_posting(producer1, price_carrots, product = products(:carrots), unit = units(:pound), delivery_date1)
+    delivery_date1_postings << posting_carrots
+    
+    price_milk = 4.00
+    posting_milk = create_posting(producer1, price_milk, product = products(:milk), unit = units(:gallon), delivery_date2)
+    delivery_date2_postings << posting_milk
+
+    #producer2 postings
+    price_beef = 5.00
+    posting_beef = create_posting(producer2, price_beef, product = products(:beef), unit = units(:pound), delivery_date1)
+    delivery_date1_postings << posting_beef
+    posting_beef.update(units_per_case: 10)
+    
+    price_milk = 6.00
+    posting_milk = create_posting(producer2, price_milk, product = products(:milk), unit = units(:gallon), delivery_date2)
+    delivery_date2_postings << posting_milk
+
+    assert_equal 6, Posting.count
+
+    #customers
+    bob = create_user("bob", "bob@b.com", 98033)
+    chris = create_user("chris", "chris@c.com", 98044)
+    sam = create_user("sam", "sam@s.com", 98055)
+
+    #tote items oxbow 1, price 1.00, contribution = $5.00
+    ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
+    ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
+    ti_sam_celery = create_tote_item(posting_celery, quantity = 2, sam)
+    ti_sam_celery.update(state: ToteItem.states[:COMMITTED])
+
+    #tote items producer1 1, price 3.00, order min: $20, contribution: $54
+    ti_bob_carrots = create_tote_item(posting_carrots, quantity = 6, bob)
+    ti_bob_carrots.update(state: ToteItem.states[:COMMITTED])
+    ti_chris_carrots = create_tote_item(posting_carrots, quantity = 12, chris)
+    ti_chris_carrots.update(state: ToteItem.states[:COMMITTED])
+
+    #tote items producer2 1, price 5.00, units_per_case: 10, num_units: 12, num_cases: 1, contribution: $50
+    ti_sam_beef = create_tote_item(posting_beef, quantity = 6, sam)
+    ti_sam_beef.update(state: ToteItem.states[:COMMITTED])
+    ti_chris_beef = create_tote_item(posting_beef, quantity = 6, chris)
+    ti_chris_beef.update(state: ToteItem.states[:COMMITTED])
+
+    #-----------------------------------------------------------------------------------------------
+
+    #tote items oxbow 2, price 2.00, contribution = $10
+    ti_bob_apples = create_tote_item(posting_apples, quantity = 3, bob)
+    ti_bob_apples.update(state: ToteItem.states[:COMMITTED])
+    ti_sam_apples = create_tote_item(posting_apples, quantity = 2, sam)
+    ti_sam_apples.update(state: ToteItem.states[:COMMITTED])
+
+    #tote items producer1 2, price 4.00, order min: $20, contribution: $24
+    ti_sam_milk = create_tote_item(posting_milk, quantity = 3, sam)
+    ti_sam_milk.update(state: ToteItem.states[:COMMITTED])
+    ti_chris_milk = create_tote_item(posting_milk, quantity = 3, chris)
+    ti_chris_milk.update(state: ToteItem.states[:COMMITTED])    
+
+    #tote items producer2 2, price 6.00, contribution: $36
+    ti_sam_milk = create_tote_item(posting_milk, quantity = 3, sam)
+    ti_sam_milk.update(state: ToteItem.states[:COMMITTED])
+    ti_chris_milk = create_tote_item(posting_milk, quantity = 3, chris)
+    ti_chris_milk.update(state: ToteItem.states[:COMMITTED])
+
+    #get producer net by first commitment zone
+    first_czs_oxbow_net = oxbow.get_producer_net(czs1)
+    #get producer net by postings
+    first_postings_distributor_net = oxbow.get_producer_net(czs1, delivery_date1_postings)
+    #verify producer nets match
+    assert_equal first_czs_oxbow_net, first_postings_distributor_net    
+    #verify correct oxbow producer net value
+    assert_equal 99.57, first_czs_oxbow_net
+    #verify correct producer1 producer net value
+    producer1_net_value = 49.32
+    assert_equal producer1_net_value, producer1.get_producer_net(czs1)
+    #verify correct producer2 producer net value
+    producer2_net_value = 45.70
+    assert_equal producer2_net_value, producer2.get_producer_net(czs1)
+
+    #verify values if we call the 'orderable' methods
+    #{postings_to_order: [], postings_to_close: postings_all, postings_total_producer_net: 0}
+
+    report = oxbow.get_postings_orderable(delivery_date1_postings)
+    assert_equal first_czs_oxbow_net, report[:postings_total_producer_net]
+
+    report = producer1.get_postings_orderable([posting_carrots])
+    assert_equal producer1_net_value, report[:postings_total_producer_net]
+
+    report = producer2.get_postings_orderable([posting_beef])
+    assert_equal producer2_net_value, report[:postings_total_producer_net]
+
+  end
+
+  test "should find orderable postings when distributor has lots of postings with various order cutoffs and minimums are met" do
+
+    nuke_all_postings
+
+    #producing distributor
+    oxbow = create_producer("oxbow", "oxbow@o.com", "WA", 98033, "www.oxbow.com", "OXBOW FARMS")
+    oxbow.update(order_minimum: 50)
+    #has many producers
+    producer1 = create_producer("producer1", "producer1@o.com", "WA", 98033, "www.producer1.com", "producer1 FARMS")
+    producer1.distributor = oxbow    
+    producer1.save
+    producer1.update(order_minimum: 20)
+
+    producer2 = create_producer("producer2", "producer2@o.com", "WA", 98033, "www.producer2.com", "producer2 FARMS")
+    producer2.distributor = oxbow
+    producer2.save
+
+    #has lots of order cutoffs
+    delivery_date1 = get_delivery_date(days_from_now = 7)
+    delivery_date2 = get_delivery_date(days_from_now = 14)
+
+    delivery_date1_postings = []
+    delivery_date2_postings = []
+
+    assert_equal 0, Posting.count
+
+    price_celery = 1.00
+    posting_celery = create_posting(oxbow, price_celery, product = products(:celery), unit = units(:pound), delivery_date1)
+    delivery_date1_postings << posting_celery
+    czs1 = posting_celery.commitment_zone_start
+
+    price_apples = 2.00
+    posting_apples = create_posting(oxbow, price_apples, product = products(:apples), unit = units(:pound), delivery_date2)
+    delivery_date2_postings << posting_apples
+    czs2 = posting_apples.commitment_zone_start
+    
+    #producer 1 postings, order min: $20
+    price_carrots = 3.00
+    posting_carrots = create_posting(producer1, price_carrots, product = products(:carrots), unit = units(:pound), delivery_date1)
+    delivery_date1_postings << posting_carrots
+    
+    price_milk = 4.00
+    posting_milk = create_posting(producer1, price_milk, product = products(:milk), unit = units(:gallon), delivery_date2)
+    delivery_date2_postings << posting_milk
+
+    #producer2 postings
+    price_beef = 5.00
+    posting_beef = create_posting(producer2, price_beef, product = products(:beef), unit = units(:pound), delivery_date1)
+    delivery_date1_postings << posting_beef
+    posting_beef.update(units_per_case: 10)
+    
+    price_milk = 6.00
+    posting_milk = create_posting(producer2, price_milk, product = products(:milk), unit = units(:gallon), delivery_date2)
+    delivery_date2_postings << posting_milk
+
+    assert_equal 6, Posting.count
+
+    #customers
+    bob = create_user("bob", "bob@b.com", 98033)
+    chris = create_user("chris", "chris@c.com", 98044)
+    sam = create_user("sam", "sam@s.com", 98055)
+
+    #tote items oxbow 1, price 1.00, contribution = $5.00
+    ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
+    ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
+    ti_sam_celery = create_tote_item(posting_celery, quantity = 2, sam)
+    ti_sam_celery.update(state: ToteItem.states[:COMMITTED])
+
+    #tote items producer1 1, price 3.00, order min: $20, contribution: $54
+    ti_bob_carrots = create_tote_item(posting_carrots, quantity = 6, bob)
+    ti_bob_carrots.update(state: ToteItem.states[:COMMITTED])
+    ti_chris_carrots = create_tote_item(posting_carrots, quantity = 12, chris)
+    ti_chris_carrots.update(state: ToteItem.states[:COMMITTED])
+
+    #tote items producer2 1, price 5.00, units_per_case: 10, num_units: 6, contribution: $0
+    ti_sam_beef = create_tote_item(posting_beef, quantity = 3, sam)
+    ti_sam_beef.update(state: ToteItem.states[:COMMITTED])
+    ti_chris_beef = create_tote_item(posting_beef, quantity = 3, chris)
+    ti_chris_beef.update(state: ToteItem.states[:COMMITTED])
+
+    #-----------------------------------------------------------------------------------------------
+
+    #tote items oxbow 2, price 2.00, contribution = $10
+    ti_bob_apples = create_tote_item(posting_apples, quantity = 3, bob)
+    ti_bob_apples.update(state: ToteItem.states[:COMMITTED])
+    ti_sam_apples = create_tote_item(posting_apples, quantity = 2, sam)
+    ti_sam_apples.update(state: ToteItem.states[:COMMITTED])
+
+    #tote items producer1 2, price 4.00, order min: $20, contribution: $24
+    ti_sam_milk = create_tote_item(posting_milk, quantity = 3, sam)
+    ti_sam_milk.update(state: ToteItem.states[:COMMITTED])
+    ti_chris_milk = create_tote_item(posting_milk, quantity = 3, chris)
+    ti_chris_milk.update(state: ToteItem.states[:COMMITTED])    
+
+    #tote items producer2 2, price 6.00, contribution: $36
+    ti_sam_milk = create_tote_item(posting_milk, quantity = 3, sam)
+    ti_sam_milk.update(state: ToteItem.states[:COMMITTED])
+    ti_chris_milk = create_tote_item(posting_milk, quantity = 3, chris)
+    ti_chris_milk.update(state: ToteItem.states[:COMMITTED])
+
+    #get producer net by first commitment zone
+    first_czs_oxbow_net = oxbow.get_producer_net(czs1)
+    #get producer net by postings
+    first_postings_distributor_net = oxbow.get_producer_net(czs1, delivery_date1_postings)
+    #verify producer nets match
+    assert_equal first_czs_oxbow_net, first_postings_distributor_net    
+    #verify correct oxbow producer net value
+    assert_equal 53.87, first_czs_oxbow_net
+    #verify correct producer1 producer net value
+    producer1_net_value = 49.32
+    assert_equal producer1_net_value, producer1.get_producer_net(czs1)
+    #verify correct producer2 producer net value
+    assert_equal 0, producer2.get_producer_net(czs1)
+
+    #verify values if we call the 'orderable' methods
+    #{postings_to_order: [], postings_to_close: postings_all, postings_total_producer_net: 0}
+
+    report = oxbow.get_postings_orderable(delivery_date1_postings)
+    assert_equal first_czs_oxbow_net, report[:postings_total_producer_net]
+
+    report = producer1.get_postings_orderable([posting_carrots])
+    assert_equal producer1_net_value, report[:postings_total_producer_net]
+
+    report = producer2.get_postings_orderable([posting_beef])
+    assert_equal 0, report[:postings_total_producer_net]
+
+  end
+
+  test "should return proper producer net value for postings when distributor has lots of postings with various order cutoffs" do
+
+    nuke_all_postings
+
+    #producing distributor
+    oxbow = create_producer("oxbow", "oxbow@o.com", "WA", 98033, "www.oxbow.com", "OXBOW FARMS")
+    oxbow.update(order_minimum: 50)
+    #has many producers
+    producer1 = create_producer("producer1", "producer1@o.com", "WA", 98033, "www.producer1.com", "producer1 FARMS")
+    producer1.distributor = oxbow    
+    producer1.save
+    producer1.update(order_minimum: 20)
+
+    producer2 = create_producer("producer2", "producer2@o.com", "WA", 98033, "www.producer2.com", "producer2 FARMS")
+    producer2.distributor = oxbow
+    producer2.save
+
+    #has lots of order cutoffs
+    delivery_date1 = get_delivery_date(days_from_now = 7)
+    delivery_date2 = get_delivery_date(days_from_now = 14)
+
+    delivery_date1_postings = []
+    delivery_date2_postings = []
+
+    assert_equal 0, Posting.count
+
+    price_celery = 1.00
+    posting_celery = create_posting(oxbow, price_celery, product = products(:celery), unit = units(:pound), delivery_date1)
+    delivery_date1_postings << posting_celery
+    czs1 = posting_celery.commitment_zone_start
+
+    price_apples = 2.00
+    posting_apples = create_posting(oxbow, price_apples, product = products(:apples), unit = units(:pound), delivery_date2)
+    delivery_date2_postings << posting_apples
+    czs2 = posting_apples.commitment_zone_start
+    
+    #producer 1 postings, order min: $20
+    price_carrots = 3.00
+    posting_carrots = create_posting(producer1, price_carrots, product = products(:carrots), unit = units(:pound), delivery_date1)
+    delivery_date1_postings << posting_carrots
+    
+    price_milk = 4.00
+    posting_milk = create_posting(producer1, price_milk, product = products(:milk), unit = units(:gallon), delivery_date2)
+    delivery_date2_postings << posting_milk
+
+    #producer2 postings
+    price_beef = 5.00
+    posting_beef = create_posting(producer2, price_beef, product = products(:beef), unit = units(:pound), delivery_date1)
+    delivery_date1_postings << posting_beef
+    posting_beef.update(units_per_case: 10)
+    
+    price_milk = 6.00
+    posting_milk = create_posting(producer2, price_milk, product = products(:milk), unit = units(:gallon), delivery_date2)
+    delivery_date2_postings << posting_milk
+
+    assert_equal 6, Posting.count
+
+    #customers
+    bob = create_user("bob", "bob@b.com", 98033)
+    chris = create_user("chris", "chris@c.com", 98044)
+    sam = create_user("sam", "sam@s.com", 98055)
+
+    #tote items oxbow 1, price 1.00, contribution = $5.00
+    ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
+    ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
+    ti_sam_celery = create_tote_item(posting_celery, quantity = 2, sam)
+    ti_sam_celery.update(state: ToteItem.states[:COMMITTED])
+
+    #tote items producer1 1, price 3.00, order min: $20, contribution: $15
+    ti_bob_carrots = create_tote_item(posting_carrots, quantity = 3, bob)
+    ti_bob_carrots.update(state: ToteItem.states[:COMMITTED])
+    ti_chris_carrots = create_tote_item(posting_carrots, quantity = 2, chris)
+    ti_chris_carrots.update(state: ToteItem.states[:COMMITTED])
+
+    #tote items producer2 1, price 5.00, units_per_case: 10, num_units: 6, contribution: $0
+    ti_sam_beef = create_tote_item(posting_beef, quantity = 3, sam)
+    ti_sam_beef.update(state: ToteItem.states[:COMMITTED])
+    ti_chris_beef = create_tote_item(posting_beef, quantity = 3, chris)
+    ti_chris_beef.update(state: ToteItem.states[:COMMITTED])
+
+    #-----------------------------------------------------------------------------------------------
+
+    #tote items oxbow 2, price 2.00, contribution = $10
+    ti_bob_apples = create_tote_item(posting_apples, quantity = 3, bob)
+    ti_bob_apples.update(state: ToteItem.states[:COMMITTED])
+    ti_sam_apples = create_tote_item(posting_apples, quantity = 2, sam)
+    ti_sam_apples.update(state: ToteItem.states[:COMMITTED])
+
+    #tote items producer1 2, price 4.00, order min: $20, contribution: $24
+    ti_sam_milk = create_tote_item(posting_milk, quantity = 3, sam)
+    ti_sam_milk.update(state: ToteItem.states[:COMMITTED])
+    ti_chris_milk = create_tote_item(posting_milk, quantity = 3, chris)
+    ti_chris_milk.update(state: ToteItem.states[:COMMITTED])    
+
+    #tote items producer2 2, price 6.00, contribution: $36
+    ti_sam_milk = create_tote_item(posting_milk, quantity = 3, sam)
+    ti_sam_milk.update(state: ToteItem.states[:COMMITTED])
+    ti_chris_milk = create_tote_item(posting_milk, quantity = 3, chris)
+    ti_chris_milk.update(state: ToteItem.states[:COMMITTED])
+
+    #get producer net by first commitment zone
+    first_czs_oxbow_net = oxbow.get_producer_net(czs1)
+    #get producer net by postings
+    first_postings_distributor_net = oxbow.get_producer_net(czs1, delivery_date1_postings)
+    #verify producer nets match
+    assert_equal first_czs_oxbow_net, first_postings_distributor_net    
+    #verify correct oxbow producer net value
+    assert_equal 18.25, first_czs_oxbow_net
+    #verify correct producer1 producer net value
+    assert_equal 13.70, producer1.get_producer_net(czs1)
+    #verify correct producer2 producer net value
+    assert_equal 0, producer2.get_producer_net(czs1)
+
+    #verify values if we call the 'orderable' methods
+    #{postings_to_order: [], postings_to_close: postings_all, postings_total_producer_net: 0}
+    report = oxbow.get_postings_orderable(delivery_date1_postings)
+    assert_equal 0, report[:postings_total_producer_net]
+
+    report = producer1.get_postings_orderable([posting_carrots])
+    assert_equal 0, report[:postings_total_producer_net]
+
+    report = producer2.get_postings_orderable([posting_beef])
+    assert_equal 0, report[:postings_total_producer_net]
+
+  end
+
+  test "should return proper value for orderable postings when producer has lots of postings with various order cutoffs" do
+
+    producer = create_producer("producer", "producer@p.com", "WA", 98033, "www.producer.com", "PRODUCER FARMS")
+
+    #create postings
+    price_celery = 2.50
+    posting_celery = create_posting(producer, price_celery, product = products(:celery))
+
+    price_apples = 2.00
+    posting_apples = create_posting(producer, price_apples, product = products(:apples))    
+
+    price_milk = 1.00
+    posting_milk = create_posting(producer, price_milk, product = products(:milk))
+    #change this order cutoff time so that it's not included in the order value computation
+    posting_milk.update(commitment_zone_start: posting_milk.commitment_zone_start - 1)
+    
+    bob = create_user("bob", "bob@b.com", 98033)
+    chris = create_user("chris", "chris@c.com", 98044)
+    sam = create_user("sam", "sam@s.com", 98055)
+
+    #create tote items for all postings
+    ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
+    ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
+    ti_chris_celery = create_tote_item(posting_celery, quantity = 6, chris)
+    ti_chris_celery.update(state: ToteItem.states[:COMMITTED])
+    ti_sam_celery = create_tote_item(posting_celery, quantity = 9, sam)
+    ti_sam_celery.update(state: ToteItem.states[:COMMITTED])
+
+    ti_bob_apples = create_tote_item(posting_apples, quantity = 2, bob)
+    ti_bob_apples.update(state: ToteItem.states[:COMMITTED])    
+    ti_chris_apples = create_tote_item(posting_apples, quantity = 4, chris)
+    ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
+    ti_sam_apples = create_tote_item(posting_apples, quantity = 6, sam)
+    ti_sam_apples.update(state: ToteItem.states[:COMMITTED])
+
+    ti_bob_milk = create_tote_item(posting_milk, quantity = 1, bob)
+    ti_bob_milk.update(state: ToteItem.states[:COMMITTED])    
+    ti_chris_milk = create_tote_item(posting_milk, quantity = 2, chris)
+    ti_chris_milk.update(state: ToteItem.states[:COMMITTED])
+    ti_sam_milk = create_tote_item(posting_milk, quantity = 3, sam)
+    ti_sam_milk.update(state: ToteItem.states[:COMMITTED])
+
+    expected_celery_posting_value = 41.04
+    expected_apples_posting_value = 21.96
+    expected_order_value = expected_celery_posting_value + expected_apples_posting_value
+    assert_equal 63, expected_order_value
+
+    assert_equal expected_celery_posting_value, posting_celery.get_producer_net_posting
+    assert_equal expected_apples_posting_value, posting_apples.get_producer_net_posting
+
+    czs = posting_celery.commitment_zone_start
+    producer_net = producer.get_producer_net(czs)
+
+    assert_equal expected_order_value, producer_net
+
+  end
+
   test "should submit orders when producer has no order minimum" do
 
     producer = create_producer("producer", "producer@p.com", "WA", 98033, "www.producer.com", "PRODUCER FARMS")
@@ -533,7 +1026,6 @@ class UserTest < ActiveSupport::TestCase
     report = distributor.get_postings_orderable([posting_celery, posting_apples, posting_milk])
     #verify all postings returned
     assert_equal 0, report[:postings_to_close].count
-
     assert_equal 3, report[:postings_to_order].count
     assert_equal posting_celery.product.name, report[:postings_to_order].first.product.name
     assert_equal posting_apples.product.name, report[:postings_to_order].second.product.name

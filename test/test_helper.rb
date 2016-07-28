@@ -6,6 +6,11 @@ class ActiveSupport::TestCase
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
   fixtures :all
 
+  def nuke_all_postings
+    Posting.delete_all
+    assert_equal 0, Posting.count
+  end
+
   def create_tote_item(posting, quantity, user)
 
     tote_item = ToteItem.create(user: user, posting: posting, quantity: quantity, price: posting.price, state: ToteItem.states[:ADDED])

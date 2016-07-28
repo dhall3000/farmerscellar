@@ -2,11 +2,6 @@ require 'test_helper'
 
 class IntegrationHelper < ActionDispatch::IntegrationTest
 
-  def nuke_all_postings
-    Posting.delete_all
-    assert_equal 0, Posting.count
-  end
-
   def create_posting(farmer, price, product, unit, delivery_date, commitment_zone_start, units_per_case)
 
     posting_params = {

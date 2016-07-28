@@ -87,14 +87,14 @@ class User < ActiveRecord::Base
 
   end
 
-  def get_postings_orderable(postings_presently_transitioning_to_commitment_zone)
+  def get_postings_orderable(postings_at_order_cutoff)
 
     if !account_type_is?(:PRODUCER)
       return nil
     end
 
     postings_by_producer = {}
-    postings_all = postings_presently_transitioning_to_commitment_zone
+    postings_all = postings_at_order_cutoff
 
     postings_all.each do |posting|
 
@@ -131,17 +131,17 @@ class User < ActiveRecord::Base
 
   end
 
-  def get_postings_orderable_for_producer(postings_presently_transitioning_to_commitment_zone)
+  #"producer" just means the entity produces product itself, as evidenced by having postings whose user_id value points to the entity.  
+  def get_postings_orderable_for_producer(postings_at_order_cutoff)
 
     if !account_type_is?(:PRODUCER)
       return nil
     end
 
-    postings = postings_presently_transitioning_to_commitment_zone
-
-    producer_net_total = 0
     postings_to_order = []
     postings_to_close = []
+
+    postings = postings_at_order_cutoff
 
     postings.each do |posting|
 
@@ -151,7 +151,6 @@ class User < ActiveRecord::Base
       end
 
       if posting.include_in_order?
-        producer_net_total = (producer_net_total + posting.get_producer_net_posting).round(2)
         postings_to_order << posting          
       else
         postings_to_close << posting
@@ -159,11 +158,61 @@ class User < ActiveRecord::Base
 
     end
 
-    if order_minimum_met?(producer_net_total)
-      return {postings_to_order: postings_to_order, postings_to_close: postings_to_close, postings_total_producer_net: producer_net_total}
-    else
-      return {postings_to_order: [], postings_to_close: postings, postings_total_producer_net: 0}
+    if postings_to_order.any?
+      
+      producer_net = get_producer_net(postings_to_order.first.commitment_zone_start, postings_to_order)
+
+      #the 'producers.any?' clause is non-obvious. it's because we allow "producing distributors", like oxbow, for example. imagine a situation where oxbow
+      #has a $50 order min. they distribute for fruit producer (FP). say that orders for FP total $45 and orders for oxbow total $10. without the
+      #'producers.any?' clause zero order would get submitted because $10 is less than $50 which means that when we're in method get_postings_orderable
+      #it will check $45 against oxbow's $50 min and fail that too. so the way to think of this added clause is don't hold oxbow's postings to its own
+      #min. instead, sum up oxbows orders with all oxbow's producers' postings and compare that to oxbow's minimum
+      if order_minimum_met?(producer_net) || producers.any?
+        return {postings_to_order: postings_to_order, postings_to_close: postings_to_close, postings_total_producer_net: producer_net}
+      end    
+
     end
+
+    return {postings_to_order: [], postings_to_close: postings, postings_total_producer_net: 0}
+
+  end
+
+  #this 'producer' can be a standalone producer or a standalone distributor or a distributor that also produces directly
+  def get_producer_net(commitment_zone_start, postings = nil)
+
+    if !account_type_is?(:PRODUCER)
+      return nil
+    end
+
+    if postings.nil?
+      producers_arr = producers.to_a.uniq{|p| p.id}
+      producers_arr << self
+      postings = Posting.where(user: producers_arr, commitment_zone_start: commitment_zone_start)
+    end
+
+    producer_net = 0
+
+    postings.each do |posting|
+
+      if posting.commitment_zone_start != commitment_zone_start
+        next
+      end
+
+      #this posting must either belong to self....
+      if posting.user != self
+
+        #...or to one of self's producers (in the case that 'self' is a distributor)
+        if !producers.where(id: posting.user.id).any?
+          next
+        end
+
+      end
+
+      producer_net = (producer_net + posting.get_producer_net_posting).round(2)
+
+    end
+
+    return producer_net
 
   end
 
