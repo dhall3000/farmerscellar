@@ -412,15 +412,14 @@ class BulkPaymentProcessing
 
         pp.tote_items.each do |tote_item|
 
-          if !posting_infos.has_key?(tote_item.posting)
-            posting_infos[tote_item.posting] = {unit_count: 0, unit_price: 0, sub_total: 0}
+          if posting_infos.has_key?(tote_item.posting)
+            next
           end
 
-          creditor_net_item = get_producer_net_item(tote_item, filled = true)
-
-          posting_infos[tote_item.posting][:unit_count] += tote_item.quantity
-          posting_infos[tote_item.posting][:sub_total] = (posting_infos[tote_item.posting][:sub_total] + creditor_net_item).round(2)
-          posting_infos[tote_item.posting][:unit_price] = (creditor_net_item / tote_item.quantity).round(2)
+          posting_infos[tote_item.posting] = {unit_count: 0, unit_price: 0, sub_total: 0}
+          posting_infos[tote_item.posting][:unit_count] = tote_item.posting.num_units_filled
+          posting_infos[tote_item.posting][:sub_total] = tote_item.posting.get_producer_net_posting
+          posting_infos[tote_item.posting][:unit_price] = tote_item.posting.get_producer_net_unit
 
         end
 

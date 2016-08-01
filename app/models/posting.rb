@@ -40,7 +40,8 @@ class Posting < ActiveRecord::Base
   end
 
   def get_producer_net_posting
-    return (num_units_orderable * get_producer_net_unit).round(2)
+    num_units = [num_units_filled, num_units_orderable].max    
+    return (num_units * get_producer_net_unit).round(2)
   end
 
   def commission_per_unit
@@ -215,6 +216,10 @@ class Posting < ActiveRecord::Base
 
     return unit_count
     
+  end
+
+  def num_units_filled
+    return tote_items.where(state: ToteItem.states[:FILLED]).sum(:quantity_filled)
   end
 
   def num_cases_orderable
