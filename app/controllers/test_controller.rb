@@ -2,6 +2,39 @@ class TestController < ApplicationController
 	
 	before_action :redirect_to_root_if_user_not_admin
 
+  def garage_door
+
+    #http://10.0.0.19:1984/client?command=door2
+
+    #uri = URI.parse("http://www.google.com/")
+
+    #uri = URI.parse("http://10.0.0.19:1984/client?command=door2")
+    #response = Net::HTTP.get_response(uri)
+
+    #uri = URI.parse(request.ip)
+    #response = Net::HTTP.get_response(uri, "/client?command=door2", 1984)
+
+    #url = "http://50.46.117.254:1984/client?command=door2"    
+
+    url =  "http://#{request.ip}:1984/client?command=door2"
+    #url = "http://10.0.0.1:1984/client?command=door2"
+    uri = URI(url)
+
+    flash[:success] =  url
+
+    response = Net::HTTP.get(uri)
+
+
+#debugger
+
+    #http://ruby-doc.org/stdlib-2.3.1/libdoc/net/http/rdoc/Net/HTTP.html
+    #http://www.rubyinside.com/nethttp-cheat-sheet-2940.html
+    #send_paypal_masspay(credentials, payouts_params)
+
+    redirect_to test_page_path
+
+  end
+
   def checkout
 
   	response = GATEWAY.setup_authorization(

@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   root 'static_pages#home'
   get 'rtauthorizations/new'
   post 'rtauthorizations/create'
+  get 'test/garage_door'
   post 'test/checkout'
   get 'test/authorize'
   post 'test/capture'
