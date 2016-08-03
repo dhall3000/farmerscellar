@@ -32,6 +32,11 @@ class PickupsController < ApplicationController
         @last_pickup = @user.pickups.order("pickups.id").last
   			#now create a new pickup to represent the current pickup  				 				
  				@user.pickups.create
+
+        if Rails.env.production?
+          toggle_garage_door
+        end
+        
         flash.now[:success] = "Thanks for checking out!"
   		end
   	else
@@ -41,7 +46,23 @@ class PickupsController < ApplicationController
 
   end
 
+  def done
+
+    if Rails.env.production?
+      toggle_garage_door
+    end
+    
+    redirect_to new_pickup_path
+
+  end
+
   private    
+
+    def toggle_garage_door
+      url =  "http://#{request.ip}:1984/client?command=door2"
+      uri = URI(url)
+      response = Net::HTTP.get(uri)
+    end
 
 	  def redirect_to_root_if_user_not_dropsite_user
 	    if !logged_in? || !current_user.account_type_is?(:DROPSITE)
