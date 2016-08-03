@@ -60,23 +60,20 @@ This email is your Farmer's Cellar delivery notification.
 
 <% if products_delivered == true %>
   <p>Your products are available for you to pick up at your convenience.</p>
+  <p>First time user? Watch <%= link_to "this", "https://youtu.be/2fOXJ2Ijs8Y", target: false %> to see what to expect at pickup.</p>
   <p>Your dropsite is:</p>
   <p>
   <%= @dropsite.name %><br>
   <% address_link = "https://www.google.com/maps/place/" + (@dropsite.address + " " + @dropsite.city + " " + @dropsite.state + " " + @dropsite.zip.to_s).gsub(' ', '+') %>
   <a target="blank" href="<%= address_link %>"><%= @dropsite.address %> <%= @dropsite.city %>, <%= @dropsite.state %> <%= @dropsite.zip.to_s %></a><br>
   Hours: <%= @dropsite.hours %>
-  </p>
-
-  <p>First time user? Watch <%= link_to "this", "https://youtu.be/2fOXJ2Ijs8Y", target: false %> to see what to expect at pickup.</p>
-
+  </p>  
+  <p>Your pickup code is: <%= @user.pickup_code.code %></p>
   <% if @dropsite.access_instructions != nil %>
     <p>
       <%= @dropsite.access_instructions %>
     </p>
   <% end %>
-
-  <p>There is a kiosk at the dropsite. If you need help remembering what you ordered just enter your pickup code at the kiosk and your product list will pop up. Your pickup code is <%= @user.pickup_code.code %>.</p>
 <% else %>
 <p>Unfortunately we were unable to fill your order for today's delivery.</p>
 <% end %>

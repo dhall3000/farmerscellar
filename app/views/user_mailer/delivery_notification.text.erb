@@ -28,18 +28,18 @@ ID=<%= tote_item.id %>,Producer=<%= tote_item.posting.user.farm_name %>,Product=
 <% if products_delivered == true %>
 Your products are available for you to pick up at your convenience.
 
+First time user? Watch this to see what to expect at pickup: https://youtu.be/2fOXJ2Ijs8Y
+
 Your dropsite is:
 <%= @dropsite.name %>
 <%= @dropsite.address %> <%= @dropsite.city %>, <%= @dropsite.state %> <%= @dropsite.zip.to_s %>
 Hours: <%= @dropsite.hours %>
 
-First time user? Watch this to see what to expect at pickup: https://youtu.be/2fOXJ2Ijs8Y
+Your pickup code is: <%= @user.pickup_code.code %>
 <% if @dropsite.access_instructions != nil %>
 
 <%= @dropsite.access_instructions %>
 <% end %>
-
-There is a kiosk at the dropsite. If you need help remembering what you ordered just enter your pickup code at the kiosk and your product list will pop up. Your pickup code is <%= @user.pickup_code.code %>.
 <% else %>
 Unfortunately we were unable to fill your order for today's delivery.
 <% end %>
