@@ -21,10 +21,20 @@ class PickupsController < ApplicationController
             
       url =  "http://#{request.ip}:1984/client?command=door2"
       uri = URI(url)
-      response = Net::HTTP.get_response(uri)
+
+      request = Net::HTTP::Get.new(uri.path)
+      begin
+        response = Net::HTTP.start(uri.host, uri.port) {|http|
+          http.read_timeout = 15 #seconds
+          http.request(request)
+        }
+      rescue Net::ReadTimeout => e  
+        flash.now[:danger] = "Oops, please try again. If this keeps happening please knock on front door."
+        puts "PickupsController.toggle_garage_door timeout. e.message = #{e.message}"
+      end
 
       puts "PickupsController.toggle_garage_door response: #{response.class.to_a}"
-      
+
     end
 
     display_user_data
