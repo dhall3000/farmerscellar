@@ -23,6 +23,8 @@ class PickupsController < ApplicationController
       uri = URI(url)
 
       request = Net::HTTP::Get.new(uri.path)
+      response = nil
+
       begin
         response = Net::HTTP.start(uri.host, uri.port) {|http|
           http.read_timeout = 15 #seconds
@@ -33,7 +35,11 @@ class PickupsController < ApplicationController
         puts "PickupsController.toggle_garage_door timeout. e.message = #{e.message}"
       end
 
-      puts "PickupsController.toggle_garage_door response: #{response.class.to_a}"
+      if response
+        puts "PickupsController.toggle_garage_door response: #{response.class.to_s}"
+      else
+        puts "PickupsController.toggle_garage_door response is nil"
+      end      
 
     end
 
