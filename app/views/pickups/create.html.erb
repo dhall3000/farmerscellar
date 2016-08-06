@@ -16,13 +16,13 @@
 					    <tr>
 					      <td class="borderless">
 									<%= form_tag pickups_toggle_garage_door_path do %>
-										<%= hidden_field_tag :pickup_code, @pickup_code %>
+										<%= hidden_field_tag :pickup_code, @pickup_code.code %>
 										<%= submit_tag "Open garage door", class: 'btn btn-lg btn-primary', data: { disable_with: "Please wait...sometimes slow! :(" } %>			
 									<% end %>
 					      </td>
 					      <td class="borderless">
 									<%= form_tag pickups_toggle_garage_door_path do %>
-										<%= hidden_field_tag :pickup_code, @pickup_code %>
+										<%= hidden_field_tag :pickup_code, @pickup_code.code %>
 										<%= submit_tag "Close garage door", class: 'btn btn-lg btn-primary', data: { disable_with: "Please wait...sometimes slow! :(" } %>			
 									<% end %>
 					      </td>
