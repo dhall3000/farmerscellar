@@ -17,22 +17,21 @@ class PickupsController < ApplicationController
 
     puts "PickupsController.toggle_garage_door start"
 
-    if Rails.env.production?      
-            
-      url =  "http://#{request.ip}:1984/client?command=door2"
-      uri = URI(url)
+    if Rails.env.production?
 
-      request = Net::HTTP::Get.new(uri.path)
+      http = Net::HTTP.new(request.ip, 1984)
+      http.open_timeout = 10
+      http.read_timeout = 10
       response = nil
 
       begin
-        response = Net::HTTP.start(uri.host, uri.port) {|http|
-          http.read_timeout = 15 #seconds
-          http.request(request)
-        }
-      rescue Net::ReadTimeout => e  
+        response = http.get("/client?command=door2")
+      rescue Net::ReadTimeout => e1
         flash.now[:danger] = "Oops, please try again. If this keeps happening please knock on front door."
-        puts "PickupsController.toggle_garage_door timeout. e.message = #{e.message}"
+        puts "PickupsController.toggle_garage_door timeout. e1.message = #{e1.message}"
+      rescue Net::OpenTimeout => e2
+        flash.now[:danger] = "Oops, please try again. If this keeps happening please knock on front door."
+        puts "PickupsController.toggle_garage_door timeout. e2.message = #{e2.message}"
       end
 
       if response
