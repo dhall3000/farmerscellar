@@ -8,13 +8,41 @@
 
     <div class="panel-group">
 
+
+      <div class="panel panel-default">
+        <div class="panel-body">
+					<table class="table-condensed">
+					  <tbody>
+					    <tr>
+					      <td class="borderless">
+									<%= form_tag pickups_toggle_garage_door_path do %>
+										<%= hidden_field_tag :pickup_code, @pickup_code %>
+										<%= submit_tag "Open garage door", class: 'btn btn-lg btn-primary', data: { disable_with: "Please wait...sometimes slow! :(" } %>			
+									<% end %>
+					      </td>
+					      <td class="borderless">
+									<%= form_tag pickups_toggle_garage_door_path do %>
+										<%= hidden_field_tag :pickup_code, @pickup_code %>
+										<%= submit_tag "Close garage door", class: 'btn btn-lg btn-primary', data: { disable_with: "Please wait...sometimes slow! :(" } %>			
+									<% end %>
+					      </td>
+					      <td class="borderless">
+									<%= link_to "Log out", new_pickup_path, class: 'btn btn-lg btn-primary', data: { disable_with: "Please wait..." } %>
+					      </td>
+					    </tr>
+					  </tbody>
+					</table>
+        </div>        
+      </div>
+        
+
       <div class="panel panel-default">
         <div class="panel-heading">
           <h2 class="panel-title"><%= @user.email %></h2>
         </div>          
         <div class="panel-body">
         	<% if @last_pickup %>
-						<p>Last pickup checkout: <%= @last_pickup.created_at.strftime("%A %B %d, %Y at %l:%M %p") %></p>
+						<p>Last pickup: <%= @last_pickup.created_at.strftime("%A %B %d, %Y at %l:%M %p") %></p>
 					<% else %>
 						<p>Below is your list of products to pick up.</p>
 					<% end %>        	
@@ -61,12 +89,8 @@
 			    </table>          	
         </div>
       </div>
-    </div>
-	</div>
-</div>
 
-<div class="row">
-	<div class="col-sm-8 col-sm-offset-2">
-	    <%= link_to "All done", pickups_done_path, class: 'btn btn-lg btn-primary btn-block fat-finger-spacing' %>
+
+    </div>
 	</div>
 </div>
