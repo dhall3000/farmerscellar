@@ -23,14 +23,15 @@ class PickupsController < ApplicationController
       http.open_timeout = 10
       http.read_timeout = 10
       response = nil
+      flash_message = "If the garage door isn't working please knock on the front door for help."
 
       begin
         response = http.get("/client?command=door2")
       rescue Net::ReadTimeout => e1
-        flash.now[:danger] = "Oops, please try again. If this keeps happening please knock on front door."
+        flash.now[:danger] = flash_message
         puts "PickupsController.toggle_garage_door timeout. e1.message = #{e1.message}"
       rescue Net::OpenTimeout => e2
-        flash.now[:danger] = "Oops, please try again. If this keeps happening please knock on front door."
+        flash.now[:danger] = flash_message
         puts "PickupsController.toggle_garage_door timeout. e2.message = #{e2.message}"
       end
 
@@ -51,22 +52,28 @@ class PickupsController < ApplicationController
 
     def display_user_data
 
+      @mockup_mode = @@mockup_mode
+
+      today_open = Time.zone.now.midnight + 8.hours
+      today_close = today_open + 12.hours
+      @closed = Time.zone.now < today_open || Time.zone.now > today_close
+
       @is_dropsite_user = true
       @pickup_code = params[:pickup_code]
-      puts "PickupsController#create @pickup_code: #{@pickup_code.to_s}"
+      puts "PickupsController#display_user_data @pickup_code: #{@pickup_code.to_s}"
       @pickup_code = PickupCode.new(code: @pickup_code, user: current_user)
 
-      if @pickup_code.valid? || @@mockup_mode
+      if @pickup_code.valid? || @mockup_mode
         @pickup_code = PickupCode.find_by(code: @pickup_code.code)     
-        if @pickup_code.nil? && !@@mockup_mode
+        if @pickup_code.nil? && !@mockup_mode
           flash.now[:danger] = "Invalid code entry"
-          puts "PickupsController#create Invalid code entry: #{@pickup_code.to_s}"
+          puts "PickupsController#display_user_data Invalid code entry: #{@pickup_code.to_s}"
           render 'pickups/new'      
         else
 
-          puts "PickupsController#create valid code. Now fetching user and tote items..."
+          puts "PickupsController#display_user_data valid code. Now fetching user and tote items..."
 
-          if @@mockup_mode
+          if @mockup_mode
             @user = User.find_by(email: "c1@c.com")
             @tote_items = get_fake_tote_items(@user)
             create_fake_last_pickup(@user)

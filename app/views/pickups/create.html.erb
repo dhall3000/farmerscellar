@@ -9,38 +9,61 @@
     <div class="panel-group">
 
 
+    	<% if @closed %>
+
+	    	<div class="panel panel-default">
+	        <div class="panel-heading">
+	          <h2 class="panel-title alert alert-danger">Attention!</h2>
+	        </div>          
+	        <div class="panel-body">
+	        	<p>City of Kirkland's rule is that <span class="alert alert-danger">all pickups must be between 8AM - 8PM</span>.</p>
+	        	<p>Go ahead and get your products now but in the future please try to pickup within those hours.</p>
+	        	<p>Thanks!</p>
+	        </div>        
+	      </div>
+
+    	<% end %>
+      
+
+
       <div class="panel panel-default">
+        <div class="panel-heading">
+          <h2 class="panel-title">Action</h2>
+        </div>          
         <div class="panel-body">
-					<table class="table-condensed">
-					  <tbody>
-					    <tr>
-					      <td class="borderless">
-									<%= form_tag pickups_toggle_garage_door_path do %>
-										<%= hidden_field_tag :pickup_code, @pickup_code.code %>
-										<%= submit_tag "Open garage door", class: 'btn btn-lg btn-primary', data: { disable_with: "Please wait...sometimes slow! :(" } %>			
-									<% end %>
-					      </td>
-					      <td class="borderless">
-									<%= form_tag pickups_toggle_garage_door_path do %>
-										<%= hidden_field_tag :pickup_code, @pickup_code.code %>
-										<%= submit_tag "Close garage door", class: 'btn btn-lg btn-primary', data: { disable_with: "Please wait...sometimes slow! :(" } %>			
-									<% end %>
-					      </td>
-					      <td class="borderless">
-									<%= link_to "Log out", new_pickup_path, class: 'btn btn-lg btn-primary', data: { disable_with: "Please wait..." } %>
-					      </td>
-					    </tr>
-					  </tbody>
-					</table>
+					<%= form_tag pickups_toggle_garage_door_path do %>
+						<% if @mockup_mode %>
+							<%= hidden_field_tag :pickup_code, "1111" %>
+						<% else %>
+							<%= hidden_field_tag :pickup_code, @pickup_code.code %>
+						<% end %>										
+						<%= submit_tag "Open garage door", class: 'btn btn-lg btn-primary fat-finger-spacing', data: { disable_with: "Please wait...sometimes slow! :(" } %>			
+					<% end %>
+
+
+					<%= form_tag pickups_toggle_garage_door_path do %>
+						
+						<% if @mockup_mode %>
+							<%= hidden_field_tag :pickup_code, "1111" %>
+						<% else %>
+							<%= hidden_field_tag :pickup_code, @pickup_code.code %>
+						<% end %>										
+
+						<%= submit_tag "Close garage door", class: 'btn btn-lg btn-primary fat-finger-spacing', data: { disable_with: "Please wait...sometimes slow! :(" } %>			
+					<% end %>
+
+
+					<%= link_to "Log out", new_pickup_path, class: 'btn btn-lg btn-primary btn-block', data: { disable_with: "Please wait..." } %>
         </div>        
       </div>
         
 
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h2 class="panel-title"><%= @user.email %></h2>
+          <h2 class="panel-title">Account Info</h2>
         </div>          
         <div class="panel-body">
+        	<p>Email: <%= @user.email %></p>
         	<% if @last_pickup %>
 						<p>Last pickup: <%= @last_pickup.created_at.strftime("%A %B %d, %Y at %l:%M %p") %></p>
 					<% else %>
@@ -52,7 +75,7 @@
       
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h2 class="panel-title">Products to pickup today</h2>
+          <h2 class="panel-title">Your recently delivered products</h2>
         </div>          
         <div class="panel-body">
 			    <table class="table">
@@ -61,7 +84,7 @@
 			        	<th class="text-center"></th>
 			          <th class="text-center">Producer</th>
 			          <th class="text-center">Product</th>
-			          <th class="text-center">Quantity to Pickup</th>
+			          <th class="text-center">Quantity Delivered</th>
 			        </tr>
 			      </thead>
 			      <tbody>
