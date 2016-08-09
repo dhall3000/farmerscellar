@@ -151,7 +151,8 @@ class BulkPurchasesTest < BulkBuyer
     tote_items = assigns(:tote_items)
     #verify proper number of items picked up
     assert_equal num_items_second_pickup_count, tote_items.count
-    #post another pickup
+    #post another pickup after 61 minutes
+    travel_to Time.zone.now + 61.minutes
     post pickups_path, pickup_code: @c1.pickup_code.code
     tote_items = assigns(:tote_items)
     #verify no more items picked up
@@ -240,7 +241,8 @@ class BulkPurchasesTest < BulkBuyer
     tote_items = assigns(:tote_items)
     #verify proper number of items picked up
     assert_equal num_items_second_pickup_count, tote_items.count
-    #post another pickup
+    #post another pickup after 61 minutes
+    travel_to Time.zone.now + 61.minutes
     post pickups_path, pickup_code: @c1.pickup_code.code
     tote_items = assigns(:tote_items)
     #verify no more items picked up

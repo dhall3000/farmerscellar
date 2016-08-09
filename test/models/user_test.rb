@@ -1055,6 +1055,156 @@ class UserTest < ActiveSupport::TestCase
     assert_equal "d1order_email@d.com", @f6.get_business_interface.order_email
   end
 
+  def setup_pickup_testing
+    
+    nuke_all_postings
+    producer = create_producer("producer", "producer@o.com", "WA", 98033, "www.producer.com", "producer FARMS")
+    producer.save
+    delivery_date = get_delivery_date(days_from_now = 14)
+    days_shift = delivery_date.wday - 3
+    delivery_date = delivery_date - days_shift.days
+    posting_carrots = create_posting(producer, price = 1.50, product = products(:carrots), unit = units(:pound), delivery_date)
+    bob = create_user("bob", "bob@b.com", 98033)
+    ti_bob_carrots = create_tote_item(posting_carrots, quantity = 6, bob)
+    ti_bob_carrots.transition(:customer_authorized)
+    ti_bob_carrots.transition(:commitment_zone_started)          
+    ti_bob_carrots.transition(:tote_item_filled, {quantity_filled: ti_bob_carrots.quantity})      
+
+    return bob
+
+  end
+
+  test "second pickup of the week should not display items picked up during first pickup" do
+
+    nuke_all_postings
+    producer = create_producer("producer", "producer@o.com", "WA", 98033, "www.producer.com", "producer FARMS")
+    producer.save
+    delivery_date = get_delivery_date(days_from_now = 14)    
+    days_shift = delivery_date.wday - 3
+    delivery_date = delivery_date - days_shift.days
+    delivery_date2 = delivery_date + 2.days
+
+    posting_carrots = create_posting(producer, price = 1.50, product = products(:carrots), unit = units(:pound), delivery_date)
+    bob = create_user("bob", "bob@b.com", 98033)
+    ti_bob_carrots = create_tote_item(posting_carrots, quantity = 6, bob)
+    ti_bob_carrots.transition(:customer_authorized)
+    ti_bob_carrots.transition(:commitment_zone_started)          
+    ti_bob_carrots.transition(:tote_item_filled, {quantity_filled: ti_bob_carrots.quantity})      
+
+    posting_apples = create_posting(producer, price = 2.50, product = products(:apples), unit = units(:pound), delivery_date2)
+    ti_bob_apples = create_tote_item(posting_apples, quantity = 2, bob)
+    ti_bob_apples.transition(:customer_authorized)
+    ti_bob_apples.transition(:commitment_zone_started)          
+    ti_bob_apples.transition(:tote_item_filled, {quantity_filled: ti_bob_apples.quantity})
+
+    #do a pickup now
+    bob.pickups.create
+    #verify there's 1 pickup
+    assert_equal 1, bob.pickups.count
+    #travel between delivery dates
+    travel_to delivery_date + 1.day
+    #verify carrots are available for pickup
+    assert_equal 1, bob.tote_items_to_pickup.count
+    assert_equal "Carrots", bob.tote_items_to_pickup.first.posting.product.name    
+    #pick up carrots
+    bob.pickups.create
+    #verify there's 2 pickups
+    assert_equal 2, bob.pickups.count
+    #travel 61 minutes forward
+    travel_to Time.zone.now + 61.minutes
+    #verify nothing is available for pickup
+    assert_equal 0, bob.tote_items_to_pickup.count
+    #travel a day after apples delivery
+    travel_to delivery_date2 + 1.day
+    #verify apples are available for pickup
+    assert_equal 1, bob.tote_items_to_pickup.count
+    assert_equal "Fuji Apples", bob.tote_items_to_pickup.first.posting.product.name
+    #pickup apples
+    bob.pickups.create
+    #verify there's 3 pickups
+    assert_equal 3, bob.pickups.count
+    #travel 61 minutes forward
+    travel_to Time.zone.now + 61.minutes
+    #verify nothing is available for pickup
+    assert_equal 0, bob.tote_items_to_pickup.count
+
+    travel_back
+
+  end
+
+  test "items delivered on wednesday should be available for pickup on thursday" do    
+
+    bob = setup_pickup_testing
+
+    assert_equal 0, bob.pickups.count
+    bob.pickups.create
+    assert_equal 1, bob.pickups.count
+
+    travel_to bob.tote_items.first.posting.delivery_date + 1.day
+    assert_equal 1, bob.tote_items_to_pickup.count
+    bob.pickups.create
+    travel_to Time.zone.now + 61.minutes
+    assert_equal 0, bob.tote_items_to_pickup.count
+
+    travel_back
+
+  end
+
+  test "items delivered on wednesday should not be available for pickup next tuesday" do
+    
+    bob = setup_pickup_testing
+
+    assert_equal 0, bob.pickups.count
+    bob.pickups.create
+    assert_equal 1, bob.pickups.count
+
+    travel_to bob.tote_items.first.posting.delivery_date + 1.day
+    assert_equal 1, bob.tote_items_to_pickup.count
+    travel_to bob.tote_items.first.posting.delivery_date + 6.days    
+    assert_equal 0, bob.tote_items_to_pickup.count
+
+    travel_back    
+
+  end
+
+  test "items picked up 30 minutes ago should still be available for pickup" do
+
+    bob = setup_pickup_testing
+
+    assert_equal 0, bob.pickups.count
+    bob.pickups.create
+    assert_equal 1, bob.pickups.count
+
+    travel_to bob.tote_items.first.posting.delivery_date + 1.day
+    assert_equal 1, bob.tote_items_to_pickup.count
+    bob.pickups.create
+    assert_equal 2, bob.pickups.count
+    travel_to Time.zone.now + 30.minutes
+    assert_equal 1, bob.tote_items_to_pickup.count
+
+    travel_back
+
+  end
+
+  test "items picked up 90 minutes ago should not still be available for pickup" do
+
+    bob = setup_pickup_testing
+
+    assert_equal 0, bob.pickups.count
+    bob.pickups.create
+    assert_equal 1, bob.pickups.count
+
+    travel_to bob.tote_items.first.posting.delivery_date + 1.day
+    assert_equal 1, bob.tote_items_to_pickup.count
+    bob.pickups.create
+    assert_equal 2, bob.pickups.count
+    travel_to Time.zone.now + 90.minutes
+    assert_equal 0, bob.tote_items_to_pickup.count
+
+    travel_back
+
+  end
+
   test "should get tote items to pickup" do
 
     c1 = users(:c1)

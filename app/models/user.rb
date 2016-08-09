@@ -236,16 +236,22 @@ class User < ActiveRecord::Base
     #TODO: for now for 'delivered' we're going to use toteitem states FILLED or PURCHASED
     #this will eventually change though once we overhaul the toteitem statemachine
 
+    ds = dropsite
+    if ds.nil?
+      ds = Dropsite.first
+    end
+
     #A) 7 days ago
-    last_pickup = 7.days.ago
+    last_pickup = ds.last_food_clearout
     if pickups.any?
       #or...
-      #B) the last pickup
-      last_pickup = pickups.order("pickups.id").last.created_at
+      #B) the last pickup that was more than 60 minutes ago. the "more than 60 minutes ago" is in case someone picks up, heads out,
+      #gets 10 minutes away and realizes they forgot something and comes back
+      last_pickup = pickups.where("created_at < ?", Time.zone.now - 60.minutes).order("pickups.id").last.created_at
     end
 
     #whichever is more recent
-    cutoff = [last_pickup, 7.days.ago].max
+    cutoff = [last_pickup, ds.last_food_clearout].max
 
     return tote_items.joins(:posting).where("postings.delivery_date > ? and postings.delivery_date < ?", cutoff, Time.zone.now).where(state: [ToteItem.states[:FILLED], ToteItem.states[:NOTFILLED]])
 
