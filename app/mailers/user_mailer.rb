@@ -42,16 +42,21 @@ class UserMailer < ApplicationMailer
 
   end
 
-  def delivery_notification(user, dropsite, tote_items)
+  def delivery_notification(user, dropsite, tote_items, partner_name = nil)
     @user = user
     @dropsite = dropsite
     @tote_items = tote_items
+    @partner_name = partner_name
     @all_items_fully_filled = all_items_fully_filled?(tote_items)
 
-    if @all_items_fully_filled
-      subject = "Delivery notification"
+    if partner_name
+      subject = partner_name + " delivery notification"
     else
-      subject = "Unfilled order(s) and delivery notification"
+      if @all_items_fully_filled
+        subject = "Delivery notification"
+      else
+        subject = "Unfilled order(s) and delivery notification"
+      end
     end
 
     subject += " & policy changes"

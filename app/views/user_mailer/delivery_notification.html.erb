@@ -7,7 +7,7 @@
   <li><%= link_to "Monday night pickup deadline", how_things_work_url(anchor: "pickup_deadline") %></li>
   <li><%= link_to "Accidentally taking incorrect product", how_things_work_url(anchor: "incorrect_product_pickup") %></li>
 </ol>
-<p>------------------------------------------------------------------------</p>
+<p>----------------------------------------------------------------------------------------</p>
 <% if !@all_items_fully_filled %>
 <h1>Important Message!</h1>
 <ol>
@@ -26,51 +26,57 @@ Hello,
 This email is your Farmer's Cellar delivery notification.
 </p>
 
-<% products_delivered = false %>
+<% if @partner_name %>
+  <% products_delivered = true %>
+<% else %>
+  <% products_delivered = false %>
+<% end %>
 
-<table border="1">
-  <thead>
-    <tr>		    
-      <th align="left">ID</th>
-      <th align="left">Producer</th>
-      <th align="left">Product</th>
-      <th align="left">Unit</th>
-      <th align="center">Quantity Delivered</th>
-      <th align="center">Status</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @tote_items.each do |tote_item| %>
-      <tr>
-        <td align="left"><%= tote_item.id %></td>
-        <td align="left"><%= tote_item.posting.user.farm_name %></td>
-        <td align="left"><%= tote_item.posting.product.name %></td>
-        <td align="left"><%= tote_item.posting.unit.name %></td>
-
-        <% if tote_item.fully_filled? %>
-          <td align="center"><%= tote_item.quantity_filled %></td>
-        <% else %>
-          <td bgcolor="yellow" align="center"><%= tote_item.quantity_filled %></td>
-        <% end %>        
-
-        <td align="center">
-          <% if tote_item.state == ToteItem.states[:FILLED] %>
-            DELIVERED
-            <% products_delivered = true %>
-          <% elsif tote_item.state == ToteItem.states[:NOTFILLED] %>
-            NOT DELIVERED
-          <% else %>
-            UNKNOWN
-          <% end %>
-        </td>
+<% if @tote_items %>
+  <table border="1">
+    <thead>
+      <tr>		    
+        <th align="left">ID</th>
+        <th align="left">Producer</th>
+        <th align="left">Product</th>
+        <th align="left">Unit</th>
+        <th align="center">Quantity Delivered</th>
+        <th align="center">Status</th>
       </tr>
-    <% end %>
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      <% @tote_items.each do |tote_item| %>
+        <tr>
+          <td align="left"><%= tote_item.id %></td>
+          <td align="left"><%= tote_item.posting.user.farm_name %></td>
+          <td align="left"><%= tote_item.posting.product.name %></td>
+          <td align="left"><%= tote_item.posting.unit.name %></td>
+
+          <% if tote_item.fully_filled? %>
+            <td align="center"><%= tote_item.quantity_filled %></td>
+          <% else %>
+            <td bgcolor="yellow" align="center"><%= tote_item.quantity_filled %></td>
+          <% end %>        
+
+          <td align="center">
+            <% if tote_item.state == ToteItem.states[:FILLED] %>
+              DELIVERED
+              <% products_delivered = true %>
+            <% elsif tote_item.state == ToteItem.states[:NOTFILLED] %>
+              NOT DELIVERED
+            <% else %>
+              UNKNOWN
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
 
 <% if products_delivered == true %>
   <p>Your products are available for you to pick up at your convenience.</p>
-  <p>First time user? Watch <%= link_to "this", "https://youtu.be/2fOXJ2Ijs8Y", target: false %> to see what to expect at pickup.</p>
+  <p>First time user? Watch <%= link_to "this", "https://youtu.be/oE4D93bALnM", target: false %> to see what to expect at pickup.</p>
   <p>Your dropsite is:</p>
   <p>
   <%= @dropsite.name %><br>

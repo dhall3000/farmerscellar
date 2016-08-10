@@ -7,7 +7,7 @@ Updated Policies
     1) Monday night pickup deadline: https://www.farmerscellar.com/how_things_work#pickup_deadline
     2) Accidentally taking incorrect product https://www.farmerscellar.com/how_things_work#incorrect_product_pickup
 
-------------------------------------------------------------------------
+----------------------------------------------------------------------------------------
 
 <% if !@all_items_fully_filled %>
 IMPORTANT MESSAGE!
@@ -22,8 +22,12 @@ Hello,
 This email is your Farmer's Cellar delivery notification.
 
 Here is the status of products you recently ordered that were set for delivery today:
-<% products_delivered = false %>
-
+<% if @partner_name %>
+  <% products_delivered = true %>
+<% else %>
+  <% products_delivered = false %>
+<% end %>
+<% if @tote_items %>
 <% @tote_items.each do |tote_item| %>
   <% status = "UNKNOWN" %>
   <% if tote_item.state == ToteItem.states[:FILLED] %>
@@ -35,11 +39,12 @@ Here is the status of products you recently ordered that were set for delivery t
 ID=<%= tote_item.id %>,Producer=<%= tote_item.posting.user.farm_name %>,Product=<%= tote_item.posting.product.name %>,Unit=<%= tote_item.posting.unit.name %>,Quantity Delivered=<%= tote_item.quantity_filled %>,Status=<%= status %>
 ---------------------------------------------------------------------------------
 <% end %>
+<% end %>
 
 <% if products_delivered == true %>
 Your products are available for you to pick up at your convenience.
 
-First time user? Watch this to see what to expect at pickup: https://youtu.be/2fOXJ2Ijs8Y
+First time user? Watch this to see what to expect at pickup: https://youtu.be/oE4D93bALnM
 
 Your dropsite is:
 <%= @dropsite.name %>

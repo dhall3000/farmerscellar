@@ -59,6 +59,36 @@ class UserMailerPreview < ActionMailer::Preview
   end
 
   # Preview this email at
+  # http://localhost:3000/rails/mailers/user_mailer/delivery_notification_partner_producer
+  def delivery_notification_partner_producer
+
+    email = "partner_user@p.com"
+
+    user = User.find_by(email: email)
+
+    if user.nil?
+
+      user = User.new(
+        email: email,
+        password: "oxuntvZb{?c6193753cjapJ",
+        name: "Bob Partner",
+        account_type: User.types[:CUSTOMER],
+        activated: true,
+        partner_user: true
+        )
+
+      user.save
+      user.set_dropsite(Dropsite.first)
+
+    end
+
+    dropsite = user.dropsite
+
+    UserMailer.delivery_notification(user, dropsite, tote_items = nil, "Azure Standard")
+
+  end
+
+  # Preview this email at
   # http://localhost:3000/rails/mailers/user_mailer/delivery_notification
   def delivery_notification_unknown_state
     user = User.find_by(email: "c1@c.com")

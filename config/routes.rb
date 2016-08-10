@@ -1,4 +1,5 @@
-Rails.application.routes.draw do
+Rails.application.routes.draw do  
+
   root 'static_pages#home'
   get 'rtauthorizations/new'
   post 'rtauthorizations/create'
@@ -28,6 +29,9 @@ Rails.application.routes.draw do
   get 'tote_items/pout'  
   post 'subscriptions/skip_dates'
   post 'pickups/toggle_garage_door'
+  get 'partner_users/index'
+  post 'partner_users/create'
+  post 'partner_users/send_delivery_notification'
   
   resources :subscriptions, only: [:new, :create, :index, :show, :edit, :update]
   resources :producer_product_unit_commissions

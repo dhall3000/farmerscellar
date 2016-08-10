@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160727204721) do
+ActiveRecord::Schema.define(version: 20160810180050) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -605,6 +605,7 @@ ActiveRecord::Schema.define(version: 20160727204721) do
     t.integer  "zip"
     t.integer  "distributor_id"
     t.float    "order_minimum",     default: 0.0,   null: false
+    t.boolean  "partner_user",      default: false
   end
 
   add_index "users", ["account_type"], name: "index_users_on_account_type"
