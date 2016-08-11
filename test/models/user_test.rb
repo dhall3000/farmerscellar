@@ -1236,6 +1236,7 @@ class UserTest < ActiveSupport::TestCase
     #verify items returned is zero
     if c1.tote_items_to_pickup.count > 0
       c1.pickups.create      
+      travel_to 61.minutes.from_now
     end
 
     assert_equal 0, c1.tote_items_to_pickup.count

@@ -247,7 +247,15 @@ class User < ActiveRecord::Base
       #or...
       #B) the last pickup that was more than 60 minutes ago. the "more than 60 minutes ago" is in case someone picks up, heads out,
       #gets 10 minutes away and realizes they forgot something and comes back
-      last_pickup = pickups.where("created_at < ?", Time.zone.now - 60.minutes).order("pickups.id").last.created_at
+      #last_pickup = pickups.where("created_at < ?", Time.zone.now - 60.minutes).order("pickups.id").last.created_at
+      last_pickup = pickups.where("created_at < ?", Time.zone.now - 60.minutes).order("pickups.id").last
+
+      if last_pickup.nil?
+        last_pickup = ds.last_food_clearout
+      else
+        last_pickup = last_pickup.created_at
+      end
+
     end
 
     #whichever is more recent
