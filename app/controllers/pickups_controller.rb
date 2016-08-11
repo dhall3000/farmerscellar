@@ -43,14 +43,14 @@ class PickupsController < ApplicationController
 
     end
 
-    display_user_data
+    display_user_data(create_pickup_on_success = false)
     puts "PickupsController.toggle_garage_door end"    
 
   end
 
   private    
 
-    def display_user_data
+    def display_user_data(create_pickup_on_success = true)
 
       @mockup_mode = @@mockup_mode
 
@@ -85,7 +85,10 @@ class PickupsController < ApplicationController
 
           @last_pickup = @user.pickups.order("pickups.id").last
           #now create a new pickup to represent the current pickup                  
-          @user.pickups.create
+
+          if create_pickup_on_success
+            @user.pickups.create
+          end
           
           render 'pickups/create'
 

@@ -58,6 +58,31 @@ class PickupsControllerTest < ActionController::TestCase
     assert_equal c1.id, Pickup.all.last.user_id
   end
 
+  test "should create a single pickup row for full pickup process" do
+    log_in_as(@dropsite_user)
+    pickups_count = Pickup.count
+    c1 = users(:c1)
+    post :create, pickup_code: c1.pickup_code.code
+    assert_response :success
+    pickup_code = assigns(:pickup_code)
+    assert pickup_code.valid?
+    user = assigns(:user)
+    assert user.valid?
+    #a new pickup object should have been created as a result of this pickup action
+    assert_equal pickups_count + 1, Pickup.count
+    assert_equal c1.id, Pickup.all.last.user_id
+
+    #ok, user logged in. now they open the garage door
+    post :toggle_garage_door, pickup_code: c1.pickup_code.code
+    #and now they close the garage door
+    post :toggle_garage_door, pickup_code: c1.pickup_code.code
+
+    #there shouldn't be any new pickup objects after cycling the garage door
+    assert_equal pickups_count + 1, Pickup.count
+    assert_equal c1.id, Pickup.all.last.user_id
+
+  end
+
   test "should not create when invalid code submitted" do
   	log_in_as(@dropsite_user)
   	pickups_count = Pickup.count
