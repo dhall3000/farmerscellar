@@ -72,22 +72,23 @@
         </div>        
       </div>
 
+      <% if @tote_items.any? %>
       
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h2 class="panel-title">Your recently delivered products</h2>
-        </div>          
-        <div class="panel-body">
-			    <table class="table">
-			      <thead>
-			        <tr>
-			        	<th class="text-center"></th>
-			          <th class="text-center">Producer</th>
-			          <th class="text-center">Product</th>
-			          <th class="text-center">Quantity Delivered</th>
-			        </tr>
-			      </thead>
-			      <tbody>
+	      <div class="panel panel-default">
+	        <div class="panel-heading">
+	          <h2 class="panel-title">Your recently delivered products</h2>
+	        </div>          
+	        <div class="panel-body">
+				    <table class="table">
+				      <thead>
+				        <tr>
+				        	<th class="text-center"></th>
+				          <th class="text-center">Producer</th>
+				          <th class="text-center">Product</th>
+				          <th class="text-center">Quantity Delivered</th>
+				        </tr>
+				      </thead>
+				      <tbody>
 
 				        <% @tote_items.each do |tote_item| %>        
 				        	<tr>				        	
@@ -108,11 +109,11 @@
 				          </tr>        
 				        <% end %>
 
-			      </tbody>
-			    </table>          	
-        </div>
-      </div>
-
+				      </tbody>
+				    </table>          	
+	        </div>
+	      </div>
+	    <% end %>
 
     </div>
 	</div>
