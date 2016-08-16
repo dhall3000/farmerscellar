@@ -124,7 +124,13 @@ class SubscriptionTest < ActiveSupport::TestCase
 			assert_equal 4.weeks, gap
 
 			gap = delivery_dates[2] - delivery_dates[1]
-			assert_equal 4.weeks, gap
+			expected_gap = 4.weeks
+
+			if delivery_dates[1].dst? && !delivery_dates[2].dst?
+				expected_gap += 1.hour
+			end			
+			
+			assert_equal expected_gap, gap
 
 			#assert all on a friday
 			assert_equal 5, delivery_dates[0].wday
