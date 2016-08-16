@@ -108,7 +108,7 @@ class Subscription < ActiveRecord::Base
     if tote_items && tote_items.any?
       puts "get_delivery_dates: tote_items.any?"
       #start at tote_items.first and compute forward
-      delivery_date = tote_items.order("tote_items.id").first.posting.delivery_date      
+      delivery_date = posting_recurrence.reference_date
     else
       puts "get_delivery_dates: !tote_items.any?"
       delivery_date = posting_recurrence.current_posting.delivery_date
