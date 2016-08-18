@@ -169,10 +169,12 @@ class ToteItemsController < ApplicationController
         ti.transition(:customer_removed)        
         if ti.state?(:REMOVED)
 
-          flash_text = "#{ti.posting.user.farm_name} #{ti.posting.product.name} removed from tote"
+          flash_text = "#{ti.posting.user.farm_name} #{ti.posting.product.name} for #{ti.posting.delivery_date.strftime("%A %B %d")} delivery removed"
 
           if ti.subscription && ti.subscription.on && !ti.subscription.paused
-            flash[:info] = flash_text + " but your subscription is still on. Go to Account, Subscriptions to manage."
+            flash[:info] = flash_text + " but your subscription is still active."
+            redirect_to edit_subscription_path(ti.subscription)
+            return
           else
             flash[:success] = flash_text
           end

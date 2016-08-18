@@ -179,7 +179,7 @@ class SubscriptionsControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert_template 'subscriptions/index'
-    assert_select 'p', "You do not have any subscriptions"
+    assert_select 'p', "You do not have any subscriptions."
     assert_equal false, assigns(:subscriptions).any?
     assert_equal nil, assigns(:end_date)
     assert_equal nil, assigns(:skip_dates)
