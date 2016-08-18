@@ -17,7 +17,7 @@ class SubscriptionsControllerTest < ActionController::TestCase
     subscription_count = @c1.subscriptions.count
     post :create, tote_item_id: ti.id, frequency: 1
     assert_response :redirect    
-    assert_redirected_to postings_path    
+    assert_redirected_to subscriptions_path    
     @c1.reload
     assert_equal subscription_count + 1, @c1.subscriptions.count
     assert_not flash.empty?
