@@ -1,5 +1,9 @@
 <h1>Shopping Tote</h1>
 
+<%= link_to subscriptions_path, class: "btn btn-primary btn-lg" do %>
+  <span class="glyphicon glyphicon-repeat"></span> Subscriptions
+<% end %>
+
 <% if logged_in? %>
 
   <% show_remove_button = true %>
