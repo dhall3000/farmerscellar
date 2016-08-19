@@ -56,7 +56,7 @@ class SubscriptionsController < ApplicationController
 
     @subscription = Subscription.new(frequency: frequency, on: true, user_id: current_user.id, posting_recurrence_id: @posting_recurrence.id, quantity: @tote_item.quantity, paused: false)
     if @subscription.save
-      
+
       @subscription.tote_items << @tote_item
       @subscription.save
 
@@ -153,21 +153,25 @@ class SubscriptionsController < ApplicationController
       return
     end
 
+    producer_product = "#{@subscription.posting_recurrence.current_posting.user.farm_name} #{@subscription.posting_recurrence.current_posting.product.name}"
+
     on = params[:subscription][:on].to_i
     if on == 0
       
       if @subscription.turn_off
 
+        flash_message = "#{producer_product} subscription"
+
         SubscriptionSkipDate.where("subscription_id = ? and skip_date > ?", id, Time.zone.now).delete_all      
         unremovable_items = remove_items_from_tote_for_this_subscription
-        if unremovable_items.any?
-          flash[:info] = "Subscription canceled. Note that your tote still has some items scheduled for delivery."
+        if unremovable_items.any?          
+          flash[:info] = "#{flash_message} canceled. Note: some items still scheduled for delivery. See tote."
         else
-          flash[:success] = "Subscription canceled"
+          flash[:success] = flash_message + " canceled"
         end
         
       else
-        flash[:danger] = "Subscription not canceled"
+        flash[:danger] = flash_message + " not canceled"
       end
 
       redirect_to subscriptions_path
@@ -192,19 +196,29 @@ class SubscriptionsController < ApplicationController
 
       if !@subscription.paused
         tote_item = @subscription.generate_next_tote_item
-      end            
+      end      
 
-      if pause_value && unremovable_items.any?
-        flash[:info] = "Subscription paused. Note that your tote still has some items scheduled for delivery."
+      if pause_value
+
+        flash_message = "#{producer_product} subscription paused."
+
+        if unremovable_items.any?
+          flash_message += " Note: some items still scheduled for delivery. See tote."
+          flash[:info] = flash_message
+        else
+          flash[:success] = flash_message
+        end
+
       else
-        flash[:success] = "Subscription updated"
+        flash_message = "#{producer_product} subscription unpaused."
+        flash[:success] = flash_message
       end
       
     else
       flash[:danger] = "Subscription not updated"
     end
 
-    redirect_to subscription_path(@subscription)
+    redirect_to subscriptions_path
     
   end
 
