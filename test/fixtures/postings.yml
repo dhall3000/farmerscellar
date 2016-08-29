@@ -18,6 +18,14 @@
 <% friday_after_base_monday = wednesday_after_base_monday + 2.days %>
 <% monday_after_base_monday = base_monday + 7.days %>
 
+<% next_non_sunday_or_monday = Time.zone.now.midnight %>
+<% if next_non_sunday_or_monday.sunday? %>
+  <% next_non_sunday_or_monday = next_non_sunday_or_monday + 2.days %>
+<% end %>
+<% if next_non_sunday_or_monday.monday? %>
+  <% next_non_sunday_or_monday = next_non_sunday_or_monday + 1.day %>
+<% end %>
+
 f9posting:
   delivery_date: <%= delivery_date %>
   commitment_zone_start: <%= delivery_date - 2.days %>  
@@ -335,8 +343,8 @@ postingf4celery:
 
 #Avocado
 postingf4avocado:
-  delivery_date: <%= Time.zone.now.midnight %>
-  commitment_zone_start: <%= Time.zone.now.midnight - 2.days %>  
+  delivery_date: <%= next_non_sunday_or_monday %>
+  commitment_zone_start: <%= next_non_sunday_or_monday - 2.days %>
   product: avocado
   quantity_available: 100
   price: 2.97
@@ -348,8 +356,8 @@ postingf4avocado:
 
 #Basil
 postingf4basil:
-  delivery_date: <%= Time.zone.now.midnight %>
-  commitment_zone_start: <%= Time.zone.now.midnight - 2.days %>  
+  delivery_date: <%= next_non_sunday_or_monday %>
+  commitment_zone_start: <%= next_non_sunday_or_monday - 2.days %>
   product: basil
   quantity_available: 100
   price: 2.27
