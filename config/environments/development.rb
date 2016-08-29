@@ -59,9 +59,13 @@ Rails.application.configure do
 
 #  ENV['PAYPALCREDENTIALS'] = "{\"USER\" => \"davideltonhall-w_api1.gmail.com\", \"PWD\" => \"GPAY4EJ3MZ2MTYJS\",\"SIGNATURE\" => \"AT6eAVSmMQynPpedcbmxy565ovQXAM-X9BnmoGTjVMyKn1FZ70rjebxN\"}"
   ENV['PAYPALCREDENTIALS'] = "{\"USER\" => \"davideltonhall-facilitator_api1.gmail.com\", \"PWD\" => \"2U4THLGZVCG6BSHH\",\"SIGNATURE\" => \"An5ns1Kso7MWUdW4ErQKJJJ4qi4-A-.uIGKotw7d0j4apBMju1cKS2pZ\"}"
+  ENV['FOODCLEAROUTDAYTIME'] = "{wday: 1, hour: 20}"
+  ENV['FOODCLEAROUTWARNINGDAYTIME'] = "{wday: 1, hour: 6}"  
   
   config.after_initialize do
     ::PAYPALCREDENTIALS = eval(ENV['PAYPALCREDENTIALS'])
+    ::FOODCLEAROUTDAYTIME = eval(ENV['FOODCLEAROUTDAYTIME'])
+    ::FOODCLEAROUTWARNINGDAYTIME = eval(ENV['FOODCLEAROUTWARNINGDAYTIME'])
 
     ActiveMerchant::Billing::Base.mode = :test    
     ::GATEWAY = ActiveMerchant::Billing::PaypalExpressGateway.new(

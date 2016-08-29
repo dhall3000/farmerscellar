@@ -16,15 +16,14 @@ class Dropsite < ActiveRecord::Base
   def last_food_clearout
     
     now = Time.zone.now
-    days_back = now.wday
     
-    if now.wday > 1
-      days_back = days_back - 1
-    elsif now.wday < 1
-      days_back = days_back + 6
+    if now.wday > FOODCLEAROUTDAYTIME[:wday]
+      days_back = now.wday - FOODCLEAROUTDAYTIME[:wday]
+    elsif now.wday < FOODCLEAROUTDAYTIME[:wday]
+      days_back = 7 - (FOODCLEAROUTDAYTIME[:wday] - now.wday)      
     else
       #ok, right now it is monday. is it before or after 8PM food sweep time?
-      if now < (now.midnight + 20.hours)
+      if now < (now.midnight + FOODCLEAROUTDAYTIME[:hour].hours)
         days_back = 7
       else
         days_back = 0
@@ -32,7 +31,7 @@ class Dropsite < ActiveRecord::Base
     end
 
     last_dropsite_clearout_day = now - days_back.days
-    last_dropsite_clearout_day_time = Time.zone.local(last_dropsite_clearout_day.year, last_dropsite_clearout_day.month, last_dropsite_clearout_day.day, 20, 0)
+    last_dropsite_clearout_day_time = Time.zone.local(last_dropsite_clearout_day.year, last_dropsite_clearout_day.month, last_dropsite_clearout_day.day, FOODCLEAROUTDAYTIME[:hour], 0)
 
     return last_dropsite_clearout_day_time        
 

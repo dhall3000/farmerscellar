@@ -93,6 +93,8 @@ Rails.application.configure do
 
   config.after_initialize do
     ::PAYPALCREDENTIALS = eval(ENV['PAYPALCREDENTIALS'])
+    ::FOODCLEAROUTDAYTIME = eval(ENV['FOODCLEAROUTDAYTIME'])
+    ::FOODCLEAROUTWARNINGDAYTIME = eval(ENV['FOODCLEAROUTWARNINGDAYTIME'])    
 
     ::GATEWAY = ActiveMerchant::Billing::PaypalExpressGateway.new(
       login: PAYPALCREDENTIALS["USER"],

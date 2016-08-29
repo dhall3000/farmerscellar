@@ -42,7 +42,14 @@ Rails.application.configure do
 
   config.action_mailer.default_url_options = { host: 'example.com' }  
 
+  ENV['FOODCLEAROUTDAYTIME'] = "{wday: 1, hour: 20}"
+  ENV['FOODCLEAROUTWARNINGDAYTIME'] = "{wday: 1, hour: 6}"    
+
   config.after_initialize do
+
+    ::FOODCLEAROUTDAYTIME = eval(ENV['FOODCLEAROUTDAYTIME'])
+    ::FOODCLEAROUTWARNINGDAYTIME = eval(ENV['FOODCLEAROUTWARNINGDAYTIME'])
+
     ::PAYPALCREDENTIALS =
     {
       "USER" => "davideltonhall-facilitator_api1.gmail.com",
