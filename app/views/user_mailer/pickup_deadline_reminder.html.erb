@@ -1,0 +1,61 @@
+<p>
+Hello,
+</p>
+<p>
+Have you picked up these products yet?
+</p>
+<% if @tote_items %>
+  <table border="1">
+    <thead>
+      <tr>        
+        <th align="left">ID</th>
+        <th align="left">Producer</th>
+        <th align="left">Product</th>
+        <th align="left">Unit</th>
+        <th align="center">Quantity Delivered</th>
+        <th align="center">Delivery Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @tote_items.each do |tote_item| %>
+        <% if tote_item.state?(:FILLED) %>
+
+          <tr>
+            <td align="left"><%= tote_item.id %></td>
+            <td align="left"><%= tote_item.posting.user.farm_name %></td>
+            <td align="left"><%= tote_item.posting.product.name %></td>
+            <td align="left"><%= tote_item.posting.unit.name %></td>
+
+            <% if tote_item.fully_filled? %>
+              <td align="center"><%= tote_item.quantity_filled %></td>
+            <% else %>
+              <td bgcolor="yellow" align="center"><%= tote_item.quantity_filled %></td>
+            <% end %>        
+
+            <td align="center"><%= tote_item.posting.delivery_date.strftime("%A %b %d, %Y") %></td>
+
+          </tr>
+
+        <% end %>
+
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<p>
+Our records suggest they might remain at the dropsite. If so, please plan to pick them up before 8PM tonight. Otherwise they'll be removed and donated according to <%= link_to "our policy outlined here", how_things_work_url(anchor: "pickup_deadline") %>.
+</p>
+<% if @user.pickups.any? %>
+<p>
+FYI, your last recorded pickup was <%= @user.pickups.last.created_at.strftime("%A %B %d, %Y at %l:%M %p") %>.
+</p>
+<% end %>
+
+<p>
+Thanks!
+</p>
+<p>
+Farmer's Cellar<br>
+<%= link_to "www.farmerscellar.com", root_url %>
+</p>

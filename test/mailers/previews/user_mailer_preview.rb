@@ -2,6 +2,19 @@
 class UserMailerPreview < ActionMailer::Preview
   include ToteItemsHelper
 
+  # Preview this email at http://localhost:3000/rails/mailers/user_mailer/pickup_deadline_reminder
+  def pickup_deadline_reminder
+    user = User.find_by(email: "c1@c.com")
+
+    user.tote_items.first.update(state: ToteItem.states[:FILLED], quantity_filled: user.tote_items.first.quantity)
+    user.tote_items.second.update(state: ToteItem.states[:FILLED], quantity_filled: user.tote_items.second.quantity)
+    user.tote_items.third.update(state: ToteItem.states[:FILLED], quantity_filled: 1)
+
+    user.pickups.create
+
+    UserMailer.pickup_deadline_reminder(user, user.tote_items)
+  end
+
   # Preview this email at http://localhost:3000/rails/mailers/user_mailer/account_activation
   def account_activation
     user = User.first

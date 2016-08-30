@@ -8,7 +8,8 @@ class RakeHelper
 	  puts "beginning hourly scheduled tasks..."
 
 	  roll_postings
-		do_nightly_tasks
+		nightly_tasks
+		send_pickup_deadline_reminders
 
 	  puts "finished with hourly tasks."
 
@@ -22,7 +23,49 @@ class RakeHelper
 			send_orders_to_creditors(transition_posting_ids)		
 		end
 
-		def self.do_nightly_tasks
+		def self.send_pickup_deadline_reminders
+
+			puts "send_pickup_deadline_reminders: enter"
+
+			#if this isn't the correct time, exit
+			now = Time.zone.now
+			if now.wday != FOODCLEAROUTWARNINGDAYTIME[:wday] || now.hour != FOODCLEAROUTWARNINGDAYTIME[:hour]
+				puts "send_pickup_deadline_reminders: it is not pickup deadline reminder time so exiting having done nothing."
+				puts "send_pickup_deadline_reminders: exit"
+				return
+			end
+
+			#get a list of everbody who had products delivered last week
+			filled_within_last_seven_days_users = User.joins(tote_items: :posting).where("postings.delivery_date > ? and tote_items.state = ?", Time.zone.now - 7.days, ToteItem.states[:FILLED]).uniq
+
+			filled_within_last_seven_days_users.each do |filled_within_last_seven_days_user|
+
+				user = filled_within_last_seven_days_user
+
+				if user.pickups.any?
+					#we want what's most recent, user's last pickup or the last food clearout
+					cutoff = [user.pickups.last.created_at, user.dropsite.last_food_clearout].max
+				else
+					#user's never picked up before so just get the latest food clearout
+					cutoff = user.dropsite.last_food_clearout
+				end				
+
+				filled_tote_items_remaining_at_dropsite = user.tote_items.joins(:posting).where("postings.delivery_date > ? and tote_items.state = ?", cutoff, ToteItem.states[:FILLED]).order("postings.delivery_date").uniq
+
+				if filled_tote_items_remaining_at_dropsite.any?
+					puts "user #{user.id.to_s} #{user.email} has products remaining. sending them a pickup deadline reminder."
+					UserMailer.pickup_deadline_reminder(user, filled_tote_items_remaining_at_dropsite).deliver_now
+				else
+					puts "user #{user.id.to_s} #{user.email} has no products remaining. not sending them a pickup deadline reminder."
+				end
+				
+			end
+			
+			puts "send_pickup_deadline_reminders: exit"
+			
+		end
+
+		def self.nightly_tasks
 
 			now = Time.zone.now
 
