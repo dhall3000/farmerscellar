@@ -14,7 +14,7 @@ class User < ActiveRecord::Base
   has_many :rtbas
   has_many :subscriptions
   has_many :pickups
-
+  has_many :partner_deliveries
   has_many :tote_items
   #has_many :postings, through: :tote_items
 

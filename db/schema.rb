@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160810180050) do
+ActiveRecord::Schema.define(version: 20160830173112) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -230,6 +230,15 @@ ActiveRecord::Schema.define(version: 20160810180050) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
+
+  create_table "partner_deliveries", force: :cascade do |t|
+    t.string   "partner"
+    t.integer  "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_index "partner_deliveries", ["user_id"], name: "index_partner_deliveries_on_user_id"
 
   create_table "payment_payable_payments", force: :cascade do |t|
     t.integer  "payment_payable_id"

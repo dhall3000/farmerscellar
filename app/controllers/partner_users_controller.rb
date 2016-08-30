@@ -58,9 +58,11 @@ class PartnerUsersController < ApplicationController
   def send_delivery_notification
 
     users = User.where(id: params["user_ids"])
+    partner = params["partner_name"]
 
     users.each do |user|
-      UserMailer.delivery_notification(user, user.dropsite, tote_items = nil, params["partner_name"]).deliver_now
+      UserMailer.delivery_notification(user, user.dropsite, tote_items = nil, partner).deliver_now
+      user.partner_deliveries.create(partner: partner)
     end
 
     flash[:success] = "Delivery notifications sent"

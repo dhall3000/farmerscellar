@@ -129,7 +129,7 @@ class RakeTasksTest < BulkBuyer
           #if it's 10pm...
           if Time.zone.now.hour == 22
             do_nightly_task_assertions
-          else
+          else            
             #otherwise only the hourlies should have processed so the following assertion should hold
             assert_equal 0, ActionMailer::Base.deliveries.count
           end
@@ -157,6 +157,11 @@ class RakeTasksTest < BulkBuyer
             assert previous_filled_count < ToteItem.where(state: ToteItem.states[:FILLED]).count            
 
             assert_equal 0, ActionMailer::Base.deliveries.count
+
+            #now pretend that the users come and do a pickup
+            customers.each do |customer|
+              customer.pickups.create
+            end
 
           end
           

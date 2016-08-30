@@ -18,7 +18,10 @@ class PartnerUsersTest < ActionDispatch::IntegrationTest
     assert user.pickup_code.code.to_i > 0
     #send delivery notification
     ActionMailer::Base.deliveries.clear
+    assert_equal 0, user.partner_deliveries.count
     post partner_users_send_delivery_notification_path, user_ids: [user.id], partner_name: "Azure Standard"
+    assert_equal 1, user.partner_deliveries.count
+    assert_equal "Azure Standard", user.partner_deliveries.first.partner
     assert :redirected
     assert_redirected_to partner_users_index_path
     assert_equal 1, ActionMailer::Base.deliveries.count

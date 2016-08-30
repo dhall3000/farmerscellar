@@ -8,7 +8,7 @@ class RakeHelper
 	  puts "beginning hourly scheduled tasks..."
 
 	  roll_postings
-		nightly_tasks
+		do_nightly_tasks
 		send_pickup_deadline_reminders
 
 	  puts "finished with hourly tasks."
@@ -65,7 +65,7 @@ class RakeHelper
 			
 		end
 
-		def self.nightly_tasks
+		def self.do_nightly_tasks
 
 			now = Time.zone.now
 
