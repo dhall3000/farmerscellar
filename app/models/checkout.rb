@@ -1,4 +1,4 @@
-class Checkout < ActiveRecord::Base
+class Checkout < ApplicationRecord
   serialize :response
 
   has_many :tote_item_checkouts

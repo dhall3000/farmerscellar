@@ -1,4 +1,4 @@
-class UserDropsite < ActiveRecord::Base
+class UserDropsite < ApplicationRecord
   belongs_to :user
   belongs_to :dropsite
 end

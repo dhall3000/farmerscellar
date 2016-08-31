@@ -1,4 +1,4 @@
-class PostingRecurrence < ActiveRecord::Base
+class PostingRecurrence < ApplicationRecord
   before_validation :set_reference_date
 
   has_many :postings

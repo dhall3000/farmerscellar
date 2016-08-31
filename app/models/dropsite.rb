@@ -1,4 +1,4 @@
-class Dropsite < ActiveRecord::Base
+class Dropsite < ApplicationRecord
 	
   has_many :user_dropsites
   has_many :users, through: :user_dropsites

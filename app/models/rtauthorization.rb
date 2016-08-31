@@ -1,4 +1,4 @@
-class Rtauthorization < ActiveRecord::Base
+class Rtauthorization < ApplicationRecord
   belongs_to :rtba
 
   has_many :tote_item_rtauthorizations

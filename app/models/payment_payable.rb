@@ -1,4 +1,4 @@
-class PaymentPayable < ActiveRecord::Base
+class PaymentPayable < ApplicationRecord
   has_many :user_payment_payables
   #'users' now stores reference to 'creditor'. see method 'get_creditor' in model User and this line of code in model BulkPurchase: payment_payable.users << producer.get_creditor
   has_many :users, through: :user_payment_payables

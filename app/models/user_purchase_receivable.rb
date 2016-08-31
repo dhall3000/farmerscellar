@@ -1,4 +1,4 @@
-class UserPurchaseReceivable < ActiveRecord::Base
+class UserPurchaseReceivable < ApplicationRecord
   belongs_to :user
   belongs_to :purchase_receivable
 end

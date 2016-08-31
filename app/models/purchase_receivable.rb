@@ -1,4 +1,4 @@
-class PurchaseReceivable < ActiveRecord::Base
+class PurchaseReceivable < ApplicationRecord
   attr_accessor :amount_to_capture
 
   has_many :rtpurchase_prs

@@ -1,2 +1,2 @@
-class WebsiteSetting < ActiveRecord::Base
+class WebsiteSetting < ApplicationRecord
 end

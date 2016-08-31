@@ -1,4 +1,4 @@
-class Subscription < ActiveRecord::Base
+class Subscription < ApplicationRecord
   include ToteItemsHelper
   include ActionView::Helpers::NumberHelper
 

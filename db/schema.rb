@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -18,9 +17,8 @@ ActiveRecord::Schema.define(version: 20160830173112) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text     "notes"
+    t.index ["user_id"], name: "index_access_codes_on_user_id"
   end
-
-  add_index "access_codes", ["user_id"], name: "index_access_codes_on_user_id"
 
   create_table "account_states", force: :cascade do |t|
     t.integer  "state"
@@ -34,10 +32,9 @@ ActiveRecord::Schema.define(version: 20160830173112) do
     t.integer  "bulk_buy_id"
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
+    t.index ["bulk_buy_id"], name: "index_admin_bulk_buys_on_bulk_buy_id"
+    t.index ["user_id"], name: "index_admin_bulk_buys_on_user_id"
   end
-
-  add_index "admin_bulk_buys", ["bulk_buy_id"], name: "index_admin_bulk_buys_on_bulk_buy_id"
-  add_index "admin_bulk_buys", ["user_id"], name: "index_admin_bulk_buys_on_user_id"
 
   create_table "authorizations", force: :cascade do |t|
     t.datetime "created_at",               null: false
@@ -62,40 +59,36 @@ ActiveRecord::Schema.define(version: 20160830173112) do
     t.integer  "pp_mp_common_id"
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
+    t.index ["bulk_payment_id"], name: "index_bp_pp_mp_commons_on_bulk_payment_id"
+    t.index ["pp_mp_common_id"], name: "index_bp_pp_mp_commons_on_pp_mp_common_id"
   end
-
-  add_index "bp_pp_mp_commons", ["bulk_payment_id"], name: "index_bp_pp_mp_commons_on_bulk_payment_id"
-  add_index "bp_pp_mp_commons", ["pp_mp_common_id"], name: "index_bp_pp_mp_commons_on_pp_mp_common_id"
 
   create_table "bp_pp_mp_errors", id: false, force: :cascade do |t|
     t.integer  "bulk_payment_id"
     t.integer  "pp_mp_error_id"
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
+    t.index ["bulk_payment_id"], name: "index_bp_pp_mp_errors_on_bulk_payment_id"
+    t.index ["pp_mp_error_id"], name: "index_bp_pp_mp_errors_on_pp_mp_error_id"
   end
-
-  add_index "bp_pp_mp_errors", ["bulk_payment_id"], name: "index_bp_pp_mp_errors_on_bulk_payment_id"
-  add_index "bp_pp_mp_errors", ["pp_mp_error_id"], name: "index_bp_pp_mp_errors_on_pp_mp_error_id"
 
   create_table "bulk_buy_purchase_receivables", id: false, force: :cascade do |t|
     t.integer  "purchase_receivable_id"
     t.integer  "bulk_buy_id"
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+    t.index ["bulk_buy_id"], name: "index_bulk_buy_purchase_receivables_on_bulk_buy_id"
+    t.index ["purchase_receivable_id"], name: "index_bulk_buy_purchase_receivables_on_purchase_receivable_id"
   end
-
-  add_index "bulk_buy_purchase_receivables", ["bulk_buy_id"], name: "index_bulk_buy_purchase_receivables_on_bulk_buy_id"
-  add_index "bulk_buy_purchase_receivables", ["purchase_receivable_id"], name: "index_bulk_buy_purchase_receivables_on_purchase_receivable_id"
 
   create_table "bulk_buy_tote_items", id: false, force: :cascade do |t|
     t.integer  "tote_item_id"
     t.integer  "bulk_buy_id"
     t.datetime "created_at",   null: false
     t.datetime "updated_at",   null: false
+    t.index ["bulk_buy_id"], name: "index_bulk_buy_tote_items_on_bulk_buy_id"
+    t.index ["tote_item_id"], name: "index_bulk_buy_tote_items_on_tote_item_id"
   end
-
-  add_index "bulk_buy_tote_items", ["bulk_buy_id"], name: "index_bulk_buy_tote_items_on_bulk_buy_id"
-  add_index "bulk_buy_tote_items", ["tote_item_id"], name: "index_bulk_buy_tote_items_on_tote_item_id"
 
   create_table "bulk_buys", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -108,10 +101,9 @@ ActiveRecord::Schema.define(version: 20160830173112) do
     t.integer  "bulk_payment_id"
     t.datetime "created_at",         null: false
     t.datetime "updated_at",         null: false
+    t.index ["bulk_payment_id"], name: "index_bulk_payment_payables_on_bulk_payment_id"
+    t.index ["payment_payable_id"], name: "index_bulk_payment_payables_on_payment_payable_id"
   end
-
-  add_index "bulk_payment_payables", ["bulk_payment_id"], name: "index_bulk_payment_payables_on_bulk_payment_id"
-  add_index "bulk_payment_payables", ["payment_payable_id"], name: "index_bulk_payment_payables_on_payment_payable_id"
 
   create_table "bulk_payments", force: :cascade do |t|
     t.integer  "num_payees"
@@ -125,10 +117,9 @@ ActiveRecord::Schema.define(version: 20160830173112) do
     t.integer  "bulk_purchase_id"
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+    t.index ["bulk_purchase_id"], name: "index_bulk_purchase_receivables_on_bulk_purchase_id"
+    t.index ["purchase_receivable_id"], name: "index_bulk_purchase_receivables_on_purchase_receivable_id"
   end
-
-  add_index "bulk_purchase_receivables", ["bulk_purchase_id"], name: "index_bulk_purchase_receivables_on_bulk_purchase_id"
-  add_index "bulk_purchase_receivables", ["purchase_receivable_id"], name: "index_bulk_purchase_receivables_on_purchase_receivable_id"
 
   create_table "bulk_purchases", force: :cascade do |t|
     t.datetime "created_at",                                                 null: false
@@ -151,19 +142,17 @@ ActiveRecord::Schema.define(version: 20160830173112) do
     t.integer  "user_id"
     t.datetime "created_at",           null: false
     t.datetime "updated_at",           null: false
+    t.index ["user_id"], name: "index_business_interfaces_on_user_id"
   end
-
-  add_index "business_interfaces", ["user_id"], name: "index_business_interfaces_on_user_id"
 
   create_table "checkout_authorizations", id: false, force: :cascade do |t|
     t.integer  "checkout_id"
     t.integer  "authorization_id"
     t.datetime "created_at",       null: false
     t.datetime "updated_at",       null: false
+    t.index ["authorization_id"], name: "index_checkout_authorizations_on_authorization_id"
+    t.index ["checkout_id"], name: "index_checkout_authorizations_on_checkout_id"
   end
-
-  add_index "checkout_authorizations", ["authorization_id"], name: "index_checkout_authorizations_on_authorization_id"
-  add_index "checkout_authorizations", ["checkout_id"], name: "index_checkout_authorizations_on_checkout_id"
 
   create_table "checkouts", force: :cascade do |t|
     t.string   "token"
@@ -173,10 +162,9 @@ ActiveRecord::Schema.define(version: 20160830173112) do
     t.datetime "created_at",                 null: false
     t.datetime "updated_at",                 null: false
     t.boolean  "is_rt",      default: false
+    t.index ["is_rt"], name: "index_checkouts_on_is_rt"
+    t.index ["token"], name: "index_checkouts_on_token"
   end
-
-  add_index "checkouts", ["is_rt"], name: "index_checkouts_on_is_rt"
-  add_index "checkouts", ["token"], name: "index_checkouts_on_token"
 
   create_table "deliveries", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -188,20 +176,18 @@ ActiveRecord::Schema.define(version: 20160830173112) do
     t.integer  "dropsite_id"
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
+    t.index ["delivery_id"], name: "index_delivery_dropsites_on_delivery_id"
+    t.index ["dropsite_id"], name: "index_delivery_dropsites_on_dropsite_id"
   end
-
-  add_index "delivery_dropsites", ["delivery_id"], name: "index_delivery_dropsites_on_delivery_id"
-  add_index "delivery_dropsites", ["dropsite_id"], name: "index_delivery_dropsites_on_dropsite_id"
 
   create_table "delivery_postings", id: false, force: :cascade do |t|
     t.integer  "posting_id"
     t.integer  "delivery_id"
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
+    t.index ["delivery_id"], name: "index_delivery_postings_on_delivery_id"
+    t.index ["posting_id"], name: "index_delivery_postings_on_posting_id"
   end
-
-  add_index "delivery_postings", ["delivery_id"], name: "index_delivery_postings_on_delivery_id"
-  add_index "delivery_postings", ["posting_id"], name: "index_delivery_postings_on_posting_id"
 
   create_table "dropsites", force: :cascade do |t|
     t.string   "name"
@@ -222,9 +208,8 @@ ActiveRecord::Schema.define(version: 20160830173112) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer  "parent_id"
+    t.index ["parent_id"], name: "index_food_categories_on_parent_id"
   end
-
-  add_index "food_categories", ["parent_id"], name: "index_food_categories_on_parent_id"
 
   create_table "nightly_task_runs", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -236,29 +221,26 @@ ActiveRecord::Schema.define(version: 20160830173112) do
     t.integer  "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_partner_deliveries_on_user_id"
   end
-
-  add_index "partner_deliveries", ["user_id"], name: "index_partner_deliveries_on_user_id"
 
   create_table "payment_payable_payments", force: :cascade do |t|
     t.integer  "payment_payable_id"
     t.integer  "payment_id"
     t.datetime "created_at",         null: false
     t.datetime "updated_at",         null: false
+    t.index ["payment_id"], name: "index_payment_payable_payments_on_payment_id"
+    t.index ["payment_payable_id"], name: "index_payment_payable_payments_on_payment_payable_id"
   end
-
-  add_index "payment_payable_payments", ["payment_id"], name: "index_payment_payable_payments_on_payment_id"
-  add_index "payment_payable_payments", ["payment_payable_id"], name: "index_payment_payable_payments_on_payment_payable_id"
 
   create_table "payment_payable_tote_items", id: false, force: :cascade do |t|
     t.integer  "tote_item_id"
     t.integer  "payment_payable_id"
     t.datetime "created_at",         null: false
     t.datetime "updated_at",         null: false
+    t.index ["payment_payable_id"], name: "index_payment_payable_tote_items_on_payment_payable_id"
+    t.index ["tote_item_id"], name: "index_payment_payable_tote_items_on_tote_item_id"
   end
-
-  add_index "payment_payable_tote_items", ["payment_payable_id"], name: "index_payment_payable_tote_items_on_payment_payable_id"
-  add_index "payment_payable_tote_items", ["tote_item_id"], name: "index_payment_payable_tote_items_on_tote_item_id"
 
   create_table "payment_payables", force: :cascade do |t|
     t.float    "amount"
@@ -278,18 +260,16 @@ ActiveRecord::Schema.define(version: 20160830173112) do
     t.integer  "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_pickup_codes_on_code"
+    t.index ["user_id"], name: "index_pickup_codes_on_user_id"
   end
-
-  add_index "pickup_codes", ["code"], name: "index_pickup_codes_on_code"
-  add_index "pickup_codes", ["user_id"], name: "index_pickup_codes_on_user_id"
 
   create_table "pickups", force: :cascade do |t|
     t.integer  "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_pickups_on_user_id"
   end
-
-  add_index "pickups", ["user_id"], name: "index_pickups_on_user_id"
 
   create_table "posting_recurrences", force: :cascade do |t|
     t.integer  "frequency",      default: 0,     null: false
@@ -320,14 +300,13 @@ ActiveRecord::Schema.define(version: 20160830173112) do
     t.string   "product_identifier"
     t.integer  "units_per_case",                default: 1
     t.string   "product_id_code"
+    t.index ["commitment_zone_start"], name: "index_postings_on_commitment_zone_start"
+    t.index ["posting_recurrence_id"], name: "index_postings_on_posting_recurrence_id"
+    t.index ["product_id"], name: "index_postings_on_product_id"
+    t.index ["state"], name: "index_postings_on_state"
+    t.index ["unit_id"], name: "index_postings_on_unit_id"
+    t.index ["user_id"], name: "index_postings_on_user_id"
   end
-
-  add_index "postings", ["commitment_zone_start"], name: "index_postings_on_commitment_zone_start"
-  add_index "postings", ["posting_recurrence_id"], name: "index_postings_on_posting_recurrence_id"
-  add_index "postings", ["product_id"], name: "index_postings_on_product_id"
-  add_index "postings", ["state"], name: "index_postings_on_state"
-  add_index "postings", ["unit_id"], name: "index_postings_on_unit_id"
-  add_index "postings", ["user_id"], name: "index_postings_on_user_id"
 
   create_table "pp_mp_commons", force: :cascade do |t|
     t.string   "correlation_id"
@@ -354,11 +333,10 @@ ActiveRecord::Schema.define(version: 20160830173112) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer  "unit_id",    null: false
+    t.index ["product_id"], name: "index_producer_product_unit_commissions_on_product_id"
+    t.index ["unit_id"], name: "index_producer_product_unit_commissions_on_unit_id"
+    t.index ["user_id"], name: "index_producer_product_unit_commissions_on_user_id"
   end
-
-  add_index "producer_product_unit_commissions", ["product_id"], name: "index_producer_product_unit_commissions_on_product_id"
-  add_index "producer_product_unit_commissions", ["unit_id"], name: "index_producer_product_unit_commissions_on_unit_id"
-  add_index "producer_product_unit_commissions", ["user_id"], name: "index_producer_product_unit_commissions_on_user_id"
 
   create_table "products", force: :cascade do |t|
     t.string   "name"
@@ -371,30 +349,27 @@ ActiveRecord::Schema.define(version: 20160830173112) do
     t.integer  "bulk_buy_id"
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
+    t.index ["bulk_buy_id"], name: "index_purchase_bulk_buys_on_bulk_buy_id"
+    t.index ["purchase_id"], name: "index_purchase_bulk_buys_on_purchase_id"
   end
-
-  add_index "purchase_bulk_buys", ["bulk_buy_id"], name: "index_purchase_bulk_buys_on_bulk_buy_id"
-  add_index "purchase_bulk_buys", ["purchase_id"], name: "index_purchase_bulk_buys_on_purchase_id"
 
   create_table "purchase_purchase_receivables", force: :cascade do |t|
     t.integer  "purchase_id"
     t.integer  "purchase_receivable_id"
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+    t.index ["purchase_id"], name: "index_purchase_purchase_receivables_on_purchase_id"
+    t.index ["purchase_receivable_id"], name: "index_purchase_purchase_receivables_on_purchase_receivable_id"
   end
-
-  add_index "purchase_purchase_receivables", ["purchase_id"], name: "index_purchase_purchase_receivables_on_purchase_id"
-  add_index "purchase_purchase_receivables", ["purchase_receivable_id"], name: "index_purchase_purchase_receivables_on_purchase_receivable_id"
 
   create_table "purchase_receivable_tote_items", id: false, force: :cascade do |t|
     t.integer  "tote_item_id"
     t.integer  "purchase_receivable_id"
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+    t.index ["purchase_receivable_id"], name: "index_purchase_receivable_tote_items_on_purchase_receivable_id"
+    t.index ["tote_item_id"], name: "index_purchase_receivable_tote_items_on_tote_item_id"
   end
-
-  add_index "purchase_receivable_tote_items", ["purchase_receivable_id"], name: "index_purchase_receivable_tote_items_on_purchase_receivable_id"
-  add_index "purchase_receivable_tote_items", ["tote_item_id"], name: "index_purchase_receivable_tote_items_on_tote_item_id"
 
   create_table "purchase_receivables", force: :cascade do |t|
     t.float    "amount"
@@ -403,10 +378,9 @@ ActiveRecord::Schema.define(version: 20160830173112) do
     t.float    "amount_purchased"
     t.integer  "kind"
     t.integer  "state",            default: 0
+    t.index ["kind"], name: "index_purchase_receivables_on_kind"
+    t.index ["state"], name: "index_purchase_receivables_on_state"
   end
-
-  add_index "purchase_receivables", ["kind"], name: "index_purchase_receivables_on_kind"
-  add_index "purchase_receivables", ["state"], name: "index_purchase_receivables_on_state"
 
   create_table "purchases", force: :cascade do |t|
     t.datetime "created_at",                                                 null: false
@@ -419,18 +393,16 @@ ActiveRecord::Schema.define(version: 20160830173112) do
     t.float    "net_amount"
     t.float    "payment_processor_fee_withheld_from_producer", default: 0.0
     t.float    "commission",                                   default: 0.0
+    t.index ["payer_id"], name: "index_purchases_on_payer_id"
+    t.index ["transaction_id"], name: "index_purchases_on_transaction_id"
   end
-
-  add_index "purchases", ["payer_id"], name: "index_purchases_on_payer_id"
-  add_index "purchases", ["transaction_id"], name: "index_purchases_on_transaction_id"
 
   create_table "rtauthorizations", force: :cascade do |t|
     t.integer  "rtba_id",    null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["rtba_id"], name: "index_rtauthorizations_on_rtba_id"
   end
-
-  add_index "rtauthorizations", ["rtba_id"], name: "index_rtauthorizations_on_rtba_id"
 
   create_table "rtbas", force: :cascade do |t|
     t.string   "token",                      null: false
@@ -439,20 +411,18 @@ ActiveRecord::Schema.define(version: 20160830173112) do
     t.datetime "created_at",                 null: false
     t.datetime "updated_at",                 null: false
     t.boolean  "active",     default: false, null: false
+    t.index ["token"], name: "index_rtbas_on_token"
+    t.index ["user_id"], name: "index_rtbas_on_user_id"
   end
-
-  add_index "rtbas", ["token"], name: "index_rtbas_on_token"
-  add_index "rtbas", ["user_id"], name: "index_rtbas_on_user_id"
 
   create_table "rtpurchase_prs", id: false, force: :cascade do |t|
     t.integer  "rtpurchase_id"
     t.integer  "purchase_receivable_id"
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+    t.index ["purchase_receivable_id"], name: "index_rtpurchase_prs_on_purchase_receivable_id"
+    t.index ["rtpurchase_id"], name: "index_rtpurchase_prs_on_rtpurchase_id"
   end
-
-  add_index "rtpurchase_prs", ["purchase_receivable_id"], name: "index_rtpurchase_prs_on_purchase_receivable_id"
-  add_index "rtpurchase_prs", ["rtpurchase_id"], name: "index_rtpurchase_prs_on_rtpurchase_id"
 
   create_table "rtpurchases", force: :cascade do |t|
     t.boolean  "success"
@@ -474,20 +444,18 @@ ActiveRecord::Schema.define(version: 20160830173112) do
     t.integer  "subscription_id"
     t.datetime "created_at",         null: false
     t.datetime "updated_at",         null: false
+    t.index ["rtauthorization_id"], name: "index_subscription_rtauthorizations_on_rtauthorization_id"
+    t.index ["subscription_id"], name: "index_subscription_rtauthorizations_on_subscription_id"
   end
-
-  add_index "subscription_rtauthorizations", ["rtauthorization_id"], name: "index_subscription_rtauthorizations_on_rtauthorization_id"
-  add_index "subscription_rtauthorizations", ["subscription_id"], name: "index_subscription_rtauthorizations_on_subscription_id"
 
   create_table "subscription_skip_dates", force: :cascade do |t|
     t.datetime "skip_date",       null: false
     t.integer  "subscription_id", null: false
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
+    t.index ["skip_date"], name: "index_subscription_skip_dates_on_skip_date"
+    t.index ["subscription_id"], name: "index_subscription_skip_dates_on_subscription_id"
   end
-
-  add_index "subscription_skip_dates", ["skip_date"], name: "index_subscription_skip_dates_on_skip_date"
-  add_index "subscription_skip_dates", ["subscription_id"], name: "index_subscription_skip_dates_on_subscription_id"
 
   create_table "subscriptions", force: :cascade do |t|
     t.integer  "frequency",             default: 0,     null: false
@@ -498,30 +466,27 @@ ActiveRecord::Schema.define(version: 20160830173112) do
     t.datetime "updated_at",                            null: false
     t.integer  "quantity",                              null: false
     t.boolean  "paused",                default: false
+    t.index ["posting_recurrence_id"], name: "index_subscriptions_on_posting_recurrence_id"
+    t.index ["user_id"], name: "index_subscriptions_on_user_id"
   end
-
-  add_index "subscriptions", ["posting_recurrence_id"], name: "index_subscriptions_on_posting_recurrence_id"
-  add_index "subscriptions", ["user_id"], name: "index_subscriptions_on_user_id"
 
   create_table "tote_item_checkouts", id: false, force: :cascade do |t|
     t.integer  "tote_item_id"
     t.integer  "checkout_id"
     t.datetime "created_at",   null: false
     t.datetime "updated_at",   null: false
+    t.index ["checkout_id"], name: "index_tote_item_checkouts_on_checkout_id"
+    t.index ["tote_item_id"], name: "index_tote_item_checkouts_on_tote_item_id"
   end
-
-  add_index "tote_item_checkouts", ["checkout_id"], name: "index_tote_item_checkouts_on_checkout_id"
-  add_index "tote_item_checkouts", ["tote_item_id"], name: "index_tote_item_checkouts_on_tote_item_id"
 
   create_table "tote_item_rtauthorizations", id: false, force: :cascade do |t|
     t.integer  "tote_item_id"
     t.integer  "rtauthorization_id"
     t.datetime "created_at",         null: false
     t.datetime "updated_at",         null: false
+    t.index ["rtauthorization_id"], name: "index_tote_item_rtauthorizations_on_rtauthorization_id"
+    t.index ["tote_item_id"], name: "index_tote_item_rtauthorizations_on_tote_item_id"
   end
-
-  add_index "tote_item_rtauthorizations", ["rtauthorization_id"], name: "index_tote_item_rtauthorizations_on_rtauthorization_id"
-  add_index "tote_item_rtauthorizations", ["tote_item_id"], name: "index_tote_item_rtauthorizations_on_tote_item_id"
 
   create_table "tote_items", force: :cascade do |t|
     t.integer  "quantity"
@@ -534,12 +499,11 @@ ActiveRecord::Schema.define(version: 20160830173112) do
     t.integer  "subscription_id"
     t.datetime "authorized_at"
     t.integer  "quantity_filled", default: 0
+    t.index ["authorized_at"], name: "index_tote_items_on_authorized_at"
+    t.index ["posting_id"], name: "index_tote_items_on_posting_id"
+    t.index ["subscription_id"], name: "index_tote_items_on_subscription_id"
+    t.index ["user_id"], name: "index_tote_items_on_user_id"
   end
-
-  add_index "tote_items", ["authorized_at"], name: "index_tote_items_on_authorized_at"
-  add_index "tote_items", ["posting_id"], name: "index_tote_items_on_posting_id"
-  add_index "tote_items", ["subscription_id"], name: "index_tote_items_on_subscription_id"
-  add_index "tote_items", ["user_id"], name: "index_tote_items_on_user_id"
 
   create_table "units", force: :cascade do |t|
     t.string   "name"
@@ -553,40 +517,36 @@ ActiveRecord::Schema.define(version: 20160830173112) do
     t.datetime "created_at",       null: false
     t.datetime "updated_at",       null: false
     t.text     "notes"
+    t.index ["account_state_id"], name: "index_user_account_states_on_account_state_id"
+    t.index ["user_id"], name: "index_user_account_states_on_user_id"
   end
-
-  add_index "user_account_states", ["account_state_id"], name: "index_user_account_states_on_account_state_id"
-  add_index "user_account_states", ["user_id"], name: "index_user_account_states_on_user_id"
 
   create_table "user_dropsites", id: false, force: :cascade do |t|
     t.integer  "user_id"
     t.integer  "dropsite_id"
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
+    t.index ["dropsite_id"], name: "index_user_dropsites_on_dropsite_id"
+    t.index ["user_id"], name: "index_user_dropsites_on_user_id"
   end
-
-  add_index "user_dropsites", ["dropsite_id"], name: "index_user_dropsites_on_dropsite_id"
-  add_index "user_dropsites", ["user_id"], name: "index_user_dropsites_on_user_id"
 
   create_table "user_payment_payables", id: false, force: :cascade do |t|
     t.integer  "user_id"
     t.integer  "payment_payable_id"
     t.datetime "created_at",         null: false
     t.datetime "updated_at",         null: false
+    t.index ["payment_payable_id"], name: "index_user_payment_payables_on_payment_payable_id"
+    t.index ["user_id"], name: "index_user_payment_payables_on_user_id"
   end
-
-  add_index "user_payment_payables", ["payment_payable_id"], name: "index_user_payment_payables_on_payment_payable_id"
-  add_index "user_payment_payables", ["user_id"], name: "index_user_payment_payables_on_user_id"
 
   create_table "user_purchase_receivables", id: false, force: :cascade do |t|
     t.integer  "user_id"
     t.integer  "purchase_receivable_id"
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+    t.index ["purchase_receivable_id"], name: "index_user_purchase_receivables_on_purchase_receivable_id"
+    t.index ["user_id"], name: "index_user_purchase_receivables_on_user_id"
   end
-
-  add_index "user_purchase_receivables", ["purchase_receivable_id"], name: "index_user_purchase_receivables_on_purchase_receivable_id"
-  add_index "user_purchase_receivables", ["user_id"], name: "index_user_purchase_receivables_on_user_id"
 
   create_table "users", force: :cascade do |t|
     t.string   "name"
@@ -615,11 +575,10 @@ ActiveRecord::Schema.define(version: 20160830173112) do
     t.integer  "distributor_id"
     t.float    "order_minimum",     default: 0.0,   null: false
     t.boolean  "partner_user",      default: false
+    t.index ["account_type"], name: "index_users_on_account_type"
+    t.index ["distributor_id"], name: "index_users_on_distributor_id"
+    t.index ["email"], name: "index_users_on_email", unique: true
   end
-
-  add_index "users", ["account_type"], name: "index_users_on_account_type"
-  add_index "users", ["distributor_id"], name: "index_users_on_distributor_id"
-  add_index "users", ["email"], name: "index_users_on_email", unique: true
 
   create_table "website_settings", force: :cascade do |t|
     t.boolean  "new_customer_access_code_required"

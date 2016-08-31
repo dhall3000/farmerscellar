@@ -1,4 +1,4 @@
-class AccountState < ActiveRecord::Base
+class AccountState < ApplicationRecord
   has_many :user_account_states
   has_many :users, through: :user_account_states
 
@@ -27,7 +27,7 @@ class AccountState < ActiveRecord::Base
 
   def self.auto_populate_database
 
-    if !ActiveRecord::Base.connection.table_exists? 'account_states'
+    if !ActiveRecord::Base.connection.data_source_exists? 'account_states'
       return
     end
 

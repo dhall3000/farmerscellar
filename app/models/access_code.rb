@@ -1,3 +1,3 @@
-class AccessCode < ActiveRecord::Base
+class AccessCode < ApplicationRecord
   belongs_to :user
 end

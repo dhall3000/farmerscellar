@@ -1,4 +1,4 @@
-class Delivery < ActiveRecord::Base
+class Delivery < ApplicationRecord
   has_many :delivery_postings
   has_many :postings, through: :delivery_postings
 

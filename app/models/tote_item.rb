@@ -1,4 +1,4 @@
-class ToteItem < ActiveRecord::Base
+class ToteItem < ApplicationRecord
   include ToteItemsHelper
 
   has_many :tote_item_rtauthorizations

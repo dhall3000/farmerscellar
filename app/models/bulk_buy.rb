@@ -1,4 +1,4 @@
-class BulkBuy < ActiveRecord::Base
+class BulkBuy < ApplicationRecord
   has_many :admin_bulk_buys
   has_many :admins, through: :admin_bulk_buys
 

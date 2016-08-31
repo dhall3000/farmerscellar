@@ -1,4 +1,4 @@
-class Purchase < ActiveRecord::Base  
+class Purchase < ApplicationRecord  
   attr_reader :amount_to_capture
   serialize :response
 

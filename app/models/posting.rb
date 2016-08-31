@@ -1,4 +1,4 @@
-class Posting < ActiveRecord::Base
+class Posting < ApplicationRecord
   belongs_to :user
   belongs_to :product
   belongs_to :unit

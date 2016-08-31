@@ -1,4 +1,4 @@
-class BulkPurchase < ActiveRecord::Base
+class BulkPurchase < ApplicationRecord
   include ToteItemsHelper
   attr_reader :num_payment_payables_created, :admin_report
 

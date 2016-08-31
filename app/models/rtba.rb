@@ -1,4 +1,4 @@
-class Rtba < ActiveRecord::Base
+class Rtba < ApplicationRecord
   attr_accessor :test_params
 
   belongs_to :user

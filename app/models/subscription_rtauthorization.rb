@@ -1,4 +1,4 @@
-class SubscriptionRtauthorization < ActiveRecord::Base
+class SubscriptionRtauthorization < ApplicationRecord
   belongs_to :rtauthorization
   belongs_to :subscription
 end

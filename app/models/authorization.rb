@@ -1,4 +1,4 @@
-class Authorization < ActiveRecord::Base
+class Authorization < ApplicationRecord
   serialize :response
   
   has_many :checkout_authorizations

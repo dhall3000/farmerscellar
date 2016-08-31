@@ -1,2 +1,2 @@
-class NightlyTaskRun < ActiveRecord::Base
+class NightlyTaskRun < ApplicationRecord
 end

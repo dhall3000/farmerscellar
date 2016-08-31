@@ -1,4 +1,4 @@
-class UserAccountState < ActiveRecord::Base
+class UserAccountState < ApplicationRecord
   belongs_to :account_state
   belongs_to :user
 

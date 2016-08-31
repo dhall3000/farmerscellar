@@ -1,3 +1,3 @@
-class PartnerDelivery < ActiveRecord::Base
+class PartnerDelivery < ApplicationRecord
   belongs_to :user
 end

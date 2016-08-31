@@ -1,4 +1,4 @@
-class SubscriptionSkipDate < ActiveRecord::Base
+class SubscriptionSkipDate < ApplicationRecord
   belongs_to :subscription
 
   validates :skip_date, presence: true

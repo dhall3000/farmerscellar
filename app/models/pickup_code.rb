@@ -1,4 +1,4 @@
-class PickupCode < ActiveRecord::Base
+class PickupCode < ApplicationRecord
   belongs_to :user
 
   #we don't want to be too specific about what the proper code format is to discourage guessing
