@@ -32,14 +32,14 @@ class SubscriptionTest < ActiveSupport::TestCase
 		get_delivery_dates_setup(posting_frequency, subscription_frequency)
 
 		current_delivery_date = @posting_recurrence.current_posting.delivery_date
-		end_date = current_delivery_date + (3 * posting_frequency * subscription_frequency).weeks
+		end_date = current_delivery_date + (3 * posting_frequency * subscription_frequency * 7).days
 		delivery_dates = @subscription.get_delivery_dates(current_delivery_date, end_date)
 
 		assert_equal 3, delivery_dates.count
 
-		assert_equal current_delivery_date + (1 * posting_frequency * subscription_frequency).weeks, delivery_dates[0]
-		assert_equal current_delivery_date + (2 * posting_frequency * subscription_frequency).weeks, delivery_dates[1]
-		assert_equal current_delivery_date + (3 * posting_frequency * subscription_frequency).weeks, delivery_dates[2]
+		assert_equal current_delivery_date + (1 * posting_frequency * subscription_frequency * 7).days, delivery_dates[0]
+		assert_equal current_delivery_date + (2 * posting_frequency * subscription_frequency * 7).days, delivery_dates[1]
+		assert_equal current_delivery_date + (3 * posting_frequency * subscription_frequency * 7).days, delivery_dates[2]
 
 	end
 
@@ -49,7 +49,7 @@ class SubscriptionTest < ActiveSupport::TestCase
 		get_delivery_dates_setup(posting_frequency, subscription_frequency)
 
 		current_delivery_date = @posting_recurrence.current_posting.delivery_date
-		end_date = current_delivery_date + (3 * posting_frequency * subscription_frequency).weeks
+		end_date = current_delivery_date + (3 * posting_frequency * subscription_frequency * 7).days
 		delivery_dates = @subscription.get_delivery_dates(current_delivery_date, end_date)
 
 		assert_equal 3, delivery_dates.count
@@ -78,16 +78,16 @@ class SubscriptionTest < ActiveSupport::TestCase
 
 		case subscription_frequency
 		when 1
-			end_date = current_delivery_date + 4.weeks
+			end_date = current_delivery_date + (4 * 7).days
 			delivery_dates = @subscription.get_delivery_dates(current_delivery_date, end_date)
 			assert_equal 3, delivery_dates.count
 
 			gap = delivery_dates[0] - current_delivery_date
-			assert_equal 1.week, gap
+			assert_equal 7.days, gap
 			gap = delivery_dates[1] - delivery_dates[0]
-			assert_equal 1.week, gap
+			assert_equal 7.days, gap
 			gap = delivery_dates[2] - delivery_dates[1]
-			assert_equal 2.weeks, gap
+			assert_equal 14.days, gap
 
 			#assert all on a friday
 			assert_equal 5, delivery_dates[0].wday
@@ -95,41 +95,41 @@ class SubscriptionTest < ActiveSupport::TestCase
 			assert_equal 5, delivery_dates[2].wday
 
 		when 2
-			end_date = current_delivery_date + 6.weeks
+			end_date = current_delivery_date + (6 * 7).days
 			delivery_dates = @subscription.get_delivery_dates(current_delivery_date, end_date)
 			assert_equal 3, delivery_dates.count
 			
 			gap = delivery_dates[0] - current_delivery_date
-			assert_equal 2.weeks, gap
+			assert_equal 14.days, gap
 
 			gap = delivery_dates[1] - delivery_dates[0]
-			assert_equal 2.weeks, gap
+			assert_equal 14.days, gap
 
 			gap = delivery_dates[2] - delivery_dates[1]
-			assert_equal 2.weeks, gap
+			assert_equal 14.days, gap
 
 			#assert all on a friday
 			assert_equal 5, delivery_dates[0].wday
 			assert_equal 5, delivery_dates[1].wday
 			assert_equal 5, delivery_dates[2].wday
 		when 3
-			end_date = current_delivery_date + 12.weeks
+			end_date = current_delivery_date + (12 * 7).days
 			delivery_dates = @subscription.get_delivery_dates(current_delivery_date, end_date)
 			assert_equal 3, delivery_dates.count
 			
 			gap = delivery_dates[0] - current_delivery_date
-			assert_equal 4.weeks, gap
+			assert_equal (4 * 7).days, gap
 
 			gap = delivery_dates[1] - delivery_dates[0]
-			assert_equal 4.weeks, gap
+			assert_equal (4 * 7).days, gap
 
 			gap = delivery_dates[2] - delivery_dates[1]
-			expected_gap = 4.weeks
+			expected_gap = (4 * 7).days
 
 			if delivery_dates[1].dst? && !delivery_dates[2].dst?
 				expected_gap += 1.hour
 			end			
-			
+
 			assert_equal expected_gap, gap
 
 			#assert all on a friday

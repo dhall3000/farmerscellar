@@ -106,7 +106,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     posting_recurrence.postings << posting
     posting_recurrence.save
     
-    delivery_dates = posting_recurrence.get_delivery_dates_for(posting.delivery_date, posting.delivery_date + 8.weeks)
+    delivery_dates = posting_recurrence.get_delivery_dates_for(posting.delivery_date, posting.delivery_date + (8 * 7).days)
 
     assert_equal 8, delivery_dates.count
     
@@ -132,7 +132,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     posting_recurrence.postings << posting
     posting_recurrence.save
     
-    delivery_dates = posting_recurrence.get_delivery_dates_for(posting.delivery_date, posting.delivery_date + 8.weeks)
+    delivery_dates = posting_recurrence.get_delivery_dates_for(posting.delivery_date, posting.delivery_date + (8 * 7).days)
 
     assert_equal 4, delivery_dates.count
         
@@ -154,7 +154,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     posting_recurrence.postings << posting
     posting_recurrence.save
     
-    delivery_dates = posting_recurrence.get_delivery_dates_for(posting.delivery_date, posting.delivery_date + 8.weeks)
+    delivery_dates = posting_recurrence.get_delivery_dates_for(posting.delivery_date, posting.delivery_date + (8 * 7).days)
 
     assert_equal 2, delivery_dates.count
         
@@ -174,7 +174,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     posting_recurrence.postings << posting
     posting_recurrence.save
     
-    delivery_dates = posting_recurrence.get_delivery_dates_for(posting.delivery_date, posting.delivery_date + 8.weeks)
+    delivery_dates = posting_recurrence.get_delivery_dates_for(posting.delivery_date, posting.delivery_date + (8 * 7).days)
 
     assert_equal 2, delivery_dates.count
         
@@ -239,7 +239,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     posting_recurrence.postings << posting
     posting_recurrence.save
     
-    delivery_dates = posting_recurrence.get_delivery_dates_for(posting.delivery_date, posting.delivery_date + 9.weeks)
+    delivery_dates = posting_recurrence.get_delivery_dates_for(posting.delivery_date, posting.delivery_date + (9 * 7).days)
     
     assert_equal 7, delivery_dates.count
 
@@ -266,7 +266,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     posting_recurrence.save
     
     may10 = Time.zone.local(2016,5,10)
-    delivery_dates = posting_recurrence.get_delivery_dates_for(may10, may10 + 4.weeks)
+    delivery_dates = posting_recurrence.get_delivery_dates_for(may10, may10 + (4 * 7).days)
 
     assert_equal Time.zone.local(2016,5,24), delivery_dates[0]
     assert_equal Time.zone.local(2016,5,31), delivery_dates[1]

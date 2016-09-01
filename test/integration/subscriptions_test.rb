@@ -28,20 +28,20 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     user.reload
     subscription = user.subscriptions.last
     
-    get edit_subscription_path(id: subscription.id, end_date: pr.postings.first.delivery_date + 20.weeks)
+    get edit_subscription_path(id: subscription.id, end_date: pr.postings.first.delivery_date + (20 * 7).days)
     skip_dates = assigns(:skip_dates)
 
     #should be 2 week gap between first tote item and first skip date
     ti_dd = subscription.tote_items.last.delivery_date
     sd = skip_dates[0][:date]
     gap = sd - ti_dd
-    assert_equal 2.weeks, gap
+    assert_equal (2 * 7).days, gap
 
     #should be 2 week gap between all the skip dates    
     count = 1
     while count < skip_dates.count
       gap = skip_dates[count][:date] - skip_dates[count - 1][:date]
-      assert_equal 2.weeks, gap
+      assert_equal (2 * 7).days, gap
       count += 1
     end
 
@@ -180,7 +180,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
         #get the computed skip dates
         skip_dates = assigns(:skip_dates)
         #send one of the skip dates back up to the controller to program in to the db
-        post subscriptions_skip_dates_path, skip_dates: {subscription.id.to_s => [skip_dates.first[:date].to_s]}, subscription_ids: [subscription.id.to_s], end_date: (skip_dates.first[:date] + 1.week).to_s
+        post subscriptions_skip_dates_path, skip_dates: {subscription.id.to_s => [skip_dates.first[:date].to_s]}, subscription_ids: [subscription.id.to_s], end_date: (skip_dates.first[:date] + 7.days).to_s
         subscription.reload        
         has_created_skip_dates = true
       end
@@ -266,16 +266,16 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     assert_equal user.tote_items.count, num_tote_items + subscription.tote_items.count - 1
     assert_equal subscription.tote_items.count, apples_posting.posting_recurrence.postings.count
     gap = subscription.tote_items[1].posting.delivery_date - subscription.tote_items[0].posting.delivery_date
-    assert_equal 1.week, gap    
+    assert_equal 7.days, gap    
 
     assert_equal ToteItem.states[:COMMITTED], subscription.tote_items[0].state
     assert_equal ToteItem.states[:REMOVED], subscription.tote_items[1].state
     assert_equal ToteItem.states[:COMMITTED], subscription.tote_items[2].state
     gap = subscription.tote_items[2].posting.delivery_date - subscription.tote_items[0].posting.delivery_date    
-    assert_equal 2.weeks, gap
+    assert_equal 14.days, gap
     
     gap = subscription.tote_items[3].posting.delivery_date - subscription.tote_items[2].posting.delivery_date
-    assert_equal 1.week, gap
+    assert_equal 7.days, gap
 
   end
 
@@ -335,10 +335,10 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     #right at the beginning of the posting recurrence series. then the turn_off method gets called so their shoudl be no further
     #tote items. but the pr should keep chugging so there should be a big gap between the last posting in the pr series vs the ti series
     gap = subscription.tote_items[1].posting.delivery_date - subscription.tote_items[0].posting.delivery_date
-    assert_equal 1.week, gap
+    assert_equal 7.days, gap
     apples_posting.reload
     gap = apples_posting.posting_recurrence.postings.last.delivery_date - subscription.tote_items.last.posting.delivery_date
-    assert gap > 1.week    
+    assert gap > 7.days
 
   end
 
@@ -564,10 +564,10 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
       while i < postings.count
         if i % 3 == 0
           #there should be a two week gap
-          expected_gap = 2.weeks
+          expected_gap = 14.days
         else
           #there should be a 1 week gap
-          expected_gap = 1.week
+          expected_gap = 7.days
         end
         actual_gap = postings[i].delivery_date - postings[i - 1].delivery_date
         assert_equal expected_gap, actual_gap
@@ -621,7 +621,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
           num_2_week_gaps = 0
           while i < tote_items.count            
             gap = tote_items[i].posting.delivery_date - tote_items[i - 1].posting.delivery_date            
-            if gap > 1.week
+            if gap > 7.days
               num_2_week_gaps += 1
             end
             i += 1

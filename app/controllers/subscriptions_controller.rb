@@ -300,7 +300,7 @@ class SubscriptionsController < ApplicationController
         return
       end
 
-      @end_date = Time.zone.now.midnight + 3.weeks
+      @end_date = Time.zone.now.midnight + (3 * 7).days
 
       if params[:end_date]
         @end_date = constrain_end_date(Time.zone.parse(params[:end_date]))
@@ -320,7 +320,7 @@ class SubscriptionsController < ApplicationController
     end
 
     def get_more_skip_dates
-      @end_date += 4.weeks
+      @end_date += (4 * 7).days
       @skip_dates = get_skip_dates_through(@subscriptions.select(:id), @end_date)
     end
 

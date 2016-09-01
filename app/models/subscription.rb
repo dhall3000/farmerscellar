@@ -138,17 +138,17 @@ class Subscription < ApplicationRecord
     def get_next_delivery_date(prev_delivery_date)
 
       if posting_recurrence.frequency < 5 #weekly-based subscriptions
-        next_delivery_date = posting_recurrence.get_delivery_dates_for(prev_delivery_date, prev_delivery_date + (frequency * posting_recurrence.frequency).weeks)[frequency - 1]
+        next_delivery_date = posting_recurrence.get_delivery_dates_for(prev_delivery_date, prev_delivery_date + (frequency * posting_recurrence.frequency * 7).days)[frequency - 1]
       elsif posting_recurrence.frequency == 5 #monthly-based subscriptions
         next_delivery_date = posting_recurrence.get_delivery_dates_for(prev_delivery_date, prev_delivery_date + (2 * frequency).months)[frequency - 1]
       elsif posting_recurrence.frequency == 6 #this is Marty/Helen the Hen's "3 weeks on, 1 week off" schedule
         case self.frequency
           when 1 #every delivery
-            next_delivery_date = posting_recurrence.get_delivery_dates_for(prev_delivery_date, prev_delivery_date + 3.weeks)[0]
+            next_delivery_date = posting_recurrence.get_delivery_dates_for(prev_delivery_date, prev_delivery_date + (3 * 7).days)[0]
           when 2 #every other week
-            next_delivery_date = prev_delivery_date + 2.weeks
+            next_delivery_date = prev_delivery_date + (2 * 7).days
           when 3 #every 4 weeks
-            next_delivery_date = prev_delivery_date + 4.weeks
+            next_delivery_date = prev_delivery_date + (4 * 7).days
           end
       end
 

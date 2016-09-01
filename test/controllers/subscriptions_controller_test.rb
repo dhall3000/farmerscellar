@@ -275,7 +275,7 @@ class SubscriptionsControllerTest < ActionController::TestCase
     c_subscription_1 = users(:c_subscription_1)
     subscription = subscriptions(:two)
     log_in_as(c_subscription_1)
-    get :edit, id: subscription.id, end_date: subscription.posting_recurrence.postings.first.delivery_date + 20.weeks
+    get :edit, id: subscription.id, end_date: subscription.posting_recurrence.postings.first.delivery_date + (20 * 7).days
     skip_dates = assigns(:skip_dates)
     pr = subscription.posting_recurrence
 

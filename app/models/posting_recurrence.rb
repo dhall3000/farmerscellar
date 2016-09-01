@@ -238,7 +238,7 @@ class PostingRecurrence < ApplicationRecord
     #set new_post delivery_date
     #NOTE: the + 10.weeks is kinda arbitrary. might need to be revisited later. just want to keep moving for now so don't
     #want to spend brain cycles doing anything 'smart' here.
-    new_post.delivery_date = get_delivery_dates_for(old_post.delivery_date, old_post.delivery_date + 10.weeks)[0]
+    new_post.delivery_date = get_delivery_dates_for(old_post.delivery_date, old_post.delivery_date + (10 * 7).days)[0]
 
     #set new_post commitment zone start
     commitment_zone_window = old_post.delivery_date - old_post.commitment_zone_start
@@ -298,7 +298,7 @@ class PostingRecurrence < ApplicationRecord
       #compute next scheduled delivery date
       case frequency
       when 1..4
-        delivery_date = delivery_date + frequency.weeks
+        delivery_date = delivery_date + (frequency * 7).days
       when 5        
         week_number = get_week_number(delivery_date)
         if week_number < 4
@@ -311,9 +311,9 @@ class PostingRecurrence < ApplicationRecord
         end               
       when 6
         #for the 3 on 1 off schedule the reference_date must always be week #1
-        delivery_date = delivery_date + 1.week
+        delivery_date = delivery_date + 7.days
         if num_deliveries_from_reference_date % 3 == 0
-          delivery_date = delivery_date + 1.week
+          delivery_date = delivery_date + 7.days
         end
       end   
 

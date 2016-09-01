@@ -68,7 +68,7 @@ class PickupDeadlineReminderTest < IntegrationHelper
     verify_pickup_deadline_reminder_email(pickup_deadline_warning, bob, [ti1_bob])
     
     #loop over the following week's deadline warning time
-    travel 1.week
+    travel 7.days
     ActionMailer::Base.deliveries.clear
     assert_equal 0, ActionMailer::Base.deliveries.count
     RakeHelper.do_hourly_tasks
