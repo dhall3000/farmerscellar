@@ -90,7 +90,6 @@ class RakeTasksTest < BulkBuyer
       if top_of_hour
 
         ActionMailer::Base.deliveries.clear
-
         RakeHelper.do_hourly_tasks
 
         committed_tote_item_count = ToteItem.where(state: ToteItem.states[:COMMITTED]).count
@@ -136,38 +135,38 @@ class RakeTasksTest < BulkBuyer
 
         end
 
-      end
+        if is_noon_hour
 
-      if is_noon_hour && top_of_hour
+          #loop through postings and fill those for whom it presently is noon on their delivery date
+          postings.each do |posting|
 
-        #loop through postings and fill those for whom it presently is noon on their delivery date
-        postings.each do |posting|
+            is_delivery_date = Time.zone.now.midnight == posting.delivery_date
 
-          is_delivery_date = Time.zone.now.midnight == posting.delivery_date
+            if is_delivery_date
 
-          if is_delivery_date
+              ActionMailer::Base.deliveries.clear
 
-            ActionMailer::Base.deliveries.clear
+              previous_filled_count = ToteItem.where(state: ToteItem.states[:FILLED]).count
 
-            previous_filled_count = ToteItem.where(state: ToteItem.states[:FILLED]).count
+              #ok, food arrived. now fill some orders        
+              fill_all_tote_items = true            
+              simulate_order_filling_for_postings([posting], fill_all_tote_items)
+              assert previous_filled_count < ToteItem.where(state: ToteItem.states[:FILLED]).count            
 
-            #ok, food arrived. now fill some orders        
-            fill_all_tote_items = true            
-            simulate_order_filling_for_postings([posting], fill_all_tote_items)
-            assert previous_filled_count < ToteItem.where(state: ToteItem.states[:FILLED]).count            
+              assert_equal 0, ActionMailer::Base.deliveries.count
 
-            assert_equal 0, ActionMailer::Base.deliveries.count
+              #now pretend that the users come and do a pickup
+              customers.each do |customer|
+                customer.pickups.create
+              end
 
-            #now pretend that the users come and do a pickup
-            customers.each do |customer|
-              customer.pickups.create
             end
-
+            
           end
-          
+
         end
 
-      end      
+      end
 
       travel 1.minute
       

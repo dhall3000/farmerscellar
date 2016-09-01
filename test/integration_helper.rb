@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'utility/rake_helper'
 
 class IntegrationHelper < ActionDispatch::IntegrationTest
 
@@ -18,7 +19,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     }
 
     log_in_as(farmer)
-    post postings_path, posting: posting_params
+    post postings_path, params: {posting: posting_params}
     posting = assigns(:posting)
     verify_post_presence(posting.price, posting.unit, exists = true, posting.id)
     
@@ -42,7 +43,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
   def verify_post_visibility(price, unit, count)
     get postings_path
     assert :success
-    assert_select "body div.panel h4.panel-title", {text: number_to_currency(price) + " / " + unit.name, count: count}
+    assert_select "body div.panel h4.panel-title", {text: ActiveSupport::NumberHelper.number_to_currency(price) + " / " + unit.name, count: count}
   end
 
   def verify_post_existence(price, count, posting_id = nil)
@@ -62,7 +63,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     get signup_path
     ActionMailer::Base.deliveries.clear
     assert_difference 'User.count', 1 do
-      post users_path, user: { name: name, email: email, password: "dogdog", zip: 98033, account_type: 0 }
+      post users_path, params: {user: { name: name, email: email, password: "dogdog", zip: 98033, account_type: 0 }}
     end
     assert_equal 1, ActionMailer::Base.deliveries.size
     user = assigns(:user)    
@@ -88,7 +89,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     log_in_as(customer)
     assert is_logged_in?
 
-    post tote_items_path, tote_item: {quantity: quantity, posting_id: posting.id}
+    post tote_items_path, params: {tote_item: {quantity: quantity, posting_id: posting.id}}
     tote_item = assigns(:tote_item)
     additional_units_required_to_fill_my_case = tote_item.additional_units_required_to_fill_my_case
 
@@ -116,7 +117,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     assert_template 'dropsites/index'
     get dropsite_path(Dropsite.first)
     assert_template 'dropsites/show'
-    post user_dropsites_path, user_dropsite: {user_id: customer.id, dropsite_id: Dropsite.first.id}
+    post user_dropsites_path, params: {user_dropsite: {user_id: customer.id, dropsite_id: Dropsite.first.id}}
 
     get tote_items_path
     assert_response :success
@@ -126,7 +127,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     assert_not_nil total_amount_to_authorize
     assert total_amount_to_authorize > 0, "total amount of tote items is not greater than zero"
     puts "total_amount_to_authorize = $#{total_amount_to_authorize}"
-    post checkouts_path, amount: total_amount_to_authorize, use_reference_transaction: "0"
+    post checkouts_path, params: {amount: total_amount_to_authorize, use_reference_transaction: "0"}
     checkout_tote_items = assigns(:checkout_tote_items)
     assert_not_nil checkout_tote_items
     assert checkout_tote_items.any?
@@ -142,7 +143,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     assert authorization.amount = checkout.amount, "authorization.amount not equal to checkout.token"
     assert_template 'authorizations/new'
     num_mail_messages_sent = ActionMailer::Base.deliveries.size
-    post authorizations_path, authorization: {token: authorization.token, payer_id: authorization.payer_id, amount: authorization.amount}    
+    post authorizations_path, params: {authorization: {token: authorization.token, payer_id: authorization.payer_id, amount: authorization.amount}}
     authorization = assigns(:authorization)
     verify_authorization_receipt_sent(num_mail_messages_sent, customer, authorization)
     assert_not_nil authorization
@@ -206,7 +207,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     log_in_as(a1)
     assert is_logged_in?
     assert posting.state?(:COMMITMENTZONE)
-    post postings_fill_path, {posting_id: posting.id, quantity: quantity}
+    post postings_fill_path, params: {posting_id: posting.id, quantity: quantity}
     assert posting.reload.state?(:CLOSED)
 
     #TODO: do something smart here with the fill_report. maybe some legitimacy checks?
@@ -232,7 +233,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
       ids << posting.id
     end
 
-    post deliveries_path, posting_ids: ids
+    post deliveries_path, params: {posting_ids: ids}
     delivery = assigns(:delivery)
     assert_redirected_to delivery_path(delivery)
     follow_redirect!
@@ -244,7 +245,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     dropsites_deliverable = assigns(:dropsites_deliverable)
 
     dropsites_deliverable.each do |dropsite|
-      patch delivery_path(delivery), dropsite_id: dropsite.id
+      patch delivery_path(delivery), params: {dropsite_id: dropsite.id}
     end
 
   end

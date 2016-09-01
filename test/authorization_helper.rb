@@ -49,7 +49,7 @@ class Authorizer < ActionDispatch::IntegrationTest
     assert_template 'dropsites/index'
     get dropsite_path(@dropsite1)
     assert_template 'dropsites/show'
-    post user_dropsites_path, user_dropsite: {user_id: customer.id, dropsite_id: @dropsite1.id}
+    post user_dropsites_path, params: {user_dropsite: {user_id: customer.id, dropsite_id: @dropsite1.id}}
 
     get tote_items_path
     assert_response :success
@@ -59,7 +59,7 @@ class Authorizer < ActionDispatch::IntegrationTest
     assert_not_nil total_amount_to_authorize
     assert total_amount_to_authorize > 0, "total amount of tote items is not greater than zero"
     puts "total_amount_to_authorize = $#{total_amount_to_authorize}"
-    post checkouts_path, amount: total_amount_to_authorize, use_reference_transaction: "0"
+    post checkouts_path, params: {amount: total_amount_to_authorize, use_reference_transaction: "0"}
     checkout_tote_items = assigns(:checkout_tote_items)
     assert_not_nil checkout_tote_items
     assert checkout_tote_items.any?
@@ -75,7 +75,7 @@ class Authorizer < ActionDispatch::IntegrationTest
     assert authorization.amount = checkout.amount, "authorization.amount not equal to checkout.token"
     assert_template 'authorizations/new'
     num_mail_messages_sent = ActionMailer::Base.deliveries.size
-    post authorizations_path, authorization: {token: authorization.token, payer_id: authorization.payer_id, amount: authorization.amount}    
+    post authorizations_path, params: {authorization: {token: authorization.token, payer_id: authorization.payer_id, amount: authorization.amount}}
     authorization = assigns(:authorization)
     verify_authorization_receipt_sent(num_mail_messages_sent, customer, authorization)
     assert_not_nil authorization

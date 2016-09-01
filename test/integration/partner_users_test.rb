@@ -8,7 +8,7 @@ class PartnerUsersTest < ActionDispatch::IntegrationTest
     log_in_as(users(:a1))    
     #create new partner user
     dropsite = Dropsite.first
-    post partner_users_create_path, name: "jane", email: "jane@j.com", dropsite: dropsite.id
+    post partner_users_create_path, params: {name: "jane", email: "jane@j.com", dropsite: dropsite.id}
     assert_response :redirect
     assert_redirected_to partner_users_index_path
     user = assigns(:user)
@@ -19,7 +19,7 @@ class PartnerUsersTest < ActionDispatch::IntegrationTest
     #send delivery notification
     ActionMailer::Base.deliveries.clear
     assert_equal 0, user.partner_deliveries.count
-    post partner_users_send_delivery_notification_path, user_ids: [user.id], partner_name: "Azure Standard"
+    post partner_users_send_delivery_notification_path, params: {user_ids: [user.id], partner_name: "Azure Standard"}
     assert_equal 1, user.partner_deliveries.count
     assert_equal "Azure Standard", user.partner_deliveries.first.partner
     assert :redirected
@@ -34,15 +34,15 @@ class PartnerUsersTest < ActionDispatch::IntegrationTest
     assert_response :redirect
     assert_redirected_to new_pickup_path
     #new user log in at the kiosk
-    post pickups_path, pickup_code: user.pickup_code.code
+    post pickups_path, params: {pickup_code: user.pickup_code.code}
     assert_response :success
     assert_template 'pickups/create'
     #open garage door
-    post pickups_toggle_garage_door_path, pickup_code: user.pickup_code.code
+    post pickups_toggle_garage_door_path, params: {pickup_code: user.pickup_code.code}
     assert_response :success
     assert_template 'pickups/create'
     #close garage door
-    post pickups_toggle_garage_door_path, pickup_code: user.pickup_code.code
+    post pickups_toggle_garage_door_path, params: {pickup_code: user.pickup_code.code}
     assert_response :success
     assert_template 'pickups/create'
     #log out of kiosk

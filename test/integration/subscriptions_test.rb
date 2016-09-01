@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'utility/rake_helper'
 
 class SubscriptionsTest < ActionDispatch::IntegrationTest
   
@@ -66,7 +67,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     commitment_zone_start = delivery_date - 2.days
     posting_recurrence_count = PostingRecurrence.joins(postings: :user).where("users.id = ?", @farmer.id).count
 
-    post postings_path, posting: {
+    post postings_path, params: {posting: {
       description: "my recurring posting",
       quantity_available: 100,
       price: 2,
@@ -77,7 +78,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
       delivery_date: delivery_date,
       commitment_zone_start: commitment_zone_start,
       posting_recurrence: {frequency: 6, on: true}
-    }
+    }}
 
     posting = assigns(:posting)
     posting_recurrence = posting.posting_recurrence
@@ -124,7 +125,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     posting_recurrence.reload
     log_in_as(c1)    
     subscriptions_count = c1.subscriptions.count    
-    post tote_items_path, tote_item: {quantity: 1, posting_id: posting_recurrence.postings.last.id}
+    post tote_items_path, params: {tote_item: {quantity: 1, posting_id: posting_recurrence.postings.last.id}}
     tote_item = assigns(:tote_item)
     assert_redirected_to new_subscription_path(tote_item_id: tote_item.id)
     follow_redirect!
@@ -134,7 +135,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
       assert_not_equal 2, subscription_create_option[:subscription_frequency]
     end
     #despite every-other-week option not being available, attempt to create every-other-week frequency subscription
-    post subscriptions_path, tote_item_id: tote_item.id, frequency: 2
+    post subscriptions_path, params: {tote_item_id: tote_item.id, frequency: 2}
     #verify subscription creation attempt failed
     c1.reload
     assert_equal subscriptions_count, c1.subscriptions.count
@@ -180,7 +181,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
         #get the computed skip dates
         skip_dates = assigns(:skip_dates)
         #send one of the skip dates back up to the controller to program in to the db
-        post subscriptions_skip_dates_path, skip_dates: {subscription.id.to_s => [skip_dates.first[:date].to_s]}, subscription_ids: [subscription.id.to_s], end_date: (skip_dates.first[:date] + 7.days).to_s
+        post subscriptions_skip_dates_path, params: {skip_dates: {subscription.id.to_s => [skip_dates.first[:date].to_s]}, subscription_ids: [subscription.id.to_s], end_date: (skip_dates.first[:date] + 7.days).to_s}
         subscription.reload        
         has_created_skip_dates = true
       end
@@ -241,7 +242,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
       #pause the subscription after one tote item has been generated
       if !has_paused && !subscription.paused && (user.tote_items.count == (num_tote_items + 1))
         log_in_as(user)
-        patch subscription_path(subscription), subscription: { paused: "1", on: "1" }
+        patch subscription_path(subscription), params: {subscription: { paused: "1", on: "1" }}
         subscription.reload
         assert subscription.paused
         pause_time = Time.zone.now
@@ -251,7 +252,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
 
       #unpause subscription one delivery cycle after pausing it
       if subscription.paused && (Time.zone.now == (pause_time + regular_tote_item_delivery_gap))
-        patch subscription_path(subscription), subscription: { paused: "0", on: "1" }
+        patch subscription_path(subscription), params: {subscription: { paused: "0", on: "1" }}
         subscription.reload
         assert_not subscription.paused
       end
@@ -317,7 +318,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
       #turn the subscription off after one tote item has been generated
       if subscription.on && user.tote_items.count == (num_tote_items + 1)
         log_in_as(user)
-        patch subscription_path(subscription), subscription: { paused: "0", on: "0" }
+        patch subscription_path(subscription), params: {subscription: { paused: "0", on: "0" }}
         subscription.reload
         assert_not subscription.on        
       end
@@ -725,10 +726,10 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     #verify tote item points to subscription
 
     log_in_as(user)
-    post user_dropsites_path, user_dropsite: {dropsite_id: dropsites(:dropsite1).id}
-    post tote_items_path, tote_item: {quantity: quantity, posting_id: posting.id}
+    post user_dropsites_path, params: {user_dropsite: {dropsite_id: dropsites(:dropsite1).id}}
+    post tote_items_path, params: {tote_item: {quantity: quantity, posting_id: posting.id}}
     tote_item = assigns(:tote_item)
-    post subscriptions_path, tote_item_id: tote_item.id, frequency: frequency
+    post subscriptions_path, params: {tote_item_id: tote_item.id, frequency: frequency}
 
     subscription = assigns(:subscription)
 
@@ -744,9 +745,9 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     total_amount_to_authorize = assigns(:total_amount_to_authorize)
 
     if total_amount_to_authorize > 0
-      post checkouts_path, use_reference_transaction: 1
+      post checkouts_path, params: {use_reference_transaction: 1}
       checkout = assigns(:checkout)
-      post rtauthorizations_create_path, token: checkout.token
+      post rtauthorizations_create_path, params: {token: checkout.token}
     end
 
     #TODO: tests
@@ -767,12 +768,12 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
 
     unit = units(:pound)
 
-    if ProducerProductUnitCommission.where(unit: farmer, product: product, unit: unit).count < 1      
+    if ProducerProductUnitCommission.where(user: farmer, product: product, unit: unit).count < 1      
       ppuc = ProducerProductUnitCommission.create(user: farmer, product: product, unit: unit, commission: 0.05)
     end
     
     delivery_date = next_day_of_week_after(Time.zone.now, 5, 7)
-    post postings_path, posting: {
+    post postings_path, params: {posting: {
       description: "#{product.name} description",
       quantity_available: 100,
       price: 2,
@@ -783,7 +784,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
       delivery_date: delivery_date,
       commitment_zone_start: delivery_date - 2.days,
       posting_recurrence: {frequency: frequency, on: true}
-    }
+    }}
 
     posting = assigns(:posting)
 
@@ -854,7 +855,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
                 puts Time.zone.now.strftime("%A %B %d")
                 #it is now noon on delivery_date of this posting so do some fills
                 log_in_as(users(:a1))
-                post postings_fill_path, posting_id: posting.id, quantity: posting.total_quantity_authorized_or_committed
+                post postings_fill_path, params: {posting_id: posting.id, quantity: posting.total_quantity_authorized_or_committed}
               end              
             end
           end        

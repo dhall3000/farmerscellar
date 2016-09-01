@@ -22,7 +22,6 @@ class RtauthorizationssTest < BulkBuyer
     posting.reload
     assert_not posting.late_adds_allowed
 
-
     gross_tote_item_value = get_gross_item(tote_item)
 
     #do one time checkout and authorization
@@ -30,7 +29,7 @@ class RtauthorizationssTest < BulkBuyer
 
     #do billing agreement checkout (do not authorize)    
     checkouts_count = Checkout.count
-    post checkouts_path, amount: gross_tote_item_value, use_reference_transaction: "1"
+    post checkouts_path, params: {amount: gross_tote_item_value, use_reference_transaction: "1"}
     assert_equal nil, flash[:danger]
     assert_equal checkouts_count + 1, Checkout.count
     assert_equal true, Checkout.last.is_rt

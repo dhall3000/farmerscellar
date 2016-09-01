@@ -36,7 +36,7 @@ class RakeHelper
 			end
 
 			#get a list of everbody who had products delivered last week
-			filled_within_last_seven_days_users = User.joins(tote_items: :posting).where("postings.delivery_date > ? and tote_items.state = ?", Time.zone.now - 7.days, ToteItem.states[:FILLED]).uniq
+			filled_within_last_seven_days_users = User.joins(tote_items: :posting).where("postings.delivery_date > ? and tote_items.state = ?", Time.zone.now - 7.days, ToteItem.states[:FILLED]).distinct
 
 			filled_within_last_seven_days_users.each do |filled_within_last_seven_days_user|
 
@@ -50,7 +50,7 @@ class RakeHelper
 					cutoff = user.dropsite.last_food_clearout
 				end				
 
-				filled_tote_items_remaining_at_dropsite = user.tote_items.joins(:posting).where("postings.delivery_date > ? and tote_items.state = ?", cutoff, ToteItem.states[:FILLED]).order("postings.delivery_date").uniq
+				filled_tote_items_remaining_at_dropsite = user.tote_items.joins(:posting).where("postings.delivery_date > ? and tote_items.state = ?", cutoff, ToteItem.states[:FILLED]).order("postings.delivery_date").distinct
 
 				if filled_tote_items_remaining_at_dropsite.any?
 					puts "user #{user.id.to_s} #{user.email} has products remaining. sending them a pickup deadline reminder."

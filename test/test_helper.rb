@@ -225,7 +225,7 @@ class ActiveSupport::TestCase
     password    = options[:password]    || 'dogdog'
     remember_me = options[:remember_me] || '1'
     if integration_test?
-      post login_path, {params: {session: { email: user.email, password: password, remember_me: remember_me }}}
+      post login_path, params: {session: { email: user.email, password: password, remember_me: remember_me }}
     else
       session[:user_id] = user.id
     end
@@ -234,7 +234,7 @@ class ActiveSupport::TestCase
   def get_access_code    
     @a1 = users(:a1)
     log_in_as(@a1)
-    post access_codes_path, access_code: {notes: "empty notes"}
+    post access_codes_path, params: {access_code: {notes: "empty notes"}}
     code = assigns(:code)
 
     return code
@@ -244,7 +244,7 @@ class ActiveSupport::TestCase
   def get_access_for(user)
     code = get_access_code
     log_in_as(user)
-    patch user_path(user), user: { access_code: code }
+    patch user_path(user), params: {user: { access_code: code }}
   end
 
   def get_error_messages(active_record_object)

@@ -72,6 +72,12 @@ f2beef:
   user: f2
   unit: pound
 
+f2beef2:
+  product: beef
+  commission: 0.045
+  user: f2
+  unit: quarter
+
 f3carrots:
   product: carrots
   commission: 0.04

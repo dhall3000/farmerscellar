@@ -30,7 +30,7 @@ class BulkBuyer < Authorizer
       end
     end
 
-    post postings_fill_path, {posting_id: posting.id, quantity: total_quantity}    
+    post postings_fill_path, params: {posting_id: posting.id, quantity: total_quantity}
 
   end
 

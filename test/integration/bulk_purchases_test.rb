@@ -10,7 +10,7 @@ class BulkPurchasesTest < BulkBuyer
     #than we're collecting from Paypal. fun.
     customers = [@c_one_tote_item]
     purchase_receivables = setup_bulk_purchase(customers)
-    post bulk_purchases_path, purchase_receivables: purchase_receivables
+    post bulk_purchases_path, params: {purchase_receivables: purchase_receivables}
     verify_legitimacy_of_bulk_purchase({sales_underwater: 1, commission_zero: 1})
     bulk_purchase = assigns(:bulk_purchase)
     do_standard_payment(customers)
@@ -22,7 +22,7 @@ class BulkPurchasesTest < BulkBuyer
 
     customers = [@c1]
     purchase_receivables = setup_bulk_purchase(customers)
-    post bulk_purchases_path, purchase_receivables: purchase_receivables
+    post bulk_purchases_path, params: {purchase_receivables: purchase_receivables}
     verify_legitimacy_of_bulk_purchase
     bulk_purchase = assigns(:bulk_purchase)
     do_standard_payment(customers)
@@ -49,7 +49,7 @@ class BulkPurchasesTest < BulkBuyer
     grand_total_payout = assigns(:grand_total_payout)
     payment_info_by_creditor_id = assigns(:payment_info_by_creditor_id)    
     assert_not_nil payment_info_by_creditor_id
-    post bulk_payments_path, payment_info_by_creditor_id: payment_info_by_creditor_id
+    post bulk_payments_path, params: {payment_info_by_creditor_id: payment_info_by_creditor_id}
     bulk_payment = assigns(:bulk_payment)
 
     assert_equal bulk_purchase.net, bulk_payment.total_payments_amount    
@@ -123,7 +123,7 @@ class BulkPurchasesTest < BulkBuyer
     travel_to middle_date
     #do a pickup
     log_in_as(users(:dropsite1))
-    post pickups_path, pickup_code: @c1.pickup_code.code
+    post pickups_path, params: {pickup_code: @c1.pickup_code.code}
     #verify there are no messages informing user of sub-fully-filled items
     assert_no_match "We couldn't fully fill this order.", response.body
     tote_items = assigns(:tote_items)
@@ -147,13 +147,13 @@ class BulkPurchasesTest < BulkBuyer
     #jump back to one day after the last delivery date
     travel_to latest_delivery_date + 1.day    
     #post a pickup
-    post pickups_path, pickup_code: @c1.pickup_code.code
+    post pickups_path, params: {pickup_code: @c1.pickup_code.code}
     tote_items = assigns(:tote_items)
     #verify proper number of items picked up
     assert_equal num_items_second_pickup_count, tote_items.count
     #post another pickup after 61 minutes
     travel_to Time.zone.now + 61.minutes
-    post pickups_path, pickup_code: @c1.pickup_code.code
+    post pickups_path, params: {pickup_code: @c1.pickup_code.code}
     tote_items = assigns(:tote_items)
     #verify no more items picked up
     assert_equal 0, tote_items.count
@@ -190,7 +190,7 @@ class BulkPurchasesTest < BulkBuyer
     assert ToteItem.create(quantity: 5, quantity_filled: 3, price: posting.price, posting: posting, user: @c1, state: ToteItem.states[:FILLED])
     assert ToteItem.create(quantity: 5, price: posting.price, posting: posting, user: @c1, state: ToteItem.states[:NOTFILLED])
     #user enters their pickup code at kiosk
-    post pickups_path, pickup_code: @c1.pickup_code.code
+    post pickups_path, params: {pickup_code: @c1.pickup_code.code}
     assert_response :success
     #verify user is looking at the pickups page with a list of product to pick up
     assert_template 'pickups/create'    
@@ -237,13 +237,13 @@ class BulkPurchasesTest < BulkBuyer
     #jump back to one day after the last delivery date
     travel_to latest_delivery_date + 1.day    
     #post a pickup
-    post pickups_path, pickup_code: @c1.pickup_code.code
+    post pickups_path, params: {pickup_code: @c1.pickup_code.code}
     tote_items = assigns(:tote_items)
     #verify proper number of items picked up
     assert_equal num_items_second_pickup_count, tote_items.count
     #post another pickup after 61 minutes
     travel_to Time.zone.now + 61.minutes
-    post pickups_path, pickup_code: @c1.pickup_code.code
+    post pickups_path, params: {pickup_code: @c1.pickup_code.code}
     tote_items = assigns(:tote_items)
     #verify no more items picked up
     assert_equal 0, tote_items.count
@@ -255,7 +255,7 @@ class BulkPurchasesTest < BulkBuyer
   def do_bulk_buy
     customers = [@c1, @c2, @c3, @c4]
     purchase_receivables = setup_bulk_purchase(customers)
-    post bulk_purchases_path, purchase_receivables: purchase_receivables
+    post bulk_purchases_path, params: {purchase_receivables: purchase_receivables}
     verify_legitimacy_of_bulk_purchase
 
     verify_proper_number_of_payment_payables
@@ -268,7 +268,7 @@ class BulkPurchasesTest < BulkBuyer
     grand_total_payout = assigns(:grand_total_payout)
     payment_info_by_creditor_id = assigns(:payment_info_by_creditor_id)    
     assert_not_nil payment_info_by_creditor_id
-    post bulk_payments_path, payment_info_by_creditor_id: payment_info_by_creditor_id
+    post bulk_payments_path, params: {payment_info_by_creditor_id: payment_info_by_creditor_id}
     bulk_payment = assigns(:bulk_payment)
 
     assert_equal bulk_purchase.net, bulk_payment.total_payments_amount    
@@ -289,7 +289,7 @@ class BulkPurchasesTest < BulkBuyer
       ids << posting.id
     end
 
-    post deliveries_path, posting_ids: ids
+    post deliveries_path, params: {posting_ids: ids}
     delivery = assigns(:delivery)
     assert_redirected_to delivery_path(delivery)
     follow_redirect!
@@ -301,7 +301,7 @@ class BulkPurchasesTest < BulkBuyer
     dropsites_deliverable = assigns(:dropsites_deliverable)
 
     dropsites_deliverable.each do |dropsite|
-      patch delivery_path(delivery), dropsite_id: dropsite.id
+      patch delivery_path(delivery), params: {dropsite_id: dropsite.id}
     end
 
   end
@@ -362,18 +362,18 @@ class BulkPurchasesTest < BulkBuyer
     #authorize some more tote items
     log_in_as(@c1)
     posting_lettuce = postings(:postingf1lettuce)
-    post tote_items_path, tote_item: {quantity: 2, price: posting_lettuce.price, state: ToteItem.states[:ADDED], posting_id: posting_lettuce.id, user_id: @c1.id}
+    post tote_items_path, params: {tote_item: {quantity: 2, price: posting_lettuce.price, state: ToteItem.states[:ADDED], posting_id: posting_lettuce.id, user_id: @c1.id}}
     get tote_items_path
     total_amount_to_authorize = assigns(:total_amount_to_authorize)    
-    post checkouts_path, amount: total_amount_to_authorize, use_reference_transaction: "0"
+    post checkouts_path, params: {amount: total_amount_to_authorize, use_reference_transaction: "0"}
     follow_redirect!
     authorization = assigns(:authorization)
-    post authorizations_path, authorization: {token: authorization.token, payer_id: authorization.payer_id, amount: authorization.amount}
+    post authorizations_path, params: {authorization: {token: authorization.token, payer_id: authorization.payer_id, amount: authorization.amount}}
     authorization = assigns(:authorization)    
 
     #add some more toteitems    
     posting_tomato = postings(:postingf2tomato)
-    post tote_items_path, tote_item: {quantity: 2, price: posting_tomato.price, state: ToteItem.states[:ADDED], posting_id: posting_tomato.id, user_id: @c1.id}
+    post tote_items_path, params: {tote_item: {quantity: 2, price: posting_tomato.price, state: ToteItem.states[:ADDED], posting_id: posting_tomato.id, user_id: @c1.id}}
 
     #by the time we get to this point c1 should have 10 toteitems, 8 in PURCHASEPENDING, 1 in ADDED and 1 in AUTHORIZED
 
@@ -382,7 +382,7 @@ class BulkPurchasesTest < BulkBuyer
 
     log_in_as(@a1)
     FakeCaptureResponse.toggle_success = true    
-    post bulk_purchases_path, purchase_receivables: purchase_receivables
+    post bulk_purchases_path, params: {purchase_receivables: purchase_receivables}
     
     #COMMENT KEY 000
     assert_equal ToteItem.where(state: ToteItem.states[:REMOVED]).count, 2
@@ -414,7 +414,7 @@ class BulkPurchasesTest < BulkBuyer
     grand_total_payout = assigns(:grand_total_payout)
     payment_info_by_creditor_id = assigns(:payment_info_by_creditor_id)    
     assert_not_nil payment_info_by_creditor_id
-    post bulk_payments_path, payment_info_by_creditor_id: payment_info_by_creditor_id
+    post bulk_payments_path, params: {payment_info_by_creditor_id: payment_info_by_creditor_id}
     bulk_payment = assigns(:bulk_payment)
 
     assert_equal bulk_purchase.net, bulk_payment.total_payments_amount    
@@ -430,7 +430,7 @@ class BulkPurchasesTest < BulkBuyer
     customers = [@c1, @c2]
 
     purchase_receivables = setup_bulk_purchase(customers)    
-    post bulk_purchases_path, purchase_receivables: purchase_receivables
+    post bulk_purchases_path, params: {purchase_receivables: purchase_receivables}
     verify_legitimacy_of_bulk_purchase
     verify_proper_number_of_payment_payables    
     bulk_purchase = assigns(:bulk_purchase)    
@@ -441,7 +441,7 @@ class BulkPurchasesTest < BulkBuyer
     grand_total_payout = assigns(:grand_total_payout)
     payment_info_by_creditor_id = assigns(:payment_info_by_creditor_id)    
     assert_not_nil payment_info_by_creditor_id
-    post bulk_payments_path, payment_info_by_creditor_id: payment_info_by_creditor_id
+    post bulk_payments_path, params: {payment_info_by_creditor_id: payment_info_by_creditor_id}
     bulk_payment = assigns(:bulk_payment)
     assert_equal bulk_purchase.net, bulk_payment.total_payments_amount
 
@@ -451,7 +451,7 @@ class BulkPurchasesTest < BulkBuyer
 
     purchase_receivables = setup_bulk_purchase(customers)    
     num_prs_just_created = purchase_receivables.count
-    post bulk_purchases_path, purchase_receivables: purchase_receivables    
+    post bulk_purchases_path, params: {purchase_receivables: purchase_receivables}
 
     #here we want to verify that this bulk purchase is not picking up any failed purchasereceivables from
     #the prior bulk purchase
@@ -468,7 +468,7 @@ class BulkPurchasesTest < BulkBuyer
     grand_total_payout = assigns(:grand_total_payout)
     payment_info_by_creditor_id = assigns(:payment_info_by_creditor_id)    
     assert_not_nil payment_info_by_creditor_id
-    post bulk_payments_path, payment_info_by_creditor_id: payment_info_by_creditor_id
+    post bulk_payments_path, params: {payment_info_by_creditor_id: payment_info_by_creditor_id}
     bulk_payment = assigns(:bulk_payment)
     assert_equal bulk_purchase.net, bulk_payment.total_payments_amount
 

@@ -9,10 +9,10 @@ class UsersSignupTest < ActionDispatch::IntegrationTest
   test "invalid signup information" do
     get signup_path
     assert_no_difference 'User.count' do
-      post users_path, user: { name:  "",
+      post users_path, params: { user: { name:  "",
                                email: "user@invalid",
                                password:              "foo",
-                               password_confirmation: "bar" }
+                               password_confirmation: "bar" }}
     end
     assert_template 'users/new'
     assert_select 'div#error_explanation'
@@ -22,7 +22,7 @@ class UsersSignupTest < ActionDispatch::IntegrationTest
   test "valid signup information with account activation" do
     get signup_path
     assert_difference 'User.count', 1 do
-      post users_path, user: { name: "Example User", email: "user@example.com", password: "dogdog", zip: 98033, account_type: 0 }
+      post users_path, params: {user: { name: "Example User", email: "user@example.com", password: "dogdog", zip: 98033, account_type: 0 }}
     end
     assert_equal 1, ActionMailer::Base.deliveries.size
     user = assigns(:user)    
@@ -33,7 +33,7 @@ class UsersSignupTest < ActionDispatch::IntegrationTest
     #try to checkout before activation.
     #first add a tote item
     posting = postings(:p1)
-    post tote_items_path, tote_item: {quantity: 1, posting_id: posting.id}
+    post tote_items_path, params: {tote_item: {quantity: 1, posting_id: posting.id}}
     tote_item = assigns(:tote_item)
     post checkouts_path
     assert_redirected_to new_account_activation_path

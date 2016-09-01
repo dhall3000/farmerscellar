@@ -44,7 +44,7 @@ class WebsiteSettingsAccessControlTest < ActionDispatch::IntegrationTest
 
   def change_website_access_code_required_to(onoff)
   	log_in_as(@admin)
-  	patch website_setting_path(@website_setting), website_setting: {new_customer_access_code_required: onoff}
+  	patch website_setting_path(@website_setting), params: {website_setting: {new_customer_access_code_required: onoff}}
   end
 
   def verify_user_has_access(user)
@@ -86,7 +86,7 @@ class WebsiteSettingsAccessControlTest < ActionDispatch::IntegrationTest
     #log in as admin
     log_in_as(@admin)
     #turn on posting recurrence    
-    patch website_setting_path(@website_setting), website_setting: {recurring_postings_enabled: true}
+    patch website_setting_path(@website_setting), params: {website_setting: {recurring_postings_enabled: true}}
     assert_response :success
     @website_setting.reload
     assert @website_setting.recurring_postings_enabled
@@ -103,7 +103,7 @@ class WebsiteSettingsAccessControlTest < ActionDispatch::IntegrationTest
     #log in as admin
     log_in_as(@admin)
     #turn off posting recurrence feature
-    patch website_setting_path(@website_setting), website_setting: {recurring_postings_enabled: false}
+    patch website_setting_path(@website_setting), params: {website_setting: {recurring_postings_enabled: false}}
     assert_response :success
     @website_setting.reload
     assert_not @website_setting.recurring_postings_enabled

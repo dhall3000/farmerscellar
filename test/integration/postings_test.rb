@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'utility/rake_helper'
 
 class PostingsTest < ActionDispatch::IntegrationTest
 
@@ -170,7 +171,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
     c2 = users(:c2)
     log_in_as(c2)
     #add tote item with quantity 4
-    post tote_items_path, tote_item: {quantity: 4, posting_id: posting.id}
+    post tote_items_path, params: {tote_item: {quantity: 4, posting_id: posting.id}}
     tote_item = assigns(:tote_item)
 
     #c2 should now be looking at the pout page
@@ -234,7 +235,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
     posting = come_up_3_short
     #user got sent to the pout page telling them they were three units short of a full case
     #so now they just added 3 more. it should not send them to pout page but back to shopping page
-    post tote_items_path, tote_item: {quantity: 3, posting_id: posting.id}
+    post tote_items_path, params: {tote_item: {quantity: 3, posting_id: posting.id}}
     tote_item = assigns(:tote_item)
 
     #the case size is 10. c1 just found out the case was 3 units shy so they added 3 more so
@@ -261,7 +262,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
     c2 = users(:c2)
     log_in_as(c2)
     #add tote item with quantity 4
-    post tote_items_path, tote_item: {quantity: 4, posting_id: posting.id}
+    post tote_items_path, params: {tote_item: {quantity: 4, posting_id: posting.id}}
     tote_item = assigns(:tote_item)
 
     #the case size is 10. c1 added 3 units and c2 just added 4. this is a total of 7 which means the 
@@ -329,7 +330,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
     end
 
     commitment_zone_start = delivery_date - 2.days
-    post postings_path, posting: {
+    post postings_path, params: {posting: {
       description: "my recurring posting",
       quantity_available: 100,
       price: price,
@@ -340,7 +341,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
       delivery_date: delivery_date,
       commitment_zone_start: commitment_zone_start,
       posting_recurrence: {frequency: 1, on: true}
-    }
+    }}
     #verify exactly one post exists
     verify_post_presence(price, @unit, exists = true)
     #wind the clock forward to between the commitment zone start and delivery date
@@ -398,7 +399,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
   def verify_post_visibility(price, unit, count)
     get postings_path
     assert :success
-    assert_select "body div.panel h4.panel-title", {text: number_to_currency(price) + " / " + unit.name, count: count}
+    assert_select "body div.panel h4.panel-title", {text: ActiveSupport::NumberHelper.number_to_currency(price) + " / " + unit.name, count: count}
   end
 
   def verify_post_existence(price, count, posting_id = nil)
@@ -422,12 +423,12 @@ class PostingsTest < ActionDispatch::IntegrationTest
     mylive = @posting.live
     mynotlive = !@posting.live
 
-    patch posting_path(@posting), posting: {
+    patch posting_path(@posting), params: {posting: {
       description: "edited description",
       quantity_available: @posting.quantity_available,
       price: @posting.price,
       live: mynotlive
-    }
+    }}
 
     assert :success  
     assert_redirected_to @farmer    
@@ -440,15 +441,15 @@ class PostingsTest < ActionDispatch::IntegrationTest
 
     get postings_path
     assert :success
-    assert_select "body div.panel h4.panel-title", {text: number_to_currency("2.75") + " / " + "Pound", count: 1}
+    assert_select "body div.panel h4.panel-title", {text: ActiveSupport::NumberHelper.number_to_currency("2.75") + " / " + "Pound", count: 1}
     
     #turn off the existing posting
-    patch posting_path(@posting), posting: {
+    patch posting_path(@posting), params: {posting: {
       description: "edited description",
       quantity_available: @posting.quantity_available,
       price: @posting.price,
       live: false
-    }
+    }}
 
     assert :success  
     assert_redirected_to @farmer
@@ -457,9 +458,9 @@ class PostingsTest < ActionDispatch::IntegrationTest
     assert_select '.price', {text: "$2.75 / Pound", count: 0}
 
     #here is where we need to copy the posting
-    get new_posting_path, posting_id: @posting.id
+    get new_posting_path, params: {posting_id: @posting.id}
     posting = assigns(:posting)
-    post postings_path, posting: {
+    post postings_path, params: {posting: {
       description: posting.description,
       quantity_available: posting.quantity_available,
       price: posting.price,
@@ -469,18 +470,18 @@ class PostingsTest < ActionDispatch::IntegrationTest
       live: posting.live,
       delivery_date: posting.delivery_date,
       commitment_zone_start: posting.commitment_zone_start
-    }
+    }}
 
     get postings_path
     assert :success
-    assert_select "body div.panel h4.panel-title", {text: number_to_currency("2.75") + " / " + "Pound", count: 1}
+    assert_select "body div.panel h4.panel-title", {text: ActiveSupport::NumberHelper.number_to_currency("2.75") + " / " + "Pound", count: 1}
 
   end
 
   def login_for(user)
     get_access_for(user)
     get login_path
-    post login_path, session: { email: @farmer.email, password: 'dogdog' }
+    post login_path, params: {session: { email: @farmer.email, password: 'dogdog' }}
     assert_redirected_to postings_path
     follow_redirect!
   end
@@ -515,7 +516,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
 
   def create_posting(producer, params)
     log_in_as(producer)
-    post postings_path, posting: params
+    post postings_path, params: {posting: params}
     posting = assigns(:posting)
     verify_post_presence(posting.price, posting.unit, exists = true, posting.id)
     return posting
@@ -534,7 +535,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
       delivery_date += 1.day
     end
 
-    post postings_path, posting: {
+    post postings_path, params: {posting: {
       description: "hi",
       quantity_available: 100,
       price: 2.97,
@@ -544,7 +545,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
       live: true,
       delivery_date: delivery_date,
       commitment_zone_start: delivery_date - 2.days
-      }
+      }}
 
     assert :success
     posting = assigns(:posting)

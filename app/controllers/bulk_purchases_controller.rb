@@ -1,3 +1,5 @@
+require 'utility/funds_processing'
+
 class BulkPurchasesController < ApplicationController
   before_action :redirect_to_root_if_user_not_admin
   
