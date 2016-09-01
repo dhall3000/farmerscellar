@@ -1,6 +1,7 @@
 require 'test_helper'
+require 'utility/rake_helper'
 
-class PostingsControllerTest < ActionController::TestCase
+class PostingsControllerTest < ActionDispatch::IntegrationTest
 
   def setup
   	@farmer = users(:f1)    
@@ -45,7 +46,7 @@ class PostingsControllerTest < ActionController::TestCase
     posting_params[:product_id] = product.id
     commission = ProducerProductUnitCommission.where(user: @farmer, product: product, unit_id: posting_params[:unit_id])
     assert_equal 0, commission.count
-    post :create, id: @farmer.id, posting: posting_params
+    post postings_path, params: { id: @farmer.id, posting: posting_params}
     posting = assigns(:posting)
     assert_not posting.valid?
     assert_not flash.empty?
@@ -77,7 +78,7 @@ class PostingsControllerTest < ActionController::TestCase
 
     admin = users(:a1)
     log_in_as(admin)
-    get :index
+    get postings_path
     postings = assigns(:postings)
 
     #even though we're well past delivery day admin should still see the posting cause it wasn't closed
@@ -154,7 +155,7 @@ class PostingsControllerTest < ActionController::TestCase
 
     travel_to posting.delivery_date + 1
 
-    post :fill, posting_id: posting.id, quantity: quantity
+    post postings_fill_path, params: {posting_id: posting.id, quantity: quantity}
     #verify success
     assert :success
     posting = assigns(:posting)
@@ -224,7 +225,7 @@ class PostingsControllerTest < ActionController::TestCase
 
     #here is the non-failing "good" case
     travel_to posting.delivery_date + 1
-    post :fill, posting_id: posting.id, quantity: 28
+    post postings_fill_path, params: {posting_id: posting.id, quantity: 28}
     assert :success
     assert_template 'postings/fill'
     assert_select 'p', "quantity filled: 28", {count: 1}
@@ -241,7 +242,7 @@ class PostingsControllerTest < ActionController::TestCase
 
     #posting_id is nil
     travel_to posting.delivery_date + 1
-    post :fill, posting_id: nil, quantity: 28
+    post postings_fill_path, params: {posting_id: nil, quantity: 28}
     assert :success
     assert_template 'postings/fill'
     #assert fail message in body is there
@@ -263,7 +264,7 @@ class PostingsControllerTest < ActionController::TestCase
 
     travel_to posting.delivery_date + 1
     #quantity is nil
-    post :fill, posting_id: posting.id, quantity: nil
+    post postings_fill_path, params: {posting_id: posting.id, quantity: nil}
     assert :success
     assert_template 'postings/fill'
     #assert fail message in body is there
@@ -286,7 +287,7 @@ class PostingsControllerTest < ActionController::TestCase
     
     travel_to posting.delivery_date + 1
     #quantity is not a number
-    post :fill, posting_id: posting.id, quantity: 'abcd'
+    post postings_fill_path, params: {posting_id: posting.id, quantity: 'abcd'}
     assert :success
     assert_template 'postings/fill'
     #assert fail message in body is there
@@ -307,7 +308,7 @@ class PostingsControllerTest < ActionController::TestCase
     
     travel_to posting.delivery_date + 1
     #quantity is negative
-    post :fill, posting_id: posting.id, quantity: -1
+    post postings_fill_path, params: {posting_id: posting.id, quantity: -1}
     assert :success
     assert_template 'postings/fill'
     #assert fail message in body is there
@@ -329,7 +330,7 @@ class PostingsControllerTest < ActionController::TestCase
     travel_to posting.delivery_date + 1
     #posting does not exist
     fake_posting_id = 987654
-    post :fill, posting_id: fake_posting_id, quantity: 28
+    post postings_fill_path, params: {posting_id: fake_posting_id, quantity: 28}
     assert :success
     assert_template 'postings/fill'
     #assert fail message in body is there
@@ -349,7 +350,7 @@ class PostingsControllerTest < ActionController::TestCase
     posting = postings(:postingf5apples)        
 
     travel_to posting.delivery_date - 1
-    post :fill, posting_id: posting.id, quantity: 28
+    post postings_fill_path, params: {posting_id: posting.id, quantity: 28}
     assert :success
     assert_template 'postings/fill'
     #assert fail message in body is there
@@ -373,20 +374,20 @@ class PostingsControllerTest < ActionController::TestCase
 
   test "should redirect on new for customer or non user" do
     #first try doing 'new' w/o logging in
-    get :new
+    get new_posting_path
     assert_response :redirect
     assert_redirected_to login_url
 
     #now try logging in as customer. still should fail.
     log_in_as(@customer)
-    get :new
+    get new_posting_path
     assert_response :redirect
     assert_redirected_to root_url
   end
 
   test "should copy posting on new" do
     log_in_as(@farmer)
-    get :new, posting_id: @posting.id
+    get new_posting_path(posting_id: @posting.id)
     assert_response :success
     assert_template 'postings/new'
 
@@ -420,7 +421,7 @@ class PostingsControllerTest < ActionController::TestCase
   end
 
   test "should get index for non users" do
-    get :index
+    get postings_path
     assert :success
     assert_template 'postings/index'
   end
@@ -512,26 +513,26 @@ class PostingsControllerTest < ActionController::TestCase
 
 #EDIT TESTS
   test "should get redirected if not logged in" do        
-    get :edit, id: @posting
+    get edit_posting_path(@posting)
     assert_not flash.empty?
     assert_redirected_to login_url    
   end
 
   test "should redirect edit when not logged in" do   
-    get :edit, id: @posting
+    get edit_posting_path(@posting)
     assert_not flash.empty?
     assert_redirected_to login_url
   end
 
   test "should redirect edit when logged in as customer" do
     log_in_as(@customer)
-    get :edit, id: @posting    
+    get edit_posting_path(@posting)
     assert_redirected_to root_url    
   end
 
   test "should get edit when logged in as farmer" do
     log_in_as(@farmer)
-    get :edit, id: @posting
+    get edit_posting_path(@posting)
     posting = assigns(:posting)
     assert posting.valid?
     assert :success
@@ -544,12 +545,12 @@ class PostingsControllerTest < ActionController::TestCase
     #first try updating as a not-logged-in user
 
     #update the posting with the new values
-    post :update, id: @posting.id, posting: {
+    patch posting_path(@posting, posting: {
       description: @posting.description + "new text",
       quantity_available: @posting.quantity_available + 1,
       price: @posting.price + 1.0,
       live: !(@posting.live)
-    }
+    })
 
     assert_redirected_to login_url
 
@@ -557,12 +558,12 @@ class PostingsControllerTest < ActionController::TestCase
     log_in_as(@customer)
 
     #update the posting with the new values
-    post :update, id: @posting.id, posting: {
+    patch posting_path(@posting, posting: {
       description: @posting.description + "new text",
       quantity_available: @posting.quantity_available + 1,
       price: @posting.price + 1.0,
       live: !(@posting.live)
-    }
+    })
 
     assert_redirected_to root_url
 
@@ -581,12 +582,12 @@ class PostingsControllerTest < ActionController::TestCase
     posting_old = @posting.dup
 
     #update the posting with the new values
-    post :update, id: @posting.id, posting: {
+    patch posting_path(@posting, posting: {
       description: @posting.description + "new text",
       quantity_available: @posting.quantity_available + 1,
       price: @posting.price + 1.0,
       live: !(@posting.live)
-    }
+    })
 
     #first make sure we were sent to the right place
     assert_redirected_to user_path(@farmer)    
@@ -614,13 +615,13 @@ class PostingsControllerTest < ActionController::TestCase
     posting_old = @posting.dup
 
     #update the posting with the new values
-    post :update, id: @posting.id, posting: {
+    patch posting_path(@posting, posting: {
       user_id: @posting2.user_id,
       product_id: @posting2.product_id,
       unit_id: @posting2.unit_id,
       delivery_date: @posting2.delivery_date + 2.days,
       commitment_zone_start: @posting2.commitment_zone_start + 2.days      
-    }
+    })
 
     #first make sure we were sent to the right place
     assert_redirected_to user_path(@farmer)
@@ -648,12 +649,12 @@ class PostingsControllerTest < ActionController::TestCase
     posting_old = @posting.dup
 
     #set price to a negative value to trigger a fail
-    post :update, id: @posting.id, posting: {
+    patch posting_path(@posting, posting: {
       description: @posting.description + "new text",
       quantity_available: @posting.quantity_available + 1,
       price: -1.0,
       live: !(@posting.live)
-    }
+    })
 
     #now we should get sent back to the edit page with errors for user to see what went wrong
     assert :success
@@ -664,13 +665,13 @@ class PostingsControllerTest < ActionController::TestCase
 
 #SHOW TESTS
   test "should not get show" do
-    get :show, id: @posting.id
+    get posting_path(@posting)
     assert_redirected_to login_url
   end
 
   test "should get show" do
     log_in_as @customer
-    get :show, id: @posting.id
+    get posting_path(@posting)
     assert :success
     assert_template 'postings/show'
     posting = assigns(:posting)
@@ -681,7 +682,7 @@ class PostingsControllerTest < ActionController::TestCase
   def get_postings_count
     
     log_in_as(@farmer)
-    get :index
+    get postings_path
     postings = assigns(:postings)        
     assert_not postings.nil?
     puts "postings.count = #{postings.count}"
@@ -728,7 +729,7 @@ class PostingsControllerTest < ActionController::TestCase
 
     parms = get_posting_params_hash
     parms[:posting_recurrence] = {frequency: PostingRecurrence.frequency[0][1], on: false}
-    post :create, id: @farmer.id, posting: parms
+    post postings_path, params: { id: @farmer.id, posting: parms}
     posting = assigns(:posting)        
     assert posting.units_per_case > 1
     assert_not posting.product_identifier.empty?
@@ -759,7 +760,7 @@ class PostingsControllerTest < ActionController::TestCase
 
     parms = get_posting_params_hash
     parms[:posting_recurrence] = {frequency: PostingRecurrence.frequency[1][1], on: true}
-    post :create, id: @farmer.id, posting: parms
+    post postings_path, params: { id: @farmer.id, posting: parms}
     posting = assigns(:posting)        
     assert_not posting.nil?    
     assert posting.posting_recurrence.valid?
@@ -783,7 +784,7 @@ class PostingsControllerTest < ActionController::TestCase
       delivery_date += 1.day
     end
 
-    post :create, id: @farmer.id, posting: get_posting_params_hash
+    post postings_path, params: { id: @farmer.id, posting: get_posting_params_hash}
     posting = assigns(:posting)        
     assert_not posting.nil?
     #the params were sent up to teh #create action with no recurrence set so we want to verify that .posting_recurrence is nil
@@ -808,7 +809,7 @@ class PostingsControllerTest < ActionController::TestCase
     #actually, because of a feature change this now does nothing. on the next line when we 'post' the live var will get set to 'true'
     posting_hash[:live] = false
 
-    post :create, id: @farmer.id, posting: posting_hash
+    post postings_path, params: { id: @farmer.id, posting: posting_hash}
     posting = assigns(:posting)
     assert_not posting.nil?
     assert posting.valid?, get_error_messages(posting)
@@ -816,7 +817,7 @@ class PostingsControllerTest < ActionController::TestCase
     assert_not flash.empty?
 
     #ok, now we have to update this posting if we really want live unset
-    patch :update, id: posting.id, posting: {live: false}
+    patch posting_path(posting, posting: {live: false})
     posting = assigns(:posting)
 
     assert_not posting.live
@@ -825,13 +826,13 @@ class PostingsControllerTest < ActionController::TestCase
   end
 
   def get_new_successfully
-    get :new
+    get new_posting_path
     assert_response :success
     assert_template 'postings/new'    
   end
 
   def successfully_get_index
-    get :index
+    get postings_path
     assert :success
     assert_template 'postings/index'
 
@@ -845,7 +846,7 @@ class PostingsControllerTest < ActionController::TestCase
   end
 
   def fail_to_create(posting_params)
-    post :create, id: @farmer.id, posting: posting_params
+    post postings_path, params: { id: @farmer.id, posting: posting_params}
 
     #verify redirection    
     assert_template 'postings/new'

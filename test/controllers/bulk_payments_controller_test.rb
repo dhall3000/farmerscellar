@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class BulkPaymentsControllerTest < ActionController::TestCase
+class BulkPaymentsControllerTest < ActionDispatch::IntegrationTest
 
   def setup
   	@a1 = users(:a1)
@@ -8,23 +8,23 @@ class BulkPaymentsControllerTest < ActionController::TestCase
 
   test "should get new" do
   	log_in_as(@a1)
-    get :new
+    get new_bulk_payment_path
     assert_response :success
   end
 
   test "should redirect on get new" do
-    get :new
+    get new_bulk_payment_path
     assert_response :redirect
   end
 
   test "should redirect on get create" do
-    post :create
+    post bulk_payments_path
     assert_response :redirect
   end
 
   test "should get create" do
   	log_in_as(@a1)
-  	post :create
+  	post bulk_payments_path
   	assert_response :success
   end
 

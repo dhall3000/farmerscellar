@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class PickupsControllerTest < ActionController::TestCase
+class PickupsControllerTest < ActionDispatch::IntegrationTest
 
 	def setup
 		@customer = users(:c1)
@@ -11,34 +11,34 @@ class PickupsControllerTest < ActionController::TestCase
 
   test "should get new" do
   	log_in_as(@dropsite_user)
-    get :new
+    get new_pickup_path
     assert_response :success
     assert_select 'input#pickup_code', count: 1
   end
 
   test "should not get new when not logged in" do
-    get :new
+    get new_pickup_path
     assert_response :redirect
     assert_select 'input#pickup_code', count: 0
   end
 
   test "should not get new when logged in as customer" do
     log_in_as(@customer)
-    get :new
+    get new_pickup_path
     assert_response :redirect
     assert_select 'input#pickup_code', count: 0
   end
 
   test "should not get new when logged in as farmer" do
   	log_in_as(@farmer)
-    get :new
+    get new_pickup_path
     assert_response :redirect
     assert_select 'input#pickup_code', count: 0
   end
 
   test "should not get new when logged in as admin" do
     log_in_as(@admin)
-    get :new
+    get new_pickup_path
     assert_response :redirect
     assert_select 'input#pickup_code', count: 0
   end
@@ -47,7 +47,7 @@ class PickupsControllerTest < ActionController::TestCase
   	log_in_as(@dropsite_user)
   	pickups_count = Pickup.count
   	c1 = users(:c1)
-    post :create, pickup_code: c1.pickup_code.code
+    post pickups_path, params: {pickup_code: c1.pickup_code.code}
     assert_response :success
     pickup_code = assigns(:pickup_code)
     assert pickup_code.valid?
@@ -62,7 +62,7 @@ class PickupsControllerTest < ActionController::TestCase
     log_in_as(@dropsite_user)
     pickups_count = Pickup.count
     c1 = users(:c1)
-    post :create, pickup_code: c1.pickup_code.code
+    post pickups_path, params: {pickup_code: c1.pickup_code.code}
     assert_response :success
     pickup_code = assigns(:pickup_code)
     assert pickup_code.valid?
@@ -73,9 +73,9 @@ class PickupsControllerTest < ActionController::TestCase
     assert_equal c1.id, Pickup.all.last.user_id
 
     #ok, user logged in. now they open the garage door
-    post :toggle_garage_door, pickup_code: c1.pickup_code.code
+    post pickups_toggle_garage_door_path, params: {pickup_code: c1.pickup_code.code}
     #and now they close the garage door
-    post :toggle_garage_door, pickup_code: c1.pickup_code.code
+    post pickups_toggle_garage_door_path, params: {pickup_code: c1.pickup_code.code}
 
     #there shouldn't be any new pickup objects after cycling the garage door
     assert_equal pickups_count + 1, Pickup.count
@@ -86,7 +86,7 @@ class PickupsControllerTest < ActionController::TestCase
   test "should not create when invalid code submitted" do
   	log_in_as(@dropsite_user)
   	pickups_count = Pickup.count
-    post :create, pickup_code: "12A45"
+    post pickups_path, params: {pickup_code: "12A45"}
     assert_response :success
     pickup_code = assigns(:pickup_code)
     assert_not pickup_code.valid?
@@ -98,7 +98,7 @@ class PickupsControllerTest < ActionController::TestCase
   test "should not create when non existent code submitted" do
   	log_in_as(@dropsite_user)
   	pickups_count = Pickup.count
-    post :create, pickup_code: "1345"
+    post pickups_path, params: {pickup_code: "1345"}
     assert_response :success
     pickup_code = assigns(:pickup_code)
     assert pickup_code.nil?

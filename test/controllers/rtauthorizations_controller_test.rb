@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class RtauthorizationsControllerTest < ActionController::TestCase
+class RtauthorizationsControllerTest < ActionDispatch::IntegrationTest
 
 	def setup
 		@c1 = users(:c1)
@@ -11,7 +11,7 @@ class RtauthorizationsControllerTest < ActionController::TestCase
 	test "should get new" do
 		log_in_as(users(:c1))
 		#the 'success' flag is strictly for test to force the type of paypal spoof response
-		get :new, token: "token"
+		get rtauthorizations_new_path, params: {token: "token"}
 		assert :success
 		assert_template 'rtauthorizations/new'
 		assert assigns(:token)
@@ -25,7 +25,7 @@ class RtauthorizationsControllerTest < ActionController::TestCase
 		log_in_as(users(:c1))
 		assert_equal 0, ActionMailer::Base.deliveries.count
 		#the 'success' flag is strictly for test to force the type of paypal spoof response
-		get :new, token: "token", testparam_fail_fakedetailsfor: true
+		get rtauthorizations_new_path, params: {token: "token", testparam_fail_fakedetailsfor: true}
 		assert :redirect
 		assert_redirected_to tote_items_path
 		assert_not flash[:danger].empty?
@@ -39,7 +39,7 @@ class RtauthorizationsControllerTest < ActionController::TestCase
 		log_in_as(@c1)
 		add_subscription_and_item_to_user(@c1)
 		authorize_part_of_tote(@c1)
-		get :new, token: "token"
+		get rtauthorizations_new_path, params: {token: "token"}
 		tote_items_authorizable = assigns(:tote_items_authorizable)
 		token = assigns(:token)
 		assert tote_items_authorizable.count > 0
@@ -52,7 +52,7 @@ class RtauthorizationsControllerTest < ActionController::TestCase
 		log_in_as(@c1)		
 		add_subscription_and_item_to_user(@c1)
 		assert_equal 0, ActionMailer::Base.deliveries.count
-		post :create, token: "token", testparam_fail_fakestore: true
+		post rtauthorizations_create_path, params: {token: "token", testparam_fail_fakestore: true}
 		assert_equal 1, ActionMailer::Base.deliveries.count
 		assert_appropriate_email(ActionMailer::Base.deliveries[0], "david@farmerscellar.com", "Problem creating paypal billing agreement!", "success: false")		
 		assert_not flash.empty?
@@ -64,7 +64,7 @@ class RtauthorizationsControllerTest < ActionController::TestCase
 		log_in_as(@c1)		
 		add_subscription_and_item_to_user(@c1)
 		assert_equal 0, ActionMailer::Base.deliveries.count
-		post :create, token: "token", testparam_fail_rtba_creation: true
+		post rtauthorizations_create_path, params: {token: "token", testparam_fail_rtba_creation: true}
 		assert_equal 1, ActionMailer::Base.deliveries.count
 		assert_appropriate_email(ActionMailer::Base.deliveries[0], "david@farmerscellar.com", "Problem creating rtba!", "can't be blank")
 		assert_not flash.empty?
@@ -76,7 +76,7 @@ class RtauthorizationsControllerTest < ActionController::TestCase
 		log_in_as(@c1)		
 		add_subscription_and_item_to_user(@c1)
 		assert_equal 0, ActionMailer::Base.deliveries.count
-		post :create, token: "token", testparam_fail_rtba_invalid: true
+		post rtauthorizations_create_path, params: {token: "token", testparam_fail_rtba_invalid: true}
 		assert_equal 1, ActionMailer::Base.deliveries.count
 		assert_appropriate_email(ActionMailer::Base.deliveries[0], "david@farmerscellar.com", "Billing agreement invalid!", "fakebillingagreementid")
 		assert_not flash.empty?
@@ -91,7 +91,7 @@ class RtauthorizationsControllerTest < ActionController::TestCase
 		authorize_part_of_tote(@c1)
 
 		#verify subscription exists
-		subscriptions = get_subscriptions_from(@c1.tote_items)
+		subscriptions = ToteItemsController.helpers.get_subscriptions_from(@c1.tote_items)
 		assert_equal 1, subscriptions.count
 		#verify no items or subscriptions associated with rtauth
 		@c1.tote_items.each do |tote_item|
@@ -101,7 +101,7 @@ class RtauthorizationsControllerTest < ActionController::TestCase
 		assert_equal 0, subscriptions[0].rtauthorizations.count
 		assert_equal 0, ActionMailer::Base.deliveries.count
 
-		post :create, token: "token", testparam_fail_rtauthsave: true
+		post rtauthorizations_create_path, params: {token: "token", testparam_fail_rtauthsave: true}
 
 		assert_equal 1, ActionMailer::Base.deliveries.count
 		assert_appropriate_email(ActionMailer::Base.deliveries[0], "david@farmerscellar.com", "Problem saving Rtauthorization!", "can't be blank")
@@ -123,7 +123,7 @@ class RtauthorizationsControllerTest < ActionController::TestCase
 		log_in_as(@c2)
 		add_subscription_and_item_to_user(@c2)
 		#verify subscription exists
-		subscriptions = get_subscriptions_from(@c2.tote_items)
+		subscriptions = ToteItemsController.helpers.get_subscriptions_from(@c2.tote_items)
 		assert_equal 1, subscriptions.count
 		#verify no items or subscriptions associated with rtauth
 		@c2.tote_items.each do |tote_item|
@@ -134,7 +134,7 @@ class RtauthorizationsControllerTest < ActionController::TestCase
 
 		#this token is in the rtba yml file and belongs to c1 so this post operation should fail
 		#because we're trying to authorize a tote full of c2's items off of c1's billing agreement
-		post :create, token: "faketoken"
+		post rtauthorizations_create_path, params: {token: "faketoken"}
 
 		#verify rtauthorization is nil
 		rtauthorization = assigns(:rtauthorization)
@@ -155,7 +155,7 @@ class RtauthorizationsControllerTest < ActionController::TestCase
 		authorize_part_of_tote(@c1)
 
 		#verify subscription exists
-		subscriptions = get_subscriptions_from(@c1.tote_items)
+		subscriptions = ToteItemsController.helpers.get_subscriptions_from(@c1.tote_items)
 		assert_equal 1, subscriptions.count
 		#verify no items or subscriptions associated with rtauth
 		@c1.tote_items.each do |tote_item|
@@ -164,7 +164,7 @@ class RtauthorizationsControllerTest < ActionController::TestCase
 
 		assert_equal 0, subscriptions[0].rtauthorizations.count
 
-		post :create, token: "token"
+		post rtauthorizations_create_path, params: {token: "token"}
 
 		#verify all items and subscriptions associated with rtauth
 		rtauthorization = assigns(:rtauthorization)

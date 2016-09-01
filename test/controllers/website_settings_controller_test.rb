@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class WebsiteSettingsControllerTest < ActionController::TestCase
+class WebsiteSettingsControllerTest < ActionDispatch::IntegrationTest
 
   def setup
   	@admin = users(:a1)
@@ -18,7 +18,7 @@ class WebsiteSettingsControllerTest < ActionController::TestCase
     assert_redirected_to root_url
 
   	#try to push an update through
-  	patch :update, id: @website_settings.id, website_setting: { new_customer_access_code_required: true }
+  	patch website_setting_path(@website_settings, {website_setting: { new_customer_access_code_required: true }})
   	#verify this attempt was unsuccessful
   	assert_response :redirect
 
@@ -32,7 +32,7 @@ class WebsiteSettingsControllerTest < ActionController::TestCase
   	assert_response :redirect
 
   	#try to push an update through
-  	patch :update, id: @website_settings.id, website_setting: { new_customer_access_code_required: true }
+  	patch website_setting_path(@website_settings, {website_setting: { new_customer_access_code_required: true }})
   	#verify this attempt was unsuccessful
   	assert_response :redirect
 
@@ -50,14 +50,14 @@ class WebsiteSettingsControllerTest < ActionController::TestCase
     get_edit
     
     assert_response :success    
-    patch :update, id: @website_settings.id, website_setting: { new_customer_access_code_required: true, recurring_postings_enabled: true }
+    patch website_setting_path(@website_settings, {website_setting: { new_customer_access_code_required: true, recurring_postings_enabled: true }})
     assert_response :success
 
     @website_settings.reload    
     assert @website_settings.new_customer_access_code_required
     assert @website_settings.recurring_postings_enabled
 
-    patch :update, id: @website_settings.id, website_setting: {new_customer_access_code_required: false, recurring_postings_enabled: false}
+    patch website_setting_path(@website_settings, {website_setting: {new_customer_access_code_required: false, recurring_postings_enabled: false}})
 
     @website_settings.reload
     assert_not @website_settings.new_customer_access_code_required
@@ -66,7 +66,7 @@ class WebsiteSettingsControllerTest < ActionController::TestCase
   end
 
   def get_edit
-    get :edit, id: @website_settings.id    
+    get edit_website_setting_path(@website_settings)
   end
 
 end

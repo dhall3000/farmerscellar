@@ -1,11 +1,11 @@
 require 'test_helper'
 
-class PartnerUsersControllerTest < ActionController::TestCase
+class PartnerUsersControllerTest < ActionDispatch::IntegrationTest
 
   test "should create new partner user if user does not already exist" do
     log_in_as(users(:a1))
     user_count = User.count
-    post :create, name: "bob", email: "bob@b.com", dropsite: Dropsite.first
+    post partner_users_create_path, params: {name: "bob", email: "bob@b.com", dropsite: Dropsite.first.id}
     user = assigns(:user)
     assert_equal user_count + 1, User.count
     bob = User.find_by(email: "bob@b.com")
@@ -20,7 +20,7 @@ class PartnerUsersControllerTest < ActionController::TestCase
     c1 = users(:c1)    
     assert_equal "c1", c1.name
     user_count = User.count
-    post :create, name: "bob", email: "c1@c.com"    
+    post partner_users_create_path, params: {name: "bob", email: "c1@c.com"}
     user = assigns(:user)
     assert_equal user_count, User.count
     bob = User.find_by(email: "c1@c.com")

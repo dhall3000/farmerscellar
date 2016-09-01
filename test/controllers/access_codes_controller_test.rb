@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class AccessCodesControllerTest < ActionController::TestCase
+class AccessCodesControllerTest < ActionDispatch::IntegrationTest
 
   def setup
     @a1 = users(:a1)    
@@ -8,19 +8,14 @@ class AccessCodesControllerTest < ActionController::TestCase
 
   test "should get new" do
     log_in_as(@a1)
-    get :new
+    get new_access_code_path
     assert_response :success
   end
 
   test "should get create" do
     log_in_as(@a1)        
-    post :create, access_code: {notes: "hello"}
+    post access_codes_path, params: {access_code: {notes: "hello"}}
     assert_response :success
   end
-
-  #test "should get update" do
-  #  patch :update
-  #  assert_response :success
-  #end
 
 end

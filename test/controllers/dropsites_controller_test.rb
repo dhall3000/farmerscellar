@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class DropsitesControllerTest < ActionController::TestCase
+class DropsitesControllerTest < ActionDispatch::IntegrationTest
 
   def setup
     @dropsite = dropsites(:dropsite1)
@@ -10,23 +10,23 @@ class DropsitesControllerTest < ActionController::TestCase
 
   test "should get new" do
     log_in_as(@admin)
-    get :new
+    get new_dropsite_path
     assert_response :success
   end
 
   test "should get index" do
-    get :index
+    get dropsites_path
     assert_response :success
   end
 
   test "should get show" do    
-    get :show, id: @dropsite
+    get dropsite_path(@dropsite)
     assert_response :success
   end
 
   test "should get edit" do    
     log_in_as(@admin)
-    get :edit, id: @dropsite
+    get edit_dropsite_path(@dropsite)
     assert_response :success
   end
 

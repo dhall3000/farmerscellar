@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class ToteItemsControllerTest < ActionController::TestCase
+class ToteItemsControllerTest < ActionDispatch::IntegrationTest
 
   def setup
     @c1 = users(:c1)
@@ -15,7 +15,7 @@ class ToteItemsControllerTest < ActionController::TestCase
     log_in_as(@c1)
 
     tote_items_count = @c1.tote_items.count
-    post :create, tote_item: {quantity: 1, posting_id: @posting_apples.id}
+    post tote_items_path, params: {tote_item: {quantity: 1, posting_id: @posting_apples.id}}
     @c1.reload
     assert_equal tote_items_count, @c1.tote_items.count
     assert_response :redirect
@@ -31,7 +31,7 @@ class ToteItemsControllerTest < ActionController::TestCase
     assert_not @posting_apples.live
 
     log_in_as(@c1)
-    get :new, posting_id: @posting_apples.id
+    get new_tote_item_path(posting_id: @posting_apples.id)
     assert_response :redirect
     assert_redirected_to postings_path
 
@@ -53,7 +53,7 @@ class ToteItemsControllerTest < ActionController::TestCase
     #verify user does not have pickup code
     assert_not c5.pickup_code
     #view index
-    get :index
+    get tote_items_path
     assert :success
     #verify user now has dropsite
     assert c5.dropsite
@@ -73,7 +73,7 @@ class ToteItemsControllerTest < ActionController::TestCase
     log_in_as(c5)
     assert_not c5.dropsite
     #view index
-    get :index
+    get tote_items_path
     assert :success
     #verify user still has no dropsite specified
     c5.reload
@@ -87,7 +87,7 @@ class ToteItemsControllerTest < ActionController::TestCase
   test "should get index" do
 
     log_in_as(@c1)
-    get :index
+    get tote_items_path
     assert_response :success
     dropsite = assigns(:dropsite)
     assert_not dropsite.nil?
@@ -101,7 +101,7 @@ class ToteItemsControllerTest < ActionController::TestCase
 
   test "should get billing agreement on index" do
     log_in_as(@c1)
-    get :index
+    get tote_items_path
     assert_response :success
     assert_template 'tote_items/index'
     rtba = assigns(:rtba)
@@ -113,7 +113,7 @@ class ToteItemsControllerTest < ActionController::TestCase
     log_in_as(@c1)
     rtba = @c1.get_active_rtba
     rtba.update(active: false)
-    get :index
+    get tote_items_path
     assert_response :success
     assert_template 'tote_items/index'
     rtba = assigns(:rtba)
@@ -123,14 +123,14 @@ class ToteItemsControllerTest < ActionController::TestCase
   test "should display helpful text on index" do    
     #if user has no tote items helpful text should be rendered
     log_in_as(users(:c_no_tote_items))
-    get :index
+    get tote_items_path
     assert_response :success
     assert_template 'tote_items/index'
     assert_match 'p', "Your shopping tote is empty so there is nothing to view here."
   end
 
   test "should display help text when not logged in for index" do
-    get :index
+    get tote_items_path
     assert_response :redirect
     assert_redirected_to login_path
     assert_not flash.empty?
@@ -140,7 +140,7 @@ class ToteItemsControllerTest < ActionController::TestCase
   test "should get create" do
 
     log_in_as(@c1)
-    post :create, tote_item: {quantity: 1, posting_id: @posting_apples.id}
+    post tote_items_path, params: {tote_item: {quantity: 1, posting_id: @posting_apples.id}}
 
     assert_equal "Item added to tote.", flash[:success]
     assert :redirected
@@ -154,7 +154,7 @@ class ToteItemsControllerTest < ActionController::TestCase
     @posting_apples.update(live: false)
 
     log_in_as(@c1)
-    post :create, tote_item: {quantity: 1, posting_id: @posting_apples}
+    post tote_items_path, params: {tote_item: {quantity: 1, posting_id: @posting_apples.id}}
 
     assert_equal "Oops, please try adding that again", flash[:danger]
     assert_redirected_to postings_path
@@ -166,7 +166,7 @@ class ToteItemsControllerTest < ActionController::TestCase
     log_in_as(@c1)
 
     #zero quantity should fail
-    post :create, tote_item: {quantity: 0, posting_id: @posting_apples}
+    post tote_items_path, params: {tote_item: {quantity: 0, posting_id: @posting_apples.id}}
 
     assert_equal "Item not added to tote. See errors below.", flash.now[:danger]
     assert_template 'tote_items/new'
@@ -181,7 +181,7 @@ class ToteItemsControllerTest < ActionController::TestCase
     ti_count = c1_tote_items.count
     subscription_count = Subscription.where(user_id: @c1.id).count
 
-    post :create, tote_item: {quantity: 2, posting_id: postings(:p_recurrence_on) }
+    post tote_items_path, params: {tote_item: {quantity: 2, posting_id: postings(:p_recurrence_on).id }}
 
     c1_tote_items = ToteItem.where(user_id: @c1.id)
     #verify there's exactly one additional tote item in the database after the post operation
@@ -201,7 +201,7 @@ class ToteItemsControllerTest < ActionController::TestCase
     c1_tote_items = ToteItem.where(user_id: @c1.id)
     ti_count = c1_tote_items.count
     posting = postings(:p_recurrence_off)
-    post :create, tote_item: {quantity: 2, posting_id: postings(:p_recurrence_off) }
+    post tote_items_path, params: {tote_item: {quantity: 2, posting_id: postings(:p_recurrence_off).id }}
     
     c1_tote_items = ToteItem.where(user_id: @c1.id)
     #verify there's exactly one additional tote item in the database after the post operation
@@ -216,33 +216,13 @@ class ToteItemsControllerTest < ActionController::TestCase
   test "should do hold behavior on create" do
 
     log_in_as(users(:c_account_on_hold))
-    post :create #TODO: COME BACK HERE AND PUT LEGIT PARAMETERS HERE
+    post tote_items_path #TODO: COME BACK HERE AND PUT LEGIT PARAMETERS HERE
 
     assert :redirected
     assert_equal flash[:danger], "Your account is on hold. Please contact Farmer's Cellar."
     assert_not assigns(:tote_item)
     assert_not assigns(:subscription)  
 
-  end
-
-  test "should get show" do
-    #get :show
-    #assert_response :success
-  end
-
-  test "should get new" do
-    #get :new
-    #assert_response :success
-  end
-
-  test "should get edit" do
-    #get :edit
-    #assert_response :success
-  end
-
-  test "should get destroy" do
-    #get :destroy
-    #assert_response :success
   end
 
 end

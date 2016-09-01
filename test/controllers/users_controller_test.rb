@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class UsersControllerTest < ActionController::TestCase
+class UsersControllerTest < ActionDispatch::IntegrationTest
 
   def setup
     @admin = users(:a1)
@@ -9,7 +9,7 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test "should get new" do
-    get :new
+    get new_user_path
     assert_response :success
   end
 
@@ -17,7 +17,7 @@ class UsersControllerTest < ActionController::TestCase
     log_in_as(@user)
     other_user = users(:c2)
     WebsiteSetting.create(new_customer_access_code_required: false, recurring_postings_enabled: true)
-    get :show, id: other_user
+    get user_path(other_user)
     assert :redirect
     assert_redirected_to root_url
   end
@@ -26,39 +26,39 @@ class UsersControllerTest < ActionController::TestCase
     log_in_as(@admin)
     other_user = users(:f1)
     WebsiteSetting.create(new_customer_access_code_required: false, recurring_postings_enabled: true)
-    get :show, id: other_user
+    get user_path(other_user)
     assert :success
     assert_template 'users/show'
   end
 
   test "should redirect edit when not logged in" do
-    get :edit, id: @user
+    get edit_user_path(@user)
     assert_not flash.empty?
     assert_redirected_to login_url
   end
 
   test "should redirect update when not logged in" do
-    post :update, id: @user, user: { name: @user.name, email: @user.email }
+    patch user_path(@user), params: { user: { name: @user.name, email: @user.email }}
     assert_not flash.empty?
     assert_redirected_to login_url
   end
 
   test "should redirect edit when logged in as wrong user" do
     log_in_as(@other_user)
-    get :edit, id: @user
+    get edit_user_path(@user)
     assert flash.empty?
     assert_redirected_to root_url
   end
 
   test "should redirect update when logged in as wrong user" do
     log_in_as(@other_user)
-    patch :update, id: @user, user: { name: @user.name, email: @user.email }
+    patch user_path(@user, {user: { name: @user.name, email: @user.email }})
     assert flash.empty?
     assert_redirected_to root_url
   end
 
   test "should redirect index when not logged in" do
-    get :index
+    get users_path
     assert_redirected_to login_url
   end
   

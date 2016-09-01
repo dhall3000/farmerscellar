@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class AuthorizationsControllerTest < ActionController::TestCase
+class AuthorizationsControllerTest < ActionDispatch::IntegrationTest
 
   def setup
     @user = users(:c1)    
@@ -8,14 +8,9 @@ class AuthorizationsControllerTest < ActionController::TestCase
 
   test "should get new" do
   	log_in_as @user
-    get :new, token: "toke"
+    get new_authorization_path, params: {token: "toke"}
     assert_response :success
     assert_template 'authorizations/new'
   end
-
-  #test "should get create" do
-  #  get :create
-  #  assert_response :success
-  #end
 
 end

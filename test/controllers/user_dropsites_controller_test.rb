@@ -1,13 +1,13 @@
 require 'test_helper'
 
-class UserDropsitesControllerTest < ActionController::TestCase
+class UserDropsitesControllerTest < ActionDispatch::IntegrationTest
 
 	def setup
 		@user = users(:c1)
 	end
 
 	test "should redirect if not logged in" do		
-		post :create, user_dropsite: {dropsite_id: 1}
+		post user_dropsites_path, params: {user_dropsite: {dropsite_id: 1}}
 		assert_redirected_to login_path
 	end
 
@@ -25,7 +25,7 @@ class UserDropsitesControllerTest < ActionController::TestCase
 		assert new_dropsite_id != old_dropsite_id
 		#post the dropsite change
 		log_in_as(@user)
-		post :create, user_dropsite: {dropsite_id: new_dropsite_id}
+		post user_dropsites_path, params: {user_dropsite: {dropsite_id: new_dropsite_id}}
 		#verify the dropsite ids are different			
 		assert @user.dropsite.id != old_dropsite_id, "@user.dropsite.id = #{@user.dropsite.id.to_s}, dropsite=#{@user.dropsite.name}, newdropsite=#{new_dropsite.name}, id=#{new_dropsite.id.to_s}"
 		assert_equal new_dropsite_id, @user.dropsite.id

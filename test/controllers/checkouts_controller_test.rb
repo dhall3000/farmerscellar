@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class CheckoutsControllerTest < ActionController::TestCase
+class CheckoutsControllerTest < ActionDispatch::IntegrationTest
   
   def setup
   	@c1 = users(:c1)
@@ -9,7 +9,7 @@ class CheckoutsControllerTest < ActionController::TestCase
   test "should create one time checkout" do
   	log_in_as(@c1)
   	checkouts_count = Checkout.count
-  	post :create, use_reference_transaction: 0
+  	post checkouts_path, params: {use_reference_transaction: 0}
   	assert_equal nil, flash[:danger]
   	assert_equal checkouts_count + 1, Checkout.count
   	assert_equal false, Checkout.last.is_rt
@@ -18,7 +18,7 @@ class CheckoutsControllerTest < ActionController::TestCase
   test "should create reference transaction checkout" do
   	log_in_as(@c1)
   	checkouts_count = Checkout.count
-  	post :create, use_reference_transaction: 1
+  	post checkouts_path, params: {use_reference_transaction: 1}
   	assert_equal nil, flash[:danger]
   	assert_equal checkouts_count + 1, Checkout.count
   	assert_equal true, Checkout.last.is_rt

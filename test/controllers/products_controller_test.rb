@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class ProductsControllerTest < ActionController::TestCase
+class ProductsControllerTest < ActionDispatch::IntegrationTest
   
   def setup
     @admin = users(:a1)
@@ -8,7 +8,7 @@ class ProductsControllerTest < ActionController::TestCase
 
   test "should get new" do
     log_in_as(@admin)
-    get :new
+    get new_product_path
     assert_response :success
   end
 
@@ -30,7 +30,7 @@ class ProductsControllerTest < ActionController::TestCase
 
   test "should get index" do
     log_in_as(@admin)
-    get :index
+    get products_path
     assert_response :success
   end
 
