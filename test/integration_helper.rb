@@ -348,7 +348,8 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     assert_match ti.posting.user.farm_name, mail.body.encoded
     assert_match ti.quantity_filled.to_s, mail.body.encoded
 
-    assert_match "Our records suggest they might remain at the dropsite. If so, please plan to pick them up before 8PM tonight. Otherwise they'll be removed and donated", mail.body.encoded
+    assert_match "Our records suggest they might remain at the dropsite. If so, please plan to pick them up before 8PM tonight (i.e.", mail.body.encoded
+    assert_match "Otherwise they'll be removed and donated", mail.body.encoded
 
     if user.pickups.any?
       assert_match "FYI, your last recorded pickup was #{user.pickups.last.created_at.strftime("%A %B %d, %Y at %l:%M %p")}", mail.body.encoded

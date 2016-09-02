@@ -1,8 +1,11 @@
 Hello,
 
 Have you picked up these products yet?
+<% if @tote_items && @tote_items.any? %>
+  <% if @partner_deliveries && @partner_deliveries.any? %>  
 
-<% if @tote_items %>
+Farmer's Cellar Sourced
+  <% end %>
 	<% @tote_items.each do |tote_item| %>
 		<% if tote_item.state?(:FILLED) %>
 --------------------------------------------------------------
@@ -10,8 +13,18 @@ ID=<%= tote_item.id %>,Producer=<%= tote_item.posting.user.farm_name %>,Product=
 		<% end %>
 	<% end %>
 <% end %>
+<% if @partner_deliveries && @partner_deliveries.any? %>  
+  <% if @tote_items && @tote_items.any? %>
 
-Our records suggest they might remain at the dropsite. If so, please plan to pick them up before 8PM tonight. Otherwise they'll be removed and donated according to our policy outlined here: <%= how_things_work_url(anchor: "pickup_deadline") %>.
+Partner Sourced
+  <% end %>  
+<% @partner_deliveries.each do |partner_delivery| %>
+--------------------------------------------------------------
+Source=<%= partner_delivery.partner %>, Delivery Date=<%= partner_delivery.created_at.strftime("%A %b %d, %Y") %>
+<% end %>
+<% end %>
+
+Our records suggest they might remain at the dropsite. If so, please plan to pick them up before 8PM tonight (i.e. <%= @user.dropsite.next_food_clearout.strftime("%A %B %d, %Y at %l:%M %p") %>). Otherwise they'll be removed and donated according to our policy outlined here: <%= how_things_work_url(anchor: "pickup_deadline") %>.
 <% if @user.pickups.any? %>
 
 FYI, your last recorded pickup was <%= @user.pickups.last.created_at.strftime("%A %B %d, %Y at %l:%M %p") %>.

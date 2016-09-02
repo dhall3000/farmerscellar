@@ -37,4 +37,8 @@ class Dropsite < ApplicationRecord
 
   end
 
+  def next_food_clearout
+    return last_food_clearout + 7.days
+  end
+
 end

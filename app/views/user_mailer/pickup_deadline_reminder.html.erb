@@ -4,7 +4,11 @@ Hello,
 <p>
 Have you picked up these products yet?
 </p>
-<% if @tote_items %>
+<% if @tote_items && @tote_items.any? %>
+  <% if @partner_deliveries && @partner_deliveries.any? %>  
+    <h2>Farmer's Cellar Sourced</h2>
+  <% end %>
+
   <table border="1">
     <thead>
       <tr>        
@@ -18,33 +22,52 @@ Have you picked up these products yet?
     </thead>
     <tbody>
       <% @tote_items.each do |tote_item| %>
-        <% if tote_item.state?(:FILLED) %>
 
-          <tr>
-            <td align="left"><%= tote_item.id %></td>
-            <td align="left"><%= tote_item.posting.user.farm_name %></td>
-            <td align="left"><%= tote_item.posting.product.name %></td>
-            <td align="left"><%= tote_item.posting.unit.name %></td>
+        <tr>
+          <td align="left"><%= tote_item.id %></td>
+          <td align="left"><%= tote_item.posting.user.farm_name %></td>
+          <td align="left"><%= tote_item.posting.product.name %></td>
+          <td align="left"><%= tote_item.posting.unit.name %></td>
 
-            <% if tote_item.fully_filled? %>
-              <td align="center"><%= tote_item.quantity_filled %></td>
-            <% else %>
-              <td bgcolor="yellow" align="center"><%= tote_item.quantity_filled %></td>
-            <% end %>        
+          <% if tote_item.fully_filled? %>
+            <td align="center"><%= tote_item.quantity_filled %></td>
+          <% else %>
+            <td bgcolor="yellow" align="center"><%= tote_item.quantity_filled %></td>
+          <% end %>        
 
-            <td align="center"><%= tote_item.posting.delivery_date.strftime("%A %b %d, %Y") %></td>
+          <td align="center"><%= tote_item.posting.delivery_date.strftime("%A %b %d, %Y") %></td>
 
-          </tr>
-
-        <% end %>
+        </tr>
 
       <% end %>
     </tbody>
   </table>
 <% end %>
 
+<% if @partner_deliveries && @partner_deliveries.any? %>  
+  <% if @tote_items && @tote_items.any? %>
+    <h2>Partner Sourced</h2>
+  <% end %>  
+  <table border="1">
+    <thead>
+      <tr>        
+        <th align="left">Source</th>
+        <th align="center">Delivery Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @partner_deliveries.each do |partner_delivery| %>
+        <tr>
+          <td align="left"><%= partner_delivery.partner %></td>
+          <td align="center"><%= partner_delivery.created_at.strftime("%A %b %d, %Y") %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>     
+<% end %>
+
 <p>
-Our records suggest they might remain at the dropsite. If so, please plan to pick them up before 8PM tonight. Otherwise they'll be removed and donated according to <%= link_to "our policy outlined here", how_things_work_url(anchor: "pickup_deadline") %>.
+Our records suggest they might remain at the dropsite. If so, please plan to pick them up before 8PM tonight (i.e. <%= @user.dropsite.next_food_clearout.strftime("%A %B %d, %Y at %l:%M %p") %>). Otherwise they'll be removed and donated according to <%= link_to "our policy outlined here", how_things_work_url(anchor: "pickup_deadline") %>.
 </p>
 <% if @user.pickups.any? %>
 <p>

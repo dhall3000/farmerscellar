@@ -3,15 +3,30 @@ require 'integration_helper'
 
 class PickupDeadlineReminderTest < IntegrationHelper
 
-  test "product delivered on wednesday user never picks up gets email on following monday" do
+  def get_next_wednesday
+
+    next_wednesday = Time.zone.now.midnight
+    while !next_wednesday.wednesday?
+      next_wednesday += 1.day
+    end
+
+    return next_wednesday
+
+  end
+
+  def travel_to_warning_day
+    warning_wday = FOODCLEAROUTWARNINGDAYTIME[:wday]
+    while Time.zone.now.wday != warning_wday
+      travel 1.day
+    end
+  end
+
+  test "fc customer only product delivered on wednesday user never picks up gets email on following monday" do
 
     nuke_all_postings
 
     #create a posting
-    delivery_date = Time.zone.now.midnight
-    while !delivery_date.wednesday?
-      delivery_date += 1.day
-    end
+    delivery_date = get_next_wednesday
     commitment_zone_start = delivery_date - 2.days
 
     distributor = create_producer("distributor", "distributor@d.com", "WA", 98033, "www.distributor.com", "Distributor Inc.")
@@ -44,11 +59,7 @@ class PickupDeadlineReminderTest < IntegrationHelper
     assert ti1_bob.reload.state?(:FILLED)
     verify_proper_delivery_notification_email(bob_mail, ti1_bob)    
 
-    #loop over deadline warning time
-    warning_wday = FOODCLEAROUTWARNINGDAYTIME[:wday]
-    while Time.zone.now.wday != warning_wday
-      travel 1.day
-    end
+    travel_to_warning_day
 
     #travel to what should be 1 hour prior to deadline warnings going out
     travel_to Time.zone.now.midnight + (FOODCLEAROUTWARNINGDAYTIME[:hour] - 1).hours
@@ -77,6 +88,53 @@ class PickupDeadlineReminderTest < IntegrationHelper
 
     travel_back
 
-  end  
+  end
+
+  test "partner customer only product delivered on wednesday user never picks up gets email on following monday" do
+
+    nuke_all_postings
+    
+    #create partner user
+    dropsite = Dropsite.first
+    log_in_as users(:a1)
+    post partner_users_create_path, params: {name: "jane", email: "jane@j.com", dropsite: dropsite.id}
+    jane = assigns(:user)
+
+    #send azure standard delivery notification
+    travel_to get_next_wednesday
+    post partner_users_send_delivery_notification_path, params: {user_ids: [jane.id], partner_name: "Azure Standard"}
+
+    #skip to pickup deadline warning time
+    travel_to_warning_day
+    travel_to Time.zone.now.midnight + FOODCLEAROUTWARNINGDAYTIME[:hour].hours
+
+    #do hourly tasks
+    ActionMailer::Base.deliveries.clear
+    assert_equal 0, ActionMailer::Base.deliveries.count
+    RakeHelper.do_hourly_tasks
+
+    #verify deadline warning email sent
+    assert_equal 1, ActionMailer::Base.deliveries.count
+            
+    #verify pickup deadline warning email goes out
+
+    if false
+    
+      pickup_deadline_warning = ActionMailer::Base.deliveries.first
+      verify_pickup_deadline_reminder_email(pickup_deadline_warning, bob, [ti1_bob])
+      
+      #loop over the following week's deadline warning time
+      travel 1.week
+      ActionMailer::Base.deliveries.clear
+      assert_equal 0, ActionMailer::Base.deliveries.count
+      RakeHelper.do_hourly_tasks
+      #verify deadline warning email does not go out
+      assert_equal 0, ActionMailer::Base.deliveries.count    
+
+    end
+
+    travel_back
+
+  end
 
 end

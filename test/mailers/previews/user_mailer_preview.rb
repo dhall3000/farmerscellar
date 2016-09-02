@@ -2,17 +2,68 @@
 class UserMailerPreview < ActionMailer::Preview
   include ToteItemsHelper
 
-  # Preview this email at http://localhost:3000/rails/mailers/user_mailer/pickup_deadline_reminder
-  def pickup_deadline_reminder
+  #http://localhost:3000/rails/mailers/user_mailer/pickup_deadline_reminder_fc_products_only
+  def pickup_deadline_reminder_fc_products_only
+
     user = User.find_by(email: "c1@c.com")
+
+    user.partner_deliveries.delete_all
+    user.pickups.delete_all
+
+    user.tote_items.first.update(state: ToteItem.states[:FILLED], quantity_filled: user.tote_items.first.quantity)
+    user.tote_items.second.update(state: ToteItem.states[:FILLED], quantity_filled: user.tote_items.second.quantity)
+    user.tote_items.third.update(state: ToteItem.states[:FILLED], quantity_filled: 1)
+    
+    user.pickups.create    
+
+    UserMailer.pickup_deadline_reminder(user, user.tote_items.where(state: ToteItem.states[:FILLED]), user.partner_deliveries)
+
+  end
+
+  #http://localhost:3000/rails/mailers/user_mailer/pickup_deadline_reminder_partner_products_only
+  def pickup_deadline_reminder_partner_products_only
+
+    user = User.find_by(email: "c1@c.com")
+
+    user.tote_items.first.update(state: ToteItem.states[:ADDED], quantity_filled: user.tote_items.first.quantity)
+    user.tote_items.second.update(state: ToteItem.states[:ADDED], quantity_filled: user.tote_items.second.quantity)
+    user.tote_items.third.update(state: ToteItem.states[:ADDED], quantity_filled: 1)
+
+    user.update(partner_user: true)
+
+    user.partner_deliveries.delete_all
+    user.partner_deliveries.create(partner: "Azure Standard")
+    user.partner_deliveries.create(partner: "Blue Valley Meats")    
+
+    user.pickups.delete_all
+    user.pickups.create    
+
+    UserMailer.pickup_deadline_reminder(user, user.tote_items.where(state: ToteItem.states[:FILLED]), user.partner_deliveries)
+
+  end
+
+  #http://localhost:3000/rails/mailers/user_mailer/pickup_deadline_reminder_fc_and_partner_products
+  def pickup_deadline_reminder_fc_and_partner_products
+
+    user = User.find_by(email: "c1@c.com")
+
+    user.partner_deliveries.delete_all
+    user.pickups.delete_all
 
     user.tote_items.first.update(state: ToteItem.states[:FILLED], quantity_filled: user.tote_items.first.quantity)
     user.tote_items.second.update(state: ToteItem.states[:FILLED], quantity_filled: user.tote_items.second.quantity)
     user.tote_items.third.update(state: ToteItem.states[:FILLED], quantity_filled: 1)
 
-    user.pickups.create
+    user.update(partner_user: true)
 
-    UserMailer.pickup_deadline_reminder(user, user.tote_items)
+    user.partner_deliveries.delete_all
+    user.partner_deliveries.create(partner: "Azure Standard")
+    user.partner_deliveries.create(partner: "Blue Valley Meats")    
+    
+    user.pickups.create    
+
+    UserMailer.pickup_deadline_reminder(user, user.tote_items.where(state: ToteItem.states[:FILLED]), user.partner_deliveries)
+
   end
 
   # Preview this email at http://localhost:3000/rails/mailers/user_mailer/account_activation

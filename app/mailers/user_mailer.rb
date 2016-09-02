@@ -73,13 +73,18 @@ class UserMailer < ApplicationMailer
     mail to: @user.email, subject: "Purchase receipt"
   end
 
-  def pickup_deadline_reminder(user, filled_tote_items)
+  def pickup_deadline_reminder(user, filled_tote_items, partner_deliveries)
+    
     @user = user
     @tote_items = filled_tote_items
+    @partner_deliveries = partner_deliveries
 
-    if @user && @user.email && @tote_items && @tote_items.where(state: ToteItem.states[:FILLED]).any?
-      mail to: @user.email, subject: "Pickup deadline reminder"
+    if @user && @user.email
+      if (@tote_items && @tote_items.any?) || (partner_deliveries && partner_deliveries.any?)
+        mail to: @user.email, subject: "Pickup deadline reminder"
+      end
     end
+
   end
 
   private

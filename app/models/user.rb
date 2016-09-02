@@ -48,6 +48,14 @@ class User < ApplicationRecord
   #if this object is a distributor it might have many PRODUCERs
   has_many :producers, class_name: "User", foreign_key: "distributor_id"
 
+  def filled_items_at_dropsite
+    return tote_items.joins(:posting).where("postings.delivery_date > ? and tote_items.state = ?", cutoff, ToteItem.states[:FILLED]).order("postings.delivery_date").distinct
+  end
+
+  def partner_deliveries_at_dropsite
+    return partner_deliveries.where("created_at > ?", cutoff).distinct
+  end
+
   def distributor?
     return account_type_is?(:PRODUCER) && producers.count > 0
   end
@@ -413,6 +421,18 @@ class User < ApplicationRecord
   end
   
   private
+
+    def cutoff
+      
+      if pickups.any?
+        #we want what's most recent, user's last pickup or the last food clearout
+        return [pickups.last.created_at, dropsite.last_food_clearout].max
+      else
+        #user's never picked up before so just get the latest food clearout
+        return dropsite.last_food_clearout
+      end
+
+    end
 
     # Converts email to all lower-case.
     def downcase_email
