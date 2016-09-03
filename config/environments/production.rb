@@ -110,5 +110,6 @@ Rails.application.configure do
 
     ::USEGATEWAY = true
     ::PAYPALMASSPAYENDPOINT = "https://api-3t.paypal.com"    
+  end
 
 end

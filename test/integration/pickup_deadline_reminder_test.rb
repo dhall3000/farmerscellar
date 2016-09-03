@@ -187,12 +187,14 @@ class PickupDeadlineReminderTest < IntegrationHelper
     expected_num_pickups = 0
 
     if user_has_prior_pickup
-      do_pickup_last_wednesday(bob)
+      do_pickup_last_wednesday(jane)
       expected_num_pickups += 1
     end
 
     #send azure standard delivery notification
     travel_to get_next_wednesday
+
+    log_in_as(users(:a1))
     post partner_users_send_delivery_notification_path, params: {user_ids: [jane.id], partner_name: "Azure Standard"}
 
     #skip to pickup deadline warning time
