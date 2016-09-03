@@ -29,6 +29,7 @@ Rails.application.routes.draw do
   get 'tote_items/pout'  
   post 'subscriptions/skip_dates'
   post 'pickups/toggle_garage_door'
+  get 'pickups/log_out_dropsite_user'
   get 'partner_users/index'
   post 'partner_users/create'
   post 'partner_users/send_delivery_notification'

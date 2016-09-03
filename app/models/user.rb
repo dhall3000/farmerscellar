@@ -420,6 +420,17 @@ class User < ApplicationRecord
     reset_sent_at < 2.hours.ago
   end
   
+  def send_pickup_deadline_reminder_email
+
+    if filled_items_at_dropsite.any? || partner_deliveries_at_dropsite.any?
+      puts "user #{id.to_s}, #{email} has products remaining. sending them a pickup deadline reminder."
+      UserMailer.pickup_deadline_reminder(self, filled_items_at_dropsite, partner_deliveries_at_dropsite).deliver_now
+    else
+      puts "user #{id.to_s}, #{email} has no products remaining. not sending them a pickup deadline reminder."
+    end    
+    
+  end
+  
   private
 
     def cutoff

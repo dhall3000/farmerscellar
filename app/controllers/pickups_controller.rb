@@ -3,6 +3,11 @@ class PickupsController < ApplicationController
 
   @@mockup_mode = false
 
+  def log_out_dropsite_user
+    log_out
+    redirect_to root_path
+  end
+
   def new
     @is_dropsite_user = true
   end

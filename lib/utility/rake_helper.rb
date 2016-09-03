@@ -33,48 +33,33 @@ class RakeHelper
 				puts "send_pickup_deadline_reminders: it is not pickup deadline reminder time so exiting having done nothing."
 				puts "send_pickup_deadline_reminders: exit"
 				return
-			end			
+			end
 
-			#get a list of everbody who had products delivered last week
+			#this is all the customers that had FC-sourced product delivered in the last 7 days						
+			filled_within_last_seven_days_users = User.select("users.id, users.email").joins(tote_items: :posting).where("postings.delivery_date > ? and tote_items.state = ?", Time.zone.now - 7.days, ToteItem.states[:FILLED]).distinct
+			#this is all the customers that had non-FC-sourced (i.e. partner source (e.g. Azure Standard, Blue Valley Meats etc)) products delivered in the last 7 days
+			partner_users_with_delivery_last_seven_days = User.select("users.id, users.email").joins(:partner_deliveries).where("users.partner_user = ? and partner_deliveries.created_at > ?", true, Time.zone.now - 7.days).distinct
 
-			#here's some hack-a-billy: we want to send a pickup deadline reminder only to folks for whom we have no record of them having picked up after their last goods
-			#were delivered. the 'goods' could be either tote items or "partner" goods (e.g. blue valley meats, azure standard etc.). so we need to query up two different lists,
-			#one for users with tote items remaining at the dropsite and one for users with partner goods remaining.
-			#since i suck at rails querying and db / sql in general i'm going to hack it like this: first do a "filter query" on tote items then do a "filter query" on parter deliveries.
-			#a "filter query" just says give me everybody who's had a tote item filled within the last 7 days. then from there i'll refine it with a call to check for if the filling
-			#was after the user's last pickup etc.
-			#then once i have these two refined "filter queries", i'm going to manually merge them together in to a hash (i.e. goods_at_dropsite_by_user). so when all is said and
-			#done you'll be able to go goods_at_dropsite_by_user[UserX][:filled_tote_items] or goods_at_dropsite_by_user[UserX][:partner_deliveries] to get what you're looking for
-			#ugly. get 'er' done
-			
-			filled_within_last_seven_days_users = User.joins(tote_items: :posting).where("postings.delivery_date > ? and tote_items.state = ?", Time.zone.now - 7.days, ToteItem.states[:FILLED]).distinct
-			partner_users_with_delivery_last_seven_days = User.joins(:partner_deliveries).where("users.partner_user = ? and partner_deliveries.created_at > ?", true, Time.zone.now - 7.days).distinct
+			#HACK! I don't know how to do this in a fancy / fast way so I'm just going to hack it. basically all I want to do is take the above two relations and merge them
+			#so that i end up with a list of distinct users who had product delivered within the last 7 days, regardless of if they had fc products, partner products or both.
+			#so that's what all the rest of this junk is
 
-			goods_at_dropsite_by_user = {}
+			last_weeks_customers = {}
 
 			filled_within_last_seven_days_users.each do |filled_within_last_seven_days_user|
-				user = filled_within_last_seven_days_user
-				goods_at_dropsite_by_user[user] = {filled_tote_items: user.filled_items_at_dropsite}				
+				last_weeks_customers[filled_within_last_seven_days_user] = nil
 			end
 
 			partner_users_with_delivery_last_seven_days.each do |partner_user_with_delivery_last_seven_days|
-				user = partner_user_with_delivery_last_seven_days
-
-				if !goods_at_dropsite_by_user.has_key?(user)
-					goods_at_dropsite_by_user[user] = {}
+				
+				if !last_weeks_customers.has_key?(partner_user_with_delivery_last_seven_days)
+					last_weeks_customers[partner_user_with_delivery_last_seven_days] = nil
 				end
-
-				goods_at_dropsite_by_user[user][:partner_deliveries] = user.partner_deliveries_at_dropsite
 
 			end
 
-			goods_at_dropsite_by_user.each do |user, goods_at_dropsite|
-
-				if (goods_at_dropsite[:filled_tote_items] && goods_at_dropsite[:filled_tote_items].any?) || (goods_at_dropsite[:partner_deliveries] && goods_at_dropsite[:partner_deliveries].any?)
-					puts "user #{user.id.to_s} #{user.email} has products remaining. sending them a pickup deadline reminder."
-					UserMailer.pickup_deadline_reminder(user, goods_at_dropsite[:filled_tote_items], goods_at_dropsite[:partner_deliveries]).deliver_now					
-				end
-
+			last_weeks_customers.each do |last_weeks_customer, val|
+				last_weeks_customer.send_pickup_deadline_reminder_email
 			end
 			
 			puts "send_pickup_deadline_reminders: exit"

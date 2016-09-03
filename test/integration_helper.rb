@@ -333,20 +333,25 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
   end
 
-  def verify_pickup_deadline_reminder_email(mail, user, tote_items)
+  def verify_pickup_deadline_reminder_email(mail, user, tote_items, partner_deliveries)
 
     assert mail
     assert user
-    assert tote_items
-    assert tote_items.any?
+    assert (tote_items && tote_items.any?) || (partner_deliveries && partner_deliveries.any?)
     assert_equal user.email, mail.to[0]
     assert_equal "Pickup deadline reminder", mail.subject
 
     assert_match "Have you picked up these products yet?", mail.body.encoded
 
-    ti = tote_items.first
-    assert_match ti.posting.user.farm_name, mail.body.encoded
-    assert_match ti.quantity_filled.to_s, mail.body.encoded
+    if tote_items && tote_items.any?
+      ti = tote_items.first
+      assert_match ti.posting.user.farm_name, mail.body.encoded
+      assert_match ti.quantity_filled.to_s, mail.body.encoded
+    end
+
+    if partner_deliveries && partner_deliveries.any?
+      assert_match partner_deliveries.first.partner, mail.body.encoded
+    end
 
     assert_match "Our records suggest they might remain at the dropsite. If so, please plan to pick them up before 8PM tonight (i.e.", mail.body.encoded
     assert_match "Otherwise they'll be removed and donated", mail.body.encoded
