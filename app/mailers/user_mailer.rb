@@ -38,7 +38,7 @@ class UserMailer < ApplicationMailer
       @tote_items = authorization.tote_items
     end
 
-    mail to: user.email, subject: "Authorization receipt & policy changes"
+    mail to: user.email, subject: "Authorization receipt"
 
   end
 
@@ -58,8 +58,6 @@ class UserMailer < ApplicationMailer
         subject = "Unfilled order(s) and delivery notification"
       end
     end
-
-    subject += " & policy changes"
 
     mail to: user.email, subject: subject
   end

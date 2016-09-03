@@ -48,7 +48,7 @@ class UserMailerTest < ActionMailer::TestCase
 
     mail = UserMailer.delivery_notification(user, dropsite, tote_items)
 
-    assert_equal "Delivery notification & policy changes", mail.subject
+    assert_equal "Delivery notification", mail.subject
     assert_equal [user.email], mail.to
     assert_equal ["david@farmerscellar.com"], mail.from
 
@@ -82,7 +82,7 @@ class UserMailerTest < ActionMailer::TestCase
 
     mail = UserMailer.delivery_notification(user, dropsite, tote_items)
 
-    assert_equal "Unfilled order(s) and delivery notification & policy changes", mail.subject
+    assert_equal "Unfilled order(s) and delivery notification", mail.subject
     assert_equal [user.email], mail.to
     assert_equal ["david@farmerscellar.com"], mail.from
 
@@ -119,7 +119,7 @@ class UserMailerTest < ActionMailer::TestCase
 
     mail = UserMailer.authorization_receipt(user, authorization)
 
-    assert_equal "Authorization receipt & policy changes", mail.subject
+    assert_equal "Authorization receipt", mail.subject
     assert_equal [user.email], mail.to
     assert_equal ["david@farmerscellar.com"], mail.from
 
@@ -148,7 +148,7 @@ class UserMailerTest < ActionMailer::TestCase
 
     mail = UserMailer.authorization_receipt(user, rtauthorization, user.tote_items)
 
-    assert_equal "Authorization receipt & policy changes", mail.subject
+    assert_equal "Authorization receipt", mail.subject
     assert_equal [user.email], mail.to
     assert_equal ["david@farmerscellar.com"], mail.from
 
