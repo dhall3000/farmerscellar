@@ -49,11 +49,11 @@ class User < ApplicationRecord
   has_many :producers, class_name: "User", foreign_key: "distributor_id"
 
   def filled_items_at_dropsite
-    return tote_items.joins(:posting).where("postings.delivery_date > ? and tote_items.state = ?", cutoff, ToteItem.states[:FILLED]).order("postings.delivery_date").distinct
+    return tote_items.joins(:posting).where("postings.delivery_date > ? and tote_items.state = ?", cutoff, ToteItem.states[:FILLED]).order("postings.delivery_date")
   end
 
   def partner_deliveries_at_dropsite
-    return partner_deliveries.where("created_at > ?", cutoff).distinct
+    return partner_deliveries.where("created_at > ?", cutoff)
   end
 
   def distributor?
