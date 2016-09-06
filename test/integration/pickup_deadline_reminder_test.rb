@@ -246,29 +246,6 @@ class PickupDeadlineReminderTest < IntegrationHelper
 
   end
 
-  def get_last_wednesday
-
-    now = Time.zone.now
-    travel_back
-    next_wednesday = get_next_wednesday
-    last_wednesday = next_wednesday - 7.days
-    travel_to now
-
-    return last_wednesday
-
-  end
-
-  def get_next_wednesday
-
-    next_wednesday = Time.zone.now.midnight
-    while !next_wednesday.wednesday?
-      next_wednesday += 1.day
-    end
-
-    return next_wednesday
-
-  end
-
   def travel_to_warning_day
     warning_wday = FOODCLEAROUTWARNINGDAYTIME[:wday]
     while Time.zone.now.wday != warning_wday
