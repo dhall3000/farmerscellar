@@ -27,8 +27,3 @@ two:
   frequency: 1
   'on': false
   reference_date: <%= monday_after_base_monday + 7.days %>
-
-three:
-  frequency: 6
-  'on': true
-  reference_date: <%= Time.zone.local(2016, 4, 26, 0, 0) %>

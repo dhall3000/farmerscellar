@@ -228,59 +228,12 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
 
   end
 
-  test "verify get delivery dates method 6" do
-
-    posting_recurrence = PostingRecurrence.new(frequency: 6, on: true)
-    posting = postings(:postingf1apples)
-    mar29 = Time.zone.local(2016,3,29)    
-    posting.delivery_date = mar29
-    posting.commitment_zone_start = mar29 - 2.days
-    posting.save
-    posting_recurrence.postings << posting
-    posting_recurrence.save
-    
-    delivery_dates = posting_recurrence.get_delivery_dates_for(posting.delivery_date, posting.delivery_date + (9 * 7).days)
-    
-    assert_equal 7, delivery_dates.count
-
-    #5, 12, 26, 3, 10, 24, 31
-    assert_equal Time.zone.local(2016,4,5), delivery_dates[0]
-    assert_equal Time.zone.local(2016,4,12), delivery_dates[1]
-    assert_equal Time.zone.local(2016,4,26), delivery_dates[2]
-    assert_equal Time.zone.local(2016,5,3), delivery_dates[3]
-    assert_equal Time.zone.local(2016,5,10), delivery_dates[4]
-    assert_equal Time.zone.local(2016,5,24), delivery_dates[5]
-    assert_equal Time.zone.local(2016,5,31), delivery_dates[6]
-
-  end
-
-  test "should return proper future delivery dates for martys schedule" do
-
-    posting_recurrence = PostingRecurrence.new(frequency: 6, on: true)
-    posting = postings(:postingf1apples)
-    mar29 = Time.zone.local(2016,3,29)    
-    posting.delivery_date = mar29
-    posting.commitment_zone_start = mar29 - 2.days
-    posting.save
-    posting_recurrence.postings << posting
-    posting_recurrence.save
-    
-    may10 = Time.zone.local(2016,5,10)
-    delivery_dates = posting_recurrence.get_delivery_dates_for(may10, may10 + (4 * 7).days)
-
-    assert_equal Time.zone.local(2016,5,24), delivery_dates[0]
-    assert_equal Time.zone.local(2016,5,31), delivery_dates[1]
-    assert_equal Time.zone.local(2016,6,7), delivery_dates[2]
-    
-  end
-
   test "should not create new posting when turned off" do
     do_not_create_posting_when_turned_off(1)
     do_not_create_posting_when_turned_off(2)
     do_not_create_posting_when_turned_off(3)
     do_not_create_posting_when_turned_off(4)
     do_not_create_posting_when_turned_off(5)
-    do_not_create_posting_when_turned_off(6)
   end
 
   def do_not_create_posting_when_turned_off(frequency)
@@ -307,7 +260,6 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     create_exactly_one_new_posting_for_next_regular_recurrence(3)
     create_exactly_one_new_posting_for_next_regular_recurrence(4)    
     create_exactly_one_new_posting_for_next_regular_recurrence(5)
-    create_exactly_one_new_posting_for_next_regular_recurrence(6)
   end
 
   #this method is only for testing frequency 1 - 4. not 0 (no recurrence), not 5 (monthly) and not 6 (irregular)

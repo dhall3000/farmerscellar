@@ -196,18 +196,6 @@ class SubscriptionTest < ActiveSupport::TestCase
 		verify_posting_recurrence_five_with_various_subscription_frequencies(2)
 	end
 
-	test "should generate appropriate delivery dates 6 and 1" do
-		verify_posting_recurrence_six_with_various_subscription_frequencies(1)
-	end
-
-	test "should generate appropriate delivery dates 6 and 2" do
-		verify_posting_recurrence_six_with_various_subscription_frequencies(2)
-	end
-
-	test "should generate appropriate delivery dates 6 and 3" do
-		verify_posting_recurrence_six_with_various_subscription_frequencies(3)
-	end
-
 	test "should generate new added tote item when rtauthorization is inactive" do
 		#create new billing agreement
 		rtba = Rtba.new(token: "faketoken", ba_id: "fake_ba_id", user_id: @user.id, active: true)

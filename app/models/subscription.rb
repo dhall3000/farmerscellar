@@ -37,12 +37,6 @@ class Subscription < ApplicationRecord
   end
 
   def generate_next_tote_item
-
-    #as of this writing (2016-05-25) there's only one case where this could ever fail; marty's 3 on 1 off delivery schedule
-    #when a customer is trying to add a every-other-week subscription on week #2 of his delivery cycle
-    if !posting_recurrence.can_add_tote_item?(frequency)      
-      return nil
-    end
        
     if !generate_tote_item_for_current_posting?
       return nil
@@ -140,16 +134,7 @@ class Subscription < ApplicationRecord
       if posting_recurrence.frequency < 5 #weekly-based subscriptions
         next_delivery_date = posting_recurrence.get_delivery_dates_for(prev_delivery_date, prev_delivery_date + (frequency * posting_recurrence.frequency * 7).days)[frequency - 1]
       elsif posting_recurrence.frequency == 5 #monthly-based subscriptions
-        next_delivery_date = posting_recurrence.get_delivery_dates_for(prev_delivery_date, prev_delivery_date + (2 * frequency).months)[frequency - 1]
-      elsif posting_recurrence.frequency == 6 #this is Marty/Helen the Hen's "3 weeks on, 1 week off" schedule
-        case self.frequency
-          when 1 #every delivery
-            next_delivery_date = posting_recurrence.get_delivery_dates_for(prev_delivery_date, prev_delivery_date + (3 * 7).days)[0]
-          when 2 #every other week
-            next_delivery_date = prev_delivery_date + (2 * 7).days
-          when 3 #every 4 weeks
-            next_delivery_date = prev_delivery_date + (4 * 7).days
-          end
+        next_delivery_date = posting_recurrence.get_delivery_dates_for(prev_delivery_date, prev_delivery_date + (2 * frequency).months)[frequency - 1]      
       end
 
       return next_delivery_date
