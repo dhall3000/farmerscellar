@@ -21,9 +21,7 @@
 one:
   frequency: 1
   'on': true
-  reference_date: <%= monday_after_base_monday + 7.days %>
 
 two:
   frequency: 1
   'on': false
-  reference_date: <%= monday_after_base_monday + 7.days %>

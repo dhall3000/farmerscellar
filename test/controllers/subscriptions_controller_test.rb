@@ -195,7 +195,7 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
 
     sd = assigns(:skip_dates)
     assert sd.count > 0
-    assert assigns(:end_date) > user.subscriptions.last.posting_recurrence.reference_date    
+    assert assigns(:end_date) > user.subscriptions.last.posting_recurrence.current_posting.delivery_date
   end
 
   test "index should not show skip dates for subscriptions that are paused" do

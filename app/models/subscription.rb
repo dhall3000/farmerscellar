@@ -99,15 +99,7 @@ class Subscription < ApplicationRecord
       return delivery_dates
     end
 
-    if tote_items && tote_items.any?
-      puts "get_delivery_dates: tote_items.any?"
-      #start at tote_items.first and compute forward
-      delivery_date = posting_recurrence.reference_date
-    else
-      puts "get_delivery_dates: !tote_items.any?"
-      delivery_date = posting_recurrence.current_posting.delivery_date
-    end
-
+    delivery_date = posting_recurrence.current_posting.delivery_date
     puts "get_delivery_dates: delivery_date=#{delivery_date.to_s}, end_date=#{end_date.to_s}"
 
     #quit when computed date is beyond end_date

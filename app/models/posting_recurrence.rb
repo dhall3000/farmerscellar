@@ -1,5 +1,4 @@
 class PostingRecurrence < ApplicationRecord
-  before_validation :set_reference_date
 
   has_many :postings
   has_many :subscriptions
@@ -33,7 +32,7 @@ class PostingRecurrence < ApplicationRecord
     PostingRecurrence.frequency[5][1]
   ]
 
-  validates_presence_of :postings, :reference_date
+  validates_presence_of :postings
 
   def turn_off
     update(on: false)
@@ -221,17 +220,17 @@ class PostingRecurrence < ApplicationRecord
       return delivery_dates
     end
 
-    if !reference_date
+    if !current_posting || current_posting.delivery_date.nil?
       return delivery_dates
     end
 
-    if start_date < reference_date
+    if start_date < current_posting.delivery_date
       return delivery_dates
     end
 
     num_deliveries_from_reference_date = 1
     #start at tote_items.first and compute forward
-    delivery_date = reference_date
+    delivery_date = current_posting.delivery_date
     #quit when computed date is beyond end_date
     while delivery_date <= end_date
 
@@ -275,23 +274,6 @@ class PostingRecurrence < ApplicationRecord
   end
 
   private
-
-    #reference_date is that from which subsequent recurrence delivery dates will be computed. it's purpose is so to allow for the
-    #feature down the road enabling farmers to change the day they delivery. for example, maybe a recurrence changes from every
-    #3rd friday of the month to every 2nd tuesday of the month.
-    def set_reference_date
-      
-      if reference_date
-        return
-      end
-
-      #I wanted to do something like:
-      #self.reference_date = postings.order("postings.id").last.delivery_date
-      #but can't because the .order forces a sql call but since this method is called before_validation the self
-      #object isn't save to db yet so the .order.last call returns nil
-      self.reference_date = postings.last.delivery_date
-
-    end
 
     def get_last_weekday_occurence_of_next_month(reference_date)
 
