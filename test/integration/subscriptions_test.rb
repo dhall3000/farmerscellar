@@ -62,7 +62,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     assert_equal Time.zone.local(2016, 1, 21), posting_recurrence.reload.current_posting.delivery_date
 
 
-    subscription.pause(true)    
+    subscription.pause
     
     count = 0
     while count < 4
@@ -83,7 +83,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     #now go to the friday after the current
     travel 4.days
     #unpause subxcription
-    subscription.pause(false)
+    subscription.reload.unpause
     #verify the unpause generated a tote time for the upcoming producer delivery
     assert_equal 2, subscription.reload.tote_items.count
     assert subscription.tote_items.last.state?(:ADDED)

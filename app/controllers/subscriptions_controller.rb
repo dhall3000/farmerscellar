@@ -179,43 +179,32 @@ class SubscriptionsController < ApplicationController
 
     end
 
-    paused = params[:subscription][:paused].to_i
-    if paused == 0
-      pause_value = false            
-    elsif paused == 1
-      pause_value = true
-      #blast all skip dates ahead of the present moment
-      SubscriptionSkipDate.where("subscription_id = ? and skip_date > ?", id, Time.zone.now).delete_all      
-      unremovable_items = @subscription.remove_items_from_tote
-    else
+    paused = params[:subscription][:paused].to_i == 1
+
+    if paused == @subscription.paused
+      #there's nothing to do here
+      flash[:danger] = "Subscription not modified"
       redirect_to subscriptions_path
       return
     end
 
-    if @subscription.pause(pause_value)
+    if paused
+      
+      SubscriptionSkipDate.where("subscription_id = ? and skip_date > ?", id, Time.zone.now).delete_all      
+      unremovable_items = @subscription.pause
+      flash_message = "#{producer_product} subscription paused."
 
-      if !@subscription.paused
-        tote_item = @subscription.generate_next_tote_item
-      end      
-
-      if pause_value
-
-        flash_message = "#{producer_product} subscription paused."
-
-        if unremovable_items.any?
-          flash_message += " Note: some items still scheduled for delivery. See tote."
-          flash[:info] = flash_message
-        else
-          flash[:success] = flash_message
-        end
-
+      if unremovable_items.any?
+        flash_message += " Note: some items still scheduled for delivery. See tote."
+        flash[:info] = flash_message
       else
-        flash_message = "#{producer_product} subscription unpaused."
         flash[:success] = flash_message
       end
-      
+
     else
-      flash[:danger] = "Subscription not updated"
+      tote_item = @subscription.unpause
+      flash_message = "#{producer_product} subscription unpaused."
+      flash[:success] = flash_message
     end
 
     redirect_to subscriptions_path

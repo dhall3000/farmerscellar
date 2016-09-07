@@ -19,19 +19,15 @@ class Subscription < ApplicationRecord
     update(on: false)
   end
 
-  def pause(paused_value)
-    
-    update(paused: paused_value)
+  def pause    
+    update(paused: true)
+    return remove_items_from_tote
+  end
 
-    if paused_value
-      unremovable_items = remove_items_from_tote
-    else
-      generate_next_tote_item
-    end
-
-    return unremovable_items
-
-  end  
+  def unpause
+    update(paused: false)
+    return generate_next_tote_item
+  end
 
   def remove_items_from_tote
 
