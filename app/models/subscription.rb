@@ -92,24 +92,6 @@ class Subscription < ApplicationRecord
 
   end
 
-  def is_future_delivery_date?(date)
-
-    delivery_dates = get_delivery_dates(date - 1.day, date + 1.day)
-
-    if delivery_dates.nil?
-      return false
-    end
-
-    if !delivery_dates.any?
-      return false
-    end
-
-    delivery_date = delivery_dates[0]
-
-    return delivery_date == date
-
-  end
-
   #this should return all dates regardless of skip dates
   #exclude start_date
   #include end_date

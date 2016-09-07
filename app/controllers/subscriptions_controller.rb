@@ -323,10 +323,6 @@ class SubscriptionsController < ApplicationController
         #see if any of the delivery dates exist in the skip dates table
         subscriber_delivery_dates.each do |subscriber_delivery_date|
 
-          if !subscription.is_future_delivery_date?(subscriber_delivery_date)
-            next
-          end
-
           if SubscriptionSkipDate.find_by(subscription_id: subscription.id, skip_date: subscriber_delivery_date)
             skip = true
           else
