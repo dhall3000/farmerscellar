@@ -163,7 +163,7 @@ class SubscriptionsController < ApplicationController
         flash_message = "#{producer_product} subscription"
 
         SubscriptionSkipDate.where("subscription_id = ? and skip_date > ?", id, Time.zone.now).delete_all      
-        unremovable_items = remove_items_from_tote_for_this_subscription
+        unremovable_items = @subscription.remove_items_from_tote
         if unremovable_items.any?          
           flash[:info] = "#{flash_message} canceled. Note: some items still scheduled for delivery. See tote."
         else
@@ -186,7 +186,7 @@ class SubscriptionsController < ApplicationController
       pause_value = true
       #blast all skip dates ahead of the present moment
       SubscriptionSkipDate.where("subscription_id = ? and skip_date > ?", id, Time.zone.now).delete_all      
-      unremovable_items = remove_items_from_tote_for_this_subscription
+      unremovable_items = @subscription.remove_items_from_tote
     else
       redirect_to subscriptions_path
       return
@@ -257,24 +257,6 @@ class SubscriptionsController < ApplicationController
       if !subscription || !current_user?(subscription.user)
         redirect_to subscriptions_path
       end      
-
-    end
-
-    def remove_items_from_tote_for_this_subscription
-
-      items = @subscription.tote_items.joins(:posting).where("postings.delivery_date >= ?", Time.zone.now.midnight)
-      unremovable_items = []
-
-      items.each do |item|
-        case item.state
-        when ToteItem.states[:ADDED], ToteItem.states[:AUTHORIZED]
-          item.transition(:customer_removed)
-        when ToteItem.states[:COMMITTED]
-          unremovable_items << item
-        end
-      end
-
-      return unremovable_items
 
     end
 

@@ -11,6 +11,103 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     @posting = postings(:postingf1apples)
   end  
 
+  test "should generate tote item if when a bi weekly subscription is paused producer changes delivery day then user unpauses subscription" do
+    nuke_all_postings
+
+    #establish weekly posting recurrence on wednesdays
+    producer = create_producer("producer1", "producer1@p.com", "WA", 98033, "www.producer1.com", "PRODUCER 1 FARMS")        
+    jan6 = Time.zone.local(2016, 1, 6)
+    delivery_date = jan6
+    commitment_zone_start = delivery_date - 2.days
+
+    #jump to first commitment zone in the series
+    travel_to commitment_zone_start
+    #Monday Jan 4
+    posting = create_posting(producer, 2.50, product = nil, unit = nil, delivery_date, commitment_zone_start, commission = 0.05)
+    posting_recurrence = PostingRecurrence.new(frequency: 1, on: true)
+    posting_recurrence.postings << posting
+    posting_recurrence.save
+    #current posting: Wednesday Jan 6
+    #generate the pr's first posting
+    assert_equal 1, posting_recurrence.postings.count    
+    RakeHelper.do_hourly_tasks
+    #current posting: Wednesday Jan 13
+    assert_equal 2, posting_recurrence.postings.count
+    assert_equal Time.zone.local(2016, 1, 13), posting_recurrence.reload.postings.last.delivery_date
+    #create bi-weekly subscription
+    jane = create_user("jane", "jane@j.com", 98033)
+    subscription = Subscription.new(frequency: 2, on: true, user: jane, posting_recurrence: posting_recurrence, quantity: 2, paused: false)
+    assert subscription.valid?
+    assert subscription.save
+    #generate the first tote item in the series
+    assert_equal 0, subscription.tote_items.count
+    subscription.generate_next_tote_item
+    assert_equal 1, subscription.tote_items.count
+    assert_equal Time.zone.local(2016, 1, 13), subscription.tote_items.last.posting.delivery_date
+
+
+    travel 7.days
+    #Monday Jan 11
+    assert_equal Time.zone.local(2016, 1, 11), Time.zone.now
+    RakeHelper.do_hourly_tasks
+    #current posting: Wednesday Jan 20
+    assert_equal 3, posting_recurrence.postings.count
+    assert_equal Time.zone.local(2016, 1, 20), posting_recurrence.reload.postings.last.delivery_date
+    assert_equal 1, subscription.reload.tote_items.count
+
+    travel_to Time.zone.local(2016, 1, 14)
+    #Thursday Jan 14
+    #change the delivery day to thursday (from wednesday)    
+    assert posting_recurrence.reload.change_delivery_day?(new_wday = 4)
+    assert_equal Time.zone.local(2016, 1, 21), posting_recurrence.reload.current_posting.delivery_date
+
+
+    subscription.pause(true)    
+    
+    count = 0
+    while count < 4
+      travel_to posting_recurrence.reload.current_posting.commitment_zone_start
+      RakeHelper.do_hourly_tasks            
+      count += 1
+      assert_equal 3 + count, posting_recurrence.reload.postings.count      
+    end
+
+    #Monday Jan 8
+    assert_equal Time.zone.local(2016,2,8), Time.zone.now
+    #current posting: Feb 18
+    assert_equal Time.zone.local(2016,2,18), posting_recurrence.reload.current_posting.delivery_date
+    
+    #verify still same # of items on the paused sx
+    assert_equal 1, subscription.reload.tote_items.count
+
+    #now go to the friday after the current
+    travel 4.days
+    #unpause subxcription
+    subscription.pause(false)
+    #verify the unpause generated a tote time for the upcoming producer delivery
+    assert_equal 2, subscription.reload.tote_items.count
+    assert subscription.tote_items.last.state?(:ADDED)
+    #verify just-added tote item is for the current_posting
+    assert_equal Time.zone.local(2016,2,18), subscription.tote_items.last.posting.delivery_date
+    assert_equal posting_recurrence.reload.current_posting.delivery_date, subscription.tote_items.last.posting.delivery_date
+
+    #go to current_posting order cutoff
+    travel_to posting_recurrence.reload.current_posting.commitment_zone_start
+    #Mon Feb 15
+    assert_equal Time.zone.local(2016,2,15), posting_recurrence.reload.current_posting.commitment_zone_start
+    RakeHelper.do_hourly_tasks
+
+    #verify new posting created for feb 25 delivery
+    assert_equal Time.zone.local(2016,2,25), posting_recurrence.reload.current_posting.delivery_date
+
+    #verify a tote item was not generated for this latest posting...
+    assert_equal 2, subscription.reload.tote_items.count
+    #...and thus the last item in the sx should be the same as it was
+    assert_equal Time.zone.local(2016,2,18), subscription.tote_items.last.posting.delivery_date
+
+    travel_back
+  end
+
   test "when weekly producer changes wday with a bi weekly subscriber should create tote item spaced roughly two weeks apart" do
 
     nuke_all_postings
@@ -81,42 +178,6 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     travel_back
 
   end
-
-  test "issue 2" do
-    #while a bi-weekly subscription is paused producer changes delivery day. then user unpauses subscription
-    #should stay on schedule
-  end
-
-  test "verify get delivery dates 2 method" do
-
-    posting_recurrence = PostingRecurrence.new(frequency: 1, on: true)
-    posting = postings(:postingf1apples)
-    mar29 = Time.zone.local(2016,3,29)    
-    posting.delivery_date = mar29
-    posting.commitment_zone_start = mar29 - 2.days
-    posting.save
-    posting_recurrence.postings << posting
-    posting_recurrence.save
-
-#    debugger
-
-    x = 1
-
-  end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   test "should not generate tote items for skip dates" do
 

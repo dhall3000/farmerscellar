@@ -20,8 +20,36 @@ class Subscription < ApplicationRecord
   end
 
   def pause(paused_value)
+    
     update(paused: paused_value)
+
+    if paused_value
+      unremovable_items = remove_items_from_tote
+    else
+      generate_next_tote_item
+    end
+
+    return unremovable_items
+
   end  
+
+  def remove_items_from_tote
+
+    items = tote_items.joins(:posting).where("postings.delivery_date >= ?", Time.zone.now.midnight)
+    unremovable_items = []
+
+    items.each do |item|
+      case item.state
+      when ToteItem.states[:ADDED], ToteItem.states[:AUTHORIZED]
+        item.transition(:customer_removed)
+      when ToteItem.states[:COMMITTED]
+        unremovable_items << item
+      end
+    end
+
+    return unremovable_items
+
+  end
 
   def authorized?
     return rtauthorizations && rtauthorizations.order("rtauthorizations.id").last && rtauthorizations.order("rtauthorizations.id").last.authorized?
