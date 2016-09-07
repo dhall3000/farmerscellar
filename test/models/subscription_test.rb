@@ -28,7 +28,7 @@ class SubscriptionTest < ActiveSupport::TestCase
 	end
 
 	def verify_posting_recurrence_with_various_frequencies(posting_frequency, subscription_frequency)
-		
+
 		get_delivery_dates_setup(posting_frequency, subscription_frequency)
 
 		current_delivery_date = @posting_recurrence.current_posting.delivery_date
@@ -37,9 +37,22 @@ class SubscriptionTest < ActiveSupport::TestCase
 
 		assert_equal 3, delivery_dates.count
 
-		assert_equal current_delivery_date + (1 * posting_frequency * subscription_frequency * 7).days, delivery_dates[0]
-		assert_equal current_delivery_date + (2 * posting_frequency * subscription_frequency * 7).days, delivery_dates[1]
-		assert_equal current_delivery_date + (3 * posting_frequency * subscription_frequency * 7).days, delivery_dates[2]
+		if @subscription.tote_items.count == 0
+			#this is one of two cases where the subscription should take the next available
+			#producer delivery. this is where the subscription has zero tote items. the other case is if the gap
+			#between the subscription's most recent tote item and the next available producer delivery is greater than the
+			#subscription's frequency. that is, if we have a subscription that is supposed to be delivered on every 3
+			#weeks and it's been 7 weeks, we want to take the next available producer delivery. this case will happen when
+			#a user puts their subscription on pause for a long time and later unpauses it.
+			assert_equal current_delivery_date + (posting_frequency * 7).days, delivery_dates[0]
+			assert_equal delivery_dates[0] + (1 * posting_frequency * subscription_frequency * 7).days, delivery_dates[1]
+			assert_equal delivery_dates[0] + (2 * posting_frequency * subscription_frequency * 7).days, delivery_dates[2]
+		else
+			subscription_last_delivery_date = @subscription.tote_items.joins(:posting).order("postings.delivery_date").last.posting.delivery_date
+			assert_equal subscription_last_delivery_date + (posting_frequency * subscription_frequency * 7).days, delivery_dates[0]
+			assert_equal delivery_dates[0] + (posting_frequency * subscription_frequency * 7).days, delivery_dates[1]
+			assert_equal delivery_dates[1] + (posting_frequency * subscription_frequency * 7).days, delivery_dates[2]
+		end
 
 	end
 

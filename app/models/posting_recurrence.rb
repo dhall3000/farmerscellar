@@ -34,6 +34,64 @@ class PostingRecurrence < ApplicationRecord
 
   validates_presence_of :postings
 
+  #constraints:
+  #can't be sunday or monday
+  #must be in the future relative to current_posting
+  #commitment_zone_start must be modified independantly
+  #
+  #here's how you should use this: say a farmer tells you he wants to switch from wednesday delivery to thursday.
+  #and he wants his first thursday delivery to be on september 7th. wait until after the system generates the
+  #september 6th posting and then, before it generates the september 13th posting, call this method.
+  #NOTE: this is a stupid method. i'm way overthinking this. if/when we need to change a posting recurrence wday
+  #just wait until a posting is generated with an incorrect wday (i.e. the first posting that's a wednesday (old wday)
+  #that should be the new wday (i.e. thursday)) and make it be the new wday. however you if you're changing, say, from
+  #a delivery day of friday to a delivery day of tuesday and you do this by backing up the delivery day in the current
+  #week (rather than scooting it forward to the tuesday of the following week) you need to not make the new delivery date
+  #prior to the order cutoff. saving will fail. if this would be the case you must first back up the order cutoff and while
+  #doing that need to make sure you don't back the order cutoff before the current time (i.e. Time.zone.now)
+  def change_delivery_day?(new_wday)
+
+    #we must have at least one posting    
+    if current_posting.nil?
+      return false
+    end
+
+    #we don't take deliveries on sunday or monday
+    if new_wday == 0 || new_wday == 1
+      return false
+    end
+
+    current_wday = current_posting.delivery_date.wday
+    new_delivery_date = current_posting.delivery_date
+    
+    if new_wday == current_wday
+      #this is not a change
+      return false
+    else
+      while new_delivery_date.wday != new_wday
+        if new_wday > current_wday
+          new_delivery_date += 1.day
+        else
+          new_delivery_date -= 1.day
+        end        
+      end
+    end
+    
+    if new_delivery_date < Time.zone.now.midnight
+      #we can't set the new delivery date to before today
+      #if we got here it means the newwday is less than the current wday
+      #but backing up to get to the new wday made us go behind today (i.e. Time.zone.now)
+      #so we need to go back to the current wday and then go forward from there
+      new_delivery_date = current_posting.delivery_date
+      while new_delivery_date.wday != new_wday
+        new_delivery_date += 1.day
+      end
+    end    
+
+    return current_posting.update(delivery_date: new_delivery_date)
+
+  end
+
   def turn_off
     update(on: false)
     subscriptions.each do |subscription|
@@ -212,6 +270,7 @@ class PostingRecurrence < ApplicationRecord
   #this should return all dates
   #exclude start_date
   #include end_date
+  #only works for delivery dates that have not been delivered yet. in other words, current_posting and forward
   def get_delivery_dates_for(start_date, end_date)
     
     delivery_dates = []
@@ -224,12 +283,7 @@ class PostingRecurrence < ApplicationRecord
       return delivery_dates
     end
 
-    if start_date < current_posting.delivery_date
-      return delivery_dates
-    end
-
-    num_deliveries_from_reference_date = 1
-    #start at tote_items.first and compute forward
+    #start at current_posting and compute forward
     delivery_date = current_posting.delivery_date
     #quit when computed date is beyond end_date
     while delivery_date <= end_date
@@ -254,8 +308,6 @@ class PostingRecurrence < ApplicationRecord
           delivery_date = get_last_weekday_occurence_of_next_month(delivery_date)
         end               
       end   
-
-      num_deliveries_from_reference_date += 1
 
     end
 

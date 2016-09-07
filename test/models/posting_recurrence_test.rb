@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'utility/rake_helper'
 
 class PostingRecurrenceTest < ActiveSupport::TestCase
   
@@ -13,6 +14,82 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     @subscription.user = users(:c1)
     @subscription.save
     @subscription.generate_next_tote_item    
+
+  end
+
+  test "delivery wday should change from wednesday to thursday" do
+
+    posting_recurrence = PostingRecurrence.new(frequency: 1, on: true)
+    posting_recurrence.postings << postings(:posting_subscription_farmer)
+    posting_recurrence.save
+    assert_equal 1, posting_recurrence.postings.count
+
+    #change to a static delivery date to make computation stuff easier
+    #this is a wednesday
+    posting_recurrence.postings.first.update(delivery_date: Time.zone.local(2016,9,7))
+    #verify first posting is on wednesday
+    assert_equal 3, posting_recurrence.reload.postings.first.delivery_date.wday
+
+    #change to posting 1's order cutoff and generate next posting
+    travel_to posting_recurrence.postings.first.commitment_zone_start
+    RakeHelper.do_hourly_tasks
+    #verify another posting was created
+    assert_equal 2, posting_recurrence.postings.count
+    #verify second posting is on wednesday
+    assert_equal 3, posting_recurrence.reload.postings.last.delivery_date.wday
+
+    #change delivery day to thursday
+    assert posting_recurrence.change_delivery_day?(4)
+    #verify second posting is on thursday
+    assert_equal 4, posting_recurrence.reload.postings.last.delivery_date.wday
+    assert_equal Time.zone.local(2016,9,15), posting_recurrence.reload.postings.last.delivery_date
+
+    #travel to last posting's order cutoff, generate new posting and verify the new posting is on a thursday
+    travel_to posting_recurrence.postings.last.commitment_zone_start
+    RakeHelper.do_hourly_tasks
+    assert_equal 3, posting_recurrence.postings.count
+    assert_equal 4, posting_recurrence.reload.postings.last.delivery_date.wday
+    assert_equal Time.zone.local(2016,9,22), posting_recurrence.reload.postings.last.delivery_date
+
+    travel_back
+
+  end
+
+  test "delivery wday should change from thursday to wednesday" do
+
+    posting_recurrence = PostingRecurrence.new(frequency: 1, on: true)
+    posting_recurrence.postings << postings(:posting_subscription_farmer)
+    posting_recurrence.save
+    assert_equal 1, posting_recurrence.postings.count
+
+    #change to a static delivery date to make computation stuff easier
+    #this is a thursday
+    posting_recurrence.postings.first.update(delivery_date: Time.zone.local(2016,9,8))
+    #verify first posting is on thursday
+    assert_equal 4, posting_recurrence.reload.postings.first.delivery_date.wday
+
+    #change to posting 1's order cutoff and generate next posting
+    travel_to posting_recurrence.postings.first.commitment_zone_start
+    RakeHelper.do_hourly_tasks
+    #verify another posting was created
+    assert_equal 2, posting_recurrence.postings.count
+    #verify second posting is on thursday
+    assert_equal 4, posting_recurrence.reload.postings.last.delivery_date.wday
+
+    #change delivery day to wednesday
+    assert posting_recurrence.change_delivery_day?(3)
+    #verify second posting is on wednesday
+    assert_equal 3, posting_recurrence.reload.postings.last.delivery_date.wday
+    assert_equal Time.zone.local(2016,9,14), posting_recurrence.reload.postings.last.delivery_date
+
+    #travel to last posting's order cutoff, generate new posting and verify the new posting is on a wednesday
+    travel_to posting_recurrence.postings.last.commitment_zone_start
+    RakeHelper.do_hourly_tasks
+    assert_equal 3, posting_recurrence.postings.count
+    assert_equal 3, posting_recurrence.reload.postings.last.delivery_date.wday
+    assert_equal Time.zone.local(2016,9,21), posting_recurrence.reload.postings.last.delivery_date
+
+    travel_back
 
   end
 

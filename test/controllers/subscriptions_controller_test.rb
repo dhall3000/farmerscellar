@@ -274,26 +274,31 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
 
     c_subscription_1 = users(:c_subscription_1)
     subscription = subscriptions(:two)
+    assert_equal 2, subscription.frequency
     log_in_as(c_subscription_1)
     get edit_subscription_path(id: subscription.id, end_date: subscription.posting_recurrence.postings.first.delivery_date + (20 * 7).days)
     skip_dates = assigns(:skip_dates)
     pr = subscription.posting_recurrence
-
-    #there should be a 2 week gap between pr's first posting and the first skip date
-
+    
     seconds_per_hour = 60 * 60
     num_seconds_per_week = 7 * 24 * seconds_per_hour
 
     pr_first_delivery_date = pr.postings.first.delivery_date
     first_subscription_skip_date = skip_dates[0][:date]
 
-    gap = first_subscription_skip_date - pr_first_delivery_date
-    spacing_should_be = 2 * num_seconds_per_week
+    gap = first_subscription_skip_date - pr_first_delivery_date        
+
+    if subscription.tote_items.count == 0
+      #there should be a 1 week gap between pr's first posting and the first skip date
+      spacing_should_be = 1 * num_seconds_per_week
+    else
+      #there should be a 2 week gap between pr's first posting and the first skip date
+      spacing_should_be = 2 * num_seconds_per_week      
+    end    
 
     if pr_first_delivery_date.dst? != first_subscription_skip_date.dst?
       spacing_should_be += seconds_per_hour
     end
-
     assert_equal spacing_should_be, gap
 
     #there should be 2 week gaps between all skip_dates

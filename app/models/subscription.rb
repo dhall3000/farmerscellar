@@ -37,7 +37,7 @@ class Subscription < ApplicationRecord
   end
 
   def generate_next_tote_item
-       
+
     if !generate_tote_item_for_current_posting?
       return nil
     end
@@ -93,33 +93,85 @@ class Subscription < ApplicationRecord
 
     puts "get_delivery_dates start: start_date=#{start_date.to_s}, end_date=#{end_date.to_s}"
 
-    delivery_dates = []
+    subscriber_delivery_dates = []
 
     if end_date < start_date
-      return delivery_dates
+      return subscriber_delivery_dates
     end
 
-    delivery_date = posting_recurrence.current_posting.delivery_date
-    puts "get_delivery_dates: delivery_date=#{delivery_date.to_s}, end_date=#{end_date.to_s}"
+    producer_delivery_dates = posting_recurrence.get_delivery_dates_for(start_date, end_date)
 
-    #quit when computed date is beyond end_date
-    while delivery_date <= end_date
+    producer_delivery_dates.each do |producer_delivery_date|
 
-      #for each computed date include it if it falls within the parameterized date range
-      if delivery_date > start_date
-        delivery_dates << delivery_date
+      if subscriber_delivery_dates.any?
+        reference_date = subscriber_delivery_dates.last
+      elsif tote_items.any?
+        reference_date = tote_items.joins(:posting).order("postings.delivery_date").last.delivery_date
+      else
+        reference_date = Time.zone.now - 365.days
       end
 
-      #compute next scheduled delivery date
-      delivery_date = get_next_delivery_date(delivery_date)
+      if posting_recurrence.frequency < 5
+        if num_sundays_between_dates(reference_date, producer_delivery_date) >= frequency * posting_recurrence.frequency
+          subscriber_delivery_dates << producer_delivery_date
+        end
+      elsif posting_recurrence.frequency == 5        
+        if num_month_day_ones_between_dates(reference_date, producer_delivery_date) >= frequency
+          subscriber_delivery_dates << producer_delivery_date
+        end
+      end
 
     end
 
-    return delivery_dates
+    return subscriber_delivery_dates
 
   end
 
   private
+
+    def num_sundays_between_dates(date1, date2)
+
+      start_date = [date1, date2].min
+      end_date = [date1, date2].max
+
+      num_sundays = 0
+
+      if start_date.wday == 0
+        start_date += 1.day
+      end
+
+      while start_date <= end_date
+        if start_date.wday == 0
+          num_sundays += 1
+        end
+        start_date += 1.day
+      end
+
+      return num_sundays
+
+    end
+
+    def num_month_day_ones_between_dates(date1, date2)
+
+      start_date = [date1, date2].min
+      end_date = [date1, date2].max
+
+      num_day_ones = 0
+
+      if start_date.day == 1
+        start_date += 1.day
+      end
+
+      while start_date <= end_date
+        if start_date.day == 1
+          num_day_ones += 1
+        end
+        start_date += 1.day
+      end
+
+      return num_day_ones
+
+    end
 
     def get_next_delivery_date(prev_delivery_date)
 
