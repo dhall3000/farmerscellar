@@ -36,12 +36,8 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     assert_equal Time.zone.local(2016, 1, 13), posting_recurrence.reload.postings.last.delivery_date
     #create bi-weekly subscription
     jane = create_user("jane", "jane@j.com", 98033)
-    subscription = Subscription.new(frequency: 2, on: true, user: jane, posting_recurrence: posting_recurrence, quantity: 2, paused: false)
-    assert subscription.valid?
-    assert subscription.save
-    #generate the first tote item in the series
-    assert_equal 0, subscription.tote_items.count
-    subscription.generate_next_tote_item
+    subscription = add_subscription(jane, posting_recurrence.reload.current_posting, quantity = 2, frequency = 2)
+
     assert_equal 1, subscription.tote_items.count
     assert_equal Time.zone.local(2016, 1, 13), subscription.tote_items.last.posting.delivery_date
 
@@ -86,7 +82,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     subscription.reload.unpause
     #verify the unpause generated a tote time for the upcoming producer delivery
     assert_equal 2, subscription.reload.tote_items.count
-    assert subscription.tote_items.last.state?(:ADDED)
+    assert subscription.tote_items.last.state?(:AUTHORIZED)
     #verify just-added tote item is for the current_posting
     assert_equal Time.zone.local(2016,2,18), subscription.tote_items.last.posting.delivery_date
     assert_equal posting_recurrence.reload.current_posting.delivery_date, subscription.tote_items.last.posting.delivery_date
@@ -134,12 +130,8 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     assert_equal Time.zone.local(2016, 1, 13), posting_recurrence.reload.postings.last.delivery_date
     #create bi-weekly subscription
     jane = create_user("jane", "jane@j.com", 98033)
-    subscription = Subscription.new(frequency: 2, on: true, user: jane, posting_recurrence: posting_recurrence, quantity: 2, paused: false)
-    assert subscription.valid?
-    assert subscription.save
-    #generate the first tote item in the series
-    assert_equal 0, subscription.tote_items.count
-    subscription.generate_next_tote_item
+    subscription = add_subscription(jane, posting_recurrence.reload.current_posting, quantity = 2, frequency = 2)
+    
     assert_equal 1, subscription.tote_items.count
     assert_equal Time.zone.local(2016, 1, 13), subscription.tote_items.last.posting.delivery_date
 
