@@ -115,12 +115,7 @@ class RakeHelper
 			puts "transition_open_postings: start"
 
 			postings = Posting.where(state: Posting.states[:OPEN])
-
-			if postings.any?
-				puts "transition_open_postings: #{postings.count.to_s} posting(s) to transition to COMMITMENTZONE"
-			else
-				puts "transition_open_postings: no postings to transition to COMMITMENTZONE"
-			end
+			puts "transition_open_postings: #{postings.count.to_s} OPEN posting(s)"
 
 			transitioned_postings = []
 

@@ -13,6 +13,10 @@ class Dropsite < ApplicationRecord
   validates :state, presence: true, length: {minimum: 2, maximum: 2, message: " must be a 2 letter abbreviation"}
   validates :zip, presence: true, numericality: { only_integer: true, greater_than: 9999, less_than: 100000, message: " code invalid. Please enter a valid 5-digit zip code."}
 
+  def update_ip_address(new_ip_address)
+    update(ip_address: new_ip_address)
+  end
+
   def last_food_clearout
     
     now = Time.zone.now

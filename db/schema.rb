@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160906182812) do
+ActiveRecord::Schema.define(version: 20160908233016) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -201,6 +201,7 @@ ActiveRecord::Schema.define(version: 20160906182812) do
     t.string   "city"
     t.string   "state"
     t.integer  "zip"
+    t.string   "ip_address"
   end
 
   create_table "food_categories", force: :cascade do |t|

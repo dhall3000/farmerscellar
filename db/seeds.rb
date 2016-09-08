@@ -271,7 +271,7 @@ posting_recurrence = PostingRecurrence.new(on: true, frequency: 1)
 posting_recurrence.postings << posting_celery
 posting_recurrence.save
 
-posting_recurrence = PostingRecurrence.new(on: true, frequency: 6)
+posting_recurrence = PostingRecurrence.new(on: true, frequency: 2)
 posting_recurrence.postings << posting_apples
 posting_recurrence.save
 
@@ -297,9 +297,10 @@ milk = Posting.create(
       description: "these milks are all organic grown with no pesticides. they are raw. no homogeneization. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too."
       )
 
-posting_recurrence = PostingRecurrence.new(on: true, frequency: 6)
+posting_recurrence = PostingRecurrence.new(on: true, frequency: 4)
 posting_recurrence.postings << milk
 posting_recurrence.save
+
 milk.transition(:commitment_zone_started)
 
 #Apples

@@ -89,7 +89,13 @@ class PickupsController < ApplicationController
           end
 
           @last_pickup = @user.pickups.order("pickups.id").last
-          #now create a new pickup to represent the current pickup                  
+          #now create a new pickup to represent the current pickup
+
+          if @user && @user.dropsite
+            @user.dropsite.update_ip_address(request.ip)
+          else
+            puts "PickupsController#display_user_data: user didn't have a dropsite specified so i couldn't update its ip address"
+          end
 
           if create_pickup_on_success
             @user.pickups.create
