@@ -15,13 +15,23 @@ class Subscription < ApplicationRecord
   validates :quantity, numericality: { only_integer: true, greater_than: 0 }
   validates_presence_of :posting_recurrence, :user
 
-  def turn_off
+  def turn_off    
     update(on: false)
+    return pause
   end
 
   def pause    
+    
     update(paused: true)
-    return remove_items_from_tote
+    nuke_all_future_subscription_skip_dates
+    unremovable_items = remove_items_from_tote
+
+    return unremovable_items
+
+  end
+
+  def nuke_all_future_subscription_skip_dates
+    SubscriptionSkipDate.where("subscription_id = ? and skip_date > ?", id, Time.zone.now).delete_all
   end
 
   def unpause

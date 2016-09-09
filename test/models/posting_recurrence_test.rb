@@ -26,6 +26,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
 
     #change to a static delivery date to make computation stuff easier
     #this is a wednesday
+    posting_recurrence.postings.first.update(commitment_zone_start: Time.zone.local(2016,9,5))
     posting_recurrence.postings.first.update(delivery_date: Time.zone.local(2016,9,7))
     #verify first posting is on wednesday
     assert_equal 3, posting_recurrence.reload.postings.first.delivery_date.wday
@@ -64,6 +65,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
 
     #change to a static delivery date to make computation stuff easier
     #this is a thursday
+    posting_recurrence.postings.first.update(commitment_zone_start: Time.zone.local(2016,9,6))
     posting_recurrence.postings.first.update(delivery_date: Time.zone.local(2016,9,8))
     #verify first posting is on thursday
     assert_equal 4, posting_recurrence.reload.postings.first.delivery_date.wday

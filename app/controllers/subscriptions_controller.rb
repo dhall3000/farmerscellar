@@ -82,7 +82,7 @@ class SubscriptionsController < ApplicationController
   def skip_dates
 
     #the idea here is that when someone clicks the 'Update' button we're going to unconditionally blast all the 
-    #previously saved skip dates and then write these new ones. Yes, not as db efficient but more davidhall coder faster
+    #previously saved skip dates and then write these new ones. Yes, not as db efficient but more davidhall coder fasterer
     end_date = constrain_end_date(Time.zone.parse(params[:end_date]))
     old_skip_dates = get_skip_dates_through(params[:subscription_ids], end_date)
 
@@ -157,24 +157,18 @@ class SubscriptionsController < ApplicationController
 
     on = params[:subscription][:on].to_i
     if on == 0
-      
-      if @subscription.turn_off
 
-        flash_message = "#{producer_product} subscription"
+      flash_message = "#{producer_product} subscription"
+      unremovable_items = @subscription.turn_off
 
-        SubscriptionSkipDate.where("subscription_id = ? and skip_date > ?", id, Time.zone.now).delete_all      
-        unremovable_items = @subscription.remove_items_from_tote
-        if unremovable_items.any?          
-          flash[:info] = "#{flash_message} canceled. Note: some items still scheduled for delivery. See tote."
-        else
-          flash[:success] = flash_message + " canceled"
-        end
-        
+      if unremovable_items.any?          
+        flash[:info] = "#{flash_message} canceled. Note: some items still scheduled for delivery. See tote."
       else
-        flash[:danger] = flash_message + " not canceled"
-      end
+        flash[:success] = flash_message + " canceled"
+      end            
 
       redirect_to subscriptions_path
+
       return
 
     end
@@ -188,9 +182,8 @@ class SubscriptionsController < ApplicationController
       return
     end
 
-    if paused
+    if paused      
       
-      SubscriptionSkipDate.where("subscription_id = ? and skip_date > ?", id, Time.zone.now).delete_all      
       unremovable_items = @subscription.pause
       flash_message = "#{producer_product} subscription paused."
 
