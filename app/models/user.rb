@@ -48,6 +48,38 @@ class User < ApplicationRecord
   #if this object is a distributor it might have many PRODUCERs
   has_many :producers, class_name: "User", foreign_key: "distributor_id"
 
+  def current_account_state
+
+    if user_account_states.nil?
+      return nil
+    end
+
+    if user_account_states.any?
+
+      last_state = user_account_states.order(:created_at).last.account_state
+
+      if last_state.nil?
+        return nil
+      else
+        return last_state.state
+      end
+
+    end
+
+    return nil
+    
+  end
+
+  def account_currently_on_hold?
+
+    if account_states == nil || !account_states.any?
+      return false
+    end
+
+    return current_account_state == AccountState.states[:HOLD]
+
+  end
+
   def filled_items_at_dropsite
     return tote_items.joins(:posting).where("postings.delivery_date > ? and tote_items.state = ?", cutoff, ToteItem.states[:FILLED]).order("postings.delivery_date")
   end
