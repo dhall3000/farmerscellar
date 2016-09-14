@@ -1,8 +1,0 @@
-Paypal Merchant Technical Support
-800-852-1973
-
-Paypal buttons
-https://developer.paypal.com/docs/classic/archive/buttons/US-UK/
-
-Active Merchant Docs
-http://www.rubydoc.info/github/Shopify/active_merchant/ActiveMerchant/Billing/PaypalExpressGateway

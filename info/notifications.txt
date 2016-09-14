@@ -1,5 +1,0 @@
--make a message feed on user's profile
--make optionable (on by default) authorization and purchase receipts and delivery notifications
--first time farmer posts send out producer notifications
--first time farmer posts a new product send a new product notify
--allow customer to specify notification next time farmer posts product x

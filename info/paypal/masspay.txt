@@ -1,3 +1,0 @@
-this is a log line from live/production that occurred on Wednesday March 30 at about 10:09 PM PST:
-
- - BulkPaymentProcessing.send_paypal_masspay: sending paypal masspay. payouts_params (minus fc credentials): {"METHOD"=>"MassPay", "CURRENCYCODE"=>"USD", "RECEIVERTYPE"=>"EmailAddress", "VERSION"=>"124.0", "L_EMAIL0"=>"marty.baronfarms@gmail.com", "L_AMT0"=>"12.06", "L_EMAIL1"=>"ricky@prideandjoydairy.com", "L_AMT1"=>"5.55"}
