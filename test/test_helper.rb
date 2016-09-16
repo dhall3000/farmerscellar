@@ -95,6 +95,8 @@ class ActiveSupport::TestCase
       farm_name: farm_name
       )
 
+    producer.settings.update(conditional_payment: true)
+
     assert producer.valid?
 
     return producer

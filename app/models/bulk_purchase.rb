@@ -256,16 +256,24 @@ class BulkPurchase < ApplicationRecord
         self.commission = (self.commission + commission).round(2)
         self.net = (self.net + net).round(2)
 
-        payment_payable = PaymentPayable.new(amount: net.round(2), amount_paid: 0)
         producer = User.find(producer_id)
+        creditor = producer.get_creditor
+        creditor_settings = creditor.settings
 
-        payment_payable.users << producer.get_creditor
+        if creditor_settings.conditional_payment
 
-        for tote_item in value[:sub_tote]
-          payment_payable.tote_items << tote_item
+          payment_payable = PaymentPayable.new(amount: net.round(2), amount_paid: 0)        
+
+          payment_payable.users << creditor
+
+          for tote_item in value[:sub_tote]
+            payment_payable.tote_items << tote_item
+          end
+
+          payment_payable.save
+
         end
 
-        payment_payable.save
         @num_payment_payables_created = @num_payment_payables_created + 1
 
       end

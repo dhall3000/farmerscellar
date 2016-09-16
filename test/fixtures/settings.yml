@@ -1,9 +1,53 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  user: one
-  conditional_payment: false
+f9:
+  user: f9
+  conditional_payment: true
 
-two:
-  user: two
-  conditional_payment: false
+d1:
+  user: d1
+  conditional_payment: true
+
+f6:
+  user: f6
+  conditional_payment: true
+
+f7:
+  user: f7
+  conditional_payment: true
+
+f8:
+  user: f8
+  conditional_payment: true
+
+f_subscriptions:
+  user: f_subscriptions
+  conditional_payment: true
+  
+f5:
+  user: f5
+  conditional_payment: true
+
+f1:
+  user: f1
+  conditional_payment: true
+
+f2:
+  user: f2
+  conditional_payment: true
+
+f3:
+  user: f3
+  conditional_payment: true
+  
+f4:
+  user: f4
+  conditional_payment: true
+
+baron_farms:
+  user: baron_farms
+  conditional_payment: true
+
+pride_and_joy:
+  user: pride_and_joy
+  conditional_payment: true

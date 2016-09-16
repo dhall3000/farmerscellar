@@ -99,8 +99,8 @@ class ToteItem < ApplicationRecord
         new_state = ToteItem.states[:FILLED]
         update(quantity_filled: params[:quantity_filled])
         
-        if quantity_filled > 0
-          create_purchase_receivable
+        if quantity_filled > 0          
+          create_funds_flow_objects
         end
       end
 
@@ -222,11 +222,26 @@ class ToteItem < ApplicationRecord
 
   private
 
+    def create_funds_flow_objects
+      create_purchase_receivable
+
+      creditor_settings = posting.user.get_creditor.settings
+
+      if !creditor_settings.conditional_payment
+        create_payment_payable
+      end
+
+    end
+
     def create_purchase_receivable
       pr = PurchaseReceivable.new(amount: get_gross_item(self, filled = true), amount_purchased: 0, kind: PurchaseReceivable.kind[:NORMAL], state: PurchaseReceivable.states[:READY])
       pr.users << user
       pr.tote_items << self
       pr.save
+    end
+
+    def create_payment_payable
+      
     end
 
 end
