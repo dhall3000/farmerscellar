@@ -32,6 +32,7 @@ class User < ApplicationRecord
 
   has_one :access_code
   has_one :pickup_code
+  has_one :setting
 
   #how do the producer/distributor stuff work: it used to be the distributors were 100% not producers and vice versa. but
   #that got changed. now a producer can be by itself or it can have a parent producer. this also is a bit of a hack.
@@ -47,6 +48,16 @@ class User < ApplicationRecord
   belongs_to :distributor, class_name: "User", foreign_key: "distributor_id"
   #if this object is a distributor it might have many PRODUCERs
   has_many :producers, class_name: "User", foreign_key: "distributor_id"
+
+  def settings
+
+    if setting.nil?
+      create_setting
+    end
+
+    return setting
+
+  end
 
   def current_account_state
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160908233016) do
+ActiveRecord::Schema.define(version: 20160916170430) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -437,6 +437,14 @@ ActiveRecord::Schema.define(version: 20160908233016) do
     t.float    "payment_processor_fee_withheld_from_us"
     t.float    "payment_processor_fee_withheld_from_producer"
     t.string   "transaction_id"
+  end
+
+  create_table "settings", force: :cascade do |t|
+    t.integer  "user_id"
+    t.boolean  "conditional_payment", default: false
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
+    t.index ["user_id"], name: "index_settings_on_user_id"
   end
 
   create_table "subscription_rtauthorizations", id: false, force: :cascade do |t|
