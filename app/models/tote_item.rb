@@ -220,28 +220,40 @@ class ToteItem < ApplicationRecord
     
   end
 
+  #true if creditor is owed $ by FC only when and if FC successfully collects from customer
+  #false if creditor is owed $ by FC the moment the tote item gets filled
+  def conditional_payment?
+
+    if posting && posting.user && posting.user.get_creditor && posting.user.get_creditor.settings
+      return posting.user.get_creditor.settings.conditional_payment
+    end
+
+    return true
+
+  end
+
   private
 
     def create_funds_flow_objects
-      create_purchase_receivable
 
-      creditor_settings = posting.user.get_creditor.settings
+      pr = create_purchase_receivable
 
-      if !creditor_settings.conditional_payment
-        create_payment_payable
+      if !conditional_payment?
+        #we are saying we owe money to the creditor at the time of fill, regardless if we're able to collect from the customer or not
+        pr.create_payment_payable
       end
 
     end
 
     def create_purchase_receivable
+      
       pr = PurchaseReceivable.new(amount: get_gross_item(self, filled = true), amount_purchased: 0, kind: PurchaseReceivable.kind[:NORMAL], state: PurchaseReceivable.states[:READY])
       pr.users << user
       pr.tote_items << self
       pr.save
-    end
-
-    def create_payment_payable
       
+      return pr
+
     end
 
 end

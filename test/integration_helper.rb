@@ -3,6 +3,75 @@ require 'utility/rake_helper'
 
 class IntegrationHelper < ActionDispatch::IntegrationTest
 
+  def setup_basic_process_through_delivery
+
+    nuke_all_postings
+
+    delivery_date = get_delivery_date(days_from_now = 10)
+    if (delivery_date - 1.day).sunday?
+      delivery_date += 1.day
+    end
+    commitment_zone_start = delivery_date - 2.days
+
+    distributor = create_producer("distributor", "distributor@d.com", "WA", 98033, "www.distributor.com", "Distributor Inc.")
+    distributor.settings.update(conditional_payment: false)
+    distributor.create_business_interface(name: "Distributor Inc.", order_email_accepted: true, order_email: distributor.email, paypal_accepted: true, paypal_email: distributor.email)
+
+    #maybe we can/will parameterize this later?
+    if false
+      distributor.update(order_minimum: 20)
+    end
+
+    producer1 = create_producer("producer1", "producer1@p.com", "WA", 98033, "www.producer1.com", "producer1 farms")
+    producer1.distributor = distributor    
+    producer1.save
+    
+    create_commission(producer1, products(:apples), units(:pound), 0.05)
+    posting1 = create_posting(producer1, 1.00, products(:apples), units(:pound), delivery_date, commitment_zone_start, units_per_case = 1)
+
+    bob = create_user("bob", "bob@b.com", 98033)
+    
+    ti1_bob = add_tote_item(bob, posting1, 2)
+
+    create_one_time_authorization_for_customer(bob)
+
+    assert_equal 1, bob.tote_items.count    
+    ti = bob.tote_items.first
+
+    assert_equal 1, Posting.count
+    posting = Posting.first
+
+    num_units = ti.quantity
+    
+    travel_to posting.commitment_zone_start
+    ActionMailer::Base.deliveries.clear
+    RakeHelper.do_hourly_tasks
+
+    assert_equal 1, ActionMailer::Base.deliveries.count
+    verify_proper_order_submission_email(ActionMailer::Base.deliveries.last, posting.user.get_creditor, posting, num_units, units_per_case = "", number_of_cases = "")
+
+    #do fill
+    travel_to posting.delivery_date + 12.hours
+
+    fill_posting(posting.reload, num_units)
+
+    #distributor posting should be closed
+    assert posting.reload.state?(:CLOSED)
+
+    #send out delivery notifications
+    ActionMailer::Base.deliveries.clear
+    do_delivery
+    
+    #verify delivery notification is correct
+    assert_equal 1, ActionMailer::Base.deliveries.count
+
+    verify_proper_delivery_notification_email(ActionMailer::Base.deliveries.first, ti.reload)
+    assert ti.reload.state?(:FILLED)
+
+    return bob
+
+  end
+
   def create_posting(farmer, price, product, unit, delivery_date, commitment_zone_start, units_per_case)
 
     posting_params = {
