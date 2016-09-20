@@ -23,7 +23,7 @@ class UserMailer < ApplicationMailer
   end
 
   #the 'authorization' param can be either a Authorization or a Rtauthorization
-  def authorization_receipt(user, authorization, tote_items_getting_authorized = nil)
+  def authorization_receipt(user, authorization, tote_items_getting_authorized = nil, subscriptions = nil)
     
     @user = user    
 
@@ -31,7 +31,7 @@ class UserMailer < ApplicationMailer
       @id = "Z#{authorization.id.to_s}"
       @amount = get_gross_tote(tote_items_getting_authorized)      
       @tote_items = tote_items_getting_authorized
-      @subscriptions = get_subscriptions_from(tote_items_getting_authorized)
+      @subscriptions = subscriptions
     else
       @id = authorization.id.to_s
       @amount = authorization.amount

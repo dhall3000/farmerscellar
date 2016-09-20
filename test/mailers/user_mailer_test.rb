@@ -142,11 +142,13 @@ class UserMailerTest < ActionMailer::TestCase
     add_subscription_and_item_to_c1
     
     rtauthorization = Rtauthorization.new(rtba: rtba)
-    rtauthorization.authorize_items_and_subscriptions(user.tote_items)   
+    subscriptions = get_active_subscriptions_for(user)
+    rtauthorization.authorize_items_and_subscriptions(user.tote_items, subscriptions)
     assert rtauthorization.valid?
     assert rtauthorization.save
 
-    mail = UserMailer.authorization_receipt(user, rtauthorization, user.tote_items)
+    subscriptions = get_active_subscriptions_for(user)
+    mail = UserMailer.authorization_receipt(user, rtauthorization, user.tote_items, subscriptions)
 
     assert_equal "Authorization receipt", mail.subject
     assert_equal [user.email], mail.to

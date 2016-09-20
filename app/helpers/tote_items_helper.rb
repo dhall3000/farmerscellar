@@ -76,25 +76,14 @@ module ToteItemsHelper
     return tote_items
 	end
 
-  def get_subscriptions_from(tote_items)
-    
-    if !tote_has_items(tote_items)
+  def get_active_subscriptions_for(user)
+
+    if user.nil?
       return nil
     end
 
-    subscriptions = nil
-
-    tote_items.each do |ti|
-      if ti.subscription
-        if subscriptions.nil?
-          subscriptions = []
-        end
-        subscriptions << ti.subscription
-      end
-    end
-
-    return subscriptions
-
+    return Subscription.where(user: user, on: true)
+    
   end
 
 	def tote_has_items(tote_items)

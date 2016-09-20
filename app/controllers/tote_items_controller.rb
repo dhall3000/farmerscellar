@@ -29,7 +29,7 @@ class ToteItemsController < ApplicationController
     end
 
     @rtba = current_user.get_active_rtba
-    @subscriptions = get_subscriptions_from(@tote_items)
+    @subscriptions = get_active_subscriptions_for(current_user)
     @provide_guest_checkout_option = !@rtba && !@subscriptions      
 
   end

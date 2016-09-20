@@ -81,13 +81,13 @@ class RtauthorizationTest < ActiveSupport::TestCase
     assert num_added_items - 1, user.tote_items.where(state: ToteItem.states[:ADDED]).count
 
     #verify subscription is not authorized
-    subscriptions = get_subscriptions_from(user.tote_items)
+    subscriptions = get_active_subscriptions_for(user)
     assert_equal 1, subscriptions.count
 
     assert_not subscriptions.last.authorized?
     
     rtauthorization = Rtauthorization.new(rtba: rtba)    
-    rtauthorization.authorize_items_and_subscriptions(user.tote_items)   
+    rtauthorization.authorize_items_and_subscriptions(user.tote_items, subscriptions)
     assert rtauthorization.valid?
     assert rtauthorization.save
 
@@ -115,14 +115,14 @@ class RtauthorizationTest < ActiveSupport::TestCase
     #and now the number of ADDED items should have gone down by 1
     assert num_added_items - 1, user.tote_items.where(state: ToteItem.states[:ADDED]).count
 
-    #verify subscription is not authorized
-    subscriptions = get_subscriptions_from(user.tote_items)
+    #verify subscription is not authorized    
+    subscriptions = get_active_subscriptions_for(user)
     assert_equal 1, subscriptions.count
 
     assert_not subscriptions.last.authorized?
     
     rtauthorization = Rtauthorization.new(rtba: rtba)    
-    rtauthorization.authorize_items_and_subscriptions(user.tote_items)   
+    rtauthorization.authorize_items_and_subscriptions(user.tote_items, subscriptions)
 
     #should not be valid because the above .authorize_items_and_subscriptions should have accomplished nothing
     #because the rtauth isn't authorized because the rtba is not active

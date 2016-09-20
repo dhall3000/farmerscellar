@@ -24,7 +24,7 @@ class Rtauthorization < ApplicationRecord
   end
 
   #TODO: test this
-  def authorize_items_and_subscriptions(tote_items_to_authorize)
+  def authorize_items_and_subscriptions(tote_items_to_authorize, subscriptions)
 
     if !authorized?
       return
@@ -40,11 +40,10 @@ class Rtauthorization < ApplicationRecord
       #associate this tote_item with the new authorization
       self.tote_items << tote_item      
 
-      #if this item came from a subscription, associate the subscription with this authorization
-      if !tote_item.subscription.nil?
-        self.subscriptions << tote_item.subscription        
-      end
+    end
 
+    subscriptions.each do |subscription|
+      self.subscriptions << subscription
     end
 
   end

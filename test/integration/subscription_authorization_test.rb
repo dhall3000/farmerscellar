@@ -42,6 +42,8 @@ class SubscriptionAuthorizationTest < IntegrationHelper
 
     assert_equal sx1.rtauthorizations.last.id, sx2.rtauthorizations.last.id
 
+    travel_back
+
 	end
 
 end

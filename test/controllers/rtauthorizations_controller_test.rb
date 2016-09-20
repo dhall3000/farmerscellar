@@ -91,7 +91,7 @@ class RtauthorizationsControllerTest < ActionDispatch::IntegrationTest
 		authorize_part_of_tote(@c1)
 
 		#verify subscription exists
-		subscriptions = ToteItemsController.helpers.get_subscriptions_from(@c1.tote_items)
+		subscriptions = ToteItemsController.helpers.get_active_subscriptions_for(@c1)
 		assert_equal 1, subscriptions.count
 		#verify no items or subscriptions associated with rtauth
 		@c1.tote_items.each do |tote_item|
@@ -122,8 +122,8 @@ class RtauthorizationsControllerTest < ActionDispatch::IntegrationTest
 	test "should not authorize off billing agreement belonging to another user" do
 		log_in_as(@c2)
 		add_subscription_and_item_to_user(@c2)
-		#verify subscription exists
-		subscriptions = ToteItemsController.helpers.get_subscriptions_from(@c2.tote_items)
+		#verify subscription exists		
+		subscriptions = ToteItemsController.helpers.get_active_subscriptions_for(@c2)
 		assert_equal 1, subscriptions.count
 		#verify no items or subscriptions associated with rtauth
 		@c2.tote_items.each do |tote_item|
@@ -154,8 +154,8 @@ class RtauthorizationsControllerTest < ActionDispatch::IntegrationTest
 		add_subscription_and_item_to_user(@c1)
 		authorize_part_of_tote(@c1)
 
-		#verify subscription exists
-		subscriptions = ToteItemsController.helpers.get_subscriptions_from(@c1.tote_items)
+		#verify subscription exists		
+		subscriptions = ToteItemsController.helpers.get_active_subscriptions_for(@c1)
 		assert_equal 1, subscriptions.count
 		#verify no items or subscriptions associated with rtauth
 		@c1.tote_items.each do |tote_item|
