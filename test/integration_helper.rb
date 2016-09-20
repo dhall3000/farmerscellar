@@ -3,6 +3,75 @@ require 'utility/rake_helper'
 
 class IntegrationHelper < ActionDispatch::IntegrationTest
 
+  def setup_basic_subscription_through_delivery
+
+    nuke_all_postings
+
+    delivery_date = get_delivery_date(days_from_now = 10)
+    if (delivery_date - 1.day).sunday?
+      delivery_date += 1.day
+    end
+    commitment_zone_start = delivery_date - 2.days
+
+    distributor = create_producer("distributor", "distributor@d.com", "WA", 98033, "www.distributor.com", "Distributor Inc.")
+    distributor.settings.update(conditional_payment: false)
+    distributor.create_business_interface(name: "Distributor Inc.", order_email_accepted: true, order_email: distributor.email, paypal_accepted: true, paypal_email: distributor.email)
+
+    #maybe we can/will parameterize this later?
+    if false
+      distributor.update(order_minimum: 20)
+    end
+
+    producer1 = create_producer("producer1", "producer1@p.com", "WA", 98033, "www.producer1.com", "producer1 farms")
+    producer1.distributor = distributor    
+    producer1.save
+    
+    create_commission(producer1, products(:apples), units(:pound), 0.05)
+    posting1 = create_recurring_posting(producer1, 1.00, products(:apples), units(:pound), delivery_date, commitment_zone_start, units_per_case = 1, frequency = 1)
+
+    bob = create_user("bob", "bob@b.com", 98033)
+    
+    ti1_bob = add_tote_item(bob, posting1, 2, subscription_frequency = 1)
+
+    create_rt_authorization_for_customer(bob)
+
+    assert_equal 1, bob.tote_items.count    
+    ti = bob.tote_items.first
+
+    assert_equal 1, Posting.count
+    posting = Posting.first
+
+    num_units = ti.quantity
+    
+    travel_to posting.commitment_zone_start
+    ActionMailer::Base.deliveries.clear
+    RakeHelper.do_hourly_tasks
+
+    assert_equal 1, ActionMailer::Base.deliveries.count
+    verify_proper_order_submission_email(ActionMailer::Base.deliveries.last, posting.user.get_creditor, posting, num_units, units_per_case = "", number_of_cases = "")
+
+    #do fill
+    travel_to posting.delivery_date + 12.hours
+
+    fill_posting(posting.reload, num_units)
+
+    #distributor posting should be closed
+    assert posting.reload.state?(:CLOSED)
+
+    #send out delivery notifications
+    ActionMailer::Base.deliveries.clear
+    do_delivery
+    
+    #verify delivery notification is correct
+    assert_equal 1, ActionMailer::Base.deliveries.count
+
+    verify_proper_delivery_notification_email(ActionMailer::Base.deliveries.first, ti.reload)
+    assert ti.reload.state?(:FILLED)
+
+    return bob
+
+  end
+
   def setup_basic_process_through_delivery
 
     nuke_all_postings
@@ -69,6 +138,20 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     assert ti.reload.state?(:FILLED)
 
     return bob
+
+  end
+
+  def create_recurring_posting(farmer, price, product, unit, delivery_date, commitment_zone_start, units_per_case, frequency)
+
+    posting = create_posting(farmer, price, product, unit, delivery_date, commitment_zone_start, units_per_case)
+    assert posting.valid?
+
+    posting_recurrence = PostingRecurrence.new(frequency: frequency, on: true)
+    posting_recurrence.postings << posting
+
+    assert posting_recurrence.save
+
+    return posting
 
   end
 
@@ -153,7 +236,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
   end
 
-  def add_tote_item(customer, posting, quantity)
+  def add_tote_item(customer, posting, quantity, frequency = nil)
     
     log_in_as(customer)
     assert is_logged_in?
@@ -164,13 +247,25 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
     assert :redirected
     assert_response :redirect
-    
-    if additional_units_required_to_fill_my_case == 0
-      assert_equal "Item added to tote.", flash[:success]
-      assert_redirected_to postings_path
+
+    if frequency && frequency > 0
+
+      follow_redirect!
+
+      post subscriptions_path, params: {tote_item_id: tote_item.id, frequency: frequency}
+      subscription = assigns(:subscription)
+      assert subscription.valid?
+
     else
-      assert_equal "Tote item created but currently won't ship. See below.", flash[:danger]
-      assert_redirected_to tote_items_pout_path(id: tote_item.id)    
+
+      if additional_units_required_to_fill_my_case == 0
+        assert_equal "Item added to tote.", flash[:success]
+        assert_redirected_to postings_path
+      else
+        assert_equal "Tote item created but currently won't ship. See below.", flash[:danger]
+        assert_redirected_to tote_items_pout_path(id: tote_item.id)    
+      end
+
     end
 
     follow_redirect!
@@ -179,7 +274,8 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
   end
 
-  def create_one_time_authorization_for_customer(customer)
+  def set_dropsite(customer)
+
     log_in_as(customer)
 
     get dropsites_path
@@ -187,6 +283,12 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     get dropsite_path(Dropsite.first)
     assert_template 'dropsites/show'
     post user_dropsites_path, params: {user_dropsite: {user_id: customer.id, dropsite_id: Dropsite.first.id}}
+
+  end
+
+  def get_total_amount_to_authorize(customer)
+    
+    set_dropsite(customer)
 
     get tote_items_path
     assert_response :success
@@ -196,6 +298,42 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     assert_not_nil total_amount_to_authorize
     assert total_amount_to_authorize > 0, "total amount of tote items is not greater than zero"
     puts "total_amount_to_authorize = $#{total_amount_to_authorize}"
+
+    return total_amount_to_authorize
+
+  end
+
+  def create_rt_authorization_for_customer(customer)
+
+    set_dropsite(customer)
+    total_amount_to_authorize = get_total_amount_to_authorize(customer)
+
+    if customer.rtbas.count == 0 || !customer.rtbas.last.ba_valid?
+
+      checkouts_count = Checkout.count
+      post checkouts_path, params: {amount: total_amount_to_authorize, use_reference_transaction: "1"}
+      assert_equal nil, flash[:danger]
+      assert_equal checkouts_count + 1, Checkout.count
+      assert_equal true, Checkout.last.is_rt
+      checkout = assigns(:checkout)
+      follow_redirect!
+      post rtauthorizations_create_path, params: {token: checkout.token}
+
+    else
+      post rtauthorizations_create_path, params: {token: customer.rtbas.last.token}    
+    end
+    
+    rtauthorization = assigns(:rtauthorization)
+
+    return rtauthorization
+
+  end
+
+  def create_one_time_authorization_for_customer(customer)    
+
+    set_dropsite(customer)
+    total_amount_to_authorize = get_total_amount_to_authorize(customer)
+
     post checkouts_path, params: {amount: total_amount_to_authorize, use_reference_transaction: "0"}
     checkout_tote_items = assigns(:checkout_tote_items)
     assert_not_nil checkout_tote_items
