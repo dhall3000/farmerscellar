@@ -32,6 +32,7 @@
       <% guest = "Guest checkout" %>
 
       <div class="col-xs-9 col-sm-4">
+      
         <% if @rtba %>
 
           <div class="fat-finger-spacing">
@@ -51,7 +52,7 @@
             <% end %>
           </div>
 
-          <% if !@subscriptions %>
+          <% if @subscriptions.nil? || !@subscriptions.any? %>
 
             <div class="fat-finger-spacing">            
               <%= form_tag(checkouts_path) do %>
