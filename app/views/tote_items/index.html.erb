@@ -1,13 +1,9 @@
 <h1>Shopping Tote</h1>
 
-<%= link_to subscriptions_path, class: "btn btn-primary btn-lg" do %>
-  <span class="glyphicon glyphicon-repeat"></span> Subscriptions
-<% end %>
-
 <% if logged_in? %>
 
   <% show_remove_button = true %>
-  <%= render partial: "shared/tote", locals: { tote_items: @tote_items, show_remove_button: show_remove_button } %>  
+  <%= render partial: "shared/tote", locals: { tote_items: @tote_items, show_remove_button: show_remove_button, subscriptions: @subscriptions } %>  
 
   <% action = "Checkout" %>
 
@@ -99,7 +95,12 @@
     <% end %>
 
   <% else %>
-    <p>Your shopping tote is empty so there is nothing to view here. You need to <%= link_to "add some items to your tote", postings_path %>, then you will see them listed here.</p>
+    <% if @subscriptions && @subscriptions.any? %>
+      <p>You have active subscriptions but your tote is otherwise empty.</p>
+      <div><%= link_to "manage subscriptions", subscriptions_path, class: "fat-finger-spacing" %></div>
+    <% else %>
+      <p>Your shopping tote is empty so there is nothing to view here. You need to <%= link_to "add some items to your tote", postings_path %>, then you will see them listed here.</p>
+    <% end %>    
   <% end %>
 
 <% else %>

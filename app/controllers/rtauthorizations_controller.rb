@@ -20,6 +20,7 @@ class RtauthorizationsController < ApplicationController
   	if details && details.success?
   		#display tote and 'agree & authorize' button
 	  	@tote_items_authorizable = current_user_current_unauthorized_tote_items	  	
+      @subscriptions_authorizable = current_user_current_unauthorized_subscriptions
   		@token = params[:token]
 		else
 			#flash danger 'please contact us, there was a problem'

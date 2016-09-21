@@ -25,6 +25,22 @@ module ToteItemsHelper
     return unauthorized_tote_items
   end
 
+  def current_user_current_unauthorized_subscriptions
+    
+    active_subscriptions = get_active_subscriptions_for(current_user)
+
+    unauthorized_subscriptions = []
+
+    active_subscriptions.each do |active_subscription|
+      if !active_subscription.authorized?
+        unauthorized_subscriptions << active_subscription
+      end
+    end
+
+    return unauthorized_subscriptions
+
+  end
+
   def url_with_protocol(url)
     /^http/i.match(url) ? url : "http://#{url}"
   end  

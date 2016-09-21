@@ -3,7 +3,7 @@
 <% if @tote_items_authorizable.count < 1 %>
   <p>There is nothing to authorize payment for. Either your shopping tote is empty or everything in your shopping tote has already been authorized.</p>
 <% else %>
-  <%= render partial: "shared/tote", locals: { tote_items: @tote_items_authorizable } %>
+  <%= render partial: "shared/tote", locals: { tote_items: @tote_items_authorizable, subscriptions: @subscriptions_authorizable } %>
 
   <% if tote_has_items(@tote_items_authorizable) %>
     <div class="row">

@@ -3,7 +3,7 @@
   <div>
     <p>You just successfully completed payment authorization for the items listed below. A receipt has been emailed to you.</p>
   </div>  
-  <%= render partial: "shared/tote", locals: { tote_items: @successfully_authorized_tote_items, authorization_adjective: "successful" } %>
+  <%= render partial: "shared/tote", locals: { tote_items: @successfully_authorized_tote_items, authorization_adjective: "successful", subscriptions: @subscriptions } %>
 
 	<% if @subscriptions %>
 
