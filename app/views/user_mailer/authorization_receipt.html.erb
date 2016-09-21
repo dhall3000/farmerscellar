@@ -37,7 +37,7 @@ Here is the product information for which you authorized payment:
   </tbody>
 </table>
 
-<% if @subscriptions %>
+<% if @subscriptions && @subscriptions.any? %>
 
   <p>
     The total payment amount authorized for the products listed above is <%= number_to_currency(@amount) %>. Additionally, you authorized future charges to your payment account associated with the following <%= "subscription".pluralize(@subscriptions.count) %>:

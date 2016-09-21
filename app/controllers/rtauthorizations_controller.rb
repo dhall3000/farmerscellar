@@ -109,13 +109,14 @@ class RtauthorizationsController < ApplicationController
 		@current_tote_items = current_user_current_tote_items
 		@successfully_authorized_tote_items = current_user_current_unauthorized_tote_items.to_a
     @subscriptions = get_active_subscriptions_for(current_user)
+    @successfully_authorized_subscriptions = current_user_current_unauthorized_subscriptions
 
     if !params[:testparam_fail_rtauthsave]
       @rtauthorization.authorize_items_and_subscriptions(@current_tote_items, @subscriptions)
     end
 
 		if @rtauthorization.save
-			UserMailer.authorization_receipt(current_user, @rtauthorization, @successfully_authorized_tote_items, @subscriptions).deliver_now			
+			UserMailer.authorization_receipt(current_user, @rtauthorization, @successfully_authorized_tote_items, @successfully_authorized_subscriptions).deliver_now			
 		else
 			AdminNotificationMailer.general_message("Problem saving Rtauthorization!", @rtauthorization.errors.to_yaml).deliver_now
 		end

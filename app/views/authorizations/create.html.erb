@@ -5,14 +5,14 @@
   </div>  
   <%= render partial: "shared/tote", locals: { tote_items: @successfully_authorized_tote_items, authorization_adjective: "successful", subscriptions: @subscriptions } %>
 
-	<% if @subscriptions %>
+	<% if @successfully_authorized_subscriptions && @successfully_authorized_subscriptions.any? %>
 
 	  <p>
-	    Additionally, you authorized future charges to your payment account associated with the following <%= "subscription".pluralize(@subscriptions.count) %>:
+	    Additionally, you authorized future charges to your payment account associated with the following <%= "subscription".pluralize(@successfully_authorized_subscriptions.count) %>:
 	  </p>
 
 	  <ul>
-	    <% @subscriptions.each do |subscription| %>
+	    <% @successfully_authorized_subscriptions.each do |subscription| %>
 	      <li><%= subscription.description %></li>
 	    <% end %>
 	  </ul>  
