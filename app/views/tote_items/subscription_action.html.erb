@@ -1,0 +1,21 @@
+<h1>Subscription</h1>
+
+<% if @subscription %>
+  
+    <div class="row">
+      <div class="col-sm-offset-4 col-sm-4">
+
+        <p>Your <%= @product_name %> subscription is still active. What would you like to do with it?</p>
+
+        <div>
+          <%= link_to "Leave it", tote_items_path, class: 'btn btn-primary btn-lg btn-block fat-finger-spacing' %>
+        </div>      
+
+        <div>
+          <%= link_to "Change it", edit_subscription_path(@subscription), class: 'btn btn-primary btn-lg btn-block' %>
+        </div>
+
+      </div>
+    </div>
+  
+<% end %>

@@ -172,9 +172,14 @@ class ToteItemsController < ApplicationController
           flash_text = "#{ti.posting.user.farm_name} #{ti.posting.product.name} for #{ti.posting.delivery_date.strftime("%A %B %d")} delivery removed"
 
           if ti.subscription && ti.subscription.on && !ti.subscription.paused
-            flash[:info] = flash_text + " but your subscription is still active."
-            redirect_to edit_subscription_path(ti.subscription)
+
+            flash.now[:success] = flash_text
+            @subscription = ti.subscription
+            @product_name = ti.posting.product.name
+            render 'tote_items/subscription_action'
+
             return
+
           else
             flash[:success] = flash_text
           end
