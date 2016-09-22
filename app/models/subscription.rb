@@ -15,6 +15,10 @@ class Subscription < ApplicationRecord
   validates :quantity, numericality: { only_integer: true, greater_than: 0 }
   validates_presence_of :posting_recurrence, :user
 
+  def latest_delivery_date_item
+    return tote_items.joins(:posting).order("postings.delivery_date").last
+  end
+
   def turn_off    
     update(on: false)
     return pause
@@ -119,28 +123,57 @@ class Subscription < ApplicationRecord
 
     producer_delivery_dates.each do |producer_delivery_date|
 
-      if subscriber_delivery_dates.any?
-        reference_date = subscriber_delivery_dates.last
-      elsif tote_items.where.not(state: [ToteItem.states[:REMOVED], ToteItem.states[:NOTFILLED]]).any?        
-        reference_date = tote_items.joins(:posting).where.not(state: [ToteItem.states[:REMOVED], ToteItem.states[:NOTFILLED]]).order("postings.delivery_date").last.delivery_date
+      if get_existing_tote_item_for_delivery_date(producer_delivery_date)
+        subscriber_delivery_dates << producer_delivery_date
       else
-        reference_date = Time.zone.now - 365.days
-      end
 
-      if posting_recurrence.frequency < 5
-        if num_sundays_between_dates(reference_date, producer_delivery_date) >= frequency * posting_recurrence.frequency
-          subscriber_delivery_dates << producer_delivery_date
+        if subscriber_delivery_dates.any?
+          reference_date = subscriber_delivery_dates.last
+        elsif tote_items.where.not(state: [ToteItem.states[:REMOVED], ToteItem.states[:NOTFILLED]]).any?        
+          reference_date = tote_items.joins(:posting).where.not(state: [ToteItem.states[:REMOVED], ToteItem.states[:NOTFILLED]]).order("postings.delivery_date").last.delivery_date
+        else
+          reference_date = Time.zone.now - 365.days
         end
-      elsif posting_recurrence.frequency == 5        
-        if num_month_day_ones_between_dates(reference_date, producer_delivery_date) >= frequency
-          subscriber_delivery_dates << producer_delivery_date
+
+        if posting_recurrence.frequency < 5
+          if num_sundays_between_dates(reference_date, producer_delivery_date) >= frequency * posting_recurrence.frequency
+            subscriber_delivery_dates << producer_delivery_date
+          end
+        elsif posting_recurrence.frequency == 5        
+          if num_month_day_ones_between_dates(reference_date, producer_delivery_date) >= frequency
+            subscriber_delivery_dates << producer_delivery_date
+          end
         end
+
       end
 
     end
 
     return subscriber_delivery_dates
 
+  end
+
+  def get_existing_tote_item_for_delivery_date(date)
+
+    #do we have any non REMOVED, non NOTFILLED items in the subscription series?
+    if (tis = tote_items.where.not(state: [ToteItem.states[:REMOVED], ToteItem.states[:NOTFILLED]])).any?
+
+      #do any of these items have a delivery date matching the given date?
+      tis = tis.joins(:posting).where("postings.delivery_date" => date)
+
+      if tis.any?
+        return tis.last
+      end
+
+    end
+
+    return nil
+
+  end
+
+  def legit_date?(date)
+    delivery_dates = get_delivery_dates(date - 1.day, date)
+    return delivery_dates && delivery_dates.any? && delivery_dates.include?(date)
   end
 
   private

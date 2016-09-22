@@ -171,7 +171,156 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
 
   end
 
+  test "should give immediate next delivery date as skip date option" do
+
+    #NOT COMMITTED, DON'T SKIP
+
+    postings = setup_posting_recurrences
+    
+    user = users(:c17)
+    assert_equal 0, ToteItem.where(user_id: user.id).count
+
+    quantity = 2
+    frequency = 1
+    apples_posting = postings[0]
+
+    num_tote_items = user.tote_items.count
+    subscription = add_subscription(user, apples_posting, quantity, frequency)
+    tote_item = subscription.tote_items.first
+
+    assert_equal 1, ToteItem.where(user_id: user.id).count
+    assert_equal ToteItem.states[:AUTHORIZED], ToteItem.where(user_id: user.id).first.state
+
+    #save the immediate next delivery date (INDD)
+    immediate_next_delivery_date = ToteItem.where(user_id: user.id).first
+    indd = immediate_next_delivery_date
+    assert_equal indd.subscription, subscription
+
+    #get the skip_dates structure
+    log_in_as(user)
+    #view the index
+    get subscriptions_path
+    #get the computed skip dates
+    skip_dates = assigns(:skip_dates)
+    assert_equal 2, skip_dates.count
+
+    #verify the INDD is in the skip_dates structure
+    assert_equal indd.posting.delivery_date, skip_dates[0][:date]
+
+    #verify INDD item not committed
+    assert_not indd.reload.state?(:COMMITTED)
+
+    #fast forward to indd's order cutoff
+    posting = do_current_posting_order_cutoff_tasks(subscription.posting_recurrence)
+    next_ti = subscription.reload.latest_delivery_date_item
+    #verify INDD not skipped. here (order cutoff) it should be COMMITTED...
+    assert indd.reload.state?(:COMMITTED)
+    #do delivery
+    do_delivery(posting)
+    #verify INDD got filled
+    assert indd.reload.state?(:FILLED)
+    assert indd.fully_filled?
+
+    #verify next not skipped
+    posting = do_current_posting_order_cutoff_tasks(subscription.posting_recurrence)
+    do_delivery(posting)
+    #next should be FILLED    
+    assert next_ti.reload.state?(:FILLED)
+
+    #first and second FILLED ti's should match the 2 skip dates given earlier
+    assert_equal indd.posting.delivery_date, skip_dates[0][:date]
+    assert_equal next_ti.posting.delivery_date, skip_dates[1][:date]
+
+    #first and second ti's should not be the same object
+    assert_not indd == next_ti
+    #first and second ti's should be separated by 7 days
+    assert_equal 7.days, next_ti.posting.delivery_date - indd.posting.delivery_date
+
+    travel_back
+
+  end
+
+  test "should skip immediate next delivery date" do
+
+    #NOT COMMITTED, ATTEMPT SKIP
+    
+    postings = setup_posting_recurrences
+    
+    user = users(:c17)
+    assert_equal 0, ToteItem.where(user_id: user.id).count
+
+    quantity = 2
+    frequency = 1
+    apples_posting = postings[0]
+
+    num_tote_items = user.tote_items.count
+    subscription = add_subscription(user, apples_posting, quantity, frequency)
+    tote_item = subscription.tote_items.first
+
+    assert_equal 1, ToteItem.where(user_id: user.id).count
+    assert_equal ToteItem.states[:AUTHORIZED], ToteItem.where(user_id: user.id).first.state
+
+    #save the immediate next delivery date (INDD)
+    immediate_next_delivery_date = ToteItem.where(user_id: user.id).first
+    indd = immediate_next_delivery_date
+    assert_equal indd.subscription, subscription
+
+    #get the skip_dates structure
+    log_in_as(user)
+    #view the index
+    get subscriptions_path
+    #get the computed skip dates
+    skip_dates = assigns(:skip_dates)
+    assert_equal 2, skip_dates.count
+
+    #verify the INDD is in the skip_dates structure
+    assert_equal indd.posting.delivery_date, skip_dates[0][:date]
+
+    #verify INDD item not committed
+    assert_not indd.reload.state?(:COMMITTED)
+
+    #specify skip INDD
+    post subscriptions_skip_dates_path, params: 
+    {
+      skip_dates: {subscription.id.to_s => [skip_dates.first[:date].to_s]},
+      subscription_ids: [subscription.id.to_s],
+      end_date: (skip_dates.first[:date] + 7.days).to_s
+    }
+
+    assert indd.reload.state?(:REMOVED)
+
+    do_current_posting_order_cutoff_tasks(subscription.posting_recurrence)
+    do_delivery(indd.posting)
+
+    #we should now be on the delivery day of the INDD
+    assert_equal Time.zone.now.midnight, indd.posting.delivery_date
+    #the 'next' ti should have been generated for the subscription
+    assert_equal 2, subscription.reload.tote_items.count
+    #this 'next' ti should be out ahead of INDD
+    assert subscription.tote_items.last.posting.delivery_date > indd.posting.delivery_date
+    #assert INDD really is REMOVED
+    assert indd.reload.state?(:REMOVED)
+
+    #verify 'next' gets filled
+    posting = subscription.reload.posting_recurrence.current_posting
+    do_current_posting_order_cutoff_tasks(subscription.posting_recurrence)
+    do_delivery(posting)
+
+    #verify there's another tote item generated
+    assert_equal 3, subscription.reload.tote_items.count
+    #verify the first is REMOVED
+    assert subscription.tote_items.first.state?(:REMOVED)
+    #verify the second is FILLED
+    assert subscription.tote_items.second.state?(:FILLED)
+    #verify the third is AUTHORIZED
+    assert subscription.tote_items.third.state?(:AUTHORIZED)
+
+    travel_back
+
+  end
+
   test "should not generate tote items for skip dates" do
+
 
     postings = setup_posting_recurrences
     
@@ -208,7 +357,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
         #get the computed skip dates
         skip_dates = assigns(:skip_dates)
         #send one of the skip dates back up to the controller to program in to the db
-        post subscriptions_skip_dates_path, params: {skip_dates: {subscription.id.to_s => [skip_dates.first[:date].to_s]}, subscription_ids: [subscription.id.to_s], end_date: (skip_dates.first[:date] + 7.days).to_s}
+        post subscriptions_skip_dates_path, params: {skip_dates: {subscription.id.to_s => [skip_dates.second[:date].to_s]}, subscription_ids: [subscription.id.to_s], end_date: (skip_dates.second[:date] + 7.days).to_s}
         subscription.reload        
         has_created_skip_dates = true
       end

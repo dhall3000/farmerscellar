@@ -6,6 +6,25 @@ class ActiveSupport::TestCase
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
   fixtures :all
 
+  def do_current_posting_order_cutoff_tasks(posting_recurrence)
+    
+    posting = posting_recurrence.current_posting
+    travel_to posting.commitment_zone_start
+    RakeHelper.do_hourly_tasks
+    
+    return posting
+
+  end
+
+  def do_delivery(posting)
+
+    travel_to posting.delivery_date + 12.hours
+    #log in as admin and process a fill
+    log_in_as(users(:a1))
+    post postings_fill_path, params: {posting_id: posting.id, quantity: posting.total_quantity_authorized_or_committed}
+
+  end
+
   def nuke_all_postings
     Posting.delete_all
     assert_equal 0, Posting.count

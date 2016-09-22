@@ -106,9 +106,24 @@ class SubscriptionsController < ApplicationController
         subscription = Subscription.find_by(id: subscription_id)
 
         if subscription && subscription.user.id == current_user.id
+          
           dates.each do |date|
-            SubscriptionSkipDate.create(subscription_id: subscription_id, skip_date: date)
+
+            existing_tote_item = subscription.get_existing_tote_item_for_delivery_date(Time.zone.parse(date))
+
+            if existing_tote_item
+
+              if !existing_tote_item.state?(:COMMITTED)
+                SubscriptionSkipDate.create(subscription_id: subscription_id, skip_date: date)
+                existing_tote_item.transition(:customer_removed)
+              end
+              
+            else
+              SubscriptionSkipDate.create(subscription_id: subscription_id, skip_date: date)              
+            end            
+
           end      
+
         end
         
       end
@@ -304,6 +319,40 @@ class SubscriptionsController < ApplicationController
 
     end
 
+    def get_skip_date(subscription, date)
+
+      if date.nil? || date < Time.zone.now.midnight
+        return nil
+      end
+
+      if subscription.nil? || !subscription.on || !subscription.legit_date?(date)
+        return nil
+      end
+
+      if SubscriptionSkipDate.find_by(subscription_id: subscription.id, skip_date: date)
+        skip = true
+      else
+        skip = false
+      end
+
+      latest_ti = subscription.latest_delivery_date_item
+
+      if latest_ti && latest_ti.posting.delivery_date == date
+        if latest_ti.state?(:ADDED) || latest_ti.state?(:AUTHORIZED)
+          skip_date = {subscription: subscription, date: date, skip: skip}
+        elsif latest_ti.state?(:COMMITTED)
+          skip_date = {subscription: subscription, date: date, skip: skip, disable: true}
+        else
+          return nil
+        end
+      else
+        skip_date = {subscription: subscription, date: date, skip: skip}
+      end
+      
+      return skip_date
+
+    end
+
     def get_skip_dates_through(subscription_ids, end_date)
       
       subscriptions = Subscription.where(id: subscription_ids)
@@ -311,19 +360,23 @@ class SubscriptionsController < ApplicationController
 
       subscriptions.each do |subscription|
 
-        #for each subscription get the next 10 delivery dates (exclude the delivery date of the current posting)
-        subscriber_delivery_dates = subscription.get_delivery_dates(subscription.posting_recurrence.current_posting.delivery_date, end_date)
+        #for each subscription get the next 10 delivery dates
+        current_delivery_date = subscription.posting_recurrence.current_posting.delivery_date
+
+        if current_delivery_date > end_date
+          subscriber_delivery_dates = []
+        else
+          subscriber_delivery_dates = subscription.get_delivery_dates(current_delivery_date - 1.day, end_date)                    
+        end        
+        
         #see if any of the delivery dates exist in the skip dates table
         subscriber_delivery_dates.each do |subscriber_delivery_date|
 
-          if SubscriptionSkipDate.find_by(subscription_id: subscription.id, skip_date: subscriber_delivery_date)
-            skip = true
-          else
-            skip = false
-          end        
+          skip_date = get_skip_date(subscription, subscriber_delivery_date)
 
-          skip_date = {subscription: subscription, date: subscriber_delivery_date, skip: skip}
-          skip_dates << skip_date             
+          if skip_date
+            skip_dates << skip_date             
+          end
 
         end
         
