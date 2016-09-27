@@ -270,7 +270,6 @@ class PostingRecurrence < ApplicationRecord
   #this should return all dates
   #exclude start_date
   #include end_date
-  #only works for delivery dates that have not been delivered yet. in other words, current_posting and forward
   def get_delivery_dates_for(start_date, end_date)
     
     delivery_dates = []
@@ -284,7 +283,12 @@ class PostingRecurrence < ApplicationRecord
     end
 
     #start at current_posting and compute forward
-    delivery_date = current_posting.delivery_date
+    if posting = get_first_posting_after(start_date)
+      delivery_date = posting.delivery_date
+    else
+      delivery_date = current_posting.delivery_date
+    end
+
     #quit when computed date is beyond end_date
     while delivery_date <= end_date
 
@@ -313,6 +317,10 @@ class PostingRecurrence < ApplicationRecord
 
     return delivery_dates
 
+  end
+
+  def get_first_posting_after(date)
+    return postings.where("delivery_date > ?", date).order("delivery_date").first
   end
 
   def current_posting

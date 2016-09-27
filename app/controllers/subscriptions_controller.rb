@@ -129,8 +129,53 @@ class SubscriptionsController < ApplicationController
       end
     end
 
+    handle_immediate_next_delivery(params[:subscription_ids], params[:skip_dates])
+
     flash[:success] = "Delivery skip dates updated"
     redirect_to subscriptions_path(end_date: end_date)
+
+  end
+
+  def handle_immediate_next_delivery(subscription_ids, skip_dates)
+    
+    if subscription_ids.nil? || !subscription_ids.any?
+      return
+    end
+
+    subscription_ids.each do |subscription_id|
+
+      subscription = Subscription.find(subscription_id)
+      date = subscription.posting_recurrence.current_posting.delivery_date
+
+      #is the posting recurrence current posting even a legitimate subscriber delivery date?
+      if !subscription.legit_date?(date)
+        next
+      end
+
+      #do we already have a tote item for the pr current posting delivery date?
+      if subscription.latest_delivery_date_item && subscription.latest_delivery_date_item.posting.delivery_date == date
+        next
+      end
+
+      regenerate = false
+
+      if skip_dates
+        skip_dates.each do |subscription_id, dates|
+
+          if !dates.include?(date)
+            regenerate = true
+          end
+
+        end
+      else
+        regenerate = true
+      end
+
+      if regenerate
+        subscription.generate_next_tote_item
+      end
+
+    end
 
   end
 
@@ -286,6 +331,7 @@ class SubscriptionsController < ApplicationController
       end
 
       farthest_existing_skip_date = SubscriptionSkipDate.joins(subscription: :user).where("subscriptions.on" => true, "subscriptions.user_id" => current_user.id).order("subscription_skip_dates.skip_date").last
+
       @skip_dates = get_skip_dates_through(subscriptions.select(:id), @end_date)
 
       while @skip_dates.count == 0 && subscriptions.count > 0
@@ -335,20 +381,20 @@ class SubscriptionsController < ApplicationController
         skip = false
       end
 
-      latest_ti = subscription.latest_delivery_date_item
+      subscription_item_with_date = subscription.tote_items.joins(:posting).where("postings.delivery_date = ?", date).where.not(state: ToteItem.states[:REMOVED]).last
 
-      if latest_ti && latest_ti.posting.delivery_date == date
-        if latest_ti.state?(:ADDED) || latest_ti.state?(:AUTHORIZED)
+      if subscription_item_with_date
+        if subscription_item_with_date.state?(:ADDED) || subscription_item_with_date.state?(:AUTHORIZED)
           skip_date = {subscription: subscription, date: date, skip: skip}
-        elsif latest_ti.state?(:COMMITTED)
-          skip_date = {subscription: subscription, date: date, skip: skip, disable: true}
+        elsif subscription_item_with_date.state?(:COMMITTED)
+          skip_date = {subscription: subscription, date: date, skip: skip, disabled: true, tote_item: subscription_item_with_date}
         else
           return nil
         end
       else
         skip_date = {subscription: subscription, date: date, skip: skip}
       end
-      
+
       return skip_date
 
     end
@@ -360,9 +406,13 @@ class SubscriptionsController < ApplicationController
 
       subscriptions.each do |subscription|
 
-        #for each subscription get the next 10 delivery dates
-        current_delivery_date = subscription.posting_recurrence.current_posting.delivery_date
-
+        if subscription.earliest_future_delivery_date_item
+          #if latest_ti is committed we want to show it to the user so they know another delivery is going to happen
+          current_delivery_date = subscription.earliest_future_delivery_date_item.posting.delivery_date
+        else
+          current_delivery_date = subscription.posting_recurrence.current_posting.delivery_date
+        end        
+        
         if current_delivery_date > end_date
           subscriber_delivery_dates = []
         else

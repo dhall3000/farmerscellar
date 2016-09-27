@@ -1,6 +1,9 @@
 <header class="navbar navbar-fixed-top navbar-inverse">
   <div class="container">
-    <%= link_to "Farmer's Cellar", root_path, id: "logo" %>
+  <%= link_to root_path, id: "logo" do %>
+    <%= image_tag "/favicon-32.png" %>   
+  <% end %>
+
 
  <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#collapsible-navbar" aria-expanded="false">
         <span class="sr-only">Toggle navigation</span>

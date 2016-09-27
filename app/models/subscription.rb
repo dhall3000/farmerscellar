@@ -15,8 +15,12 @@ class Subscription < ApplicationRecord
   validates :quantity, numericality: { only_integer: true, greater_than: 0 }
   validates_presence_of :posting_recurrence, :user
 
+  def earliest_future_delivery_date_item
+    return tote_items.joins(:posting).where(state: [ToteItem.states[:ADDED], ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED]]).where("postings.delivery_date > ?", Time.zone.now).order("postings.delivery_date").first
+  end
+
   def latest_delivery_date_item
-    return tote_items.joins(:posting).order("postings.delivery_date").last
+    return tote_items.where.not(state: ToteItem.states[:REMOVED]).joins(:posting).order("postings.delivery_date").last
   end
 
   def turn_off    

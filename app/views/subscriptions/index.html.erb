@@ -5,11 +5,7 @@
 
 <% if @subscriptions.any? %>
 	
-<%= link_to tote_items_path, class: "btn btn-primary btn-lg fat-finger-spacing" do %>
-  <span class="glyphicon glyphicon-shopping-cart"></span> Tote
-<% end %>
-
-      <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+      <div class="panel-group" role="tablist" aria-multiselectable="true">
 
 
 
@@ -19,35 +15,38 @@
           <div class="panel-heading" role="tab" id="detailsHeading">
             <h4 class="panel-title">List of Current Subscriptions</h4>
           </div>          
-          <div id="detailsBody" class="panel-collapse" role="tabpanel" aria-labelledby="detailsHeading">
-            <div class="panel-body">
-              <table class="table">            	
-                <tbody>
-                
-                  <% @subscriptions.each do |subscription| %>                    
-                    <tr>                  
-                      <td class="text-left borderless">
-                        <%=
-                          posting = subscription.posting_recurrence.current_posting
-                          link_to "#{posting.user.farm_name} #{posting.product.name}", subscription_path(subscription)
-                        %>
-                      </td>
-                      <td class="text-right borderless">
+          
+          <div class="panel-body">
+            <table class="table" style="margin-bottom:0;">            	
+              <tbody>
+              
+                <% @subscriptions.each do |subscription| %>                    
+                  <tr>                  
+                    <td class="text-left borderless">
+                      <%=
+                        posting = subscription.posting_recurrence.current_posting
+                        link_to "#{posting.user.farm_name} #{posting.product.name}", subscription_path(subscription)
+                      %>
+                    </td>
+                    <td class="text-right borderless">
+
+                      <%= link_to subscription_path(subscription) do %>
                         <% if subscription.paused %>
                           <span class="glyphicon glyphicon-pause alert-danger" aria-hidden="true"></span>
                         <% else %>
                           <span class="glyphicon glyphicon-play alert-success" aria-hidden="true"></span>
                         <% end %>
-                        
-                      </td>                      
-                    </tr>
-                  <% end %>
+                      <% end %>
+                      
+                    </td>                      
+                  </tr>
+                <% end %>
 
-                </tbody>
-              </table>
+              </tbody>
+            </table>
 
-            </div>
           </div>
+          
         </div>
 
 
@@ -69,7 +68,9 @@
                 </thead>
                 <tbody>
                   <% subscription_ids = [] %>
+                  <% count = 0 %>
                   <% @skip_dates.each do |skip_date| %>                
+                    <% count = count + 1 %>
                     <% if skip_date[:subscription].paused %>
                       <% next %>
                     <% end %>
@@ -83,8 +84,27 @@
                       <% posting = skip_date[:subscription].posting_recurrence.current_posting %>
                       <td><%= "#{posting.user.farm_name} #{posting.product.name}" %></td>
                       <td class="text-center"><%= skip_date[:date].strftime("%a %b %d") %></td>
-                      <td class="text-center"><%= check_box_tag "skip_dates[#{skip_date[:subscription].id.to_s}][]", skip_date[:date], skip_date[:skip] %></td>
+                      
+                      <td class="text-center">
+                        <% if skip_date[:disabled] %>                          
+                          <a href=<%= "##{count.to_s}helpInfo" %> data-toggle="collapse"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></a>
+                        <% else %>                          
+                          <%= check_box_tag "skip_dates[#{skip_date[:subscription].id.to_s}][]", skip_date[:date], skip_date[:skip] %>
+                        <% end %>
+                      </td>
+
                     </tr>
+                    <% if skip_date[:disabled] && skip_date[:tote_item] %>
+
+                      <tr>
+                        <td class="borderless" colspan="3">
+                          <div id=<%= "#{count.to_s}helpInfo" %> class="collapse">
+                            <p>Order Cutoff was <%= skip_date[:tote_item].posting.commitment_zone_start.strftime("%-m/%d at %l%p") %>. Delivery can't be skipped after Order Cutoff. <%= link_to("More info", how_things_work_path(anchor: "cancellation")) %>.</p>
+                          </div>                          
+                        </td>
+                      </tr>
+
+                    <% end %>
                   <% end %>
                 </tbody>
               </table>
