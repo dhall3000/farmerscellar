@@ -1,20 +1,19 @@
-<header class="navbar navbar-fixed-top navbar-inverse">
+<nav class="navbar navbar-fixed-top navbar-inverse">
   <div class="container">
-  <%= link_to root_path, id: "logo" do %>
-    <%= image_tag "/favicon-32.png" %>   
-  <% end %>
-
-
- <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#collapsible-navbar" aria-expanded="false">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#collapsible-navbar" aria-expanded="false">
         <span class="sr-only">Toggle navigation</span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
+      <%= link_to root_path, id: "logo" do %>
+        <span>Farmer's Cellar</span>
+        <%= image_tag "/favicon-32.png", id: "headerIcon" %>
+      <% end %>
+    </div>
 
- <div class="collapse navbar-collapse" id="collapsible-navbar">
-
-    <nav>
+    <div class="collapse navbar-collapse" id="collapsible-navbar">    
       <ul class="nav navbar-nav navbar-right">        
         <li><%= link_to "Home", root_path %></li>
         <li><%= link_to "Shop", postings_path %></li>
@@ -47,10 +46,9 @@
         <% else %>
           <li><%= link_to "Log in", login_path %></li>
         <% end %>
-      </ul>
-    </nav>
+      </ul>    
 
-</div>
+    </div>
 
   </div>
-</header>
+</nav>

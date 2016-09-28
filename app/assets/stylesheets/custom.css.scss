@@ -66,17 +66,21 @@ p {
 
 #logo {
   float: left;
-  margin-right: 10px;
-  font-size: 1.7em;
-  color: white;
-  text-transform: uppercase;
-  letter-spacing: -1px;
-  padding-top: 9px;
+  margin-left: 5px;
+  margin-right: 5px;
+  font-size: 1.8em;
+  color: white;  
+  font-family: Times New Roman, Times, Serif;  
+  padding-top: 7px;
   font-weight: bold;
   &:hover {
     color: white;
     text-decoration: none;
   }
+}
+
+#headerIcon {
+  padding-bottom: 5px;
 }
 
 /* footer */
