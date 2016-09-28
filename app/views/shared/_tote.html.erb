@@ -14,8 +14,7 @@
     <h2>Items</h2>
     <table class="table">
       <thead>
-        <tr>
-          <th></th>
+        <tr>          
           <th class="text-left">Product</th>          
           <th class="text-center hidden-xs">Quantity</th>
           <th class="text-center hidden-xs">Price</th>
@@ -33,16 +32,6 @@
             <tr>
           <% end %>        
 
-            <td>
-              <% if show_remove_button %>
-                <% if tote_item.state == ToteItem.states[:ADDED] || tote_item.state == ToteItem.states[:AUTHORIZED] %>
-                  <%= link_to "", tote_item, class: "glyphicon glyphicon-remove", method: :delete %>
-                <% else %>
-                  <% data_content = "This item cannot be removed. It is 'committed' because it is past its Order Cutoff. Please see " + link_to("Order Cancellation", how_things_work_path(anchor: "cancellation")) + "." %>
-                  <a tabindex="0" role="button" data-container="body" data-placement="right" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=data_content%>"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
-                <% end %>
-              <% end %>
-            </td>          
             <td class="text-left">
               <%= tote_item.posting.product.name %>
             </td>
@@ -64,7 +53,7 @@
               <tr>
             <% end %>
 
-                <td colspan="6" class="hidden-xs borderless">
+                <td colspan="5" class="hidden-xs borderless">
                   <div>
                     <a href="#<%= 'toteItemDetails' + tote_item.id.to_s %>" data-toggle="collapse">
                       <span class="glyphicon glyphicon-expand" aria-hidden="true"></span>
@@ -72,11 +61,23 @@
                         <span class="alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
                       <% end %>
                     </a>
+                    <% if show_remove_button %>
+                      <div style="float:right;">
+                        <% if tote_item.state == ToteItem.states[:ADDED] || tote_item.state == ToteItem.states[:AUTHORIZED] %>
+                          <%= link_to "", tote_item, class: "glyphicon glyphicon-remove", method: :delete %>
+                        <% else %>
+                          <% data_content = "This item cannot be removed. It is 'committed' because it is past its Order Cutoff. Please see " + link_to("Order Cancellation", how_things_work_path(anchor: "cancellation")) + "." %>
+                          <a tabindex="0" role="button" data-container="body" data-placement="right" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=data_content%>"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+                        <% end %>
+                      </div>
+                    <% end %>
                   </div>
+
                   <div id="<%= 'toteItemDetails' + tote_item.id.to_s %>" class="collapse">
                     <%= render partial: "shared/tote_expansion_row", locals: { tote_item: tote_item } %>
                   </div>
-                </td>            
+                </td>  
+
             
                 <td colspan="4" class="hidden-sm hidden-md hidden-lg borderless">
                   <div>
@@ -86,6 +87,16 @@
                         <span class="alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
                       <% end %>
                     </a>
+                    <% if show_remove_button %>
+                      <div style="float:right;">
+                        <% if tote_item.state == ToteItem.states[:ADDED] || tote_item.state == ToteItem.states[:AUTHORIZED] %>
+                          <%= link_to "", tote_item, class: "glyphicon glyphicon-remove", method: :delete %>
+                        <% else %>
+                          <% data_content = "This item cannot be removed. It is 'committed' because it is past its Order Cutoff. Please see " + link_to("Order Cancellation", how_things_work_path(anchor: "cancellation")) + "." %>
+                          <a tabindex="0" role="button" data-container="body" data-placement="right" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=data_content%>"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+                        <% end %>
+                      </div>
+                    <% end %>                    
                   </div>
                   <div id="xs<%= 'toteItemDetails' + tote_item.id.to_s %>" class="collapse">
                     <%= render partial: "shared/tote_expansion_row", locals: { tote_item: tote_item } %>
