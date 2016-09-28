@@ -25,9 +25,26 @@ Source=<%= partner_delivery.partner %>, Delivery Date=<%= partner_delivery.creat
 <% end %>
 
 Our records suggest they might remain at the dropsite. If so, please plan to pick them up before 8PM tonight (i.e. <%= @user.dropsite.next_food_clearout.strftime("%A %B %d, %Y at %l:%M %p") %>). Otherwise they'll be removed and donated according to our policy outlined here: <%= how_things_work_url(anchor: "pickup_deadline") %>.
-<% if @user.pickups.any? %>
 
+<% if @user.pickups.any? %>
 FYI, your last recorded pickup was <%= @user.pickups.last.created_at.strftime("%A %B %d, %Y at %l:%M %p") %>.
+<% else %>
+First time user? Watch this to see what to expect at pickup: https://youtu.be/oE4D93bALnM
+<% end %>
+<% if @user.dropsite %>
+
+Your dropsite is:
+<%= @user.dropsite.name %>
+<%= @user.dropsite.address %> <%= @user.dropsite.city %>, <%= @user.dropsite.state %> <%= @user.dropsite.zip.to_s %>
+Hours: <%= @user.dropsite.hours %>
+<% if @user.dropsite.access_instructions != nil %>
+
+<%= @user.dropsite.access_instructions %>
+<% end %>
+<% end %>
+<% if @user.pickup_code %>
+
+Your pickup code is: <%= @user.pickup_code.code %>
 <% end %>
 
 Thanks!

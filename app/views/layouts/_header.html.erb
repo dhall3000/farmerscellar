@@ -21,7 +21,11 @@
           <% if user_has_access?  %>            
             <li>
               <%= link_to tote_items_path do %>
-                <span class="glyphicon glyphicon-shopping-cart"></span> Tote
+                <% if current_user_current_tote_items && ((num_tote_items = current_user_current_tote_items.count) > 0) %>
+                  <span class="glyphicon glyphicon-shopping-cart"></span> Tote (<%= num_tote_items.to_s %>)
+                <% else %>
+                  <span class="glyphicon glyphicon-shopping-cart"></span> Tote
+                <% end %>
               <% end %>
             </li>
           <% end %>

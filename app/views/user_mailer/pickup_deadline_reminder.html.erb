@@ -70,9 +70,28 @@ Have you picked up these products yet?
 Our records suggest they might remain at the dropsite. If so, please plan to pick them up before 8PM tonight (i.e. <%= @user.dropsite.next_food_clearout.strftime("%A %B %d, %Y at %l:%M %p") %>). Otherwise they'll be removed and donated according to <%= link_to "our policy outlined here", how_things_work_url(anchor: "pickup_deadline") %>.
 </p>
 <% if @user.pickups.any? %>
-<p>
-FYI, your last recorded pickup was <%= @user.pickups.last.created_at.strftime("%A %B %d, %Y at %l:%M %p") %>.
-</p>
+  <p>
+  FYI, your last recorded pickup was <%= @user.pickups.last.created_at.strftime("%A %B %d, %Y at %l:%M %p") %>.
+  </p>
+<% else %>
+  <p>First time user? Watch <%= link_to "this", "https://youtu.be/oE4D93bALnM", target: false %> to see what to expect at pickup.</p>
+<% end %>
+<% if @user.dropsite %>
+  <p>Your dropsite is:</p>
+  <p>
+  <%= @user.dropsite.name %><br>
+  <% address_link = "https://www.google.com/maps/place/" + (@user.dropsite.address + " " + @user.dropsite.city + " " + @user.dropsite.state + " " + @user.dropsite.zip.to_s).gsub(' ', '+') %>
+  <a target="blank" href="<%= address_link %>"><%= @user.dropsite.address %> <%= @user.dropsite.city %>, <%= @user.dropsite.state %> <%= @user.dropsite.zip.to_s %></a><br>
+  Hours: <%= @user.dropsite.hours %>
+  </p>
+  <% if @user.dropsite.access_instructions != nil %>
+    <p>
+      <%= @user.dropsite.access_instructions %>
+    </p>
+  <% end %>
+<% end %>
+<% if @user.pickup_code %>
+  <p>Your pickup code is: <%= @user.pickup_code.code %></p>
 <% end %>
 
 <p>
