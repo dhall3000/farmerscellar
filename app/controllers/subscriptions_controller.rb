@@ -129,52 +129,40 @@ class SubscriptionsController < ApplicationController
       end
     end
 
-    handle_immediate_next_delivery(params[:subscription_ids], params[:skip_dates])
+    handle_unskips(params[:subscription_ids], params[:skip_dates])
 
     flash[:success] = "Delivery skip dates updated"
     redirect_to subscriptions_path(end_date: end_date)
 
   end
 
-  def handle_immediate_next_delivery(subscription_ids, skip_dates)
+  def handle_unskips(subscription_ids, skip_dates)
     
     if subscription_ids.nil? || !subscription_ids.any?
       return
     end
 
+    #subscription_ids is all the subscriptions we're "handling"
     subscription_ids.each do |subscription_id|
 
       subscription = Subscription.find(subscription_id)
-      date = subscription.posting_recurrence.current_posting.delivery_date
+      current_posting_delivery_date = subscription.posting_recurrence.current_posting.delivery_date
 
       #is the posting recurrence current posting even a legitimate subscriber delivery date?
-      if !subscription.legit_date?(date)
+      if !subscription.legit_date?(current_posting_delivery_date)
         next
       end
 
       #do we already have a tote item for the pr current posting delivery date?
-      if subscription.latest_delivery_date_item && subscription.latest_delivery_date_item.posting.delivery_date == date
+      if subscription.latest_delivery_date_item && subscription.latest_delivery_date_item.posting.delivery_date == current_posting_delivery_date
         next
       end
 
-      regenerate = false
-
-      if skip_dates
-        skip_dates.each do |subscription_id, dates|
-
-          if !dates.include?(date)
-            regenerate = true
-          end
-
-        end
-      else
-        regenerate = true
-      end
-
-      if regenerate
+      #no skip dates at all? skip_dates exists but contains no dates to skip? the skip list given does not contain the current posting
+      if !skip_dates || !(dates = skip_dates[subscription_id]) || !dates.include?(current_posting_delivery_date.to_s)
         subscription.generate_next_tote_item
       end
-
+ 
     end
 
   end

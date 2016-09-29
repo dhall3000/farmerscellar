@@ -287,6 +287,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
       end_date: (skip_dates.first[:date] + 7.days).to_s
     }
 
+    #verify INDD is REMOVED (i.e. skipped)
     assert indd.reload.state?(:REMOVED)
     do_current_posting_order_cutoff_tasks(subscription.posting_recurrence)
 
@@ -310,8 +311,320 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     assert_equal 2, subscription.reload.tote_items.count
     #this 'next' ti should be out ahead of INDD
     assert subscription.tote_items.last.posting.delivery_date > indd.posting.delivery_date
+    assert_equal 7.days, subscription.tote_items.last.posting.delivery_date - indd.posting.delivery_date
     #assert INDD really is REMOVED
     assert indd.reload.state?(:REMOVED)
+
+    #verify 'next' gets filled
+    posting = subscription.reload.posting_recurrence.current_posting
+    do_current_posting_order_cutoff_tasks(subscription.posting_recurrence)
+    do_delivery(posting)
+
+    #verify there's another tote item generated
+    assert_equal 3, subscription.reload.tote_items.count
+    #verify the first is REMOVED
+    assert subscription.tote_items.first.state?(:REMOVED)
+    #verify the second is FILLED
+    assert subscription.tote_items.second.state?(:FILLED)
+    #verify the third is AUTHORIZED
+    assert subscription.tote_items.third.state?(:AUTHORIZED)
+
+    travel_back
+
+  end
+
+  test "skip dates programming for oddball recurrence and subscription schedules" do
+
+    #description: we're going to set up aposting recurrence of every other week and
+    #subscription of every 8 weeks. we're just going to pick along through this and
+    #verify it's doing the right thing
+
+    nuke_all_postings
+    posting = setup_posting_recurrence(product = products(:apples), frequency = 2)
+    quantity = 2
+    frequency = 4 #every 8 weeks
+    user = create_user("jane", "jane@j.com", 98033)
+    subscription = add_subscription(user, posting, quantity, frequency)
+
+    #user should get FILLED on the very first posting in the series
+    assert_equal 1, user.reload.tote_items.count
+
+    user_first_item = user.tote_items.first
+
+    #then user should not get filled for the next four producer deliveries, so that
+    #user's next delivery is 8 weeks from the first
+    count = 0
+    while count < 4
+
+      posting = subscription.reload.posting_recurrence.current_posting
+      do_current_posting_order_cutoff_tasks(subscription.reload.posting_recurrence)
+      travel 1.hour
+
+      if count < 3
+        #for the first three producer deliveries a user item should not be added
+        assert_equal 1, user.reload.tote_items.count
+      end
+
+      do_delivery(posting)
+
+      if count < 3
+        #for the first three producer deliveries the user's only item should remain FILLED
+        assert user.reload.tote_items.last.state?(:FILLED)
+      end
+      
+      #get the skip_dates structure
+      log_in_as(user)
+      get subscriptions_path
+      skip_dates = assigns(:skip_dates)      
+
+      #user's next available skip date should be 8 weeks from their first delivery
+      assert_equal user_first_item.posting.delivery_date + (8 * 7).days, skip_dates[0][:date]
+
+      count += 1
+
+    end
+
+    #we should now be 6 weeks from user's first delivery (which is the same as 2 weeks away from user's next delivery)
+    assert_equal user_first_item.posting.delivery_date + (6 * 7).days + 12.hours, Time.zone.now
+
+    #user should have 2 tote items now and the 2nd should be AUTHORIZED
+    assert_equal 2, user.reload.tote_items.count
+    assert user.tote_items.last.state?(:AUTHORIZED)
+
+    #skipping this second delivery now should cause this 2nd/last item to transition to REMOVED
+    post subscriptions_skip_dates_path, params: 
+    {
+      skip_dates: {subscription.id.to_s => [skip_dates.first[:date].to_s]},
+      subscription_ids: [subscription.id.to_s],
+      end_date: (skip_dates.first[:date] + 7.days).to_s
+    }    
+    assert_equal 2, user.reload.tote_items.count
+    assert user.tote_items.last.state?(:REMOVED)
+
+    #unskipping should create a 3rd item which should be in the AUTHORIZED state and have correct date
+    post subscriptions_skip_dates_path, params: 
+    {
+      subscription_ids: [subscription.id.to_s],
+      end_date: (skip_dates.first[:date] + 7.days).to_s
+    }
+    assert_equal 3, user.reload.tote_items.count
+    assert user.tote_items.last.state?(:AUTHORIZED)
+
+    #going 1 hour past order cutoff of current posting should make it so first skip date remains 8 weeks from 1st delivery
+    do_current_posting_order_cutoff_tasks(subscription.reload.posting_recurrence)
+    travel 1.hour
+    log_in_as(user)
+    get subscriptions_path(end_date: user_first_item.posting.delivery_date + 20.weeks)
+    skip_dates = assigns(:skip_dates)          
+    assert_equal user_first_item.posting.delivery_date + (8 * 7).days, skip_dates[0][:date]
+    #but this 1st skip date should be disabled because we're after order cutoff
+    assert skip_dates[0][:disabled]
+    #and second skip date is 16 weeks from 1st delivery
+    assert_equal user_first_item.posting.delivery_date + (16 * 7).days, skip_dates[1][:date]
+
+    travel_back
+
+  end
+
+  test "should skip immediate next delivery date and next then unskip only indd" do
+
+    postings = setup_posting_recurrences
+    
+    user = users(:c17)
+    assert_equal 0, ToteItem.where(user_id: user.id).count
+
+    quantity = 2
+    frequency = 1
+    apples_posting = postings[0]
+
+    num_tote_items = user.tote_items.count
+    subscription = add_subscription(user, apples_posting, quantity, frequency)
+    tote_item = subscription.tote_items.first
+
+    assert_equal 1, ToteItem.where(user_id: user.id).count
+    assert_equal ToteItem.states[:AUTHORIZED], ToteItem.where(user_id: user.id).first.state
+
+    #save the immediate next delivery date (INDD)
+    immediate_next_delivery_date = ToteItem.where(user_id: user.id).first
+    indd = immediate_next_delivery_date
+    assert_equal indd.subscription, subscription
+
+    #get the skip_dates structure
+    log_in_as(user)
+    #view the index
+    get subscriptions_path
+    #get the computed skip dates
+    skip_dates = assigns(:skip_dates)
+    assert_equal 2, skip_dates.count
+
+    #verify the INDD is in the skip_dates structure
+    assert_equal indd.posting.delivery_date, skip_dates[0][:date]
+
+    #verify INDD item not committed
+    assert_not indd.reload.state?(:COMMITTED)
+
+    #specify skip INDD and next
+    post subscriptions_skip_dates_path, params: 
+    {
+      skip_dates: {subscription.id.to_s => [skip_dates.first[:date].to_s, skip_dates.second[:date].to_s]},
+      subscription_ids: [subscription.id.to_s],
+      end_date: (skip_dates.first[:date] + 7.days).to_s
+    }
+
+    assert indd.reload.state?(:REMOVED)
+
+    #'unskip' indd only (not 'next', the one after indd)
+    assert_equal 1, user.reload.tote_items.count
+    post subscriptions_skip_dates_path, params: 
+    {
+      skip_dates: {subscription.id.to_s => [skip_dates.second[:date].to_s]},
+      subscription_ids: [subscription.id.to_s],
+      end_date: (skip_dates.first[:date] + 7.days).to_s
+    }
+    #a new item should have been added
+    assert_equal 2, user.reload.tote_items.count
+    assert_equal indd.posting.delivery_date, user.tote_items.last.posting.delivery_date
+    assert user.tote_items.first.state?(:REMOVED)
+    assert user.tote_items.last.state?(:AUTHORIZED)
+
+    do_current_posting_order_cutoff_tasks(subscription.posting_recurrence)
+
+    #go one hour in to the commitment zone, then verify INDD is displayed in skip dates but with disabled: true
+    travel 1.hour
+    log_in_as(user)
+
+    #view the index
+    get subscriptions_path
+    skip_dates = assigns(:skip_dates)        
+    #at this point there should be three skip dates. the first should have disabled: true because it's in the commitment zone
+    assert_equal 3, skip_dates.count
+    assert skip_dates[0][:disabled]
+    assert_equal indd.posting.delivery_date, skip_dates[0][:date]
+
+    #there should be 2 items. the first should be REMOVED, 2nd COMMITTED and these two should have the same delivery date
+    #because the user skipped and then immediately unskipped   
+    assert_equal 2, user.reload.tote_items.count
+    assert user.reload.tote_items.first.state?(:REMOVED)
+    assert user.reload.tote_items.second.state?(:COMMITTED)
+    assert_equal user.reload.tote_items.first.posting.delivery_date, user.reload.tote_items.last.posting.delivery_date
+        
+    do_delivery(indd.posting)
+
+    #we should now be on the delivery day of the INDD
+    assert_equal Time.zone.now.midnight, indd.posting.delivery_date
+    #assert INDD really is REMOVED
+    assert indd.reload.state?(:REMOVED)    
+    assert user.reload.tote_items.first.state?(:REMOVED)
+    #verify unskipped item got filled
+    assert user.reload.tote_items.last.state?(:FILLED)
+
+    #verify 'next' gets filled
+    posting = subscription.reload.posting_recurrence.current_posting
+    do_current_posting_order_cutoff_tasks(subscription.posting_recurrence)
+    do_delivery(posting)
+
+    #verify there's another tote item generated
+    assert_equal 3, subscription.reload.tote_items.count
+    #verify the first is REMOVED
+    assert subscription.tote_items.first.state?(:REMOVED)
+    #verify the second is FILLED
+    assert subscription.tote_items.second.state?(:FILLED)
+    #verify the third is AUTHORIZED
+    assert subscription.tote_items.third.state?(:AUTHORIZED)
+    #verify 2 week spacing between fills
+    assert_equal 14.days, subscription.tote_items.third.posting.delivery_date - subscription.tote_items.second.posting.delivery_date
+
+    travel_back
+
+  end
+
+  test "should skip immediate next delivery date and next then unskip only next" do
+
+    postings = setup_posting_recurrences
+    
+    user = users(:c17)
+    assert_equal 0, ToteItem.where(user_id: user.id).count
+
+    quantity = 2
+    frequency = 1
+    apples_posting = postings[0]
+
+    num_tote_items = user.tote_items.count
+    subscription = add_subscription(user, apples_posting, quantity, frequency)
+    tote_item = subscription.tote_items.first
+
+    assert_equal 1, ToteItem.where(user_id: user.id).count
+    assert_equal ToteItem.states[:AUTHORIZED], ToteItem.where(user_id: user.id).first.state
+
+    #save the immediate next delivery date (INDD)
+    immediate_next_delivery_date = ToteItem.where(user_id: user.id).first
+    indd = immediate_next_delivery_date
+    assert_equal indd.subscription, subscription
+
+    #get the skip_dates structure
+    log_in_as(user)
+    #view the index
+    get subscriptions_path
+    #get the computed skip dates
+    skip_dates = assigns(:skip_dates)
+    assert_equal 2, skip_dates.count
+
+    #verify the INDD is in the skip_dates structure
+    assert_equal indd.posting.delivery_date, skip_dates[0][:date]
+
+    #verify INDD item not committed
+    assert_not indd.reload.state?(:COMMITTED)
+
+    #specify skip INDD and next
+    post subscriptions_skip_dates_path, params: 
+    {
+      skip_dates: {subscription.id.to_s => [skip_dates.first[:date].to_s, skip_dates.second[:date].to_s]},
+      subscription_ids: [subscription.id.to_s],
+      end_date: (skip_dates.first[:date] + 7.days).to_s
+    }
+
+    assert indd.reload.state?(:REMOVED)
+
+    #'unskip' next (not INDD...the one after that)
+    assert_equal 1, user.reload.tote_items.count
+    post subscriptions_skip_dates_path, params: 
+    {
+      skip_dates: {subscription.id.to_s => [skip_dates.first[:date].to_s]},
+      subscription_ids: [subscription.id.to_s],
+      end_date: (skip_dates.first[:date] + 7.days).to_s
+    }
+    #a new item should not have been added
+    assert_equal 1, user.reload.tote_items.count
+    assert_equal indd.posting.delivery_date, user.tote_items.last.posting.delivery_date
+    assert user.tote_items.last.state?(:REMOVED)
+
+    do_current_posting_order_cutoff_tasks(subscription.posting_recurrence)
+
+    #go one hour in to the commitment zone, then verify INDD is displayed in skip dates but with disabled: true
+    travel 1.hour
+    log_in_as(user)
+
+    #view the index
+    get subscriptions_path
+    skip_dates = assigns(:skip_dates)        
+    #at this point there should be 2 skip dates
+    assert_equal 2, skip_dates.count
+    
+    #there should be 3 items. the first should be REMOVED, 2nd COMMITTED and these two should have the same delivery date
+    #because the user skipped and then immediately unskipped   
+    assert_equal 2, user.reload.tote_items.count
+    assert user.reload.tote_items.first.state?(:REMOVED)
+    assert user.reload.tote_items.second.state?(:AUTHORIZED)
+        
+    do_delivery(indd.posting)
+
+    #we should now be on the delivery day of the INDD
+    assert_equal Time.zone.now.midnight, indd.posting.delivery_date
+    #assert INDD really is REMOVED
+    assert indd.reload.state?(:REMOVED)
+
+    #verify unskipped item got filled
+    assert user.reload.tote_items.first.state?(:REMOVED)
 
     #verify 'next' gets filled
     posting = subscription.reload.posting_recurrence.current_posting
@@ -386,33 +699,39 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     assert indd.reload.state?(:REMOVED)
 
     #'unskip' INDD
-    assert_equal 1, user.tote_items.count
+    assert_equal 1, user.reload.tote_items.count
+
     post subscriptions_skip_dates_path, params: 
     {
       subscription_ids: [subscription.id.to_s],
       end_date: (skip_dates.first[:date] + 7.days).to_s
     }
     #a new item should have been added with the same delivery date as INDD
-    assert_equal 2, user.tote_items.count
+    assert_equal 2, user.reload.tote_items.count
     assert_equal indd.posting.delivery_date, user.tote_items.last.posting.delivery_date
     assert user.tote_items.last.state?(:AUTHORIZED)
 
     do_current_posting_order_cutoff_tasks(subscription.posting_recurrence)
 
-    #go one hour in to the commitment zone, then verify INDD is no longer displayed in skip dates
+    #go one hour in to the commitment zone, then verify INDD is displayed in skip dates but with disabled: true
     travel 1.hour
     log_in_as(user)
-    #view the index
 
+    #view the index
     get subscriptions_path
     skip_dates = assigns(:skip_dates)        
+    #at this point there should be three skip dates. the first should have disabled: true because it's in the commitment zone
     assert_equal 3, skip_dates.count
     assert_equal true, skip_dates[0][:disabled]
 
-    #at this point there should be three skip dates. the first should have disabled: true because it's in the commitment zone
+    #there should be 3 items. the first should be REMOVED, 2nd COMMITTED and these two should have the same delivery date
+    #because the user skipped and then immediately unskipped   
     assert_equal 3, user.reload.tote_items.count
     assert user.reload.tote_items.first.state?(:REMOVED)
     assert user.reload.tote_items.second.state?(:COMMITTED)
+    #the 1st and 2nd items represent the skipped and then immediately unskipped items so they should have the same delivery date
+    assert_equal user.reload.tote_items.first.posting.delivery_date, user.reload.tote_items.second.posting.delivery_date
+    #and this, the 3rd item, was generated when we hit the order cutoff
     assert user.reload.tote_items.third.state?(:AUTHORIZED)
     
     do_delivery(indd.posting)
@@ -422,7 +741,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     #assert INDD really is REMOVED
     assert indd.reload.state?(:REMOVED)
 
-    #verify unskipped posting got filled
+    #verify unskipped item got filled
     assert user.reload.tote_items.second.state?(:FILLED)
 
     #verify 'next' gets filled
