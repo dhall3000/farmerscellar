@@ -333,6 +333,44 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
 
   end
 
+  test "item nuked from tote should show checked skip date" do
+
+    #Say that you have a subscription with an item in the tote. Then if you go into the tote and nuke
+    #the item then after that go into the subscription index what you will see is a skip date that is unchecked.
+    #This is nonsensical. It should be checked.
+
+    nuke_all_postings
+    posting = setup_posting_recurrence(product = products(:apples), frequency = 2)
+    quantity = 2
+    frequency = 4 #every 8 weeks
+    user = create_user("jane", "jane@j.com", 98033)
+    subscription = add_subscription(user, posting, quantity, frequency)
+
+    #user should get FILLED on the very first posting in the series
+    assert_equal 1, user.reload.tote_items.count
+    ti = user.tote_items.first
+    assert ti.state?(:AUTHORIZED)
+
+    #go in to the tote, nuke the item from the tote
+    log_in_as(user)
+    delete tote_item_path(id: ti.id)
+    assert ti.reload.state?(:REMOVED)
+    
+    #pull down the skip dates
+    get subscriptions_path(end_date: (Time.zone.now + 10.weeks).to_s)
+    skip_dates = assigns(:skip_dates)      
+
+    #verify the skip date for the appropriate date is checked while others are not
+    assert_equal ti.posting.delivery_date, skip_dates[0][:date]
+    assert skip_dates[0][:skip]
+
+    assert_equal ti.posting.delivery_date + (8 * 7).days, skip_dates[1][:date]
+    assert_not skip_dates[1][:skip]
+
+    travel_back
+
+  end
+
   test "skip dates programming for oddball recurrence and subscription schedules" do
 
     #description: we're going to set up aposting recurrence of every other week and

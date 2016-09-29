@@ -176,6 +176,7 @@ class ToteItemsController < ApplicationController
             flash.now[:success] = flash_text
             @subscription = ti.subscription
             @product_name = ti.posting.product.name
+            ti.subscription.create_skip_date(ti)
             render 'tote_items/subscription_action'
 
             return

@@ -15,6 +15,26 @@ class Subscription < ApplicationRecord
   validates :quantity, numericality: { only_integer: true, greater_than: 0 }
   validates_presence_of :posting_recurrence, :user
 
+  def create_skip_date(tote_item)
+
+    #we're only going to create this skip date if the given tote item belongs to this subscription
+    if !tote_items.where(id: tote_item.id).any?
+      return
+    end
+
+    #again, checking to see if this tote item really belongs to this subscription
+    if tote_item && tote_item.subscription && tote_item.subscription.id == id
+
+      date = tote_item.posting.delivery_date
+
+      if !SubscriptionSkipDate.where(subscription_id: id, skip_date: date).any?
+        SubscriptionSkipDate.create(subscription_id: id, skip_date: date)
+      end
+
+    end
+
+  end
+
   def earliest_future_delivery_date_item
     return tote_items.joins(:posting).where(state: [ToteItem.states[:ADDED], ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED]]).where("postings.delivery_date > ?", Time.zone.now).order("postings.delivery_date").first
   end
