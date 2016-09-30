@@ -99,12 +99,18 @@ class PickupsController < ApplicationController
           else
             puts "PickupsController#display_user_data: user didn't have a dropsite specified so i couldn't update its ip address"
           end
-
-          #now create a new pickup to represent the current pickup          
-          if create_pickup_on_success
-            @user.pickups.create
-          end
           
+          if create_pickup_on_success
+            #have zero pickups been created within the last 60 minutes?
+            #we don't want to create a new pickup object every time someone logs in because we auto log folks out after 5 minutes of
+            #inactivity so it's likely user will log in, open door, dink around inside dropsite for 10 minutes, then have
+            #to log in to close the garage door. we don't want to create a pickup on this second log in.
+            if @user.pickups.where("created_at > ?", Time.zone.now - 60.minutes).order("pickups.id").last.nil?
+              #create a new pickup to represent the current pickup          
+              @user.pickups.create
+            end
+          end         
+
           render 'pickups/create'
 
         end
