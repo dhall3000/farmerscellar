@@ -47,6 +47,7 @@ class PickupsControllerTest < ActionDispatch::IntegrationTest
   	log_in_as(@dropsite_user)
   	pickups_count = Pickup.count
   	c1 = users(:c1)
+    hack_tote_item_and_clock(c1)
     post pickups_path, params: {pickup_code: c1.pickup_code.code}
     assert_response :success
     pickup_code = assigns(:pickup_code)
@@ -56,12 +57,34 @@ class PickupsControllerTest < ActionDispatch::IntegrationTest
     #a new pickup object should have been created as a result of this pickup action
     assert_equal pickups_count + 1, Pickup.count
     assert_equal c1.id, Pickup.all.last.user_id
+
+    travel_back
+    
+  end
+
+  def hack_tote_item_and_clock(user)
+    #REMEMBER: travel_back when done using this method!
+
+    #we have to hack a tote item. we have to make it be FILLED, then we have to make its posting
+    #be delivered properly relative to the most recent dropsite clearout. otherwise the kiosk
+    #login will fail
+    ti = user.tote_items.first
+    ti.update(state: ToteItem.states[:FILLED])
+
+    if user.dropsite.nil?
+      user.set_dropsite(Dropsite.first)
+    end
+
+    ti.posting.update(delivery_date: Time.zone.now.midnight, commitment_zone_start: Time.zone.now.midnight - 2.days)
+    travel_to Time.zone.now.midnight + 12.hours
+
   end
 
   test "should create a single pickup row for full pickup process" do
     log_in_as(@dropsite_user)
     pickups_count = Pickup.count
     c1 = users(:c1)
+    hack_tote_item_and_clock(c1)    
     post pickups_path, params: {pickup_code: c1.pickup_code.code}
     assert_response :success
     pickup_code = assigns(:pickup_code)
@@ -80,6 +103,8 @@ class PickupsControllerTest < ActionDispatch::IntegrationTest
     #there shouldn't be any new pickup objects after cycling the garage door
     assert_equal pickups_count + 1, Pickup.count
     assert_equal c1.id, Pickup.all.last.user_id
+
+    travel_back
 
   end
 

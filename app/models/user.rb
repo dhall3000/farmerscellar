@@ -288,21 +288,39 @@ class User < ApplicationRecord
     #TODO: for now for 'delivered' we're going to use toteitem states FILLED or PURCHASED
     #this will eventually change though once we overhaul the toteitem statemachine
 
-    ds = dropsite
-    if ds.nil?
-      ds = Dropsite.first
+    if dropsite.nil?
+      return nil
     end
 
     #whichever is more recent
     if previous_pickup
       previous_pickup_time = previous_pickup.created_at
     else
-      previous_pickup_time = ds.last_food_clearout
+      previous_pickup_time = dropsite.last_food_clearout
     end
-    
-    cutoff = [previous_pickup_time, ds.last_food_clearout].max
 
-    return tote_items.joins(:posting).where("postings.delivery_date > ? and postings.delivery_date < ?", cutoff, Time.zone.now).where(state: [ToteItem.states[:FILLED], ToteItem.states[:NOTFILLED]])
+    #there is a private method called 'cutoff' and i don't want to get mixed up with that so just stick an 'x' on it and call it good    
+    xcutoff = [previous_pickup_time, dropsite.last_food_clearout].max
+
+    return tote_items.joins(:posting).where("postings.delivery_date > ? and postings.delivery_date < ?", xcutoff, Time.zone.now).where(state: [ToteItem.states[:FILLED], ToteItem.states[:NOTFILLED]])
+
+  end
+
+  def tote_items_delivered_since_last_food_clearout    
+    return tote_items.joins(:posting).where("postings.delivery_date > ? and tote_items.state = ?", dropsite.last_food_clearout, ToteItem.states[:FILLED])
+  end
+
+  def partner_deliveries_since_last_food_clearout
+    return partner_deliveries.where("created_at > ?", dropsite.last_food_clearout)
+  end
+
+  def delivery_since_last_dropsite_clearout?
+
+    if dropsite.nil?
+      return false
+    end
+
+    return tote_items_delivered_since_last_food_clearout.any? || partner_deliveries_since_last_food_clearout.any?
 
   end
 

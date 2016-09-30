@@ -82,10 +82,14 @@ class PickupsController < ApplicationController
             @user = User.find_by(email: "c1@c.com")
             @tote_items = get_fake_tote_items(@user)
             create_fake_last_pickup(@user)
-          else
+          elsif @pickup_code.user.delivery_since_last_dropsite_clearout?
             @user = @pickup_code.user
             #get a product list of everything that's been delivered since the last pickup (or 7 days, whichever is more recent)
-            @tote_items = @user.tote_items_to_pickup                  
+            @tote_items = @user.tote_items_to_pickup
+          else
+            flash.now[:danger] = "Access denied: no deliveries have been made for you this week"
+            render 'pickups/new'
+            return
           end
                     
           if @user.previous_pickup

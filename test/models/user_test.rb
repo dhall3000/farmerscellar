@@ -1065,6 +1065,7 @@ class UserTest < ActiveSupport::TestCase
     delivery_date = delivery_date - days_shift.days
     posting_carrots = create_posting(producer, price = 1.50, product = products(:carrots), unit = units(:pound), delivery_date)
     bob = create_user("bob", "bob@b.com", 98033)
+    bob.set_dropsite(Dropsite.first)
     ti_bob_carrots = create_tote_item(posting_carrots, quantity = 6, bob)
     ti_bob_carrots.transition(:customer_authorized)
     ti_bob_carrots.transition(:commitment_zone_started)          
@@ -1086,6 +1087,7 @@ class UserTest < ActiveSupport::TestCase
 
     posting_carrots = create_posting(producer, price = 1.50, product = products(:carrots), unit = units(:pound), delivery_date)
     bob = create_user("bob", "bob@b.com", 98033)
+    bob.set_dropsite(Dropsite.first)
     ti_bob_carrots = create_tote_item(posting_carrots, quantity = 6, bob)
     ti_bob_carrots.transition(:customer_authorized)
     ti_bob_carrots.transition(:commitment_zone_started)          
@@ -1151,7 +1153,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "items delivered on wednesday should not be available for pickup next tuesday" do
-    
+
     bob = setup_pickup_testing
 
     assert_equal 0, bob.pickups.count

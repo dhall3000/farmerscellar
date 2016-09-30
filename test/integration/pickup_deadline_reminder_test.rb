@@ -314,9 +314,19 @@ class PickupDeadlineReminderTest < IntegrationHelper
     last_wednesday = get_last_wednesday
     now = Time.zone.now
     travel_to last_wednesday
-    do_pickup_for(user)
+
+    #note: here we used to do this line of code:
+    #do_pickup_for(user)
+    #but we can't because we just added the security feature where user only has access to dropsite
+    #if they got a delivery in the week they're trying to enter. so this hack doesn't work of
+    #just backing up the clock and doing a pickup cause the code now accuratley senses there is
+    #nothing in the dropsite for the user and bars access. so what we're now doing is hacking
+    #the hack by just creating a pickup object back in time
+
+    user.pickups.create    
     travel_to now
     assert_equal num_pickups + 1, user.reload.pickups.count
+    
   end
 
 end
