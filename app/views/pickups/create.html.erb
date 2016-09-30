@@ -55,8 +55,8 @@
         </div>          
         <div class="panel-body">
         	<p>Email: <%= @user.email %></p>
-        	<% if @last_pickup %>
-						<p>Last pickup: <%= @last_pickup.created_at.strftime("%A %B %d, %Y at %l:%M %p") %></p>
+        	<% if @previous_pickup_time %>
+						<p>Last pickup: <%= @previous_pickup_time.strftime("%A %B %d, %Y at %l:%M %p") %></p>
 					<% else %>
 						<p>Below is your list of products to pick up.</p>
 					<% end %>        	

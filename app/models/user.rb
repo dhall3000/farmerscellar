@@ -282,6 +282,7 @@ class User < ApplicationRecord
   end  
 
   def tote_items_to_pickup
+
     #this should return a set of toteitems that have been delivered but not picked up yet
 
     #TODO: for now for 'delivered' we're going to use toteitem states FILLED or PURCHASED
@@ -292,28 +293,21 @@ class User < ApplicationRecord
       ds = Dropsite.first
     end
 
-    #A) 7 days ago
-    last_pickup = ds.last_food_clearout
-    if pickups.any?
-      #or...
-      #B) the last pickup that was more than 60 minutes ago. the "more than 60 minutes ago" is in case someone picks up, heads out,
-      #gets 10 minutes away and realizes they forgot something and comes back
-      #last_pickup = pickups.where("created_at < ?", Time.zone.now - 60.minutes).order("pickups.id").last.created_at
-      last_pickup = pickups.where("created_at < ?", Time.zone.now - 60.minutes).order("pickups.id").last
-
-      if last_pickup.nil?
-        last_pickup = ds.last_food_clearout
-      else
-        last_pickup = last_pickup.created_at
-      end
-
-    end
-
     #whichever is more recent
-    cutoff = [last_pickup, ds.last_food_clearout].max
+    if previous_pickup
+      previous_pickup_time = previous_pickup.created_at
+    else
+      previous_pickup_time = ds.last_food_clearout
+    end
+    
+    cutoff = [previous_pickup_time, ds.last_food_clearout].max
 
     return tote_items.joins(:posting).where("postings.delivery_date > ? and postings.delivery_date < ?", cutoff, Time.zone.now).where(state: [ToteItem.states[:FILLED], ToteItem.states[:NOTFILLED]])
 
+  end
+
+  def previous_pickup
+    return pickups.where("created_at < ?", Time.zone.now - 60.minutes).order("pickups.id").last
   end
 
   def set_dropsite(dropsite)

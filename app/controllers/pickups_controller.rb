@@ -87,16 +87,20 @@ class PickupsController < ApplicationController
             #get a product list of everything that's been delivered since the last pickup (or 7 days, whichever is more recent)
             @tote_items = @user.tote_items_to_pickup                  
           end
-
-          @last_pickup = @user.pickups.order("pickups.id").last
-          #now create a new pickup to represent the current pickup
-
+                    
+          if @user.previous_pickup
+            @previous_pickup_time = @user.previous_pickup.created_at
+          else
+            @previous_pickup_time = nil
+          end
+          
           if @user && @user.dropsite
             @user.dropsite.update_ip_address(request.ip)
           else
             puts "PickupsController#display_user_data: user didn't have a dropsite specified so i couldn't update its ip address"
           end
 
+          #now create a new pickup to represent the current pickup          
           if create_pickup_on_success
             @user.pickups.create
           end
