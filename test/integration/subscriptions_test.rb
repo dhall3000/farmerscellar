@@ -202,7 +202,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     get subscriptions_path
     #get the computed skip dates
     skip_dates = assigns(:skip_dates)
-    assert_equal 2, skip_dates.count
+    assert skip_dates.count > 1
 
     #verify the INDD is in the skip_dates structure
     assert_equal indd.posting.delivery_date, skip_dates[0][:date]
@@ -271,7 +271,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     get subscriptions_path
     #get the computed skip dates
     skip_dates = assigns(:skip_dates)
-    assert_equal 2, skip_dates.count
+    assert skip_dates.count > 1
 
     #verify the INDD is in the skip_dates structure
     assert_equal indd.posting.delivery_date, skip_dates[0][:date]
@@ -493,7 +493,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     get subscriptions_path
     #get the computed skip dates
     skip_dates = assigns(:skip_dates)
-    assert_equal 2, skip_dates.count
+    assert skip_dates.count > 1
 
     #verify the INDD is in the skip_dates structure
     assert_equal indd.posting.delivery_date, skip_dates[0][:date]
@@ -605,7 +605,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     get subscriptions_path
     #get the computed skip dates
     skip_dates = assigns(:skip_dates)
-    assert_equal 2, skip_dates.count
+    assert skip_dates.count > 1
 
     #verify the INDD is in the skip_dates structure
     assert_equal indd.posting.delivery_date, skip_dates[0][:date]
@@ -718,7 +718,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     get subscriptions_path
     #get the computed skip dates
     skip_dates = assigns(:skip_dates)
-    assert_equal 2, skip_dates.count
+    assert skip_dates.count > 1
 
     #verify the INDD is in the skip_dates structure
     assert_equal indd.posting.delivery_date, skip_dates[0][:date]

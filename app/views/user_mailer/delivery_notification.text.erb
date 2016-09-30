@@ -31,7 +31,7 @@ ID=<%= tote_item.id %>,Producer=<%= tote_item.posting.user.farm_name %>,Product=
 <% end %>
 
 <% if products_delivered == true %>
-Your products are available for you to pick up at your convenience.
+Your products are available for you to pick up at your convenience. However, all products must be picked up by<%=@dropsite.next_food_clearout.strftime("%l%p on %A %B %d, %Y") %> according to our pickup deadline policy outlined here: <%= how_things_work_url(anchor: "pickup_deadline") %>
 
 First time user? Watch this to see what to expect at pickup: https://youtu.be/oE4D93bALnM
 

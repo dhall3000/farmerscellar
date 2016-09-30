@@ -65,7 +65,9 @@ This email is your Farmer's Cellar delivery notification.
 <% end %>
 
 <% if products_delivered == true %>
-  <p>Your products are available for you to pick up at your convenience.</p>
+  <p>
+    Your products are available for you to pick up at your convenience. However, all products must be picked up by <%= @dropsite.next_food_clearout.strftime("%l%p on %A %B %d, %Y") %> according to <%= link_to "our pickup deadline policy outlined here", how_things_work_url(anchor: "pickup_deadline") %>.
+  </p>
   <p>First time user? Watch <%= link_to "this", "https://youtu.be/oE4D93bALnM", target: false %> to see what to expect at pickup.</p>
   <p>Your dropsite is:</p>
   <p>
