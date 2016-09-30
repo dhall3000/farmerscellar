@@ -177,6 +177,32 @@ class Subscription < ApplicationRecord
 
   end
 
+  #this considers skip dates. the first date returned will be after prev_date
+  def get_next_scheduled_delivery_date(prev_date)
+
+    while true
+
+      next_end = prev_date + (posting_recurrence.frequency * 7).days
+      delivery_dates = get_delivery_dates(prev_date, next_end)
+      if delivery_dates && delivery_dates.any?
+
+        #ok, you got some delivery dates. now check for skip dates. return the first delivery date
+        #you come across that doesn't have a skip date in the db
+        delivery_dates.each do |delivery_date|
+
+          if !SubscriptionSkipDate.where(subscription: self, skip_date: delivery_date).any?
+            return delivery_date
+          end
+
+        end
+      
+      end
+      prev_date = next_end
+
+    end
+
+  end
+
   def get_existing_tote_item_for_delivery_date(date)
 
     #do we have any non REMOVED, non NOTFILLED items in the subscription series?
@@ -243,18 +269,6 @@ class Subscription < ApplicationRecord
       end
 
       return num_day_ones
-
-    end
-
-    def get_next_delivery_date(prev_delivery_date)
-
-      if posting_recurrence.frequency < 5 #weekly-based subscriptions
-        next_delivery_date = posting_recurrence.get_delivery_dates_for(prev_delivery_date, prev_delivery_date + (frequency * posting_recurrence.frequency * 7).days)[frequency - 1]
-      elsif posting_recurrence.frequency == 5 #monthly-based subscriptions
-        next_delivery_date = posting_recurrence.get_delivery_dates_for(prev_delivery_date, prev_delivery_date + (2 * frequency).months)[frequency - 1]      
-      end
-
-      return next_delivery_date
 
     end
 

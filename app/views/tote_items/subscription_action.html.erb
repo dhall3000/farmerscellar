@@ -5,14 +5,14 @@
     <div class="row">
       <div class="col-sm-offset-4 col-sm-4">
 
-        <p>Your <%= @product_name %> subscription is still active. What would you like to do with it?</p>
+        <p>Your <%= @product_name %> subscription is still active. Your next scheduled delivery is <%= @subscription.get_next_scheduled_delivery_date(@tote_item.posting.delivery_date).strftime("%A %B %d") %>.</p>
 
         <div>
-          <%= link_to "Leave it", tote_items_path, class: 'btn btn-primary btn-lg btn-block fat-finger-spacing' %>
+          <%= link_to "Leave subscription active", tote_items_path, class: 'btn btn-primary btn-lg btn-block fat-finger-spacing' %>
         </div>      
 
         <div>
-          <%= link_to "Change it", edit_subscription_path(@subscription), class: 'btn btn-primary btn-lg btn-block' %>
+          <%= link_to "Change subscription", edit_subscription_path(@subscription), class: 'btn btn-primary btn-lg btn-block' %>
         </div>
 
       </div>

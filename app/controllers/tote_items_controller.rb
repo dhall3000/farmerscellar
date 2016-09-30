@@ -169,13 +169,14 @@ class ToteItemsController < ApplicationController
         ti.transition(:customer_removed)        
         if ti.state?(:REMOVED)
 
-          flash_text = "#{ti.posting.user.farm_name} #{ti.posting.product.name} for #{ti.posting.delivery_date.strftime("%A %B %d")} delivery removed"
+          flash_text = "#{ti.posting.product.name} for #{ti.posting.delivery_date.strftime("%A %B %d")} delivery canceled"
 
           if ti.subscription && ti.subscription.on && !ti.subscription.paused
 
             flash.now[:success] = flash_text
             @subscription = ti.subscription
             @product_name = ti.posting.product.name
+            @tote_item = ti
             ti.subscription.create_skip_date(ti)
             render 'tote_items/subscription_action'
 
