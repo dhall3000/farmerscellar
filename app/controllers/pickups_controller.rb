@@ -78,12 +78,13 @@ class PickupsController < ApplicationController
 
           puts "PickupsController#display_user_data valid code. Now fetching user and tote items..."
 
+          @user = @pickup_code.user
+
           if @mockup_mode
             @user = User.find_by(email: "c1@c.com")
             @tote_items = get_fake_tote_items(@user)
             create_fake_last_pickup(@user)
-          elsif @pickup_code.user.delivery_since_last_dropsite_clearout?
-            @user = @pickup_code.user
+          elsif @user.delivery_since_last_dropsite_clearout? || @user.account_type_is?(:PRODUCER) || @user.account_type_is?(:ADMIN)
             #get a product list of everything that's been delivered since the last pickup (or 7 days, whichever is more recent)
             @tote_items = @user.tote_items_to_pickup
           else
