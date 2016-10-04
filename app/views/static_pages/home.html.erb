@@ -12,50 +12,86 @@
 </div>
 
 <% if spoofing? %>
-  <div><%= link_to "Unspoof", sessions_unspoof_path, class: "btn btn-lg btn-primary" %></div>
-<% end %>
 
-<% if current_user != nil && current_user.account_type == User.types[:ADMIN] %>
-  <div>
-    <% if !@website_settings.nil? %>
-      <p><%= link_to "Website Settings", edit_website_setting_path(@website_settings), class: "btn btn-lg btn-primary" %></p>
-    <% end %>
-    <p><%= link_to "Receive products", postings_path, class: "btn btn-lg btn-primary" %></p>
-    <p><%= link_to "Deliver products", deliveries_path, class: "btn btn-lg btn-primary" %></p>
-    <p><%= link_to "Create new access code", new_access_code_path, class: "btn btn-lg btn-primary" %></p>    
-    <p><%= link_to "Products", products_path, class: "btn btn-lg btn-primary" %></p>
-    <p><%= link_to "Producer Product Commissions", producer_product_unit_commissions_path, class: "btn btn-lg btn-primary" %></p>
-    <p><%= link_to "Add new dropsite", new_dropsite_path, class: "btn btn-lg btn-primary" %></p>
-    <p><%= link_to "List dropsites", dropsites_path, class: "btn btn-lg btn-primary" %></p>        
-    <p><%= link_to "List Users", users_path, class: "btn btn-lg btn-primary" %></p>
-    <p><%= link_to "Go to test page", test_page_path, class: "btn btn-lg btn-primary" %></p>
-    <p><%= link_to "Partner Users", partner_users_index_path, class: "btn btn-lg btn-primary" %></p>
-    <p><%= link_to "Toggle garage door", toggle_garage_door_path, class: "btn btn-lg btn-primary" %></p>
-    
+  <div class="row">
+    <div class="col-sm-offset-3 col-sm-6">
 
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h2>User Spoof</h2>
-        </div>
-        <div class="panel-body">
-
-
-          <%= form_tag sessions_spoof_path do %>      
-            <%= label_tag :email %>
-            <%= text_field_tag :email, nil, class: "form-control" %>                        
-            <%= submit_tag "Spoof user", class: "btn btn-lg btn-primary btn-block" %>
-          <% end %>
-
+      <div class="panel-group">
+        <div class="panel panel-default">      
+          <div class="panel-heading">
+            <h2 class="panel-title">User Spoof</h2>
+          </div>
+          <div class="panel-body">
+            <%= link_to "Unspoof", sessions_unspoof_path, class: "btn btn-lg btn-primary" %>          
+          </div>
 
         </div>
       </div>
 
-
-
-      
-    
-    
+    </div>
   </div>
+
+  
+<% end %>
+
+<% if admin_logged_in? %>
+
+  <div class="row">
+    <div class="col-sm-offset-3 col-sm-6">
+
+      <div class="panel-group">
+
+
+
+        <div class="panel panel-default">      
+
+          <div class="panel-heading">
+            <h2 class="panel-title">Miscellaneous</h2>
+          </div>
+
+          <div class="panel-body">
+            <% if !@website_settings.nil? %>
+              <%= link_to "Website Settings", edit_website_setting_path(@website_settings), class: "btn btn-lg btn-primary btn-block" %>
+            <% end %>
+            <%= link_to "Receive products", postings_path, class: "btn btn-lg btn-primary btn-block" %>
+            <%= link_to "Deliver products", deliveries_path, class: "btn btn-lg btn-primary btn-block" %>
+            <%= link_to "Create new access code", new_access_code_path, class: "btn btn-lg btn-primary btn-block" %>    
+            <%= link_to "Products", products_path, class: "btn btn-lg btn-primary btn-block" %>
+            <%= link_to "Producer Product Commissions", producer_product_unit_commissions_path, class: "btn btn-lg btn-primary btn-block" %>
+            <%= link_to "Add new dropsite", new_dropsite_path, class: "btn btn-lg btn-primary btn-block" %>
+            <%= link_to "List dropsites", dropsites_path, class: "btn btn-lg btn-primary btn-block" %>        
+            <%= link_to "List Users", users_path, class: "btn btn-lg btn-primary btn-block" %>
+            <%= link_to "Go to test page", test_page_path, class: "btn btn-lg btn-primary btn-block" %>
+            <%= link_to "Partner Users", partner_users_index_path, class: "btn btn-lg btn-primary btn-block" %>
+            <%= link_to "Toggle garage door", toggle_garage_door_path, class: "btn btn-lg btn-primary btn-block" %>
+          </div>
+
+        </div>
+
+
+        <div class="panel panel-default">      
+
+          <div class="panel-heading">
+            <h2 class="panel-title">User Spoof</h2>
+          </div>
+          <div class="panel-body">
+            <%= form_tag sessions_spoof_path do %>      
+              <%= label_tag :email %>
+              <%= text_field_tag :email, nil, class: "form-control" %>                        
+              <%= submit_tag "Spoof user", class: "btn btn-lg btn-primary btn-block" %>
+            <% end %>
+          </div>
+
+        </div>
+
+
+      </div>
+
+
+    </div>
+  </div>
+
+
 <% end %>
 
 <%= render partial: "shared/access_code_submission" %>

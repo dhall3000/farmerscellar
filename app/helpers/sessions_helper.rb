@@ -1,5 +1,9 @@
 module SessionsHelper
 
+  def admin_logged_in?
+    return !current_user.nil? && current_user.account_type_is?(:ADMIN)
+  end
+
   def spoofing?
     return session[:spoofing_admin_id]
   end
