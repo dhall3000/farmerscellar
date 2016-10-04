@@ -1,5 +1,9 @@
 module SessionsHelper
 
+  def spoofing?
+    return session[:spoofing_admin_id]
+  end
+
   def log_in(user)
     session[:user_id] = user.id
     UserAccountState.ensure_state_exists(user)

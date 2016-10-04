@@ -1,5 +1,45 @@
 class SessionsController < ApplicationController
-  def new    
+  before_action :redirect_to_root_if_user_not_admin, only: [:spoof]
+
+  def new
+
+  end
+
+  def spoof
+
+    if spoofing?
+      redirect_to root_url
+      return
+    end
+
+    user = User.find_by(email: params[:email].downcase)
+    if user.nil? || !user.valid?
+      flash[:danger] = "Can't spoof #{params[:email]}. Email address not associated with a valid user account."
+      redirect_to root_url
+      return
+    end
+
+    session[:spoofing_admin_id] = current_user.id
+    log_in user
+
+    flash[:success] = "Now spoofing user #{user.email}"
+    redirect_to root_url
+
+  end
+
+  def unspoof    
+
+    if !spoofing?
+      redirect_to root_url
+      return
+    end
+
+    log_out
+    log_in User.find(session[:spoofing_admin_id])
+    session[:spoofing_admin_id] = nil
+    flash[:success] = "All done spoofing"
+    redirect_to root_url
+
   end
 
   def create

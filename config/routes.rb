@@ -19,6 +19,8 @@ Rails.application.routes.draw do
   get 'login' => 'sessions#new'
   post 'login' => 'sessions#create'
   delete 'logout' => 'sessions#destroy'
+  post 'sessions/spoof'
+  get 'sessions/unspoof'
   post 'postings/fill' => 'postings#fill'
   get 'bulk_payments/test_masspay' => 'bulk_payments#test_masspay'
   post 'bulk_payments/test_masspay' => 'bulk_payments#test_masspay'

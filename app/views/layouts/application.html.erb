@@ -35,8 +35,11 @@
       <%= render 'layouts/header' %>
     <% end %>
     <div class="container">
+      <% if spoofing? %>
+        <div id="spoofBanner" class="spoof-banner alert alert-danger">Spoofing user <%= current_user.email %></div>
+      <% end %>
       <% flash.each do |message_type, message| %>
-      <div class="alert alert-<%= message_type %>"><%= message %></div>
+        <div class="alert alert-<%= message_type %>"><%= message %></div>
       <% end %>
       <%= yield %>
       <% if !@is_dropsite_user %>
