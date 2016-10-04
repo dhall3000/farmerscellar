@@ -35,8 +35,7 @@
 			      <table class="table">
 			        <thead>
 			          <tr>
-			            <th class="text-center">Send Notification</th>
-			            <th class="text-center">Dropsite</th>
+			            <th class="text-center">Notify</th>
 			            <th class="text-center">Name</th>
 			            <th class="text-center">Email</th>
 			          </tr>
@@ -46,7 +45,6 @@
 			          <% @partner_users.each do |user| %>
 			            <tr>
 			              <td><%= check_box_tag "user_ids[]", user.id %></td>
-			              <td class="text-center"><%= user.dropsite.name %></td>
 			              <td class="text-center"><%= user.name %></td>
 			              <td class="text-center"><%= user.email %></td>
 			            </tr>
