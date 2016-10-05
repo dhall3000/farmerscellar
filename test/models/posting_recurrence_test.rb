@@ -373,8 +373,10 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     between_posting_span_days = (posting_recurrence.postings.last.delivery_date - posting_recurrence.postings.first.delivery_date) / (24 * 60 * 60)
 
     if frequency > 0 && frequency < 5
-      #verify the proper duration between week-based postings      
-      assert_equal frequency * 7, between_posting_span_days
+      #verify the proper duration between week-based postings
+      #the '.to_i' is cause daylight savings sometimes adds 1 hour to the calculation and i don't want to apply more brain cells 
+      #to fixing it other than adding .to_i
+      assert_equal frequency * 7, between_posting_span_days.to_i
     end
 
     if frequency == 5

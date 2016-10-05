@@ -1,5 +1,5 @@
 <% provide(:title, "Edit user") %>
-<h1>Update your profile</h1>
+<h1>Update settings</h1>
 
 <div class="row">
   <div class="col-md-6 col-md-offset-3">
@@ -11,20 +11,9 @@
 
       <%= f.label :email %>
       <%= f.email_field :email, class: 'form-control' %>
-
-    <%= f.label :beta, class: "inline" do %>
-      <%= f.check_box :beta %>
-      <span>Join beta users group</span>      
-    <% end %>
-
-    <a href='#' id="beta_users_explanation" tabindex="0" data-container="body" data-toggle="popover" data-trigger="focus" data-content="As we grow, our beta users will get a first shot at new features and give feedback about their experiences. This feedback is an integral part of helping Farmer's Cellar take shape. Keep in mind there may be times where we make mistakes as a normal part of growing pains. As always we'll fix any mistakes to your satisfaction and work to not repeat them.">(?)</a>
-    <p></p>
-
+   
       <%= f.label :password %>
       <%= f.password_field :password, class: 'form-control' %>
-
-      <%= f.label :zip, "Zip code" %>
-      <%= f.number_field :zip, class: 'form-control' %>    
 
       <% #if this is a farmer we need to put all the fields up for them to edit %>
       <% if @user.account_type == 1 %>
@@ -42,7 +31,7 @@
 
       <% end %>
 
-      <%= f.submit id: "submit_button", class: "btn btn-primary", disabled: save_button_disabled_state %>
+      <%= f.submit "Update", class: "btn btn-primary btn-lg", disabled: save_button_disabled_state %>
     <% end %>
   </div>
 </div>
