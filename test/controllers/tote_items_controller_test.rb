@@ -7,6 +7,18 @@ class ToteItemsControllerTest < ActionDispatch::IntegrationTest
     @posting_apples = postings(:postingf1apples)
   end
 
+  test "tote item helper methods should return correct values" do
+    tote_items = ToteItemsController.helpers.unauthorized_items_for(@c1)
+    assert_equal 11, tote_items.count
+
+    tote_items = ToteItemsController.helpers.authorized_items_for(@c1)
+    assert_equal 0, tote_items.count
+
+    subscriptions = ToteItemsController.helpers.get_active_subscriptions_by_authorization_state(users(:c_subscription))
+    assert_equal 1, subscriptions[:unauthorized].count
+    assert_equal 0, subscriptions[:authorized].count
+  end
+
   test "should not create tote item for unlive posting" do
     @posting_apples.update(live: false)
     @posting_apples.reload

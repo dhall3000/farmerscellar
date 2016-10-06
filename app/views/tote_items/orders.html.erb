@@ -1,0 +1,8 @@
+<h1>Current Orders</h1>
+
+<% if !logged_in? %>
+  <p>Sorry, you need to log in before you can view your orders</p>
+  <% return %>
+<% end %>
+
+<%= render partial: 'shared/orderables', locals: { tote_items: @tote_items, subscriptions: @authorized_subscriptions, items_to_show: @items_to_show, show_remove_button: true, items_total_gross: @items_total_gross } %>

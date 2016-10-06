@@ -28,6 +28,15 @@
                 <% end %>
               <% end %>
             </li>
+            <li>
+              <%= link_to tote_items_path(orders: true) do %>
+                <% if (authorized_items = authorized_items_for(current_user)) && authorized_items.count > 0 %>
+                  Orders (<%= authorized_items.count.to_s %>)
+                <% else %>
+                  Orders
+                <% end %>
+              <% end %>
+            </li>
           <% end %>
           <li class="dropdown">
 

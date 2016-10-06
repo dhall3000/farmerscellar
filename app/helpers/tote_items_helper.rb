@@ -1,4 +1,67 @@
 module ToteItemsHelper
+
+  #gets all tote items for the given user that are ADDED with delivery date of today or in the future (i.e. none from the past)
+  def authorized_items_for(user)
+
+    if user.nil? || !user.valid?
+      return nil
+    end
+
+    #commenting out this one for posterity's sake. if you leave the trailing .where only-today-or-future-deliveries, what happens if the producer
+    #is late delivering...needs to slide by a day or two? i hate this scenario and generally it's not going to work i don't think. or is that so?
+    #what if you have a producer on monthly deliveries but we make a route by his place weekly. he might call up and say "is there any way you could
+    #pick up next week?" also, holidays. what about when normal delivery date is on Christmas day? probably better just leave it with no date for now
+    #until we figure out a slicker way of doing delivery slides which i guess we probably just shouldn't do but still unsure how to do holidays
+    #and we definitely want delivery cancel feature
+    #return ToteItem.joins(:posting).where(user: user, state: [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED]]).where("postings.delivery_date >= ?", Time.zone.now.midnight)
+    return ToteItem.where(user: user, state: [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED]])
+
+  end
+
+  #gets all tote items for the given user that are ADDED with delivery date of today or in the future (i.e. none from the past)
+  def unauthorized_items_for(user)
+
+    if user.nil? || !user.valid?
+      return nil
+    end
+
+    #commenting out this one for posterity's sake. if you leave the trailing .where only-today-or-future-deliveries, what happens if the producer
+    #is late delivering...needs to slide by a day or two? i hate this scenario and generally it's not going to work i don't think. or is that so?
+    #what if you have a producer on monthly deliveries but we make a route by his place weekly. he might call up and say "is there any way you could
+    #pick up next week?" also, holidays. what about when normal delivery date is on Christmas day? probably better just leave it with no date for now
+    #until we figure out a slicker way of doing delivery slides which i guess we probably just shouldn't do but still unsure how to do holidays
+    #and we definitely want delivery cancel feature
+    #return ToteItem.joins(:posting).where(user: user, state: ToteItem.states[:ADDED]).where("postings.delivery_date >= ?", Time.zone.now.midnight)
+    return ToteItem.where(user: user, state: ToteItem.states[:ADDED])
+
+  end
+
+  def get_active_subscriptions_by_authorization_state(user)
+
+    if user.nil? || !user.valid?
+      return {}
+    end
+
+    active_subscriptions = get_active_subscriptions_for(user)
+
+    if active_subscriptions.nil?
+      return {}
+    end
+
+    authorized_subscriptions = []
+    unauthorized_subscriptions = []    
+
+    active_subscriptions.each do |subscription|
+      if subscription.authorized?
+        authorized_subscriptions << subscription
+      else
+        unauthorized_subscriptions << subscription
+      end
+    end
+
+    return {authorized: authorized_subscriptions, unauthorized: unauthorized_subscriptions}
+
+  end
   
   def all_items_fully_filled?(tote_items)
 

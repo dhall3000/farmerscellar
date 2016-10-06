@@ -108,18 +108,6 @@ class PostingRecurrence < ApplicationRecord
     return @descriptions[subscription_frequency]
   end
 
-  def friendly_subscription_frequency(subscription_frequency)
-
-    options = subscription_create_options
-
-    if subscription_frequency < 0 || subscription_frequency >= options.count
-      return ""
-    end
-
-    return subscription_create_options[subscription_frequency][:text]
-    
-  end
-
   def subscription_create_options
 
     options = [{subscription_frequency: 0, text: @@just_once, next_delivery_date: current_posting.delivery_date}]

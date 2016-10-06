@@ -15,10 +15,6 @@ class Subscription < ApplicationRecord
   validates :quantity, numericality: { only_integer: true, greater_than: 0 }
   validates_presence_of :posting_recurrence, :user
 
-  def friendly_frequency
-    return posting_recurrence.friendly_subscription_frequency(frequency)
-  end
-
   def create_skip_date(tote_item)
 
     #we're only going to create this skip date if the given tote item belongs to this subscription
@@ -93,12 +89,18 @@ class Subscription < ApplicationRecord
     return rtauthorizations && rtauthorizations.order("rtauthorizations.id").last && rtauthorizations.order("rtauthorizations.id").last.authorized?
   end
 
+  def friendly_frequency
+    return posting_recurrence.subscription_description(frequency)
+  end
+
+  def sub_total_per_delivery
+    return get_gross_cost(quantity, posting_recurrence.current_posting.price)
+  end
+
   def description
     #this should return a string like: "3 dozens of Helen the Hen eggs every other week for a subtotal of $18.75 each delivery"
-    posting = posting_recurrence.postings.order("postings.id").last
-    friendly_frequency = posting_recurrence.subscription_description(frequency).downcase
-    subtotal = number_to_currency(get_gross_cost(quantity, posting.price))
-    text = "#{quantity.to_s} #{posting.unit.name.pluralize(quantity)} of #{posting.user.farm_name} #{posting.product.name} delivered #{friendly_frequency} for a subtotal of #{subtotal} each delivery"
+    posting = posting_recurrence.current_posting
+    text = "#{quantity.to_s} #{posting.unit.name.pluralize(quantity)} of #{posting.user.farm_name} #{posting.product.name} delivered #{friendly_frequency.downcase} for a subtotal of #{number_to_currency(sub_total_per_delivery)} each delivery"
     return text
   end
 
