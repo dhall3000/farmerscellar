@@ -15,6 +15,10 @@ class Subscription < ApplicationRecord
   validates :quantity, numericality: { only_integer: true, greater_than: 0 }
   validates_presence_of :posting_recurrence, :user
 
+  def friendly_frequency
+    return posting_recurrence.friendly_subscription_frequency(frequency)
+  end
+
   def create_skip_date(tote_item)
 
     #we're only going to create this skip date if the given tote item belongs to this subscription

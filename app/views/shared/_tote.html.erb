@@ -2,8 +2,10 @@
 
 <% tote_items_added = [] %>
 <% tote_items_authorized = [] %>
-<% if !local_assigns[:authorization_adjective] %>
-  <% authorization_adjective = "needs" %>  
+<% if completed_authorization = local_assigns[:completed_authorization] %>
+  <% authorization_adjective = "successful" %>
+<% else %>
+  <% authorization_adjective = "needs" %>
 <% end %>
 <% if !local_assigns[:show_remove_button] %>
   <% show_remove_button = false %>  
@@ -116,8 +118,39 @@
   <div class="row">
     <div class="col-xs-12 col-sm-10 col-sm-offset-1">    
       <h2>Subscriptions</h2>
-      <p>You have active subscriptions.</p>
-      <div><%= link_to "manage subscriptions", subscriptions_path, class: "fat-finger-spacing" %></div>
+        <table class="table">
+          <thead>
+            <tr>          
+              <th class="text-left">Product</th>          
+              <th class="text-center">Quantity</th>
+              <th class="text-right">Delivery</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% subscriptions.each do |subscription| %>
+              <% if subscription.paused || !subscription.on %>
+                <% next %>
+              <% end %>
+              <% posting = subscription.posting_recurrence.current_posting %>
+              <% if subscription.authorized? %>
+                <tr>
+              <% else %>
+                <tr class="action_needed">
+              <% end %>
+              <td class="text-left">
+                <%= posting.product.name %>
+              </td>
+              <td class="text-center">                
+                <%= pluralize(subscription.quantity, posting.unit.name)%>
+              </td>
+              <td class="text-right">
+                <%= subscription.friendly_frequency %>
+              </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+        <div><%= link_to "manage subscriptions", subscriptions_path, class: "fat-finger-spacing" %></div>
     </div>
   </div>
 
@@ -144,10 +177,10 @@
           <% end %>
           <% if tote_items_added.count > 0 %>
 
-            <% if authorization_adjective == "needs" %>
-              <% data_content = "This is the total of all the items that you added to your shopping tote but have not yet checked out. These are the items listed above with a yellow background. Your account will not be charged for these unless you first check out." %>
-            <% else %>
+            <% if completed_authorization %>
               <% data_content = "This is the total of all the items that you just successfully authorized Farmer's Cellar to charge your payment account for. Your account will be charged for these once your order is delivered." %>
+            <% else %>
+              <% data_content = "This is the total of all the items that you added to your shopping tote but have not yet checked out. These are the items listed above with a yellow background. Your account will not be charged for these unless you first check out." %>
             <% end %>
             
             <tr class="action_needed">
