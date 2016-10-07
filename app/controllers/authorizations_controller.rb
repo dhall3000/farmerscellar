@@ -3,9 +3,9 @@ class AuthorizationsController < ApplicationController
   
   def new
 
-    @unauthorized_tote_items = current_user_current_unauthorized_tote_items
+    @tote_items = unauthorized_items_for(current_user)
     
-    if @unauthorized_tote_items.count < 1
+    if @tote_items.count < 1
       return
     end
 
@@ -16,7 +16,8 @@ class AuthorizationsController < ApplicationController
       @authorization = Authorization.new(token: params[:token], payer_id: ('a'..'z').to_a.shuffle[0..10].join)
     end
 
-    @authorization.amount = get_gross_tote(@unauthorized_tote_items)
+    @authorization.amount = get_gross_tote(@tote_items)
+    @items_total_gross = @authorization.amount
 
   end
 

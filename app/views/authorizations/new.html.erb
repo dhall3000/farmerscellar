@@ -1,35 +1,25 @@
-<h1>Payment Authorization Confirmation</h1>
+<h1>Checkout Confirmation</h1>
 
-<% if @unauthorized_tote_items.count < 1 %>
+<% if @tote_items.count < 1 %>
   <p>There is nothing to authorize payment for. Either your shopping tote is empty or everything in your shopping tote has already been authorized.</p>
 <% else %>  
-  <%= render partial: "shared/tote", locals: { tote_items: @unauthorized_tote_items, subscriptions: @subscriptions } %>
 
-  <% if tote_has_items(@unauthorized_tote_items) %>
-    <div class="row">
-      <div class="col-xs-12 col-sm-5">
-        <p>Please confirm that you'd like to authorize payment for the items in your tote shown above.</p>
-        <p></p>
-          <%= form_for(@authorization) do |f| %>
-            <%= f.hidden_field :token %>
-            <%= f.hidden_field :payer_id %>
-            <%= f.hidden_field :amount %>
-            <%= f.submit "Confirm payment authorization", class: "btn btn-primary btn-lg", data: { disable_with: "Please wait..." } %>      
-          <% end %>
-      </div>
-      <div class="col-xs-0 col-sm-7">          
-      </div>
-    </div>
+  <% if tote_has_stuff?(current_user) %>
+
+    <%= render partial: 'shared/orderables', locals: { tote_items: @tote_items, subscriptions: @subscriptions, show_remove_button: false, items_total_gross: @items_total_gross } %>
+
+    <% content_for :action do %>
+      <p>Please confirm that you'd like to authorize payment for the items in your tote shown above.</p>
+      <p></p>
+      <%= form_for(@authorization) do |f| %>
+        <%= f.hidden_field :token %>
+        <%= f.hidden_field :payer_id %>
+        <%= f.hidden_field :amount %>
+        <%= f.submit "Confirm payment authorization", class: "btn btn-primary btn-lg", data: { disable_with: "Please wait..." } %>      
+      <% end %>
+    <% end %>
+
+    <%= render partial: 'shared/payflow_action', locals: { action_title: "Confirmation needed" } %>
+
   <% end %>
-<% end %>
-
-<% if false %>
-
-  <div>
-	<%= form_tag({controller: "authorizations", action: "create"}, method: "post") do %>
-	  <%= hidden_field_tag(:amount, get_gross_tote(@unauthorized_tote_items)) %>
-	  <%= image_submit_tag("https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif") %>
-	<% end %>
-  </div>
-
 <% end %>

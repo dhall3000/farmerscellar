@@ -4,70 +4,43 @@
 
   <%= render partial: 'shared/orderables', locals: { tote_items: @tote_items, subscriptions: @subscriptions, show_remove_button: true, items_total_gross: @items_total_gross } %>
 
-  <div class="row">
-    <div class="col-xs-12 col-sm-offset-5 col-sm-6">
+  <% content_for :action do %>
+    <% one_click = "One-click checkout" %>
+    <% if @rtba %>
 
-      <div class="panel-group">
-
-
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h2>Checkout</h2>
-          </div>
-          <div class="panel-body">                          
-            <table class="table">
-              <tbody>
-                <tr>
-                  <td class="borderless">
-                    <span><%= image_tag "https://www.paypalobjects.com/en_US/i/btn/x-click-but02.gif" %></span>
-                  </td>
-                  <td class="borderless">
-
-                    <% one_click = "One-click checkout" %>
-                    <% if @rtba %>
-
-                      <div class="fat-finger-spacing">
-                        <%= form_tag rtauthorizations_create_path do %>
-                          <%= hidden_field_tag(:token, @rtba.token) %>
-                          <%= submit_tag one_click, class: 'btn btn-lg btn-primary', id: "paypal-button", disabled: @dropsite.nil?, data: { disable_with: "Please wait..." } %>
-                        <% end %>
-                      </div>
-
-                    <% else %>
-
-                      <div class="fat-finger-spacing">
-                        <%= form_tag(checkouts_path) do %>
-                          <%= hidden_field_tag(:amount, @items_total_gross) %>                        
-                          <%= hidden_field_tag(:use_reference_transaction, "1") %>
-                          <%= submit_tag one_click, class: 'btn btn-lg btn-primary', id: "paypal-button", disabled: @dropsite.nil?, data: { disable_with: "Please wait..." } %>                        
-                        <% end %>
-                      </div>
-
-                      <% if @subscriptions.nil? || !@subscriptions.any? %>
-
-                        <div class="fat-finger-spacing">            
-                          <%= form_tag(checkouts_path) do %>
-                            <%= hidden_field_tag(:amount, @items_total_gross) %>                        
-                            <%= hidden_field_tag(:use_reference_transaction, "0") %>
-                            <%= submit_tag "Guest checkout", class: 'btn btn-lg btn-primary', id: "paypal-button", disabled: @dropsite.nil?, data: { disable_with: "Please wait..." } %>                        
-                          <% end %>                            
-                        </div>
-
-                      <% end %>          
-                    <% end %>
-                    <p class="small">(By proceeding with checkout you agree to transact with and through Farmer's Cellar in accordance with our operational policies and procedures outlined on our <%= link_to "How Things Work", how_things_work_path %> page)</p>
-                  </td>
-                </tr>
-              </tbody>
-            </table>            
-          </div>
-        </div>
-
-
+      <div class="fat-finger-spacing">
+        <%= form_tag rtauthorizations_create_path do %>
+          <%= hidden_field_tag(:token, @rtba.token) %>
+          <%= submit_tag one_click, class: 'btn btn-lg btn-primary', id: "paypal-button", disabled: @dropsite.nil?, data: { disable_with: "Please wait..." } %>
+        <% end %>
       </div>
 
-    </div>
-  </div>
+    <% else %>
+
+      <div class="fat-finger-spacing">
+        <%= form_tag(checkouts_path) do %>
+          <%= hidden_field_tag(:amount, @items_total_gross) %>                        
+          <%= hidden_field_tag(:use_reference_transaction, "1") %>
+          <%= submit_tag one_click, class: 'btn btn-lg btn-primary', id: "paypal-button", disabled: @dropsite.nil?, data: { disable_with: "Please wait..." } %>                        
+        <% end %>
+      </div>
+
+      <% if @subscriptions.nil? || !@subscriptions.any? %>
+
+        <div class="fat-finger-spacing">            
+          <%= form_tag(checkouts_path) do %>
+            <%= hidden_field_tag(:amount, @items_total_gross) %>                        
+            <%= hidden_field_tag(:use_reference_transaction, "0") %>
+            <%= submit_tag "Guest checkout", class: 'btn btn-lg btn-primary', id: "paypal-button", disabled: @dropsite.nil?, data: { disable_with: "Please wait..." } %>                        
+          <% end %>                            
+        </div>
+
+      <% end %>          
+    <% end %>
+    <p class="small">(By proceeding with checkout you agree to transact with and through Farmer's Cellar in accordance with our operational policies and procedures outlined on our <%= link_to "How Things Work", how_things_work_path %> page)</p>    
+  <% end %>
+
+  <%= render partial: 'shared/payflow_action', locals: { action_title: "Checkout" } %>
 
 <% else %>  
 

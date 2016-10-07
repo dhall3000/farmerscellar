@@ -1,0 +1,29 @@
+<% #grab params from local_assigns
+  action_title = local_assigns[:action_title]
+%>
+
+<div class="row">
+  <div class="col-xs-12 col-sm-offset-5 col-sm-6">
+    <div class="panel-group">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h2><%= action_title %></h2>
+        </div>
+        <div class="panel-body">                          
+          <table class="table">
+            <tbody>
+              <tr>
+                <td class="borderless">
+                  <span><%= image_tag "https://www.paypalobjects.com/en_US/i/btn/x-click-but02.gif" %></span>
+                </td>
+                <td class="borderless">
+                  <%= yield :action %>
+                </td>
+              </tr>
+            </tbody>
+          </table>            
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

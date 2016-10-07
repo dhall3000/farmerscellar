@@ -61,7 +61,7 @@ class SubscriptionsController < ApplicationController
       @subscription.save
 
       flash[:success] = "Subscription created"
-      redirect_to subscriptions_path
+      redirect_to postings_path
 
       return
 
