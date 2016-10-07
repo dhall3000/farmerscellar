@@ -1,8 +1,8 @@
 <h1>Shopping Tote</h1>
 
-<% if @items_to_show %>
+<% if tote_has_stuff?(current_user) %>
 
-  <%= render partial: 'shared/orderables', locals: { tote_items: @tote_items, subscriptions: @unauthorized_subscriptions, items_to_show: @items_to_show, show_remove_button: true, items_total_gross: @items_total_gross } %>
+  <%= render partial: 'shared/orderables', locals: { tote_items: @tote_items, subscriptions: @subscriptions, show_remove_button: true, items_total_gross: @items_total_gross } %>
 
   <div class="row">
     <div class="col-xs-12 col-sm-offset-5 col-sm-6">
@@ -37,7 +37,7 @@
 
                       <div class="fat-finger-spacing">
                         <%= form_tag(checkouts_path) do %>
-                          <%= hidden_field_tag(:amount, @total_amount_to_authorize) %>                        
+                          <%= hidden_field_tag(:amount, @items_total_gross) %>                        
                           <%= hidden_field_tag(:use_reference_transaction, "1") %>
                           <%= submit_tag one_click, class: 'btn btn-lg btn-primary', id: "paypal-button", disabled: @dropsite.nil?, data: { disable_with: "Please wait..." } %>                        
                         <% end %>
@@ -47,7 +47,7 @@
 
                         <div class="fat-finger-spacing">            
                           <%= form_tag(checkouts_path) do %>
-                            <%= hidden_field_tag(:amount, @total_amount_to_authorize) %>                        
+                            <%= hidden_field_tag(:amount, @items_total_gross) %>                        
                             <%= hidden_field_tag(:use_reference_transaction, "0") %>
                             <%= submit_tag "Guest checkout", class: 'btn btn-lg btn-primary', id: "paypal-button", disabled: @dropsite.nil?, data: { disable_with: "Please wait..." } %>                        
                           <% end %>                            
@@ -69,6 +69,16 @@
     </div>
   </div>
 
-<% else %>
-  <p>Your shopping tote is empty. You need to <%= link_to "add some items to your tote", postings_path %>, then you will see them listed here.</p>  
+<% else %>  
+
+  <div class="row">
+    <div class="col-xs-12 col-sm-offset-3 col-sm-6">
+      <div class="panel panel-default">    
+        <div class="panel-body">
+          <p>Your shopping tote is empty. You need to <%= link_to "add some items to your tote", postings_path %>, then you can checkout here.</p>  
+        </div>
+      </div>
+    </div>
+  </div>
+
 <% end %>

@@ -5,4 +5,18 @@
   <% return %>
 <% end %>
 
-<%= render partial: 'shared/orderables', locals: { tote_items: @tote_items, subscriptions: @authorized_subscriptions, items_to_show: @items_to_show, show_remove_button: true, items_total_gross: @items_total_gross } %>
+<% if orders_exist?(current_user) %>
+  <%= render partial: 'shared/orderables', locals: { tote_items: @tote_items, subscriptions: @subscriptions, show_remove_button: true, items_total_gross: @items_total_gross } %>
+<% else %>
+
+  <div class="row">
+    <div class="col-xs-12 col-sm-offset-3 col-sm-6">
+      <div class="panel panel-default">    
+        <div class="panel-body">
+          <p class="text-center">You have no current orders. First go to your <%= link_to "Shopping Tote", tote_items_path %> and check out, then your orders will show up here.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+<% end %>

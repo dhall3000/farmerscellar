@@ -1,5 +1,23 @@
 module ToteItemsHelper
 
+  def orders_exist?(user)
+    
+    tote_items = authorized_items_for(user)
+    subscriptions = get_active_subscriptions_by_authorization_state(user)[:authorized]
+    
+    return (tote_items && tote_items.any?) || (subscriptions && subscriptions.any?)
+
+  end
+
+  def tote_has_stuff?(user)
+
+    tote_items = unauthorized_items_for(user)
+    subscriptions = get_active_subscriptions_by_authorization_state(user)[:unauthorized]
+    
+    return (tote_items && tote_items.any?) || (subscriptions && subscriptions.any?)
+    
+  end
+
   #gets all tote items for the given user that are ADDED with delivery date of today or in the future (i.e. none from the past)
   def authorized_items_for(user)
 

@@ -20,47 +20,27 @@ class ToteItemsController < ApplicationController
     end
 
     @rtba = current_user.get_active_rtba
-    show_orders = params[:orders]
+    @items_total_gross = 0    
+    template = ''
 
-    if show_orders
-      
+    if params[:orders]
+      #user wants to see their orders      
       @tote_items = authorized_items_for(current_user)
-      @items_total_gross = 0
-
-      if !@tote_items.nil?
-        @tote_items = @tote_items.joins(:posting).order("postings.delivery_date")
-        @tote_items.each do |tote_item|
-          @items_total_gross = (@items_total_gross + get_gross_item(tote_item)).round(2)
-        end        
-      end
-
-      @authorized_subscriptions = get_active_subscriptions_by_authorization_state(current_user)[:authorized]
-      @items_to_show = (@tote_items && @tote_items.any?) || (@authorized_subscriptions && @authorized_subscriptions.any?)
-
-      render 'tote_items/orders'
-      return
-
+      @subscriptions = get_active_subscriptions_by_authorization_state(current_user)[:authorized]
+      template = 'tote_items/orders'      
     else
-
       #user wants to see their shopping tote
-
       @tote_items = unauthorized_items_for(current_user)
-
-      if @tote_items.nil? || !@tote_items.any?
-        @total_amount_to_authorize = 0
-      else
-        @tote_items = @tote_items.joins(:posting).order("postings.delivery_date")
-        @items_total_gross = get_gross_tote(@tote_items)
-      end
-
-      @unauthorized_subscriptions = get_active_subscriptions_by_authorization_state(current_user)[:unauthorized]      
-      @provide_guest_checkout_option = !@rtba && !@unauthorized_subscriptions
-      @items_to_show = (@tote_items && @tote_items.any?) || (@unauthorized_subscriptions && @unauthorized_subscriptions.any?)
-
-      render 'tote_items/tote'
-      return
-
+      @subscriptions = get_active_subscriptions_by_authorization_state(current_user)[:unauthorized]      
+      template = 'tote_items/tote'
     end
+
+    if !@tote_items.nil?
+      @tote_items = @tote_items.joins(:posting).order("postings.delivery_date")
+      @items_total_gross = get_gross_tote(@tote_items)
+    end
+
+    render template    
 
   end
 

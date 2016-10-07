@@ -1,15 +1,9 @@
 <% #grab params from local_assigns
   tote_items = local_assigns[:tote_items]
   subscriptions = local_assigns[:subscriptions]
-  items_to_show = local_assigns[:items_to_show]
   show_remove_button = local_assigns[:show_remove_button]
   items_total_gross = local_assigns[:items_total_gross]
 %>
-
-<% if !items_to_show %>
-  <p>You currently have no orders</p>
-  <% return %>
-<% end %>
 
 <div class="row">
   <div class="col-xs-12 col-sm-10 col-sm-offset-1">    
