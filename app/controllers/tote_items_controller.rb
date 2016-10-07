@@ -31,8 +31,7 @@ class ToteItemsController < ApplicationController
         @tote_items = @tote_items.joins(:posting).order("postings.delivery_date")
         @tote_items.each do |tote_item|
           @items_total_gross = (@items_total_gross + get_gross_item(tote_item)).round(2)
-        end
-        
+        end        
       end
 
       @authorized_subscriptions = get_active_subscriptions_by_authorization_state(current_user)[:authorized]
@@ -43,19 +42,22 @@ class ToteItemsController < ApplicationController
 
     else
 
-      @tote_items = current_user_current_tote_items
+      #user wants to see their shopping tote
 
-      if @tote_items.nil?
+      @tote_items = unauthorized_items_for(current_user)
+
+      if @tote_items.nil? || !@tote_items.any?
         @total_amount_to_authorize = 0
       else
-        @tote_items = @tote_items.order("postings.delivery_date")
-        @total_amount_to_authorize = get_gross_tote(@tote_items.where(state: ToteItem.states[:ADDED]))
+        @tote_items = @tote_items.joins(:posting).order("postings.delivery_date")
+        @items_total_gross = get_gross_tote(@tote_items)
       end
-      
-      @subscriptions = get_active_subscriptions_for(current_user)
-      @provide_guest_checkout_option = !@rtba && !@subscriptions
 
-      render 'tote_items/index'
+      @unauthorized_subscriptions = get_active_subscriptions_by_authorization_state(current_user)[:unauthorized]      
+      @provide_guest_checkout_option = !@rtba && !@unauthorized_subscriptions
+      @items_to_show = (@tote_items && @tote_items.any?) || (@unauthorized_subscriptions && @unauthorized_subscriptions.any?)
+
+      render 'tote_items/tote'
       return
 
     end
