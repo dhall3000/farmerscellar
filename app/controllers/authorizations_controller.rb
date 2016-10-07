@@ -53,6 +53,7 @@ class AuthorizationsController < ApplicationController
     @authorization.response = response
 
     @authorization_succeeded = response.params["ack"] == "Success" && @authorization.gross_amount > 0
+
     if !@authorization_succeeded
       AdminNotificationMailer.general_message("One time authorization failed", response.to_yaml).deliver_now
     end
@@ -65,7 +66,7 @@ class AuthorizationsController < ApplicationController
       @authorization.save
 
       if @authorization_succeeded && @authorization.checkouts.order("checkouts.id").last.tote_items.any?        
-        flash.now[:success] = "Payment authorized!"
+        flash.now[:success] = "Checkout successful"
         @tote_items = current_user_current_unauthorized_tote_items.to_a
         @authorization.checkouts.order("checkouts.id").last.tote_items.where(state: ToteItem.states[:ADDED]).each do |tote_item|
           tote_item.transition(:customer_authorized)
@@ -74,13 +75,13 @@ class AuthorizationsController < ApplicationController
         @authorization.update(amount: @items_total_gross)
         current_user.send_authorization_receipt(@authorization)
       else
-        flash.now[:danger] = "Payment not authorized."
+        flash.now[:danger] = "Checkout failed"
         AdminNotificationMailer.general_message("One time authorization failed", response.to_yaml).deliver_now
       end
 
     else
       AdminNotificationMailer.general_message("Checkout is nil", "admin, something went seriously wrong. The Checkout object is nil for the following authorization: #{response.to_yaml}").deliver_now      
-      flash.now[:danger] = "Payment not authorized"
+      flash.now[:danger] = "Checkout failed"
     end
 
   end

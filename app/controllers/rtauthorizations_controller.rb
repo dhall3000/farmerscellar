@@ -64,7 +64,7 @@ class RtauthorizationsController < ApplicationController
 				
 				if !rtba.valid?
 					AdminNotificationMailer.general_message("Problem creating rtba!", rtba.errors.to_yaml).deliver_now
-					flash.now[:danger] = "Couldn't establish billing agreement. Please try checking out again. If this problem persists please contact us."
+					flash[:danger] = "Couldn't establish billing agreement. Please try checking out again. If this problem persists please contact us."
 					redirect_to tote_items_path
 					return
 				end				
@@ -73,7 +73,7 @@ class RtauthorizationsController < ApplicationController
 
 			else
 				AdminNotificationMailer.general_message("Problem creating paypal billing agreement!", ba.to_yaml).deliver_now
-				flash.now[:danger] = "Couldn't establish billing agreement. Please try checking out again. If this problem persists please contact us."
+				flash[:danger] = "Couldn't establish billing agreement. Please try checking out again. If this problem persists please contact us."
 				redirect_to tote_items_path
 				return
 			end
@@ -85,7 +85,7 @@ class RtauthorizationsController < ApplicationController
   	
 		#is ba legit?
 		if !rtba.ba_valid?
-			flash.now[:danger] = "The Billing Agreement we have on file is no longer valid. Please try to establish a new one by checking out again. If you continue to have problems please contact us."
+			flash[:danger] = "The Billing Agreement we have on file is no longer valid. Please try to establish a new one by checking out again. If you continue to have problems please contact us."
 			AdminNotificationMailer.general_message("Billing agreement invalid!", rtba.ba_id).deliver_now
 			redirect_to tote_items_path
 			return
@@ -100,7 +100,7 @@ class RtauthorizationsController < ApplicationController
       body_lines << "rtba.user.id: #{rtba.user.id.to_s}"
       body_lines << "current_user.id: #{current_user.id.to_s}"
       AdminNotificationMailer.general_message("Billing agreement hack potential!", "fake body", body_lines).deliver_now      
-      flash[:danger] = "Payment not authorized. Please try again or contact us if this continues."
+      flash[:danger] = "Checkout failed. Please try again or contact us if this continues."
       redirect_to tote_items_path
       return
     end
@@ -128,7 +128,7 @@ class RtauthorizationsController < ApplicationController
 			AdminNotificationMailer.general_message("Problem saving Rtauthorization!", @rtauthorization.errors.to_yaml).deliver_now
 		end
   	
-  	flash.now[:success] = "Payment authorized!"		
+  	flash.now[:success] = "Checkout successful"		
     @authorization_succeeded = true
     render 'authorizations/create'    
 
