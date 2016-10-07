@@ -165,8 +165,8 @@ class ToteItemsController < ApplicationController
     #Lower Capture Amount
     #You complete a void on the funds remaining on the authorization. 
 
-
     #DESCRIPTION: the intent is for use by shopping tote editing feature enabling user to remove items from their tote
+    @referer = request.referer
     ti = ToteItem.find_by_id(params[:id])
 
     if ti == nil
@@ -186,7 +186,7 @@ class ToteItemsController < ApplicationController
             flash.now[:success] = flash_text
             @subscription = ti.subscription
             @product_name = ti.posting.product.name
-            @tote_item = ti
+            @tote_item = ti            
             ti.subscription.create_skip_date(ti)
             render 'tote_items/subscription_action'
 
@@ -203,7 +203,8 @@ class ToteItemsController < ApplicationController
             
     end
     
-    redirect_to tote_items_path
+    redirect_to @referer
+
   end
 
   private

@@ -10,7 +10,7 @@
             <p>Your <%= @product_name %> subscription is still active. Your next scheduled delivery is <%= @subscription.get_next_scheduled_delivery_date(@tote_item.posting.delivery_date).strftime("%A %B %d") %>.</p>
 
             <div>
-              <%= link_to "Leave subscription active", tote_items_path, class: 'btn btn-primary btn-lg btn-block fat-finger-spacing' %>
+              <%= link_to "Leave subscription active", @referer, class: 'btn btn-primary btn-lg btn-block fat-finger-spacing' %>
             </div>      
 
             <div>
