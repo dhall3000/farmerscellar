@@ -21,8 +21,8 @@
           <% if user_has_access?  %>            
             <li>
               <%= link_to tote_items_path do %>
-                <% if current_user_current_tote_items && ((num_tote_items = current_user_current_tote_items.count) > 0) %>
-                  <span class="glyphicon glyphicon-shopping-cart"></span> Tote (<%= num_tote_items.to_s %>)
+                <% if (num_tote_objects = num_tote_objects(current_user)) > 0 %>
+                  <span class="glyphicon glyphicon-shopping-cart"></span> Tote (<%= num_tote_objects.to_s %>)
                 <% else %>
                   <span class="glyphicon glyphicon-shopping-cart"></span> Tote
                 <% end %>
@@ -30,8 +30,8 @@
             </li>
             <li>
               <%= link_to tote_items_path(orders: true) do %>
-                <% if (authorized_items = authorized_items_for(current_user)) && authorized_items.count > 0 %>
-                  Orders (<%= authorized_items.count.to_s %>)
+                <% if (num_order_objects = num_order_objects(current_user)) > 0 %>
+                  Orders (<%= num_order_objects.to_s %>)
                 <% else %>
                   Orders
                 <% end %>
