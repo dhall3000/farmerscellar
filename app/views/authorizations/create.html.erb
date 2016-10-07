@@ -1,16 +1,24 @@
-<% if @authorization_succeeded %>
-<h1>Payment Authorization Complete</h1>
-  <div class="row">
-    <div class="col-xs-12 col-sm-10 col-sm-offset-1">
-      <div>
-        <p>You just successfully completed payment authorization for the items listed below. A receipt has been emailed to you.</p>
+<h1>Checkout</h1>
+
+<div class="row">
+  <div class="col-xs-12 col-sm-10 col-sm-offset-1">
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h2>Status</h2>
       </div>
-    </div>
+      <div class="panel-body">
+        <% if @authorization_succeeded %>
+          <p>You just successfully completed payment authorization for the items listed below. A receipt has been emailed to you.</p>
+        <% else %>
+          <span class="alert alert-danger">Something seems to have gone wrong with your payment authorization. Please <%= link_to "contact us", contact_path %> to get this issue corrected. Thank you!</span>
+        <% end %>
+
+      </div>
+    </div>      
   </div>
-  
-  <%= render partial: "shared/tote", locals: { completed_authorization: @authorization_succeeded, tote_items: @successfully_authorized_tote_items, subscriptions: @successfully_authorized_subscriptions } %>
-	
-<% else %>
-<h1>Payment Authorization Error</h1>
-  Something seemed to have gone wrong with your payment authorization. Please <%= link_to "contact us", contact_path %> to get this issue corrected. Thank you!
+</div>
+
+<% if @authorization_succeeded %>
+  <%= render partial: 'shared/orderables', locals: { tote_items: @tote_items, subscriptions: @subscriptions, show_remove_button: false, items_total_gross: @items_total_gross } %>
 <% end %>

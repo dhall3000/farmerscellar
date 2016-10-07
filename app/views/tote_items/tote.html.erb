@@ -8,7 +8,7 @@
     <% one_click = "One-click checkout" %>
     <% if @rtba %>
 
-      <div class="fat-finger-spacing">
+      <div>
         <%= form_tag rtauthorizations_create_path do %>
           <%= hidden_field_tag(:token, @rtba.token) %>
           <%= submit_tag one_click, class: 'btn btn-lg btn-primary', id: "paypal-button", disabled: @dropsite.nil?, data: { disable_with: "Please wait..." } %>
@@ -27,7 +27,7 @@
 
       <% if @subscriptions.nil? || !@subscriptions.any? %>
 
-        <div class="fat-finger-spacing">            
+        <div>            
           <%= form_tag(checkouts_path) do %>
             <%= hidden_field_tag(:amount, @items_total_gross) %>                        
             <%= hidden_field_tag(:use_reference_transaction, "0") %>

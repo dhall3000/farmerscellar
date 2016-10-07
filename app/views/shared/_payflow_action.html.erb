@@ -9,19 +9,13 @@
         <div class="panel-heading">
           <h2><%= action_title %></h2>
         </div>
-        <div class="panel-body">                          
-          <table class="table">
-            <tbody>
-              <tr>
-                <td class="borderless">
-                  <span><%= image_tag "https://www.paypalobjects.com/en_US/i/btn/x-click-but02.gif" %></span>
-                </td>
-                <td class="borderless">
-                  <%= yield :action %>
-                </td>
-              </tr>
-            </tbody>
-          </table>            
+        <div class="panel-body">
+          <div class="fat-finger-spacing">
+            <%= yield :action %>                
+          </div>
+          <div class="text-right">
+            <%= image_tag "https://www.paypalobjects.com/webstatic/en_US/i/buttons/PP_logo_h_100x26.png" %>            
+          </div>
         </div>
       </div>
     </div>

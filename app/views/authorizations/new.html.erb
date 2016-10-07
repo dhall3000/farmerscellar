@@ -1,25 +1,21 @@
 <h1>Checkout Confirmation</h1>
 
-<% if @tote_items.count < 1 %>
-  <p>There is nothing to authorize payment for. Either your shopping tote is empty or everything in your shopping tote has already been authorized.</p>
-<% else %>  
+<% if tote_has_stuff?(current_user) %>
 
-  <% if tote_has_stuff?(current_user) %>
+  <%= render partial: 'shared/orderables', locals: { tote_items: @tote_items, subscriptions: @subscriptions, show_remove_button: false, items_total_gross: @items_total_gross } %>
 
-    <%= render partial: 'shared/orderables', locals: { tote_items: @tote_items, subscriptions: @subscriptions, show_remove_button: false, items_total_gross: @items_total_gross } %>
-
-    <% content_for :action do %>
-      <p>Please confirm that you'd like to authorize payment for the items in your tote shown above.</p>
-      <p></p>
-      <%= form_for(@authorization) do |f| %>
-        <%= f.hidden_field :token %>
-        <%= f.hidden_field :payer_id %>
-        <%= f.hidden_field :amount %>
-        <%= f.submit "Confirm payment authorization", class: "btn btn-primary btn-lg", data: { disable_with: "Please wait..." } %>      
-      <% end %>
+  <% content_for :action do %>
+    <%= form_for(@authorization) do |f| %>
+      <%= f.hidden_field :token %>
+      <%= f.hidden_field :payer_id %>
+      <%= f.hidden_field :amount %>
+      <%= f.submit "Confirm", class: "btn btn-primary btn-lg", data: { disable_with: "Please wait..." } %>      
     <% end %>
-
-    <%= render partial: 'shared/payflow_action', locals: { action_title: "Confirmation needed" } %>
-
+    <span class="small">(By clicking 'Confirm' you authorize and agree to payment for the above items in accordance with our operational policies and procedures outlined on our <%= link_to "How Things Work", how_things_work_path %> page)</span>
   <% end %>
+
+  <%= render partial: 'shared/payflow_action', locals: { action_title: "Confirmation needed" } %>
+  
+<% else %>  
+  <p>There is nothing to authorize payment for. Either your shopping tote is empty or everything in your shopping tote has already been authorized.</p>
 <% end %>

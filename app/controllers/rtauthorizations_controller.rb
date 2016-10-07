@@ -19,9 +19,10 @@ class RtauthorizationsController < ApplicationController
 
   	if details && details.success?
   		#display tote and 'agree & authorize' button
-	  	@tote_items_authorizable = current_user_current_unauthorized_tote_items	  	
-      @subscriptions_authorizable = current_user_current_unauthorized_subscriptions
-  		@token = params[:token]
+	  	@tote_items = unauthorized_items_for(current_user)      
+      @subscriptions = get_active_subscriptions_by_authorization_state(current_user)[:unauthorized]
+  		@items_total_gross = get_gross_tote(@tote_items)
+      @token = params[:token]
 		else
 			#flash danger 'please contact us, there was a problem'
 			flash[:danger] = "There was a problem with Paypal. Please contact us if this continues."
@@ -102,21 +103,27 @@ class RtauthorizationsController < ApplicationController
       flash[:danger] = "Payment not authorized. Please try again or contact us if this continues."
       redirect_to tote_items_path
       return
-    end    
+    end
 
+    @all_subscriptions = get_active_subscriptions_by_authorization_state(current_user)
+
+    @tote_items = unauthorized_items_for(current_user)
+    @subscriptions = @all_subscriptions[:unauthorized]
+
+    @all_tote_items = authorized_items_for(current_user).or(@tote_items)
+    @all_subscriptions = @all_subscriptions[:unauthorized] + @all_subscriptions[:authorized]
+
+    @items_total_gross = get_gross_tote(@tote_items)
+    
 		#we have a legit billing agreement in place so now create a new authorization object and associate it with all appropriate other objects
 		@rtauthorization = Rtauthorization.new(rtba: rtba)
-		@current_tote_items = current_user_current_tote_items
-		@successfully_authorized_tote_items = current_user_current_unauthorized_tote_items.to_a
-    @subscriptions = get_active_subscriptions_for(current_user)
-    @successfully_authorized_subscriptions = current_user_current_unauthorized_subscriptions
-
+	
     if !params[:testparam_fail_rtauthsave]
-      @rtauthorization.authorize_items_and_subscriptions(@current_tote_items, @subscriptions)
+      @rtauthorization.authorize_items_and_subscriptions(@all_tote_items, @all_subscriptions)
     end
 
 		if @rtauthorization.save
-			UserMailer.authorization_receipt(current_user, @rtauthorization, @successfully_authorized_tote_items, @successfully_authorized_subscriptions).deliver_now			
+			UserMailer.authorization_receipt(current_user, @rtauthorization, @tote_items, @subscriptions).deliver_now			
 		else
 			AdminNotificationMailer.general_message("Problem saving Rtauthorization!", @rtauthorization.errors.to_yaml).deliver_now
 		end

@@ -1,24 +1,19 @@
-<h1>Billing Agreement and Authorization</h1>
+<h1>Billing Agreement</h1>
 
-<% if @tote_items_authorizable.count < 1 %>
-  <p>There is nothing to authorize payment for. Either your shopping tote is empty or everything in your shopping tote has already been authorized.</p>
-<% else %>
-  <%= render partial: "shared/tote", locals: { tote_items: @tote_items_authorizable, subscriptions: @subscriptions_authorizable } %>
+<% if tote_has_stuff?(current_user) %>
 
-  <% if tote_has_items(@tote_items_authorizable) %>
-    <div class="row">
+  <%= render partial: 'shared/orderables', locals: { tote_items: @tote_items, subscriptions: @subscriptions, show_remove_button: false, items_total_gross: @items_total_gross } %>  
 
-      <div class="col-xs-12 col-sm-5">
-        <p><span class="small">I want to use Paypal for all future purchases with Farmer's Cellar. I understand this lets me check out faster by not having to log in to PayPal to finish my purchase. I can change my preferred payment method or cancel this authorization at any time in my Account Profile at PayPal.com.</span></p>
-        <p></p>
- 				<%= form_tag rtauthorizations_create_path do %>
-        	<%= hidden_field_tag :token, @token %>
-        	<%= submit_tag "Agree & Authorize", class: "btn btn-primary btn-lg", data: { disable_with: "Please wait..." } %>        
-       	<% end %>
-      </div>
-
-      <div class="col-xs-0 col-sm-7">          
-      </div>
-    </div>
+  <% content_for :action do %>
+    <span class="small">I agree to use Paypal for this and all future purchases with Farmer's Cellar. I understand this lets me check out faster by not having to log in to PayPal to finish my purchase. I can change my preferred payment method or cancel this authorization at any time in my Account Profile at PayPal.com.</span>
+    <%= form_tag rtauthorizations_create_path do %>
+      <%= hidden_field_tag :token, @token %>
+      <%= submit_tag "I agree", class: "btn btn-primary btn-lg", data: { disable_with: "Please wait..." } %>        
+    <% end %>
   <% end %>
+
+  <%= render partial: 'shared/payflow_action', locals: { action_title: "Agreement" } %>
+
+<% else %>
+  <p>There is nothing to authorize payment for. Either your shopping tote is empty or everything in your shopping tote has already been authorized.</p>
 <% end %>

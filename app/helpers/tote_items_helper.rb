@@ -36,7 +36,7 @@ module ToteItemsHelper
     return num_tote_objects(user) > 0
   end
 
-  #gets all tote items for the given user that are ADDED with delivery date of today or in the future (i.e. none from the past)
+  #gets all tote items for the given user that are either AUTHORIZED or COMMITTED
   def authorized_items_for(user)
 
     if user.nil? || !user.valid?
@@ -54,7 +54,7 @@ module ToteItemsHelper
 
   end
 
-  #gets all tote items for the given user that are ADDED with delivery date of today or in the future (i.e. none from the past)
+  #gets all tote items for the given user that are ADDED
   def unauthorized_items_for(user)
 
     if user.nil? || !user.valid?
