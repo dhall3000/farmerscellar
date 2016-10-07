@@ -67,7 +67,7 @@ class AuthorizationsController < ApplicationController
 
       if @authorization_succeeded && @authorization.checkouts.order("checkouts.id").last.tote_items.any?        
         flash.now[:success] = "Checkout successful"
-        @tote_items = current_user_current_unauthorized_tote_items.to_a
+        @tote_items = unauthorized_items_for(current_user)
         @authorization.checkouts.order("checkouts.id").last.tote_items.where(state: ToteItem.states[:ADDED]).each do |tote_item|
           tote_item.transition(:customer_authorized)
         end

@@ -110,7 +110,7 @@ class RtauthorizationsController < ApplicationController
     @tote_items = unauthorized_items_for(current_user)
     @subscriptions = @all_subscriptions[:unauthorized]
 
-    @all_tote_items = authorized_items_for(current_user).or(@tote_items)
+    @all_tote_items = all_items_for(current_user)
     @all_subscriptions = @all_subscriptions[:unauthorized] + @all_subscriptions[:authorized]
 
     @items_total_gross = get_gross_tote(@tote_items)

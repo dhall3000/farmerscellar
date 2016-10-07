@@ -39,9 +39,9 @@ class CheckoutsController < ApplicationController
       end
 
       if is_rt
-        @checkout_tote_items = current_user_current_tote_items
+        @checkout_tote_items = all_items_for(current_user)
       else
-        @checkout_tote_items = current_user_current_unauthorized_tote_items
+        @checkout_tote_items = unauthorized_items_for(current_user)
       end      
 
       if @checkout_tote_items == nil || !@checkout_tote_items.any?

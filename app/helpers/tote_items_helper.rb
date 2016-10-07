@@ -72,6 +72,10 @@ module ToteItemsHelper
 
   end
 
+  def all_items_for(user)
+    return authorized_items_for(current_user).or(unauthorized_items_for(user))
+  end
+
   def get_active_subscriptions_by_authorization_state(user)
 
     if user.nil? || !user.valid?
@@ -115,81 +119,9 @@ module ToteItemsHelper
 
   end
 
-  def current_user_current_unauthorized_tote_items
-    all_tote_items = current_user_current_tote_items
-    if all_tote_items == nil or all_tote_items.count < 1
-      return nil
-    end
-    unauthorized_tote_items = all_tote_items.where(state: ToteItem.states[:ADDED])
-    return unauthorized_tote_items
-  end
-
-  def current_user_current_unauthorized_subscriptions
-    
-    active_subscriptions = get_active_subscriptions_for(current_user)
-
-    unauthorized_subscriptions = []
-
-    active_subscriptions.each do |active_subscription|
-      if !active_subscription.authorized?
-        unauthorized_subscriptions << active_subscription
-      end
-    end
-
-    return unauthorized_subscriptions
-
-  end
-
   def url_with_protocol(url)
     /^http/i.match(url) ? url : "http://#{url}"
   end  
-
-  def current_tote_items_for_user(user)
-
-    #2016-04-06 NEW DESCRIPTION!:
-    #Ok, enough confuddling things. From now on (until this hack gets yanked/redid) this method is ONLY for fetching tote items that are progressing along the
-    #path of getting FILLED, but not FILLED itself. That is, FILLED is not on the "progression" path to getting filled. It is FILLED> So it doesn't count. Neither
-    #does NOTFILLED or REMOVED
-
-    #DESCRIPTION: the intent of this method is to get a collection of toteitems that are currently in the abstract, virtual 'tote'. so, old/expired
-    #toteitems are not included, nor are those in states REMOVED, FILLED, NOTFILLED etc.
-    #actually, that is false. as of this writing, the possible toteitem states are:
-    #{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLED: 4, NOTFILLED: 5, REMOVED: 6, PURCHASED: 7}
-    #should we display them all except REMOVED? no. we should display all things that are on track to becoming purchased, strictly.
-    #in other words, we should display in the tote all the following items:
-    #ADDED, AUTHORIZED, COMMITTED and FILLED
-
-    #here's all the toteitems associated with this user
-    all = ToteItem.joins(posting: [:user, :product]).where(user_id: user.id)
-
-    #the 'displayable' items are just the ones in the proper states for user viewing
-    if all != nil && all.count > 0
-      displayable = all.where("tote_items.state = ? or tote_items.state = ? or tote_items.state = ?", ToteItem.states[:ADDED], ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED])
-    end
-
-    if displayable != nil && displayable.count > 0      
-      #now, we don't want the user to see old posts. we only want them to see 'current' posts. current posts are those yet to be delivered.
-      #however there is one exception to this rule and that is when an item has progressed to the FILLED state but then does not make
-      #it to the PURCHASED state, for whatever reason. in this case, the customer owes money but has not yet purchased so we want it to
-      #remain in their tote forever until it's purchased
-      #current = displayable.where("postings.delivery_date >= ? or state = ? or state = ?", Time.zone.today, ToteItem.states[:FILLED])
-
-      #the above was a good thought. however, we changed the funds collecting model. when the above was in place our funds-collecting model was to pull from customer
-      #credit cards every night. we had to change that to reduce transaction fees though. we changed to where we only pull funds after all a customer's products
-      #have been delivered for the week. so, theoretically a customer could have a product delivered on a monday and a saturday and for all those days it would
-      #the monday product in the tote. this is not good. so we're changing the whole model to where only items currently in motion toward FILLED get displayed.
-      #once products are filled/delivered they should drop out of the tote.
-      current = displayable.where("postings.delivery_date >= ?", Time.zone.today)
-    end
-
-    return current
-
-  end
-
-	def current_user_current_tote_items
-    tote_items = current_tote_items_for_user(current_user)
-    return tote_items
-	end
 
   def get_active_subscriptions_for(user)
 
