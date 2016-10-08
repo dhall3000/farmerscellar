@@ -146,7 +146,6 @@ class PostingsTest < ActionDispatch::IntegrationTest
   test "user 1 should see pout page then user 2 auths to fill case so user 1 should no longer see pout" do
 
     #c1 auths. then c2 adds above current case in to the next case. verify c1 now no longer sees pout page.
-
     posting = come_up_3_short
     c1 = users(:c1)
     c1_ti = c1.tote_items.order(:created_at).last
@@ -162,9 +161,9 @@ class PostingsTest < ActionDispatch::IntegrationTest
     #as of right now c1 has 3 auth'd and c2 has 4 auth'd for a total of 7. so if we log in as c1 and go to the tote
     #we should still see the red exclamation mark telling us the case isn't full yet, we're short 4
     log_in_as(c1)
-    get tote_items_path
+    get tote_items_path(orders: true)
     assert_response :success
-    assert_template 'tote_items/index'    
+    assert_template 'tote_items/orders'    
     assert_select "span.glyphicon-exclamation-sign"
 
     #log in as c2
@@ -191,9 +190,9 @@ class PostingsTest < ActionDispatch::IntegrationTest
 
     #now c1 shouldn't see the exclamation mark in the tote
     log_in_as(c1)
-    get tote_items_path
+    get tote_items_path(orders: true)
     assert_response :success
-    assert_template 'tote_items/index'    
+    assert_template 'tote_items/orders'    
     assert_select "span.glyphicon-exclamation-sign", count: 0
 
   end

@@ -53,13 +53,13 @@ class Authorizer < ActionDispatch::IntegrationTest
 
     get tote_items_path
     assert_response :success
-    assert_template 'tote_items/index'
+    assert_template 'tote_items/tote'
     assert_not_nil assigns(:tote_items)
-    total_amount_to_authorize = assigns(:total_amount_to_authorize)
-    assert_not_nil total_amount_to_authorize
-    assert total_amount_to_authorize > 0, "total amount of tote items is not greater than zero"
-    puts "total_amount_to_authorize = $#{total_amount_to_authorize}"
-    post checkouts_path, params: {amount: total_amount_to_authorize, use_reference_transaction: "0"}
+    items_total_gross = assigns(:items_total_gross)
+    assert_not_nil items_total_gross
+    assert items_total_gross > 0, "total amount of tote items is not greater than zero"
+    puts "items_total_gross = $#{items_total_gross}"
+    post checkouts_path, params: {amount: items_total_gross, use_reference_transaction: "0"}
     checkout_tote_items = assigns(:checkout_tote_items)
     assert_not_nil checkout_tote_items
     assert checkout_tote_items.any?
@@ -102,7 +102,6 @@ class Authorizer < ActionDispatch::IntegrationTest
     assert_match authorization.checkouts.last.tote_items.last.quantity.to_s, mail.body.encoded
     assert_match authorization.checkouts.last.tote_items.last.posting.unit.name, mail.body.encoded
     assert_match authorization.checkouts.last.tote_items.last.posting.delivery_date.strftime("%A %b %d, %Y"), mail.body.encoded
-
     assert authorization.amount > 0
     assert_match authorization.amount.to_s, mail.body.encoded
 
@@ -116,7 +115,7 @@ module AuthorizationHelper
     log_in_as(user)
     get tote_items_path
     assert_response :success
-    assert_template 'tote_items/index'
+    assert_template 'tote_items/tote'
     assert_not_nil assigns(:tote_items)
     total_amount = assigns(:total_amount)
     assert_not_nil total_amount

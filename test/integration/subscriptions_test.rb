@@ -2,6 +2,7 @@ require 'test_helper'
 require 'utility/rake_helper'
 
 class SubscriptionsTest < ActionDispatch::IntegrationTest
+  include ActionView::Helpers::DateHelper 
   
   def setup
     @on = false
@@ -933,7 +934,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     assert_equal 14.days, gap
     
     gap = subscription.tote_items[3].posting.delivery_date - subscription.tote_items[2].posting.delivery_date
-    assert_equal 7.days, gap
+    assert_equal distance_of_time_in_words(7.days), distance_of_time_in_words(gap)
 
   end
 
@@ -1309,10 +1310,10 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
 
     get tote_items_path
     assert :success
-    assert_template 'tote_items/index'
-    total_amount_to_authorize = assigns(:total_amount_to_authorize)
+    assert_template 'tote_items/tote'
+    items_total_gross = assigns(:items_total_gross)
 
-    if total_amount_to_authorize > 0
+    if items_total_gross > 0
       post checkouts_path, params: {use_reference_transaction: 1}
       checkout = assigns(:checkout)
       post rtauthorizations_create_path, params: {token: checkout.token}

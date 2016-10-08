@@ -104,29 +104,17 @@ class BulkPurchasesTest < BulkBuyer
     do_bulk_buy
     do_delivery
 
-    #find the earliest and latest delivery dates among c1's toteitems
-    tote_items = @c1.tote_items
-    earliest_delivery_date = 100.days.from_now
-    latest_delivery_date = 100.days.ago
-    tote_items.each do |ti|
-      if ti.posting.delivery_date < earliest_delivery_date
-        earliest_delivery_date = ti.posting.delivery_date
-      end
-      if ti.posting.delivery_date > latest_delivery_date
-        latest_delivery_date = ti.posting.delivery_date
-      end
-    end
-
-    #split the difference, time wise
-    middle_date = earliest_delivery_date + ((latest_delivery_date - earliest_delivery_date) / 2)    
-    #jump to that middle-ground time
-    travel_to middle_date
+    earliest_delivery_date = @c1.tote_items.joins(:posting).order("postings.delivery_date").first.posting.delivery_date
+    latest_delivery_date = @c1.tote_items.joins(:posting).order("postings.delivery_date").last.posting.delivery_date
+    #jump to just after to the earliest delivery date
+    travel_to earliest_delivery_date + 1.second
     #do a pickup
     log_in_as(users(:dropsite1))
     post pickups_path, params: {pickup_code: @c1.pickup_code.code}
     #verify there are no messages informing user of sub-fully-filled items
     assert_no_match "We couldn't fully fill this order.", response.body
     tote_items = assigns(:tote_items)
+
     #verify the number of items is less than the total amount    
     assert tote_items.count < @c1.tote_items.count
     #save the number picked up for later comparison
@@ -166,23 +154,10 @@ class BulkPurchasesTest < BulkBuyer
     do_bulk_buy
     do_delivery
 
-    #find the earliest and latest delivery dates among c1's toteitems
-    tote_items = @c1.tote_items
-    earliest_delivery_date = 100.days.from_now
-    latest_delivery_date = 100.days.ago
-    tote_items.each do |ti|
-      if ti.posting.delivery_date < earliest_delivery_date
-        earliest_delivery_date = ti.posting.delivery_date
-      end
-      if ti.posting.delivery_date > latest_delivery_date
-        latest_delivery_date = ti.posting.delivery_date
-      end
-    end
-
-    #split the difference, time wise
-    middle_date = earliest_delivery_date + ((latest_delivery_date - earliest_delivery_date) / 2)    
-    #jump to that middle-ground time
-    travel_to middle_date
+    earliest_delivery_date = @c1.tote_items.joins(:posting).order("postings.delivery_date").first.posting.delivery_date
+    latest_delivery_date = @c1.tote_items.joins(:posting).order("postings.delivery_date").last.posting.delivery_date
+    #jump to just after to the earliest delivery date
+    travel_to earliest_delivery_date + 1.second
     #do a pickup
     log_in_as(users(:dropsite1))    
     #scab in some tote items that aren't fully filled

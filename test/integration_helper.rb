@@ -286,32 +286,32 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
   end
 
-  def get_total_amount_to_authorize(customer)
+  def get_items_total_gross(customer)
     
     set_dropsite(customer)
 
     get tote_items_path
     assert_response :success
-    assert_template 'tote_items/index'
+    assert_template 'tote_items/tote'
     assert_not_nil assigns(:tote_items)
-    total_amount_to_authorize = assigns(:total_amount_to_authorize)
-    assert_not_nil total_amount_to_authorize
-    assert total_amount_to_authorize > 0, "total amount of tote items is not greater than zero"
-    puts "total_amount_to_authorize = $#{total_amount_to_authorize}"
+    items_total_gross = assigns(:items_total_gross)
+    assert_not_nil items_total_gross
+    assert items_total_gross > 0, "total amount of tote items is not greater than zero"
+    puts "items_total_gross = $#{items_total_gross}"
 
-    return total_amount_to_authorize
+    return items_total_gross
 
   end
 
   def create_rt_authorization_for_customer(customer)
 
     set_dropsite(customer)
-    total_amount_to_authorize = get_total_amount_to_authorize(customer)
+    items_total_gross = get_items_total_gross(customer)
 
     if customer.rtbas.count == 0 || !customer.rtbas.last.ba_valid?
 
       checkouts_count = Checkout.count
-      post checkouts_path, params: {amount: total_amount_to_authorize, use_reference_transaction: "1"}
+      post checkouts_path, params: {amount: items_total_gross, use_reference_transaction: "1"}
       assert_equal nil, flash[:danger]
       assert_equal checkouts_count + 1, Checkout.count
       assert_equal true, Checkout.last.is_rt
@@ -332,9 +332,9 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
   def create_one_time_authorization_for_customer(customer)    
 
     set_dropsite(customer)
-    total_amount_to_authorize = get_total_amount_to_authorize(customer)
+    items_total_gross = get_items_total_gross(customer)
 
-    post checkouts_path, params: {amount: total_amount_to_authorize, use_reference_transaction: "0"}
+    post checkouts_path, params: {amount: items_total_gross, use_reference_transaction: "0"}
     checkout_tote_items = assigns(:checkout_tote_items)
     assert_not_nil checkout_tote_items
     assert checkout_tote_items.any?

@@ -73,7 +73,7 @@ module ToteItemsHelper
   end
 
   def all_items_for(user)
-    return authorized_items_for(current_user).or(unauthorized_items_for(user))
+    return authorized_items_for(user).or(unauthorized_items_for(user))
   end
 
   def get_active_subscriptions_by_authorization_state(user)
