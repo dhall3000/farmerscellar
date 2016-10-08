@@ -106,8 +106,8 @@ class ToteItemsControllerTest < ActionDispatch::IntegrationTest
     tote_items = assigns(:tote_items)
     assert_not tote_items.nil?
     assert tote_items.any?
-    total_amount_to_authorize = assigns(:total_amount_to_authorize)
-    assert total_amount_to_authorize > 0
+    items_total_gross = assigns(:items_total_gross)
+    assert items_total_gross > 0
 
   end
 
@@ -115,7 +115,7 @@ class ToteItemsControllerTest < ActionDispatch::IntegrationTest
     log_in_as(@c1)
     get tote_items_path
     assert_response :success
-    assert_template 'tote_items/index'
+    assert_template 'tote_items/tote'
     rtba = assigns(:rtba)
     assert_not rtba.nil?
     assert rtba.active
@@ -127,7 +127,7 @@ class ToteItemsControllerTest < ActionDispatch::IntegrationTest
     rtba.update(active: false)
     get tote_items_path
     assert_response :success
-    assert_template 'tote_items/index'
+    assert_template 'tote_items/tote'
     rtba = assigns(:rtba)
     assert rtba.nil?    
   end
@@ -137,7 +137,7 @@ class ToteItemsControllerTest < ActionDispatch::IntegrationTest
     log_in_as(users(:c_no_tote_items))
     get tote_items_path
     assert_response :success
-    assert_template 'tote_items/index'
+    assert_template 'tote_items/tote'
     assert_match 'p', "Your shopping tote is empty so there is nothing to view here."
   end
 

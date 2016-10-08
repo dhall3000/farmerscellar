@@ -15,7 +15,7 @@ class RtauthorizationsControllerTest < ActionDispatch::IntegrationTest
 		assert :success
 		assert_template 'rtauthorizations/new'
 		assert assigns(:token)
-		assert assigns(:tote_items_authorizable)
+		assert assigns(:tote_items)
 		assert flash[:success].nil?
 		assert flash[:danger].nil?
 	end
@@ -40,10 +40,10 @@ class RtauthorizationsControllerTest < ActionDispatch::IntegrationTest
 		add_subscription_and_item_to_user(@c1)
 		authorize_part_of_tote(@c1)
 		get rtauthorizations_new_path, params: {token: "token"}
-		tote_items_authorizable = assigns(:tote_items_authorizable)
+		tote_items = assigns(:tote_items)
 		token = assigns(:token)
-		assert tote_items_authorizable.count > 0
-		assert tote_items_authorizable.count < @c1.tote_items.count
+		assert tote_items.count > 0
+		assert tote_items.count < @c1.tote_items.count
 		assert_not token.nil?
 
 	end
@@ -115,7 +115,7 @@ class RtauthorizationsControllerTest < ActionDispatch::IntegrationTest
 		end
 
 		assert_equal 0, subscriptions[0].rtauthorizations.count
-		assert_equal "Payment authorized!", flash.now[:success]
+		assert_equal "Checkout successful", flash.now[:success]
 
 	end
 
@@ -140,7 +140,7 @@ class RtauthorizationsControllerTest < ActionDispatch::IntegrationTest
 		rtauthorization = assigns(:rtauthorization)
 		assert rtauthorization.nil?
 		#verify flash
-		assert_equal "Payment not authorized. Please try again or contact us if this continues.", flash[:danger]		
+		assert_equal "Checkout failed. Please try again or contact us if this continues.", flash[:danger]		
 		#verify redirect
 		assert_redirected_to tote_items_path
 		#verify admin email
@@ -175,7 +175,7 @@ class RtauthorizationsControllerTest < ActionDispatch::IntegrationTest
 		end
 
 		assert_equal rtauthorization.id, subscriptions[0].rtauthorizations.last.id
-		assert_equal "Payment authorized!", flash.now[:success]
+		assert_equal "Checkout successful", flash.now[:success]
 
 	end
 
