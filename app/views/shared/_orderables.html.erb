@@ -99,7 +99,7 @@
                               <%= link_to "", tote_item, class: "glyphicon glyphicon-remove", method: :delete %>
                             <% else %>
                               <% data_content = "This item cannot be removed. It is 'committed' because it is past its Order Cutoff. Please see " + link_to("Order Cancellation", how_things_work_path(anchor: "cancellation")) + "." %>
-                              <a tabindex="0" role="button" data-container="body" data-placement="right" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=data_content%>"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+                              <a tabindex="0" role="button" data-container="body" data-placement="left" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=data_content%>"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
                             <% end %>
                           </div>
                         <% end %>
@@ -125,7 +125,7 @@
                               <%= link_to "", tote_item, class: "glyphicon glyphicon-remove", method: :delete %>
                             <% else %>
                               <% data_content = "This item cannot be removed. It is 'committed' because it is past its Order Cutoff. Please see " + link_to("Order Cancellation", how_things_work_path(anchor: "cancellation")) + "." %>
-                              <a tabindex="0" role="button" data-container="body" data-placement="right" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=data_content%>"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+                              <a tabindex="0" role="button" data-container="body" data-placement="left" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=data_content%>"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
                             <% end %>
                           </div>
                         <% end %>                    
