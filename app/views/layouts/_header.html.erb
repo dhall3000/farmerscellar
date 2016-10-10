@@ -21,11 +21,26 @@
           <% if user_has_access?  %>            
             <li>
               <%= link_to tote_items_path do %>
-                <% if (num_tote_objects = num_tote_objects(current_user)) > 0 %>
-                  <span class="glyphicon glyphicon-shopping-cart"></span> Tote (<%= num_tote_objects.to_s %>)
-                <% else %>
-                  <span class="glyphicon glyphicon-shopping-cart"></span> Tote
-                <% end %>
+                
+                <%
+                  unauthorized_items = unauthorized_items_for(current_user)
+                  if unauthorized_items.nil? || (num_tote_items = unauthorized_items.count) == 0
+                    num_items_string = ""
+                  else
+                    num_items_string = "#{num_tote_items.to_s}"
+                  end
+                %>
+                <span class="glyphicon glyphicon-shopping-cart"></span><span class="header-object-count"><%= num_items_string %></span>
+
+                <%
+                  unauthorized_subscriptions = get_active_subscriptions_by_authorization_state(current_user)[:unauthorized]
+                  if unauthorized_subscriptions && (num_unauthorized_subscriptions = unauthorized_subscriptions.count) > 0
+                %>
+                    <span> <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span><span class="header-object-count"><%= num_unauthorized_subscriptions.to_s %></span></span>
+                  <% end %>
+
+                <span> Tote</span>
+                              
               <% end %>
             </li>
             <li>
