@@ -2,13 +2,13 @@ module ToteItemsHelper
 
   def num_order_objects(user)
     tote_items = authorized_items_for(user)
-    subscriptions = get_active_subscriptions_by_authorization_state(user)[:authorized]
+    subscriptions = get_active_subscriptions_by_authorization_state(user, include_paused_subscriptions = false)[:authorized]
     return total_num_objects(tote_items, subscriptions)
   end
 
   def num_tote_objects(user)
     tote_items = unauthorized_items_for(user)
-    subscriptions = get_active_subscriptions_by_authorization_state(user)[:unauthorized]
+    subscriptions = get_active_subscriptions_by_authorization_state(user, include_paused_subscriptions = true)[:unauthorized]
     return total_num_objects(tote_items, subscriptions)
   end
 
@@ -76,13 +76,13 @@ module ToteItemsHelper
     return authorized_items_for(user).or(unauthorized_items_for(user))
   end
 
-  def get_active_subscriptions_by_authorization_state(user)
+  def get_active_subscriptions_by_authorization_state(user, include_paused_subscriptions = true)
 
     if user.nil? || !user.valid?
       return {}
     end
 
-    active_subscriptions = get_active_subscriptions_for(user)
+    active_subscriptions = get_active_subscriptions_for(user, include_paused_subscriptions)
 
     if active_subscriptions.nil?
       return {}
@@ -123,13 +123,17 @@ module ToteItemsHelper
     /^http/i.match(url) ? url : "http://#{url}"
   end  
 
-  def get_active_subscriptions_for(user)
+  def get_active_subscriptions_for(user, include_paused_subscriptions = true)
 
     if user.nil?
       return nil
     end
 
-    return Subscription.where(user: user, on: true)
+    if include_paused_subscriptions
+      return Subscription.where(user: user, on: true)
+    else
+      return Subscription.where(user: user, on: true, paused: false)
+    end    
     
   end
 

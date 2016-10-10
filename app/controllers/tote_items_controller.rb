@@ -26,7 +26,7 @@ class ToteItemsController < ApplicationController
     if params[:orders]
       #user wants to see their orders      
       @tote_items = authorized_items_for(current_user)
-      @subscriptions = get_active_subscriptions_by_authorization_state(current_user)[:authorized]
+      @subscriptions = get_active_subscriptions_by_authorization_state(current_user, include_paused_subscriptions = false)[:authorized]
       template = 'tote_items/orders'      
     else
       #user wants to see their shopping tote
