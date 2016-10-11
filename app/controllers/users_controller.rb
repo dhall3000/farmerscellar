@@ -29,6 +29,8 @@ class UsersController < ApplicationController
       @postings = Posting.where(user_id: @user.id).order(delivery_date: :desc, id: :desc)
     end
 
+    @recent_pickups = @user.pickups.order(created_at: :desc).limit(10)
+
   end
 
   def create    
