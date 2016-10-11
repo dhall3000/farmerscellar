@@ -55,7 +55,7 @@ Rails.application.routes.draw do
   resources :dropsites
   resources :user_dropsites, only: [:create]
   resources :deliveries
-  resources :pickups, only: [:new, :create]
+  resources :pickups, only: [:new, :create, :index]
 
   #THIS MUST BE THE LAST THING IN THIS ROUTES FILE. it's for catching bad paths and redirecting to root  
   get '*path' => redirect('/')

@@ -1,0 +1,27 @@
+<% provide(:title, "Pickups") %>
+<h1>Pickups</h1>
+
+<div class="row">
+  <div class="col-xs-12 col-sm-offset-3 col-sm-6">
+  	<table class="table">
+  		<thead>
+  			<tr>
+  				<th>Datetime</th>
+  				<th>ID</th>
+  				<th>Email</th>
+  				<th>Name</th>
+  			</tr>
+  		</thead>
+  		<tbody>
+	    	<% @pickups.each do |pickup| %>
+					<tr>
+						<td><%= pickup.created_at.strftime("%A %B %d, %Y at %l:%M %p") %></td>
+						<td><%= pickup.user.id.to_s %></td>
+						<td><%= pickup.user.email %></td>
+						<td><%= pickup.user.name %></td>
+					</tr>
+	    	<% end %>		        	  			
+  		</tbody>
+    </table>
+  </div>
+</div>

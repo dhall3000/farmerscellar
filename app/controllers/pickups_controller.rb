@@ -1,7 +1,12 @@
 class PickupsController < ApplicationController
-	before_action :redirect_to_root_if_user_not_dropsite_user
+	before_action :redirect_to_root_if_user_not_dropsite_user, only: [:log_out_dropsite_user, :new, :create, :toggle_garage_door]
+  before_action :redirect_to_root_if_user_not_admin, only: [:index]
 
   @@mockup_mode = false
+
+  def index
+    @pickups = Pickup.order(created_at: :desc).limit(50)
+  end
 
   def log_out_dropsite_user
     log_out
