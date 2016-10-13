@@ -256,6 +256,13 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
       subscription = assigns(:subscription)
       assert subscription.valid?
 
+      if tote_item.reload.additional_units_required_to_fill_my_case == 0
+        assert_redirected_to postings_path
+      else
+        assert_equal "Subscription created but needs attention. See below.", flash[:danger]
+        assert_redirected_to tote_items_pout_path(id: tote_item.id)        
+      end
+
     else
 
       if additional_units_required_to_fill_my_case == 0

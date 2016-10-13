@@ -3,6 +3,37 @@ require 'integration_helper'
 
 class CaseTechTest < IntegrationHelper
 
+  test "should show pout page if subscription first tote item will not fill" do
+    nuke_all_postings
+
+    delivery_date = get_delivery_date(days_from_now = 10)
+    if (delivery_date - 1.day).sunday?
+      delivery_date += 1.day
+    end
+    commitment_zone_start = delivery_date - 2.days
+
+    distributor = create_producer("distributor", "distributor@d.com", "WA", 98033, "www.distributor.com", "Distributor Inc.")
+    distributor.settings.update(conditional_payment: false)
+    distributor.create_business_interface(name: "Distributor Inc.", order_email_accepted: true, order_email: distributor.email, paypal_accepted: true, paypal_email: distributor.email)
+
+    producer1 = create_producer("producer1", "producer1@p.com", "WA", 98033, "www.producer1.com", "producer1 farms")
+    producer1.distributor = distributor    
+    producer1.save
+    
+    create_commission(producer1, products(:apples), units(:pound), 0.05)
+    posting1 = create_recurring_posting(producer1, 1.00, products(:apples), units(:pound), delivery_date, commitment_zone_start, units_per_case = 10, frequency = 1)
+
+    bob = create_user("bob", "bob@b.com", 98033)
+    
+    ti1_bob = add_tote_item(bob, posting1, 2, subscription_frequency = 1)
+
+    create_rt_authorization_for_customer(bob)
+  end
+
+  test "should show pout page if subscription first tote item will only partially fill" do
+
+  end
+
   test "should pay producer proper amount if partial fills exist" do
     #we're going to create a posting whose case size is 10 and then have a single customer
     #add/auth a single tote item of quantity 13. this should trigger an order to the producer of a 

@@ -60,10 +60,15 @@ class SubscriptionsController < ApplicationController
       @subscription.tote_items << @tote_item
       @subscription.save
 
-      flash[:success] = "Subscription created"
-      redirect_to postings_path
-
-      return
+      if @tote_item.additional_units_required_to_fill_my_case == 0
+        flash[:success] = "Subscription created"
+        redirect_to postings_path
+        return
+      else
+        flash[:danger] = "Subscription created but needs attention. See below."
+        redirect_to tote_items_pout_path(id: @tote_item.id)
+        return        
+      end        
 
     else
       AdminNotificationMailer.general_message("Subscription failed to create", @subscription.to_yaml).deliver_now
