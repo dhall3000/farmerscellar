@@ -15,7 +15,6 @@
 
     <div class="collapse navbar-collapse" id="collapsible-navbar">    
       <ul class="nav navbar-nav navbar-right">        
-        <li><%= link_to "Home", root_path %></li>
         <li><%= link_to "Shop", postings_path %></li>
         <% if logged_in? %>          
           <% if user_has_access?  %>            

@@ -1,5 +1,8 @@
 class StaticPagesController < ApplicationController
   before_action :redirect_to_root_if_user_not_admin, only: [:test_page, :test_exception, :toggle_garage_door]
+
+  def news
+  end
   
   def home
     @website_settings = WebsiteSetting.order("website_settings.id").last
