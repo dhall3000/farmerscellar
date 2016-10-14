@@ -269,7 +269,13 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
         assert_equal "Item added to tote.", flash[:success]
         assert_redirected_to postings_path
       else
-        assert_equal "Tote item created but currently won't ship. See below.", flash[:danger]
+        
+        if tote_item.will_partially_fill?
+          assert_equal "Tote item created but currently will only partially ship. See below.", flash[:danger]
+        else
+          assert_equal "Tote item created but currently won't ship. See below.", flash[:danger]
+        end
+          
         assert_redirected_to tote_items_pout_path(id: tote_item.id)    
       end
 

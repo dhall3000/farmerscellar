@@ -143,6 +143,48 @@ class PostingsTest < ActionDispatch::IntegrationTest
 
   end
 
+  test "will partially fill should really work" do
+
+    #months after implementing I've become skeptical that ToteItem.will_partially_fill? really works
+    #create a posting with units per case = 10
+    #have 1st customer authorize for quantity 5
+    #then have 2nd customer add for quantity 10
+    #verify will partially fill reports true
+
+    posting = create_standard_posting
+    c1_quantity = 5
+    c2_quantity = 10
+    expected_additional_units_required_to_fill_my_case = 5
+    
+    #create an authorized tote item for c1 with quantity 5
+    c1 = users(:c1)
+    ti = ToteItem.new(quantity: c1_quantity, posting_id: posting.id, state: ToteItem.states[:ADDED], price: posting.price, user_id: c1.id)    
+    assert ti.save
+    ti.transition(:customer_authorized)
+
+    #log in as c2
+    c2 = users(:c2)
+    log_in_as(c2)
+    #add tote item with quantity 10
+    post tote_items_path, params: {tote_item: {quantity: c2_quantity, posting_id: posting.id}}
+    tote_item = assigns(:tote_item)
+
+    #the case size is 10. c1 added 5 units and c2 just added 10. this is a total of 15 which means the 
+    #additional_units_required_to_fill_my_case should be 5
+    assert_equal expected_additional_units_required_to_fill_my_case, tote_item.additional_units_required_to_fill_my_case
+
+    assert_response :redirect
+    follow_redirect!
+    assert_template 'tote_items/pout'
+
+    assert_not flash.empty?
+    assert_equal "Tote item created but currently will only partially ship. See below.", flash[:danger]
+
+    assert tote_item.will_partially_fill?
+    assert_equal expected_additional_units_required_to_fill_my_case, tote_item.expected_fill_quantity
+
+  end
+
   test "user 1 should see pout page then user 2 auths to fill case so user 1 should no longer see pout" do
 
     #c1 auths. then c2 adds above current case in to the next case. verify c1 now no longer sees pout page.
@@ -273,7 +315,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
     assert_template 'tote_items/pout'
 
     assert_not flash.empty?
-    assert_equal "Tote item created but currently won't ship. See below.", flash[:danger]
+    assert_equal "Tote item created but currently will only partially ship. See below.", flash[:danger]
 
     return posting
 
