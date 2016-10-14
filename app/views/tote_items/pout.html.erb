@@ -7,7 +7,7 @@
 
         <div class="panel panel-default">
           <div class="panel-heading" role="tab">
-            <h4 class="panel-title">Explanation</h4>
+            <h4 class="panel-title">Attention</h4>
           </div>
           <div class="panel-body" role="tabpanel">
 
@@ -23,7 +23,21 @@
                 <span class="alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Additional <%= "unit".pluralize(@additional_units_required_to_fill_my_case) %> required to<%= fully%> ship:  <%= @additional_units_required_to_fill_my_case.to_s %>
               </p>
 
-              <p>The case that your items are in is not yet full. You can help fill it by recruiting your community or ordering more yourself.</p>
+              <%
+                if @tote_item.subscription
+                  subscription_text = " for the next delivery"
+                else
+                  subscription_text = ""
+                end
+              %>
+
+              <p>The case that your item is in<%= subscription_text %> is not yet full. You can:</p>
+
+              <ol>
+                <li>Leave this order alone (other customer orders may cause it to<%= fully%> ship)</li>
+                <li>Order more yourself</li>
+                <li>Recruit community</li>                
+              </ol>
 
             <% end %>
 
