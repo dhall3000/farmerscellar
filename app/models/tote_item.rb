@@ -33,6 +33,10 @@ class ToteItem < ApplicationRecord
   validates :state, inclusion: { in: ToteItem.states.values }
   validates :state, numericality: {only_integer: true}
 
+  def cancelable?
+    return state?(:ADDED) || state?(:AUTHORIZED)
+  end
+
   def additional_units_required_to_fill_my_case(include_this_item = true)
     return posting.additional_units_required_to_fill_items_case(self, include_this_item)
   end

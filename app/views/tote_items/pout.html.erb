@@ -9,7 +9,11 @@
 
         <div class="panel panel-default">
           <div class="panel-heading" role="tab">
-            <h4 class="panel-title">Attention</h4>
+            <% if @tote_item.cancelable? %>
+              <h4 class="panel-title">Attention</h4>
+            <% else %>
+              <h4 class="panel-title">For your information...</h4>
+            <% end %>            
           </div>
           <div class="panel-body" role="tabpanel">
 
@@ -42,21 +46,26 @@
                       <li><%= "Currently only #{@expected_fill_quantity.to_s} of the #{@tote_item.quantity.to_s} " %><%= "unit".pluralize(@additional_units_required_to_fill_my_case) + " ordered are set to ship" %></li>
                     <% end %>
                     <li>Reason: the case that your order will ship in<%= subscription_text %> is not yet full</li>
-                    <li><%= @additional_units_required_to_fill_my_case.to_s %> more <%= "unit".pluralize(@additional_units_required_to_fill_my_case) %> required to fill this case<%= subscription_text %></li>                    
+                    <% if @tote_item.cancelable? %>
+                      <li><%= @additional_units_required_to_fill_my_case.to_s %> more <%= "unit".pluralize(@additional_units_required_to_fill_my_case) %> required to fill this case<%= subscription_text %></li>                    
+                    <% end %>
                     <% if @tote_item.subscription %>
                       <li>This notice does not apply to subsequent deliveries</li>
                     <% end %>
                   </ul>
                 </li>
 
-                <li class="list-group-item">
-                  <h5>Resolution</h5>
-                  <ul>
-                    <li>Leave this order alone (other customer orders may fill this case, causing your order to<%= fully%> ship)</li>
-                    <li>Order more yourself</li>
-                    <li>Recruit community</li>                
-                  </ul>
-                </li>
+
+                <% if @tote_item.cancelable? %>
+                  <li class="list-group-item">
+                    <h5>Resolution</h5>
+                    <ul>
+                      <li>Leave this order alone (other customer orders may fill this case, causing your order to<%= fully%> ship)</li>
+                      <li>Order more yourself</li>
+                      <li>Recruit community</li>                
+                    </ul>
+                  </li>
+                <% end %>
 
               </ul>
 
@@ -66,35 +75,38 @@
         </div>
 
 
+        <% if @tote_item.cancelable? %>
+          <div class="panel panel-default">
+            <div class="panel-heading" role="tab">
+              <h4 class="panel-title">Recruit Community</h4>
+            </div>
+            <div class="panel-body" role="tabpanel">
 
-        <div class="panel panel-default">
-          <div class="panel-heading" role="tab">
-            <h4 class="panel-title">Recruit Community</h4>
+  						<div
+  						  class="fb-like"						  
+  				  		data-href=<%= new_tote_item_url(posting_id: @posting.id) %>
+  				  		data-share="true"
+  				  		data-width="200"
+  				  		data-size="large"
+  						  data-show-faces="true">
+  						</div>
+                          
+            </div>
           </div>
-          <div class="panel-body" role="tabpanel">
+        <% end %>
 
-						<div
-						  class="fb-like"						  
-				  		data-href=<%= new_tote_item_url(posting_id: @posting.id) %>
-				  		data-share="true"
-				  		data-width="200"
-				  		data-size="large"
-						  data-show-faces="true">
-						</div>
-                        
+
+
+        <% if @tote_item.cancelable? %>
+          <div class="panel panel-default">
+            <div class="panel-heading" role="tab">
+              <h4 class="panel-title">Order more <%= User.find_by(id: @posting.user_id).farm_name %> <%= Product.find_by(id: @posting.product_id).name %></h4>
+            </div>
+            <div id="quantityBody" class="panel-body" role="tabpanel">
+            	<%= render partial: "add_quantity", locals: { tote_item: ToteItem.new, posting: @posting, account_on_hold: @account_on_hold } %>                        
+            </div>
           </div>
-        </div>
-
-
-
-        <div class="panel panel-default">
-          <div class="panel-heading" role="tab">
-            <h4 class="panel-title">Order more <%= User.find_by(id: @posting.user_id).farm_name %> <%= Product.find_by(id: @posting.product_id).name %></h4>
-          </div>
-          <div id="quantityBody" class="panel-body" role="tabpanel">
-          	<%= render partial: "add_quantity", locals: { tote_item: ToteItem.new, posting: @posting, account_on_hold: @account_on_hold } %>                        
-          </div>
-        </div>
+        <% end %>
 
 
     </div>
