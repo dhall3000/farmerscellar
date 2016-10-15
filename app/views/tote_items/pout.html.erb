@@ -3,7 +3,10 @@
 <div class="row">
   <div class="col-xs-12 col-md-4 col-md-offset-4">
 
-    <%= link_to "continue shopping", postings_path, class: "fat-finger-spacing" %>
+    <% if !@back_link.nil? && !@back_link_text.nil? %>
+      <%= link_to @back_link_text, @back_link, class: "fat-finger-spacing" %>
+    <% end %>
+    
     <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 
 

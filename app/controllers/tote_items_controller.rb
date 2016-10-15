@@ -144,6 +144,20 @@ class ToteItemsController < ApplicationController
     end
 
     @account_on_hold = account_on_hold
+    @back_link = request.referer
+
+    case request.referer
+    when new_tote_item_url(posting_id: @tote_item.posting.id.to_s)
+      @back_link = postings_path
+      @back_link_text = "continue shopping"
+    when tote_items_url
+      @back_link_text = "shopping tote"
+    when tote_items_url(orders: true)
+      @back_link_text = "current orders"
+    else
+      @back_link = nil
+      @back_link_text = nil
+    end
 
   end
 
