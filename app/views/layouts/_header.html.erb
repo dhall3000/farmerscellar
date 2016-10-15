@@ -43,12 +43,21 @@
               <% end %>
             </li>
             <li>
-              <%= link_to tote_items_path(orders: true) do %>
-                <% if (num_order_objects = num_order_objects(current_user)) > 0 %>
-                  Orders (<%= num_order_objects.to_s %>)
-                <% else %>
-                  Orders
-                <% end %>
+
+              <%= link_to tote_items_path(orders: true) do %>                
+
+                <%
+                  num_order_objects = num_order_objects(current_user)
+                  if num_order_objects.nil? || num_order_objects == 0
+                    num_order_objects = ""
+                  else
+                    num_order_objects= "#{num_order_objects.to_s}"
+                  end
+                %>
+
+                <span class="glyphicon glyphicon glyphicon-list-alt"></span><span class="header-object-count"> <%= num_order_objects %></span>
+                <span> Orders</span>
+
               <% end %>
             </li>
           <% end %>
