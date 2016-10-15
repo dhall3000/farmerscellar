@@ -4,7 +4,7 @@ class AuthorizationsController < ApplicationController
   def new
 
     @tote_items = unauthorized_items_for(current_user)
-    
+
     if @tote_items.count < 1
       return
     end
@@ -68,9 +68,19 @@ class AuthorizationsController < ApplicationController
       if @authorization_succeeded && @authorization.checkouts.order("checkouts.id").last.tote_items.any?        
         flash.now[:success] = "Checkout successful"
         @tote_items = unauthorized_items_for(current_user).to_a
+
         @authorization.checkouts.order("checkouts.id").last.tote_items.where(state: ToteItem.states[:ADDED]).each do |tote_item|
           tote_item.transition(:customer_authorized)
         end
+
+        #2016-10-15
+        #next we display the 'checkout confirmation' page along with a list of the items just having gotten checked out. if we don't reload them
+        #here their state will be ADDED when it should be AUTHORIZED. the only consequence of this i'm aware of is that if you have a partially filling
+        #item when you expand the expansion row to get more info it reports "this item won't ship" when it should say "this item will only partially ship"
+        @tote_items.each do |ti|
+          ti.reload
+        end
+
         @items_total_gross = get_gross_tote(@tote_items)
         @authorization.update(amount: @items_total_gross)
         current_user.send_authorization_receipt(@authorization)

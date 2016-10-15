@@ -1,9 +1,6 @@
 require 'test_helper'
 
 class ToteItemTest < ActiveSupport::TestCase
-  # test "the truth" do
-  #   assert true
-  # end
 
   def setup
   	@tote_item = tote_items(:c1apple)
@@ -73,6 +70,39 @@ class ToteItemTest < ActiveSupport::TestCase
     @tote_item.quantity_filled = expected_quantity
     expected_payment_processor_fee_item = 0.40
     assert_equal expected_payment_processor_fee_item, get_payment_processor_fee_item(@tote_item, filled = true)
+
+  end
+
+  test "partial shipping added item should still report partial ship after authorization" do
+
+    assert_equal 0, @posting.tote_items.count
+
+    #three merry shoppers come along and add+auth a total of quantity 6
+    c1 = users(:c1)
+    ti = create_tote_item(c1, @posting, 3, authorize = true)
+    assert_equal 7, ti.additional_units_required_to_fill_my_case
+
+    c2 = users(:c2)
+    ti = create_tote_item(c2, @posting, 1, authorize = true)
+    assert_equal 6, ti.additional_units_required_to_fill_my_case
+
+    c3 = users(:c3)
+    ti = create_tote_item(c3, @posting, 2, authorize = true)
+    assert_equal 4, ti.additional_units_required_to_fill_my_case
+
+    #then c4 comes along and adds 5. this fills the first case with quantity 1 left over for the 2nd case
+    c4 = users(:c4)
+    ti = create_tote_item(c4, @posting, 5, authorize = false)
+    #consequently, we should report '9' remaining to fill the 2nd case
+    assert_equal 9, ti.additional_units_required_to_fill_my_case
+    #and if nothing changes, this item will partially fill
+    assert ti.will_partially_fill?
+    #now c4 authorizes...
+    ti.transition(:customer_authorized)
+    ti.reload
+    assert ti.state?(:AUTHORIZED)
+    #and if nothing changes, this item should still report will partially fill
+    assert ti.will_partially_fill?
 
   end
 

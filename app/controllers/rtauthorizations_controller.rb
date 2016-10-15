@@ -122,6 +122,14 @@ class RtauthorizationsController < ApplicationController
       @rtauthorization.authorize_items_and_subscriptions(@all_tote_items, @all_subscriptions)
     end
 
+    #2016-10-15
+    #next we display the 'checkout confirmation' page along with a list of the items just having gotten checked out. if we don't reload them
+    #here their state will be ADDED when it should be AUTHORIZED. the only consequence of this i'm aware of is that if you have a partially filling
+    #item when you expand the expansion row to get more info it reports "this item won't ship" when it should say "this item will only partially ship"
+    @tote_items.each do |ti|
+      ti.reload
+    end
+
 		if @rtauthorization.save
 			UserMailer.authorization_receipt(current_user, @rtauthorization, @tote_items, @subscriptions).deliver_now			
 		else
