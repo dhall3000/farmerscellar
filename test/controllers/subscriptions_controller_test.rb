@@ -21,7 +21,7 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
     @c1.reload
     assert_equal subscription_count + 1, @c1.subscriptions.count
     assert_not flash.empty?
-    assert_equal "Subscription created", flash.now[:success]
+    assert_equal "Subscription added", flash.now[:success]
     subscription = assigns(:subscription)
     assert_equal 1, subscription.tote_items.count
     assert_equal @c1.id, subscription.tote_items.last.user.id
@@ -38,7 +38,7 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :redirect    
     assert_redirected_to postings_path
     assert_not flash.empty?
-    assert_equal "Tote item created", flash[:success]
+    assert_equal "Tote item added", flash[:success]
     @c1.reload
     assert_equal subscription_count, @c1.subscriptions.count
   end

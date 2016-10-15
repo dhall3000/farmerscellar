@@ -571,7 +571,8 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     #verify the third is AUTHORIZED
     assert subscription.tote_items.third.state?(:AUTHORIZED)
     #verify 2 week spacing between fills
-    assert_equal 14.days, subscription.tote_items.third.posting.delivery_date - subscription.tote_items.second.posting.delivery_date
+    gap = subscription.tote_items.third.posting.delivery_date - subscription.tote_items.second.posting.delivery_date    
+    assert_equal distance_of_time_in_words(14.days), distance_of_time_in_words(gap)
 
     travel_back
 
@@ -931,7 +932,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     assert_equal ToteItem.states[:REMOVED], subscription.tote_items[1].state
     assert_equal ToteItem.states[:COMMITTED], subscription.tote_items[2].state
     gap = subscription.tote_items[2].posting.delivery_date - subscription.tote_items[0].posting.delivery_date    
-    assert_equal 14.days, gap
+    assert_equal distance_of_time_in_words(14.days), distance_of_time_in_words(gap)
     
     gap = subscription.tote_items[3].posting.delivery_date - subscription.tote_items[2].posting.delivery_date
     assert_equal distance_of_time_in_words(7.days), distance_of_time_in_words(gap)

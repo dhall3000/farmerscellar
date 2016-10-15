@@ -178,7 +178,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
     assert_template 'tote_items/pout'
 
     assert_not flash.empty?
-    assert_equal "Tote item created but currently will only partially ship. See below.", flash[:danger]
+    assert_equal "Item added to tote but attention needed. See below.", flash[:danger]
 
     assert tote_item.will_partially_fill?
     assert_equal expected_additional_units_required_to_fill_my_case, tote_item.expected_fill_quantity
@@ -220,7 +220,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_template 'tote_items/pout'
     assert_not flash.empty?
-    assert_equal "Tote item created but currently will only partially ship. See below.", flash[:danger]
+    assert_equal "Item added to tote but attention needed. See below.", flash[:danger]
 
     #now authorize
     tote_item.transition(:customer_authorized)
@@ -315,7 +315,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
     assert_template 'tote_items/pout'
 
     assert_not flash.empty?
-    assert_equal "Tote item created but currently will only partially ship. See below.", flash[:danger]
+    assert_equal "Item added to tote but attention needed. See below.", flash[:danger]
 
     return posting
 

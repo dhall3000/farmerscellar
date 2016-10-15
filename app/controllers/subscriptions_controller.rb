@@ -34,22 +34,13 @@ class SubscriptionsController < ApplicationController
     if frequency == 0
 
       if @tote_item.additional_units_required_to_fill_my_case == 0
-        flash[:success] = "Tote item created"
+        flash[:success] = "Tote item added"
         redirect_to postings_path
         return
       else
-
-        if @tote_item.will_partially_fill?
-          flash_message = "Tote item created but currently will only partially ship. See below."
-        else
-          flash_message = "Tote item created but currently won't ship. See below."
-        end
-
-        flash[:danger] = flash_message        
+        flash[:danger] = "Item added to tote but attention needed. See below."
         redirect_to tote_items_pout_path(id: @tote_item.id)
-
         return
-
       end
 
     end
@@ -61,18 +52,18 @@ class SubscriptionsController < ApplicationController
       @subscription.save
 
       if @tote_item.additional_units_required_to_fill_my_case == 0
-        flash[:success] = "Subscription created"
+        flash[:success] = "Subscription added"
         redirect_to postings_path
         return
       else
-        flash[:danger] = "Subscription created but needs attention. See below."
+        flash[:danger] = "Subscription added but needs attention. See below."
         redirect_to tote_items_pout_path(id: @tote_item.id)
         return        
       end        
 
     else
       AdminNotificationMailer.general_message("Subscription failed to create", @subscription.to_yaml).deliver_now
-      flash[:danger] = "Subscription not created"
+      flash[:danger] = "Subscription not added"
       redirect_to postings_path
       return
     end

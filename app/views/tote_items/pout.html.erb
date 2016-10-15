@@ -2,6 +2,8 @@
 
 <div class="row">
   <div class="col-xs-12 col-md-4 col-md-offset-4">
+
+    <%= link_to "continue shopping", postings_path, class: "fat-finger-spacing" %>
     <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 
 
@@ -13,16 +15,6 @@
 
             <% if @additional_units_required_to_fill_my_case > 0 %>              
 
-              <% if @will_partially_fill %>
-                <% fully = " fully" %>
-              <% else %>
-                <% fully = "" %>
-              <% end %>              
-
-              <p class="alert alert-danger">
-                <span class="alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Additional <%= "unit".pluralize(@additional_units_required_to_fill_my_case) %> required to<%= fully%> ship:  <%= @additional_units_required_to_fill_my_case.to_s %>
-              </p>
-
               <%
                 if @tote_item.subscription
                   subscription_text = " for the next delivery"
@@ -31,13 +23,42 @@
                 end
               %>
 
-              <p>The case that your item is in<%= subscription_text %> is not yet full. You can:</p>
+              <p class="alert alert-danger"><span class="alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                <% if @will_partially_fill %>                
+                  <span> Currently this order will only partially ship<%= subscription_text %></span>
+                  <% fully = " fully" %>
+                <% else %>
+                  <span> Currently this order will not ship<%= subscription_text %></span>
+                  <% fully = "" %>
+                <% end %>              
+              </p>
 
-              <ol>
-                <li>Leave this order alone (other customer orders may cause it to<%= fully%> ship)</li>
-                <li>Order more yourself</li>
-                <li>Recruit community</li>                
-              </ol>
+              <ul class="list-group">
+
+                <li class="list-group-item">
+                  <h5>Details</h5>
+                  <ul>
+                    <% if @will_partially_fill %>                    
+                      <li><%= "Currently only #{@expected_fill_quantity.to_s} of the #{@tote_item.quantity.to_s} " %><%= "unit".pluralize(@additional_units_required_to_fill_my_case) + " ordered are set to ship" %></li>
+                    <% end %>
+                    <li>Reason: the case that your order will ship in<%= subscription_text %> is not yet full</li>
+                    <li><%= @additional_units_required_to_fill_my_case.to_s %> more <%= "unit".pluralize(@additional_units_required_to_fill_my_case) %> required to fill this case<%= subscription_text %></li>                    
+                    <% if @tote_item.subscription %>
+                      <li>This notice does not apply to subsequent deliveries</li>
+                    <% end %>
+                  </ul>
+                </li>
+
+                <li class="list-group-item">
+                  <h5>Resolution</h5>
+                  <ul>
+                    <li>Leave this order alone (other customer orders may fill this case, causing your order to<%= fully%> ship)</li>
+                    <li>Order more yourself</li>
+                    <li>Recruit community</li>                
+                  </ul>
+                </li>
+
+              </ul>
 
             <% end %>
 

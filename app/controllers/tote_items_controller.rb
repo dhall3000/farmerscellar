@@ -100,18 +100,9 @@ class ToteItemsController < ApplicationController
           redirect_to postings_path
           return
         else
-
-          if @tote_item.will_partially_fill?
-            flash_message = "Tote item created but currently will only partially ship. See below."
-          else
-            flash_message = "Tote item created but currently won't ship. See below."
-          end
-
-          flash[:danger] = flash_message
+          flash[:danger] = "Item added to tote but attention needed. See below."
           redirect_to tote_items_pout_path(id: @tote_item.id)
-          
           return
-
         end
         
       end
@@ -143,6 +134,7 @@ class ToteItemsController < ApplicationController
     @posting = @tote_item.posting
     @additional_units_required_to_fill_my_case = @tote_item.additional_units_required_to_fill_my_case
     @will_partially_fill = @tote_item.will_partially_fill?
+    @expected_fill_quantity = @tote_item.expected_fill_quantity
 
     if @additional_units_required_to_fill_my_case < 1
       AdminNotificationMailer.general_message("unknown problem. pout message action called but @additional_units_required_to_fill_my_case < 1", "user id #{current_user.id.to_s} should have seen the pout page. @tote_item.id #{@tote_item.id.to_s}. @additional_units_required_to_fill_my_case = #{@additional_units_required_to_fill_my_case.to_s}").deliver_now

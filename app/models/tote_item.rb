@@ -34,12 +34,13 @@ class ToteItem < ApplicationRecord
   validates :state, numericality: {only_integer: true}
 
   def additional_units_required_to_fill_my_case(include_this_item = true)
-    return posting.additional_units_required_to_fill_items_case(self)
+    return posting.additional_units_required_to_fill_items_case(self, include_this_item)
   end
 
   #this will tell you if the tote item is crossing a case boundary and hence will only partially fill of nothing changes
   def will_partially_fill?
-    return expected_fill_quantity < quantity    
+    efq = expected_fill_quantity
+    return efq > 0 && efq < quantity
   end
 
   def expected_fill_quantity
@@ -51,7 +52,8 @@ class ToteItem < ApplicationRecord
     #additional_units_required_to_fill_my_case > 0 then this item will partially fill if it's quantity is > than that needed to fill that prior case
 
     if additional_units_required_to_fill_my_case > 0 
-      if quantity > (additional_units_required_to_fill_my_case_prior_to_placing_order = additional_units_required_to_fill_my_case(include_this_item = false))
+      additional_units_required_to_fill_my_case_prior_to_placing_order = additional_units_required_to_fill_my_case(include_this_item = false)
+      if quantity > additional_units_required_to_fill_my_case_prior_to_placing_order
         #item's case is not all filled up but it spans a case boundary
         return additional_units_required_to_fill_my_case_prior_to_placing_order
       else
