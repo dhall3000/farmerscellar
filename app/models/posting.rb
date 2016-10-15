@@ -105,11 +105,13 @@ class Posting < ApplicationRecord
           #aren't expecting it. so we just boot the customer here so they can't authorize late.
           if !late_adds_allowed
             update(live: false)
-            tote_items.each do |tote_item|
-              if tote_item.state?(:ADDED)
-                tote_item.transition(:system_removed)                
-              end
-            end
+            tote_items.where(state: ToteItem.states[:ADDED]).each do |tote_item|
+              tote_item.transition(:system_removed)
+            end            
+          end
+
+          tote_items.where(state: ToteItem.states[:AUTHORIZED]).each do |tote_item|
+            tote_item.transition(:commitment_zone_started)
           end
 
           if !posting_recurrence.nil? && posting_recurrence.on

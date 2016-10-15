@@ -19,8 +19,7 @@ class RakeHelper
 
 		def self.roll_postings			
 		  transition_posting_ids = transition_open_postings
-		  transitioned_tote_item_ids = transition_tote_items_to_committed(transition_posting_ids)	  
-			send_orders_to_creditors(transition_posting_ids)		
+			send_orders_to_creditors(transition_posting_ids)
 		end
 
 		def self.send_pickup_deadline_reminders
@@ -131,46 +130,7 @@ class RakeHelper
 
 			return transitioned_postings.uniq
 
-		end
-
-		def self.transition_tote_items_to_committed(transitioned_postings)
-
-			puts "transition_tote_items_to_committed: start"
-
-			postings = Posting.where(id: transitioned_postings)
-
-			transitioned_tote_item_ids = []
-
-			postings.each do |posting|
-
-				puts "transition_tote_items_to_committed: now transitioning tote items to COMMITTED for posting id #{posting.id.to_s}"
-				
-				tote_items_to_transition = posting.tote_items.where(state: ToteItem.states[:AUTHORIZED])
-
-				if !tote_items_to_transition.any?
-					puts "transition_tote_items_to_committed: there are no tote items associated with posting id #{posting.id.to_s} that need to be transitioned to COMMITTED"
-				end
-
-				tote_items_to_transition.each do |tote_item_to_transition|
-
-					if tote_item_to_transition.posting.commitment_zone_start.nil?
-		      	next
-		    	end
-
-			    if Time.zone.now >= tote_item_to_transition.posting.commitment_zone_start
-			    	puts "transition_tote_items_to_committed: transitioning tote_item id #{tote_item_to_transition.id.to_s} to COMMITTED"
-					  tote_item_to_transition.transition(:commitment_zone_started)
-					  transitioned_tote_item_ids << tote_item_to_transition.id
-			    end
-				end
-
-			end
-
-			puts "transition_tote_items_to_committed: end"
-
-			return transitioned_tote_item_ids
-
-		end
+		end		
 
 		def self.send_orders_to_creditors(posting_ids)
 
