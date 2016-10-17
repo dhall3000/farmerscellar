@@ -171,7 +171,7 @@ class PurchaseReceivable < ApplicationRecord
       return nil
     end
 
-    return tote_item.posting.user.get_creditor
+    return tote_item.posting.get_creditor
 
   end
 

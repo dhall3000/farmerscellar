@@ -5,7 +5,7 @@ class ProducerNotificationsMailerPreview < ActionMailer::Preview
   def current_orders
   	postings = Posting.all
     ToteItem.all.update_all(state: ToteItem.states[:COMMITTED])
-  	creditor = postings.first.user.get_creditor
+  	creditor = postings.first.get_creditor
     ProducerNotificationsMailer.current_orders(creditor, postings)
   end
 
@@ -28,7 +28,7 @@ class ProducerNotificationsMailerPreview < ActionMailer::Preview
     ti2 = ToteItem.new(quantity: 3, posting: posting, user: user, price: posting.price, state: ToteItem.states[:COMMITTED])
     ti2.save
 
-    creditor = posting.user.get_creditor
+    creditor = posting.get_creditor
     ProducerNotificationsMailer.current_orders(creditor, [posting])
   end
 
@@ -63,7 +63,7 @@ class ProducerNotificationsMailerPreview < ActionMailer::Preview
     ti2 = ToteItem.new(quantity: 3, posting: posting2, user: user, price: posting2.price, state: ToteItem.states[:COMMITTED])
     ti2.save
 
-    creditor = posting1.user.get_creditor
+    creditor = posting1.get_creditor
     ProducerNotificationsMailer.current_orders(creditor, [posting1, posting2])
 
   end
@@ -108,7 +108,7 @@ class ProducerNotificationsMailerPreview < ActionMailer::Preview
     ti2 = ToteItem.new(quantity: 3, posting: posting3, user: user, price: posting3.price, state: ToteItem.states[:COMMITTED])
     ti2.save
 
-    creditor = posting1.user.get_creditor
+    creditor = posting1.get_creditor
     ProducerNotificationsMailer.current_orders(creditor, [posting1, posting2, posting3])
 
   end

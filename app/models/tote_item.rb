@@ -247,8 +247,8 @@ class ToteItem < ApplicationRecord
   #false if creditor is owed $ by FC the moment the tote item gets filled
   def conditional_payment?
 
-    if posting && posting.user && posting.user.get_creditor && posting.user.get_creditor.settings
-      return posting.user.get_creditor.settings.conditional_payment
+    if posting && posting.user && posting.get_creditor && posting.get_creditor.settings
+      return posting.get_creditor.settings.conditional_payment
     end
 
     return true

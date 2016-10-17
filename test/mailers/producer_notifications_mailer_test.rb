@@ -5,7 +5,7 @@ class ProducerNotificationsMailerTest < ActionMailer::TestCase
   	tote_items = ToteItem.all
   	tote_items.update_all(state: ToteItem.states[:COMMITTED])
   	ps = Posting.all
-    mail = ProducerNotificationsMailer.current_orders(ps.first.user.get_creditor, ps).deliver_now
+    mail = ProducerNotificationsMailer.current_orders(ps.first.get_creditor, ps).deliver_now
 
     assert_equal "Current orders for upcoming deliveries", mail.subject
     assert_equal [ps.first.user.email], mail.to

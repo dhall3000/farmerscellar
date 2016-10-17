@@ -48,7 +48,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     RakeHelper.do_hourly_tasks
 
     assert_equal 1, ActionMailer::Base.deliveries.count
-    verify_proper_order_submission_email(ActionMailer::Base.deliveries.last, posting.user.get_creditor, posting, num_units, units_per_case = "", number_of_cases = "")
+    verify_proper_order_submission_email(ActionMailer::Base.deliveries.last, posting.get_creditor, posting, num_units, units_per_case = "", number_of_cases = "")
 
     #do fill
     travel_to posting.delivery_date + 12.hours
@@ -117,7 +117,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     RakeHelper.do_hourly_tasks
 
     assert_equal 1, ActionMailer::Base.deliveries.count
-    verify_proper_order_submission_email(ActionMailer::Base.deliveries.last, posting.user.get_creditor, posting, num_units, units_per_case = "", number_of_cases = "")
+    verify_proper_order_submission_email(ActionMailer::Base.deliveries.last, posting.get_creditor, posting, num_units, units_per_case = "", number_of_cases = "")
 
     #do fill
     travel_to posting.delivery_date + 12.hours

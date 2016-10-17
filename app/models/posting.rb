@@ -22,6 +22,10 @@ class Posting < ApplicationRecord
 
   validates_presence_of :user, :product, :unit  
 
+  def get_creditor
+    return user.get_creditor
+  end
+
   def get_producer_net_unit
     producer_net_unit = price - commission_per_unit - ToteItemsController.helpers.get_payment_processor_fee_unit(price)
     return producer_net_unit.round(2)

@@ -33,7 +33,7 @@ class DistributorTest < BulkBuyer
 
     #assert that neither the distributor nor producer got emailed
     customer.tote_items.each do |tote_item|
-      assert_not_email_to(tote_item.posting.user.get_creditor.email)
+      assert_not_email_to(tote_item.posting.get_creditor.email)
     end
 
     travel_back
@@ -81,7 +81,7 @@ class DistributorTest < BulkBuyer
 
     #assert that neither the distributor nor producer got emailed
     customer.tote_items.each do |tote_item|
-      assert_not_email_to(tote_item.posting.user.get_creditor.email)
+      assert_not_email_to(tote_item.posting.get_creditor.email)
     end
 
     travel_back

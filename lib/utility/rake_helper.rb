@@ -146,7 +146,7 @@ class RakeHelper
 		  creditors = {}
 		  postings.each do |posting|
 
-		  	creditor = posting.user.get_creditor
+		  	creditor = posting.get_creditor
 
 		  	if !creditors.has_key?(creditor)
 		  		creditors[creditor] = []
