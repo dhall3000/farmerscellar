@@ -44,8 +44,27 @@ class Posting < ApplicationRecord
   end
 
   def get_producer_net_posting
-    num_units = [num_units_filled, num_units_orderable].max    
+
+    if state?(:CLOSED)
+      num_units = num_units_filled
+    else
+      num_units = num_units_orderable
+    end
+    
     return (num_units * get_producer_net_unit).round(2)
+
+  end
+
+  def get_gross_posting
+    
+    if state?(:CLOSED)
+      num_units = num_units_filled
+    else
+      num_units = num_units_orderable
+    end
+    
+    return (num_units * price).round(2)
+
   end
 
   def commission_per_unit
@@ -69,6 +88,20 @@ class Posting < ApplicationRecord
       return commission_factors.order(:created_at).last.commission
     end    
 
+  end
+
+  def gross_order_minimum
+
+    if order_minimum.nil?
+      return 0
+    end
+
+    return (order_minimum / (1.0 - (0.035 + get_commission_factor))).round(2)
+
+  end
+
+  def additional_gross_required_to_order
+    return [gross_order_minimum - get_gross_posting, 0].max
   end
 
   #OPEN means open for customers to place orders. but that's somewhat confusing because if late_adds_allowed then customer can place order even in the COMMITMENTZONE
@@ -198,10 +231,22 @@ class Posting < ApplicationRecord
       return false
     end
 
-    #posting order minimum (if any - rare) met? (currently not implemented)
+    if !order_minimum_met?
+      return false
+    end
 
     return true
     
+  end
+
+  def order_minimum_met?
+
+    if order_minimum.nil?
+      return true
+    end
+
+    return get_producer_net_posting > order_minimum
+
   end
 
   def packing_minimum_met?

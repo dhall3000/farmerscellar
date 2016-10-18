@@ -39,9 +39,21 @@ class BulkBuyer < Authorizer
     num_authorized = ToteItem.where(state: ToteItem.states[:AUTHORIZED]).count
 
     #now change all the tote_items from AUTHORIZED to COMMITTED
+    postings = {}
     ToteItem.where(state: ToteItem.states[:AUTHORIZED]).each do |tote_item|
-      tote_item.transition(:commitment_zone_started)
+      if !postings.has_key?(tote_item.posting)
+        postings[tote_item.posting] = true
+      end
     end
+
+    current_time = Time.zone.now
+
+    postings.each do |posting, val|
+      travel_to posting.commitment_zone_start
+      posting.transition(:commitment_zone_started)
+    end
+
+    travel_to current_time
 
     num_committed = ToteItem.where(state: ToteItem.states[:COMMITTED]).count
 

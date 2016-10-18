@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160916170430) do
+ActiveRecord::Schema.define(version: 20161018205207) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -300,6 +300,7 @@ ActiveRecord::Schema.define(version: 20160916170430) do
     t.string   "product_identifier"
     t.integer  "units_per_case",                default: 1
     t.string   "product_id_code"
+    t.float    "order_minimum"
     t.index ["commitment_zone_start"], name: "index_postings_on_commitment_zone_start"
     t.index ["posting_recurrence_id"], name: "index_postings_on_posting_recurrence_id"
     t.index ["product_id"], name: "index_postings_on_product_id"

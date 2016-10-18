@@ -33,6 +33,8 @@ class BulkPurchasesTest < BulkBuyer
     ricky_proceeds = (c1_charge_amount * (0.965)).round(2)
     assert_equal ricky_proceeds, bulk_payment.payment_payables[10].payments.first.amount
 
+    travel_back
+
   end
 
   def do_standard_payment(customers)
@@ -424,6 +426,20 @@ class BulkPurchasesTest < BulkBuyer
     FakeCaptureResponse.succeed = true
     customers = [@c3, @c4]
 
+
+
+
+    #MASSIVELY, MASSIVELY, MASSIVE HACK-A-BILLY
+    #this is an ancient test and totally hocus pocus. we're trying to do this back to back thing but we're using overlapping postings. what i mean is if you take
+    #customers c1 and c2 (as above) and move their associated toteitems/postings through the sequence (i.e. added, auth'd, committed, filled, paid etc) you're
+    #have several postings go through this process twice. doesn't work because once you get to this line of code, to go forward you need postings in
+    #their natural initial state....'0', aka OPEN. but many of them are CLOSED. so since the whole test is one big hack, hack it further. if this gets too
+    #much worse in the future might want to just rewrite the test.
+    Posting.where.not(state: Posting.states[:OPEN]).update_all(state: Posting.states[:OPEN])
+
+
+
+
     purchase_receivables = setup_bulk_purchase(customers)    
     num_prs_just_created = purchase_receivables.count
     post bulk_purchases_path, params: {purchase_receivables: purchase_receivables}
@@ -446,6 +462,8 @@ class BulkPurchasesTest < BulkBuyer
     post bulk_payments_path, params: {payment_info_by_creditor_id: payment_info_by_creditor_id}
     bulk_payment = assigns(:bulk_payment)
     assert_equal bulk_purchase.net, bulk_payment.total_payments_amount
+
+    travel_back
 
   end
 

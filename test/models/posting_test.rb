@@ -18,6 +18,44 @@ class PostingTest < ActiveSupport::TestCase
     @posting.save
   end
 
+  test "should submit order when posting value above order minimum" do
+    @posting.update(order_minimum: 100)
+    ti = ToteItem.new(quantity: 100, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: @user)
+    assert ti.save
+    ti.transition(:customer_authorized)
+    ti.transition(:commitment_zone_started)
+    assert_equal 1, @posting.tote_items.count
+    assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
+    assert @posting.include_in_order?    
+  end
+  
+  test "should not submit order when posting value below order minimum" do
+    @posting.update(order_minimum: 100)
+    ti = ToteItem.new(quantity: 1, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: @user)
+    assert ti.save
+    ti.transition(:customer_authorized)
+    ti.transition(:commitment_zone_started)
+    assert_equal 1, @posting.tote_items.count
+    assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
+    assert_not @posting.include_in_order?    
+  end
+
+  test "posting should properly report remaining order amount necessary" do
+    #the producer net order min is 100. this means the retail order min is > 100
+    @posting.update(order_minimum: 100)
+    assert @posting.gross_order_minimum > @posting.order_minimum    
+    ti = ToteItem.new(quantity: 1, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: @user)
+    assert ti.save
+    ti.transition(:customer_authorized)
+    ti.transition(:commitment_zone_started)
+    assert_equal 1, @posting.tote_items.count
+    assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
+    assert_not @posting.include_in_order?    
+    # $100 producer net order minimum equals ~$109 gross order min. a single unit worth gross $1.25 was ordered. so the amount it
+    #sould report as needed additional is ~ $109 - $1.25
+    assert_equal @posting.gross_order_minimum - @posting.price, @posting.additional_gross_required_to_order
+  end
+
   test "should not submit order when no quantity is authorized or committed" do
     assert_equal 0, @posting.tote_items.count
     ti = ToteItem.new(quantity: 1, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: @user)
