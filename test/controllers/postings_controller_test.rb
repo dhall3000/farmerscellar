@@ -98,7 +98,7 @@ class PostingsControllerTest < ActionDispatch::IntegrationTest
     #make this test to have COMMITTED toteitems of quantities like:
     #1,2,3,4,5,6,7 = 28
     #then recieve fill quantity 8 from producer so that the first 3 toteitems get fully filled
-    #but the 4th toteitem (quantity 4) doesn't get filled at all and there is quantity 2 left over
+    #but the 4th toteitem (quantity 4) gets partially filled
     fill(8)
   end
 
@@ -114,15 +114,10 @@ class PostingsControllerTest < ActionDispatch::IntegrationTest
     fill(0)
   end
 
-  test "should skip larger quantity tote items then fill a smaller quantity item" do
-    #we only fill a tote item completely or not at all. so as we're running through the queue if we come across
-    #a tote item we can't fill we shouldn't stop there. we should continue all the way through to the end of the
-    #queue as long as we have 'quantity_remaining' looking for a tote item of smaller quantity that we can
-    #completely fill. test that this works as expected.
-
+  test "should do a partial fill" do
     #make this test to have COMMITTED toteitems of quantities like:
     #1,2,3,4,2,6,7 = 25
-    #then recieve fill quantity 9 from producer so that items 1,2 & 3 get filled, then 5 is skipped, 2 is filled with 1 leftover
+    #then recieve fill quantity 9 from producer so that items 1,2 & 3 get filled and the 4th item gets partially filled
     
     ######################setup######################
     posting = postings(:postingf5apples)
@@ -131,6 +126,10 @@ class PostingsControllerTest < ActionDispatch::IntegrationTest
     ######################end setup######################
 
     fill(9)
+    assert_select 'p', "quantity remaining: 0", {count: 1}
+    assert_select 'span.alert.alert-danger', "num partially filled items: 1", {count: 1}
+    assert_select 'td span.alert.alert-danger', "3 of 4", {count: 1}
+    assert_select 'span.alert.alert-danger', "3 of 4", {count: 1}
 
   end
 

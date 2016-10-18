@@ -3,9 +3,12 @@
 	<p>Producer: <%= @posting.user.farm_name %></p>
 	<p>Product: <%= @posting.product.name %></p>
 	<p>Unit: <%= @posting.unit.name %></p>
-	<p>quantity filled: <%= @fill_report[:quantity_filled] %></p>
+	<p>quantity filled: <%= @fill_report[:quantity_filled] %></p>  
 	<p>quantity not filled: <%= @fill_report[:quantity_not_filled] %></p>
 	<p>quantity remaining: <%= @fill_report[:quantity_remaining] %></p>
+  <% if @fill_report[:partially_filled_tote_items] && @fill_report[:partially_filled_tote_items].count > 0 %>
+    <p><span class="alert alert-danger">num partially filled items: <%= @fill_report[:partially_filled_tote_items].count.to_s %></span></p>
+  <% end %>
 
   <div class="panel-group">
 
@@ -27,7 +30,11 @@
 			        <tr>
 			          <td><%= tote_item.user.id %></td>
 			          <td><%= tote_item.user.email %></td>          
-			          <td><%= tote_item.quantity %></td>
+                <% if tote_item.partially_filled? %>
+                  <td><span class="alert alert-danger"><%= "#{tote_item.quantity_filled.to_s} of #{tote_item.quantity.to_s}" %></span></td>
+                <% else %>
+                  <td><%= tote_item.quantity_filled.to_s %></td>
+                <% end %> 
 			        </tr>
 			      <% end %>
 			    </tbody>
@@ -53,8 +60,8 @@
 			      <% @fill_report[:tote_items_not_filled].each do |tote_item| %>
 			        <tr>
 			          <td><%= tote_item.user.id %></td>
-			          <td><%= tote_item.user.email %></td>          
-			          <td><%= tote_item.quantity %></td>
+			          <td><%= tote_item.user.email %></td>
+                <td><%= tote_item.quantity.to_s %></td>
 			        </tr>
 			      <% end %>
 			    </tbody>

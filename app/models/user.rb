@@ -138,12 +138,15 @@ class User < ApplicationRecord
 
   end
 
+  #hand a blob of postings that are right at their order cutoff. note this 'user' can be a creditor. so the 'blob' of postings
+  #could represent many producers
   def get_postings_orderable(postings_at_order_cutoff)
 
     if !account_type_is?(:PRODUCER)
       return nil
     end
 
+    #split out the postings by individual producer and store them here for later use
     postings_by_producer = {}
     postings_all = postings_at_order_cutoff
 
