@@ -55,6 +55,16 @@ class Posting < ApplicationRecord
 
   end
 
+  def outbound_order_value_producer_net
+    
+    if (inbound = inbound_order_value_producer_net) > order_minimum_producer_net
+      return inbound
+    else
+      return 0
+    end
+
+  end
+
   def commission_per_unit
     commission_factor = get_commission_factor
     commission_per_unit = (price * commission_factor).round(2)

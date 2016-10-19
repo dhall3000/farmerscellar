@@ -19,6 +19,250 @@ class PostingTest < ActiveSupport::TestCase
     @posting.save
   end
 
+  test "outbound order value producer net should report zero when inbound orders below order minimums 4" do
+    #OM > 2 cases
+    #this test has both an OM and uses cases. the OM < 1 case. play around at the limits and verify things are correct
+
+    #specify posting values    
+    @posting.update(order_minimum_producer_net: 25, units_per_case: 10, price: 1)
+
+    #verify order submitted if inbound units ordered == 31
+    #verify order not submitted if user removes quantity 2 such that inbound units ordered reduces to == 29
+
+    #posting has no items
+    assert_equal 0, @posting.tote_items.count
+    #u1 orders 29
+    u1 = create_user("u1", "u1@u.com")
+    assert u1.valid?
+    u1_ti1 = ToteItem.new(quantity: 29, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: u1)    
+    u1_ti1.save
+    u1_ti1.transition(:customer_authorized)
+    #verify minimums not met
+    assert_not @posting.requirements_met_to_send_order?
+    assert @posting.outbound_order_value_producer_net == 0
+    #new users orders 2. total will now be 31 .
+    u2 = create_user("u2", "u2@u.com")
+    assert u2.valid?
+    u2_ti1 = ToteItem.new(quantity: 2, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: u2)    
+    u2_ti1.save
+    u2_ti1.transition(:customer_authorized)
+    #verify order gets submitted now
+    assert @posting.requirements_met_to_send_order?
+    assert @posting.outbound_order_value_producer_net > 0
+    assert @posting.outbound_order_value_producer_net > @posting.order_minimum_producer_net
+    #u2 changes thier mind and cancels order
+    u2_ti1.transition(:customer_removed)
+    #verify order won't get submitted
+    assert_not @posting.requirements_met_to_send_order?
+    assert @posting.outbound_order_value_producer_net == 0
+
+  end
+
+  test "outbound order value producer net should report zero when inbound orders below order minimums 3" do
+    #OM > 2 cases
+    #this test has both an OM and uses cases. the OM < 1 case. play around at the limits and verify things are correct
+
+    #specify posting values    
+    @posting.update(order_minimum_producer_net: 25, units_per_case: 10, price: 1)
+
+    #verify order submitted if inbound units ordered == 31
+
+    #posting has no items
+    assert_equal 0, @posting.tote_items.count
+    #u1 orders 29
+    u1 = create_user("u1", "u1@u.com")
+    assert u1.valid?
+    u1_ti1 = ToteItem.new(quantity: 29, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: u1)    
+    u1_ti1.save
+    u1_ti1.transition(:customer_authorized)
+    #verify minimums not met
+    assert_not @posting.requirements_met_to_send_order?
+    assert @posting.outbound_order_value_producer_net == 0
+    #new users orders 2. total will now be 31 .
+    u2 = create_user("u2", "u2@u.com")
+    assert u2.valid?
+    u2_ti1 = ToteItem.new(quantity: 2, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: u2)    
+    u2_ti1.save
+    u2_ti1.transition(:customer_authorized)
+    #verify order gets submitted now
+    assert @posting.requirements_met_to_send_order?
+    assert @posting.outbound_order_value_producer_net > 0
+    assert @posting.outbound_order_value_producer_net > @posting.order_minimum_producer_net
+
+  end
+
+  test "outbound order value producer net should report zero when inbound orders below order minimums 2" do
+    #OM > 2 cases
+    #this test has both an OM and uses cases. the OM < 1 case. play around at the limits and verify things are correct
+
+    #specify posting values    
+    @posting.update(order_minimum_producer_net: 25, units_per_case: 10, price: 1)
+
+    #verify order not submitted if inbound units ordered == 26
+
+    #posting has no items
+    assert_equal 0, @posting.tote_items.count
+    #u1 orders 26
+    u1 = create_user("u1", "u1@u.com")
+    assert u1.valid?
+    u1_ti1 = ToteItem.new(quantity: 26, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: u1)    
+    u1_ti1.save
+    u1_ti1.transition(:customer_authorized)
+    #verify minimums not met
+    assert_not @posting.requirements_met_to_send_order?
+    assert @posting.outbound_order_value_producer_net == 0
+    
+  end
+
+  test "outbound order value producer net should report zero when inbound orders below order minimums" do
+    #OM > 2 cases
+    #this test has both an OM and uses cases. the OM < 1 case. play around at the limits and verify things are correct
+
+    #specify posting values    
+    @posting.update(order_minimum_producer_net: 25, units_per_case: 10, price: 1)
+
+    #verify order not submitted if inbound units ordered == 24
+
+    #posting has no items
+    assert_equal 0, @posting.tote_items.count
+    #u1 orders 24
+    u1 = create_user("u1", "u1@u.com")
+    assert u1.valid?
+    u1_ti1 = ToteItem.new(quantity: 24, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: u1)    
+    u1_ti1.save
+    u1_ti1.transition(:customer_authorized)
+    #verify minimums not met
+    assert_not @posting.requirements_met_to_send_order?
+    assert @posting.outbound_order_value_producer_net == 0
+    
+  end
+  
+  test "outbound order value producer net should report zero when user removes item 3" do
+    #OM < 1 case
+    #this test has both an OM and uses cases. the OM < 1 case. play around at the limits and verify things are correct
+
+    #specify posting values    
+    @posting.update(order_minimum_producer_net: 5, units_per_case: 10, price: 1)
+
+    #verify order not submitted if inbound units ordered == 9
+    #verify order submitted if inbound units ordered == 11
+    #verify order not submitted if user removes quantity 2 such that inbound units ordered returns to == 9
+
+    #posting has no items
+    assert_equal 0, @posting.tote_items.count
+    #u1 orders 9
+    u1 = create_user("u1", "u1@u.com")
+    assert u1.valid?
+    u1_ti1 = ToteItem.new(quantity: 9, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: u1)    
+    u1_ti1.save
+    u1_ti1.transition(:customer_authorized)
+    #verify minimums not met
+    assert_not @posting.requirements_met_to_send_order?
+    assert @posting.outbound_order_value_producer_net == 0
+    #u2 orders 2
+    u2 = create_user("u2", "u2@u.com")
+    assert u2.valid?
+    u2_ti1 = ToteItem.new(quantity: 2, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: u2)        
+    u2_ti1.save
+    u2_ti1.transition(:customer_authorized)
+    #verify order is submittable
+    assert @posting.requirements_met_to_send_order?
+    #verify outbound_order_value_producer_net > 0
+    assert @posting.outbound_order_value_producer_net > 0
+    #verify that the outbound order amount equals 1 case, even though there were inbound orders totaling slightly more than one case
+    assert_equal @posting.get_producer_net_case, @posting.outbound_order_value_producer_net
+    #u2 cancels their order
+    u2_ti1.transition(:customer_removed)    
+    #verify outbound_order_value_producer_net == 0
+    assert_not @posting.requirements_met_to_send_order?
+    assert @posting.outbound_order_value_producer_net == 0
+
+  end
+
+  test "outbound order value producer net should report zero when user removes item 2" do
+
+    #posting uses OM but not cases. initially orders total more than OM. then a user removes their item to bring inbound orders
+    #to less than OM. verify the outbound order value is zero.
+
+    #specify posting values    
+    @posting.update(order_minimum_producer_net: 10, units_per_case: 1, price: 1)    
+    #posting has no items
+    assert_equal 0, @posting.tote_items.count
+    #u1 orders 9
+    u1 = create_user("u1", "u1@u.com")
+    assert u1.valid?
+    #we are using 10 but this will create a inbound order value retail of 10. not producer net. so it should still cause 
+    #us to be below OM
+    u1_ti1 = ToteItem.new(quantity: 10, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: u1)    
+    u1_ti1.save
+    u1_ti1.transition(:customer_authorized)
+    #verify minimums not met
+    assert_not @posting.requirements_met_to_send_order?
+    assert @posting.inbound_order_value_producer_net < 10
+    assert @posting.inbound_order_value_producer_net > 0
+    assert @posting.outbound_order_value_producer_net == 0
+    #u2 orders 2
+    u2 = create_user("u2", "u2@u.com")
+    assert u2.valid?
+    u2_ti1 = ToteItem.new(quantity: 2, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: u2)        
+    u2_ti1.save
+    u2_ti1.transition(:customer_authorized)
+    #verify order is submittable
+    assert @posting.requirements_met_to_send_order?
+    assert @posting.inbound_order_value_producer_net > 10
+    assert @posting.outbound_order_value_producer_net >= 10
+
+    #u2 cancels their order
+    u2_ti1.transition(:customer_removed)    
+    #verify outbound order conditions unmet
+    assert_not @posting.requirements_met_to_send_order?
+    assert @posting.inbound_order_value_producer_net < 10
+    assert @posting.inbound_order_value_producer_net > 0
+    assert @posting.outbound_order_value_producer_net == 0
+
+  end
+
+  test "outbound order value producer net should report zero when user removes item" do
+
+    #posting uses cases but no OM. initially orders total more than one case. then a user removes their item to bring inbound orders
+    #to less than one case. verify the outbound order value is zero.
+
+    #posting has upc = 10
+    @posting.update(units_per_case: 10)
+    assert_equal 10, @posting.units_per_case
+    #posting has no OM
+    assert_equal 0, @posting.order_minimum_producer_net
+    #posting has no items
+    assert_equal 0, @posting.tote_items.count
+    #u1 orders 9
+    u1 = create_user("u1", "u1@u.com")
+    assert u1.valid?
+    u1_ti1 = ToteItem.new(quantity: 9, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: u1)    
+    u1_ti1.save
+    u1_ti1.transition(:customer_authorized)
+    #verify minimums not met
+    assert_not @posting.requirements_met_to_send_order?
+    assert @posting.outbound_order_value_producer_net == 0
+    #u2 orders 2
+    u2 = create_user("u2", "u2@u.com")
+    assert u2.valid?
+    u2_ti1 = ToteItem.new(quantity: 2, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: u2)        
+    u2_ti1.save
+    u2_ti1.transition(:customer_authorized)
+    #verify order is submittable
+    assert @posting.requirements_met_to_send_order?
+    #verify outbound_order_value_producer_net > 0
+    assert @posting.outbound_order_value_producer_net > 0
+    #verify that the outbound order amount equals 1 case, even though there were inbound orders totaling slightly more than one case
+    assert_equal @posting.get_producer_net_case, @posting.outbound_order_value_producer_net
+    #u2 cancels their order
+    u2_ti1.transition(:customer_removed)    
+    #verify outbound_order_value_producer_net == 0
+    assert_not @posting.requirements_met_to_send_order?
+    assert @posting.outbound_order_value_producer_net == 0
+
+  end
+
   test "should submit order when posting value above order minimum" do
     @posting.update(order_minimum_producer_net: 100)
     ti = ToteItem.new(quantity: 100, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: @user)

@@ -81,7 +81,7 @@ class ActiveSupport::TestCase
 
   end
 
-  def create_user(name, email, zip)
+  def create_user(name, email, zip = nil)
 
     #create producer
     user = User.create!(

@@ -300,7 +300,7 @@ ActiveRecord::Schema.define(version: 20161019193021) do
     t.string   "product_identifier"
     t.integer  "units_per_case",                default: 1
     t.string   "product_id_code"
-    t.float    "order_minimum_producer_net"
+    t.float    "order_minimum_producer_net",    default: 0.0
     t.index ["commitment_zone_start"], name: "index_postings_on_commitment_zone_start"
     t.index ["posting_recurrence_id"], name: "index_postings_on_posting_recurrence_id"
     t.index ["product_id"], name: "index_postings_on_product_id"
