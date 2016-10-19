@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161019193021) do
+ActiveRecord::Schema.define(version: 20161019220843) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -510,6 +510,7 @@ ActiveRecord::Schema.define(version: 20161019193021) do
     t.integer  "quantity_filled", default: 0
     t.index ["authorized_at"], name: "index_tote_items_on_authorized_at"
     t.index ["posting_id"], name: "index_tote_items_on_posting_id"
+    t.index ["state"], name: "index_tote_items_on_state"
     t.index ["subscription_id"], name: "index_tote_items_on_subscription_id"
     t.index ["user_id"], name: "index_tote_items_on_user_id"
   end
