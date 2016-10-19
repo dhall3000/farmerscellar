@@ -43,27 +43,15 @@ class Posting < ApplicationRecord
 
   end
 
-  def get_producer_net_posting
+  def inbound_order_value_producer_net
 
     if state?(:CLOSED)
       num_units = num_units_filled
     else
-      num_units = num_units_orderable
+      num_units = inbound_num_units_ordered
     end
     
     return (num_units * get_producer_net_unit).round(2)
-
-  end
-
-  def get_gross_posting
-    
-    if state?(:CLOSED)
-      num_units = num_units_filled
-    else
-      num_units = num_units_orderable
-    end
-    
-    return (num_units * price).round(2)
 
   end
 
@@ -90,18 +78,30 @@ class Posting < ApplicationRecord
 
   end
 
-  def gross_order_minimum
+  def order_minimum_retail
 
-    if order_minimum.nil?
+    if order_minimum_producer_net.nil?
       return 0
     end
 
-    return (order_minimum / (1.0 - (0.035 + get_commission_factor))).round(2)
+    return (order_minimum_producer_net / (1.0 - (0.035 + get_commission_factor))).round(2)
 
   end
 
-  def additional_gross_required_to_order
-    return [gross_order_minimum - get_gross_posting, 0].max
+  def additional_retail_amount_necessary_to_send_order
+    return [order_minimum_retail - inbound_order_value_retail, 0].max
+  end
+
+  def inbound_order_value_retail
+    
+    if state?(:CLOSED)
+      num_units = num_units_filled
+    else
+      num_units = inbound_num_units_ordered
+    end
+    
+    return (num_units * price).round(2)
+
   end
 
   #OPEN means open for customers to place orders. but that's somewhat confusing because if late_adds_allowed then customer can place order even in the COMMITMENTZONE
@@ -224,7 +224,7 @@ class Posting < ApplicationRecord
 
   end
 
-  def include_in_order?
+  def requirements_met_to_send_order?
 
     #packing minimum met?(at least one unit (or 1 case if cases are in effect))
     if !packing_minimum_met?
@@ -241,11 +241,11 @@ class Posting < ApplicationRecord
 
   def order_minimum_met?
 
-    if order_minimum.nil?
+    if order_minimum_producer_net.nil?
       return true
     end
 
-    return get_producer_net_posting > order_minimum
+    return inbound_order_value_producer_net > order_minimum_producer_net
 
   end
 
@@ -257,12 +257,12 @@ class Posting < ApplicationRecord
     end
   end
 
-  def num_units_orderable
+  def inbound_num_units_ordered
 
     if units_per_case.nil? || units_per_case < 2
       unit_count = total_quantity_authorized_or_committed
     else
-      unit_count = num_cases_orderable * units_per_case
+      unit_count = inbound_num_cases_ordered * units_per_case
     end
 
     return unit_count
@@ -273,15 +273,13 @@ class Posting < ApplicationRecord
     return tote_items.where(state: ToteItem.states[:FILLED]).sum(:quantity_filled)
   end
 
-  def num_cases_orderable
+  def inbound_num_cases_ordered
     
-    if units_per_case.nil? || units_per_case < 2
-      case_count = nil
-    else
-      case_count = total_quantity_authorized_or_committed / units_per_case
+    if units_per_case.nil? || units_per_case < 1
+      return nil
     end
-
-    return case_count
+    
+    return total_quantity_authorized_or_committed / units_per_case    
 
   end
 

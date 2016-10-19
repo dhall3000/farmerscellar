@@ -192,9 +192,8 @@ module ToteItemsHelper
     else
       quantity = tote_item.quantity
     end
-
-    commission_factor = tote_item.posting.get_commission_factor
-    commission_unit = (tote_item.price * commission_factor).round(2)
+    
+    commission_unit = tote_item.posting.commission_per_unit
     commission_item = (commission_unit * quantity).round(2)
 
     return commission_item

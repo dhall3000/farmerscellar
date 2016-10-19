@@ -418,7 +418,7 @@ class BulkPaymentProcessing
 
           posting_infos[tote_item.posting] = {unit_count: 0, unit_price: 0, sub_total: 0}
           posting_infos[tote_item.posting][:unit_count] = tote_item.posting.num_units_filled
-          posting_infos[tote_item.posting][:sub_total] = tote_item.posting.get_producer_net_posting
+          posting_infos[tote_item.posting][:sub_total] = tote_item.posting.inbound_order_value_producer_net
           posting_infos[tote_item.posting][:unit_price] = tote_item.posting.get_producer_net_unit
 
         end

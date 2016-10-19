@@ -493,8 +493,8 @@ class UserTest < ActiveSupport::TestCase
     expected_order_value = expected_celery_posting_value + expected_apples_posting_value
     assert_equal 63, expected_order_value
 
-    assert_equal expected_celery_posting_value, posting_celery.get_producer_net_posting
-    assert_equal expected_apples_posting_value, posting_apples.get_producer_net_posting
+    assert_equal expected_celery_posting_value, posting_celery.inbound_order_value_producer_net
+    assert_equal expected_apples_posting_value, posting_apples.inbound_order_value_producer_net
 
     czs = posting_celery.commitment_zone_start
     producer_net = producer.get_producer_net(czs)
@@ -528,7 +528,7 @@ class UserTest < ActiveSupport::TestCase
     ti_chris_apples = create_tote_item(posting_apples, quantity = 4, chris)
     ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
 
-    #verify get_producer_net_posting value
+    #verify inbound_order_value_producer_net value
     gross_celery = 22.50
     commission_per_unit_celery = 0.13
     payment_processor_fee_unit_celery = 0.09
@@ -536,7 +536,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 2.28, producer_net_unit_celery
     assert_equal producer_net_unit_celery, posting_celery.get_producer_net_unit
     expected_producer_net_celery = 20.52
-    assert_equal expected_producer_net_celery, posting_celery.get_producer_net_posting
+    assert_equal expected_producer_net_celery, posting_celery.inbound_order_value_producer_net
 
     gross_apples = 12
     commission_per_unit_apples = 0.10
@@ -545,9 +545,9 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 1.83, producer_net_unit_apples
     assert_equal producer_net_unit_apples, posting_apples.get_producer_net_unit
     expected_producer_net_apples = 10.98
-    assert_equal expected_producer_net_apples, posting_apples.get_producer_net_posting
+    assert_equal expected_producer_net_apples, posting_apples.inbound_order_value_producer_net
 
-    producer_net = posting_apples.get_producer_net_posting + posting_celery.get_producer_net_posting
+    producer_net = posting_apples.inbound_order_value_producer_net + posting_celery.inbound_order_value_producer_net
     expected_producer_net = 31.50
     assert_equal expected_producer_net, producer_net
 
@@ -590,7 +590,7 @@ class UserTest < ActiveSupport::TestCase
     ti_chris_apples = create_tote_item(posting_apples, quantity = 4, chris)
     ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
 
-    #verify get_producer_net_posting value
+    #verify inbound_order_value_producer_net value
     gross_celery = 22.50
     commission_per_unit_celery = 0.13
     payment_processor_fee_unit_celery = 0.09
@@ -598,7 +598,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 2.28, producer_net_unit_celery
     assert_equal producer_net_unit_celery, posting_celery.get_producer_net_unit
     expected_producer_net_celery = 20.52
-    assert_equal expected_producer_net_celery, posting_celery.get_producer_net_posting
+    assert_equal expected_producer_net_celery, posting_celery.inbound_order_value_producer_net
 
     gross_apples = 12
     commission_per_unit_apples = 0.10
@@ -607,9 +607,9 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 1.83, producer_net_unit_apples
     assert_equal producer_net_unit_apples, posting_apples.get_producer_net_unit
     expected_producer_net_apples = 10.98
-    assert_equal expected_producer_net_apples, posting_apples.get_producer_net_posting
+    assert_equal expected_producer_net_apples, posting_apples.inbound_order_value_producer_net
 
-    producer_net = posting_apples.get_producer_net_posting + posting_celery.get_producer_net_posting
+    producer_net = posting_apples.inbound_order_value_producer_net + posting_celery.inbound_order_value_producer_net
     expected_producer_net = 31.50
     assert_equal expected_producer_net, producer_net
 
@@ -651,7 +651,7 @@ class UserTest < ActiveSupport::TestCase
     ti_chris_apples = create_tote_item(posting_apples, quantity = 4, chris)
     ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
 
-    #verify get_producer_net_posting value
+    #verify inbound_order_value_producer_net value
     gross_celery = 22.50
     commission_per_unit_celery = 0.13
     payment_processor_fee_unit_celery = 0.09
@@ -659,7 +659,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 2.28, producer_net_unit_celery
     assert_equal producer_net_unit_celery, posting_celery.get_producer_net_unit
     expected_producer_net_celery = 20.52
-    assert_equal expected_producer_net_celery, posting_celery.get_producer_net_posting
+    assert_equal expected_producer_net_celery, posting_celery.inbound_order_value_producer_net
 
     gross_apples = 12
     commission_per_unit_apples = 0.10
@@ -668,9 +668,9 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 1.83, producer_net_unit_apples
     assert_equal producer_net_unit_apples, posting_apples.get_producer_net_unit
     expected_producer_net_apples = 10.98
-    assert_equal expected_producer_net_apples, posting_apples.get_producer_net_posting
+    assert_equal expected_producer_net_apples, posting_apples.inbound_order_value_producer_net
 
-    producer_net = posting_apples.get_producer_net_posting + posting_celery.get_producer_net_posting
+    producer_net = posting_apples.inbound_order_value_producer_net + posting_celery.inbound_order_value_producer_net
     expected_producer_net = 31.50
     assert_equal expected_producer_net, producer_net
 
@@ -714,7 +714,7 @@ class UserTest < ActiveSupport::TestCase
     ti_chris_apples = create_tote_item(posting_apples, quantity = 4, chris)
     ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
 
-    #verify get_producer_net_posting value
+    #verify inbound_order_value_producer_net value
     gross_celery = 22.50
     commission_per_unit_celery = 0.13
     payment_processor_fee_unit_celery = 0.09
@@ -722,7 +722,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 2.28, producer_net_unit_celery
     assert_equal producer_net_unit_celery, posting_celery.get_producer_net_unit
     expected_producer_net_celery = 20.52
-    assert_equal expected_producer_net_celery, posting_celery.get_producer_net_posting
+    assert_equal expected_producer_net_celery, posting_celery.inbound_order_value_producer_net
 
     gross_apples = 12
     commission_per_unit_apples = 0.10
@@ -731,9 +731,9 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 1.83, producer_net_unit_apples
     assert_equal producer_net_unit_apples, posting_apples.get_producer_net_unit
     expected_producer_net_apples = 10.98
-    assert_equal expected_producer_net_apples, posting_apples.get_producer_net_posting
+    assert_equal expected_producer_net_apples, posting_apples.inbound_order_value_producer_net
 
-    producer_net = posting_apples.get_producer_net_posting + posting_celery.get_producer_net_posting
+    producer_net = posting_apples.inbound_order_value_producer_net + posting_celery.inbound_order_value_producer_net
     expected_producer_net = 31.50
     assert_equal expected_producer_net, producer_net
 
@@ -780,7 +780,7 @@ class UserTest < ActiveSupport::TestCase
     ti_chris_apples = create_tote_item(posting_apples, quantity = 4, chris)
     ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
 
-    #verify get_producer_net_posting value
+    #verify inbound_order_value_producer_net value
     gross_celery = 22.50
     commission_per_unit_celery = 0.13
     payment_processor_fee_unit_celery = 0.09
@@ -788,7 +788,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 2.28, producer_net_unit_celery
     assert_equal producer_net_unit_celery, posting_celery.get_producer_net_unit
     expected_producer_net_celery = 20.52
-    assert_equal expected_producer_net_celery, posting_celery.get_producer_net_posting
+    assert_equal expected_producer_net_celery, posting_celery.inbound_order_value_producer_net
 
     gross_apples = 12
     commission_per_unit_apples = 0.10
@@ -797,9 +797,9 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 1.83, producer_net_unit_apples
     assert_equal producer_net_unit_apples, posting_apples.get_producer_net_unit
     expected_producer_net_apples = 10.98
-    assert_equal expected_producer_net_apples, posting_apples.get_producer_net_posting
+    assert_equal expected_producer_net_apples, posting_apples.inbound_order_value_producer_net
 
-    producer_net = posting_apples.get_producer_net_posting + posting_celery.get_producer_net_posting
+    producer_net = posting_apples.inbound_order_value_producer_net + posting_celery.inbound_order_value_producer_net
     expected_producer_net = 31.50
     assert_equal expected_producer_net, producer_net
 
@@ -846,7 +846,7 @@ class UserTest < ActiveSupport::TestCase
     ti_chris_apples = create_tote_item(posting_apples, quantity = 4, chris)
     ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
 
-    #verify get_producer_net_posting value
+    #verify inbound_order_value_producer_net value
     gross_celery = 22.50
     commission_per_unit_celery = 0.13
     payment_processor_fee_unit_celery = 0.09
@@ -854,7 +854,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 2.28, producer_net_unit_celery
     assert_equal producer_net_unit_celery, posting_celery.get_producer_net_unit
     expected_producer_net_celery = 20.52
-    assert_equal expected_producer_net_celery, posting_celery.get_producer_net_posting
+    assert_equal expected_producer_net_celery, posting_celery.inbound_order_value_producer_net
 
     gross_apples = 12
     commission_per_unit_apples = 0.10
@@ -863,9 +863,9 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 1.83, producer_net_unit_apples
     assert_equal producer_net_unit_apples, posting_apples.get_producer_net_unit
     expected_producer_net_apples = 10.98
-    assert_equal expected_producer_net_apples, posting_apples.get_producer_net_posting
+    assert_equal expected_producer_net_apples, posting_apples.inbound_order_value_producer_net
 
-    producer_net = posting_apples.get_producer_net_posting + posting_celery.get_producer_net_posting
+    producer_net = posting_apples.inbound_order_value_producer_net + posting_celery.inbound_order_value_producer_net
     expected_producer_net = 31.50
     assert_equal expected_producer_net, producer_net
 
@@ -918,7 +918,7 @@ class UserTest < ActiveSupport::TestCase
     ti_chris_apples = create_tote_item(posting_apples, quantity = 4, chris)
     ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
 
-    #verify get_producer_net_posting value
+    #verify inbound_order_value_producer_net value
     gross_celery = 22.50
     commission_per_unit_celery = 0.13
     payment_processor_fee_unit_celery = 0.09
@@ -926,7 +926,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 2.28, producer_net_unit_celery
     assert_equal producer_net_unit_celery, posting_celery.get_producer_net_unit
     expected_producer_net_celery = 20.52
-    assert_equal expected_producer_net_celery, posting_celery.get_producer_net_posting
+    assert_equal expected_producer_net_celery, posting_celery.inbound_order_value_producer_net
 
     gross_apples = 12
     commission_per_unit_apples = 0.10
@@ -935,9 +935,9 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 1.83, producer_net_unit_apples
     assert_equal producer_net_unit_apples, posting_apples.get_producer_net_unit
     expected_producer_net_apples = 10.98
-    assert_equal expected_producer_net_apples, posting_apples.get_producer_net_posting
+    assert_equal expected_producer_net_apples, posting_apples.inbound_order_value_producer_net
 
-    producer_net = posting_apples.get_producer_net_posting + posting_celery.get_producer_net_posting
+    producer_net = posting_apples.inbound_order_value_producer_net + posting_celery.inbound_order_value_producer_net
     expected_producer_net = 31.50
     assert_equal expected_producer_net, producer_net
 
@@ -990,7 +990,7 @@ class UserTest < ActiveSupport::TestCase
     ti_chris_apples = create_tote_item(posting_apples, quantity = 4, chris)
     ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
 
-    #verify get_producer_net_posting value
+    #verify inbound_order_value_producer_net value
     gross_milk = price_milk
     commission_per_unit_milk = 0.50
     payment_processor_fee_unit_milk = 0.35
@@ -998,7 +998,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 9.15, producer_net_unit_milk
     assert_equal producer_net_unit_milk, posting_milk.get_producer_net_unit
     expected_producer_net_milk = 9.15
-    assert_equal expected_producer_net_milk, posting_milk.get_producer_net_posting    
+    assert_equal expected_producer_net_milk, posting_milk.inbound_order_value_producer_net    
 
     gross_celery = 22.50
     commission_per_unit_celery = 0.13
@@ -1007,7 +1007,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 2.28, producer_net_unit_celery
     assert_equal producer_net_unit_celery, posting_celery.get_producer_net_unit
     expected_producer_net_celery = 20.52
-    assert_equal expected_producer_net_celery, posting_celery.get_producer_net_posting
+    assert_equal expected_producer_net_celery, posting_celery.inbound_order_value_producer_net
 
     gross_apples = 12
     commission_per_unit_apples = 0.10
@@ -1016,9 +1016,9 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 1.83, producer_net_unit_apples
     assert_equal producer_net_unit_apples, posting_apples.get_producer_net_unit
     expected_producer_net_apples = 10.98
-    assert_equal expected_producer_net_apples, posting_apples.get_producer_net_posting
+    assert_equal expected_producer_net_apples, posting_apples.inbound_order_value_producer_net
 
-    producer_net = posting_apples.get_producer_net_posting + posting_celery.get_producer_net_posting + posting_milk.get_producer_net_posting
+    producer_net = posting_apples.inbound_order_value_producer_net + posting_celery.inbound_order_value_producer_net + posting_milk.inbound_order_value_producer_net
     expected_producer_net = 40.65
     assert_equal expected_producer_net, producer_net
 

@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class PostingTest < ActiveSupport::TestCase
+  include ToteItemsHelper
 
   def setup
     @user = users(:c1)
@@ -19,41 +20,41 @@ class PostingTest < ActiveSupport::TestCase
   end
 
   test "should submit order when posting value above order minimum" do
-    @posting.update(order_minimum: 100)
+    @posting.update(order_minimum_producer_net: 100)
     ti = ToteItem.new(quantity: 100, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: @user)
     assert ti.save
     ti.transition(:customer_authorized)
     ti.transition(:commitment_zone_started)
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
-    assert @posting.include_in_order?    
+    assert @posting.requirements_met_to_send_order?    
   end
   
   test "should not submit order when posting value below order minimum" do
-    @posting.update(order_minimum: 100)
+    @posting.update(order_minimum_producer_net: 100)
     ti = ToteItem.new(quantity: 1, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: @user)
     assert ti.save
     ti.transition(:customer_authorized)
     ti.transition(:commitment_zone_started)
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
-    assert_not @posting.include_in_order?    
+    assert_not @posting.requirements_met_to_send_order?    
   end
 
   test "posting should properly report remaining order amount necessary" do
     #the producer net order min is 100. this means the retail order min is > 100
-    @posting.update(order_minimum: 100)
-    assert @posting.gross_order_minimum > @posting.order_minimum    
+    @posting.update(order_minimum_producer_net: 100)
+    assert @posting.order_minimum_retail > @posting.order_minimum_producer_net
     ti = ToteItem.new(quantity: 1, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: @user)
     assert ti.save
     ti.transition(:customer_authorized)
     ti.transition(:commitment_zone_started)
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
-    assert_not @posting.include_in_order?    
+    assert_not @posting.requirements_met_to_send_order?    
     # $100 producer net order minimum equals ~$109 gross order min. a single unit worth gross $1.25 was ordered. so the amount it
     #sould report as needed additional is ~ $109 - $1.25
-    assert_equal @posting.gross_order_minimum - @posting.price, @posting.additional_gross_required_to_order
+    assert_equal @posting.order_minimum_retail - @posting.price, @posting.additional_retail_amount_necessary_to_send_order
   end
 
   test "should not submit order when no quantity is authorized or committed" do
@@ -62,7 +63,7 @@ class PostingTest < ActiveSupport::TestCase
     assert ti.save    
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:ADDED], @posting.tote_items.first.state
-    assert_not @posting.include_in_order?
+    assert_not @posting.requirements_met_to_send_order?
   end
 
   test "should submit order when quantity is above zero and cases arent in use" do
@@ -73,7 +74,7 @@ class PostingTest < ActiveSupport::TestCase
     ti.transition(:commitment_zone_started)
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
-    assert @posting.include_in_order?
+    assert @posting.requirements_met_to_send_order?
   end
 
   test "should submit order when quantity is at least the size of a case" do
@@ -87,7 +88,7 @@ class PostingTest < ActiveSupport::TestCase
     ti.transition(:commitment_zone_started)
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
-    assert @posting.include_in_order?
+    assert @posting.requirements_met_to_send_order?
   end
 
   test "should only submit order in round case lots when applicable" do    
@@ -102,8 +103,8 @@ class PostingTest < ActiveSupport::TestCase
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
     
-    assert_equal case_size, @posting.num_units_orderable
-    assert_equal 1, @posting.num_cases_orderable
+    assert_equal case_size, @posting.inbound_num_units_ordered
+    assert_equal 1, @posting.inbound_num_cases_ordered
   end
 
   test "should submit order for all committed quantity when cases not in use" do
@@ -117,8 +118,8 @@ class PostingTest < ActiveSupport::TestCase
     ti.transition(:commitment_zone_started)
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state    
-    assert_equal unit_count, @posting.num_units_orderable
-    assert_equal nil, @posting.num_cases_orderable
+    assert_equal unit_count, @posting.inbound_num_units_ordered
+    assert_equal nil, @posting.inbound_num_cases_ordered
   end
 
   test "should not submit order when quantity authorized or committed is less than a case size" do
@@ -132,7 +133,7 @@ class PostingTest < ActiveSupport::TestCase
     ti.transition(:commitment_zone_started)
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
-    assert_not @posting.include_in_order?
+    assert_not @posting.requirements_met_to_send_order?
   end
 
   test "should fill all items" do

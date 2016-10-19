@@ -46,8 +46,8 @@ class ProducerNotificationsMailer < ApplicationMailer
         @column_product_id_code = true
       end
 
-      unit_count = posting.num_units_orderable
-      case_count = posting.num_cases_orderable
+      unit_count = posting.inbound_num_units_ordered
+      case_count = posting.inbound_num_cases_ordered
 
       if !case_count.nil? && case_count > 0
         @column_cases = true

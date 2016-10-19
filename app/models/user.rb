@@ -204,7 +204,7 @@ class User < ApplicationRecord
         next
       end
 
-      if posting.include_in_order?
+      if posting.requirements_met_to_send_order?
         postings_to_order << posting          
       else
         postings_to_close << posting
@@ -262,7 +262,7 @@ class User < ApplicationRecord
 
       end
 
-      producer_net = (producer_net + posting.get_producer_net_posting).round(2)
+      producer_net = (producer_net + posting.inbound_order_value_producer_net).round(2)
 
     end
 

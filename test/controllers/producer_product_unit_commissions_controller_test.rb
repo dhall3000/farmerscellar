@@ -116,6 +116,7 @@ class ProducerProductUnitCommissionsControllerTest < ActionDispatch::Integration
     assert_not ppc.nil?
 
     ti = ToteItem.new(price: 11, quantity: 1, quantity_filled: 1, posting_id: @posting.id)
+    @posting.update(price: 11)
     computed_producer_net = ToteItemsController.helpers.get_producer_net_item(ti, filled = true)
     expected_producer_net = 10
     assert_equal expected_producer_net, computed_producer_net
