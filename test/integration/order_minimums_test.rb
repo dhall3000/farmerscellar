@@ -19,7 +19,7 @@ class OrderMinimumsTest < IntegrationHelper
 
     distributor = create_producer("distributor", "distributor@d.com", "WA", 98033, "www.distributor.com", "Distributor Inc.")
     distributor.create_business_interface(name: "Distributor Inc.", order_email_accepted: true, order_email: distributor.email, paypal_accepted: true, paypal_email: distributor.email)
-    distributor.update(order_minimum: 20)
+    distributor.update(order_minimum_producer_net: 20)
 
     producer1 = create_producer("producer1", "producer1@p.com", "WA", 98033, "www.producer1.com", "producer1 farms")
     producer1.distributor = distributor

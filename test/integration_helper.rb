@@ -19,7 +19,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
     #maybe we can/will parameterize this later?
     if false
-      distributor.update(order_minimum: 20)
+      distributor.update(order_minimum_producer_net: 20)
     end
 
     producer1 = create_producer("producer1", "producer1@p.com", "WA", 98033, "www.producer1.com", "producer1 farms")
@@ -88,7 +88,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
     #maybe we can/will parameterize this later?
     if false
-      distributor.update(order_minimum: 20)
+      distributor.update(order_minimum_producer_net: 20)
     end
 
     producer1 = create_producer("producer1", "producer1@p.com", "WA", 98033, "www.producer1.com", "producer1 farms")

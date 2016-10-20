@@ -49,6 +49,35 @@ class User < ApplicationRecord
   #if this object is a distributor it might have many PRODUCERs
   has_many :producers, class_name: "User", foreign_key: "distributor_id"
 
+  def inbound_order_value_producer_net(order_cutoff)
+
+    order_value = 0
+
+    #loop through my postings and sum their order value
+    postings.where(commitment_zone_start: order_cutoff).each do |posting|
+      order_value = (order_value + posting.outbound_order_value_producer_net).round(2)
+    end
+
+    #loop through my producers (if any) and sum their order value
+    producers.each do |producer|
+      order_value = (order_value + producer.outbound_order_value_producer_net(order_cutoff)).round(2)
+    end
+
+    #return the sum of the two order values
+    return order_value
+
+  end
+
+  def outbound_order_value_producer_net(order_cutoff)
+    
+    if (inbound = inbound_order_value_producer_net(order_cutoff)) > order_minimum_producer_net
+      return inbound
+    else
+      return 0
+    end
+
+  end
+
   def settings
 
     if setting.nil?
@@ -272,11 +301,11 @@ class User < ApplicationRecord
 
   def order_minimum_met?(producer_net_total)
 
-    if self.order_minimum.nil?            
+    if self.order_minimum_producer_net.nil?            
       return true
     end
 
-    if producer_net_total >= self.order_minimum
+    if producer_net_total >= self.order_minimum_producer_net
       return true
     end
 

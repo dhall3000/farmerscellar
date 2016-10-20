@@ -103,7 +103,7 @@ f4 = User.create!(name:  "f4",
              agreement: 1,
              farm_name: "F4 FARM",
              beta: false,
-             order_minimum: 20
+             order_minimum_producer_net: 20
              )
 
 AccessCode.create(user: f4, notes: "code for user 4")

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161019220843) do
+ActiveRecord::Schema.define(version: 20161019222215) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -561,13 +561,13 @@ ActiveRecord::Schema.define(version: 20161019220843) do
   create_table "users", force: :cascade do |t|
     t.string   "name"
     t.string   "email"
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
+    t.datetime "created_at",                                 null: false
+    t.datetime "updated_at",                                 null: false
     t.string   "password_digest"
-    t.integer  "account_type",      default: 0
+    t.integer  "account_type",               default: 0
     t.string   "remember_digest"
     t.string   "activation_digest"
-    t.boolean  "activated",         default: false
+    t.boolean  "activated",                  default: false
     t.datetime "activated_at"
     t.string   "reset_digest"
     t.datetime "reset_sent_at"
@@ -578,13 +578,13 @@ ActiveRecord::Schema.define(version: 20161019220843) do
     t.string   "phone"
     t.string   "website"
     t.boolean  "agreement"
-    t.boolean  "farmer_approval",   default: false
+    t.boolean  "farmer_approval",            default: false
     t.string   "farm_name"
     t.boolean  "beta"
     t.integer  "zip"
     t.integer  "distributor_id"
-    t.float    "order_minimum",     default: 0.0,   null: false
-    t.boolean  "partner_user",      default: false
+    t.float    "order_minimum_producer_net", default: 0.0,   null: false
+    t.boolean  "partner_user",               default: false
     t.index ["account_type"], name: "index_users_on_account_type"
     t.index ["distributor_id"], name: "index_users_on_distributor_id"
     t.index ["email"], name: "index_users_on_email", unique: true

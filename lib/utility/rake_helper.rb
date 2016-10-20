@@ -109,28 +109,26 @@ class RakeHelper
 
 		end	
 
-		def self.transition_open_postings
+    def self.transition_open_postings
 
-			puts "transition_open_postings: start"
+      puts "transition_open_postings: start"
 
-			postings = Posting.where(state: Posting.states[:OPEN])
-			puts "transition_open_postings: #{postings.count.to_s} OPEN posting(s)"
+      postings = Posting.where("state = ? AND commitment_zone_start <= ?", Posting.states[:OPEN], Time.zone.now)
+      puts "transition_open_postings: #{postings.count.to_s} OPEN posting(s)"
 
-			transitioned_postings = []
+      transitioned_postings = []
 
-			postings.each do |posting|
-				if Time.zone.now >= posting.commitment_zone_start
-					puts "transition_open_postings: transitioning posting id #{posting.id.to_s} to COMMITMENTZONE"
-					posting.transition(:commitment_zone_started)
-					transitioned_postings << posting.id
-				end
-			end
+      postings.each do |posting|
+        puts "transition_open_postings: transitioning posting id #{posting.id.to_s} to COMMITMENTZONE"
+        posting.transition(:commitment_zone_started)
+        transitioned_postings << posting.id
+      end
 
-			puts "transition_open_postings: end "
+      puts "transition_open_postings: end "
 
-			return transitioned_postings.uniq
+      return transitioned_postings.uniq
 
-		end		
+    end   
 
 		def self.send_orders_to_creditors(posting_ids)
 

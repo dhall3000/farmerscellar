@@ -18,7 +18,7 @@ class UserTest < ActiveSupport::TestCase
     #has many producers
     producer1 = create_producer("producer1", "producer1@o.com", "WA", 98033, "www.producer1.com", "producer1 FARMS")
     producer1.save
-    producer1.update(order_minimum: 20)
+    producer1.update(order_minimum_producer_net: 20)
 
     #has lots of order cutoffs
     delivery_date1 = get_delivery_date(days_from_now = 7)
@@ -69,12 +69,12 @@ class UserTest < ActiveSupport::TestCase
 
     #producing distributor
     oxbow = create_producer("oxbow", "oxbow@o.com", "WA", 98033, "www.oxbow.com", "OXBOW FARMS")
-    oxbow.update(order_minimum: 50)
+    oxbow.update(order_minimum_producer_net: 50)
     #has many producers
     producer1 = create_producer("producer1", "producer1@o.com", "WA", 98033, "www.producer1.com", "producer1 FARMS")
     producer1.distributor = oxbow    
     producer1.save
-    producer1.update(order_minimum: 20)
+    producer1.update(order_minimum_producer_net: 20)
 
     producer2 = create_producer("producer2", "producer2@o.com", "WA", 98033, "www.producer2.com", "producer2 FARMS")
     producer2.distributor = oxbow
@@ -198,12 +198,12 @@ class UserTest < ActiveSupport::TestCase
 
     #producing distributor
     oxbow = create_producer("oxbow", "oxbow@o.com", "WA", 98033, "www.oxbow.com", "OXBOW FARMS")
-    oxbow.update(order_minimum: 50)
+    oxbow.update(order_minimum_producer_net: 50)
     #has many producers
     producer1 = create_producer("producer1", "producer1@o.com", "WA", 98033, "www.producer1.com", "producer1 FARMS")
     producer1.distributor = oxbow    
     producer1.save
-    producer1.update(order_minimum: 20)
+    producer1.update(order_minimum_producer_net: 20)
 
     producer2 = create_producer("producer2", "producer2@o.com", "WA", 98033, "www.producer2.com", "producer2 FARMS")
     producer2.distributor = oxbow
@@ -326,12 +326,12 @@ class UserTest < ActiveSupport::TestCase
 
     #producing distributor
     oxbow = create_producer("oxbow", "oxbow@o.com", "WA", 98033, "www.oxbow.com", "OXBOW FARMS")
-    oxbow.update(order_minimum: 50)
+    oxbow.update(order_minimum_producer_net: 50)
     #has many producers
     producer1 = create_producer("producer1", "producer1@o.com", "WA", 98033, "www.producer1.com", "producer1 FARMS")
     producer1.distributor = oxbow    
     producer1.save
-    producer1.update(order_minimum: 20)
+    producer1.update(order_minimum_producer_net: 20)
 
     producer2 = create_producer("producer2", "producer2@o.com", "WA", 98033, "www.producer2.com", "producer2 FARMS")
     producer2.distributor = oxbow
@@ -566,8 +566,8 @@ class UserTest < ActiveSupport::TestCase
     producer = create_producer("producer", "producer@p.com", "WA", 98033, "www.producer.com", "PRODUCER FARMS")
 
     order_minimum = 30
-    producer.update(order_minimum: order_minimum)
-    assert_equal order_minimum, producer.reload.order_minimum
+    producer.update(order_minimum_producer_net: order_minimum)
+    assert_equal order_minimum, producer.reload.order_minimum_producer_net
 
     #create postings
     price_celery = 2.50
@@ -627,8 +627,8 @@ class UserTest < ActiveSupport::TestCase
     producer = create_producer("producer", "producer@p.com", "WA", 98033, "www.producer.com", "PRODUCER FARMS")
 
     order_minimum = 32
-    producer.update(order_minimum: order_minimum)
-    assert_equal order_minimum, producer.reload.order_minimum
+    producer.update(order_minimum_producer_net: order_minimum)
+    assert_equal order_minimum, producer.reload.order_minimum_producer_net
 
     #create postings
     price_celery = 2.50
@@ -750,8 +750,8 @@ class UserTest < ActiveSupport::TestCase
   test "should submit orders when producer orders meet distributor order minimum" do
     distributor = create_producer("distributor", "distributor@d.com", "WA", 98033, "www.distributor.com", "BIGTIME DISTRIBUTOR GUY")
     order_minimum = 30
-    distributor.update(order_minimum: order_minimum)
-    assert_equal order_minimum, distributor.reload.order_minimum
+    distributor.update(order_minimum_producer_net: order_minimum)
+    assert_equal order_minimum, distributor.reload.order_minimum_producer_net
     producer1 = create_producer("producer1", "producer1@p.com", "WA", 98033, "www.producer1.com", "producer1 FARMS")
     producer1.distributor = distributor
     producer1.save
@@ -816,8 +816,8 @@ class UserTest < ActiveSupport::TestCase
   test "should not submit orders when producer orders do not meet distributor order minimum" do
     distributor = create_producer("distributor", "distributor@d.com", "WA", 98033, "www.distributor.com", "BIGTIME DISTRIBUTOR GUY")
     order_minimum = 32
-    distributor.update(order_minimum: order_minimum)
-    assert_equal order_minimum, distributor.reload.order_minimum
+    distributor.update(order_minimum_producer_net: order_minimum)
+    assert_equal order_minimum, distributor.reload.order_minimum_producer_net
     producer1 = create_producer("producer1", "producer1@p.com", "WA", 98033, "www.producer1.com", "producer1 FARMS")
     producer1.distributor = distributor
     producer1.save
@@ -883,15 +883,15 @@ class UserTest < ActiveSupport::TestCase
   test "should exclude producer from distributor order submission when producer order minimum is not met" do
     distributor = create_producer("distributor", "distributor@d.com", "WA", 98033, "www.distributor.com", "BIGTIME DISTRIBUTOR GUY")
     distributor_order_minimum = 10
-    distributor.update(order_minimum: distributor_order_minimum)
-    assert_equal distributor_order_minimum, distributor.reload.order_minimum
+    distributor.update(order_minimum_producer_net: distributor_order_minimum)
+    assert_equal distributor_order_minimum, distributor.reload.order_minimum_producer_net
 
     producer1 = create_producer("producer1", "producer1@p.com", "WA", 98033, "www.producer1.com", "producer1 FARMS")
     producer1.distributor = distributor
     producer1.save
     producer1_order_minimum = 25
-    producer1.update(order_minimum: producer1_order_minimum)
-    assert_equal producer1_order_minimum, producer1.reload.order_minimum
+    producer1.update(order_minimum_producer_net: producer1_order_minimum)
+    assert_equal producer1_order_minimum, producer1.reload.order_minimum_producer_net
 
     producer2 = create_producer("producer2", "producer2@p.com", "WA", 98033, "www.producer2.com", "producer2 FARMS")
     producer2.distributor = distributor
