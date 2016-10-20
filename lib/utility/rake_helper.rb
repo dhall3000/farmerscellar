@@ -192,7 +192,7 @@ class RakeHelper
 	    	return
 	    end
 
-	    producer_net_total = orderable_report[:postings_total_producer_net]
+	    producer_net_total = orderable_report[:outbound_order_value_producer_net]
 	    postings_orderable = orderable_report[:postings_to_order]
 	    postings_closeable = orderable_report[:postings_to_close]
 

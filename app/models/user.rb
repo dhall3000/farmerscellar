@@ -195,11 +195,11 @@ class User < ApplicationRecord
 
     postings_by_producer.each do |producer, postings_for_producer|
 
-      #{postings_to_order: postings_to_order, postings_to_close: postings_to_close, postings_total_producer_net: producer_net_total}
+      #{postings_to_order: postings_to_order, postings_to_close: postings_to_close, outbound_order_value_producer_net: producer_net_total}
       ret = producer.get_postings_orderable_for_producer(postings_for_producer)
 
       if ret != nil        
-        producer_net_total = (producer_net_total + ret[:postings_total_producer_net]).round(2)
+        producer_net_total = (producer_net_total + ret[:outbound_order_value_producer_net]).round(2)
         postings_to_order.concat ret[:postings_to_order]
         postings_to_close.concat ret[:postings_to_close]
       end
@@ -207,9 +207,9 @@ class User < ApplicationRecord
     end
 
     if order_minimum_met?(producer_net_total)
-      return {postings_to_order: postings_to_order, postings_to_close: postings_to_close, postings_total_producer_net: producer_net_total}
+      return {postings_to_order: postings_to_order, postings_to_close: postings_to_close, outbound_order_value_producer_net: producer_net_total}
     else
-      return {postings_to_order: [], postings_to_close: postings_all, postings_total_producer_net: 0}
+      return {postings_to_order: [], postings_to_close: postings_all, outbound_order_value_producer_net: 0}
     end
 
   end
@@ -251,12 +251,12 @@ class User < ApplicationRecord
       #it will check $45 against oxbow's $50 min and fail that too. so the way to think of this added clause is don't hold oxbow's postings to its own
       #min. instead, sum up oxbows orders with all oxbow's producers' postings and compare that to oxbow's minimum
       if order_minimum_met?(producer_net) || producers.any?
-        return {postings_to_order: postings_to_order, postings_to_close: postings_to_close, postings_total_producer_net: producer_net}
+        return {postings_to_order: postings_to_order, postings_to_close: postings_to_close, outbound_order_value_producer_net: producer_net}
       end    
 
     end
 
-    return {postings_to_order: [], postings_to_close: postings, postings_total_producer_net: 0}
+    return {postings_to_order: [], postings_to_close: postings, outbound_order_value_producer_net: 0}
 
   end
 

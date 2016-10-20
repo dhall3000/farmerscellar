@@ -59,7 +59,7 @@ class UserTest < ActiveSupport::TestCase
 
     report = producer1.get_postings_orderable([posting_carrots])
     producer1_net_value = 49.32
-    assert_equal producer1_net_value, report[:postings_total_producer_net]
+    assert_equal producer1_net_value, report[:outbound_order_value_producer_net]
 
   end
 
@@ -179,16 +179,16 @@ class UserTest < ActiveSupport::TestCase
     assert_equal producer2_net_value, producer2.get_producer_net(czs1)
 
     #verify values if we call the 'orderable' methods
-    #{postings_to_order: [], postings_to_close: postings_all, postings_total_producer_net: 0}
+    #{postings_to_order: [], postings_to_close: postings_all, outbound_order_value_producer_net: 0}
 
     report = oxbow.get_postings_orderable(delivery_date1_postings)
-    assert_equal first_czs_oxbow_net, report[:postings_total_producer_net]
+    assert_equal first_czs_oxbow_net, report[:outbound_order_value_producer_net]
 
     report = producer1.get_postings_orderable([posting_carrots])
-    assert_equal producer1_net_value, report[:postings_total_producer_net]
+    assert_equal producer1_net_value, report[:outbound_order_value_producer_net]
 
     report = producer2.get_postings_orderable([posting_beef])
-    assert_equal producer2_net_value, report[:postings_total_producer_net]
+    assert_equal producer2_net_value, report[:outbound_order_value_producer_net]
 
   end
 
@@ -307,16 +307,16 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 0, producer2.get_producer_net(czs1)
 
     #verify values if we call the 'orderable' methods
-    #{postings_to_order: [], postings_to_close: postings_all, postings_total_producer_net: 0}
+    #{postings_to_order: [], postings_to_close: postings_all, outbound_order_value_producer_net: 0}
 
     report = oxbow.get_postings_orderable(delivery_date1_postings)
-    assert_equal first_czs_oxbow_net, report[:postings_total_producer_net]
+    assert_equal first_czs_oxbow_net, report[:outbound_order_value_producer_net]
 
     report = producer1.get_postings_orderable([posting_carrots])
-    assert_equal producer1_net_value, report[:postings_total_producer_net]
+    assert_equal producer1_net_value, report[:outbound_order_value_producer_net]
 
     report = producer2.get_postings_orderable([posting_beef])
-    assert_equal 0, report[:postings_total_producer_net]
+    assert_equal 0, report[:outbound_order_value_producer_net]
 
   end
 
@@ -434,15 +434,15 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 0, producer2.get_producer_net(czs1)
 
     #verify values if we call the 'orderable' methods
-    #{postings_to_order: [], postings_to_close: postings_all, postings_total_producer_net: 0}
+    #{postings_to_order: [], postings_to_close: postings_all, outbound_order_value_producer_net: 0}
     report = oxbow.get_postings_orderable(delivery_date1_postings)
-    assert_equal 0, report[:postings_total_producer_net]
+    assert_equal 0, report[:outbound_order_value_producer_net]
 
     report = producer1.get_postings_orderable([posting_carrots])
-    assert_equal 0, report[:postings_total_producer_net]
+    assert_equal 0, report[:outbound_order_value_producer_net]
 
     report = producer2.get_postings_orderable([posting_beef])
-    assert_equal 0, report[:postings_total_producer_net]
+    assert_equal 0, report[:outbound_order_value_producer_net]
 
   end
 
@@ -558,7 +558,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal report[:postings_to_order].last, posting_apples
     assert_equal 0, report[:postings_to_close].count
     #verify total order amount    
-    assert_equal expected_producer_net, report[:postings_total_producer_net]
+    assert_equal expected_producer_net, report[:outbound_order_value_producer_net]
 
   end
 
@@ -620,7 +620,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal report[:postings_to_order].last, posting_apples
     assert_equal 0, report[:postings_to_close].count
     #verify total order amount    
-    assert_equal expected_producer_net, report[:postings_total_producer_net]
+    assert_equal expected_producer_net, report[:outbound_order_value_producer_net]
   end
 
   test "should not submit orders when total producer net is below producer order minimum" do
@@ -681,7 +681,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal report[:postings_to_close].first, posting_celery
     assert_equal report[:postings_to_close].last, posting_apples
     #verify total order amount    
-    assert_equal 0, report[:postings_total_producer_net]
+    assert_equal 0, report[:outbound_order_value_producer_net]
   end
 
   test "should submit orders when distributor has no order minimum" do
@@ -744,7 +744,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal report[:postings_to_order].last, posting_apples
     assert_equal 0, report[:postings_to_close].count
     #verify total order amount    
-    assert_equal expected_producer_net, report[:postings_total_producer_net]
+    assert_equal expected_producer_net, report[:outbound_order_value_producer_net]
   end
 
   test "should submit orders when producer orders meet distributor order minimum" do
@@ -810,7 +810,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal report[:postings_to_order].last, posting_apples
     assert_equal 0, report[:postings_to_close].count
     #verify total order amount    
-    assert_equal expected_producer_net, report[:postings_total_producer_net]
+    assert_equal expected_producer_net, report[:outbound_order_value_producer_net]
   end
   
   test "should not submit orders when producer orders do not meet distributor order minimum" do
@@ -877,7 +877,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal report[:postings_to_close].first, posting_celery
     assert_equal report[:postings_to_close].last, posting_apples    
     #verify total order amount    
-    assert_equal 0, report[:postings_total_producer_net]
+    assert_equal 0, report[:outbound_order_value_producer_net]
   end
 
   test "should exclude producer from distributor order submission when producer order minimum is not met" do
@@ -951,7 +951,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal posting_celery, report[:postings_to_close].last
 
     #verify total order amount    
-    assert_equal expected_producer_net_apples, report[:postings_total_producer_net]
+    assert_equal expected_producer_net_apples, report[:outbound_order_value_producer_net]
   end
 
   test "should submit orders properly when distributor is itself a producer" do
@@ -1032,7 +1032,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal posting_milk.product.name, report[:postings_to_order].last.product.name
         
     #verify total order amount    
-    assert_equal expected_producer_net, report[:postings_total_producer_net]
+    assert_equal expected_producer_net, report[:outbound_order_value_producer_net]
   end
 
   test "producer without distributor should have business interface" do
