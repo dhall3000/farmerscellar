@@ -40,7 +40,9 @@ class PostingsTest < ActionDispatch::IntegrationTest
 
   test "should partially fill an item to complete a case then send correct order to creditor" do
 
+    nuke_all_postings
     posting = create_standard_posting
+
     posting.units_per_case = 10
     assert posting.save
     assert_equal 0, posting.tote_items.count
@@ -98,6 +100,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
   end
   
   test "should not send order email if first case does not get filled" do
+    nuke_all_postings
     posting = create_standard_posting
     posting.units_per_case = 10
     assert posting.save

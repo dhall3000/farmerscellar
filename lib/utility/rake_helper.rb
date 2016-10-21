@@ -145,17 +145,20 @@ class RakeHelper
 		  postings.each do |posting|
 
 		  	creditor = posting.get_creditor
+		  	order_cutoff = posting.commitment_zone_start
 
-		  	if !creditors.has_key?(creditor)
-		  		creditors[creditor] = []
+		  	if !creditors[creditor]
+		  		creditors[creditor] = {}
 		  	end
 
-		  	creditors[creditor] << posting
+		  	if !creditors[creditor][order_cutoff]
+		  		creditors[creditor][order_cutoff] = true		  		
+		  	end
 
 		  end
 
-		  creditors.each do |creditor, postings|
-		  	send_order_to_creditor(creditor, postings)
+		  creditors.each do |creditor, order_cutoffs|
+		  	send_order_to_creditor(creditor, order_cutoffs)
 		  end
 
 		  puts "send_orders_to_creditors: end"
@@ -163,13 +166,13 @@ class RakeHelper
 		end
 
 		#the postings sent in as param should be right at their order cutoff
-		def self.send_order_to_creditor(creditor, postings_in_transition)
+		def self.send_order_to_creditor(creditor, order_cutoffs)
 
 			puts "send_order_to_creditor: start"
 
-			postings = postings_in_transition
+			#postings = postings_in_transition
 
-			if creditor.nil? || postings.nil?
+			if creditor.nil? || order_cutoffs.nil?
 				AdminNotificationMailer.general_message("MAJOR PROBLEM: send_order_to_creditor error", "creditor or postings params were nil").deliver_now
 				return
 			end
@@ -183,35 +186,38 @@ class RakeHelper
 			else
 				puts "send_order_to_creditor: sending order to #{creditor.get_business_interface.name}"
 			end
-			
-	    orderable_report = creditor.get_postings_orderable(postings)
 
-	    if orderable_report.nil?
-	    	msg_body = "orderable_report is nil"
-	    	AdminNotificationMailer.general_message("MAJOR PROBLEM: send_order_to_creditor error", msg_body).deliver_now
-	    	return
-	    end
+			order_cutoffs.each do |order_cutoff, ignore_value|
 
-	    producer_net_total = orderable_report[:outbound_order_value_producer_net]
-	    postings_orderable = orderable_report[:postings_to_order]
-	    postings_closeable = orderable_report[:postings_to_close]
+        order_report = creditor.outbound_order_report(order_cutoff)
 
-	    if creditor.order_minimum_met?(producer_net_total)	    	
-		  	puts "send_order_to_creditor: sending order for #{postings_orderable.count.to_s} posting(s) to #{bi.name}"
-		  	ProducerNotificationsMailer.current_orders(creditor, postings_orderable).deliver_now
-	    end
+        #{postings_order_requirements_met: postings_order_requirements_met, postings_order_requirements_unmet: postings_order_requirements_unmet, order_value_producer_net: order_value_producer_net}
+        
+        producer_net_total = order_report[:order_value_producer_net]
+        postings_orderable = order_report[:postings_order_requirements_met]
+        postings_closeable = order_report[:postings_order_requirements_unmet]
 
-	    postings_closeable.each do |posting_closeable|
-	  		#close out the posting so admin doesn't have to deal with it.
-	  		#here at the order cutoff is the time to close out the posting so that admin doesn't have to see it on their
-	  		#radar screen. or is this the right time? say that order cutoff is on monday and delivery friday. but say on wednesday we also have some
-	  		#products being delivered. if we close out this posting due to insufficient quantity on monday then on wednesday the delivery notification
-	  		#would go out to the user. this might be confusing. on the other hand, the unfilled folks might want to know earlier rather than later so
-	  		#they can take measures to procure similar such food elsehow.
-	  		posting_closeable.fill(0)
-	    end
+        if creditor.order_minimum_met?(producer_net_total)        
+          puts "send_order_to_creditor: sending order for #{postings_orderable.count.to_s} posting(s) to #{bi.name}"
+          ProducerNotificationsMailer.current_orders(creditor, postings_orderable).deliver_now
+        end
+
+        postings_closeable.each do |posting_closeable|
+          #close out the posting so admin doesn't have to deal with it.
+          #here at the order cutoff is the time to close out the posting so that admin doesn't have to see it on their
+          #radar screen. or is this the right time? say that order cutoff is on monday and delivery friday. but say on wednesday we also have some
+          #products being delivered. if we close out this posting due to insufficient quantity on monday then on wednesday the delivery notification
+          #would go out to the user. this might be confusing. on the other hand, the unfilled folks might want to know earlier rather than later so
+          #they can take measures to procure similar such food elsehow.
+          posting_closeable.fill(0)
+        end
+
+			end
+
+
 	    
 			puts "send_order_to_creditor: end"
+
 		end
 
 		def self.get_commit_totes_email_body(tote_item_ids)

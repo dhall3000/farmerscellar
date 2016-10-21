@@ -16,7 +16,6 @@ class User < ApplicationRecord
   has_many :pickups
   has_many :partner_deliveries
   has_many :tote_items
-  #has_many :postings, through: :tote_items
 
   has_many :user_account_states
   has_many :account_states, through: :user_account_states
@@ -49,33 +48,65 @@ class User < ApplicationRecord
   #if this object is a distributor it might have many PRODUCERs
   has_many :producers, class_name: "User", foreign_key: "distributor_id"
 
-  def inbound_order_value_producer_net(order_cutoff)
+  def inbound_order_report(order_cutoff)
 
-    order_value = 0
-
+    #postings_order_requirements_met, postings_order_requirements_unmet, order_value_producer_net
+    postings_order_requirements_met = []
+    postings_order_requirements_unmet = []
+    order_value_producer_net = 0
+    
     #loop through my postings and sum their order value
     postings.where(commitment_zone_start: order_cutoff).each do |posting|
-      order_value = (order_value + posting.outbound_order_value_producer_net).round(2)
+
+      posting_outbound_order_value_producer_net = posting.outbound_order_value_producer_net
+
+      order_value_producer_net = (order_value_producer_net + posting_outbound_order_value_producer_net).round(2)
+
+      if posting_outbound_order_value_producer_net > 0
+        postings_order_requirements_met << posting
+      else
+        postings_order_requirements_unmet << posting
+      end
+      
     end
 
     #loop through my producers (if any) and sum their order value
     producers.each do |producer|
-      order_value = (order_value + producer.outbound_order_value_producer_net(order_cutoff)).round(2)
+      producer_outbound_order_report = producer.outbound_order_report(order_cutoff)
+      postings_order_requirements_met.concat(producer_outbound_order_report[:postings_order_requirements_met])
+      postings_order_requirements_unmet.concat(producer_outbound_order_report[:postings_order_requirements_unmet])
+      order_value_producer_net = (order_value_producer_net + producer_outbound_order_report[:order_value_producer_net]).round(2)
     end
 
-    #return the sum of the two order values
-    return order_value
+    return {postings_order_requirements_met: postings_order_requirements_met, postings_order_requirements_unmet: postings_order_requirements_unmet, order_value_producer_net: order_value_producer_net}
 
   end
 
-  def outbound_order_value_producer_net(order_cutoff)
+  def outbound_order_report(order_cutoff)
     
-    if (inbound = inbound_order_value_producer_net(order_cutoff)) > order_minimum_producer_net
+    inbound = inbound_order_report(order_cutoff)
+
+    if inbound[:order_value_producer_net] >= order_minimum_producer_net
       return inbound
     else
-      return 0
+
+      #ok, nothing should be ordered so concat all the postings in the 'unmet' hash key      
+      postings_order_requirements_unmet = inbound[:postings_order_requirements_unmet].concat(inbound[:postings_order_requirements_met])
+      postings_order_requirements_met = []      
+      order_value_producer_net = 0
+
+      return {postings_order_requirements_met: postings_order_requirements_met, postings_order_requirements_unmet: postings_order_requirements_unmet, order_value_producer_net: order_value_producer_net}
+
     end
 
+  end
+
+  def inbound_order_value_producer_net(order_cutoff)
+    return inbound_order_report(order_cutoff)[:order_value_producer_net]
+  end
+
+  def outbound_order_value_producer_net(order_cutoff)
+    return outbound_order_report(order_cutoff)[:order_value_producer_net]
   end
 
   def settings
