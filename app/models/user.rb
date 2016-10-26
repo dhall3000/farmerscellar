@@ -202,20 +202,6 @@ class User < ApplicationRecord
 
   end
 
-  def order_minimum_met?(producer_net_total)
-
-    if self.order_minimum_producer_net.nil?            
-      return true
-    end
-
-    if producer_net_total >= self.order_minimum_producer_net
-      return true
-    end
-
-    return false
-
-  end  
-
   def tote_items_to_pickup
 
     #this should return a set of toteitems that have been delivered but not picked up yet

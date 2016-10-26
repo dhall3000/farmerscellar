@@ -192,15 +192,11 @@ class RakeHelper
         order_report = creditor.outbound_order_report(order_cutoff)
 
         #{postings_order_requirements_met: postings_order_requirements_met, postings_order_requirements_unmet: postings_order_requirements_unmet, order_value_producer_net: order_value_producer_net}
-        
-        producer_net_total = order_report[:order_value_producer_net]
         postings_orderable = order_report[:postings_order_requirements_met]
         postings_closeable = order_report[:postings_order_requirements_unmet]
 
-        if creditor.order_minimum_met?(producer_net_total)        
-          puts "send_order_to_creditor: sending order for #{postings_orderable.count.to_s} posting(s) to #{bi.name}"
-          ProducerNotificationsMailer.current_orders(creditor, postings_orderable).deliver_now
-        end
+        puts "send_order_to_creditor: sending order for #{postings_orderable.count.to_s} posting(s) to #{bi.name}"
+        ProducerNotificationsMailer.current_orders(creditor, postings_orderable).deliver_now
 
         postings_closeable.each do |posting_closeable|
           #close out the posting so admin doesn't have to deal with it.
@@ -213,8 +209,6 @@ class RakeHelper
         end
 
 			end
-
-
 	    
 			puts "send_order_to_creditor: end"
 
