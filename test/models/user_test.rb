@@ -10,7 +10,7 @@ class UserTest < ActiveSupport::TestCase
     @d1 = users(:d1)
   end
 
-  #what if you have a producer that has no distributor. can you call producer.get_postings_orderable(postings_at_order_cutoff) on it and have it do the right thing?
+  #what if you have a producer that has no distributor. can you call producer.outbound_order_report(postings_at_order_cutoff) on it and have it do the right thing?
   test "should return proper orderable report when distributor postings reporter called on a producer with no distributor" do
 
     nuke_all_postings
@@ -56,10 +56,10 @@ class UserTest < ActiveSupport::TestCase
     ti_sam_milk.update(state: ToteItem.states[:COMMITTED])
     ti_chris_milk = create_tote_item(posting_milk, quantity = 3, chris)
     ti_chris_milk.update(state: ToteItem.states[:COMMITTED])
-
-    report = producer1.get_postings_orderable([posting_carrots])
-    producer1_net_value = 49.32
-    assert_equal producer1_net_value, report[:outbound_order_value_producer_net]
+    
+    report = producer1.outbound_order_report(posting_carrots.commitment_zone_start)    
+    producer1_net_value = 49.32    
+    assert_equal producer1_net_value, report[:order_value_producer_net]
 
   end
 
@@ -164,31 +164,47 @@ class UserTest < ActiveSupport::TestCase
     ti_chris_milk.update(state: ToteItem.states[:COMMITTED])
 
     #get producer net by first commitment zone
-    first_czs_oxbow_net = oxbow.get_producer_net(czs1)
+    first_czs_oxbow_net = oxbow.outbound_order_value_producer_net(czs1)
     #get producer net by postings
-    first_postings_distributor_net = oxbow.get_producer_net(czs1, delivery_date1_postings)
+    first_postings_distributor_net = get_outbound_order_value_producer_net(delivery_date1_postings)
     #verify producer nets match
     assert_equal first_czs_oxbow_net, first_postings_distributor_net    
     #verify correct oxbow producer net value
     assert_equal 99.57, first_czs_oxbow_net
     #verify correct producer1 producer net value
     producer1_net_value = 49.32
-    assert_equal producer1_net_value, producer1.get_producer_net(czs1)
+    assert_equal producer1_net_value, producer1.outbound_order_value_producer_net(czs1)
     #verify correct producer2 producer net value
     producer2_net_value = 45.70
-    assert_equal producer2_net_value, producer2.get_producer_net(czs1)
+    assert_equal producer2_net_value, producer2.outbound_order_value_producer_net(czs1)
 
     #verify values if we call the 'orderable' methods
     #{postings_to_order: [], postings_to_close: postings_all, outbound_order_value_producer_net: 0}
 
-    report = oxbow.get_postings_orderable(delivery_date1_postings)
-    assert_equal first_czs_oxbow_net, report[:outbound_order_value_producer_net]
+    report = oxbow.outbound_order_report(delivery_date1_postings.first.commitment_zone_start)
+    assert_equal first_czs_oxbow_net, report[:order_value_producer_net]
 
-    report = producer1.get_postings_orderable([posting_carrots])
-    assert_equal producer1_net_value, report[:outbound_order_value_producer_net]
+    report = producer1.outbound_order_report(posting_carrots.commitment_zone_start)
+    assert_equal producer1_net_value, report[:order_value_producer_net]
 
-    report = producer2.get_postings_orderable([posting_beef])
-    assert_equal producer2_net_value, report[:outbound_order_value_producer_net]
+    report = producer2.outbound_order_report(posting_beef.commitment_zone_start)
+    assert_equal producer2_net_value, report[:order_value_producer_net]
+
+  end
+
+  def get_outbound_order_value_producer_net(postings)
+
+    outbound_order_value_producer_net = 0
+
+    if postings.nil?
+      return outbound_order_value_producer_net
+    end
+
+    postings.each do |posting|
+      outbound_order_value_producer_net = (outbound_order_value_producer_net + posting.outbound_order_value_producer_net).round(2)
+    end
+
+    return outbound_order_value_producer_net
 
   end
 
@@ -293,30 +309,30 @@ class UserTest < ActiveSupport::TestCase
     ti_chris_milk.update(state: ToteItem.states[:COMMITTED])
 
     #get producer net by first commitment zone
-    first_czs_oxbow_net = oxbow.get_producer_net(czs1)
-    #get producer net by postings
-    first_postings_distributor_net = oxbow.get_producer_net(czs1, delivery_date1_postings)
+    first_czs_oxbow_net = oxbow.outbound_order_value_producer_net(czs1)
+    #get producer net by postings    
+    first_postings_distributor_net = get_outbound_order_value_producer_net(delivery_date1_postings)
     #verify producer nets match
     assert_equal first_czs_oxbow_net, first_postings_distributor_net    
     #verify correct oxbow producer net value
     assert_equal 53.87, first_czs_oxbow_net
     #verify correct producer1 producer net value
     producer1_net_value = 49.32
-    assert_equal producer1_net_value, producer1.get_producer_net(czs1)
+    assert_equal producer1_net_value, producer1.outbound_order_value_producer_net(czs1)
     #verify correct producer2 producer net value
-    assert_equal 0, producer2.get_producer_net(czs1)
+    assert_equal 0, producer2.outbound_order_value_producer_net(czs1)
 
     #verify values if we call the 'orderable' methods
     #{postings_to_order: [], postings_to_close: postings_all, outbound_order_value_producer_net: 0}
 
-    report = oxbow.get_postings_orderable(delivery_date1_postings)
-    assert_equal first_czs_oxbow_net, report[:outbound_order_value_producer_net]
+    report = oxbow.outbound_order_report(delivery_date1_postings.first.commitment_zone_start)
+    assert_equal first_czs_oxbow_net, report[:order_value_producer_net]
 
-    report = producer1.get_postings_orderable([posting_carrots])
-    assert_equal producer1_net_value, report[:outbound_order_value_producer_net]
+    report = producer1.outbound_order_report(posting_carrots.commitment_zone_start)
+    assert_equal producer1_net_value, report[:order_value_producer_net]
 
-    report = producer2.get_postings_orderable([posting_beef])
-    assert_equal 0, report[:outbound_order_value_producer_net]
+    report = producer2.outbound_order_report(posting_beef.commitment_zone_start)
+    assert_equal 0, report[:order_value_producer_net]
 
   end
 
@@ -420,29 +436,35 @@ class UserTest < ActiveSupport::TestCase
     ti_chris_milk = create_tote_item(posting_milk, quantity = 3, chris)
     ti_chris_milk.update(state: ToteItem.states[:COMMITTED])
 
-    #get producer net by first commitment zone
-    first_czs_oxbow_net = oxbow.get_producer_net(czs1)
-    #get producer net by postings
-    first_postings_distributor_net = oxbow.get_producer_net(czs1, delivery_date1_postings)
-    #verify producer nets match
-    assert_equal first_czs_oxbow_net, first_postings_distributor_net    
-    #verify correct oxbow producer net value
-    assert_equal 18.25, first_czs_oxbow_net
-    #verify correct producer1 producer net value
-    assert_equal 13.70, producer1.get_producer_net(czs1)
-    #verify correct producer2 producer net value
-    assert_equal 0, producer2.get_producer_net(czs1)
+    #oxbow has om $50 and only has gross sales of $5. producer1 has om $20 and only has gross sales of $13.75
+    #producer2 has no om but does have case size of 10 and only 6 units sold
+    #so each of the three producers should have individual outbound order of $0 which means the sum is also $0
+
+    assert_equal 1, producer1.postings.where(commitment_zone_start: czs1).count
+    p1p = producer1.postings.where(commitment_zone_start: czs1).first
+    assert_equal 13.70, p1p.outbound_order_value_producer_net
+    assert_equal 20, producer1.order_minimum_producer_net
+    assert_equal 0, producer1.outbound_order_value_producer_net(czs1)
+
+    assert_equal 1, producer2.postings.where(commitment_zone_start: czs1).count
+    p2p = producer2.postings.where(commitment_zone_start: czs1).first
+    assert_equal 10, p2p.units_per_case
+    assert_equal 6, p2p.total_quantity_authorized_or_committed
+    assert_equal 0, producer2.outbound_order_value_producer_net(czs1)
+
+    assert_equal 4.55, oxbow.inbound_order_value_producer_net(czs1)
+    assert_equal 0, oxbow.outbound_order_value_producer_net(czs1)
 
     #verify values if we call the 'orderable' methods
     #{postings_to_order: [], postings_to_close: postings_all, outbound_order_value_producer_net: 0}
-    report = oxbow.get_postings_orderable(delivery_date1_postings)
-    assert_equal 0, report[:outbound_order_value_producer_net]
+    report = oxbow.outbound_order_report(czs1)
+    assert_equal 0, report[:order_value_producer_net]
 
-    report = producer1.get_postings_orderable([posting_carrots])
-    assert_equal 0, report[:outbound_order_value_producer_net]
+    report = producer1.outbound_order_report(p1p.commitment_zone_start)
+    assert_equal 0, report[:order_value_producer_net]
 
-    report = producer2.get_postings_orderable([posting_beef])
-    assert_equal 0, report[:outbound_order_value_producer_net]
+    report = producer2.outbound_order_report(p2p.commitment_zone_start)
+    assert_equal 0, report[:order_value_producer_net]
 
   end
 
@@ -497,7 +519,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal expected_apples_posting_value, posting_apples.inbound_order_value_producer_net
 
     czs = posting_celery.commitment_zone_start
-    producer_net = producer.get_producer_net(czs)
+    producer_net = producer.outbound_order_value_producer_net(czs)
 
     assert_equal expected_order_value, producer_net
 
@@ -551,14 +573,14 @@ class UserTest < ActiveSupport::TestCase
     expected_producer_net = 31.50
     assert_equal expected_producer_net, producer_net
 
-    #get_postings_orderable(postings_presently_transitioning_to_commitment_zone) should return postings
-    report = producer.get_postings_orderable([posting_celery, posting_apples])
+    #outbound_order_report(postings_presently_transitioning_to_commitment_zone) should return postings
+    report = producer.outbound_order_report(posting_celery.commitment_zone_start)
     #verify all postings returned
-    assert_equal report[:postings_to_order].first, posting_celery
-    assert_equal report[:postings_to_order].last, posting_apples
-    assert_equal 0, report[:postings_to_close].count
+    assert_equal report[:postings_order_requirements_met].first, posting_celery
+    assert_equal report[:postings_order_requirements_met].last, posting_apples
+    assert_equal 0, report[:postings_order_requirements_unmet].count
     #verify total order amount    
-    assert_equal expected_producer_net, report[:outbound_order_value_producer_net]
+    assert_equal expected_producer_net, report[:order_value_producer_net]
 
   end
 
@@ -613,14 +635,14 @@ class UserTest < ActiveSupport::TestCase
     expected_producer_net = 31.50
     assert_equal expected_producer_net, producer_net
 
-    #get_postings_orderable(postings_presently_transitioning_to_commitment_zone) should return postings
-    report = producer.get_postings_orderable([posting_celery, posting_apples])
+    #outbound_order_report(postings_presently_transitioning_to_commitment_zone) should return postings
+    report = producer.outbound_order_report(posting_celery.commitment_zone_start)
     #verify all postings returned
-    assert_equal report[:postings_to_order].first, posting_celery
-    assert_equal report[:postings_to_order].last, posting_apples
-    assert_equal 0, report[:postings_to_close].count
+    assert_equal report[:postings_order_requirements_met].first, posting_celery
+    assert_equal report[:postings_order_requirements_met].last, posting_apples
+    assert_equal 0, report[:postings_order_requirements_unmet].count
     #verify total order amount    
-    assert_equal expected_producer_net, report[:outbound_order_value_producer_net]
+    assert_equal expected_producer_net, report[:order_value_producer_net]
   end
 
   test "should not submit orders when total producer net is below producer order minimum" do
@@ -674,14 +696,14 @@ class UserTest < ActiveSupport::TestCase
     expected_producer_net = 31.50
     assert_equal expected_producer_net, producer_net
 
-    #get_postings_orderable(postings_presently_transitioning_to_commitment_zone) should return postings
-    report = producer.get_postings_orderable([posting_celery, posting_apples])
+    #outbound_order_report(postings_presently_transitioning_to_commitment_zone) should return postings
+    report = producer.outbound_order_report(posting_celery.commitment_zone_start)
     #verify all postings returned
-    assert_equal 0, report[:postings_to_order].count
-    assert_equal report[:postings_to_close].first, posting_celery
-    assert_equal report[:postings_to_close].last, posting_apples
+    assert_equal 0, report[:postings_order_requirements_met].count
+    assert_equal report[:postings_order_requirements_unmet].first, posting_celery
+    assert_equal report[:postings_order_requirements_unmet].last, posting_apples
     #verify total order amount    
-    assert_equal 0, report[:outbound_order_value_producer_net]
+    assert_equal 0, report[:order_value_producer_net]
   end
 
   test "should submit orders when distributor has no order minimum" do
@@ -737,14 +759,14 @@ class UserTest < ActiveSupport::TestCase
     expected_producer_net = 31.50
     assert_equal expected_producer_net, producer_net
 
-    #get_postings_orderable(postings_presently_transitioning_to_commitment_zone) should return postings
-    report = distributor.get_postings_orderable([posting_celery, posting_apples])
+    #outbound_order_report(postings_presently_transitioning_to_commitment_zone) should return postings
+    report = distributor.outbound_order_report(posting_celery.commitment_zone_start)
     #verify all postings returned
-    assert_equal report[:postings_to_order].first, posting_celery
-    assert_equal report[:postings_to_order].last, posting_apples
-    assert_equal 0, report[:postings_to_close].count
+    assert_equal report[:postings_order_requirements_met].first, posting_celery
+    assert_equal report[:postings_order_requirements_met].last, posting_apples
+    assert_equal 0, report[:postings_order_requirements_unmet].count
     #verify total order amount    
-    assert_equal expected_producer_net, report[:outbound_order_value_producer_net]
+    assert_equal expected_producer_net, report[:order_value_producer_net]
   end
 
   test "should submit orders when producer orders meet distributor order minimum" do
@@ -803,14 +825,14 @@ class UserTest < ActiveSupport::TestCase
     expected_producer_net = 31.50
     assert_equal expected_producer_net, producer_net
 
-    #get_postings_orderable(postings_presently_transitioning_to_commitment_zone) should return postings
-    report = distributor.get_postings_orderable([posting_celery, posting_apples])
+    #outbound_order_report(postings_presently_transitioning_to_commitment_zone) should return postings
+    report = distributor.outbound_order_report(posting_celery.commitment_zone_start)
     #verify all postings returned
-    assert_equal report[:postings_to_order].first, posting_celery
-    assert_equal report[:postings_to_order].last, posting_apples
-    assert_equal 0, report[:postings_to_close].count
+    assert_equal report[:postings_order_requirements_met].first, posting_celery
+    assert_equal report[:postings_order_requirements_met].last, posting_apples
+    assert_equal 0, report[:postings_order_requirements_unmet].count
     #verify total order amount    
-    assert_equal expected_producer_net, report[:outbound_order_value_producer_net]
+    assert_equal expected_producer_net, report[:order_value_producer_net]
   end
   
   test "should not submit orders when producer orders do not meet distributor order minimum" do
@@ -869,15 +891,15 @@ class UserTest < ActiveSupport::TestCase
     expected_producer_net = 31.50
     assert_equal expected_producer_net, producer_net
 
-    #get_postings_orderable(postings_presently_transitioning_to_commitment_zone) should return postings
-    report = distributor.get_postings_orderable([posting_celery, posting_apples])
+    #outbound_order_report(postings_presently_transitioning_to_commitment_zone) should return postings
+    report = distributor.outbound_order_report(posting_celery.commitment_zone_start)
     #verify all postings returned
-    assert_equal 0, report[:postings_to_order].count
+    assert_equal 0, report[:postings_order_requirements_met].count
 
-    assert_equal report[:postings_to_close].first, posting_celery
-    assert_equal report[:postings_to_close].last, posting_apples    
+    assert_equal report[:postings_order_requirements_unmet].first, posting_celery
+    assert_equal report[:postings_order_requirements_unmet].last, posting_apples    
     #verify total order amount    
-    assert_equal 0, report[:outbound_order_value_producer_net]
+    assert_equal 0, report[:order_value_producer_net]
   end
 
   test "should exclude producer from distributor order submission when producer order minimum is not met" do
@@ -941,17 +963,17 @@ class UserTest < ActiveSupport::TestCase
     expected_producer_net = 31.50
     assert_equal expected_producer_net, producer_net
 
-    #get_postings_orderable(postings_presently_transitioning_to_commitment_zone) should return postings
-    report = distributor.get_postings_orderable([posting_celery, posting_apples])
+    #outbound_order_report(postings_presently_transitioning_to_commitment_zone) should return postings
+    report = distributor.outbound_order_report(posting_celery.commitment_zone_start)
     #verify all postings returned
-    assert_equal 1, report[:postings_to_order].count
-    assert_equal posting_apples, report[:postings_to_order].last
+    assert_equal 1, report[:postings_order_requirements_met].count
+    assert_equal posting_apples, report[:postings_order_requirements_met].last
 
-    assert_equal 1, report[:postings_to_close].count
-    assert_equal posting_celery, report[:postings_to_close].last
+    assert_equal 1, report[:postings_order_requirements_unmet].count
+    assert_equal posting_celery, report[:postings_order_requirements_unmet].last
 
     #verify total order amount    
-    assert_equal expected_producer_net_apples, report[:outbound_order_value_producer_net]
+    assert_equal expected_producer_net_apples, report[:order_value_producer_net]
   end
 
   test "should submit orders properly when distributor is itself a producer" do
@@ -1022,17 +1044,18 @@ class UserTest < ActiveSupport::TestCase
     expected_producer_net = 40.65
     assert_equal expected_producer_net, producer_net
 
-    #get_postings_orderable(postings_presently_transitioning_to_commitment_zone) should return postings
-    report = distributor.get_postings_orderable([posting_celery, posting_apples, posting_milk])
+    #outbound_order_report(postings_presently_transitioning_to_commitment_zone) should return postings
+    report = distributor.outbound_order_report(posting_celery.commitment_zone_start)
     #verify all postings returned
-    assert_equal 0, report[:postings_to_close].count
-    assert_equal 3, report[:postings_to_order].count
-    assert_equal posting_celery.product.name, report[:postings_to_order].first.product.name
-    assert_equal posting_apples.product.name, report[:postings_to_order].second.product.name
-    assert_equal posting_milk.product.name, report[:postings_to_order].last.product.name
+    assert_equal 0, report[:postings_order_requirements_unmet].count
+    assert_equal 3, report[:postings_order_requirements_met].count
         
+    assert_equal posting_milk.product.name, report[:postings_order_requirements_met].first.product.name
+    assert_equal posting_celery.product.name, report[:postings_order_requirements_met].second.product.name
+    assert_equal posting_apples.product.name, report[:postings_order_requirements_met].last.product.name
+
     #verify total order amount    
-    assert_equal expected_producer_net, report[:outbound_order_value_producer_net]
+    assert_equal expected_producer_net, report[:order_value_producer_net]
   end
 
   test "producer without distributor should have business interface" do
