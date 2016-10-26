@@ -235,7 +235,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     #first and second ti's should not be the same object
     assert_not indd == next_ti
     #first and second ti's should be separated by 7 days
-    assert_equal 7.days, next_ti.posting.delivery_date - indd.posting.delivery_date
+    assert_equal distance_of_time_in_words(7.days), distance_of_time_in_words(next_ti.posting.delivery_date - indd.posting.delivery_date)
 
     travel_back
 
@@ -302,7 +302,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     #the person specified to skip, then let the order cutoff hit, then views their skip date options. at this point it is
     #not an option for them to 'unskip' INDD so we don't even show that in skip_dates. therefore, the first displayed
     #skip date should be 7 days after INDD    
-    assert_equal 7.days, skip_dates[0][:date] - indd.posting.delivery_date
+    assert_equal distance_of_time_in_words(7.days), distance_of_time_in_words(skip_dates[0][:date] - indd.posting.delivery_date)
 
     do_delivery(indd.posting)
 
@@ -312,7 +312,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     assert_equal 2, subscription.reload.tote_items.count
     #this 'next' ti should be out ahead of INDD
     assert subscription.tote_items.last.posting.delivery_date > indd.posting.delivery_date
-    assert_equal 7.days, subscription.tote_items.last.posting.delivery_date - indd.posting.delivery_date
+    assert_equal distance_of_time_in_words(7.days), distance_of_time_in_words(subscription.tote_items.last.posting.delivery_date - indd.posting.delivery_date)
     #assert INDD really is REMOVED
     assert indd.reload.state?(:REMOVED)
 
@@ -889,7 +889,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     regular_tote_item_delivery_gap = 1.minute
     has_paused = false
 
-    30.times do
+    5.times do
 
       top_of_hour = Time.zone.now.min == 0
       is_noon_hour = Time.zone.now.hour == 12
@@ -916,7 +916,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
         assert_not subscription.paused
       end
 
-      travel 1.day
+      travel_to subscription.posting_recurrence.current_posting.commitment_zone_start
 
     end
 
@@ -926,7 +926,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     assert_equal user.tote_items.count, num_tote_items + subscription.tote_items.count - 1
     assert_equal subscription.tote_items.count, apples_posting.posting_recurrence.postings.count
     gap = subscription.tote_items[1].posting.delivery_date - subscription.tote_items[0].posting.delivery_date
-    assert_equal 7.days, gap    
+    assert_equal distance_of_time_in_words(7.days), distance_of_time_in_words(gap)
 
     assert_equal ToteItem.states[:COMMITTED], subscription.tote_items[0].state
     assert_equal ToteItem.states[:REMOVED], subscription.tote_items[1].state
@@ -994,8 +994,8 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     #as of this writing only two items should have been generated in this series. they should be without gap (i.e. 7 day spacing)
     #right at the beginning of the posting recurrence series. then the turn_off method gets called so their shoudl be no further
     #tote items. but the pr should keep chugging so there should be a big gap between the last posting in the pr series vs the ti series
-    gap = subscription.tote_items[1].posting.delivery_date - subscription.tote_items[0].posting.delivery_date
-    assert_equal 7.days, gap
+    gap = subscription.tote_items[1].posting.delivery_date - subscription.tote_items[0].posting.delivery_date    
+    assert_equal distance_of_time_in_words(7.days), distance_of_time_in_words(gap)
     apples_posting.reload
     gap = apples_posting.posting_recurrence.postings.last.delivery_date - subscription.tote_items.last.posting.delivery_date
     assert gap > 7.days

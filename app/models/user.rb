@@ -4,7 +4,7 @@ class User < ApplicationRecord
   validates :name, length: { maximum: 50 }
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
   validates :email, presence: true, length: { maximum: 255 }, format: { with: VALID_EMAIL_REGEX }, uniqueness: { case_sensitive: false }
-  validates :farm_name, presence: true, if: :is_producer?
+  validates :farm_name, presence: true, if: :producer?
   validates :account_type, presence: true
   validates :account_type, numericality: {only_integer: true, greater_than: -1, less_than: 5, message: "account_type is invalid"}
 
@@ -159,8 +159,12 @@ class User < ApplicationRecord
     return partner_deliveries.where("created_at > ?", cutoff)
   end
 
+  def producer?
+    return account_type_is?(:PRODUCER)
+  end
+
   def distributor?
-    return account_type_is?(:PRODUCER) && producers.count > 0
+    return producer? && producers.any?
   end
   
   #this method is recursive. it will start at the current level and traverse up the distributor parenthood,
@@ -316,10 +320,6 @@ class User < ApplicationRecord
     
     return rtba
 
-  end
-
-  def is_producer?
-    return account_type == 1
   end
 
   def self.types

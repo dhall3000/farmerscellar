@@ -255,7 +255,7 @@ class Posting < ApplicationRecord
       return true
     end
 
-    return inbound_order_value_producer_net > order_minimum_producer_net
+    return inbound_order_value_producer_net >= order_minimum_producer_net
 
   end
 
