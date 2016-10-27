@@ -940,18 +940,18 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
   end
 
   test "should not generate tote items after subscription is turned off" do
-    test_subscription_turn_off(posting_frequency = 1, subscription_frequency = 1)
+    do_subscription_turn_off(posting_frequency = 1, subscription_frequency = 1)
   end
 
   test "should not generate tote items after subscription is turned off monthly recurrence" do
-    test_subscription_turn_off(posting_frequency = 5, subscription_frequency = 1)
+    do_subscription_turn_off(posting_frequency = 5, subscription_frequency = 1)
   end
 
   test "should not generate tote items after subscription is turned off monthly recurrence 2" do
-    test_subscription_turn_off(posting_frequency = 5, subscription_frequency = 2)
+    do_subscription_turn_off(posting_frequency = 5, subscription_frequency = 2)
   end
 
-  def test_subscription_turn_off(posting_frequency, subscription_frequency)
+  def do_subscription_turn_off(posting_frequency, subscription_frequency)
 
     posting = create_posting_recurrence(posting_frequency).current_posting
 

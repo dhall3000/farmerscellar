@@ -143,7 +143,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
   end
 
   test "should have legit subscription options" do
-    monthly_posting_recurrence = create_posting_recurrence
+    monthly_posting_recurrence = create_posting_recurrence(5)
     monthly_options = monthly_posting_recurrence.subscription_create_options
 
     options = @posting_recurrence.subscription_create_options
@@ -217,9 +217,11 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
   end
 
   test "verify get delivery dates method 1 for monthly recurrence" do
+    posting_recurrence_frequency = 5
     order_cutoff = Time.zone.local(2016, 8, 29, 8)
     delivery_date = Time.zone.local(2016, 9, 2)
-    monthly_posting_recurrence = create_posting_recurrence(order_cutoff, delivery_date)
+
+    monthly_posting_recurrence = create_posting_recurrence(posting_recurrence_frequency, order_cutoff, delivery_date)
     delivery_dates = monthly_posting_recurrence.get_delivery_dates_for(delivery_date, delivery_date + (8 * 31).days)
     assert_equal 8, delivery_dates.count
     
