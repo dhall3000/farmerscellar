@@ -744,7 +744,16 @@ class PostingsControllerTest < ActionDispatch::IntegrationTest
 
   end
 
-  def successfully_create_posting_with_recurrence
+  test "successfully create posting with monthly recurrence" do
+    successfully_create_posting_with_recurrence(monthly_posting_frequency = 5)
+  end
+
+  def successfully_create_posting_with_recurrence(posting_frequency = nil)
+
+    if posting_frequency.nil?
+      posting_frequency = 1
+    end
+
     #log in
     log_in_as(@farmer)
     #go to post creation page
@@ -758,10 +767,10 @@ class PostingsControllerTest < ActionDispatch::IntegrationTest
     posting_recurrence_count = PostingRecurrence.count
 
     parms = get_posting_params_hash
-    parms[:posting_recurrence] = {frequency: PostingRecurrence.frequency[1][1], on: true}
+    parms[:posting_recurrence] = {frequency: posting_frequency, on: true}
     post postings_path, params: { id: @farmer.id, posting: parms}
     posting = assigns(:posting)        
-    assert_not posting.nil?    
+    assert_not posting.nil?
     assert posting.posting_recurrence.valid?
     assert posting.valid?, get_error_messages(posting)
     #there should be more posting recurrences in the database now than thre was before this posting

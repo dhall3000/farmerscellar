@@ -43,17 +43,7 @@ class PostingsController < ApplicationController
     #if posting_recurrence_params are repeating, associate a new recurrence with this posting
     if !posting_recurrence_params.nil? && posting_recurrence_params[:on] && posting_recurrence_params[:frequency].to_i > PostingRecurrence.frequency[0][1]      
       posting_recurrence = PostingRecurrence.new(posting_recurrence_params)
-      posting_recurrence.postings << @posting
-
-      if posting_recurrence_params[:frequency].to_i == 5
-        @posting.build_posting_recurrence(posting_recurrence_params)
-        load_posting_choices
-        flash.now[:danger] = "Sorry, monthly posting schedule isn't quite ready yet. If you need it done soon please contact us and we'll speed it up. In the meantime consider doing a every-4-weeks delivery schedule."
-        AdminNotificationMailer.general_message("Attempt made to create monthly posting recurrence", "User Id: #{current_user.id.to_s}, Farm Name: #{current_user.farm_name}, Email: #{current_user.email}").deliver_now
-        render 'new'        
-        return
-      end
-            
+      posting_recurrence.postings << @posting            
     end
 
     #first check to see if we have a commission set for this creation attempt
