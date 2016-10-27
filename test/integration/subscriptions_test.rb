@@ -940,18 +940,28 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
   end
 
   test "should not generate tote items after subscription is turned off" do
+    test_subscription_turn_off(posting_frequency = 1, subscription_frequency = 1)
+  end
 
-    postings = setup_posting_recurrences
-    posting_recurrences = get_posting_recurrences(postings)
+  test "should not generate tote items after subscription is turned off monthly recurrence" do
+    test_subscription_turn_off(posting_frequency = 5, subscription_frequency = 1)
+  end
+
+  test "should not generate tote items after subscription is turned off monthly recurrence 2" do
+    test_subscription_turn_off(posting_frequency = 5, subscription_frequency = 2)
+  end
+
+  def test_subscription_turn_off(posting_frequency, subscription_frequency)
+
+    posting = create_posting_recurrence(posting_frequency).current_posting
 
     user = users(:c17)
     assert_equal 0, ToteItem.where(user_id: user.id).count
 
     quantity = 2
-    frequency = 1
-    apples_posting = postings[0]
+    subscription_frequency = 1    
 
-    subscription = add_subscription(user, apples_posting, quantity, frequency)
+    subscription = add_subscription(user, posting, quantity, subscription_frequency)
     tote_item = subscription.tote_items.first
 
     assert_equal 1, ToteItem.where(user_id: user.id).count
@@ -965,7 +975,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     regular_tote_item_delivery_gap = 1.minute
     has_paused = false
 
-    30.times do
+    110.times do
 
       top_of_hour = Time.zone.now.min == 0
       is_noon_hour = Time.zone.now.hour == 12
@@ -988,17 +998,28 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
 
     travel_back
 
+    posting.reload
     user.reload
     assert_equal num_tote_items + 1, user.tote_items.count
 
     #as of this writing only two items should have been generated in this series. they should be without gap (i.e. 7 day spacing)
     #right at the beginning of the posting recurrence series. then the turn_off method gets called so their shoudl be no further
     #tote items. but the pr should keep chugging so there should be a big gap between the last posting in the pr series vs the ti series
-    gap = subscription.tote_items[1].posting.delivery_date - subscription.tote_items[0].posting.delivery_date    
-    assert_equal distance_of_time_in_words(7.days), distance_of_time_in_words(gap)
-    apples_posting.reload
-    gap = apples_posting.posting_recurrence.postings.last.delivery_date - subscription.tote_items.last.posting.delivery_date
-    assert gap > 7.days
+    actual_tote_items_gap = subscription.tote_items[1].posting.delivery_date - subscription.tote_items[0].posting.delivery_date    
+    actual_tote_item_postings_gap = posting.posting_recurrence.postings.last.delivery_date - subscription.tote_items.last.posting.delivery_date
+
+    if posting_frequency > 0 && posting_frequency < 5      
+      assert_equal distance_of_time_in_words((7 * posting_frequency * subscription_frequency).days), distance_of_time_in_words(actual_tote_items_gap)      
+      assert actual_tote_item_postings_gap > 7.days
+    elsif posting_frequency == 5
+      expected_tote_items_gap_lo = (28 * subscription_frequency).days
+      expected_tote_items_gap_hi = (37 * subscription_frequency).days
+
+      assert actual_tote_items_gap >= expected_tote_items_gap_lo
+      assert actual_tote_items_gap <= expected_tote_items_gap_hi
+    else
+      assert false, "incorrect posting_frequency"
+    end
 
   end
 
@@ -1157,77 +1178,6 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
 
     do_posting_spacing(posting_recurrence)
     do_tote_item_spacing(posting_recurrence)    
-
-  end
-
-  def do_posting_spacing(posting_recurrence)
-
-    postings = posting_recurrence.postings
-    assert postings.count > 1, "there aren't enough postings in this recurrence to test the spacing"
-
-    seconds_per_hour = 60 * 60
-    num_seconds_per_week = 7 * 24 * seconds_per_hour
-
-    if posting_recurrence.frequency <= 4      
-
-      count = 1
-      while count < postings.count
-
-        spacing = postings[count].delivery_date - postings[count - 1].delivery_date
-
-        if !postings[count].delivery_date.dst? && postings[count - 1].delivery_date.dst?
-          spacing -= seconds_per_hour
-        end
-
-        if postings[count].delivery_date.dst? && !postings[count - 1].delivery_date.dst?
-          spacing += seconds_per_hour
-        end        
-
-        assert_equal num_seconds_per_week * posting_recurrence.frequency, spacing
-        count += 1
-
-      end
-
-    elsif posting_recurrence.frequency == 5
-      assert false, "do_posting_spacing doesn't test frequency 5 yet"      
-    end
-
-  end
-
-  def do_tote_item_spacing(posting_recurrence)
-
-    seconds_per_hour = 60 * 60
-    num_seconds_per_week = 7 * 24 * seconds_per_hour
-    postings = posting_recurrence.postings
-    subscription = posting_recurrence.subscriptions.last
-    tote_items = subscription.tote_items
-
-    assert postings.count > 1, "there aren't enough postings in this recurrence to test the tote items spacing"
-    assert tote_items.count > 1, "there aren't enough tote_items in this subscription to test the tote items spacing"
-
-    if posting_recurrence.frequency <= 4
-
-      count = 1
-      while count < tote_items.count
-
-        actual_spacing = tote_items[count].posting.delivery_date - tote_items[count - 1].posting.delivery_date
-        expected_spacing = num_seconds_per_week * posting_recurrence.frequency * subscription.frequency
-
-        if !tote_items[count].posting.delivery_date.dst? && tote_items[count - 1].posting.delivery_date.dst?
-          expected_spacing += seconds_per_hour
-        end
-
-        if tote_items[count].posting.delivery_date.dst? && !tote_items[count - 1].posting.delivery_date.dst?
-          expected_spacing -= seconds_per_hour
-        end
-
-        assert_equal expected_spacing, actual_spacing
-        count += 1
-      end
-
-    elsif posting_recurrence.frequency == 5
-      assert false, "do_tote_item_spacing doesn't test frequency 5 yet"
-    end
 
   end
 

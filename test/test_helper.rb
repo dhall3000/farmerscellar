@@ -6,6 +6,239 @@ class ActiveSupport::TestCase
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
   fixtures :all
 
+  def do_posting_spacing(posting_recurrence)
+
+    postings = posting_recurrence.postings
+    assert postings.count > 1, "there aren't enough postings in this recurrence to test the spacing"
+
+    seconds_per_hour = 60 * 60
+    num_seconds_per_day = seconds_per_hour * 24
+    num_seconds_per_week = 7 * num_seconds_per_day
+
+    #these are for measuring gaps in monthly subscriptions. the lowest number of days from one delivery to the next
+    #is 28. but the highest is 31 + 6 (which is the same as 28 + 9). The "+ 6" is because say we're delivering
+    #on "first friday of the month" and that the last day of the month is Friday. in this case the next friday
+    #which would be the 1st friday of the next month, is the 6th day of the month
+    num_seconds_per_month_lo = num_seconds_per_week * 4
+    num_seconds_per_month_hi = num_seconds_per_month_lo + (9 * num_seconds_per_day)
+
+    if posting_recurrence.frequency > 0 && posting_recurrence.frequency < 6
+
+      count = 1
+      while count < postings.count
+
+        spacing = postings[count].delivery_date - postings[count - 1].delivery_date
+
+        if !postings[count].delivery_date.dst? && postings[count - 1].delivery_date.dst?
+          spacing -= seconds_per_hour
+        end
+
+        if postings[count].delivery_date.dst? && !postings[count - 1].delivery_date.dst?
+          spacing += seconds_per_hour
+        end
+
+        if posting_recurrence.frequency == 5
+          assert spacing.seconds >= num_seconds_per_month_lo.seconds
+          assert spacing.seconds <= num_seconds_per_month_hi.seconds
+        else
+          assert_equal num_seconds_per_week * posting_recurrence.frequency, spacing
+        end
+        
+        count += 1
+
+      end
+
+    else
+      assert false, "posting_recurrence frequence #{posting_recurrence.frequency.to_s} not implemented"
+    end
+
+  end
+
+  def do_tote_item_spacing(posting_recurrence)
+
+    seconds_per_hour = 60 * 60
+    num_seconds_per_day = seconds_per_hour * 24
+    num_seconds_per_week = 7 * num_seconds_per_day
+    #these are for measuring gaps in monthly subscriptions. the lowest number of days from one delivery to the next
+    #is 28. but the highest is 31 + 6 (which is the same as 28 + 9). The "+ 6" is because say we're delivering
+    #on "first friday of the month" and that the last day of the month is Friday. in this case the next friday
+    #which would be the 1st friday of the next month, is the 6th day of the month
+    num_seconds_per_month_lo = num_seconds_per_week * 4
+    num_seconds_per_month_hi = num_seconds_per_month_lo + (9 * num_seconds_per_day)
+
+    postings = posting_recurrence.postings
+    subscription = posting_recurrence.subscriptions.last
+    tote_items = subscription.tote_items
+
+    assert postings.count > 1, "there aren't enough postings in this recurrence to test the tote items spacing"
+    assert tote_items.count > 1, "there aren't enough tote_items in this subscription to test the tote items spacing"
+
+    if posting_recurrence.frequency > 0 && posting_recurrence.frequency < 5
+      count = 1
+      while count < tote_items.count
+
+        actual_spacing = tote_items[count].posting.delivery_date - tote_items[count - 1].posting.delivery_date
+        expected_spacing = num_seconds_per_week * posting_recurrence.frequency * subscription.frequency
+
+        if !tote_items[count].posting.delivery_date.dst? && tote_items[count - 1].posting.delivery_date.dst?
+          expected_spacing += seconds_per_hour
+        end
+
+        if tote_items[count].posting.delivery_date.dst? && !tote_items[count - 1].posting.delivery_date.dst?
+          expected_spacing -= seconds_per_hour
+        end
+
+        assert_equal expected_spacing, actual_spacing
+        count += 1
+      end
+    elsif posting_recurrence.frequency == 5
+      count = 1
+      while count < tote_items.count
+
+        actual_spacing = tote_items[count].posting.delivery_date - tote_items[count - 1].posting.delivery_date
+
+        expected_spacing_lo = num_seconds_per_month_lo * subscription.frequency
+        expected_spacing_hi = num_seconds_per_month_hi * subscription.frequency
+
+        if !tote_items[count].posting.delivery_date.dst? && tote_items[count - 1].posting.delivery_date.dst?
+          expected_spacing_lo += seconds_per_hour
+          expected_spacing_hi += seconds_per_hour
+        end
+
+        if tote_items[count].posting.delivery_date.dst? && !tote_items[count - 1].posting.delivery_date.dst?
+          expected_spacing_lo -= seconds_per_hour
+          expected_spacing_hi -= seconds_per_hour
+        end
+
+        assert actual_spacing.seconds >= expected_spacing_lo.seconds
+        assert actual_spacing.seconds <= expected_spacing_hi.seconds
+        
+        count += 1
+
+      end
+    else
+      assert false, "do_tote_item_spacing doesn't test frequency #{posting_recurrence.frequency.to_s} yet"
+    end
+
+  end
+
+  def add_tote_item(customer, posting, quantity, frequency = nil)
+    
+    log_in_as(customer)
+    assert is_logged_in?
+
+    post tote_items_path, params: {tote_item: {quantity: quantity, posting_id: posting.id}}
+    tote_item = assigns(:tote_item)
+    additional_units_required_to_fill_my_case = tote_item.additional_units_required_to_fill_my_case
+
+    assert :redirected
+    assert_response :redirect
+
+    if frequency && frequency > 0
+
+      follow_redirect!
+
+      post subscriptions_path, params: {tote_item_id: tote_item.id, frequency: frequency}
+      subscription = assigns(:subscription)
+      assert subscription.valid?
+
+      if tote_item.reload.additional_units_required_to_fill_my_case == 0
+        assert_redirected_to postings_path
+      else
+        assert_equal "Subscription added but needs attention. See below.", flash[:danger]
+        assert_redirected_to tote_items_pout_path(id: tote_item.id)        
+      end
+
+    else
+
+      if additional_units_required_to_fill_my_case == 0
+        assert_equal "Item added to tote.", flash[:success]
+        assert_redirected_to postings_path
+      else
+        assert_equal "Item added to tote but attention needed. See below.", flash[:danger]          
+        assert_redirected_to tote_items_pout_path(id: tote_item.id)
+      end
+
+    end
+
+    follow_redirect!
+
+    return tote_item
+
+  end
+
+  def create_rt_authorization_for_customer(customer)
+
+    set_dropsite(customer)
+    items_total_gross = get_items_total_gross(customer)
+
+    if customer.rtbas.count == 0 || !customer.rtbas.last.ba_valid?
+
+      checkouts_count = Checkout.count
+      post checkouts_path, params: {amount: items_total_gross, use_reference_transaction: "1"}
+      assert_equal nil, flash[:danger]
+      assert_equal checkouts_count + 1, Checkout.count
+      assert_equal true, Checkout.last.is_rt
+      checkout = assigns(:checkout)
+      follow_redirect!
+      post rtauthorizations_create_path, params: {token: checkout.token}
+
+    else
+      post rtauthorizations_create_path, params: {token: customer.rtbas.last.token}    
+    end
+    
+    rtauthorization = assigns(:rtauthorization)
+
+    return rtauthorization
+
+  end
+
+  def set_dropsite(customer)
+
+    log_in_as(customer)
+
+    get dropsites_path
+    assert_template 'dropsites/index'
+    get dropsite_path(Dropsite.first)
+    assert_template 'dropsites/show'
+    post user_dropsites_path, params: {user_dropsite: {user_id: customer.id, dropsite_id: Dropsite.first.id}}
+
+  end
+
+  def get_items_total_gross(customer)
+    
+    set_dropsite(customer)
+
+    get tote_items_path
+    assert_response :success
+    assert_template 'tote_items/tote'
+    assert_not_nil assigns(:tote_items)
+    items_total_gross = assigns(:items_total_gross)
+    assert_not_nil items_total_gross
+    assert items_total_gross > 0, "total amount of tote items is not greater than zero"
+    puts "items_total_gross = $#{items_total_gross}"
+
+    return items_total_gross
+
+  end
+
+  def create_posting_recurrence(posting_recurrence_frequency = nil, order_cutoff = nil, delivery_date = nil)
+
+    monthly_posting = create_posting(create_producer("john", "john@j.com", "WA", 98033, "john@j.com", "John's Farms"), 1.25)
+    monthly_posting_recurrence = PostingRecurrence.new(frequency: posting_recurrence_frequency, on: true)
+    monthly_posting_recurrence.postings << monthly_posting
+    assert monthly_posting_recurrence.save
+
+    if order_cutoff && delivery_date
+      assert order_cutoff < delivery_date
+      monthly_posting.update(commitment_zone_start: order_cutoff, delivery_date: delivery_date)
+      assert monthly_posting.valid?
+    end
+
+    return monthly_posting_recurrence
+
+  end
+
   def do_current_posting_order_cutoff_tasks(posting_recurrence)
     
     posting = posting_recurrence.current_posting
@@ -23,6 +256,11 @@ class ActiveSupport::TestCase
     log_in_as(users(:a1))
     post postings_fill_path, params: {posting_id: posting.id, quantity: posting.total_quantity_authorized_or_committed}
 
+  end
+
+  def nuke_all_users
+    User.delete_all
+    assert_equal 0, User.count
   end
 
   def nuke_all_postings
@@ -115,6 +353,7 @@ class ActiveSupport::TestCase
       )
 
     producer.settings.update(conditional_payment: true)
+    producer.create_business_interface(name: "#{name} #{name}, Inc.", order_email_accepted: true, order_email: producer.email, paypal_accepted: true, paypal_email: producer.email)
 
     assert producer.valid?
 

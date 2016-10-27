@@ -143,6 +143,9 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
   end
 
   test "should have legit subscription options" do
+    monthly_posting_recurrence = create_posting_recurrence
+    monthly_options = monthly_posting_recurrence.subscription_create_options
+
     options = @posting_recurrence.subscription_create_options
 
     assert_not options.nil?
@@ -152,11 +155,19 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     assert_equal "Every 3 weeks", options[3][:text]
     assert_equal "Every 4 weeks", options[4][:text]
 
+    assert_equal "Just once", monthly_options[0][:text]
+    assert_match "every month", monthly_options[1][:text]
+    assert_match "every 2nd month", monthly_options[2][:text]
+
     assert_equal 0, options[0][:subscription_frequency]
     assert_equal 1, options[1][:subscription_frequency]
     assert_equal 2, options[2][:subscription_frequency]
     assert_equal 3, options[3][:subscription_frequency]
     assert_equal 4, options[4][:subscription_frequency]
+
+    assert_equal 0, monthly_options[0][:subscription_frequency]
+    assert_equal 1, monthly_options[1][:subscription_frequency]
+    assert_equal 2, monthly_options[2][:subscription_frequency]
 
     delivery_date = @posting_recurrence.postings.last.delivery_date
 
@@ -165,6 +176,11 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     assert_equal delivery_date, options[2][:next_delivery_date]
     assert_equal delivery_date, options[3][:next_delivery_date]
     assert_equal delivery_date, options[4][:next_delivery_date]
+
+    delivery_date = monthly_posting_recurrence.postings.last.delivery_date
+    assert_equal delivery_date, monthly_options[0][:next_delivery_date]
+    assert_equal delivery_date, monthly_options[1][:next_delivery_date]
+    assert_equal delivery_date, monthly_options[2][:next_delivery_date]
 
   end
 
@@ -198,6 +214,23 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     assert_equal Time.zone.local(2016,5,17), delivery_dates[6]
     assert_equal Time.zone.local(2016,5,24), delivery_dates[7]
 
+  end
+
+  test "verify get delivery dates method 1 for monthly recurrence" do
+    order_cutoff = Time.zone.local(2016, 8, 29, 8)
+    delivery_date = Time.zone.local(2016, 9, 2)
+    monthly_posting_recurrence = create_posting_recurrence(order_cutoff, delivery_date)
+    delivery_dates = monthly_posting_recurrence.get_delivery_dates_for(delivery_date, delivery_date + (8 * 31).days)
+    assert_equal 8, delivery_dates.count
+    
+    assert_equal Time.zone.local(2016,10,7), delivery_dates[0]
+    assert_equal Time.zone.local(2016,11,4), delivery_dates[1]
+    assert_equal Time.zone.local(2016,12,2), delivery_dates[2]
+    assert_equal Time.zone.local(2017,1,6), delivery_dates[3]
+    assert_equal Time.zone.local(2017,2,3), delivery_dates[4]
+    assert_equal Time.zone.local(2017,3,3), delivery_dates[5]
+    assert_equal Time.zone.local(2017,4,7), delivery_dates[6]
+    assert_equal Time.zone.local(2017,5,5), delivery_dates[7]
   end
 
   test "verify get delivery dates method 2" do
