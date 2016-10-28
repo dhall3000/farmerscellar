@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'utility/rake_helper'
 
 class ToteItemsControllerTest < ActionDispatch::IntegrationTest
 
@@ -48,10 +49,52 @@ class ToteItemsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to postings_path
 
     assert_not flash.empty?
-    assert_equal "Oops, please try adding that again", flash[:danger]    
+    assert_equal "Oops, that posting is no longer active", flash[:danger]    
   end
 
-  test "should auto assign dropsite if only one dropsite exists and user has not specified a dropsite" do    
+  test "should get new for live posting if attempt made to pull up old unlive posting from an active posting recurrence" do
+    nuke_all_postings
+
+    #create posting recurrence
+    pr = create_posting_recurrence(1, Time.zone.now.midnight + 1.day, Time.zone.now.midnight + 3.days)
+    #skip ahead to the order cutoff of the first posting and trigger it to generate the 2nd posting. this will put
+    #the first posting in a CLOSED state
+    travel_to pr.current_posting.commitment_zone_start
+    RakeHelper.do_hourly_tasks
+    assert_equal 2, pr.postings.count
+    
+    #check that the 2 postings are in the proper states
+    assert pr.reload.postings.first.state?(:CLOSED)
+    closed_posting_id = pr.postings.first.id
+
+    assert pr.postings.last.state?(:OPEN)
+    opened_posting_id = pr.postings.last.id
+
+    assert opened_posting_id != closed_posting_id
+
+    #now log in and verify that the 2nd (i.e. OPENed) posting can be accessed
+    log_in_as(@c1)
+    get new_tote_item_path(posting_id: opened_posting_id)
+    assert_response :success
+    assert_template 'tote_items/new'
+    posting = assigns(:posting)
+    assert posting.valid?
+    assert posting.state?(:OPEN)
+    assert_equal opened_posting_id, posting.id
+
+    #and now verify that if an attempt is made to view the 1st (i.e. CLOSEd) posting it will redirect to display the 2nd OPEN posting
+    get new_tote_item_path(posting_id: closed_posting_id)
+    assert_response :success
+    assert_template 'tote_items/new'
+    posting = assigns(:posting)
+    assert posting.valid?
+    assert posting.state?(:OPEN)
+    assert_equal opened_posting_id, posting.id
+
+    travel_back
+  end
+
+  test "should auto assign dropsite if only one dropsite exists and user has not specified a dropsite" do        
     #verify only one dropsite exists
     dropsite = dropsites(:dropsite2)
     dropsite.destroy
