@@ -440,7 +440,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     assert_match "Quantity", receipt.body.encoded
     assert_match "Sub Total", receipt.body.encoded
     assert_match "Thanks!", receipt.body.encoded
-    assert_match "www.farmerscellar.com", receipt.body.encoded            
+    assert_match "farmerscellar.com/news", receipt.body.encoded            
     
     #verify the dollar figures
     verify_amounts(receipt, tote_items)
@@ -474,7 +474,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
       assert_match "FYI, your last recorded pickup was #{user.pickups.last.created_at.strftime("%A %B %d, %Y at %l:%M %p")}", mail.body.encoded
     end
 
-    assert_match "www.farmerscellar.com", mail.body.encoded
+    assert_match "farmerscellar.com/news", mail.body.encoded
 
   end
 

@@ -63,7 +63,7 @@ class PostingsController < ApplicationController
 
   	if @posting.save
       if @posting.live
-        flash[:info] = "Your new posting is now live!"
+        flash[:success] = "Your new posting is now live!"
       else
         flash[:info] = "Your posting was created but is not live as you specified during creation."
       end  	  
