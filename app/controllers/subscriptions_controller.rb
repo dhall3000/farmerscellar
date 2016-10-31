@@ -32,35 +32,18 @@ class SubscriptionsController < ApplicationController
     end
 
     if frequency == 0
-
-      if @tote_item.additional_units_required_to_fill_my_case == 0
-        flash[:success] = "Tote item added"
-        redirect_to postings_path
-        return
-      else
-        flash[:danger] = "Item added to tote but attention needed. See below."
-        redirect_to tote_items_pout_path(id: @tote_item.id)
-        return
-      end
-
+      flash[:success] = "Tote item added"
+      redirect_to postings_path
+      return
     end
 
     @subscription = Subscription.new(frequency: frequency, on: true, user_id: current_user.id, posting_recurrence_id: @posting_recurrence.id, quantity: @tote_item.quantity, paused: false)
     if @subscription.save
-
       @subscription.tote_items << @tote_item
       @subscription.save
-
-      if @tote_item.additional_units_required_to_fill_my_case == 0
-        flash[:success] = "Subscription added"
-        redirect_to postings_path
-        return
-      else
-        flash[:danger] = "Subscription added but needs attention. See below."
-        redirect_to tote_items_pout_path(id: @tote_item.id)
-        return        
-      end        
-
+      flash[:success] = "Subscription added"
+      redirect_to postings_path
+      return
     else
       AdminNotificationMailer.general_message("Subscription failed to create", @subscription.to_yaml).deliver_now
       flash[:danger] = "Subscription not added"

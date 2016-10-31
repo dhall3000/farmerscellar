@@ -114,21 +114,10 @@ class ToteItemsController < ApplicationController
         redirect_to new_subscription_path(tote_item_id: @tote_item.id)
         return
       else
-
-        additional_units_required_to_fill_my_case = @tote_item.additional_units_required_to_fill_my_case
-
-        if additional_units_required_to_fill_my_case == 0
-          flash[:success] = "Item added to tote."
-          redirect_to postings_path
-          return
-        else
-          flash[:danger] = "Item added to tote but attention needed. See below."
-          redirect_to tote_items_pout_path(id: @tote_item.id)
-          return
-        end
-        
+        flash[:success] = "Item added to tote."
+        redirect_to postings_path
+        return        
       end
-
     else
       flash.now[:danger] = "Item not added to tote. See errors below."
       @sanitized_producer_url = @posting.user.website

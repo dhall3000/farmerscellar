@@ -141,24 +141,12 @@ class ActiveSupport::TestCase
       post subscriptions_path, params: {tote_item_id: tote_item.id, frequency: frequency}
       subscription = assigns(:subscription)
       assert subscription.valid?
-
-      if tote_item.reload.additional_units_required_to_fill_my_case == 0
-        assert_redirected_to postings_path
-      else
-        assert_equal "Subscription added but needs attention. See below.", flash[:danger]
-        assert_redirected_to tote_items_pout_path(id: tote_item.id)        
-      end
+      assert_redirected_to postings_path
+      assert_equal "Subscription added", flash[:success]
 
     else
-
-      if additional_units_required_to_fill_my_case == 0
-        assert_equal "Item added to tote.", flash[:success]
-        assert_redirected_to postings_path
-      else
-        assert_equal "Item added to tote but attention needed. See below.", flash[:danger]          
-        assert_redirected_to tote_items_pout_path(id: tote_item.id)
-      end
-
+      assert_equal "Item added to tote.", flash[:success]
+      assert_redirected_to postings_path
     end
 
     follow_redirect!

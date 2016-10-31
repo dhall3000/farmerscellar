@@ -178,10 +178,10 @@ class PostingsTest < ActionDispatch::IntegrationTest
 
     assert_response :redirect
     follow_redirect!
-    assert_template 'tote_items/pout'
+    assert_template 'postings/index'
 
     assert_not flash.empty?
-    assert_equal "Item added to tote but attention needed. See below.", flash[:danger]
+    assert_equal "Item added to tote.", flash[:success]
 
     assert tote_item.will_partially_fill?
     assert_equal expected_additional_units_required_to_fill_my_case, tote_item.expected_fill_quantity
@@ -221,9 +221,9 @@ class PostingsTest < ActionDispatch::IntegrationTest
     #c2 should now be looking at the pout page
     assert_response :redirect
     follow_redirect!
-    assert_template 'tote_items/pout'
+    assert_template 'postings/index'
     assert_not flash.empty?
-    assert_equal "Item added to tote but attention needed. See below.", flash[:danger]
+    assert_equal "Item added to tote.", flash[:success]
 
     #now authorize
     tote_item.transition(:customer_authorized)
@@ -315,10 +315,10 @@ class PostingsTest < ActionDispatch::IntegrationTest
 
     assert_response :redirect
     follow_redirect!
-    assert_template 'tote_items/pout'
+    assert_template 'postings/index'
 
     assert_not flash.empty?
-    assert_equal "Item added to tote but attention needed. See below.", flash[:danger]
+    assert_equal "Item added to tote.", flash[:success]
 
     return posting
 
