@@ -85,11 +85,16 @@
                   </tr>        
                   <tr>
 
+                    <%
+                      additional_units_required_to_fill_my_case = tote_item.additional_units_required_to_fill_my_case
+                      biggest_order_minimum_producer_net_outstanding = tote_item.posting.biggest_order_minimum_producer_net_outstanding
+                    %>
+
                     <td colspan="5" class="hidden-xs borderless">
                       <div>
                         <a href="#<%= 'toteItemDetails' + tote_item.id.to_s %>" data-toggle="collapse">
                           <span class="glyphicon glyphicon-expand" aria-hidden="true"></span>
-                          <% if tote_item.additional_units_required_to_fill_my_case > 0 %>
+                          <% if additional_units_required_to_fill_my_case > 0 || biggest_order_minimum_producer_net_outstanding > 0 %>
                             <span class="alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
                           <% end %>
                         </a>
@@ -106,7 +111,7 @@
                       </div>
 
                       <div id="<%= 'toteItemDetails' + tote_item.id.to_s %>" class="collapse">
-                        <%= render partial: "shared/tote_expansion_row", locals: { tote_item: tote_item } %>
+                        <%= render partial: "shared/tote_expansion_row", locals: { tote_item: tote_item, additional_units_required_to_fill_my_case: additional_units_required_to_fill_my_case, biggest_order_minimum_producer_net_outstanding: biggest_order_minimum_producer_net_outstanding } %>
                       </div>
                     </td>  
 
@@ -115,7 +120,7 @@
                       <div>
                         <a href="#xs<%= 'toteItemDetails' + tote_item.id.to_s %>" data-toggle="collapse">
                           <span class="glyphicon glyphicon-expand" aria-hidden="true"></span>
-                          <% if tote_item.additional_units_required_to_fill_my_case > 0 %>
+                          <% if additional_units_required_to_fill_my_case > 0 || biggest_order_minimum_producer_net_outstanding > 0 %>
                             <span class="alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
                           <% end %>
                         </a>
@@ -131,7 +136,7 @@
                         <% end %>                    
                       </div>
                       <div id="xs<%= 'toteItemDetails' + tote_item.id.to_s %>" class="collapse">
-                        <%= render partial: "shared/tote_expansion_row", locals: { tote_item: tote_item } %>
+                        <%= render partial: "shared/tote_expansion_row", locals: { tote_item: tote_item, additional_units_required_to_fill_my_case: additional_units_required_to_fill_my_case, biggest_order_minimum_producer_net_outstanding: biggest_order_minimum_producer_net_outstanding } %>
                       </div>
                     </td>
 

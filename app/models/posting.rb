@@ -342,34 +342,50 @@ class Posting < ApplicationRecord
   	end
   end
 
-  def additional_units_required_to_fill_items_case(tote_item, include_this_item = true)
+  def expected_fill_quantity(tote_item)
+
+    additional_units_required_to_fill_items_case = additional_units_required_to_fill_items_case(tote_item)
+
+    if additional_units_required_to_fill_items_case == 0
+      return tote_item.quantity
+    end
+
+    if tote_item.state?(:AUTHORIZED) || tote_item.state?(:COMMITTED)
+      queue_quantity_before_item = tote_items.where(state: [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED]]).where("authorized_at < ?", tote_item.authorized_at).sum(:quantity)
+    elsif tote_item.state?(:ADDED)
+      queue_quantity_before_item = tote_items.where(state: [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED]]).sum(:quantity) +
+        tote_items.where(user: tote_item.user, state: ToteItem.states[:ADDED]).where("created_at < ?", tote_item.created_at).sum(:quantity)
+    end
+
+    case_quantity_before_item = queue_quantity_before_item % units_per_case
+    quantity_needed_before_to_fill_case = units_per_case - case_quantity_before_item
+
+    if tote_item.quantity < quantity_needed_before_to_fill_case
+      return 0
+    else
+      return quantity_needed_before_to_fill_case + ((tote_item.quantity - quantity_needed_before_to_fill_case) / units_per_case) * units_per_case
+    end
+
+  end
+
+  def additional_units_required_to_fill_items_case(tote_item)
 
     if tote_item.state?(:ADDED)
-
-      quantity_all_authorized_or_committed = tote_items.where(state: [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED]]).sum(:quantity)      
-      quantity_added_through = tote_items.where(user_id: tote_item.user_id, state: ToteItem.states[:ADDED]).where(include_this_item ? "created_at <= ?" : "created_at < ?", tote_item.created_at).sum(:quantity)
-
-      queue_quantity_through_item = quantity_all_authorized_or_committed + quantity_added_through
-      queue_quantity_after_item = include_this_item ? tote_items.where(user_id: tote_item.user_id, state: ToteItem.states[:ADDED]).where("created_at > ?", tote_item.created_at).sum(:quantity) : 0
+      
+      queue_quantity_through_item = tote_items.where(state: [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED]]).sum(:quantity) +
+        tote_items.where(user: tote_item.user, state: ToteItem.states[:ADDED]).where("created_at <= ?", tote_item.created_at).sum(:quantity)
+      existing_quantity_after_item = tote_items.where(user: tote_item.user, state: ToteItem.states[:ADDED]).where("created_at > ?", tote_item.created_at).sum(:quantity)
 
     elsif tote_item.state?(:AUTHORIZED) || tote_item.state?(:COMMITTED)      
 
-      quantity_authorized_or_committed_after = include_this_item ? tote_items.where(state: [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED]]).where("authorized_at > ?", tote_item.authorized_at).sum(:quantity) : 0
-      quantity_all_added = include_this_item ? tote_items.where(user_id: tote_item.user_id, state: ToteItem.states[:ADDED]).sum(:quantity) : 0      
+      queue_quantity_through_item = tote_items.where(state: [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED]]).where("authorized_at <= ?", tote_item.authorized_at).sum(:quantity)
+      existing_quantity_after_item = tote_items.where(state: [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED]]).where("authorized_at > ?", tote_item.authorized_at).sum(:quantity)
 
-      queue_quantity_through_item = tote_items.where(state: [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED]]).where(include_this_item ? "authorized_at <= ?" : "authorized_at < ?", tote_item.authorized_at).sum(:quantity)
-      queue_quantity_after_item = quantity_authorized_or_committed_after + quantity_all_added
-
-    else
-      return 0
     end
 
-    additional_units_required_to_fill_items_case = units_per_case - (queue_quantity_through_item % units_per_case) - queue_quantity_after_item
-    additional_units_required_to_fill_items_case = [0, additional_units_required_to_fill_items_case].max
-    #this next line really is needed. it's for the case where the case boundary is hit dead on. in this case additional_units_required_to_fill_items_case == units_per_case prior to this line
-    additional_units_required_to_fill_items_case = additional_units_required_to_fill_items_case % units_per_case
+    quantity_needed_after_to_fill_items_case = (units_per_case - (queue_quantity_through_item % units_per_case)) % units_per_case
 
-    return additional_units_required_to_fill_items_case
+    return [0, quantity_needed_after_to_fill_items_case - existing_quantity_after_item].max
 
   end
   

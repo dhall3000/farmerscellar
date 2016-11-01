@@ -131,8 +131,10 @@ class ToteItemsController < ApplicationController
   end
 
   def pout
-    
+
     @tote_item = ToteItem.find_by(id: params[:id])
+    @additional_units_required_to_fill_my_case = params[:additional_units_required_to_fill_my_case].to_i
+    @biggest_order_minimum_producer_net_outstanding = params[:biggest_order_minimum_producer_net_outstanding].to_f
 
     if @tote_item.nil?
       #this should be impossible. email admin.
@@ -143,12 +145,17 @@ class ToteItemsController < ApplicationController
     end
 
     @posting = @tote_item.posting
-    @additional_units_required_to_fill_my_case = @tote_item.additional_units_required_to_fill_my_case
     @will_partially_fill = @tote_item.will_partially_fill?
     @expected_fill_quantity = @tote_item.expected_fill_quantity
 
-    if @additional_units_required_to_fill_my_case < 1
-      AdminNotificationMailer.general_message("unknown problem. pout message action called but @additional_units_required_to_fill_my_case < 1", "user id #{current_user.id.to_s} should have seen the pout page. @tote_item.id #{@tote_item.id.to_s}. @additional_units_required_to_fill_my_case = #{@additional_units_required_to_fill_my_case.to_s}").deliver_now
+    #if order minimums aren't met there's not going to be any filling whatsoever
+    if @biggest_order_minimum_producer_net_outstanding > 0
+      @expected_fill_quantity = 0
+      @will_partially_fill = false
+    end
+
+    if @additional_units_required_to_fill_my_case < 1 && @biggest_order_minimum_producer_net_outstanding <= 0
+      AdminNotificationMailer.general_message("pout message problem", "@additional_units_required_to_fill_my_case = #{@additional_units_required_to_fill_my_case.to_s}. @biggest_order_minimum_producer_net_outstanding = #{@biggest_order_minimum_producer_net_outstanding.to_s}. user id #{current_user.id.to_s} should have seen the pout page? @tote_item.id #{@tote_item.id.to_s}.").deliver_now
       flash.discard
       redirect_to postings_path
       return
@@ -241,6 +248,7 @@ class ToteItemsController < ApplicationController
 
     # Confirms the correct user.
     def correct_user
+
       #@user = User.find(params[:id])
       #redirect_to(root_url) unless current_user?(@user)
       ti = ToteItem.find_by_id(params[:id])

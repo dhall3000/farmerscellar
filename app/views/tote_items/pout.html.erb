@@ -20,31 +20,39 @@
           </div>
           <div class="panel-body" role="tabpanel">
 
-            <% if @additional_units_required_to_fill_my_case > 0 %>              
+            
 
-              <%
-                if @tote_item.subscription
-                  subscription_text = " for the next delivery"
-                else
-                  subscription_text = ""
-                end
-              %>
+            <%
+              if @tote_item.subscription
+                subscription_text = " for the next delivery"
+              else
+                subscription_text = ""
+              end
+            %>
 
-              <p class="alert alert-danger"><span class="alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-                <% if @will_partially_fill %>                
-                  <span> Currently this order will only partially ship<%= subscription_text %></span>
-                  <% fully = " fully" %>
-                <% else %>
-                  <span> Currently this order will not ship<%= subscription_text %></span>
-                  <% fully = "" %>
-                <% end %>              
-              </p>
+            <p class="alert alert-danger"><span class="alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+              <% if @will_partially_fill %>                
+                <span> Currently this order will only partially ship<%= subscription_text %></span>
+                <% fully = " fully" %>
+              <% else %>
+                <span> Currently this order will not ship<%= subscription_text %></span>
+                <% fully = "" %>
+              <% end %>              
+            </p>
 
-              <ul class="list-group">
+            <ul class="list-group">
 
-                <li class="list-group-item">
-                  <h5>Details</h5>
-                  <ul>
+              <li class="list-group-item">
+                <h5>Details</h5>
+                <ul>
+
+                  <% if @biggest_order_minimum_producer_net_outstanding > 0 %>
+
+                    <li>Order minimum unmet</li>
+                    <li><%= number_to_currency(@biggest_order_minimum_producer_net_outstanding) %> more required</li>
+
+                  <% elsif @additional_units_required_to_fill_my_case > 0 %>                    
+
                     <% if @will_partially_fill %>                    
                       <li><%= "Currently only #{@expected_fill_quantity.to_s} of the #{@tote_item.quantity.to_s} " %><%= "unit".pluralize(@additional_units_required_to_fill_my_case) + " ordered are set to ship" %></li>
                     <% end %>
@@ -52,27 +60,31 @@
                     <% if @tote_item.cancelable? %>
                       <li><%= @additional_units_required_to_fill_my_case.to_s %> more <%= "unit".pluralize(@additional_units_required_to_fill_my_case) %> required to fill this case<%= subscription_text %></li>                    
                     <% end %>
-                    <% if @tote_item.subscription %>
-                      <li>This notice does not apply to subsequent deliveries</li>
-                    <% end %>
+
+                  <% end %>
+
+                  <% if @tote_item.subscription %>
+                    <li>This notice does not apply to subsequent deliveries</li>
+                  <% end %>
+
+                </ul>
+              </li>
+
+
+              <% if @tote_item.cancelable? %>
+                <li class="list-group-item">
+                  <h5>Resolution</h5>
+                  <ul>
+                    <li>Leave this order alone (other customer orders may fill this case, causing your order to<%= fully%> ship)</li>
+                    <li>Order more yourself</li>
+                    <li>Recruit community</li>                
                   </ul>
                 </li>
+              <% end %>
 
+            </ul>
 
-                <% if @tote_item.cancelable? %>
-                  <li class="list-group-item">
-                    <h5>Resolution</h5>
-                    <ul>
-                      <li>Leave this order alone (other customer orders may fill this case, causing your order to<%= fully%> ship)</li>
-                      <li>Order more yourself</li>
-                      <li>Recruit community</li>                
-                    </ul>
-                  </li>
-                <% end %>
-
-              </ul>
-
-            <% end %>
+            
 
           </div>
         </div>

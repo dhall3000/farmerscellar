@@ -8,7 +8,7 @@
       <div class="panel-body">
         <ul class="list-group">
 
-          <% if tote_item.additional_units_required_to_fill_my_case > 0 %>
+          <% if additional_units_required_to_fill_my_case > 0 || biggest_order_minimum_producer_net_outstanding > 0 %>
             <li class="list-group-item">
               <div class="fat-finger-spacing">                
 
@@ -17,7 +17,7 @@
 
 
                 <p class="alert alert-danger"><span class="alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-                  <% if tote_item.will_partially_fill? %>                
+                  <% if tote_item.will_partially_fill? && biggest_order_minimum_producer_net_outstanding == 0 %>                
                     <span> Currently this item will only partially ship</span>
                     <% fully = " fully" %>
                   <% else %>
@@ -30,7 +30,12 @@
 
               </div>              
               <div>
-                <%= link_to "More info", tote_items_pout_path(id: tote_item.id), class: "btn btn-primary btn-lg btn-block" %>
+                <%= form_tag tote_items_pout_path do %>
+                    <%= hidden_field_tag :id, tote_item.id %>
+                    <%= hidden_field_tag :additional_units_required_to_fill_my_case, additional_units_required_to_fill_my_case %>
+                    <%= hidden_field_tag :biggest_order_minimum_producer_net_outstanding, biggest_order_minimum_producer_net_outstanding %>
+                    <%= submit_tag "More info", class: "btn btn-lg btn-primary" %>
+                 <% end %>                                
               </div>              
             </li>
           <% end %>

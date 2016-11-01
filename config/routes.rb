@@ -30,7 +30,7 @@ Rails.application.routes.draw do
   post 'reference_transactions/create_capture'
   get 'reference_transactions/do_rtpurchase'
   get 'reference_transactions/do_bulk_purchase'
-  get 'tote_items/pout'  
+  post 'tote_items/pout'  
   post 'subscriptions/skip_dates'
   post 'pickups/toggle_garage_door'  
   get 'pickups/log_out_dropsite_user'

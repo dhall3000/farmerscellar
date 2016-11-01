@@ -37,8 +37,8 @@ class ToteItem < ApplicationRecord
     return state?(:ADDED) || state?(:AUTHORIZED)
   end
 
-  def additional_units_required_to_fill_my_case(include_this_item = true)
-    return posting.additional_units_required_to_fill_items_case(self, include_this_item)
+  def additional_units_required_to_fill_my_case
+    return posting.additional_units_required_to_fill_items_case(self)
   end
 
   #this will tell you if the tote item is crossing a case boundary and hence will only partially fill of nothing changes
@@ -48,27 +48,7 @@ class ToteItem < ApplicationRecord
   end
 
   def expected_fill_quantity
-
-    #additional_units_required_to_fill_my_case (with no params) tells you the difference from the 'top' of this item to the 'top' of the case
-    #in which this item's 'top' resides. confusing. additional_units_required_to_fill_my_case(false) gives you the difference between the top
-    #of the case in which the bottom of this item resides and this item's bottom.
-    #if this item is straddling a case boundary it will get fully filled if additional_units_required_to_fill_my_case == 0 but if 
-    #additional_units_required_to_fill_my_case > 0 then this item will partially fill if it's quantity is > than that needed to fill that prior case
-
-    if additional_units_required_to_fill_my_case > 0 
-      additional_units_required_to_fill_my_case_prior_to_placing_order = additional_units_required_to_fill_my_case(include_this_item = false)
-      if quantity > additional_units_required_to_fill_my_case_prior_to_placing_order
-        #item's case is not all filled up but it spans a case boundary
-        return additional_units_required_to_fill_my_case_prior_to_placing_order
-      else
-        #item's case is not all filled up and it does not span a case boundary. i.e. this item is fully contained in an unfilled case.
-        return 0
-      end
-    else
-      #item's case is all filled up
-      return quantity
-    end
-
+    return posting.expected_fill_quantity(self)
   end
 
   def delivery_date
