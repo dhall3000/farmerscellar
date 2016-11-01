@@ -265,7 +265,7 @@ class ActiveSupport::TestCase
 
   end
 
-  def create_posting(producer, price, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, commission = nil)
+  def create_posting(producer, price, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, commission = nil, order_minimum_producer_net = nil)
 
     if delivery_date.nil?
       delivery_date = get_delivery_date(days_from_now = 7)
@@ -289,17 +289,36 @@ class ActiveSupport::TestCase
 
     create_commission(producer, product, unit, commission)
 
-    posting = Posting.create(
-      live: true,
-      delivery_date: delivery_date,
-      commitment_zone_start: commitment_zone_start,
-      product_id: product.id,
-      quantity_available: 100,
-      price: price,
-      user_id: producer.id,
-      unit_id: unit.id,
-      description: "this is a description of the posting"
-      )
+    if order_minimum_producer_net
+
+      posting = Posting.create(
+        live: true,
+        delivery_date: delivery_date,
+        commitment_zone_start: commitment_zone_start,
+        product_id: product.id,
+        quantity_available: 100,
+        price: price,
+        user_id: producer.id,
+        unit_id: unit.id,
+        description: "this is a description of the posting",
+        order_minimum_producer_net: order_minimum_producer_net
+        )
+
+    else
+
+      posting = Posting.create(
+        live: true,
+        delivery_date: delivery_date,
+        commitment_zone_start: commitment_zone_start,
+        product_id: product.id,
+        quantity_available: 100,
+        price: price,
+        user_id: producer.id,
+        unit_id: unit.id,
+        description: "this is a description of the posting"
+        )
+
+    end
 
     assert posting.valid?
 

@@ -43,6 +43,45 @@ class Posting < ApplicationRecord
 
   end
 
+  def biggest_order_minimum_producer_net_outstanding
+    #this posting has a producer and that producer might have a distributor. among those possible three entities, each could
+    #have an order minimum. we here want to return the greatest deficiency of those three
+
+    biggest_outstanding = 0
+
+    temp = order_minimum_producer_net_outstanding
+
+    if temp > biggest_outstanding
+      biggest_outstanding = temp
+    end
+
+    temp = user.order_minimum_producer_net_outstanding(commitment_zone_start)
+
+    if temp > biggest_outstanding
+      biggest_outstanding = temp
+    end
+
+    if user.distributor
+      temp = user.distributor.order_minimum_producer_net_outstanding(commitment_zone_start)
+      if temp > biggest_outstanding
+        biggest_outstanding = temp
+      end
+    end
+
+    return biggest_outstanding
+
+  end
+
+  def order_minimum_producer_net_outstanding
+
+    if order_minimum_producer_net.nil? || order_minimum_producer_net == 0
+      return 0
+    end
+
+    return [(order_minimum_producer_net - inbound_order_value_producer_net).round(2), 0].max
+
+  end
+
   def inbound_order_value_producer_net
 
     if state?(:CLOSED)
@@ -56,7 +95,7 @@ class Posting < ApplicationRecord
   end
 
   def outbound_order_value_producer_net
-    
+
     if (inbound = inbound_order_value_producer_net) > order_minimum_producer_net
       return inbound
     else

@@ -109,6 +109,16 @@ class User < ApplicationRecord
     return outbound_order_report(order_cutoff)[:order_value_producer_net]
   end
 
+  def order_minimum_producer_net_outstanding(order_cutoff)
+
+    if order_minimum_producer_net.nil? || order_minimum_producer_net == 0
+      return 0
+    end
+    
+    return [(order_minimum_producer_net - inbound_order_value_producer_net(order_cutoff)).round(2), 0].max
+
+  end
+
   def settings
 
     if setting.nil?

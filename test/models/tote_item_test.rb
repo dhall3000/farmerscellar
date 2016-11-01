@@ -19,6 +19,212 @@ class ToteItemTest < ActiveSupport::TestCase
     @posting.save
   end
 
+  test "should report producer order minimum deficiency when posting and distributor order min met" do
+
+    #get outstanding of posting
+    #get outstanding of producer
+    #get outstanding of distributor
+    #return the biggest value
+
+    nuke_all_postings
+    nuke_all_users
+
+    customer = create_user("bob", "bob@b.com", 98033)
+    
+    distributor = create_producer("distributor", "distributor@d.com", "WA", 98033, "www.distributor.com", "DISTRIBOTOR'S Farms")
+    distributor.update(order_minimum_producer_net: 100)
+
+    farm1 = create_producer("farmer1", "f1@f.com", "WA", 98033, "www.farmer1.com", "farmer 1's farms")
+    farm1.update(distributor: distributor, order_minimum_producer_net: 50)
+    price = 2
+    posting_f1 = create_posting(farm1, price, products(:apples))
+    posting_f1.update(order_minimum_producer_net: 10)
+    quantity = 4
+    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting_f1, user: customer)
+    assert ti.save
+    assert ti.state?(:AUTHORIZED)
+    assert_equal (quantity * price * 0.915).round(2), posting_f1.inbound_order_value_producer_net
+    assert_equal 0, posting_f1.outbound_order_value_producer_net
+
+    farm2 = create_producer("farmer2", "f2@f.com", "WA", 98033, "www.farmer2.com", "farmer 2's farms")
+    farm2.update(distributor: distributor)
+    price = 2
+    posting_f2 = create_posting(farm2, price, products(:milk))
+    quantity = 45
+    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting_f2, user: customer)
+    assert ti.save
+    assert ti.state?(:AUTHORIZED)
+
+    #verify that the amount left for the posting is > 0
+    assert posting_f1.order_minimum_producer_net_outstanding > 0
+    #verify that the amount left for the distributor is > 0
+    assert distributor.order_minimum_producer_net_outstanding(posting_f1.commitment_zone_start) > 0
+
+    #verify that the amount left for the producer is greater than the amount left for the posting
+    assert farm1.order_minimum_producer_net_outstanding(posting_f1.commitment_zone_start) > posting_f1.order_minimum_producer_net_outstanding
+    #verify that the amount left for the producer is greater than the amount left for the distributor
+    assert farm1.order_minimum_producer_net_outstanding(posting_f1.commitment_zone_start) > distributor.order_minimum_producer_net_outstanding(posting_f1.commitment_zone_start)
+
+    #verify the biggest amount outstanding reported by the posting is correct (hint: should be equal to the producer's amount outstanding since it's the biggest of the three)
+    assert_equal farm1.order_minimum_producer_net_outstanding(posting_f1.commitment_zone_start), posting_f1.biggest_order_minimum_producer_net_outstanding
+
+  end
+
+  test "should report order amount remaining needed when distributor order minimum unmet" do
+
+    nuke_all_postings
+    nuke_all_users
+    
+    distributor = create_producer("distributor", "distributor@d.com", "WA", 98033, "www.distributor.com", "DISTRIBOTOR'S Farms")
+    distributor.update(order_minimum_producer_net: 100)
+
+    farm1 = create_producer("farmer1", "f1@f.com", "WA", 98033, "www.farmer1.com", "farmer 1's farms")
+    farm1.update(distributor: distributor)
+    farm2 = create_producer("farmer2", "f2@f.com", "WA", 98033, "www.farmer2.com", "farmer 2's farms")
+    farm2.update(distributor: distributor)
+    farm3 = create_producer("farmer3", "f3@f.com", "WA", 98033, "www.farmer3.com", "farmer 3's farms")
+    farm3.update(distributor: distributor)
+
+    customer = create_user("bob", "bob@b.com", 98033)
+    make_some_orders(distributor, customer)
+    make_some_orders(farm1, customer)
+    make_some_orders(farm2, customer)
+    make_some_orders(farm3, customer)
+
+    order_cutoff = distributor.postings.first.commitment_zone_start
+    assert_equal 0, distributor.outbound_order_value_producer_net(order_cutoff)
+    #OM for the distributor is 100. distributor has 3 producers, each of which has 3 postings. the distributor himself also has 3 postings. the customer buys quantity of 4 from each of
+    #the 12 postings. that's quantity of 48. the retail price is $2 so the retail producer net for the distributor is $96. multiply this by 0.915 to account for paypal fees
+    #and FC commission and you have 87.84 for the distributor inbound order value
+    assert_equal 87.84, distributor.inbound_order_value_producer_net(order_cutoff)
+    assert_equal (100 - 87.84).round(2), distributor.order_minimum_producer_net_outstanding(order_cutoff)
+    
+  end
+
+  def make_some_orders(producer, customer)
+
+    price = 2
+    posting_a = create_posting(producer, price, products(:apples))
+    posting_b = create_posting(producer, price, products(:milk))
+    posting_c = create_posting(producer, price, products(:celery))
+
+    quantity = 4
+    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting_a, user: customer)
+    assert ti.save
+    assert ti.state?(:AUTHORIZED)
+
+    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting_b, user: customer)
+    assert ti.save
+    assert ti.state?(:AUTHORIZED)
+
+    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting_c, user: customer)
+    assert ti.save
+    assert ti.state?(:AUTHORIZED)
+    
+  end
+
+  test "should report order amount remaining needed when producer order minimum unmet" do
+    
+    nuke_all_postings
+    producer = create_producer("john", "john@j.com", "WA", 98033, "www.john.com", "JOHN'S Farms")
+    producer.update(order_minimum_producer_net: 100)
+    price = 5
+    posting_a = create_posting(producer, price, products(:apples))
+    posting_b = create_posting(producer, price, products(:milk))
+    posting_c = create_posting(producer, price, products(:celery))
+
+    customer = create_user("bob", "bob@b.com", 98033)
+
+    quantity = 5
+    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting_a, user: customer)
+    assert ti.save
+    assert ti.state?(:AUTHORIZED)
+
+    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting_b, user: customer)
+    assert ti.save
+    assert ti.state?(:AUTHORIZED)
+
+    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting_c, user: customer)
+    assert ti.save
+    assert ti.state?(:AUTHORIZED)
+
+    retail = quantity * 3 * price
+
+    assert producer.inbound_order_value_producer_net(posting_a.commitment_zone_start) > 0
+    assert producer.inbound_order_value_producer_net(posting_a.commitment_zone_start) < producer.order_minimum_producer_net
+    assert_equal 0, producer.outbound_order_value_producer_net(posting_a.commitment_zone_start)
+    assert producer.order_minimum_producer_net_outstanding(posting_a.commitment_zone_start) > 0
+    assert producer.order_minimum_producer_net_outstanding(posting_a.commitment_zone_start) < producer.order_minimum_producer_net
+
+    #the sum of the posting values + the producer's amount outstanding equals the producers order minimum
+    assert_equal producer.order_minimum_producer_net, (posting_a.outbound_order_value_producer_net * 3).round(2) + producer.order_minimum_producer_net_outstanding(posting_a.commitment_zone_start)
+    
+  end
+
+  test "should report order amount remaining needed when posting order minimum unmet" do
+
+    nuke_all_postings
+    producer = create_producer("john", "john@j.com", "WA", 98033, "www.john.com", "JOHN'S Farms")
+    delivery_date = get_delivery_date(7)
+    price = 5
+    order_minimum_producer_net = 100
+    posting = create_posting(producer, price, products(:apples), units(:pound), delivery_date, delivery_date - 2.days, commission = 0.05, order_minimum_producer_net)
+    customer = create_user("bob", "bob@b.com", 98033)
+    quantity = 10
+    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting, user: customer)
+    assert ti.save
+    assert ti.state?(:AUTHORIZED)
+
+    expected_order_min_outstanding = (posting.order_minimum_producer_net - posting.inbound_order_value_producer_net).round(2)
+    assert expected_order_min_outstanding > 0
+    assert expected_order_min_outstanding < posting.order_minimum_producer_net
+    assert_equal 0, posting.outbound_order_value_producer_net
+    assert_equal expected_order_min_outstanding, posting.order_minimum_producer_net_outstanding
+
+  end
+
+  test "should report order amount remaining is zero when posting does not have order minimum" do
+
+    nuke_all_postings
+    producer = create_producer("john", "john@j.com", "WA", 98033, "www.john.com", "JOHN'S Farms")
+    delivery_date = get_delivery_date(7)
+    price = 5    
+    posting = create_posting(producer, price, products(:apples), units(:pound), delivery_date, delivery_date - 2.days, commission = 0.05)    
+    customer = create_user("bob", "bob@b.com", 98033)
+    quantity = 10
+    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting, user: customer)
+    assert ti.save
+    assert ti.state?(:AUTHORIZED)
+
+    expected_order_min_outstanding = 0
+    assert_equal 0, expected_order_min_outstanding
+    assert_not posting.order_minimum_producer_net.nil?
+    assert posting.outbound_order_value_producer_net > 0
+    assert_equal 0, posting.order_minimum_producer_net_outstanding
+
+  end
+
+  test "should report order amount remaining is zero when posting order minimum met" do
+
+    nuke_all_postings
+    producer = create_producer("john", "john@j.com", "WA", 98033, "www.john.com", "JOHN'S Farms")
+    delivery_date = get_delivery_date(7)
+    price = 5
+    order_minimum_producer_net = 100
+    posting = create_posting(producer, price, products(:apples), units(:pound), delivery_date, delivery_date - 2.days, commission = 0.05, order_minimum_producer_net)
+    customer = create_user("bob", "bob@b.com", 98033)
+    quantity = 25
+    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting, user: customer)
+    assert ti.save
+    assert ti.state?(:AUTHORIZED)
+
+    expected_order_min_outstanding = [0, (posting.order_minimum_producer_net - posting.inbound_order_value_producer_net).round(2)].max
+    assert_equal 0, expected_order_min_outstanding
+    assert posting.outbound_order_value_producer_net > order_minimum_producer_net
+    assert_equal expected_order_min_outstanding, posting.order_minimum_producer_net_outstanding
+
+  end
+
   test "base level toteitemshelper methods should return correct values" do
 
     #test get_gross_cost
