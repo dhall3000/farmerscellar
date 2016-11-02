@@ -1,18 +1,8 @@
 <h1>How Often?</h1>
 
 <div class="row">
-  <div class="col-sm-offset-4 col-sm-4">
-
-
-
-
-    <div class="panel-group">
-
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h2 class="panel-title">One Time</h2>
-        </div>          
-        <div class="panel-body">
+  <div class="col-sm-offset-4 col-sm-4">        
+        
 
 
           <table class="table">      
@@ -61,24 +51,7 @@
                 </tr>
 
 
-            </tbody>
-          </table>          
 
-        </div>
-      </div>
-
-
-
-
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h2 class="panel-title">Subscription</h2>
-        </div>          
-        <div class="panel-body">
-          
-
-          <table class="table">      
-            <tbody>        
               <%
                 count = 1
                 while count < @subscription_create_options.count
@@ -95,20 +68,26 @@
                     <td class="borderless">
                     </td>
                   </tr>
+
+                <tr>
+                  <td class="borderless">
+                    <div class="collapse">                      
+                    </div>
+                  </td>
+                </tr>
+
+
               <%
                   count += 1
                 end
               %>
+
+
+
             </tbody>
-          </table>
+          </table>          
 
-
-
-        </div>
-      </div>
-
-
-    </div>
+        
 
 
   </div>
