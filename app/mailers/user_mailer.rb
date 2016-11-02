@@ -43,6 +43,12 @@ class UserMailer < ApplicationMailer
   end
 
   def delivery_notification(user, dropsite, tote_items, partner_name = nil)
+
+    #xunrfomunchfve (string search this string for more info)
+    if partner_name.nil? && !any_items_filled?(tote_items)
+      return
+    end
+
     @user = user
     @dropsite = dropsite
     @tote_items = tote_items

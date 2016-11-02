@@ -78,6 +78,7 @@ class UserMailerTest < ActionMailer::TestCase
 
     #this actually is a little wonky because this toteitem doesn't belong to c1, it belongs to another user
     #but oh well, we're using it here to test the mailer
+    tote_items[1].update(state: ToteItem.states[:FILLED], quantity_filled: tote_items[1].quantity)
     tote_items[2].state = ToteItem.states[:NOTFILLED]
 
     mail = UserMailer.delivery_notification(user, dropsite, tote_items)

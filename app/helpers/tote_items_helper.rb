@@ -119,6 +119,22 @@ module ToteItemsHelper
 
   end
 
+  def any_items_filled?(tote_items)
+    
+    if tote_items.nil? || !tote_items.any?
+      return false
+    end
+
+    tote_items.each do |tote_item|
+      if tote_item.fully_filled? || tote_item.partially_filled?
+        return true
+      end
+    end
+
+    return false
+    
+  end
+
   def url_with_protocol(url)
     /^http/i.match(url) ? url : "http://#{url}"
   end  
