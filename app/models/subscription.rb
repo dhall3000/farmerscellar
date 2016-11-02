@@ -15,6 +15,14 @@ class Subscription < ApplicationRecord
   validates :quantity, numericality: { only_integer: true, greater_than: 0 }
   validates_presence_of :posting_recurrence, :user
 
+  def self.kinds
+    {NORMAL: 0, ROLLUNTILFILLED: 1}
+  end
+
+  def kind?(kind_token)
+    return self.kind == Subscription.kinds[kind_token]
+  end
+
   def create_skip_date(tote_item)
 
     #we're only going to create this skip date if the given tote item belongs to this subscription

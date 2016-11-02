@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161019222215) do
+ActiveRecord::Schema.define(version: 20161102221802) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -475,6 +475,7 @@ ActiveRecord::Schema.define(version: 20161019222215) do
     t.datetime "updated_at",                            null: false
     t.integer  "quantity",                              null: false
     t.boolean  "paused",                default: false
+    t.integer  "kind",                  default: 0,     null: false
     t.index ["posting_recurrence_id"], name: "index_subscriptions_on_posting_recurrence_id"
     t.index ["user_id"], name: "index_subscriptions_on_user_id"
   end
