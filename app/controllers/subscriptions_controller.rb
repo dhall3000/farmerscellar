@@ -32,9 +32,22 @@ class SubscriptionsController < ApplicationController
     end
 
     if frequency == 0
+
+      if params[:roll_until_filled]
+
+        @subscription = Subscription.new(kind: Subscription.kinds[:ROLLUNTILFILLED], frequency: 1, on: true, user_id: current_user.id, posting_recurrence_id: @posting_recurrence.id, quantity: @tote_item.quantity, paused: false)
+        if @subscription.save
+          @subscription.tote_items << @tote_item
+          @subscription.save
+        end
+
+      end
+
       flash[:success] = "Tote item added"
       redirect_to postings_path
+
       return
+      
     end
 
     @subscription = Subscription.new(frequency: frequency, on: true, user_id: current_user.id, posting_recurrence_id: @posting_recurrence.id, quantity: @tote_item.quantity, paused: false)

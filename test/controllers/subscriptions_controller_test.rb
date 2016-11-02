@@ -8,6 +8,24 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
     @subscription = subscriptions(:one)
   end
 
+  test "should create roll till filled order" do
+    log_in_as(@c1)
+    posting = postings(:p_recurrence_on)
+    ti = ToteItem.new(quantity: 1, price: posting.price, posting_id: posting.id, user_id: @c1.id)
+    assert ti.valid?
+    assert ti.save        
+    subscription_count = @c1.subscriptions.count
+    post subscriptions_path, params: {tote_item_id: ti.id, frequency: 0, roll_until_filled: true}
+    assert_response :redirect
+    assert_redirected_to postings_path
+    assert_not flash.empty?
+    assert_equal "Tote item added", flash[:success]
+    @c1.reload
+    assert_equal subscription_count + 1, @c1.subscriptions.count
+    ti.reload
+    assert ti.subscription.kind?(:ROLLUNTILFILLED)
+  end
+
   test "should create" do
     log_in_as(@c1)
     posting = postings(:p_recurrence_on)
