@@ -1,19 +1,115 @@
 <h1>How Often?</h1>
 
-<% if @subscription_create_options && @subscription_create_options.any? %>
-	<% @subscription_create_options.each do |subscription_create_option| %>
-		<div class="row">
-			<div class="col-sm-offset-4 col-sm-4">
+<div class="row">
+  <div class="col-sm-offset-4 col-sm-4">
 
-				<div class="fat-finger-spacing">
-					<%= form_tag subscriptions_path do %>
-						<%= hidden_field_tag :frequency, subscription_create_option[:subscription_frequency] %>
-						<%= hidden_field_tag :tote_item_id, @tote_item.id %>
-						<%= submit_tag subscription_create_option[:text], class: "btn btn-primary btn-lg" %>
-					<% end %>
-				</div>			
 
-			</div>
-		</div>
-	<% end %>
-<% end %>
+
+
+    <div class="panel-group">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h2 class="panel-title">One Time</h2>
+        </div>          
+        <div class="panel-body">
+
+
+          <table class="table">      
+            <tbody>        
+                
+                <tr>
+                  <td class="borderless">                    
+                    <%= form_tag subscriptions_path do %>
+                      <%= hidden_field_tag :frequency, @subscription_create_options[0][:subscription_frequency] %>
+                      <%= hidden_field_tag :tote_item_id, @tote_item.id %>
+                      <%= submit_tag @subscription_create_options[0][:text], class: "btn btn-primary btn-lg" %>
+                    <% end %>
+                  </td>
+                  <td class="borderless">                    
+                    <a href="#just-once-help-text" data-toggle="collapse"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="borderless">
+                    <div id="just-once-help-text" class="collapse">
+                      <span>This places an order for delivery only on <%= @tote_item.posting.delivery_date.strftime("%A %b %d") %>. If we are unable to fill your order on that date this order will automatically be canceled.</span>
+                    </div>
+                  </td>
+                </tr>
+                
+
+                <tr>
+                  <td class="borderless">                    
+                    <%= form_tag subscriptions_path do %>
+                      <%= hidden_field_tag :frequency, @subscription_create_options[0][:subscription_frequency] %>
+                      <%= hidden_field_tag :tote_item_id, @tote_item.id %>
+                      <%= hidden_field_tag :roll_until_filled, true %>
+                      <%= submit_tag @subscription_create_options[0][:text] + " (roll until filled)", class: "btn btn-primary btn-lg" %>
+                    <% end %>
+                  </td>
+                  <td class="borderless">                    
+                    <a href="#roll-until-filled-help-text" data-toggle="collapse"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="borderless">
+                    <div id="roll-until-filled-help-text" class="collapse">
+                      <span>This places an order for delivery on <%= @tote_item.posting.delivery_date.strftime("%A %b %d") %>. If we are unable to fill your order on that date this order will automatically roll to the next scheduled delivery until we are able to fill the order.</span>
+                    </div>
+                  </td>
+                </tr>
+
+
+            </tbody>
+          </table>          
+
+        </div>
+      </div>
+
+
+
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h2 class="panel-title">Subscription</h2>
+        </div>          
+        <div class="panel-body">
+          
+
+          <table class="table">      
+            <tbody>        
+              <%
+                count = 1
+                while count < @subscription_create_options.count
+                  subscription_create_option = @subscription_create_options[count]
+              %>
+                  <tr>
+                    <td class="borderless">
+                      <%= form_tag subscriptions_path do %>
+                        <%= hidden_field_tag :frequency, subscription_create_option[:subscription_frequency] %>
+                        <%= hidden_field_tag :tote_item_id, @tote_item.id %>
+                        <%= submit_tag subscription_create_option[:text], class: "btn btn-primary btn-lg" %>
+                      <% end %>
+                    </td>                  
+                    <td class="borderless">
+                    </td>
+                  </tr>
+              <%
+                  count += 1
+                end
+              %>
+            </tbody>
+          </table>
+
+
+
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+</div>
