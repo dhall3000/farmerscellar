@@ -114,7 +114,7 @@ class ToteItemsController < ApplicationController
         redirect_to new_subscription_path(tote_item_id: @tote_item.id)
         return
       else
-        flash[:success] = "Item added to tote."
+        flash[:success] = "Tote item added"
         redirect_to postings_path
         return        
       end

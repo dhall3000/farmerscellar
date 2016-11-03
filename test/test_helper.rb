@@ -122,8 +122,8 @@ class ActiveSupport::TestCase
 
   end
 
-  def add_tote_item(customer, posting, quantity, frequency = nil)
-    
+  def add_tote_item(customer, posting, quantity, frequency = nil, roll_until_filled = nil)
+ 
     log_in_as(customer)
     assert is_logged_in?
 
@@ -134,22 +134,42 @@ class ActiveSupport::TestCase
     assert :redirected
     assert_response :redirect
 
-    if frequency && frequency > 0
-
-      follow_redirect!
-
-      post subscriptions_path, params: {tote_item_id: tote_item.id, frequency: frequency}
-      subscription = assigns(:subscription)
-      assert subscription.valid?
-      assert_redirected_to postings_path
-      assert_equal "Subscription added", flash[:success]
-
-    else
-      assert_equal "Item added to tote.", flash[:success]
-      assert_redirected_to postings_path
-    end
+    if !frequency
+      frequency = 0
+    end    
 
     follow_redirect!
+
+    if  frequency == 0 && !roll_until_filled
+      if posting.posting_recurrence.nil? || !posting.posting_recurrence.on
+        assert_equal "Tote item added", flash[:success]
+        return tote_item
+      end
+    end
+
+    post subscriptions_path, params: {tote_item_id: tote_item.id, frequency: frequency, roll_until_filled: roll_until_filled}
+
+    if roll_until_filled || frequency > 0
+      subscription = assigns(:subscription)
+      assert subscription.valid?
+    end
+
+    if subscription
+      if roll_until_filled
+        assert subscription.kind?(:ROLLUNTILFILLED)
+      else
+        assert subscription.kind?(:NORMAL)
+      end
+    end
+
+    assert_redirected_to postings_path
+    follow_redirect!
+
+    if frequency > 0
+      assert_equal "Subscription added", flash[:success]
+    else  
+      assert_equal "Tote item added", flash[:success]
+    end    
 
     return tote_item
 
@@ -202,7 +222,7 @@ class ActiveSupport::TestCase
     assert_template 'tote_items/tote'
     assert_not_nil assigns(:tote_items)
     items_total_gross = assigns(:items_total_gross)
-    assert_not_nil items_total_gross
+    assert_not_nil items_total_gross    
     assert items_total_gross > 0, "total amount of tote items is not greater than zero"
     puts "items_total_gross = $#{items_total_gross}"
 
@@ -212,18 +232,18 @@ class ActiveSupport::TestCase
 
   def create_posting_recurrence(posting_recurrence_frequency = nil, order_cutoff = nil, delivery_date = nil)
 
-    monthly_posting = create_posting(create_producer("john", "john@j.com", "WA", 98033, "john@j.com", "John's Farms"), 1.25)
-    monthly_posting_recurrence = PostingRecurrence.new(frequency: posting_recurrence_frequency, on: true)
-    monthly_posting_recurrence.postings << monthly_posting
-    assert monthly_posting_recurrence.save
+    posting = create_posting(create_producer("john", "john@j.com", "WA", 98033, "john@j.com", "John's Farms"), 1.25)
+    posting_recurrence = PostingRecurrence.new(frequency: posting_recurrence_frequency, on: true)
+    posting_recurrence.postings << posting
+    assert posting_recurrence.save
 
     if order_cutoff && delivery_date
       assert order_cutoff < delivery_date
-      monthly_posting.update(commitment_zone_start: order_cutoff, delivery_date: delivery_date)
-      assert monthly_posting.valid?
+      posting.update(commitment_zone_start: order_cutoff, delivery_date: delivery_date)
+      assert posting.valid?
     end
 
-    return monthly_posting_recurrence
+    return posting_recurrence
 
   end
 

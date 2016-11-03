@@ -181,7 +181,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
     assert_template 'postings/index'
 
     assert_not flash.empty?
-    assert_equal "Item added to tote.", flash[:success]
+    assert_equal "Tote item added", flash[:success]
 
     assert tote_item.will_partially_fill?
     assert_equal expected_additional_units_required_to_fill_my_case, tote_item.expected_fill_quantity
@@ -223,7 +223,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_template 'postings/index'
     assert_not flash.empty?
-    assert_equal "Item added to tote.", flash[:success]
+    assert_equal "Tote item added", flash[:success]
 
     #now authorize
     tote_item.transition(:customer_authorized)
@@ -318,7 +318,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
     assert_template 'postings/index'
 
     assert_not flash.empty?
-    assert_equal "Item added to tote.", flash[:success]
+    assert_equal "Tote item added", flash[:success]
 
     return posting
 

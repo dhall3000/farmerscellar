@@ -56,7 +56,7 @@ class ToteItemsControllerTest < ActionDispatch::IntegrationTest
     nuke_all_postings
 
     #create posting recurrence
-    pr = create_posting_recurrence(1, Time.zone.now.midnight + 1.day, Time.zone.now.midnight + 3.days)
+    pr = create_posting_recurrence(1, get_delivery_date(days_from_now = 1), get_delivery_date(days_from_now = 3))
     #skip ahead to the order cutoff of the first posting and trigger it to generate the 2nd posting. this will put
     #the first posting in a CLOSED state
     travel_to pr.current_posting.commitment_zone_start
@@ -198,7 +198,7 @@ class ToteItemsControllerTest < ActionDispatch::IntegrationTest
     log_in_as(@c1)
     post tote_items_path, params: {tote_item: {quantity: 1, posting_id: @posting_apples.id}}
 
-    assert_equal "Item added to tote.", flash[:success]
+    assert_equal "Tote item added", flash[:success]
     assert :redirected
     assert_response :redirect
     assert_redirected_to postings_path
@@ -264,7 +264,7 @@ class ToteItemsControllerTest < ActionDispatch::IntegrationTest
     assert_equal ti_count + 1, c1_tote_items.count
     new_ti = c1_tote_items.last
     
-    assert_equal "Item added to tote.", flash[:success]
+    assert_equal "Tote item added", flash[:success]
     assert_redirected_to postings_path
 
   end
