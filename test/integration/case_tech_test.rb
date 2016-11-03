@@ -21,7 +21,7 @@ class CaseTechTest < IntegrationHelper
     producer1.save
     
     create_commission(producer1, products(:apples), units(:pound), 0.05)
-    posting1 = create_recurring_posting(producer1, 1.00, products(:apples), units(:pound), delivery_date, commitment_zone_start, units_per_case = 10, frequency = 1)
+    posting1 = create_posting_recurrence(producer1, 1.00, products(:apples), units(:pound), delivery_date, commitment_zone_start, units_per_case = 10, frequency = 1).current_posting
 
     bob = create_user("bob", "bob@b.com", 98033)
     

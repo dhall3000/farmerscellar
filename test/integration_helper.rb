@@ -27,7 +27,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     producer1.save
     
     create_commission(producer1, products(:apples), units(:pound), 0.05)
-    posting1 = create_recurring_posting(producer1, 1.00, products(:apples), units(:pound), delivery_date, commitment_zone_start, units_per_case = 1, frequency = 1)
+    posting1 = create_posting_recurrence(producer1, 1.00, products(:apples), units(:pound), delivery_date, commitment_zone_start, units_per_case = 1, frequency = 1).current_posting
 
     bob = create_user("bob", "bob@b.com", 98033)
     
@@ -141,7 +141,45 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
   end
 
-  def create_recurring_posting(farmer, price, product, unit, delivery_date, commitment_zone_start, units_per_case, frequency)
+  def create_posting_recurrence(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = nil)
+
+    if farmer.nil?
+      farmer = create_producer("john", "john@j.com", "WA", 98033, "www.john.com", "JOHN'S Farm")
+      assert farmer.valid?
+      assert farmer.producer?
+    end
+
+    if product.nil?
+      product = products(:apples)
+    end
+
+    if unit.nil?
+      unit = units(:pound)
+    end
+
+    if !ProducerProductUnitCommission.where(user: farmer, product: product, unit: unit).any?
+      create_commission(farmer, product, unit, 0.05)
+    end
+
+    if price.nil?
+      price = 1.0
+    end
+
+    if delivery_date.nil?
+      delivery_date = get_delivery_date(days_from_now = 7)
+    end
+
+    if commitment_zone_start.nil?
+      commitment_zone_start = delivery_date - 2.days
+    end
+
+    if units_per_case.nil?
+      units_per_case = 1
+    end
+
+    if frequency.nil?
+      frequency = 1
+    end
 
     posting = create_posting(farmer, price, product, unit, delivery_date, commitment_zone_start, units_per_case)
     assert posting.valid?
@@ -151,7 +189,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
     assert posting_recurrence.save
 
-    return posting
+    return posting.reload.posting_recurrence
 
   end
 
@@ -361,6 +399,59 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     dropsites_deliverable.each do |dropsite|
       patch delivery_path(delivery), params: {dropsite_id: dropsite.id}
     end
+
+  end
+
+  def add_tote_item(customer, posting, quantity, frequency = nil, roll_until_filled = nil)
+ 
+    log_in_as(customer)
+    assert is_logged_in?
+
+    post tote_items_path, params: {tote_item: {quantity: quantity, posting_id: posting.id}}
+    tote_item = assigns(:tote_item)
+    additional_units_required_to_fill_my_case = tote_item.additional_units_required_to_fill_my_case
+
+    assert :redirected
+    assert_response :redirect
+
+    if !frequency
+      frequency = 0
+    end    
+
+    follow_redirect!
+
+    if  frequency == 0 && !roll_until_filled
+      if posting.posting_recurrence.nil? || !posting.posting_recurrence.on
+        assert_equal "Tote item added", flash[:success]
+        return tote_item
+      end
+    end
+
+    post subscriptions_path, params: {tote_item_id: tote_item.id, frequency: frequency, roll_until_filled: roll_until_filled}
+
+    if roll_until_filled || frequency > 0
+      subscription = assigns(:subscription)
+      assert subscription.valid?
+    end
+
+    if subscription
+      if roll_until_filled
+        assert subscription.kind?(:ROLLUNTILFILLED)
+      else
+        assert subscription.kind?(:NORMAL)
+      end
+    end
+
+    assert_redirected_to postings_path
+    follow_redirect!
+
+    if frequency > 0
+      assert_equal "Subscription added", flash[:success]
+    else  
+      assert_equal "Tote item added", flash[:success]
+    end    
+
+    return tote_item
 
   end
 

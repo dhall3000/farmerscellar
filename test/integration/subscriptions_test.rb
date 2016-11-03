@@ -217,14 +217,14 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     #verify INDD not skipped. here (order cutoff) it should be COMMITTED...
     assert indd.reload.state?(:COMMITTED)
     #do delivery
-    do_delivery(posting)
+    fully_fill_posting(posting)
     #verify INDD got filled
     assert indd.reload.state?(:FILLED)
     assert indd.fully_filled?
 
     #verify next not skipped
     posting = do_current_posting_order_cutoff_tasks(subscription.posting_recurrence)
-    do_delivery(posting)
+    fully_fill_posting(posting)
     #next should be FILLED    
     assert next_ti.reload.state?(:FILLED)
 
@@ -304,7 +304,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     #skip date should be 7 days after INDD    
     assert_equal distance_of_time_in_words(7.days), distance_of_time_in_words(skip_dates[0][:date] - indd.posting.delivery_date)
 
-    do_delivery(indd.posting)
+    fully_fill_posting(indd.posting)
 
     #we should now be on the delivery day of the INDD
     assert_equal Time.zone.now.midnight, indd.posting.delivery_date
@@ -319,7 +319,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     #verify 'next' gets filled
     posting = subscription.reload.posting_recurrence.current_posting
     do_current_posting_order_cutoff_tasks(subscription.posting_recurrence)
-    do_delivery(posting)
+    fully_fill_posting(posting)
 
     #verify there's another tote item generated
     assert_equal 3, subscription.reload.tote_items.count
@@ -404,7 +404,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
         assert_equal 1, user.reload.tote_items.count
       end
 
-      do_delivery(posting)
+      fully_fill_posting(posting)
 
       if count < 3
         #for the first three producer deliveries the user's only item should remain FILLED
@@ -547,7 +547,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     assert user.reload.tote_items.second.state?(:COMMITTED)
     assert_equal user.reload.tote_items.first.posting.delivery_date, user.reload.tote_items.last.posting.delivery_date
         
-    do_delivery(indd.posting)
+    fully_fill_posting(indd.posting)
 
     #we should now be on the delivery day of the INDD
     assert_equal Time.zone.now.midnight, indd.posting.delivery_date
@@ -560,7 +560,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     #verify 'next' gets filled
     posting = subscription.reload.posting_recurrence.current_posting
     do_current_posting_order_cutoff_tasks(subscription.posting_recurrence)
-    do_delivery(posting)
+    fully_fill_posting(posting)
 
     #verify there's another tote item generated
     assert_equal 3, subscription.reload.tote_items.count
@@ -656,7 +656,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     assert user.reload.tote_items.first.state?(:REMOVED)
     assert user.reload.tote_items.second.state?(:AUTHORIZED)
         
-    do_delivery(indd.posting)
+    fully_fill_posting(indd.posting)
 
     #we should now be on the delivery day of the INDD
     assert_equal Time.zone.now.midnight, indd.posting.delivery_date
@@ -669,7 +669,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     #verify 'next' gets filled
     posting = subscription.reload.posting_recurrence.current_posting
     do_current_posting_order_cutoff_tasks(subscription.posting_recurrence)
-    do_delivery(posting)
+    fully_fill_posting(posting)
 
     #verify there's another tote item generated
     assert_equal 3, subscription.reload.tote_items.count
@@ -774,7 +774,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     #and this, the 3rd item, was generated when we hit the order cutoff
     assert user.reload.tote_items.third.state?(:AUTHORIZED)
     
-    do_delivery(indd.posting)
+    fully_fill_posting(indd.posting)
 
     #we should now be on the delivery day of the INDD
     assert_equal Time.zone.now.midnight, indd.posting.delivery_date
@@ -787,7 +787,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     #verify 'next' gets filled
     posting = subscription.reload.posting_recurrence.current_posting
     do_current_posting_order_cutoff_tasks(subscription.posting_recurrence)
-    do_delivery(posting)
+    fully_fill_posting(posting)
 
     #verify there's another tote item generated
     assert_equal 4, subscription.reload.tote_items.count

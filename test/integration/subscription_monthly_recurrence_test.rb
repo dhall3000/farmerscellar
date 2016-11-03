@@ -1,7 +1,8 @@
 require 'test_helper'
+require 'integration_helper'
 require 'utility/rake_helper'
 
-class SubscriptionMonthlyRecurrenceTest < ActionDispatch::IntegrationTest
+class SubscriptionMonthlyRecurrenceTest < IntegrationHelper
 
   #I am now verifying the correct implementation of the monthly subscription way after the weeklies were implemented
   #that's what all these tests are for
@@ -13,7 +14,9 @@ class SubscriptionMonthlyRecurrenceTest < ActionDispatch::IntegrationTest
 
     monthly_recurrence_frequency = 5
     subscription_frequency = 1 #every recurrence delivery
-    posting_recurrence = create_posting_recurrence(monthly_recurrence_frequency, order_cutoff = nil, delivery_date = nil)
+    posting_recurrence = create_posting_recurrence
+    posting_recurrence.update(frequency: monthly_recurrence_frequency)
+
     posting = posting_recurrence.current_posting
 
     user = create_user("bob", "bob@b.com")

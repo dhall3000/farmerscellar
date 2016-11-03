@@ -122,59 +122,6 @@ class ActiveSupport::TestCase
 
   end
 
-  def add_tote_item(customer, posting, quantity, frequency = nil, roll_until_filled = nil)
- 
-    log_in_as(customer)
-    assert is_logged_in?
-
-    post tote_items_path, params: {tote_item: {quantity: quantity, posting_id: posting.id}}
-    tote_item = assigns(:tote_item)
-    additional_units_required_to_fill_my_case = tote_item.additional_units_required_to_fill_my_case
-
-    assert :redirected
-    assert_response :redirect
-
-    if !frequency
-      frequency = 0
-    end    
-
-    follow_redirect!
-
-    if  frequency == 0 && !roll_until_filled
-      if posting.posting_recurrence.nil? || !posting.posting_recurrence.on
-        assert_equal "Tote item added", flash[:success]
-        return tote_item
-      end
-    end
-
-    post subscriptions_path, params: {tote_item_id: tote_item.id, frequency: frequency, roll_until_filled: roll_until_filled}
-
-    if roll_until_filled || frequency > 0
-      subscription = assigns(:subscription)
-      assert subscription.valid?
-    end
-
-    if subscription
-      if roll_until_filled
-        assert subscription.kind?(:ROLLUNTILFILLED)
-      else
-        assert subscription.kind?(:NORMAL)
-      end
-    end
-
-    assert_redirected_to postings_path
-    follow_redirect!
-
-    if frequency > 0
-      assert_equal "Subscription added", flash[:success]
-    else  
-      assert_equal "Tote item added", flash[:success]
-    end    
-
-    return tote_item
-
-  end
-
   def create_rt_authorization_for_customer(customer)
 
     set_dropsite(customer)
@@ -257,7 +204,7 @@ class ActiveSupport::TestCase
 
   end
 
-  def do_delivery(posting)
+  def fully_fill_posting(posting)
 
     travel_to posting.delivery_date + 12.hours
     #log in as admin and process a fill

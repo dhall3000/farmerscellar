@@ -1,7 +1,7 @@
 require 'test_helper'
 require 'integration_helper'
 
-class SubscriptionsRollUntilFilledTest < ActionDispatch::IntegrationTest
+class SubscriptionsRollUntilFilledTest < IntegrationHelper
 
   test "subscription should regenerate each recurrence until order fills once then cancel subscription" do
 
@@ -17,7 +17,9 @@ class SubscriptionsRollUntilFilledTest < ActionDispatch::IntegrationTest
     #10bob should continue to get filled.
 
     nuke_all_postings
-    pr = create_posting_recurrence(posting_recurrence_frequency = 1)
+    #create_posting_recurrence(farmer, price, product, unit, delivery_date, commitment_zone_start, units_per_case, frequency)
+
+    pr = create_posting_recurrence
     pr.current_posting.update(price: 1)
     pr.current_posting.user.update(order_minimum_producer_net: 20)
 
