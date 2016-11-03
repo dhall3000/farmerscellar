@@ -102,8 +102,14 @@ class ToteItem < ApplicationRecord
         new_state = ToteItem.states[:FILLED]
         update(quantity_filled: params[:quantity_filled])
         
-        if quantity_filled > 0          
+        if quantity_filled > 0
+          
           create_funds_flow_objects
+
+          if subscription
+            subscription.fill(params[:quantity_filled], self)
+          end
+
         end
       end
 

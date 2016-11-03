@@ -409,7 +409,6 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
     post tote_items_path, params: {tote_item: {quantity: quantity, posting_id: posting.id}}
     tote_item = assigns(:tote_item)
-    additional_units_required_to_fill_my_case = tote_item.additional_units_required_to_fill_my_case
 
     assert :redirected
     assert_response :redirect

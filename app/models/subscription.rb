@@ -23,6 +23,22 @@ class Subscription < ApplicationRecord
     return self.kind == Subscription.kinds[kind_token]
   end
 
+  def fill(quantity, tote_item = nil)
+
+    if quantity < 1
+      return
+    end
+
+    if tote_item.nil?
+      tote_item = tote_items.last
+    end
+
+    if kind?(:ROLLUNTILFILLED)
+      turn_off
+    end
+
+  end
+
   def create_skip_date(tote_item)
 
     #we're only going to create this skip date if the given tote item belongs to this subscription
