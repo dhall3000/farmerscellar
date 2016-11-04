@@ -3,6 +3,80 @@ require 'integration_helper'
 
 class SubscriptionsRollUntilFilledTest < IntegrationHelper
 
+  test "skip date action should not act on rtf subscriptions" do
+
+    nuke_all_postings
+    bob = create_user("bob", "bob@b.com", 98033)
+    
+    #2 create rtf subscription
+    pr_celery_rtf = create_posting_recurrence(farmer = nil, price = 2.29, product = products(:celery), unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1)
+    celery_subscription = create_tote_item(bob, pr_celery_rtf.current_posting, quantity = 3, frequency = 0, roll_until_filled = true).subscription
+    assert celery_subscription
+    assert celery_subscription.kind?(:ROLLUNTILFILLED)
+
+    log_in_as(bob)
+    #4 verify show does not display celery RTF subscription
+    get subscription_path(celery_subscription)
+    assert :redirect
+    assert_redirected_to subscriptions_path
+    #5 verify edit does not display celery RTF subscription
+    get edit_subscription_path(celery_subscription)
+    assert :redirect
+    assert_redirected_to subscriptions_path
+
+    immediate_next_delivery_date = ToteItem.where(user_id: bob.id).first
+    indd = immediate_next_delivery_date
+    assert_equal indd.subscription, celery_subscription
+
+    #verify INDD item not committed
+    assert_not indd.reload.state?(:COMMITTED)
+
+    #specify skip INDD
+    post subscriptions_skip_dates_path, params: 
+    {
+      skip_dates: {celery_subscription.id.to_s => [indd.posting.delivery_date.to_s]},
+      subscription_ids: [celery_subscription.id.to_s],
+      end_date: (indd.posting.delivery_date + 7.days).to_s
+    }
+
+    #verify INDD did not get REMOVED (i.e. skipped)
+    assert_not indd.reload.state?(:REMOVED)
+    
+  end
+
+  test "neither show nor edit should not display rtf subscriptions" do
+
+    nuke_all_postings
+    bob = create_user("bob", "bob@b.com", 98033)
+    #1 create regular subscription
+    pr_apples = create_posting_recurrence(farmer = nil, price = 1, product = products(:apples), unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1)
+    assert pr_apples.valid?
+    apples_subscription = create_tote_item(bob, pr_apples.current_posting, quantity = 2, frequency = 1).subscription
+    assert apples_subscription
+    
+    #2 create rtf subscription
+    pr_celery_rtf = create_posting_recurrence(farmer = pr_apples.current_posting.user, price = 2.29, product = products(:celery), unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1)
+    celery_subscription = create_tote_item(bob, pr_celery_rtf.current_posting, quantity = 3, frequency = 0, roll_until_filled = true).subscription
+    assert celery_subscription
+    assert celery_subscription.kind?(:ROLLUNTILFILLED)
+
+    log_in_as(bob)
+    #3 verify displays apples subscription
+    get subscription_path(apples_subscription)
+    assert :success
+    assert_template 'subscriptions/show'
+    assert_select 'p', "JOHN'S Farm Fuji Apples"      
+    #4 verify show does not display celery RTF subscription
+    get subscription_path(celery_subscription)
+    assert :redirect
+    assert_redirected_to subscriptions_path
+    #5 verify edit does not display celery RTF subscription
+    get edit_subscription_path(celery_subscription)
+    assert :redirect
+    assert_redirected_to subscriptions_path
+
+  end
+
   test "index should not display rtf subscriptions" do
 
     nuke_all_postings

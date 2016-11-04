@@ -97,7 +97,7 @@ class SubscriptionsController < ApplicationController
         #before programming in the skip dates, verify the subscription really belongs to current_user
         subscription = Subscription.find_by(id: subscription_id)
 
-        if subscription && subscription.user.id == current_user.id
+        if subscription && subscription.user.id == current_user.id && !subscription.kind?(:ROLLUNTILFILLED)
           
           dates.each do |date|
 
@@ -125,37 +125,6 @@ class SubscriptionsController < ApplicationController
 
     flash[:success] = "Delivery skip dates updated"
     redirect_to subscriptions_path(end_date: end_date)
-
-  end
-
-  def handle_unskips(subscription_ids, skip_dates)
-    
-    if subscription_ids.nil? || !subscription_ids.any?
-      return
-    end
-
-    #subscription_ids is all the subscriptions we're "handling"
-    subscription_ids.each do |subscription_id|
-
-      subscription = Subscription.find(subscription_id)
-      current_posting_delivery_date = subscription.posting_recurrence.current_posting.delivery_date
-
-      #is the posting recurrence current posting even a legitimate subscriber delivery date?
-      if !subscription.legit_date?(current_posting_delivery_date)
-        next
-      end
-
-      #do we already have a tote item for the pr current posting delivery date?
-      if subscription.latest_delivery_date_item && subscription.latest_delivery_date_item.posting.delivery_date == current_posting_delivery_date
-        next
-      end
-
-      #no skip dates at all? skip_dates exists but contains no dates to skip? the skip list given does not contain the current posting
-      if !skip_dates || !(dates = skip_dates[subscription_id]) || !dates.include?(current_posting_delivery_date.to_s)
-        subscription.generate_next_tote_item
-      end
- 
-    end
 
   end
 
@@ -246,6 +215,42 @@ class SubscriptionsController < ApplicationController
 
   private
 
+    def handle_unskips(subscription_ids, skip_dates)
+      
+      if subscription_ids.nil? || !subscription_ids.any?
+        return
+      end
+
+      #subscription_ids is all the subscriptions we're "handling"
+      subscription_ids.each do |subscription_id|
+
+        subscription = Subscription.find(subscription_id)
+
+        if subscription.kind?(:ROLLUNTILFILLED)
+          next
+        end
+
+        current_posting_delivery_date = subscription.posting_recurrence.current_posting.delivery_date
+
+        #is the posting recurrence current posting even a legitimate subscriber delivery date?
+        if !subscription.legit_date?(current_posting_delivery_date)
+          next
+        end
+
+        #do we already have a tote item for the pr current posting delivery date?
+        if subscription.latest_delivery_date_item && subscription.latest_delivery_date_item.posting.delivery_date == current_posting_delivery_date
+          next
+        end
+
+        #no skip dates at all? skip_dates exists but contains no dates to skip? the skip list given does not contain the current posting
+        if !skip_dates || !(dates = skip_dates[subscription_id]) || !dates.include?(current_posting_delivery_date.to_s)
+          subscription.generate_next_tote_item
+        end
+   
+      end
+
+    end
+
     def new_conditions_met?
 
       #if tote_item_id is not in params, redirect to postings page
@@ -287,7 +292,7 @@ class SubscriptionsController < ApplicationController
       @subscriptions = Subscription.where(id: params[:id])
       @subscription = @subscriptions.order("subscriptions.id").last
 
-      if @subscription.nil? || !@subscription.on
+      if @subscription.nil? || !@subscription.on || @subscription.kind?(:ROLLUNTILFILLED)
         redirect_to subscriptions_path
         return
       end
@@ -381,10 +386,14 @@ class SubscriptionsController < ApplicationController
 
     def get_skip_dates_through(subscription_ids, end_date)
       
-      subscriptions = Subscription.where(id: subscription_ids)
+      subscriptions = Subscription.where(id: subscription_ids).where.not(kind: Subscription.kinds[:ROLLUNTILFILLED])
       skip_dates = []
 
       subscriptions.each do |subscription|
+
+        if subscription.kind?(:ROLLUNTILFILLED)
+          next
+        end
 
         if subscription.earliest_future_delivery_date_item
           #if latest_ti is committed we want to show it to the user so they know another delivery is going to happen
