@@ -45,15 +45,15 @@ class OrderMinimumsTest < IntegrationHelper
     sam = create_user("sam", "sam@s.com", 98033)
 
     #both customers order from both distributor postings
-    ti1_bob = add_tote_item(bob, posting1, 2)
-    ti2_bob = add_tote_item(bob, posting2, 4)
+    ti1_bob = create_tote_item(bob, posting1, 2)
+    ti2_bob = create_tote_item(bob, posting2, 4)
 
-    ti1_sam = add_tote_item(sam, posting1, 1)
-    ti2_sam = add_tote_item(sam, posting2, 3)
+    ti1_sam = create_tote_item(sam, posting1, 1)
+    ti2_sam = create_tote_item(sam, posting2, 3)
 
     #one customer orders from the decoy
     num_decoy_units = 4
-    ti_decoy_bob = add_tote_item(bob, posting_decoy, num_decoy_units)
+    ti_decoy_bob = create_tote_item(bob, posting_decoy, num_decoy_units)
 
     create_one_time_authorization_for_customer(bob)
     create_one_time_authorization_for_customer(sam)

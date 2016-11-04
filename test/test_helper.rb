@@ -177,23 +177,6 @@ class ActiveSupport::TestCase
 
   end
 
-  def create_posting_recurrence(posting_recurrence_frequency = nil, order_cutoff = nil, delivery_date = nil)
-
-    posting = create_posting(create_producer("john", "john@j.com", "WA", 98033, "john@j.com", "John's Farms"), 1.25)
-    posting_recurrence = PostingRecurrence.new(frequency: posting_recurrence_frequency, on: true)
-    posting_recurrence.postings << posting
-    assert posting_recurrence.save
-
-    if order_cutoff && delivery_date
-      assert order_cutoff < delivery_date
-      posting.update(commitment_zone_start: order_cutoff, delivery_date: delivery_date)
-      assert posting.valid?
-    end
-
-    return posting_recurrence
-
-  end
-
   def do_current_posting_order_cutoff_tasks(posting_recurrence)
     
     posting = posting_recurrence.current_posting
@@ -221,15 +204,6 @@ class ActiveSupport::TestCase
   def nuke_all_postings
     Posting.delete_all
     assert_equal 0, Posting.count
-  end
-
-  def create_tote_item(posting, quantity, user)
-
-    tote_item = ToteItem.create(user: user, posting: posting, quantity: quantity, price: posting.price, state: ToteItem.states[:ADDED])
-    assert tote_item.valid?
-
-    return tote_item
-
   end
 
   def create_posting(producer, price, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, commission = nil, order_minimum_producer_net = nil)
@@ -290,6 +264,53 @@ class ActiveSupport::TestCase
     assert posting.valid?
 
     return posting
+
+  end
+
+  def create_posting_recurrence(posting_recurrence_frequency = nil, order_cutoff = nil, delivery_date = nil)
+
+    posting = create_posting(create_producer("john", "john@j.com", "WA", 98033, "john@j.com", "John's Farms"), 1.25)
+    posting_recurrence = PostingRecurrence.new(frequency: posting_recurrence_frequency, on: true)
+    posting_recurrence.postings << posting
+    assert posting_recurrence.save
+
+    if order_cutoff && delivery_date
+      assert order_cutoff < delivery_date
+      posting.update(commitment_zone_start: order_cutoff, delivery_date: delivery_date)
+      assert posting.valid?
+    end
+
+    return posting_recurrence
+
+  end
+
+  def create_tote_item(posting, quantity, user)
+
+    tote_item = ToteItem.create(user: user, posting: posting, quantity: quantity, price: posting.price, state: ToteItem.states[:ADDED])
+    assert tote_item.valid?
+
+    return tote_item
+
+  end
+
+  def create_subscription(user, posting, quantity, frequency)
+
+    assert user.valid?
+    assert posting.valid?
+    assert posting.posting_recurrence
+
+    tote_item = create_tote_item(posting, quantity, user)
+    subscription = Subscription.new(kind: Subscription.kinds[:NORMAL], frequency: frequency, on: true, user: user, posting_recurrence: posting.posting_recurrence, quantity: quantity, paused: false)
+
+    if frequency == 0
+      subscription.kind = Subscription.kinds[:ROLLUNTILFILLED]
+    end
+
+    assert subscription.save    
+    subscription.tote_items << tote_item
+    subscription.save
+
+    return subscription
 
   end
 

@@ -3,6 +3,32 @@ require 'integration_helper'
 
 class SubscriptionsRollUntilFilledTest < IntegrationHelper
 
+  test "index should not display rtf subscriptions" do
+
+    nuke_all_postings
+    bob = create_user("bob", "bob@b.com", 98033)
+    #1 create regular subscription
+    pr_apples = create_posting_recurrence(farmer = nil, price = 1, product = products(:apples), unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1)
+    assert pr_apples.valid?
+    ti = create_tote_item(bob, pr_apples.current_posting, quantity = 2, frequency = 1)
+    assert ti.subscription
+    
+    #2 create rtf subscription
+    pr_celery_rtf = create_posting_recurrence(farmer = pr_apples.current_posting.user, price = 2.29, product = products(:celery), unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1)
+    ti = create_tote_item(bob, pr_celery_rtf.current_posting, quantity = 3, frequency = 0, roll_until_filled = true)
+    assert ti.subscription
+    assert ti.subscription.kind?(:ROLLUNTILFILLED)
+    #3 view subscriptions index
+    log_in_as(bob)
+    get subscriptions_path
+    assert_template 'subscriptions/index'    
+    #4 verify normal subscription is visible
+    assert_select 'a', "JOHN'S Farm Fuji Apples"
+    #5 verify rtf sub is not displayed
+    assert_select 'a', {text: "JOHN'S Farm Celery", count: 0}    
+
+  end
+
   test "subscription should regenerate each recurrence until order fills once then cancel subscription" do
 
     #1producer has an order minimum
@@ -26,11 +52,11 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     bob = create_user("bob", "bob@b.com", 98033)
     sam = create_user("sam", "sam@s.com", 98033)
 
-    ti_bob = add_tote_item(bob, pr.current_posting, quantity = 2, frequency = 0)
+    ti_bob = create_tote_item(bob, pr.current_posting, quantity = 2, frequency = 0)
     assert ti_bob.valid?
     assert ti_bob.state?(:ADDED)
 
-    ti_sam = add_tote_item(sam, pr.current_posting, quantity = 2, frequency = 0, roll_until_filled = true)
+    ti_sam = create_tote_item(sam, pr.current_posting, quantity = 2, frequency = 0, roll_until_filled = true)
     assert ti_sam.valid?
     assert ti_sam.state?(:ADDED)
 
@@ -61,7 +87,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
 
     #6
     ti_sam = sam.tote_items.last
-    ti_bob = add_tote_item(bob, second_posting, quantity = 25, frequency = 1)
+    ti_bob = create_tote_item(bob, second_posting, quantity = 25, frequency = 1)
     create_rt_authorization_for_customer(bob)
 
     #7

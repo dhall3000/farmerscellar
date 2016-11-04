@@ -287,7 +287,7 @@ class PickupDeadlineReminderTest < IntegrationHelper
 
   def create_authorized_tote_item_for(user, posting, quantity)
 
-    tote_item = add_tote_item(user, posting, quantity)
+    tote_item = create_tote_item(user, posting, quantity)
     create_one_time_authorization_for_customer(user)
 
     return tote_item

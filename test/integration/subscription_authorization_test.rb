@@ -26,7 +26,7 @@ class SubscriptionAuthorizationTest < IntegrationHelper
 		#at this point bob doesn't have any items in his tote, although he does have an authorized subscription
 
 		#create another subscription
-    add_tote_item(bob, Posting.last, 2, subscription_frequency = 1)
+    create_tote_item(bob, Posting.last, 2, subscription_frequency = 1)
     assert_equal 3, Rtauthorization.count
     rtauth1 = Rtauthorization.last
 

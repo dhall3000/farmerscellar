@@ -25,7 +25,7 @@ class CaseTechTest < IntegrationHelper
 
     bob = create_user("bob", "bob@b.com", 98033)
     
-    ti1_bob = add_tote_item(bob, posting1, 2, subscription_frequency = 1)
+    ti1_bob = create_tote_item(bob, posting1, 2, subscription_frequency = 1)
 
     create_rt_authorization_for_customer(bob)
   end
@@ -66,7 +66,7 @@ class CaseTechTest < IntegrationHelper
     customer = create_new_customer("bob", "bob@fc.com")
     customer.set_dropsite(Dropsite.first)
     #create tote items for user/posting
-    tote_item = add_tote_item(customer, posting, number_of_units)
+    tote_item = create_tote_item(customer, posting, number_of_units)
     #authorize tote items
     create_one_time_authorization_for_customer(customer)
     #fast forward to commitment zone

@@ -38,7 +38,7 @@ class SubscriptionMonthlyRecurrenceTest < IntegrationHelper
       posting_recurrence.reload
 
       if posting_recurrence.postings.count >= 2 && user.tote_items.count == num_tote_items_start        
-        add_tote_item(user, posting_recurrence.current_posting, quantity, subscription_frequency)
+        create_tote_item(user, posting_recurrence.current_posting, quantity, subscription_frequency)
         create_rt_authorization_for_customer(user)
       end                
 

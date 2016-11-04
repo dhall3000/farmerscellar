@@ -3,144 +3,6 @@ require 'utility/rake_helper'
 
 class IntegrationHelper < ActionDispatch::IntegrationTest
 
-  def setup_basic_subscription_through_delivery
-
-    nuke_all_postings
-
-    delivery_date = get_delivery_date(days_from_now = 10)
-    if (delivery_date - 1.day).sunday?
-      delivery_date += 1.day
-    end
-    commitment_zone_start = delivery_date - 2.days
-
-    distributor = create_producer("distributor", "distributor@d.com", "WA", 98033, "www.distributor.com", "Distributor Inc.")
-    distributor.settings.update(conditional_payment: false)
-    distributor.create_business_interface(name: "Distributor Inc.", order_email_accepted: true, order_email: distributor.email, paypal_accepted: true, paypal_email: distributor.email)
-
-    #maybe we can/will parameterize this later?
-    if false
-      distributor.update(order_minimum_producer_net: 20)
-    end
-
-    producer1 = create_producer("producer1", "producer1@p.com", "WA", 98033, "www.producer1.com", "producer1 farms")
-    producer1.distributor = distributor    
-    producer1.save
-    
-    create_commission(producer1, products(:apples), units(:pound), 0.05)
-    posting1 = create_posting_recurrence(producer1, 1.00, products(:apples), units(:pound), delivery_date, commitment_zone_start, units_per_case = 1, frequency = 1).current_posting
-
-    bob = create_user("bob", "bob@b.com", 98033)
-    
-    ti1_bob = add_tote_item(bob, posting1, 2, subscription_frequency = 1)
-
-    create_rt_authorization_for_customer(bob)
-
-    assert_equal 1, bob.tote_items.count    
-    ti = bob.tote_items.first
-
-    assert_equal 1, Posting.count
-    posting = Posting.first
-
-    num_units = ti.quantity
-    
-    travel_to posting.commitment_zone_start
-    ActionMailer::Base.deliveries.clear
-    RakeHelper.do_hourly_tasks
-
-    assert_equal 1, ActionMailer::Base.deliveries.count
-    verify_proper_order_submission_email(ActionMailer::Base.deliveries.last, posting.get_creditor, posting, num_units, units_per_case = "", number_of_cases = "")
-
-    #do fill
-    travel_to posting.delivery_date + 12.hours
-
-    fill_posting(posting.reload, num_units)
-
-    #distributor posting should be closed
-    assert posting.reload.state?(:CLOSED)
-
-    #send out delivery notifications
-    ActionMailer::Base.deliveries.clear
-    do_delivery
-    
-    #verify delivery notification is correct
-    assert_equal 1, ActionMailer::Base.deliveries.count
-
-    verify_proper_delivery_notification_email(ActionMailer::Base.deliveries.first, ti.reload)
-    assert ti.reload.state?(:FILLED)
-
-    return bob
-
-  end
-
-  def setup_basic_process_through_delivery
-
-    nuke_all_postings
-
-    delivery_date = get_delivery_date(days_from_now = 10)
-    if (delivery_date - 1.day).sunday?
-      delivery_date += 1.day
-    end
-    commitment_zone_start = delivery_date - 2.days
-
-    distributor = create_producer("distributor", "distributor@d.com", "WA", 98033, "www.distributor.com", "Distributor Inc.")
-    distributor.settings.update(conditional_payment: false)
-    distributor.create_business_interface(name: "Distributor Inc.", order_email_accepted: true, order_email: distributor.email, paypal_accepted: true, paypal_email: distributor.email)
-
-    #maybe we can/will parameterize this later?
-    if false
-      distributor.update(order_minimum_producer_net: 20)
-    end
-
-    producer1 = create_producer("producer1", "producer1@p.com", "WA", 98033, "www.producer1.com", "producer1 farms")
-    producer1.distributor = distributor    
-    producer1.save
-    
-    create_commission(producer1, products(:apples), units(:pound), 0.05)
-    posting1 = create_posting(producer1, 1.00, products(:apples), units(:pound), delivery_date, commitment_zone_start, units_per_case = 1)
-
-    bob = create_user("bob", "bob@b.com", 98033)
-    
-    ti1_bob = add_tote_item(bob, posting1, 2)
-
-    create_one_time_authorization_for_customer(bob)
-
-    assert_equal 1, bob.tote_items.count    
-    ti = bob.tote_items.first
-
-    assert_equal 1, Posting.count
-    posting = Posting.first
-
-    num_units = ti.quantity
-    
-    travel_to posting.commitment_zone_start
-    ActionMailer::Base.deliveries.clear
-    RakeHelper.do_hourly_tasks
-
-    assert_equal 1, ActionMailer::Base.deliveries.count
-    verify_proper_order_submission_email(ActionMailer::Base.deliveries.last, posting.get_creditor, posting, num_units, units_per_case = "", number_of_cases = "")
-
-    #do fill
-    travel_to posting.delivery_date + 12.hours
-
-    fill_posting(posting.reload, num_units)
-
-    #distributor posting should be closed
-    assert posting.reload.state?(:CLOSED)
-
-    #send out delivery notifications
-    ActionMailer::Base.deliveries.clear
-    do_delivery
-    
-    #verify delivery notification is correct
-    assert_equal 1, ActionMailer::Base.deliveries.count
-
-    verify_proper_delivery_notification_email(ActionMailer::Base.deliveries.first, ti.reload)
-    assert ti.reload.state?(:FILLED)
-
-    return bob
-
-  end
-
   def create_posting_recurrence(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = nil)
 
     if farmer.nil?
@@ -217,37 +79,6 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
   end
 
-  def verify_post_presence(price, unit, exists, posting_id = nil)
-
-    if exists == true
-      count = 1
-    else
-      count = 0
-    end
-
-    verify_post_visibility(price, unit, count)    
-    verify_post_existence(price, count, posting_id)
-
-  end
-
-  def verify_post_visibility(price, unit, count)
-    get postings_path
-    assert :success
-    assert_select "body div.panel h4.panel-title", {text: ActiveSupport::NumberHelper.number_to_currency(price) + " / " + unit.name, count: count}
-  end
-
-  def verify_post_existence(price, count, posting_id = nil)
-
-    postings = Posting.where(price: price)
-    assert_not postings.nil?
-    assert_equal count, postings.count
-
-    if posting_id != nil
-      assert_equal posting_id, postings.last.id
-    end
-
-  end
-
   def create_new_customer(name, email)
 
     get signup_path
@@ -305,6 +136,231 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     return authorization
 
   end
+
+  def create_tote_item(customer, posting, quantity, frequency = nil, roll_until_filled = nil)
+ 
+    log_in_as(customer)
+    assert is_logged_in?
+
+    post tote_items_path, params: {tote_item: {quantity: quantity, posting_id: posting.id}}
+    tote_item = assigns(:tote_item)
+
+    assert :redirected
+    assert_response :redirect
+
+    if !frequency
+      frequency = 0
+    end    
+
+    follow_redirect!
+
+    if  frequency == 0 && !roll_until_filled
+      if posting.posting_recurrence.nil? || !posting.posting_recurrence.on
+        assert_equal "Tote item added", flash[:success]
+        return tote_item
+      end
+    end
+
+    post subscriptions_path, params: {tote_item_id: tote_item.id, frequency: frequency, roll_until_filled: roll_until_filled}
+
+    if roll_until_filled || frequency > 0
+      subscription = assigns(:subscription)
+      assert subscription.valid?
+    end
+
+    if subscription
+      if roll_until_filled
+        assert subscription.kind?(:ROLLUNTILFILLED)
+      else
+        assert subscription.kind?(:NORMAL)
+      end
+    end
+
+    assert_redirected_to postings_path
+    follow_redirect!
+
+    if frequency > 0
+      assert_equal "Subscription added", flash[:success]
+    else  
+      assert_equal "Tote item added", flash[:success]
+    end    
+
+    return tote_item.reload
+
+  end
+
+  def setup_basic_subscription_through_delivery
+
+    nuke_all_postings
+
+    delivery_date = get_delivery_date(days_from_now = 10)
+    if (delivery_date - 1.day).sunday?
+      delivery_date += 1.day
+    end
+    commitment_zone_start = delivery_date - 2.days
+
+    distributor = create_producer("distributor", "distributor@d.com", "WA", 98033, "www.distributor.com", "Distributor Inc.")
+    distributor.settings.update(conditional_payment: false)
+    distributor.create_business_interface(name: "Distributor Inc.", order_email_accepted: true, order_email: distributor.email, paypal_accepted: true, paypal_email: distributor.email)
+
+    #maybe we can/will parameterize this later?
+    if false
+      distributor.update(order_minimum_producer_net: 20)
+    end
+
+    producer1 = create_producer("producer1", "producer1@p.com", "WA", 98033, "www.producer1.com", "producer1 farms")
+    producer1.distributor = distributor    
+    producer1.save
+    
+    create_commission(producer1, products(:apples), units(:pound), 0.05)
+    posting1 = create_posting_recurrence(producer1, 1.00, products(:apples), units(:pound), delivery_date, commitment_zone_start, units_per_case = 1, frequency = 1).current_posting
+
+    bob = create_user("bob", "bob@b.com", 98033)
+    
+    ti1_bob = create_tote_item(bob, posting1, 2, subscription_frequency = 1)
+
+    create_rt_authorization_for_customer(bob)
+
+    assert_equal 1, bob.tote_items.count    
+    ti = bob.tote_items.first
+
+    assert_equal 1, Posting.count
+    posting = Posting.first
+
+    num_units = ti.quantity
+    
+    travel_to posting.commitment_zone_start
+    ActionMailer::Base.deliveries.clear
+    RakeHelper.do_hourly_tasks
+
+    assert_equal 1, ActionMailer::Base.deliveries.count
+    verify_proper_order_submission_email(ActionMailer::Base.deliveries.last, posting.get_creditor, posting, num_units, units_per_case = "", number_of_cases = "")
+
+    #do fill
+    travel_to posting.delivery_date + 12.hours
+
+    fill_posting(posting.reload, num_units)
+
+    #distributor posting should be closed
+    assert posting.reload.state?(:CLOSED)
+
+    #send out delivery notifications
+    ActionMailer::Base.deliveries.clear
+    do_delivery
+    
+    #verify delivery notification is correct
+    assert_equal 1, ActionMailer::Base.deliveries.count
+
+    verify_proper_delivery_notification_email(ActionMailer::Base.deliveries.first, ti.reload)
+    assert ti.reload.state?(:FILLED)
+
+    return bob
+
+  end
+
+  def setup_basic_process_through_delivery
+
+    nuke_all_postings
+
+    delivery_date = get_delivery_date(days_from_now = 10)
+    if (delivery_date - 1.day).sunday?
+      delivery_date += 1.day
+    end
+    commitment_zone_start = delivery_date - 2.days
+
+    distributor = create_producer("distributor", "distributor@d.com", "WA", 98033, "www.distributor.com", "Distributor Inc.")
+    distributor.settings.update(conditional_payment: false)
+    distributor.create_business_interface(name: "Distributor Inc.", order_email_accepted: true, order_email: distributor.email, paypal_accepted: true, paypal_email: distributor.email)
+
+    #maybe we can/will parameterize this later?
+    if false
+      distributor.update(order_minimum_producer_net: 20)
+    end
+
+    producer1 = create_producer("producer1", "producer1@p.com", "WA", 98033, "www.producer1.com", "producer1 farms")
+    producer1.distributor = distributor    
+    producer1.save
+    
+    create_commission(producer1, products(:apples), units(:pound), 0.05)
+    posting1 = create_posting(producer1, 1.00, products(:apples), units(:pound), delivery_date, commitment_zone_start, units_per_case = 1)
+
+    bob = create_user("bob", "bob@b.com", 98033)
+    
+    ti1_bob = create_tote_item(bob, posting1, 2)
+
+    create_one_time_authorization_for_customer(bob)
+
+    assert_equal 1, bob.tote_items.count    
+    ti = bob.tote_items.first
+
+    assert_equal 1, Posting.count
+    posting = Posting.first
+
+    num_units = ti.quantity
+    
+    travel_to posting.commitment_zone_start
+    ActionMailer::Base.deliveries.clear
+    RakeHelper.do_hourly_tasks
+
+    assert_equal 1, ActionMailer::Base.deliveries.count
+    verify_proper_order_submission_email(ActionMailer::Base.deliveries.last, posting.get_creditor, posting, num_units, units_per_case = "", number_of_cases = "")
+
+    #do fill
+    travel_to posting.delivery_date + 12.hours
+
+    fill_posting(posting.reload, num_units)
+
+    #distributor posting should be closed
+    assert posting.reload.state?(:CLOSED)
+
+    #send out delivery notifications
+    ActionMailer::Base.deliveries.clear
+    do_delivery
+    
+    #verify delivery notification is correct
+    assert_equal 1, ActionMailer::Base.deliveries.count
+
+    verify_proper_delivery_notification_email(ActionMailer::Base.deliveries.first, ti.reload)
+    assert ti.reload.state?(:FILLED)
+
+    return bob
+
+  end
+
+
+
+  def verify_post_presence(price, unit, exists, posting_id = nil)
+
+    if exists == true
+      count = 1
+    else
+      count = 0
+    end
+
+    verify_post_visibility(price, unit, count)    
+    verify_post_existence(price, count, posting_id)
+
+  end
+
+  def verify_post_visibility(price, unit, count)
+    get postings_path
+    assert :success
+    assert_select "body div.panel h4.panel-title", {text: ActiveSupport::NumberHelper.number_to_currency(price) + " / " + unit.name, count: count}
+  end
+
+  def verify_post_existence(price, count, posting_id = nil)
+
+    postings = Posting.where(price: price)
+    assert_not postings.nil?
+    assert_equal count, postings.count
+
+    if posting_id != nil
+      assert_equal posting_id, postings.last.id
+    end
+
+  end
+
+
 
   def verify_authorization_receipt_sent(num_mail_messages_sent, user, authorization)
 
@@ -399,58 +455,6 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     dropsites_deliverable.each do |dropsite|
       patch delivery_path(delivery), params: {dropsite_id: dropsite.id}
     end
-
-  end
-
-  def add_tote_item(customer, posting, quantity, frequency = nil, roll_until_filled = nil)
- 
-    log_in_as(customer)
-    assert is_logged_in?
-
-    post tote_items_path, params: {tote_item: {quantity: quantity, posting_id: posting.id}}
-    tote_item = assigns(:tote_item)
-
-    assert :redirected
-    assert_response :redirect
-
-    if !frequency
-      frequency = 0
-    end    
-
-    follow_redirect!
-
-    if  frequency == 0 && !roll_until_filled
-      if posting.posting_recurrence.nil? || !posting.posting_recurrence.on
-        assert_equal "Tote item added", flash[:success]
-        return tote_item
-      end
-    end
-
-    post subscriptions_path, params: {tote_item_id: tote_item.id, frequency: frequency, roll_until_filled: roll_until_filled}
-
-    if roll_until_filled || frequency > 0
-      subscription = assigns(:subscription)
-      assert subscription.valid?
-    end
-
-    if subscription
-      if roll_until_filled
-        assert subscription.kind?(:ROLLUNTILFILLED)
-      else
-        assert subscription.kind?(:NORMAL)
-      end
-    end
-
-    assert_redirected_to postings_path
-    follow_redirect!
-
-    if frequency > 0
-      assert_equal "Subscription added", flash[:success]
-    else  
-      assert_equal "Tote item added", flash[:success]
-    end    
-
-    return tote_item
 
   end
 

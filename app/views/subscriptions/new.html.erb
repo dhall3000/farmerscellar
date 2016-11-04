@@ -23,7 +23,7 @@
                 <tr>
                   <td class="borderless">
                     <div id="just-once-help-text" class="collapse">
-                      <span>This places an order for delivery only on <%= @tote_item.posting.delivery_date.strftime("%A %b %d") %>. If we are unable to fill your order on that date this order will automatically be canceled.</span>
+                      <span>This places an order for delivery on <%= @tote_item.posting.delivery_date.strftime("%A %b %d") %>. If it does not fill on that date this order will automatically be canceled.</span>
                     </div>
                   </td>
                 </tr>
@@ -45,7 +45,7 @@
                 <tr>
                   <td class="borderless">
                     <div id="roll-until-filled-help-text" class="collapse">
-                      <span>This places an order for delivery on <%= @tote_item.posting.delivery_date.strftime("%A %b %d") %>. If we are unable to fill your order on that date this order will automatically roll to the next scheduled delivery until we are able to fill the order.</span>
+                      <span>This places an order for delivery on <%= @tote_item.posting.delivery_date.strftime("%A %b %d") %>. If it does not fill on that date we will keep rolling the order to the next delivery date until it fills.</span>
                     </div>
                   </td>
                 </tr>
