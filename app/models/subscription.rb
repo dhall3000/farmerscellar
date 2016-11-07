@@ -19,6 +19,8 @@ class Subscription < ApplicationRecord
     {NORMAL: 0, ROLLUNTILFILLED: 1}
   end
 
+  validates :kind, inclusion: { in: Subscription.kinds.values }
+
   def kind?(kind_token)
     return self.kind == Subscription.kinds[kind_token]
   end
