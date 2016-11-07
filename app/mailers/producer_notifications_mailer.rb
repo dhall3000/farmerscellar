@@ -49,7 +49,7 @@ class ProducerNotificationsMailer < ApplicationMailer
       unit_count = posting.inbound_num_units_ordered
       case_count = posting.inbound_num_cases_ordered
 
-      if case_count && case_count > 1
+      if case_count && case_count > 0 && posting.units_per_case && posting.units_per_case > 1
         @column_cases = true
       end
 
