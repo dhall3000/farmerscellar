@@ -33,6 +33,10 @@ class ToteItem < ApplicationRecord
   validates :state, inclusion: { in: ToteItem.states.values }
   validates :state, numericality: {only_integer: true}
 
+  def roll_until_filled?
+    return subscription && subscription.on && subscription.kind?(:ROLLUNTILFILLED)
+  end
+
   def cancelable?
     return state?(:ADDED) || state?(:AUTHORIZED)
   end

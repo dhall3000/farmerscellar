@@ -191,7 +191,7 @@ class ToteItemsController < ApplicationController
     #You complete a void on the funds remaining on the authorization. 
 
     #DESCRIPTION: the intent is for use by shopping tote editing feature enabling user to remove items from their tote
-    @referer = request.referer
+    @referer = request.referer || tote_items_path(orders: true)
     ti = ToteItem.find_by_id(params[:id])
 
     if ti == nil
@@ -206,7 +206,7 @@ class ToteItemsController < ApplicationController
 
           flash_text = "#{ti.posting.product.name} for #{ti.posting.delivery_date.strftime("%A %B %d")} delivery canceled"
 
-          if ti.subscription && ti.subscription.on && !ti.subscription.paused
+          if ti.subscription && ti.subscription.on && !ti.subscription.paused && ti.subscription.kind?(:NORMAL)
 
             flash.now[:success] = flash_text
             @subscription = ti.subscription
@@ -224,6 +224,10 @@ class ToteItemsController < ApplicationController
         else
           flash[:danger] = "This item could not be removed. Please contact Farmer's Cellar for help."
         end
+      end
+
+      if ti.roll_until_filled?
+        ti.subscription.turn_off
       end
             
     end

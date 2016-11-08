@@ -414,7 +414,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     a1 = users(:a1)
     log_in_as(a1)
     assert is_logged_in?
-    assert posting.state?(:COMMITMENTZONE)
+    assert posting.reload.state?(:COMMITMENTZONE)
     post postings_fill_path, params: {posting_id: posting.id, quantity: quantity}
     assert posting.reload.state?(:CLOSED)
 

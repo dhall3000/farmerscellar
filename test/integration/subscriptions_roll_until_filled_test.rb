@@ -3,6 +3,321 @@ require 'integration_helper'
 
 class SubscriptionsRollUntilFilledTest < IntegrationHelper
 
+  test "should cancel authorized order when user cancels between first postings cutoff and delivery order does not fill" do
+
+    nuke_all_postings
+
+    pr = create_posting_recurrence
+    pr.current_posting.update(price: 1)
+    pr.current_posting.user.update(order_minimum_producer_net: 20)
+
+    bob = create_user("bob", "bob@b.com", 98033)
+    sam = create_user("sam", "sam@s.com", 98033)
+
+    ti_bob = create_tote_item(bob, pr.current_posting, quantity = 2, frequency = 0)
+    assert ti_bob.valid?
+    assert ti_bob.state?(:ADDED)
+
+    ti_sam = create_tote_item(sam, pr.current_posting, quantity = 2, frequency = 0, roll_until_filled = true)
+    assert ti_sam.valid?
+    assert ti_sam.state?(:ADDED)
+    assert_equal 1, sam.reload.tote_items.count
+
+    create_rt_authorization_for_customer(bob)
+    create_rt_authorization_for_customer(sam)
+    assert ti_bob.reload.state?(:AUTHORIZED)
+    assert ti_sam.reload.state?(:AUTHORIZED)
+
+    #move to posting 1 order cutoff
+    first_posting = pr.current_posting
+    travel_to first_posting.commitment_zone_start
+    ActionMailer::Base.deliveries.clear
+    #generate producer order and 'next' tote items
+    RakeHelper.do_hourly_tasks
+    assert_equal 2, sam.reload.tote_items.count
+    sam.reload
+    first_ti = sam.tote_items.first
+    second_ti = sam.tote_items.last
+    assert first_ti.state?(:NOTFILLED)
+    assert second_ti.state?(:AUTHORIZED)
+
+    #move to a day between first posting's order cutoff and delivery date
+    travel 1.day
+
+    #attempt to cancel sam's order    
+    log_in_as(sam)
+    delete tote_item_path(id: second_ti.id)
+    assert_response :redirect
+    assert_redirected_to tote_items_path(orders: true)
+    follow_redirect!
+    #verify danger flash message
+    assert_equal "#{second_ti.posting.product.name} for #{second_ti.posting.delivery_date.strftime("%A %B %d")} delivery canceled", flash[:success]
+    #verify one item REMOVED
+    assert second_ti.reload.state?(:REMOVED)
+    #verify subscription object off
+    assert_not first_ti.subscription.on    
+    #verify no more items get generated
+    travel_to second_ti.posting.commitment_zone_start    
+    RakeHelper.do_hourly_tasks
+    assert_equal 2, sam.reload.tote_items.count
+
+    travel_back
+
+  end
+
+  test "should cancel authorized order when user cancels between first postings cutoff and delivery order fills" do
+    #when user has auth'd RTF order between order cutoff and delivery the Orders page will show two tote items; one
+    #for the upcoming delivery and another for the delivery after that. the user who attempts to cancel their RTF order
+    #at this time might do so by clicking 'remove' on either of the two. regardless which one the user attempts we need
+    #to make the behavior be the same: the latter gets REMOVED and the former generates a flash danger message and
+    #remains in place. the subscription object always needs to get turned off as well.
+    #here user will make an attempt to nuke the COMMITTED tote item
+
+    nuke_all_postings
+
+    pr = create_posting_recurrence
+    pr.current_posting.update(price: 1)
+    pr.current_posting.user.update(order_minimum_producer_net: 20)
+
+    bob = create_user("bob", "bob@b.com", 98033)
+    sam = create_user("sam", "sam@s.com", 98033)
+
+    ti_bob = create_tote_item(bob, pr.current_posting, quantity = 25, frequency = 0)
+    assert ti_bob.valid?
+    assert ti_bob.state?(:ADDED)
+
+    ti_sam = create_tote_item(sam, pr.current_posting, quantity = 2, frequency = 0, roll_until_filled = true)
+    assert ti_sam.valid?
+    assert ti_sam.state?(:ADDED)
+    assert_equal 1, sam.reload.tote_items.count
+
+    create_rt_authorization_for_customer(bob)
+    create_rt_authorization_for_customer(sam)
+    assert ti_bob.reload.state?(:AUTHORIZED)
+    assert ti_sam.reload.state?(:AUTHORIZED)
+
+    #move to posting 1 order cutoff
+    first_posting = pr.current_posting
+    travel_to first_posting.commitment_zone_start
+    ActionMailer::Base.deliveries.clear
+    #generate producer order and 'next' tote items
+    RakeHelper.do_hourly_tasks
+    assert_equal 2, sam.reload.tote_items.count
+    assert sam.tote_items.last.state?(:AUTHORIZED)
+
+    #move to a day between first posting's order cutoff and delivery date
+    travel 1.day
+
+    #attempt to cancel sam's order
+    assert ti_sam.reload.state?(:COMMITTED)
+    log_in_as(sam)
+    delete tote_item_path(id: ti_sam.id)
+    assert_response :redirect
+    assert_redirected_to tote_items_path(orders: true)
+    #verify danger flash message
+    follow_redirect!
+    assert_equal "This item is not removable because it is already 'committed'. Please see 'Order Cancellation' on the 'How it Works' page. Shopping tote item not deleted.", flash[:danger]
+    #verify one item COMMITTED
+    assert ti_sam.reload.state?(:COMMITTED)
+    #verify one item REMOVED
+    assert sam.reload.tote_items.last.state?(:REMOVED)
+    #verify subscription object off
+    assert_not ti_sam.subscription.on
+    #verify one item gets filled
+    travel_to ti_sam.posting.delivery_date + 12.hours
+    fill_posting(first_posting, first_posting.total_quantity_authorized_or_committed)
+    assert ti_sam.reload.state?(:FILLED)
+    assert ti_sam.fully_filled?
+    assert ti_sam.quantity > 0
+    #verify delivery notification gets sent
+    ActionMailer::Base.deliveries.clear
+    do_delivery
+    assert_equal 2, ActionMailer::Base.deliveries.count
+    verify_proper_delivery_notification_email(ActionMailer::Base.deliveries.last, ti_sam)
+    
+    #verify no more items get generated
+    travel_to first_posting.posting_recurrence.current_posting.commitment_zone_start    
+    RakeHelper.do_hourly_tasks
+    assert_equal 2, sam.reload.tote_items.count
+
+    travel_back
+
+  end
+
+  test "should cancel authorized order when user cancels between first postings cutoff and delivery order fills 2" do
+    #when user has auth'd RTF order between order cutoff and delivery the Orders page will show two tote items; one
+    #for the upcoming delivery and another for the delivery after that. the user who attempts to cancel their RTF order
+    #at this time might do so by clicking 'remove' on either of the two. regardless which one the user attempts we need
+    #to make the behavior be the same: the latter gets REMOVED and the former generates a flash danger message and
+    #remains in place. the subscription object always needs to get turned off as well.
+    #here user will make an attempt to nuke the AUTHORIZED tote item
+    #here's how it should behave. user nukes this item and gets the usual treatment. a success flash saying item canceled.
+    #but in the background it also turns off the RTF subscription object. they also do not get any warning that they
+    #can't cancel the COMMITTED item. we redirect them back to the orders page after they nuke the AUTH'd item and assume
+    #they'll see the COMMITTED remains. this is where they'll probably try to nuke the COMMITTED item and then they'll see
+    #the informative flash that tells them they can't do that.
+
+    nuke_all_postings
+
+    pr = create_posting_recurrence
+    pr.current_posting.update(price: 1)
+    pr.current_posting.user.update(order_minimum_producer_net: 20)
+
+    bob = create_user("bob", "bob@b.com", 98033)
+    sam = create_user("sam", "sam@s.com", 98033)
+
+    ti_bob = create_tote_item(bob, pr.current_posting, quantity = 25, frequency = 0)
+    assert ti_bob.valid?
+    assert ti_bob.state?(:ADDED)
+
+    ti_sam = create_tote_item(sam, pr.current_posting, quantity = 2, frequency = 0, roll_until_filled = true)
+    assert ti_sam.valid?
+    assert ti_sam.state?(:ADDED)
+    assert_equal 1, sam.reload.tote_items.count
+
+    create_rt_authorization_for_customer(bob)
+    create_rt_authorization_for_customer(sam)
+    assert ti_bob.reload.state?(:AUTHORIZED)
+    assert ti_sam.reload.state?(:AUTHORIZED)
+
+    #move to posting 1 order cutoff
+    first_posting = pr.current_posting
+    travel_to first_posting.commitment_zone_start
+    ActionMailer::Base.deliveries.clear
+    #generate producer order and 'next' tote items
+    RakeHelper.do_hourly_tasks
+    assert_equal 2, sam.reload.tote_items.count
+    assert sam.tote_items.last.state?(:AUTHORIZED)
+
+    #move to a day between first posting's order cutoff and delivery date
+    travel 1.day
+
+    #attempt to cancel sam's order
+    assert ti_sam.reload.state?(:COMMITTED)
+    log_in_as(sam)
+    get tote_items_path params: {orders: true}
+    assert_response :success
+    assert_template 'tote_items/orders'
+    assert ti_sam.id != sam.reload.tote_items.last.id
+    second_ti = sam.reload.tote_items.last
+    delete tote_item_path(id: second_ti.id)
+    assert_response :redirect
+    assert_redirected_to tote_items_path(orders: true)
+    follow_redirect!
+    assert_template 'tote_items/orders'
+    #verify danger flash message
+    assert_equal "#{second_ti.posting.product.name} for #{second_ti.posting.delivery_date.strftime("%A %B %d")} delivery canceled", flash[:success]
+    #verify one item COMMITTED
+    assert ti_sam.reload.state?(:COMMITTED)
+    #verify one item REMOVED
+    assert sam.reload.tote_items.last.state?(:REMOVED)
+    #verify subscription object off
+    assert_not ti_sam.subscription.on
+    #verify one item gets filled
+    travel_to ti_sam.posting.delivery_date + 12.hours
+    fill_posting(first_posting, first_posting.total_quantity_authorized_or_committed)
+    assert ti_sam.reload.state?(:FILLED)
+    assert ti_sam.fully_filled?
+    assert ti_sam.quantity > 0
+    #verify delivery notification gets sent
+    ActionMailer::Base.deliveries.clear
+    do_delivery
+    assert_equal 2, ActionMailer::Base.deliveries.count
+    verify_proper_delivery_notification_email(ActionMailer::Base.deliveries.last, ti_sam)
+    
+    #verify no more items get generated
+    travel_to first_posting.posting_recurrence.current_posting.commitment_zone_start    
+    RakeHelper.do_hourly_tasks
+    assert_equal 2, sam.reload.tote_items.count
+
+    travel_back
+
+  end
+
+  test "should cancel authorized order when user cancels before first cutoff" do
+
+    nuke_all_postings
+
+    pr = create_posting_recurrence
+    pr.current_posting.update(price: 1)
+    pr.current_posting.user.update(order_minimum_producer_net: 20)
+
+    bob = create_user("bob", "bob@b.com", 98033)
+    sam = create_user("sam", "sam@s.com", 98033)
+
+    ti_bob = create_tote_item(bob, pr.current_posting, quantity = 2, frequency = 0)
+    assert ti_bob.valid?
+    assert ti_bob.state?(:ADDED)
+
+    ti_sam = create_tote_item(sam, pr.current_posting, quantity = 2, frequency = 0, roll_until_filled = true)
+    assert ti_sam.valid?
+    assert ti_sam.state?(:ADDED)
+
+    create_rt_authorization_for_customer(bob)
+    create_rt_authorization_for_customer(sam)
+
+    assert ti_bob.reload.state?(:AUTHORIZED)
+    assert ti_sam.reload.state?(:AUTHORIZED)
+
+    #cancel sam's order
+    log_in_as(sam)
+    delete tote_item_path(id: ti_sam.id)
+    assert_response :redirect
+    #verify tote item REMOVED
+    assert ti_sam.reload.state?(:REMOVED)
+    #verify subscription object off
+    assert_not ti_sam.subscription.on        
+    #verify no more items get generated
+    assert_equal 1, sam.tote_items.count
+    first_posting = pr.current_posting
+    travel_to first_posting.commitment_zone_start
+    ActionMailer::Base.deliveries.clear
+    RakeHelper.do_hourly_tasks
+    assert_equal 1, sam.reload.tote_items.count
+
+    travel_back
+
+  end
+
+  test "should cancel added order when user cancels before first cutoff" do
+
+    nuke_all_postings
+
+    pr = create_posting_recurrence
+    pr.current_posting.update(price: 1)
+    pr.current_posting.user.update(order_minimum_producer_net: 20)
+
+    bob = create_user("bob", "bob@b.com", 98033)
+    sam = create_user("sam", "sam@s.com", 98033)
+
+    ti_bob = create_tote_item(bob, pr.current_posting, quantity = 2, frequency = 0)
+    assert ti_bob.valid?
+    assert ti_bob.state?(:ADDED)
+
+    ti_sam = create_tote_item(sam, pr.current_posting, quantity = 2, frequency = 0, roll_until_filled = true)
+    assert ti_sam.valid?
+    assert ti_sam.state?(:ADDED)
+
+    #cancel sam's order
+    log_in_as(sam)
+    delete tote_item_path(id: ti_sam.id)
+    assert_response :redirect
+    #verify tote item REMOVED
+    assert ti_sam.reload.state?(:REMOVED)
+    #verify subscription object off
+    assert_not ti_sam.subscription.on        
+    #verify no more items get generated
+    assert_equal 1, sam.tote_items.count
+    first_posting = pr.current_posting
+    travel_to first_posting.commitment_zone_start
+    ActionMailer::Base.deliveries.clear
+    RakeHelper.do_hourly_tasks
+    assert_equal 1, sam.reload.tote_items.count
+
+    travel_back
+
+  end
+
   test "skip date action should not act on rtf subscriptions" do
 
     nuke_all_postings
@@ -117,7 +432,6 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     #10bob should continue to get filled.
 
     nuke_all_postings
-    #create_posting_recurrence(farmer, price, product, unit, delivery_date, commitment_zone_start, units_per_case, frequency)
 
     pr = create_posting_recurrence
     pr.current_posting.update(price: 1)
