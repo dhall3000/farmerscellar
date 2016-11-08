@@ -100,7 +100,7 @@
                         </a>
                         <% if show_remove_button %>
                           <div style="float:right;">
-                            <% if tote_item.state == ToteItem.states[:ADDED] || tote_item.state == ToteItem.states[:AUTHORIZED] %>
+                            <% if tote_item.state == ToteItem.states[:ADDED] || tote_item.state == ToteItem.states[:AUTHORIZED] || tote_item.roll_until_filled? %>
                               <%= link_to "", tote_item, class: "glyphicon glyphicon-remove", method: :delete %>
                             <% else %>
                               <% data_content = "This item cannot be removed. It is 'committed' because it is past its Order Cutoff. Please see " + link_to("Order Cancellation", how_things_work_path(anchor: "cancellation")) + "." %>
@@ -126,7 +126,7 @@
                         </a>
                         <% if show_remove_button %>
                           <div style="float:right;">
-                            <% if tote_item.state == ToteItem.states[:ADDED] || tote_item.state == ToteItem.states[:AUTHORIZED] %>
+                            <% if tote_item.state == ToteItem.states[:ADDED] || tote_item.state == ToteItem.states[:AUTHORIZED] || tote_item.roll_until_filled? %>
                               <%= link_to "", tote_item, class: "glyphicon glyphicon-remove", method: :delete %>
                             <% else %>
                               <% data_content = "This item cannot be removed. It is 'committed' because it is past its Order Cutoff. Please see " + link_to("Order Cancellation", how_things_work_path(anchor: "cancellation")) + "." %>
