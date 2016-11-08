@@ -59,8 +59,12 @@
             </li>
           </div>
           <li class="list-group-item"><%= link_to("Order Cutoff", how_things_work_path(anchor: "cutoff")) %>: <%= tote_item.posting.commitment_zone_start.strftime("%a %m/%d %l:%M %p") %></li>
-          <% if !tote_item.subscription.nil? %>
-            <li class="list-group-item">This is a subscription for <%= tote_item.subscription.description %></li>          
+          <% if tote_item.subscription %>
+            <% if tote_item.subscription.kind?(:NORMAL) %>
+              <li class="list-group-item">This is a subscription for <%= tote_item.subscription.description %></li>          
+            <% elsif tote_item.subscription.kind?(:ROLLUNTILFILLED) %>
+              <li class="list-group-item">This is a Roll Until Filled order. This means that if the order does not fill this delivery we will keep 'rolling' the order to the next delivery date until it fills.</li>
+            <% end %>            
           <% end %>
         </ul>
       </div>

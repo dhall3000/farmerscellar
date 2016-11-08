@@ -25,7 +25,7 @@
         <% end %>
       </div>
 
-      <% if @subscriptions.nil? || !@subscriptions.any? %>
+      <% if @recurring_orders.nil? || !@recurring_orders.any? %>
 
         <div>            
           <%= form_tag(checkouts_path) do %>

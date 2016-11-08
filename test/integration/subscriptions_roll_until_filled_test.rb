@@ -44,7 +44,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     
   end
 
-  test "neither show nor edit should not display rtf subscriptions" do
+  test "neither show nor edit should display rtf subscriptions" do
 
     nuke_all_postings
     bob = create_user("bob", "bob@b.com", 98033)

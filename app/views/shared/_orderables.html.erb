@@ -76,7 +76,7 @@
                     <td class="text-center hidden-xs"><%= tote_item.quantity.to_s %></td>
                     <td class="text-center hidden-xs"><%= number_to_currency(tote_item.posting.price) %> / <%= Unit.find_by(id: tote_item.posting.unit_id).name %></td>                    
                     <td class="text-center">              
-                      <% if tote_item.subscription && tote_item.subscription.on %>
+                      <% if tote_item.subscription && tote_item.subscription.on && tote_item.subscription.kind?(:NORMAL) %>
                         <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>
                       <% end %>
                       <%= tote_item.posting.delivery_date.strftime("%a %m/%d") %>

@@ -20,7 +20,7 @@ class RtauthorizationsController < ApplicationController
   	if details && details.success?
   		#display tote and 'agree & authorize' button
 	  	@tote_items = unauthorized_items_for(current_user)      
-      @subscriptions = get_active_subscriptions_by_authorization_state(current_user)[:unauthorized]
+      @subscriptions = get_active_subscriptions_by_authorization_state(current_user, include_paused_subscriptions = true, kind = Subscription.kinds[:NORMAL])[:unauthorized]
   		@items_total_gross = get_gross_tote(@tote_items)
       @token = params[:token]
 		else
@@ -105,7 +105,8 @@ class RtauthorizationsController < ApplicationController
       return
     end
 
-    @all_subscriptions = get_active_subscriptions_by_authorization_state(current_user)
+    @all_subscriptions = get_active_subscriptions_by_authorization_state(current_user, include_paused_subscriptions = true, kind = Subscription.kinds[:NORMAL])
+    recurring_orders = get_active_subscriptions_by_authorization_state(current_user, include_paused_subscriptions = true)
 
     @tote_items = unauthorized_items_for(current_user)
     @subscriptions = @all_subscriptions[:unauthorized]
@@ -119,7 +120,7 @@ class RtauthorizationsController < ApplicationController
 		@rtauthorization = Rtauthorization.new(rtba: rtba)
 	
     if !params[:testparam_fail_rtauthsave]
-      @rtauthorization.authorize_items_and_subscriptions(@all_tote_items, @all_subscriptions)
+      @rtauthorization.authorize_items_and_subscriptions(@all_tote_items, recurring_orders[:unauthorized] + recurring_orders[:authorized])
     end
 
     #2016-10-15
