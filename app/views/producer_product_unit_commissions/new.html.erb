@@ -4,6 +4,35 @@
   <div class="col-md-6 col-md-offset-3">  
 
     <div class="panel-group" role="tablist" aria-multiselectable="true">        
+
+
+
+      <div class="panel panel-default">
+        <div class="panel-heading" role="tab">
+          <h4 class="panel-title">Retail Price Helper</h4>
+        </div>                
+        <div class="panel-body">
+
+          <% if @retail_price %>
+            <p>Retail Price: <%= number_to_currency(@retail_price) %></p>
+          <% end %>
+
+          <p>Note: just provide the commission, not the producer's share of credit card fees. This 'helper' will bake in those fees.</p>         
+
+          <%= form_tag(producer_product_unit_commissions_retail_helper_path) do %>
+            <%= label_tag :producer_net %>
+            <%= number_field_tag :producer_net, nil, {min: 0.0, step: 0.01, class: 'form-control'} %>
+            <%= label_tag :commission %>
+            <%= number_field_tag :commission, nil, {min: 0.0, step: :any, class: 'form-control'} %>
+            <%= submit_tag "Get retail price", class: "btn btn-lg btn-primary" %>
+          <% end %>
+
+        </div>
+      </div>
+
+
+
+
       <div class="panel panel-default">
         <div class="panel-heading" role="tab">
           <h4 class="panel-title">Set Commission Directly</h4>
@@ -25,7 +54,7 @@
             <%= f.label :commission %>
             <%= f.text_field :commission, class: "form-control" %>
 
-            <%= f.submit class: "btn btn-primary" %>
+            <%= f.submit class: "btn btn-primary btn-lg" %>
 
           <% end %>
 
@@ -56,7 +85,7 @@
             <%= label_tag :producer_net %>
             <%= text_field_tag :producer_net, nil, class: "form-control" %>
 
-            <%= f.submit class: "btn btn-primary" %>
+            <%= f.submit class: "btn btn-primary btn-lg" %>
 
           <% end %>
 

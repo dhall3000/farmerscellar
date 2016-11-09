@@ -13,6 +13,20 @@ class ProducerProductUnitCommissionsController < ApplicationController
     load_data
   end
 
+  def retail_helper
+
+        
+    @ppc = ProducerProductUnitCommission.new
+    load_data
+
+    commission = params[:commission].to_f
+    producer_net = params[:producer_net].to_f
+    @retail_price = get_retail_price(commission, producer_net)
+
+    render new_producer_product_unit_commission_path
+
+  end
+
   def create
 
     user_id = params[:producer_product_unit_commission][:user_id]

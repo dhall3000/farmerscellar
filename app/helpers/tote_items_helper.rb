@@ -298,6 +298,10 @@ module ToteItemsHelper
 
   end
 
+  def get_retail_price(commission, producer_net)
+    return (producer_net / (1.0 - (commission + 0.035))).round(2)
+  end
+
   def get_commission_factor_tote(tote_items, filled = false)
     
     value = get_gross_tote(tote_items, filled)
