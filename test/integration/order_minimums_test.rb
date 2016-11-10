@@ -17,19 +17,19 @@ class OrderMinimumsTest < IntegrationHelper
     delivery_date_decoy = delivery_date - 1.day
     commitment_zone_start_decoy = delivery_date_decoy - 2.days
 
-    distributor = create_producer("distributor", "distributor@d.com", "WA", 98033, "www.distributor.com", "Distributor Inc.")
+    distributor = create_producer("distributor", "distributor@d.com")
     distributor.create_business_interface(name: "Distributor Inc.", order_email_accepted: true, order_email: distributor.email, paypal_accepted: true, paypal_email: distributor.email)
     distributor.update(order_minimum_producer_net: 20)
 
-    producer1 = create_producer("producer1", "producer1@p.com", "WA", 98033, "www.producer1.com", "producer1 farms")
+    producer1 = create_producer("producer1", "producer1@p.com")
     producer1.distributor = distributor
     producer1.save
 
-    producer2 = create_producer("producer2", "producer2@p.com", "WA", 98033, "www.producer2.com", "producer2 farms")
+    producer2 = create_producer("producer2", "producer2@p.com")
     producer2.distributor = distributor
     producer2.save
 
-    producer_decoy = create_producer("producer_decoy", "producer_decoy@p.com", "WA", 98033, "www.producer_decoy.com", "producer_decoy farms")
+    producer_decoy = create_producer("producer_decoy", "producer_decoy@p.com")
     producer_decoy.create_business_interface(name: producer_decoy.farm_name, order_email_accepted: true, order_email: producer_decoy.email, paypal_accepted: true, paypal_email: producer_decoy.email)
 
     create_commission(producer1, products(:apples), units(:pound), 0.05)
@@ -41,8 +41,8 @@ class OrderMinimumsTest < IntegrationHelper
     create_commission(producer_decoy, products(:milk), units(:gallon), 0.05)
     posting_decoy = create_posting(producer_decoy, 10.50, products(:milk), units(:gallon), delivery_date_decoy, commitment_zone_start_decoy, units_per_case = 1)
 
-    bob = create_user("bob", "bob@b.com", 98033)
-    sam = create_user("sam", "sam@s.com", 98033)
+    bob = create_user("bob", "bob@b.com")
+    sam = create_user("sam", "sam@s.com")
 
     #both customers order from both distributor postings
     ti1_bob = create_tote_item(bob, posting1, 2)

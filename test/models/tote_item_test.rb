@@ -29,12 +29,12 @@ class ToteItemTest < ActiveSupport::TestCase
     nuke_all_postings
     nuke_all_users
 
-    customer = create_user("bob", "bob@b.com", 98033)
+    customer = create_user("bob", "bob@b.com")
     
-    distributor = create_producer("distributor", "distributor@d.com", "WA", 98033, "www.distributor.com", "DISTRIBOTOR'S Farms")
+    distributor = create_producer("distributor", "distributor@d.com")
     distributor.update(order_minimum_producer_net: 100)
 
-    farm1 = create_producer("farmer1", "f1@f.com", "WA", 98033, "www.farmer1.com", "farmer 1's farms")
+    farm1 = create_producer("farmer1", "f1@f.com")
     farm1.update(distributor: distributor, order_minimum_producer_net: 50)
     price = 2
     posting_f1 = create_posting(farm1, price, products(:apples))
@@ -46,7 +46,7 @@ class ToteItemTest < ActiveSupport::TestCase
     assert_equal (quantity * price * 0.915).round(2), posting_f1.inbound_order_value_producer_net
     assert_equal 0, posting_f1.outbound_order_value_producer_net
 
-    farm2 = create_producer("farmer2", "f2@f.com", "WA", 98033, "www.farmer2.com", "farmer 2's farms")
+    farm2 = create_producer("farmer2", "f2@f.com")
     farm2.update(distributor: distributor)
     price = 2
     posting_f2 = create_posting(farm2, price, products(:milk))
@@ -75,17 +75,17 @@ class ToteItemTest < ActiveSupport::TestCase
     nuke_all_postings
     nuke_all_users
     
-    distributor = create_producer("distributor", "distributor@d.com", "WA", 98033, "www.distributor.com", "DISTRIBOTOR'S Farms")
+    distributor = create_producer("distributor", "distributor@d.com")
     distributor.update(order_minimum_producer_net: 100)
 
-    farm1 = create_producer("farmer1", "f1@f.com", "WA", 98033, "www.farmer1.com", "farmer 1's farms")
+    farm1 = create_producer("farmer1", "f1@f.com")
     farm1.update(distributor: distributor)
-    farm2 = create_producer("farmer2", "f2@f.com", "WA", 98033, "www.farmer2.com", "farmer 2's farms")
+    farm2 = create_producer("farmer2", "f2@f.com")
     farm2.update(distributor: distributor)
-    farm3 = create_producer("farmer3", "f3@f.com", "WA", 98033, "www.farmer3.com", "farmer 3's farms")
+    farm3 = create_producer("farmer3", "f3@f.com")
     farm3.update(distributor: distributor)
 
-    customer = create_user("bob", "bob@b.com", 98033)
+    customer = create_user("bob", "bob@b.com")
     make_some_orders(distributor, customer)
     make_some_orders(farm1, customer)
     make_some_orders(farm2, customer)
@@ -126,14 +126,14 @@ class ToteItemTest < ActiveSupport::TestCase
   test "should report order amount remaining needed when producer order minimum unmet" do
     
     nuke_all_postings
-    producer = create_producer("john", "john@j.com", "WA", 98033, "www.john.com", "JOHN'S Farms")
+    producer = create_producer("john", "john@j.com")
     producer.update(order_minimum_producer_net: 100)
     price = 5
     posting_a = create_posting(producer, price, products(:apples))
     posting_b = create_posting(producer, price, products(:milk))
     posting_c = create_posting(producer, price, products(:celery))
 
-    customer = create_user("bob", "bob@b.com", 98033)
+    customer = create_user("bob", "bob@b.com")
 
     quantity = 5
     ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting_a, user: customer)
@@ -164,12 +164,12 @@ class ToteItemTest < ActiveSupport::TestCase
   test "should report order amount remaining needed when posting order minimum unmet" do
 
     nuke_all_postings
-    producer = create_producer("john", "john@j.com", "WA", 98033, "www.john.com", "JOHN'S Farms")
+    producer = create_producer("john", "john@j.com")
     delivery_date = get_delivery_date(7)
     price = 5
     order_minimum_producer_net = 100
     posting = create_posting(producer, price, products(:apples), units(:pound), delivery_date, delivery_date - 2.days, commission = 0.05, order_minimum_producer_net)
-    customer = create_user("bob", "bob@b.com", 98033)
+    customer = create_user("bob", "bob@b.com")
     quantity = 10
     ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting, user: customer)
     assert ti.save
@@ -186,11 +186,11 @@ class ToteItemTest < ActiveSupport::TestCase
   test "should report order amount remaining is zero when posting does not have order minimum" do
 
     nuke_all_postings
-    producer = create_producer("john", "john@j.com", "WA", 98033, "www.john.com", "JOHN'S Farms")
+    producer = create_producer("john", "john@j.com")
     delivery_date = get_delivery_date(7)
     price = 5    
     posting = create_posting(producer, price, products(:apples), units(:pound), delivery_date, delivery_date - 2.days, commission = 0.05)    
-    customer = create_user("bob", "bob@b.com", 98033)
+    customer = create_user("bob", "bob@b.com")
     quantity = 10
     ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting, user: customer)
     assert ti.save
@@ -207,12 +207,12 @@ class ToteItemTest < ActiveSupport::TestCase
   test "should report order amount remaining is zero when posting order minimum met" do
 
     nuke_all_postings
-    producer = create_producer("john", "john@j.com", "WA", 98033, "www.john.com", "JOHN'S Farms")
+    producer = create_producer("john", "john@j.com")
     delivery_date = get_delivery_date(7)
     price = 5
     order_minimum_producer_net = 100
     posting = create_posting(producer, price, products(:apples), units(:pound), delivery_date, delivery_date - 2.days, commission = 0.05, order_minimum_producer_net)
-    customer = create_user("bob", "bob@b.com", 98033)
+    customer = create_user("bob", "bob@b.com")
     quantity = 25
     ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting, user: customer)
     assert ti.save
@@ -231,7 +231,7 @@ class ToteItemTest < ActiveSupport::TestCase
     quantity = 13
     price = 21.07
     expected_gross_cost = 273.91
-    assert_equal expected_gross_cost, get_gross_cost(quantity, price)    
+    assert_equal expected_gross_cost, ToteItemsController.helpers.get_gross_cost(quantity, price)    
 
     #test get_commission_item
     expected_price = 2.75
@@ -249,7 +249,7 @@ class ToteItemTest < ActiveSupport::TestCase
     assert_equal expected_commission_factor, @posting.get_commission_factor    
     assert_equal expected_price, @tote_item.price
     assert_equal expected_quantity, @tote_item.quantity
-    assert_equal expected_commission, get_commission_item(@tote_item)
+    assert_equal expected_commission, ToteItemsController.helpers.get_commission_item(@tote_item)
     
     #test get_commission_item filled = true
     expected_price = 2.75
@@ -257,7 +257,7 @@ class ToteItemTest < ActiveSupport::TestCase
     expected_quantity = 4
     @tote_item.quantity_filled = expected_quantity
     expected_commission = 0.56
-    assert_equal expected_commission, get_commission_item(@tote_item, filled = true)
+    assert_equal expected_commission, ToteItemsController.helpers.get_commission_item(@tote_item, filled = true)
 
     #test get_payment_processor_fee_unit
     #unit price is 2.75
@@ -265,17 +265,17 @@ class ToteItemTest < ActiveSupport::TestCase
     #multiplied is 0.09625
     #rounded 2 is 0.10
     expected_payment_processor_fee_unit = 0.10
-    assert_equal expected_payment_processor_fee_unit, get_payment_processor_fee_unit(@tote_item.price)
+    assert_equal expected_payment_processor_fee_unit, ToteItemsController.helpers.get_payment_processor_fee_unit(@tote_item.price)
 
     #test get_payment_processor_fee_item
     expected_payment_processor_fee_item = 0.30
-    assert_equal expected_payment_processor_fee_item, get_payment_processor_fee_item(@tote_item)
+    assert_equal expected_payment_processor_fee_item, ToteItemsController.helpers.get_payment_processor_fee_item(@tote_item)
 
     #test get_payment_processor_fee_item filled = true
     expected_quantity = 4
     @tote_item.quantity_filled = expected_quantity
     expected_payment_processor_fee_item = 0.40
-    assert_equal expected_payment_processor_fee_item, get_payment_processor_fee_item(@tote_item, filled = true)
+    assert_equal expected_payment_processor_fee_item, ToteItemsController.helpers.get_payment_processor_fee_item(@tote_item, filled = true)
 
   end
 
@@ -404,7 +404,8 @@ class ToteItemTest < ActiveSupport::TestCase
 
     assert_equal 1, @tote_item.purchase_receivables.count
     assert @tote_item.purchase_receivables.last.amount > 0
-    assert @tote_item.purchase_receivables.last.amount < get_gross_item(@tote_item), "The PurchaseReceivable amount is #{@tote_item.purchase_receivables.last.amount.to_s} but should be less than the get_gross_item amount which is #{get_gross_item(@tote_item).to_s}"
+
+    assert @tote_item.purchase_receivables.last.amount < ToteItemsController.helpers.get_gross_item(@tote_item), "The PurchaseReceivable amount is #{@tote_item.purchase_receivables.last.amount.to_s} but should be less than the get_gross_item amount which is #{ToteItemsController.helpers.get_gross_item(@tote_item).to_s}"
 
   end
 

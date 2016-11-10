@@ -16,7 +16,7 @@ class UserTest < ActiveSupport::TestCase
     nuke_all_postings
 
     #has many producers
-    producer1 = create_producer("producer1", "producer1@o.com", "WA", 98033, "www.producer1.com", "producer1 FARMS")
+    producer1 = create_producer("producer1", "producer1@o.com")
     producer1.save
     producer1.update(order_minimum_producer_net: 20)
 
@@ -41,9 +41,9 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 2, Posting.count
 
     #customers
-    bob = create_user("bob", "bob@b.com", 98033)
-    chris = create_user("chris", "chris@c.com", 98044)
-    sam = create_user("sam", "sam@s.com", 98055)
+    bob = create_user("bob", "bob@b.com")
+    chris = create_user("chris", "chris@c.com")
+    sam = create_user("sam", "sam@s.com")
 
     #tote items producer1 1, price 3.00, order min: $20, contribution: $54
     ti_bob_carrots = create_tote_item(posting_carrots, quantity = 6, bob)
@@ -68,15 +68,15 @@ class UserTest < ActiveSupport::TestCase
     nuke_all_postings
 
     #producing distributor
-    oxbow = create_producer("oxbow", "oxbow@o.com", "WA", 98033, "www.oxbow.com", "OXBOW FARMS")
+    oxbow = create_producer("oxbow", "oxbow@o.com")
     oxbow.update(order_minimum_producer_net: 50)
     #has many producers
-    producer1 = create_producer("producer1", "producer1@o.com", "WA", 98033, "www.producer1.com", "producer1 FARMS")
+    producer1 = create_producer("producer1", "producer1@o.com")
     producer1.distributor = oxbow    
     producer1.save
     producer1.update(order_minimum_producer_net: 20)
 
-    producer2 = create_producer("producer2", "producer2@o.com", "WA", 98033, "www.producer2.com", "producer2 FARMS")
+    producer2 = create_producer("producer2", "producer2@o.com")
     producer2.distributor = oxbow
     producer2.save
 
@@ -121,9 +121,9 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 6, Posting.count
 
     #customers
-    bob = create_user("bob", "bob@b.com", 98033)
-    chris = create_user("chris", "chris@c.com", 98044)
-    sam = create_user("sam", "sam@s.com", 98055)
+    bob = create_user("bob", "bob@b.com")
+    chris = create_user("chris", "chris@c.com")
+    sam = create_user("sam", "sam@s.com")
 
     #tote items oxbow 1, price 1.00, contribution = $5.00
     ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
@@ -213,15 +213,15 @@ class UserTest < ActiveSupport::TestCase
     nuke_all_postings
 
     #producing distributor
-    oxbow = create_producer("oxbow", "oxbow@o.com", "WA", 98033, "www.oxbow.com", "OXBOW FARMS")
+    oxbow = create_producer("oxbow", "oxbow@o.com")
     oxbow.update(order_minimum_producer_net: 50)
     #has many producers
-    producer1 = create_producer("producer1", "producer1@o.com", "WA", 98033, "www.producer1.com", "producer1 FARMS")
+    producer1 = create_producer("producer1", "producer1@o.com")
     producer1.distributor = oxbow    
     producer1.save
     producer1.update(order_minimum_producer_net: 20)
 
-    producer2 = create_producer("producer2", "producer2@o.com", "WA", 98033, "www.producer2.com", "producer2 FARMS")
+    producer2 = create_producer("producer2", "producer2@o.com")
     producer2.distributor = oxbow
     producer2.save
 
@@ -266,9 +266,9 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 6, Posting.count
 
     #customers
-    bob = create_user("bob", "bob@b.com", 98033)
-    chris = create_user("chris", "chris@c.com", 98044)
-    sam = create_user("sam", "sam@s.com", 98055)
+    bob = create_user("bob", "bob@b.com")
+    chris = create_user("chris", "chris@c.com")
+    sam = create_user("sam", "sam@s.com")
 
     #tote items oxbow 1, price 1.00, contribution = $5.00
     ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
@@ -341,15 +341,15 @@ class UserTest < ActiveSupport::TestCase
     nuke_all_postings
 
     #producing distributor
-    oxbow = create_producer("oxbow", "oxbow@o.com", "WA", 98033, "www.oxbow.com", "OXBOW FARMS")
+    oxbow = create_producer("oxbow", "oxbow@o.com")
     oxbow.update(order_minimum_producer_net: 50)
     #has many producers
-    producer1 = create_producer("producer1", "producer1@o.com", "WA", 98033, "www.producer1.com", "producer1 FARMS")
+    producer1 = create_producer("producer1", "producer1@o.com")
     producer1.distributor = oxbow    
     producer1.save
     producer1.update(order_minimum_producer_net: 20)
 
-    producer2 = create_producer("producer2", "producer2@o.com", "WA", 98033, "www.producer2.com", "producer2 FARMS")
+    producer2 = create_producer("producer2", "producer2@o.com")
     producer2.distributor = oxbow
     producer2.save
 
@@ -394,9 +394,9 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 6, Posting.count
 
     #customers
-    bob = create_user("bob", "bob@b.com", 98033)
-    chris = create_user("chris", "chris@c.com", 98044)
-    sam = create_user("sam", "sam@s.com", 98055)
+    bob = create_user("bob", "bob@b.com")
+    chris = create_user("chris", "chris@c.com")
+    sam = create_user("sam", "sam@s.com")
 
     #tote items oxbow 1, price 1.00, contribution = $5.00
     ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
@@ -470,7 +470,7 @@ class UserTest < ActiveSupport::TestCase
 
   test "should return proper value for orderable postings when producer has lots of postings with various order cutoffs" do
 
-    producer = create_producer("producer", "producer@p.com", "WA", 98033, "www.producer.com", "PRODUCER FARMS")
+    producer = create_producer("producer", "producer@p.com")
 
     #create postings
     price_celery = 2.50
@@ -484,9 +484,9 @@ class UserTest < ActiveSupport::TestCase
     #change this order cutoff time so that it's not included in the order value computation
     posting_milk.update(commitment_zone_start: posting_milk.commitment_zone_start - 1)
     
-    bob = create_user("bob", "bob@b.com", 98033)
-    chris = create_user("chris", "chris@c.com", 98044)
-    sam = create_user("sam", "sam@s.com", 98055)
+    bob = create_user("bob", "bob@b.com")
+    chris = create_user("chris", "chris@c.com")
+    sam = create_user("sam", "sam@s.com")
 
     #create tote items for all postings
     ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
@@ -527,7 +527,7 @@ class UserTest < ActiveSupport::TestCase
 
   test "should submit orders when producer has no order minimum" do
 
-    producer = create_producer("producer", "producer@p.com", "WA", 98033, "www.producer.com", "PRODUCER FARMS")
+    producer = create_producer("producer", "producer@p.com")
 
     #create postings
     price_celery = 2.50
@@ -537,8 +537,8 @@ class UserTest < ActiveSupport::TestCase
     posting_apples = create_posting(producer, price_apples, product = products(:apples))    
 
     #create tote items
-    bob = create_user("bob", "bob@b.com", 98033)
-    chris = create_user("chris", "chris@c.com", 98044)
+    bob = create_user("bob", "bob@b.com")
+    chris = create_user("chris", "chris@c.com")
 
     ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
     ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
@@ -585,7 +585,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "should submit orders when total producer net meets producer order minimum" do
-    producer = create_producer("producer", "producer@p.com", "WA", 98033, "www.producer.com", "PRODUCER FARMS")
+    producer = create_producer("producer", "producer@p.com")
 
     order_minimum = 30
     producer.update(order_minimum_producer_net: order_minimum)
@@ -599,8 +599,8 @@ class UserTest < ActiveSupport::TestCase
     posting_apples = create_posting(producer, price_apples, product = products(:apples))    
 
     #create tote items
-    bob = create_user("bob", "bob@b.com", 98033)
-    chris = create_user("chris", "chris@c.com", 98044)
+    bob = create_user("bob", "bob@b.com")
+    chris = create_user("chris", "chris@c.com")
 
     ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
     ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
@@ -646,7 +646,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "should not submit orders when total producer net is below producer order minimum" do
-    producer = create_producer("producer", "producer@p.com", "WA", 98033, "www.producer.com", "PRODUCER FARMS")
+    producer = create_producer("producer", "producer@p.com")
 
     order_minimum = 32
     producer.update(order_minimum_producer_net: order_minimum)
@@ -660,8 +660,8 @@ class UserTest < ActiveSupport::TestCase
     posting_apples = create_posting(producer, price_apples, product = products(:apples))    
 
     #create tote items
-    bob = create_user("bob", "bob@b.com", 98033)
-    chris = create_user("chris", "chris@c.com", 98044)
+    bob = create_user("bob", "bob@b.com")
+    chris = create_user("chris", "chris@c.com")
 
     ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
     ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
@@ -707,11 +707,11 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "should submit orders when distributor has no order minimum" do
-    distributor = create_producer("distributor", "distributor@d.com", "WA", 98033, "www.distributor.com", "BIGTIME DISTRIBUTOR GUY")
-    producer1 = create_producer("producer1", "producer1@p.com", "WA", 98033, "www.producer1.com", "producer1 FARMS")
+    distributor = create_producer("distributor", "distributor@d.com")
+    producer1 = create_producer("producer1", "producer1@p.com")
     producer1.distributor = distributor
     producer1.save
-    producer2 = create_producer("producer2", "producer2@p.com", "WA", 98033, "www.producer2.com", "producer2 FARMS")
+    producer2 = create_producer("producer2", "producer2@p.com")
     producer2.distributor = distributor
     producer2.save
 
@@ -723,8 +723,8 @@ class UserTest < ActiveSupport::TestCase
     posting_apples = create_posting(producer2, price_apples, product = products(:apples))    
 
     #create tote items
-    bob = create_user("bob", "bob@b.com", 98033)
-    chris = create_user("chris", "chris@c.com", 98044)
+    bob = create_user("bob", "bob@b.com")
+    chris = create_user("chris", "chris@c.com")
 
     ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
     ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
@@ -770,14 +770,14 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "should submit orders when producer orders meet distributor order minimum" do
-    distributor = create_producer("distributor", "distributor@d.com", "WA", 98033, "www.distributor.com", "BIGTIME DISTRIBUTOR GUY")
+    distributor = create_producer("distributor", "distributor@d.com")
     order_minimum = 30
     distributor.update(order_minimum_producer_net: order_minimum)
     assert_equal order_minimum, distributor.reload.order_minimum_producer_net
-    producer1 = create_producer("producer1", "producer1@p.com", "WA", 98033, "www.producer1.com", "producer1 FARMS")
+    producer1 = create_producer("producer1", "producer1@p.com")
     producer1.distributor = distributor
     producer1.save
-    producer2 = create_producer("producer2", "producer2@p.com", "WA", 98033, "www.producer2.com", "producer2 FARMS")
+    producer2 = create_producer("producer2", "producer2@p.com")
     producer2.distributor = distributor
     producer2.save
 
@@ -789,8 +789,8 @@ class UserTest < ActiveSupport::TestCase
     posting_apples = create_posting(producer2, price_apples, product = products(:apples))    
 
     #create tote items
-    bob = create_user("bob", "bob@b.com", 98033)
-    chris = create_user("chris", "chris@c.com", 98044)
+    bob = create_user("bob", "bob@b.com")
+    chris = create_user("chris", "chris@c.com")
 
     ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
     ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
@@ -836,14 +836,14 @@ class UserTest < ActiveSupport::TestCase
   end
   
   test "should not submit orders when producer orders do not meet distributor order minimum" do
-    distributor = create_producer("distributor", "distributor@d.com", "WA", 98033, "www.distributor.com", "BIGTIME DISTRIBUTOR GUY")
+    distributor = create_producer("distributor", "distributor@d.com")
     order_minimum = 32
     distributor.update(order_minimum_producer_net: order_minimum)
     assert_equal order_minimum, distributor.reload.order_minimum_producer_net
-    producer1 = create_producer("producer1", "producer1@p.com", "WA", 98033, "www.producer1.com", "producer1 FARMS")
+    producer1 = create_producer("producer1", "producer1@p.com")
     producer1.distributor = distributor
     producer1.save
-    producer2 = create_producer("producer2", "producer2@p.com", "WA", 98033, "www.producer2.com", "producer2 FARMS")
+    producer2 = create_producer("producer2", "producer2@p.com")
     producer2.distributor = distributor
     producer2.save
 
@@ -855,8 +855,8 @@ class UserTest < ActiveSupport::TestCase
     posting_apples = create_posting(producer2, price_apples, product = products(:apples))    
 
     #create tote items
-    bob = create_user("bob", "bob@b.com", 98033)
-    chris = create_user("chris", "chris@c.com", 98044)
+    bob = create_user("bob", "bob@b.com")
+    chris = create_user("chris", "chris@c.com")
 
     ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
     ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
@@ -903,19 +903,19 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "should exclude producer from distributor order submission when producer order minimum is not met" do
-    distributor = create_producer("distributor", "distributor@d.com", "WA", 98033, "www.distributor.com", "BIGTIME DISTRIBUTOR GUY")
+    distributor = create_producer("distributor", "distributor@d.com")
     distributor_order_minimum = 10
     distributor.update(order_minimum_producer_net: distributor_order_minimum)
     assert_equal distributor_order_minimum, distributor.reload.order_minimum_producer_net
 
-    producer1 = create_producer("producer1", "producer1@p.com", "WA", 98033, "www.producer1.com", "producer1 FARMS")
+    producer1 = create_producer("producer1", "producer1@p.com")
     producer1.distributor = distributor
     producer1.save
     producer1_order_minimum = 25
     producer1.update(order_minimum_producer_net: producer1_order_minimum)
     assert_equal producer1_order_minimum, producer1.reload.order_minimum_producer_net
 
-    producer2 = create_producer("producer2", "producer2@p.com", "WA", 98033, "www.producer2.com", "producer2 FARMS")
+    producer2 = create_producer("producer2", "producer2@p.com")
     producer2.distributor = distributor
     producer2.save
 
@@ -927,8 +927,8 @@ class UserTest < ActiveSupport::TestCase
     posting_apples = create_posting(producer2, price_apples, product = products(:apples))    
 
     #create tote items
-    bob = create_user("bob", "bob@b.com", 98033)
-    chris = create_user("chris", "chris@c.com", 98044)
+    bob = create_user("bob", "bob@b.com")
+    chris = create_user("chris", "chris@c.com")
 
     ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
     ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
@@ -977,11 +977,11 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "should submit orders properly when distributor is itself a producer" do
-    distributor = create_producer("distributor", "distributor@d.com", "WA", 98033, "www.distributor.com", "BIGTIME DISTRIBUTOR GUY")
-    producer1 = create_producer("producer1", "producer1@p.com", "WA", 98033, "www.producer1.com", "producer1 FARMS")
+    distributor = create_producer("distributor", "distributor@d.com")
+    producer1 = create_producer("producer1", "producer1@p.com")
     producer1.distributor = distributor
     producer1.save
-    producer2 = create_producer("producer2", "producer2@p.com", "WA", 98033, "www.producer2.com", "producer2 FARMS")
+    producer2 = create_producer("producer2", "producer2@p.com")
     producer2.distributor = distributor
     producer2.save
 
@@ -996,8 +996,8 @@ class UserTest < ActiveSupport::TestCase
     posting_apples = create_posting(producer2, price_apples, product = products(:apples))    
 
     #create tote items
-    bob = create_user("bob", "bob@b.com", 98033)
-    chris = create_user("chris", "chris@c.com", 98044)
+    bob = create_user("bob", "bob@b.com")
+    chris = create_user("chris", "chris@c.com")
 
     ti_bob_milk = create_tote_item(posting_milk, quantity = 1, bob)
     ti_bob_milk.update(state: ToteItem.states[:COMMITTED])
@@ -1081,13 +1081,13 @@ class UserTest < ActiveSupport::TestCase
   def setup_pickup_testing
     
     nuke_all_postings
-    producer = create_producer("producer", "producer@o.com", "WA", 98033, "www.producer.com", "producer FARMS")
+    producer = create_producer("producer", "producer@o.com")
     producer.save
     delivery_date = get_delivery_date(days_from_now = 14)
     days_shift = delivery_date.wday - 3
     delivery_date = delivery_date - days_shift.days
     posting_carrots = create_posting(producer, price = 1.50, product = products(:carrots), unit = units(:pound), delivery_date)
-    bob = create_user("bob", "bob@b.com", 98033)
+    bob = create_user("bob", "bob@b.com")
     bob.set_dropsite(Dropsite.first)
     ti_bob_carrots = create_tote_item(posting_carrots, quantity = 6, bob)
     ti_bob_carrots.transition(:customer_authorized)
@@ -1101,7 +1101,7 @@ class UserTest < ActiveSupport::TestCase
   test "second pickup of the week should not display items picked up during first pickup" do
 
     nuke_all_postings
-    producer = create_producer("producer", "producer@o.com", "WA", 98033, "www.producer.com", "producer FARMS")
+    producer = create_producer("producer", "producer@o.com")
     producer.save
     delivery_date = get_delivery_date(days_from_now = 14)    
     days_shift = delivery_date.wday - 3
@@ -1109,7 +1109,7 @@ class UserTest < ActiveSupport::TestCase
     delivery_date2 = delivery_date + 2.days
 
     posting_carrots = create_posting(producer, price = 1.50, product = products(:carrots), unit = units(:pound), delivery_date)
-    bob = create_user("bob", "bob@b.com", 98033)
+    bob = create_user("bob", "bob@b.com")
     bob.set_dropsite(Dropsite.first)
     ti_bob_carrots = create_tote_item(posting_carrots, quantity = 6, bob)
     ti_bob_carrots.transition(:customer_authorized)

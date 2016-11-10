@@ -42,7 +42,7 @@ class PickupDeadlineReminderTest < IntegrationHelper
     friday_posting = create_following_friday_posting(wednesday_posting)
 
     #add some tote items to user tote
-    bob = create_user("bob", "bob@b.com", 98033)
+    bob = create_user("bob", "bob@b.com")
     quantity = 2
     ti1_bob = create_authorized_tote_item_for(bob, wednesday_posting, quantity)
     ti2_bob = create_authorized_tote_item_for(bob, friday_posting, quantity)
@@ -90,7 +90,7 @@ class PickupDeadlineReminderTest < IntegrationHelper
     posting1 = create_next_wednesday_posting
 
     #add some tote items to user tote
-    bob = create_user("bob", "bob@b.com", 98033)
+    bob = create_user("bob", "bob@b.com")
     quantity = 2
     ti1_bob = create_authorized_tote_item_for(bob, posting1, quantity)
 
@@ -134,7 +134,7 @@ class PickupDeadlineReminderTest < IntegrationHelper
     posting1 = create_next_wednesday_posting
 
     #add some tote items to user tote
-    bob = create_user("bob", "bob@b.com", 98033)
+    bob = create_user("bob", "bob@b.com")
     quantity = 2
     ti1_bob = create_authorized_tote_item_for(bob, posting1, quantity)
 
@@ -271,10 +271,10 @@ class PickupDeadlineReminderTest < IntegrationHelper
     delivery_date = get_next_wednesday
     commitment_zone_start = delivery_date - 2.days
 
-    distributor = create_producer("distributor", "distributor@d.com", "WA", 98033, "www.distributor.com", "Distributor Inc.")
+    distributor = create_producer("distributor", "distributor@d.com")
     distributor.create_business_interface(name: "Distributor Inc.", order_email_accepted: true, order_email: distributor.email, paypal_accepted: true, paypal_email: distributor.email)
 
-    producer1 = create_producer("producer1", "producer1@p.com", "WA", 98033, "www.producer1.com", "producer1 farms")
+    producer1 = create_producer("producer1", "producer1@p.com")
     producer1.distributor = distributor
     producer1.save
 

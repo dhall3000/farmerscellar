@@ -6,7 +6,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
   def create_posting_recurrence(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = nil)
 
     if farmer.nil?
-      farmer = create_producer("john", "john@j.com", "WA", 98033, "www.john.com", "JOHN'S Farm")
+      farmer = create_producer("john", "john@j.com")
       assert farmer.valid?
       assert farmer.producer?
     end
@@ -199,7 +199,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     end
     commitment_zone_start = delivery_date - 2.days
 
-    distributor = create_producer("distributor", "distributor@d.com", "WA", 98033, "www.distributor.com", "Distributor Inc.")
+    distributor = create_producer("distributor", "distributor@d.com")
     distributor.settings.update(conditional_payment: false)
     distributor.create_business_interface(name: "Distributor Inc.", order_email_accepted: true, order_email: distributor.email, paypal_accepted: true, paypal_email: distributor.email)
 
@@ -208,14 +208,14 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
       distributor.update(order_minimum_producer_net: 20)
     end
 
-    producer1 = create_producer("producer1", "producer1@p.com", "WA", 98033, "www.producer1.com", "producer1 farms")
+    producer1 = create_producer("producer1", "producer1@p.com")
     producer1.distributor = distributor    
     producer1.save
     
     create_commission(producer1, products(:apples), units(:pound), 0.05)
     posting1 = create_posting_recurrence(producer1, 1.00, products(:apples), units(:pound), delivery_date, commitment_zone_start, units_per_case = 1, frequency = 1).current_posting
 
-    bob = create_user("bob", "bob@b.com", 98033)
+    bob = create_user("bob", "bob@b.com")
     
     ti1_bob = create_tote_item(bob, posting1, 2, subscription_frequency = 1)
 
@@ -268,7 +268,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     end
     commitment_zone_start = delivery_date - 2.days
 
-    distributor = create_producer("distributor", "distributor@d.com", "WA", 98033, "www.distributor.com", "Distributor Inc.")
+    distributor = create_producer("distributor", "distributor@d.com")
     distributor.settings.update(conditional_payment: false)
     distributor.create_business_interface(name: "Distributor Inc.", order_email_accepted: true, order_email: distributor.email, paypal_accepted: true, paypal_email: distributor.email)
 
@@ -277,14 +277,14 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
       distributor.update(order_minimum_producer_net: 20)
     end
 
-    producer1 = create_producer("producer1", "producer1@p.com", "WA", 98033, "www.producer1.com", "producer1 farms")
+    producer1 = create_producer("producer1", "producer1@p.com")
     producer1.distributor = distributor    
     producer1.save
     
     create_commission(producer1, products(:apples), units(:pound), 0.05)
     posting1 = create_posting(producer1, 1.00, products(:apples), units(:pound), delivery_date, commitment_zone_start, units_per_case = 1)
 
-    bob = create_user("bob", "bob@b.com", 98033)
+    bob = create_user("bob", "bob@b.com")
     
     ti1_bob = create_tote_item(bob, posting1, 2)
 

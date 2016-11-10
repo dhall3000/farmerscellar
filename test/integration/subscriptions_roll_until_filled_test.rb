@@ -11,8 +11,8 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     pr.current_posting.update(price: 1)
     pr.current_posting.user.update(order_minimum_producer_net: 20)
 
-    bob = create_user("bob", "bob@b.com", 98033)
-    sam = create_user("sam", "sam@s.com", 98033)
+    bob = create_user("bob", "bob@b.com")
+    sam = create_user("sam", "sam@s.com")
 
     ti_bob = create_tote_item(bob, pr.current_posting, quantity = 2, frequency = 0)
     assert ti_bob.valid?
@@ -79,8 +79,8 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     pr.current_posting.update(price: 1)
     pr.current_posting.user.update(order_minimum_producer_net: 20)
 
-    bob = create_user("bob", "bob@b.com", 98033)
-    sam = create_user("sam", "sam@s.com", 98033)
+    bob = create_user("bob", "bob@b.com")
+    sam = create_user("sam", "sam@s.com")
 
     ti_bob = create_tote_item(bob, pr.current_posting, quantity = 25, frequency = 0)
     assert ti_bob.valid?
@@ -163,8 +163,8 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     pr.current_posting.update(price: 1)
     pr.current_posting.user.update(order_minimum_producer_net: 20)
 
-    bob = create_user("bob", "bob@b.com", 98033)
-    sam = create_user("sam", "sam@s.com", 98033)
+    bob = create_user("bob", "bob@b.com")
+    sam = create_user("sam", "sam@s.com")
 
     ti_bob = create_tote_item(bob, pr.current_posting, quantity = 25, frequency = 0)
     assert ti_bob.valid?
@@ -242,8 +242,8 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     pr.current_posting.update(price: 1)
     pr.current_posting.user.update(order_minimum_producer_net: 20)
 
-    bob = create_user("bob", "bob@b.com", 98033)
-    sam = create_user("sam", "sam@s.com", 98033)
+    bob = create_user("bob", "bob@b.com")
+    sam = create_user("sam", "sam@s.com")
 
     ti_bob = create_tote_item(bob, pr.current_posting, quantity = 2, frequency = 0)
     assert ti_bob.valid?
@@ -287,8 +287,8 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     pr.current_posting.update(price: 1)
     pr.current_posting.user.update(order_minimum_producer_net: 20)
 
-    bob = create_user("bob", "bob@b.com", 98033)
-    sam = create_user("sam", "sam@s.com", 98033)
+    bob = create_user("bob", "bob@b.com")
+    sam = create_user("sam", "sam@s.com")
 
     ti_bob = create_tote_item(bob, pr.current_posting, quantity = 2, frequency = 0)
     assert ti_bob.valid?
@@ -321,7 +321,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
   test "skip date action should not act on rtf subscriptions" do
 
     nuke_all_postings
-    bob = create_user("bob", "bob@b.com", 98033)
+    bob = create_user("bob", "bob@b.com")
     
     #2 create rtf subscription
     pr_celery_rtf = create_posting_recurrence(farmer = nil, price = 2.29, product = products(:celery), unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1)
@@ -362,7 +362,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
   test "neither show nor edit should display rtf subscriptions" do
 
     nuke_all_postings
-    bob = create_user("bob", "bob@b.com", 98033)
+    bob = create_user("bob", "bob@b.com")
     #1 create regular subscription
     pr_apples = create_posting_recurrence(farmer = nil, price = 1, product = products(:apples), unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1)
     assert pr_apples.valid?
@@ -380,7 +380,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     get subscription_path(apples_subscription)
     assert :success
     assert_template 'subscriptions/show'
-    assert_select 'p', "JOHN'S Farm Fuji Apples"      
+    assert_select 'p', "john Farms Fuji Apples"      
     #4 verify show does not display celery RTF subscription
     get subscription_path(celery_subscription)
     assert :redirect
@@ -395,7 +395,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
   test "index should not display rtf subscriptions" do
 
     nuke_all_postings
-    bob = create_user("bob", "bob@b.com", 98033)
+    bob = create_user("bob", "bob@b.com")
     #1 create regular subscription
     pr_apples = create_posting_recurrence(farmer = nil, price = 1, product = products(:apples), unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1)
     assert pr_apples.valid?
@@ -412,9 +412,9 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     get subscriptions_path
     assert_template 'subscriptions/index'    
     #4 verify normal subscription is visible
-    assert_select 'a', "JOHN'S Farm Fuji Apples"
+    assert_select 'a', "john Farms Fuji Apples"
     #5 verify rtf sub is not displayed
-    assert_select 'a', {text: "JOHN'S Farm Celery", count: 0}    
+    assert_select 'a', {text: "john Farms Celery", count: 0}    
 
   end
 
@@ -437,8 +437,8 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     pr.current_posting.update(price: 1)
     pr.current_posting.user.update(order_minimum_producer_net: 20)
 
-    bob = create_user("bob", "bob@b.com", 98033)
-    sam = create_user("sam", "sam@s.com", 98033)
+    bob = create_user("bob", "bob@b.com")
+    sam = create_user("sam", "sam@s.com")
 
     ti_bob = create_tote_item(bob, pr.current_posting, quantity = 2, frequency = 0)
     assert ti_bob.valid?

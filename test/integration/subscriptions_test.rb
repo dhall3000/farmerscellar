@@ -16,7 +16,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     nuke_all_postings
 
     #establish weekly posting recurrence on wednesdays
-    producer = create_producer("producer1", "producer1@p.com", "WA", 98033, "www.producer1.com", "PRODUCER 1 FARMS")        
+    producer = create_producer("producer1", "producer1@p.com")        
     jan6 = Time.zone.local(2016, 1, 6)
     delivery_date = jan6
     commitment_zone_start = delivery_date - 2.days
@@ -36,7 +36,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     assert_equal 2, posting_recurrence.postings.count
     assert_equal Time.zone.local(2016, 1, 13), posting_recurrence.reload.postings.last.delivery_date
     #create bi-weekly subscription
-    jane = create_user("jane", "jane@j.com", 98033)
+    jane = create_user("jane", "jane@j.com")
     subscription = add_subscription(jane, posting_recurrence.reload.current_posting, quantity = 2, frequency = 2)
 
     assert_equal 1, subscription.tote_items.count
@@ -110,7 +110,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     nuke_all_postings
 
     #establish weekly posting recurrence on wednesdays
-    producer = create_producer("producer1", "producer1@p.com", "WA", 98033, "www.producer1.com", "PRODUCER 1 FARMS")        
+    producer = create_producer("producer1", "producer1@p.com")        
     jan6 = Time.zone.local(2016, 1, 6)
     delivery_date = jan6
     commitment_zone_start = delivery_date - 2.days
@@ -130,7 +130,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     assert_equal 2, posting_recurrence.postings.count
     assert_equal Time.zone.local(2016, 1, 13), posting_recurrence.reload.postings.last.delivery_date
     #create bi-weekly subscription
-    jane = create_user("jane", "jane@j.com", 98033)
+    jane = create_user("jane", "jane@j.com")
     subscription = add_subscription(jane, posting_recurrence.reload.current_posting, quantity = 2, frequency = 2)
     
     assert_equal 1, subscription.tote_items.count
@@ -344,7 +344,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     posting = setup_posting_recurrence(product = products(:apples), frequency = 2)
     quantity = 2
     frequency = 4 #every 8 weeks
-    user = create_user("jane", "jane@j.com", 98033)
+    user = create_user("jane", "jane@j.com")
     subscription = add_subscription(user, posting, quantity, frequency)
 
     #user should get FILLED on the very first posting in the series
@@ -382,7 +382,7 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     posting = setup_posting_recurrence(product = products(:apples), frequency = 2)
     quantity = 2
     frequency = 4 #every 8 weeks
-    user = create_user("jane", "jane@j.com", 98033)
+    user = create_user("jane", "jane@j.com")
     subscription = add_subscription(user, posting, quantity, frequency)
 
     #user should get FILLED on the very first posting in the series

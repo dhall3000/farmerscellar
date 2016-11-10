@@ -73,7 +73,7 @@ module TestLib
 
   def create_posting_recurrence(posting_recurrence_frequency = nil, order_cutoff = nil, delivery_date = nil)
 
-    posting = create_posting(create_producer("john", "john@j.com", "WA", 98033, "john@j.com", "John's Farms"), 1.25)
+    posting = create_posting(create_producer("john", "john@j.com"), 1.25)
     posting_recurrence = PostingRecurrence.new(frequency: posting_recurrence_frequency, on: true)
     posting_recurrence.postings << posting
     assert posting_recurrence.save
@@ -118,45 +118,63 @@ module TestLib
 
   end
 
-  def create_user(name, email, zip = nil)
+  def create_user(name = "customer name", email = "customer@c.com")
 
-    #create producer
     user = User.create!(
       name:  name,
       email: email,
-      password:              "dogdog",
+      password: "dogdog",
       password_confirmation: "dogdog",
-      account_type: 0,
+      account_type: '0',
       activated: true,
       activated_at: Time.zone.now,
-      agreement: 1,
-      zip: zip,
+      address: "4215 21st St. SW",
+      city: "Redmond",
+      state: "Washington",
+      zip: "98008",
+      phone: "206-599-6579",
       beta: false
       )
 
-    assert user.valid?
+    if Rails.env.test?
+      assert user.valid?
+    end
 
     return user
 
   end
 
-  def create_producer(name, email, state, zip, website, farm_name)
+  def create_producer(name = "producer name", email = "producer@p.com", distributor = nil, order_min = 0)
+    
+    user = create_user(name, email)    
+    user.update(
+      account_type: User.types[:PRODUCER],
+      distributor: distributor,
+      order_minimum_producer_net: order_min,
+      description: "description of #{name} farm",
+      website: "www.#{name}.com",
+      farm_name: "#{name} Farms")
 
-    producer = create_user(name, email, zip)
-
-    producer.update(account_type: 1,
-      description: "here is a description of our farm",
-      state: state,
-      website: website,
-      farm_name: farm_name
-      )
+    producer = user.reload
 
     producer.settings.update(conditional_payment: true)
-    producer.create_business_interface(name: "#{name} #{name}, Inc.", order_email_accepted: true, order_email: producer.email, paypal_accepted: true, paypal_email: producer.email)
-
-    assert producer.valid?
+    create_business_interface(producer)
 
     return producer
+
+  end
+
+  def create_business_interface(creditor, order_email_accepted = true, order_instructions = "order instructions", paypal_accepted = true, payment_instructions = "payment instructions")
+
+    creditor.create_business_interface(
+      name: "#{creditor.name} #{creditor.name}, Inc.",
+      order_email_accepted: order_email_accepted,
+      order_email: creditor.email,
+      order_instructions: order_instructions,
+      paypal_accepted: paypal_accepted,
+      paypal_email: creditor.email,
+      payment_instructions: payment_instructions
+      )
 
   end
 
