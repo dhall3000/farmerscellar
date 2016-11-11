@@ -1,5 +1,88 @@
 module TestLib
 
+  def create_db_objects
+    #creates a distributor with OM $100 that gets met
+    #distributor has 3 postings
+    #distributor has 3 producers
+    #each producer has 3 postings
+    #producer 1 has OM $50 that gets met
+    #producer 1 has a Product5 posting with OM $20 that does not get met
+    #producer 2 has OM $50 that does not get met
+    
+    bob = create_user("bob", "bob@b.com")
+
+    delivery_date = get_delivery_date(10)
+
+    order_cutoff1 = delivery_date - 4.days
+    order_cutoff2 = delivery_date - 3.days
+    order_cutoff3 = delivery_date - 2.days
+
+    order_cutoffs = [order_cutoff1, order_cutoff2, order_cutoff3]    
+
+    tis = []
+    postings = []
+    
+    #create distributor D1
+    distributor = create_distributor("distributor", "distributor@d.com", 100)
+    posting1 = create_posting(distributor, 10, get_product("Product1"), get_unit("Pound"), delivery_date, order_cutoff1)
+    tis << create_tote_item(posting1, 1, bob)
+    posting2 = create_posting(distributor, 10, get_product("Product2"), get_unit("Pound"), delivery_date, order_cutoff2)
+    tis << create_tote_item(posting2, 1, bob)
+    posting3 = create_posting(distributor, 10, get_product("Product3"), get_unit("Pound"), delivery_date, order_cutoff3) 
+    tis << create_tote_item(posting3, 1, bob)
+
+    f1 = create_producer("producer1", "producer1@p.com", distributor, order_min = 50)
+    posting4 = create_posting(f1, 10, get_product("Product4"), get_unit("Pound"), delivery_date, order_cutoff1)
+    tis << create_tote_item(posting4, 7, bob)
+    posting5 = create_posting(f1, 10, get_product("Product5"), get_unit("Pound"), delivery_date, order_cutoff2, 0.05, 20)
+    tis << create_tote_item(posting5, 1, bob)
+    posting6 = create_posting(f1, 10, get_product("Product6"), get_unit("Pound"), delivery_date, order_cutoff3)
+    tis << create_tote_item(posting6, 7, bob)
+
+    f2 = create_producer("producer2", "producer2@p.com", distributor, order_min = 50)
+    posting7 = create_posting(f2, 10, get_product("Product7"), get_unit("Pound"), delivery_date, order_cutoff1)
+    tis << create_tote_item(posting7, 1, bob)
+    posting8 = create_posting(f2, 10, get_product("Product8"), get_unit("Pound"), delivery_date, order_cutoff2)
+    tis << create_tote_item(posting8, 1, bob)
+    posting9 = create_posting(f2, 10, get_product("Product9"), get_unit("Pound"), delivery_date, order_cutoff3)
+    tis << create_tote_item(posting9, 1, bob)
+
+    f3 = create_producer("producer3", "producer3@p.com", distributor)
+    posting10 = create_posting(f3, 10, get_product("Product10"), get_unit("Pound"), delivery_date, order_cutoff1)
+    tis << create_tote_item(posting10, 12, bob)
+    posting11 = create_posting(f3, 10, get_product("Product11"), get_unit("Pound"), delivery_date, order_cutoff2)
+    tis << create_tote_item(posting11, 12, bob)
+    posting12 = create_posting(f3, 10, get_product("Product12"), get_unit("Pound"), delivery_date, order_cutoff3)
+    tis << create_tote_item(posting12, 12, bob)
+
+    tis.each do |ti|
+      ti.transition(:customer_authorized)
+      if Rails.env.test?
+        assert ti.reload.state?(:AUTHORIZED)
+      end
+    end
+
+    if Rails.env.test?
+      assert distributor.outbound_order_value_producer_net(order_cutoff1) > 0
+      assert distributor.outbound_order_value_producer_net(order_cutoff2) > 0
+      assert distributor.outbound_order_value_producer_net(order_cutoff3) > 0
+      
+      assert f1.outbound_order_value_producer_net(order_cutoff1) > 0
+      assert_equal 0, posting5.outbound_order_value_producer_net
+      assert_equal 0, f1.outbound_order_value_producer_net(order_cutoff2)
+      assert f1.outbound_order_value_producer_net(order_cutoff3) > 0
+
+      assert_equal 0, f2.outbound_order_value_producer_net(order_cutoff1)
+      assert_equal 0, f2.outbound_order_value_producer_net(order_cutoff2)
+      assert_equal 0, f2.outbound_order_value_producer_net(order_cutoff3)
+    end
+
+    postings = [posting1, posting2, posting3, posting4, posting5, posting6, posting7, posting8, posting9, posting10, posting11, posting12]
+
+    return {customer: bob, delivery_date: delivery_date, order_cutoffs: order_cutoffs, distributor: distributor, producers: [f1, f2, f3], postings: postings, tote_items: tis}
+
+  end
+
   def destroy_objects(objects)
 
     if objects && objects.any?

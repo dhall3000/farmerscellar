@@ -170,8 +170,6 @@ class RakeHelper
 
 			puts "send_order_to_creditor: start"
 
-			#postings = postings_in_transition
-
 			if creditor.nil? || order_cutoffs.nil?
 				AdminNotificationMailer.general_message("MAJOR PROBLEM: send_order_to_creditor error", "creditor or postings params were nil").deliver_now
 				return
@@ -213,6 +211,50 @@ class RakeHelper
 			puts "send_order_to_creditor: end"
 
 		end
+
+    def self.send_postings_receivable_to_admin
+      
+      puts "send_postings_receivable_to_admin: enter"
+
+      #if this isn't the correct time, exit
+      now = Time.zone.now
+      if now.hour != 2
+        puts "send_postings_receivable_to_admin: it's not 2AM so quitting."
+        puts "send_postings_receivable_to_admin: exit"
+        return        
+      end
+
+      delivery_date = now.midnight
+      all_postings_by_creditor_for_delivery_date = Posting.postings_by_creditor(delivery_date)
+
+      if all_postings_by_creditor_for_delivery_date.count > 0
+        puts "send_postings_receivable_to_admin: there were #{all_postings_by_creditor_for_delivery_date.count.to_s} postings for today"
+      else
+        puts "send_postings_receivable_to_admin: there were 0 postings for today"
+      end      
+
+      receivable_postings_by_creditor = {}
+
+      all_postings_by_creditor_for_delivery_date.each do |creditor, postings|
+        
+        postings = creditor.postings_receivable(delivery_date)
+        
+        if postings && postings.any?
+          receivable_postings_by_creditor[creditor] = postings
+        end
+
+      end
+
+      if receivable_postings_by_creditor.count > 0
+        puts "send_postings_receivable_to_admin: there were #{receivable_postings_by_creditor.count.to_s} postings receivable for today. sending email to admin."
+        AdminNotificationMailer.receiving(receivable_postings_by_creditor, delivery_date).deliver_now
+      else
+        puts "send_postings_receivable_to_admin: there were 0 postings receivable for today"
+      end
+
+      puts "send_postings_receivable_to_admin: exit"
+
+    end
 
 		def self.get_commit_totes_email_body(tote_item_ids)
 

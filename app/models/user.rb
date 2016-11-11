@@ -48,6 +48,35 @@ class User < ApplicationRecord
   #if this object is a distributor it might have many PRODUCERs
   has_many :producers, class_name: "User", foreign_key: "distributor_id"
 
+  def postings_receivable(delivery_date)
+    #this plucks all postings for this delivery date (regardless of order cutoff) for this creditor
+    #and subjects them to all shipping criteria (e.g. case tech, order minimums etc.) and returns
+    #all postings that FC should be receiving on the given delivery date
+
+    postings = []
+
+    #get list of unique order_cutoffs with the given delivery date
+    order_cutoffs = postings_by_delivery_date(delivery_date).select(:commitment_zone_start).distinct        
+    #call outbound order report on each unique order cutoff
+    order_cutoffs.each do |order_cutoff|
+      postings += outbound_order_report(order_cutoff.commitment_zone_start)[:postings_order_requirements_met]            
+    end    
+    
+    return postings
+
+  end
+
+  def postings_by_delivery_date(delivery_date)
+
+    pdd = postings.where(delivery_date: delivery_date)
+    producers.each do |producer|
+      pdd = pdd.merge(producer.postings_by_delivery_date(delivery_date))
+    end
+
+    return pdd
+
+  end
+
   def inbound_order_report(order_cutoff)
 
     #postings_order_requirements_met, postings_order_requirements_unmet, order_value_producer_net
