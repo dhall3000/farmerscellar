@@ -1,10 +1,49 @@
 module TestLib
-  
+
+  def destroy_objects(objects)
+
+    if objects && objects.any?
+      objects.each do |obj|
+        obj.destroy
+      end
+    end
+
+  end
+
+  def get_product(name = "Fuji Apples")
+
+    product = Product.find_by(name: name)
+
+    if product
+      return product
+    end
+
+    return Product.create(name: name)
+
+  end
+
+  def get_unit(name = "Pound")
+
+    unit = Unit.find_by(name: name)
+
+    if unit
+      return unit
+    end
+
+    return Unit.create(name: name)
+
+  end
+
   def create_commission(farmer, product, unit, commission)    
     
     ppuc = ProducerProductUnitCommission.new(user: farmer, product: product, unit: unit, commission: commission)
-    assert ppuc.valid?
-    assert ppuc.save
+
+    if Rails.env.test?
+      assert ppuc.valid?
+      assert ppuc.save
+    else
+      ppuc.save
+    end
 
     return ppuc
 
@@ -20,12 +59,16 @@ module TestLib
       commitment_zone_start = delivery_date - 2.days
     end
 
-    if product.nil?
-      product = products(:apples)
-    end
+    if Rails.env.test?
 
-    if unit.nil?
-      unit = units(:pound)
+      if product.nil?
+        product = products(:apples)
+      end
+
+      if unit.nil?
+        unit = units(:pound)
+      end
+
     end
 
     if commission.nil?
@@ -65,7 +108,9 @@ module TestLib
 
     end
 
-    assert posting.valid?
+    if Rails.env.test?
+      assert posting.valid?
+    end
 
     return posting
 
@@ -120,6 +165,12 @@ module TestLib
 
   def create_user(name = "customer name", email = "customer@c.com")
 
+    user = User.find_by(email: email)
+
+    if user
+      user.destroy
+    end
+
     user = User.create!(
       name:  name,
       email: email,
@@ -162,6 +213,10 @@ module TestLib
 
     return producer
 
+  end
+
+  def create_distributor(name = "distributor name", email = "distributor@d.com", order_min = 0)
+    return create_producer(name, email, distributor = nil, order_min)
   end
 
   def create_business_interface(creditor, order_email_accepted = true, order_instructions = "order instructions", paypal_accepted = true, payment_instructions = "payment instructions")

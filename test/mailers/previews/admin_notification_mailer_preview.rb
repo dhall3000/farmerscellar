@@ -10,43 +10,54 @@ class AdminNotificationMailerPreview < ActionMailer::Preview
   #http://localhost:3000/rails/mailers/admin_notification_mailer/receiving
   def receiving
 
-return AdminNotificationMailer.receiving(nil)
+    db_objects = create_distributor_posting_tree("distributor1", "producer1", "producer2")
+    db_objects += create_distributor_posting_tree("distributor2", "producer3", "producer4")
+    delivery_date = get_first_delivery_date_from_db_objects(db_objects)
 
-    #create distributor D1    
-    if (d1 = User.find_by(email: "d1@d.com"))
-      d1.destroy
-    end
-    d1 = create_distributor("d1 name", "d1@d.com")
-    #create business interface
-    create_business_interface(d1)
-    d1.settings.update(conditional_payment: false)
-        
-    #create producer P1
-    if (p1 = User.find_by(email: "p1@p.com"))
-      p1.destroy
-    end
-    p1 = create_producer("P1", "p1@p.com", d1, order_min = 0)
-    #create posting P1P1
-    #create posting P1P2
+    postings_by_creditor = Posting.postings_by_creditor(delivery_date)
 
-    #create producer P2
-    if (p2 = User.find_by(email: "p2@p.com"))
-      p2.destroy
-    end
-    p2 = create_producer("P2", "p2@p.com", d1, order_min = 0)
-    #create posting P2P1
-    #create posting P2P2
+    mail = AdminNotificationMailer.receiving(postings_by_creditor, delivery_date)
 
-    bob = create_user("bob", "bob@b.com")
-
-    mail = AdminNotificationMailer.receiving(nil)
-
-    bob.destroy
-    p1.destroy
-    p2.destroy
-    d1.destroy
+    destroy_objects(db_objects)
 
     return mail
+
+  end
+
+  def get_first_delivery_date_from_db_objects(db_objects)
+
+    db_objects.each do |obj|
+      if obj.class.name == "Posting"
+        return obj.delivery_date
+      end
+    end
+
+    return nil
+
+  end
+
+  def create_distributor_posting_tree(distributor = "d1", producer1 = "p1", producer2 = "p2")
+
+    db_objects = []
+
+    #create distributor D1
+    db_objects << (d1 = create_distributor(distributor, "#{distributor}@d.com"))
+        
+    #create producer P1
+    db_objects << (p1 = create_producer(producer1, "#{producer1}@p.com", d1, order_min = 0))
+    #create posting P1P1
+    db_objects << (p1p1 = create_posting(p1, 1.25, get_product("Apples"), get_unit("Pound"), get_delivery_date(100)))
+    #create posting P1P2
+    db_objects << create_posting(p1, 1.50, get_product("Oranges"), get_unit("Pound"), get_delivery_date(100))
+
+    #create producer P2
+    db_objects << (p2 = create_producer(producer2, "#{producer2}@p.com", d1, order_min = 0))
+    #create posting P2P1
+    db_objects << create_posting(p1, 1.50, get_product("Zuchini"), get_unit("Whole"), get_delivery_date(100))
+    #create posting P2P2
+    db_objects << create_posting(p1, 1.75, get_product("Carrots"), get_unit("Bunch"), get_delivery_date(100))
+
+    return db_objects
 
   end
 

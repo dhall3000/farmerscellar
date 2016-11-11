@@ -22,6 +22,27 @@ class Posting < ApplicationRecord
 
   validates_presence_of :user, :product, :unit  
 
+  def self.postings_by_creditor(delivery_date)
+
+    all_postings = Posting.where(delivery_date: delivery_date)
+    postings_by_creditor = {}
+
+    all_postings.each do |posting|
+
+      creditor = posting.get_creditor
+
+      if postings_by_creditor[creditor].nil?
+        postings_by_creditor[creditor] = []
+      end
+
+      postings_by_creditor[creditor] << posting
+
+    end
+
+    return postings_by_creditor
+
+  end
+
   def get_creditor
     return user.get_creditor
   end

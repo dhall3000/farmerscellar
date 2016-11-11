@@ -6,13 +6,15 @@ class AdminNotificationMailer < ApplicationMailer
     mail to: "david@farmerscellar.com", subject: subject
   end
 
-  def receiving(postings_by_creditor)
+  def receiving(postings_by_creditor, delivery_date)
 
-    #if postings_by_creditor.nil?
-    #  return
-    #end
-    
-    mail to: "david@farmerscellar.com", subject: "Receiving"
+    if postings_by_creditor.nil?
+      return
+    end
+
+    @postings_by_creditor = postings_by_creditor
+        
+    mail to: "david@farmerscellar.com", subject: "Postings receivable for #{delivery_date.strftime("%A %B %d, %Y")}"
 
   end
 
