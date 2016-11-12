@@ -185,6 +185,8 @@ class RakeHelper
 				puts "send_order_to_creditor: sending order to #{creditor.get_business_interface.name}"
 			end
 
+      postings_for_creditor_order = []
+
 			order_cutoffs.each do |order_cutoff, ignore_value|
 
         order_report = creditor.outbound_order_report(order_cutoff)
@@ -192,6 +194,8 @@ class RakeHelper
         #{postings_order_requirements_met: postings_order_requirements_met, postings_order_requirements_unmet: postings_order_requirements_unmet, order_value_producer_net: order_value_producer_net}
         postings_orderable = order_report[:postings_order_requirements_met]
         postings_closeable = order_report[:postings_order_requirements_unmet]
+
+        postings_for_creditor_order += postings_orderable
 
         puts "send_order_to_creditor: sending order for #{postings_orderable.count.to_s} posting(s) to #{bi.name}"
         ProducerNotificationsMailer.current_orders(creditor, postings_orderable).deliver_now
@@ -207,6 +211,11 @@ class RakeHelper
         end
 
 			end
+
+      if postings_for_creditor_order.any?
+        delivery_date = postings_for_creditor_order.first.delivery_date
+        CreditorOrder.create(creditor: creditor, delivery_date: delivery_date, postings: postings_for_creditor_order)
+      end
 	    
 			puts "send_order_to_creditor: end"
 
@@ -225,31 +234,24 @@ class RakeHelper
       end
 
       delivery_date = now.midnight
-      all_postings_by_creditor_for_delivery_date = Posting.postings_by_creditor(delivery_date)
+      postings_by_creditor = {}
 
-      if all_postings_by_creditor_for_delivery_date.count > 0
-        puts "send_postings_receivable_to_admin: there were #{all_postings_by_creditor_for_delivery_date.count.to_s} postings for today"
-      else
-        puts "send_postings_receivable_to_admin: there were 0 postings for today"
-      end      
+      #you'll have one row for each creditor/order_cutoff combo. we want to mash these in to one per creditor/delivery_date combo      
+      CreditorOrder.where(delivery_date: delivery_date).each do |creditor_order|
 
-      receivable_postings_by_creditor = {}
-
-      all_postings_by_creditor_for_delivery_date.each do |creditor, postings|
-        
-        postings = creditor.postings_receivable(delivery_date)
-        
-        if postings && postings.any?
-          receivable_postings_by_creditor[creditor] = postings
+        if postings_by_creditor[creditor_order.creditor].nil?
+          postings_by_creditor[creditor_order.creditor] = creditor_order.postings.to_a
+        else
+          postings_by_creditor[creditor_order.creditor] += creditor_order.postings.to_a
         end
 
       end
 
-      if receivable_postings_by_creditor.count > 0
-        puts "send_postings_receivable_to_admin: there were #{receivable_postings_by_creditor.count.to_s} postings receivable for today. sending email to admin."
-        AdminNotificationMailer.receiving(receivable_postings_by_creditor, delivery_date).deliver_now
+      if postings_by_creditor.count > 0
+        puts "send_postings_receivable_to_admin: there were #{postings_by_creditor.count.to_s} orders receivable for today. sending email to admin."
+        AdminNotificationMailer.receiving(postings_by_creditor, delivery_date).deliver_now
       else
-        puts "send_postings_receivable_to_admin: there were 0 postings receivable for today"
+        puts "send_postings_receivable_to_admin: there were 0 orders receivable for today"      
       end
 
       puts "send_postings_receivable_to_admin: exit"

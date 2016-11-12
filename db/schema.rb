@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161102221802) do
+ActiveRecord::Schema.define(version: 20161111234244) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -164,6 +164,24 @@ ActiveRecord::Schema.define(version: 20161102221802) do
     t.boolean  "is_rt",      default: false
     t.index ["is_rt"], name: "index_checkouts_on_is_rt"
     t.index ["token"], name: "index_checkouts_on_token"
+  end
+
+  create_table "creditor_order_postings", force: :cascade do |t|
+    t.integer  "creditor_order_id"
+    t.integer  "posting_id"
+    t.datetime "created_at",        null: false
+    t.datetime "updated_at",        null: false
+    t.index ["creditor_order_id"], name: "index_creditor_order_postings_on_creditor_order_id"
+    t.index ["posting_id"], name: "index_creditor_order_postings_on_posting_id"
+  end
+
+  create_table "creditor_orders", force: :cascade do |t|
+    t.datetime "delivery_date"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+    t.integer  "creditor_id"
+    t.index ["creditor_id"], name: "index_creditor_orders_on_creditor_id"
+    t.index ["delivery_date"], name: "index_creditor_orders_on_delivery_date"
   end
 
   create_table "deliveries", force: :cascade do |t|
