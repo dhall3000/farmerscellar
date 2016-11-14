@@ -10,6 +10,7 @@ class RakeHelper
 	  roll_postings
 		do_nightly_tasks
 		send_pickup_deadline_reminders
+    send_postings_receivable_to_admin
 
 	  puts "finished with hourly tasks."
 
