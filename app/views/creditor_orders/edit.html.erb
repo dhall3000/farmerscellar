@@ -1,0 +1,54 @@
+<h1>Edit Creditor Order</h1>
+
+<h2><%= @creditor_order.creditor.get_business_interface.name %></h2>
+
+<%= form_tag creditor_order_path(@creditor_order), method: :patch do %>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <% if @creditor_order.creditor.distributor? %>
+          <th>Producer</th>
+        <% end %>
+        <th>Product</th>
+        <th>Product ID Code</th>
+        <th>Unit</th>        
+        <th>Case Size</th>
+        <th>Cases</th>
+        <th>Fill Quantity</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% @creditor_order.postings.each do |posting| %>
+        <tr>
+          <td><%= posting.id.to_s %></td>
+          <% if @creditor_order.creditor.distributor? %>
+            <td><%= posting.user.farm_name %></td>
+          <% end %>
+          <td><%= posting.product.name %></td>
+          <td><%= posting.product_id_code %></td>
+          <td><%= posting.unit.name %></td>
+          <%
+          if posting.units_per_case.nil? || posting.units_per_case < 2
+            units_per_case = nil
+            num_cases_ordered = nil
+          else
+            units_per_case = posting.units_per_case.to_s
+            num_cases_ordered = posting.inbound_num_cases_ordered.to_s
+          end
+          %>
+          <td><%= units_per_case %></td>
+          <td><%= num_cases_ordered %></td>                    
+          <td>
+            <%= hidden_field_tag "fills[][posting_id]", posting.id.to_s %>
+            <%= number_field_tag "fills[][quantity]", posting.num_units_filled, class: "input-lg" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+    
+  </table>
+  <%= submit_tag "Update", class: "btn btn-lg btn-primary" %>
+
+<% end %>

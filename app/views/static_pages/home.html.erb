@@ -50,16 +50,16 @@
           </div>
 
           <div class="panel-body">
-            <% if !@website_settings.nil? %>
-              <%= link_to "Website Settings", edit_website_setting_path(@website_settings), class: "btn btn-lg btn-primary btn-block" %>
-            <% end %>
-            <%= link_to "Receive products", postings_path, class: "btn btn-lg btn-primary btn-block" %>
+            <%= link_to "Receiving", creditor_orders_path, class: "btn btn-lg btn-primary btn-block" %>
             <%= link_to "Deliver products", deliveries_path, class: "btn btn-lg btn-primary btn-block" %>
             <%= link_to "Create new access code", new_access_code_path, class: "btn btn-lg btn-primary btn-block" %>    
             <%= link_to "Products", products_path, class: "btn btn-lg btn-primary btn-block" %>
             <%= link_to "Producer Product Commissions", producer_product_unit_commissions_path, class: "btn btn-lg btn-primary btn-block" %>
             <%= link_to "Add new dropsite", new_dropsite_path, class: "btn btn-lg btn-primary btn-block" %>
             <%= link_to "List dropsites", dropsites_path, class: "btn btn-lg btn-primary btn-block" %>        
+            <% if @website_settings %>
+              <%= link_to "Website Settings", edit_website_setting_path(@website_settings), class: "btn btn-lg btn-primary btn-block" %>
+            <% end %>
             <%= link_to "List Users", users_path, class: "btn btn-lg btn-primary btn-block" %>
             <%= link_to "Go to test page", test_page_path, class: "btn btn-lg btn-primary btn-block" %>
             <%= link_to "Partner Users", partner_users_index_path, class: "btn btn-lg btn-primary btn-block" %>

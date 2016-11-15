@@ -1,0 +1,49 @@
+<h1>Show Creditor Order</h1>
+
+<h2><%= @creditor_order.creditor.get_business_interface.name %></h2>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <% if @creditor_order.creditor.distributor? %>
+        <th>Producer</th>
+      <% end %>
+      <th>Product</th>
+      <th>Product ID Code</th>
+      <th>Unit</th>        
+      <th>Units</th>
+      <th>Case Size</th>
+      <th>Cases</th>        
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @creditor_order.postings.each do |posting| %>
+      <tr>
+        <td><%= posting.id.to_s %></td>
+        <% if @creditor_order.creditor.distributor? %>
+          <td><%= posting.user.farm_name %></td>
+        <% end %>
+        <td><%= posting.product.name %></td>
+        <td><%= posting.product_id_code %></td>
+        <td><%= posting.unit.name %></td>
+        <td><%= posting.inbound_num_units_ordered %></td>
+        <%
+        if posting.units_per_case.nil? || posting.units_per_case < 2
+          units_per_case = nil
+          num_cases_ordered = nil
+        else
+          units_per_case = posting.units_per_case.to_s
+          num_cases_ordered = posting.inbound_num_cases_ordered.to_s
+        end
+        %>
+        <td><%= units_per_case %></td>
+        <td><%= num_cases_ordered %></td>                    
+      </tr>
+    <% end %>
+  </tbody>
+  
+</table>
+
+<%= link_to "Edit", edit_creditor_order_path(@creditor_order), class: "btn btn-primary btn-lg btn-block" %>

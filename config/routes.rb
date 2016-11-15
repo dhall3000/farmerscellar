@@ -38,7 +38,8 @@ Rails.application.routes.draw do
   get 'partner_users/index'
   post 'partner_users/create'
   post 'partner_users/send_delivery_notification'
-  
+
+  resources :creditor_orders  
   resources :subscriptions, only: [:new, :create, :index, :show, :edit, :update]
   resources :producer_product_unit_commissions
   resources :products

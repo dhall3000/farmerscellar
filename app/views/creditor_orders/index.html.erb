@@ -1,0 +1,49 @@
+<h1>Creditor Orders</h1>
+
+<% if @unclosed_closed_creditor_orders && @unclosed_closed_creditor_orders.any? %>
+  <h2>Unclosed Orders</h2>
+  <table class="table">
+    <thead>
+      <tr>          
+        <th class="text-left">Creditor</th>          
+        <th class="text-center">Delivery Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @unclosed_closed_creditor_orders.each do |co| %>
+        <tr>
+          <td class="text-left">
+            <%= link_to co.creditor.get_business_interface.name, creditor_order_path(co) %>
+          </td>
+          <td class="text-center">                
+            <%= co.delivery_date.strftime("%A %B %d, %Y") %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<% if @closed_closed_creditor_orders && @closed_closed_creditor_orders.any? %>
+  <h2>Closed Orders</h2>
+  <table class="table">
+    <thead>
+      <tr>          
+        <th class="text-left">Creditor</th>          
+        <th class="text-center">Delivery Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @closed_closed_creditor_orders.each do |co| %>
+        <tr>
+          <td class="text-left">
+            <%= link_to co.creditor.get_business_interface.name, creditor_order_path(co) %>
+          </td>
+          <td class="text-center">                
+            <%= co.delivery_date.strftime("%A %B %d, %Y") %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>

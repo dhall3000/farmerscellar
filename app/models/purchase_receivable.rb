@@ -195,7 +195,7 @@ class PurchaseReceivable < ApplicationRecord
         return
       end
 
-      net = get_producer_net_tote(tote_items, filled = true)      
+      net = ToteItemsController.helpers.get_producer_net_tote(tote_items, filled = true)      
       payment_payable = PaymentPayable.new(amount: net.round(2), amount_paid: 0)        
 
       payment_payable.users << creditor
