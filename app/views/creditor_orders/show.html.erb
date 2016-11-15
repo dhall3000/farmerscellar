@@ -10,9 +10,9 @@
         <th>Producer</th>
       <% end %>
       <th>Product</th>
-      <th>Product ID Code</th>
+      <th class="text-center">Product ID Code</th>
       <th>Unit</th>        
-      <th>Units</th>
+      <th class="text-center">Units</th>
       <th>Case Size</th>
       <th>Cases</th>        
     </tr>
@@ -26,9 +26,9 @@
           <td><%= posting.user.farm_name %></td>
         <% end %>
         <td><%= posting.product.name %></td>
-        <td><%= posting.product_id_code %></td>
+        <td class="text-center"><%= posting.product_id_code %></td>
         <td><%= posting.unit.name %></td>
-        <td><%= posting.inbound_num_units_ordered %></td>
+        <td class="text-center"><%= posting.total_quantity_ordered_from_creditor %></td>
         <%
         if posting.units_per_case.nil? || posting.units_per_case < 2
           units_per_case = nil

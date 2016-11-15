@@ -10,12 +10,13 @@
         <% if @creditor_order.creditor.distributor? %>
           <th>Producer</th>
         <% end %>
-        <th>Product</th>
-        <th>Product ID Code</th>
+        <th class="text-center">Product</th>
+        <th class="text-center">Product ID Code</th>
         <th>Unit</th>        
         <th>Case Size</th>
         <th>Cases</th>
-        <th>Fill Quantity</th>
+        <th class="text-center">Units Ordered</th>
+        <th class="text-center">Units Received</th>
       </tr>
     </thead>
 
@@ -26,8 +27,8 @@
           <% if @creditor_order.creditor.distributor? %>
             <td><%= posting.user.farm_name %></td>
           <% end %>
-          <td><%= posting.product.name %></td>
-          <td><%= posting.product_id_code %></td>
+          <td class="text-center"><%= posting.product.name %></td>
+          <td class="text-center"><%= posting.product_id_code %></td>
           <td><%= posting.unit.name %></td>
           <%
           if posting.units_per_case.nil? || posting.units_per_case < 2
@@ -40,7 +41,8 @@
           %>
           <td><%= units_per_case %></td>
           <td><%= num_cases_ordered %></td>                    
-          <td>
+          <td class="text-center"><%= posting.total_quantity_ordered_from_creditor %></td>
+          <td class="text-center">
             <%= hidden_field_tag "fills[][posting_id]", posting.id.to_s %>
             <%= number_field_tag "fills[][quantity]", posting.num_units_filled, class: "input-lg" %>
           </td>

@@ -446,6 +446,18 @@ class Posting < ApplicationRecord
 
   end
 
+  def total_quantity_ordered_from_creditor
+
+    unit_count = total_quantity_ordered
+
+    if units_per_case && units_per_case > 1
+      unit_count = (unit_count / units_per_case) * units_per_case
+    end
+
+    return unit_count
+
+  end
+
   private
 
     def get_first_committed_tote_item
