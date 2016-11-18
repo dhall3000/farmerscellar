@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161111234244) do
+ActiveRecord::Schema.define(version: 20161118182239) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -264,8 +264,10 @@ ActiveRecord::Schema.define(version: 20161111234244) do
   create_table "payment_payables", force: :cascade do |t|
     t.float    "amount"
     t.float    "amount_paid"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+    t.boolean  "fully_paid",  default: false, null: false
+    t.index ["fully_paid"], name: "index_payment_payables_on_fully_paid"
   end
 
   create_table "payments", force: :cascade do |t|

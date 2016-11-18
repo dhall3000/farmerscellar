@@ -14,7 +14,7 @@ class AdminNotificationMailer < ApplicationMailer
 
     @postings_by_creditor = postings_by_creditor
         
-    mail to: "david@farmerscellar.com", subject: "Postings receivable for #{delivery_date.strftime("%A %B %d, %Y")}"
+    mail to: "david@farmerscellar.com", subject: "postings receivable"
 
   end
 

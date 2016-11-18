@@ -26,7 +26,7 @@ class BulkPaymentProcessing
 
     puts "BulkPaymentProcessing.bulk_payment_new start"
 
-  	unpaid_payment_payables = PaymentPayable.where("amount_paid < amount")
+  	unpaid_payment_payables = PaymentPayable.where(fully_paid: false)
 
   	if unpaid_payment_payables.count == 0
       puts "BulkPaymentProcessing.bulk_payment_new there are no unpaid PaymentPayables so quitting."
@@ -98,7 +98,7 @@ class BulkPaymentProcessing
         #payment below but rather leave it as is AND alert the admin that there was a payment problem. the details of how to do this are
         #that when errors come down they have a funky identifier like 'L_EMAILn' where 'n' is the integer id of exactly which (of the potentially many)
         #payments failed. so i'd have to write tedious code to correlate this funky id with the ids in my system. notgonnadoit right now.
-        payment_payable.update(amount_paid: payment_payable.amount)
+        payment_payable.update(amount_paid: payment_payable.amount, fully_paid: true)
 	  	  payment.payment_payables << payment_payable
 	  	  bulk_payment.payment_payables << payment_payable
 	  	end

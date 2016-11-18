@@ -1,4 +1,4 @@
-Rails.application.routes.draw do  
+Rails.application.routes.draw do
 
   root 'static_pages#home'
   get 'rtauthorizations/new'
@@ -39,6 +39,7 @@ Rails.application.routes.draw do
   post 'partner_users/create'
   post 'partner_users/send_delivery_notification'
 
+  resources :payment_payables, only: [:index]
   resources :creditor_orders  
   resources :subscriptions, only: [:new, :create, :index, :show, :edit, :update]
   resources :producer_product_unit_commissions

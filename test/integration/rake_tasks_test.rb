@@ -132,7 +132,7 @@ class RakeTasksTest < BulkBuyer
             if ActionMailer::Base.deliveries.count > 0
               assert_equal 1, ActionMailer::Base.deliveries.count
               mail = ActionMailer::Base.deliveries.first
-              assert_appropriate_email(mail, "david@farmerscellar.com", "Postings receivable for #{Time.zone.now.midnight.strftime("%A %B %d, %Y")}", "Product ID Code")
+              assert_appropriate_email(mail, "david@farmerscellar.com", "postings receivable", "Product ID Code")
             end            
           else            
             #otherwise only the hourlies should have processed so the following assertion should hold

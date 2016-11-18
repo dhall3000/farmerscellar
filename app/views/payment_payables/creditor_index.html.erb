@@ -1,0 +1,28 @@
+<h1>Payment Payables</h1>
+
+<h2><%= @creditor.get_business_interface.name %></h2>
+<p>Total: <%= number_to_currency(@total) %></p>
+<table class="table">
+  <thead>
+    <tr>          
+      <th class="text-center">ID</th>
+      <th class="text-center">Amount</th>
+      <th class="text-center">Created</th>      
+    </tr>
+  </thead>
+  <tbody>
+    <% @unpaid_payment_payables.each do |pp| %>
+      <tr>
+        <td class="text-center">
+          <%= pp.id.to_s %>
+        </td>
+        <td class="text-center">                
+          <%= number_to_currency(pp.amount - pp.amount_paid) %>
+        </td>
+        <td class="text-center">
+          <%= pp.created_at.to_s %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
