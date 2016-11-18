@@ -18,7 +18,7 @@ class OrderMinimumsTest < IntegrationHelper
     commitment_zone_start_decoy = delivery_date_decoy - 2.days
 
     distributor = create_producer("distributor", "distributor@d.com")
-    distributor.create_business_interface(name: "Distributor Inc.", order_email_accepted: true, order_email: distributor.email, paypal_accepted: true, paypal_email: distributor.email)
+    distributor.create_business_interface(name: "Distributor Inc.", order_email_accepted: true, order_email: distributor.email, payment_method: BusinessInterface.payment_methods[:PAYPAL], paypal_email: distributor.email)
     distributor.update(order_minimum_producer_net: 20)
 
     producer1 = create_producer("producer1", "producer1@p.com")
@@ -30,7 +30,7 @@ class OrderMinimumsTest < IntegrationHelper
     producer2.save
 
     producer_decoy = create_producer("producer_decoy", "producer_decoy@p.com")
-    producer_decoy.create_business_interface(name: producer_decoy.farm_name, order_email_accepted: true, order_email: producer_decoy.email, paypal_accepted: true, paypal_email: producer_decoy.email)
+    producer_decoy.create_business_interface(name: producer_decoy.farm_name, order_email_accepted: true, order_email: producer_decoy.email, payment_method: BusinessInterface.payment_methods[:PAYPAL], paypal_email: producer_decoy.email)
 
     create_commission(producer1, products(:apples), units(:pound), 0.05)
     posting1 = create_posting(producer1, 1.00, products(:apples), units(:pound), delivery_date, commitment_zone_start, units_per_case = 1)

@@ -338,10 +338,10 @@ ToteItem.create(quantity: 2, price: posting_celery.price, state: ToteItem.states
 Dropsite.create(name: "Farmer's Cellar", phone: "206-588-6579", hours: "8 - 8", address: "9827 128TH AVE NE", city: "Kirkland", state: "WA", zip: 98033, active: true, access_instructions: "punch in 123 and hit enter")
 WebsiteSetting.create(new_customer_access_code_required: false, recurring_postings_enabled: true)
 
-BusinessInterface.create(name: "F1 FARM", order_email_accepted: true, order_email: f1.email, paypal_accepted: true, paypal_email: f1.email, user: f1)
-BusinessInterface.create(name: "F2 FARM", order_email_accepted: true, order_email: f2.email, paypal_accepted: true, paypal_email: f2.email, user: f2)
-BusinessInterface.create(name: "F3 FARM", order_email_accepted: true, order_email: f3.email, paypal_accepted: true, paypal_email: f3.email, user: f3)
-BusinessInterface.create(name: "F4 FARM", order_email_accepted: true, order_email: f4.email, paypal_accepted: true, paypal_email: f4.email, user: f4)
+BusinessInterface.create(name: "F1 FARM", order_email_accepted: true, order_email: f1.email, payment_method: BusinessInterface.payment_methods[:PAYPAL], paypal_email: f1.email, user: f1)
+BusinessInterface.create(name: "F2 FARM", order_email_accepted: true, order_email: f2.email, payment_method: BusinessInterface.payment_methods[:PAYPAL], paypal_email: f2.email, user: f2)
+BusinessInterface.create(name: "F3 FARM", order_email_accepted: true, order_email: f3.email, payment_method: BusinessInterface.payment_methods[:PAYPAL], paypal_email: f3.email, user: f3)
+BusinessInterface.create(name: "F4 FARM", order_email_accepted: true, order_email: f4.email, payment_method: BusinessInterface.payment_methods[:PAYPAL], paypal_email: f4.email, user: f4)
 
 if develop_creditor_orders_controller
   RakeHelper.do_hourly_tasks

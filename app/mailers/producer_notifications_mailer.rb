@@ -78,7 +78,7 @@ class ProducerNotificationsMailer < ApplicationMailer
 
     subject = "Payment receipt"
 
-    if @business_interface.paypal_accepted
+    if @business_interface.payment_method?(:PAYPAL)
       @email = @business_interface.paypal_email
     else
       @email = "david@farmerscellar.com"

@@ -153,7 +153,7 @@ class BulkPaymentProcessing
           next
         end
         bi = creditor.get_business_interface
-        if bi.paypal_accepted
+        if bi.payment_method?(:PAYPAL)
           paypal_payment_info_by_creditor_id[creditor_id] = payment_info
         else
           manual_payment_info_by_creditor_id[creditor_id] = payment_info

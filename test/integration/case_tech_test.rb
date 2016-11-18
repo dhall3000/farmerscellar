@@ -14,7 +14,7 @@ class CaseTechTest < IntegrationHelper
 
     distributor = create_producer("distributor", "distributor@d.com")
     distributor.settings.update(conditional_payment: false)
-    distributor.create_business_interface(name: "Distributor Inc.", order_email_accepted: true, order_email: distributor.email, paypal_accepted: true, paypal_email: distributor.email)
+    distributor.create_business_interface(name: "Distributor Inc.", order_email_accepted: true, order_email: distributor.email, payment_method: BusinessInterface.payment_methods[:PAYPAL], paypal_email: distributor.email)
 
     producer1 = create_producer("producer1", "producer1@p.com")
     producer1.distributor = distributor    

@@ -201,7 +201,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
     distributor = create_producer("distributor", "distributor@d.com")
     distributor.settings.update(conditional_payment: false)
-    distributor.create_business_interface(name: "Distributor Inc.", order_email_accepted: true, order_email: distributor.email, paypal_accepted: true, paypal_email: distributor.email)
+    distributor.create_business_interface(name: "Distributor Inc.", order_email_accepted: true, order_email: distributor.email, payment_method: BusinessInterface.payment_methods[:PAYPAL], paypal_email: distributor.email)
 
     #maybe we can/will parameterize this later?
     if false
@@ -270,7 +270,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
     distributor = create_producer("distributor", "distributor@d.com")
     distributor.settings.update(conditional_payment: false)
-    distributor.create_business_interface(name: "Distributor Inc.", order_email_accepted: true, order_email: distributor.email, paypal_accepted: true, paypal_email: distributor.email)
+    distributor.create_business_interface(name: "Distributor Inc.", order_email_accepted: true, order_email: distributor.email, payment_method: BusinessInterface.payment_methods[:PAYPAL], paypal_email: distributor.email)
 
     #maybe we can/will parameterize this later?
     if false
@@ -617,7 +617,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     bi = postings.first.user.get_business_interface
     subject = "Payment receipt"    
 
-    if bi.paypal_accepted
+    if bi.payment_method?(:PAYPAL)
       email = bi.paypal_email
     else
       email = "david@farmerscellar.com"

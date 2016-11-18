@@ -302,14 +302,14 @@ module TestLib
     return create_producer(name, email, distributor = nil, order_min)
   end
 
-  def create_business_interface(creditor, order_email_accepted = true, order_instructions = "order instructions", paypal_accepted = true, payment_instructions = "payment instructions")
+  def create_business_interface(creditor, order_email_accepted = true, order_instructions = "order instructions", payment_method = BusinessInterface.payment_methods[:PAYPAL], payment_instructions = "payment instructions")
 
     creditor.create_business_interface(
       name: "#{creditor.name} #{creditor.name}, Inc.",
       order_email_accepted: order_email_accepted,
       order_email: creditor.email,
       order_instructions: order_instructions,
-      paypal_accepted: paypal_accepted,
+      payment_method: payment_method,
       paypal_email: creditor.email,
       payment_instructions: payment_instructions
       )
