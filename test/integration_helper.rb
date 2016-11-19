@@ -3,6 +3,52 @@ require 'utility/rake_helper'
 
 class IntegrationHelper < ActionDispatch::IntegrationTest
 
+  def fully_fill_all_creditor_orders
+
+    log_in_as(users(:a1))
+    get creditor_orders_path
+    assert_response :success
+    assert_template 'creditor_orders/index'
+
+    unclosed_creditor_orders = assigns(:unclosed_creditor_orders)
+    unclosed_creditor_orders.each do |uco|
+      fully_fill_creditor_order(uco)
+    end
+
+  end
+
+  def fully_fill_creditor_order(co)
+    
+    assert co
+    assert co.postings
+    fills = []
+
+    log_in_as(users(:a1))
+    
+    get creditor_order_path(co)
+    assert_response :success
+    assert_template 'creditor_orders/show'
+
+    get edit_creditor_order_path(co)
+    assert_response :success
+    assert_template 'creditor_orders/edit'
+
+    co.postings.each do |posting|
+      assert_not posting.state?(:CLOSED)
+      fill = {posting_id: posting.id, quantity: posting.total_quantity_ordered_from_creditor}
+      fills << fill
+    end
+    
+    patch creditor_order_path(co), params: {fills: fills}
+    assert_response :redirect
+    assert_redirected_to creditor_orders_path
+
+    co.reload.postings.each do |posting|
+      assert posting.state?(:CLOSED)
+    end
+
+  end
+
   def create_posting_recurrence(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = nil)
 
     if farmer.nil?

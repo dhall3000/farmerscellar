@@ -1,5 +1,10 @@
 module TestLib
 
+  def clear_mailer
+    ActionMailer::Base.deliveries.clear
+    assert_equal 0, ActionMailer::Base.deliveries.count
+  end
+
   def create_db_objects
     #creates a distributor with OM $100 that gets met
     #distributor has 3 postings

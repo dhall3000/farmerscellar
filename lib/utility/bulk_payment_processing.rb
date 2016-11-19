@@ -26,7 +26,7 @@ class BulkPaymentProcessing
 
     puts "BulkPaymentProcessing.bulk_payment_new start"
 
-  	unpaid_payment_payables = PaymentPayable.where(fully_paid: false)
+    unpaid_payment_payables = PaymentPayable.where(fully_paid: false).joins(users: :business_interface).where("business_interfaces.payment_method = ?", BusinessInterface.payment_methods[:PAYPAL])
 
   	if unpaid_payment_payables.count == 0
       puts "BulkPaymentProcessing.bulk_payment_new there are no unpaid PaymentPayables so quitting."

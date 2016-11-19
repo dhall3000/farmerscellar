@@ -1,6 +1,7 @@
 require 'test_helper'
+require 'integration_helper'
 
-class Authorizer < ActionDispatch::IntegrationTest
+class Authorizer < IntegrationHelper
 
   def setup
     @c1 = users(:c1)
