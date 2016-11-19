@@ -20,6 +20,7 @@ class PaymentPayablesController < ApplicationController
   end
 
   private
+  
     def get_pps_by_creditor
 
       pps_by_creditor = {}
@@ -27,12 +28,14 @@ class PaymentPayablesController < ApplicationController
       pps = PaymentPayable.where(fully_paid: false)
 
       pps.each do |pp|
+
+        creditor = pp.users.last
         
-        if pps_by_creditor[pp.users.last].nil?
-          pps_by_creditor[pp.users.last] = 0.0
+        if pps_by_creditor[creditor].nil?
+          pps_by_creditor[creditor] = 0.0
         end
 
-        pps_by_creditor[pp.users.last] = (pps_by_creditor[pp.users.last] + (pp.amount - pp.amount_paid)).round(2)
+        pps_by_creditor[creditor] = (pps_by_creditor[creditor] + (pp.amount - pp.amount_paid)).round(2)
 
       end
 
@@ -43,6 +46,8 @@ class PaymentPayablesController < ApplicationController
     def dev_create_db_objects
 
       creditor = User.find_by(email: "f1@f.com")
+      creditor.get_business_interface.update(payment_method: BusinessInterface.payment_methods[:CHECK])
+
       if UserPaymentPayable.where(user: creditor).count > 0
         UserPaymentPayable.all.delete_all
         PaymentPayable.all.delete_all
@@ -56,6 +61,7 @@ class PaymentPayablesController < ApplicationController
       pp.save
 
       creditor = User.find_by(email: "f2@f.com")
+      creditor.get_business_interface.update(payment_method: BusinessInterface.payment_methods[:CHECK])
       pp = PaymentPayable.new(amount: 20.35, amount_paid: 0)
       pp.users << creditor
       pp.save

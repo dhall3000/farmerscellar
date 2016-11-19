@@ -3,18 +3,22 @@
 <table class="table">
   <thead>
     <tr>          
-      <th class="text-left">Creditor</th>          
-      <th class="text-center">Amount Payable</th>
+      <th class="text-center">Creditor</th>
+      <th class="text-center">Payment Method</th>                
+      <th class="text-center">Amount Payable</th>      
     </tr>
   </thead>
   <tbody>
-    <% @pps_by_creditor.each do |creditor, sub_total| %>
+    <% @pps_by_creditor.each do |creditor, total| %>
       <tr>
-        <td class="text-left">
+        <td class="text-center">
           <%= link_to creditor.get_business_interface.name, payment_payables_path(creditor_id: creditor.id) %>
         </td>
+        <td class="text-center">
+          <%= creditor.get_business_interface.friendly_payment_method %>
+        </td>
         <td class="text-center">                
-          <%= number_to_currency(sub_total) %>
+          <%= number_to_currency(total) %>
         </td>
       </tr>
     <% end %>

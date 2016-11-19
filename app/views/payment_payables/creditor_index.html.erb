@@ -1,6 +1,7 @@
 <h1>Payment Payables</h1>
 
 <h2><%= @creditor.get_business_interface.name %></h2>
+<p>Payment method: <%= @creditor.get_business_interface.friendly_payment_method %></p>
 <p>Total: <%= number_to_currency(@total) %></p>
 <table class="table">
   <thead>

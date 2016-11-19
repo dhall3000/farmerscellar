@@ -24,6 +24,25 @@ class BusinessInterface < ApplicationRecord
     return payment_time == BusinessInterface.payment_times[time_key]
   end
 
+  def friendly_payment_method
+    
+    case payment_method
+      when BusinessInterface.payment_methods[:PAYPAL]
+        friendly_payment_method = "Paypal"
+      when BusinessInterface.payment_methods[:CASH]
+        friendly_payment_method = "Cash"
+      when BusinessInterface.payment_methods[:PLASTIC]
+        friendly_payment_method = "Plastic"
+      when BusinessInterface.payment_methods[:CHECK]
+        friendly_payment_method = "Check"
+      else
+        friendly_payment_method = "Unknown"
+    end
+
+    return friendly_payment_method
+
+  end
+
 #HOW TO USE
 #  consider Marty. he's going to have one user for Helen the Hen and another for Baron Farms. but payment for both need to go to marty.davis@whatever.com.
 #  HtH and BF are both PRODUCER user accounts. HtH is also a distributor for BF. HtH must then have a BusinessInterface and BF must have HtH as its creditor. That is

@@ -5,6 +5,7 @@ class PaymentPayablesControllerTest < ActionDispatch::IntegrationTest
   def setup
 
     creditor = users(:f1)
+    creditor.get_business_interface.update(payment_method: BusinessInterface.payment_methods[:CHECK])
     pp = PaymentPayable.new(amount: 10.55, amount_paid: 0)
     pp.users << creditor
     pp.save
@@ -13,6 +14,7 @@ class PaymentPayablesControllerTest < ActionDispatch::IntegrationTest
     pp.save
 
     creditor = users(:f2)
+    creditor.get_business_interface.update(payment_method: BusinessInterface.payment_methods[:CASH])
     pp = PaymentPayable.new(amount: 20.35, amount_paid: 0)
     pp.users << creditor
     pp.save
@@ -31,6 +33,8 @@ class PaymentPayablesControllerTest < ActionDispatch::IntegrationTest
     assert_template 'payment_payables/index'
     pps_by_creditor = assigns(:pps_by_creditor)
     assert_equal 2, pps_by_creditor.count
+    assert_select 'td', {text: "Check", count: 1}
+    assert_select 'td', {text: "Cash", count: 1}
   end
 
   test "should get index for creditor" do
