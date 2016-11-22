@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class CreditorOrderTest < ActiveSupport::TestCase
+class CreditorObligationPaymentTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end

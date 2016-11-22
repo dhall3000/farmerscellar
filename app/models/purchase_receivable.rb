@@ -175,7 +175,7 @@ class PurchaseReceivable < ApplicationRecord
 
   end
 
-  def create_payment_payable(purchase = nil)
+  def create_payment_payable(purchase = nil, creditor_obligation = nil)
 
     if purchase.nil?
 
@@ -202,6 +202,7 @@ class PurchaseReceivable < ApplicationRecord
       payment_payable.tote_items << tote_item
 
       payment_payable.save
+      creditor_obligation.add_payment_payable(payment_payable)
 
       return
 
@@ -261,7 +262,7 @@ class PurchaseReceivable < ApplicationRecord
         payment_payable.tote_items << tote_item
       end
 
-      payment_payable.save
+      payment_payable.save      
 
       num_payment_payables_created += 1
 

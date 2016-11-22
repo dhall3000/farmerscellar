@@ -50,7 +50,7 @@ class BulkBuyer < Authorizer
 
     postings.each do |posting, val|
       travel_to posting.commitment_zone_start
-      posting.transition(:commitment_zone_started)
+      RakeHelper.do_hourly_tasks
     end
 
     travel_to current_time

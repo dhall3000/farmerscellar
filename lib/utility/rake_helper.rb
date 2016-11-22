@@ -187,6 +187,7 @@ class RakeHelper
 			end
 
       postings_for_creditor_order = []
+      total_producer_net = 0.0
 
 			order_cutoffs.each do |order_cutoff, ignore_value|
 
@@ -197,6 +198,7 @@ class RakeHelper
         postings_closeable = order_report[:postings_order_requirements_unmet]
 
         postings_for_creditor_order += postings_orderable
+        total_producer_net = (total_producer_net + order_report[:order_value_producer_net]).round(2)
 
         puts "send_order_to_creditor: sending order for #{postings_orderable.count.to_s} posting(s) to #{bi.name}"
         ProducerNotificationsMailer.current_orders(creditor, postings_orderable).deliver_now
@@ -215,7 +217,7 @@ class RakeHelper
 
       if postings_for_creditor_order.any?
         delivery_date = postings_for_creditor_order.first.delivery_date
-        CreditorOrder.create(creditor: creditor, delivery_date: delivery_date, postings: postings_for_creditor_order)
+        CreditorOrder.create(creditor: creditor, delivery_date: delivery_date, postings: postings_for_creditor_order, order_value_producer_net: total_producer_net)
       end
 	    
 			puts "send_order_to_creditor: end"

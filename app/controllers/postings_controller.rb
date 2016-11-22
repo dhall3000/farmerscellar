@@ -122,7 +122,17 @@ class PostingsController < ApplicationController
       @posting = Posting.find_by(id: params[:posting_id].to_i)
       if @posting
         if Time.zone.now >= @posting.delivery_date
-          @fill_report = @posting.fill(params[:quantity].to_i)          
+          
+          cop = CreditorOrderPosting.find_by(posting: @posting)
+
+          if cop
+            creditor_order = cop.creditor_order
+            creditor_obligation = CreditorObligation.find_by(creditor_order: creditor_order) || CreditorObligation.create(creditor_order: creditor_order, balance: 0.0)
+            @fill_report = @posting.fill(params[:quantity].to_i, creditor_obligation)
+          else
+            flash.now[:danger] = "Couldn't find an associated CreditorOrder for this posting so we did not do the fill operation"
+          end
+
         else
           flash.now[:danger] = "The delivery date for this posting is #{@posting.delivery_date}"
         end

@@ -222,6 +222,9 @@ class PostingsControllerTest < ActionDispatch::IntegrationTest
     log_in_as(@admin)
     posting = postings(:postingf5apples)        
 
+    travel_to posting.commitment_zone_start
+    RakeHelper.do_hourly_tasks
+    
     #here is the non-failing "good" case
     travel_to posting.delivery_date + 1
     post postings_fill_path, params: {posting_id: posting.id, quantity: 28}

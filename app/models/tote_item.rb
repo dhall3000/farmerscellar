@@ -108,7 +108,7 @@ class ToteItem < ApplicationRecord
         
         if quantity_filled > 0
           
-          create_funds_flow_objects
+          create_funds_flow_objects(params[:creditor_obligation])
 
           if subscription
             subscription.fill(params[:quantity_filled], self)
@@ -247,13 +247,13 @@ class ToteItem < ApplicationRecord
 
   private
 
-    def create_funds_flow_objects
+    def create_funds_flow_objects(creditor_obligation)
 
       pr = create_purchase_receivable
 
       if !conditional_payment?
         #we are saying we owe money to the creditor at the time of fill, regardless if we're able to collect from the customer or not
-        pr.create_payment_payable
+        pr.create_payment_payable(purchase = nil, creditor_obligation)
       end
 
     end

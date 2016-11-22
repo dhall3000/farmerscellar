@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161118235930) do
+ActiveRecord::Schema.define(version: 20161121213621) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -167,6 +167,32 @@ ActiveRecord::Schema.define(version: 20161118235930) do
     t.index ["token"], name: "index_checkouts_on_token"
   end
 
+  create_table "creditor_obligation_payment_payables", force: :cascade do |t|
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+    t.integer  "creditor_obligation_id"
+    t.integer  "payment_payable_id"
+    t.index ["creditor_obligation_id"], name: "index_copp_on_co_id"
+    t.index ["payment_payable_id"], name: "index_copp_on_pp_id"
+  end
+
+  create_table "creditor_obligation_payments", force: :cascade do |t|
+    t.integer  "creditor_obligation_id"
+    t.integer  "payment_id"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+    t.index ["creditor_obligation_id"], name: "index_creditor_obligation_payments_on_creditor_obligation_id"
+    t.index ["payment_id"], name: "index_creditor_obligation_payments_on_payment_id"
+  end
+
+  create_table "creditor_obligations", force: :cascade do |t|
+    t.integer  "creditor_order_id"
+    t.float    "balance",           default: 0.0, null: false
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.index ["creditor_order_id"], name: "index_creditor_obligations_on_creditor_order_id"
+  end
+
   create_table "creditor_order_postings", force: :cascade do |t|
     t.integer  "creditor_order_id"
     t.integer  "posting_id"
@@ -178,9 +204,10 @@ ActiveRecord::Schema.define(version: 20161118235930) do
 
   create_table "creditor_orders", force: :cascade do |t|
     t.datetime "delivery_date"
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
     t.integer  "creditor_id"
+    t.float    "order_value_producer_net", default: 0.0, null: false
     t.index ["creditor_id"], name: "index_creditor_orders_on_creditor_id"
     t.index ["delivery_date"], name: "index_creditor_orders_on_delivery_date"
   end

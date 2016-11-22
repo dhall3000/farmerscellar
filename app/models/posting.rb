@@ -247,7 +247,15 @@ class Posting < ApplicationRecord
 
   end
 
-  def fill(quantity)
+  def fill(quantity, creditor_obligation = nil)
+
+    if quantity > 0 && creditor_obligation.nil?
+      #hack: if this condition ever holds it's a big problem. i should redesign this. or at the very least raise
+      #an exception on this condition. but not for now...i'm in a hurry. the condition creditor_obligation is allowed
+      #to be nil is when quantity is zero. quantity is zero when, at order cutoff, we CLOSE the posting due to
+      #insufficient orders. in this case no obligation is incurred so we can have nil. hence the condition: if
+      #quantity is > 0 there must be a creditor_obligation object to attribute the incurred charges to.
+    end
 
     quantity_remaining = quantity
     quantity_filled = 0
@@ -263,7 +271,7 @@ class Posting < ApplicationRecord
         quantity_to_fill = [first_committed_tote_item.quantity, quantity_remaining].min
         quantity_remaining = quantity_remaining - quantity_to_fill
         quantity_filled = quantity_filled + quantity_to_fill
-        first_committed_tote_item.transition(:tote_item_filled, {quantity_filled: quantity_to_fill})
+        first_committed_tote_item.transition(:tote_item_filled, {quantity_filled: quantity_to_fill, creditor_obligation: creditor_obligation})
         tote_items_filled << first_committed_tote_item
 
         if first_committed_tote_item.partially_filled?

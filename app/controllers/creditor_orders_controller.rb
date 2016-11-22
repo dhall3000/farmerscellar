@@ -25,6 +25,15 @@ class CreditorOrdersController < ApplicationController
       return
     end
 
+    creditor_order = CreditorOrder.find(params[:id].to_i)
+    if creditor_order.nil?
+      flash[:danger] = "Could not find CreditorOrder id #{params[:id]}"
+      redirect_to creditor_orders_path
+      return
+    end
+
+    creditor_obligation = CreditorObligation.find_by(creditor_order: creditor_order) || CreditorObligation.create(creditor_order: creditor_order, balance: 0.0)
+
     fills.each do |fill|
 
       posting_id = fill[:posting_id].to_i
@@ -38,9 +47,9 @@ class CreditorOrdersController < ApplicationController
 
       if posting.nil?
         next
-      end
+      end      
 
-      fill_report = posting.fill(quantity)
+      fill_report = posting.fill(quantity, creditor_obligation)
 
     end
 
@@ -69,7 +78,7 @@ class CreditorOrdersController < ApplicationController
       unclosed_creditor_orders = []
 
       creditor_orders.each do |creditor_order|
-        if all_postings_closed?(creditor_order.postings)
+        if creditor_order.all_postings_closed?
           closed_creditor_orders << creditor_order
         else
           unclosed_creditor_orders << creditor_order
@@ -77,22 +86,6 @@ class CreditorOrdersController < ApplicationController
       end
 
       return {closed_creditor_orders: closed_creditor_orders, unclosed_creditor_orders: unclosed_creditor_orders}
-
-    end
-
-    def all_postings_closed?(postings)
-
-      if postings.nil?
-        return true
-      end
-
-      postings.each do |posting|
-        if !posting.state?(:CLOSED)
-          return false
-        end
-      end
-
-      return true
 
     end
 

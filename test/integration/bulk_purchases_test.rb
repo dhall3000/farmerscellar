@@ -325,16 +325,18 @@ class BulkPurchasesTest < BulkBuyer
 
   #bundle exec rake test test/integration/bulk_purchases_test.rb
   test "do bulk buy with purchase failures" do
-
-  #def skip1
+  
     customers = [@c1, @c2, @c3, @c4]
     purchase_receivables = setup_bulk_purchase(customers)
 
     #COMMENT KEY 000: we're going to set up c1 so that he has some toteitems in a bulk purchase that fail but at the moment of fail
     #he also has a ti that's ADDED and another that's AUTHORIZED. the code should sense these latter two and
     #switch them to state REMOVED. so we're going to first verify that we have zero in the REMOVED state and
-    #then after the purchase failure verify that we have 2 in the REMOVED state
-    assert_equal ToteItem.where(state: ToteItem.states[:REMOVED]).count, 0
+    #then after the purchase failure verify that we have 2 in the REMOVED state.
+    #I modified this assertion on 2016-11-22 because we added a RakeHelper.do_hourly_tasks in the code path to fix a different
+    #test break. this caused user c18's three tote items to get REMOVED. so i changed this test to just assert that c1-c4
+    #have zero REMOVED items
+    assert_equal 0, ToteItem.where(user: customers, state: ToteItem.states[:REMOVED]).count
 
     #authorize some more tote items
     log_in_as(@c1)
@@ -362,7 +364,7 @@ class BulkPurchasesTest < BulkBuyer
     post bulk_purchases_path, params: {purchase_receivables: purchase_receivables}
     
     #COMMENT KEY 000
-    assert_equal ToteItem.where(state: ToteItem.states[:REMOVED]).count, 2
+    assert_equal 2, ToteItem.where(user: customers, state: ToteItem.states[:REMOVED]).count
     verify_legitimacy_of_bulk_purchase
     verify_proper_number_of_payment_payables    
     bulk_purchase = assigns(:bulk_purchase)
