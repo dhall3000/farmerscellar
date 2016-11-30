@@ -25,6 +25,24 @@ class Posting < ApplicationRecord
 
   validates_presence_of :user, :product, :unit  
 
+  def self.close(postings_closeable)
+
+    if postings_closeable && postings_closeable.any?
+
+      postings_closeable.each do |posting_closeable|
+        #close out the posting so admin doesn't have to deal with it.
+        #here at the order cutoff is the time to close out the posting so that admin doesn't have to see it on their
+        #radar screen. or is this the right time? say that order cutoff is on monday and delivery friday. but say on wednesday we also have some
+        #products being delivered. if we close out this posting due to insufficient quantity on monday then on wednesday the delivery notification
+        #would go out to the user. this might be confusing. on the other hand, the unfilled folks might want to know earlier rather than later so
+        #they can take measures to procure similar such food elsehow.
+        posting_closeable.fill(0)
+      end
+
+    end
+
+  end
+
   def creditor_order
     return creditor_orders.last
   end

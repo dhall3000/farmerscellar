@@ -186,9 +186,6 @@ class RakeHelper
 				puts "send_order_to_creditor: sending order to #{creditor.get_business_interface.name}"
 			end
 
-      postings_for_creditor_order = []
-      total_producer_net = 0.0
-
 			order_cutoffs.each do |order_cutoff, ignore_value|
 
         order_report = creditor.outbound_order_report(order_cutoff)
@@ -196,29 +193,17 @@ class RakeHelper
         #{postings_order_requirements_met: postings_order_requirements_met, postings_order_requirements_unmet: postings_order_requirements_unmet, order_value_producer_net: order_value_producer_net}
         postings_orderable = order_report[:postings_order_requirements_met]
         postings_closeable = order_report[:postings_order_requirements_unmet]
+        order_value_producer_net = order_report[:order_value_producer_net]
 
-        postings_for_creditor_order += postings_orderable
-        total_producer_net = (total_producer_net + order_report[:order_value_producer_net]).round(2)
+        if postings_orderable && postings_orderable.any?                  
+          CreditorOrder.submit(creditor, postings_orderable[0].delivery_date, postings_orderable, order_value_producer_net)
+        end
 
-        puts "send_order_to_creditor: sending order for #{postings_orderable.count.to_s} posting(s) to #{bi.name}"
-        ProducerNotificationsMailer.current_orders(creditor, postings_orderable).deliver_now
-
-        postings_closeable.each do |posting_closeable|
-          #close out the posting so admin doesn't have to deal with it.
-          #here at the order cutoff is the time to close out the posting so that admin doesn't have to see it on their
-          #radar screen. or is this the right time? say that order cutoff is on monday and delivery friday. but say on wednesday we also have some
-          #products being delivered. if we close out this posting due to insufficient quantity on monday then on wednesday the delivery notification
-          #would go out to the user. this might be confusing. on the other hand, the unfilled folks might want to know earlier rather than later so
-          #they can take measures to procure similar such food elsehow.
-          posting_closeable.fill(0)
+        if postings_closeable && postings_closeable.any?
+          Posting.close(postings_closeable)
         end
 
 			end
-
-      if postings_for_creditor_order.any?
-        delivery_date = postings_for_creditor_order.first.delivery_date
-        CreditorOrder.create(creditor: creditor, delivery_date: delivery_date, postings: postings_for_creditor_order, order_value_producer_net: total_producer_net)
-      end
 	    
 			puts "send_order_to_creditor: end"
 

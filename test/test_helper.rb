@@ -190,16 +190,7 @@ class ActiveSupport::TestCase
     travel_to posting.commitment_zone_start
     RakeHelper.do_hourly_tasks
     
-    return posting
-
-  end
-
-  def fully_fill_posting(posting)
-
-    travel_to posting.delivery_date + 12.hours
-    #log in as admin and process a fill
-    log_in_as(users(:a1))
-    post postings_fill_path, params: {posting_id: posting.id, quantity: posting.total_quantity_authorized_or_committed}
+    return posting.reload
 
   end
 

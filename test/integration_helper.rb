@@ -34,6 +34,49 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     follow_redirect!
   end
 
+  def fully_fill_posting(posting)
+
+    travel_to posting.delivery_date + 12.hours
+    #log in as admin and process a fill
+    log_in_as(users(:a1))
+    post postings_fill_path, params: {posting_id: posting.id, quantity: posting.total_quantity_authorized_or_committed}
+
+  end
+
+  def go_to_delivery_day_and_fill_posting(posting, quantity = nil)
+    
+    travel_to posting.delivery_date + 12.hours
+
+    if posting.creditor_order
+      fill_posting(posting, quantity)      
+    end    
+
+  end
+
+  def fill_posting(posting, quantity = nil)
+
+    assert posting, "posting param is nil"
+    assert posting.creditor_order, "This posting has no associated order. You can't fill a posting that doesn't have an associated CreditorOrder object."
+
+    if quantity.nil?
+      quantity = posting.total_quantity_ordered_from_creditor
+    end
+
+    a1 = users(:a1)
+    log_in_as(a1)
+    assert is_logged_in?
+    fills = get_creditor_order_fills_param(posting.id, quantity)
+    patch creditor_order_path(posting.creditor_order), params: {fills: fills}
+    assert_response :redirect
+    assert_redirected_to creditor_orders_path
+    follow_redirect!
+    assert_template 'creditor_orders/index'
+    assert posting.reload.state?(:CLOSED)
+
+    #TODO: do something smart here with the fill_report. maybe some legitimacy checks?
+    fill_report = assigns(:fill_report)
+  end
+
   def fully_fill_all_creditor_orders
 
     log_in_as(users(:a1))
@@ -145,6 +188,20 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
   end
 
   def create_posting(farmer, price, product, unit, delivery_date, commitment_zone_start, units_per_case)
+
+    if farmer.nil?
+      farmer = create_producer("john", "john@j.com")
+      assert farmer.valid?
+      assert farmer.producer?
+    end
+
+    if product.nil?
+      product = products(:apples)
+    end
+
+    if unit.nil?
+      unit = units(:pound)
+    end
 
     if ProducerProductUnitCommission.where(user: farmer, product: product, unit: unit).count == 0
       ProducerProductUnitCommission.create(user: farmer, product: product, unit: unit, commission: 0.05)
@@ -504,23 +561,6 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     assert_match units_per_case.to_s, mail.body.encoded
     assert_match number_of_cases.to_s, mail.body.encoded
 
-  end
-
-  def fill_posting(posting, quantity)
-
-    a1 = users(:a1)
-    log_in_as(a1)
-    assert is_logged_in?
-    fills = get_creditor_order_fills_param(posting.id, quantity)
-    patch creditor_order_path(posting.creditor_order), params: {fills: fills}
-    assert_response :redirect
-    assert_redirected_to creditor_orders_path
-    follow_redirect!
-    assert_template 'creditor_orders/index'
-    assert posting.reload.state?(:CLOSED)
-
-    #TODO: do something smart here with the fill_report. maybe some legitimacy checks?
-    fill_report = assigns(:fill_report)
   end
 
   def do_delivery
