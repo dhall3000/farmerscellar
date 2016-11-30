@@ -4,6 +4,9 @@ class ToteItemTest < ActiveSupport::TestCase
 
   def setup
   	@tote_item = tote_items(:c1apple)
+    creditor_order = CreditorOrder.new(delivery_date: @tote_item.posting.delivery_date, creditor: @tote_item.posting.get_creditor, order_value_producer_net: 1.0)
+    creditor_order.postings << @tote_item.posting
+    assert creditor_order.save    
 
     @farmer = users(:f1)
     @product = products(:apples)
@@ -17,6 +20,11 @@ class ToteItemTest < ActiveSupport::TestCase
 
     @posting = Posting.new(units_per_case: 10, unit: @unit, product: @product, user: @farmer, description: "descrip", quantity_available: 100, price: 1.25, live: true, commitment_zone_start: delivery_date - 2.days, delivery_date: delivery_date)
     @posting.save
+
+    creditor_order = CreditorOrder.new(delivery_date: @posting.delivery_date, creditor: @posting.get_creditor, order_value_producer_net: 1.0)
+    creditor_order.postings << @posting
+    assert creditor_order.save
+
   end
 
   test "should report producer order minimum deficiency when posting and distributor order min met" do
@@ -395,7 +403,7 @@ class ToteItemTest < ActiveSupport::TestCase
     assert_equal ToteItem.states[:ADDED], @tote_item.state
     @tote_item.transition(:customer_authorized)
     @tote_item.transition(:commitment_zone_started)
-    @tote_item.transition(:tote_item_filled, {quantity_filled: @tote_item.quantity / 2})
+    @tote_item.posting.fill(@tote_item.quantity / 2)
 
     @tote_item.reload
     assert_equal ToteItem.states[:FILLED], @tote_item.state
@@ -451,7 +459,7 @@ class ToteItemTest < ActiveSupport::TestCase
     @tote_item.transition(:customer_authorized)
     @tote_item.transition(:commitment_zone_started)    
     @tote_item.reload
-    @tote_item.transition(:tote_item_filled, {quantity_filled: @tote_item.quantity})
+    @tote_item.posting.fill(@tote_item.quantity)
     assert_equal pr_count + 1, PurchaseReceivable.count    
     tote_item_value = (@tote_item.price * @tote_item.quantity).round(2)
     pr = @tote_item.purchase_receivables.last

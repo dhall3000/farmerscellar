@@ -29,8 +29,8 @@ class BulkBuyer < Authorizer
         num_tote_items_filled = num_tote_items_filled + 1          
       end
     end
-
-    post postings_fill_path, params: {posting_id: posting.id, quantity: total_quantity}
+ 
+    fill_posting(posting, total_quantity)
 
   end
 
@@ -39,17 +39,16 @@ class BulkBuyer < Authorizer
     num_authorized = ToteItem.where(state: ToteItem.states[:AUTHORIZED]).count
 
     #now change all the tote_items from AUTHORIZED to COMMITTED
-    postings = {}
+    order_cutoffs = []
     ToteItem.where(state: ToteItem.states[:AUTHORIZED]).each do |tote_item|
-      if !postings.has_key?(tote_item.posting)
-        postings[tote_item.posting] = true
-      end
+      order_cutoffs << tote_item.posting.commitment_zone_start
     end
 
+    order_cutoffs = order_cutoffs.uniq.sort
     current_time = Time.zone.now
 
-    postings.each do |posting, val|
-      travel_to posting.commitment_zone_start
+    order_cutoffs.each do |order_cutoff|
+      travel_to order_cutoff
       RakeHelper.do_hourly_tasks
     end
 
@@ -71,6 +70,7 @@ class BulkBuyer < Authorizer
     assert_not_nil postings
     puts "there are #{postings.count} postings"
 
+    postings = postings.where(state: Posting.states[:COMMITMENTZONE])
     simulate_order_filling_for_postings(postings, fill_all_tote_items, time_travel_to_delivery_dates)
 
   end

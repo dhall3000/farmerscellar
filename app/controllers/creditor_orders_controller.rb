@@ -25,15 +25,6 @@ class CreditorOrdersController < ApplicationController
       return
     end
 
-    creditor_order = CreditorOrder.find(params[:id].to_i)
-    if creditor_order.nil?
-      flash[:danger] = "Could not find CreditorOrder id #{params[:id]}"
-      redirect_to creditor_orders_path
-      return
-    end
-
-    creditor_obligation = CreditorObligation.find_by(creditor_order: creditor_order) || CreditorObligation.create(creditor_order: creditor_order, balance: 0.0)
-
     fills.each do |fill|
 
       posting_id = fill[:posting_id].to_i
@@ -49,7 +40,7 @@ class CreditorOrdersController < ApplicationController
         next
       end      
 
-      fill_report = posting.fill(quantity, creditor_obligation)
+      fill_report = posting.fill(quantity)
 
     end
 

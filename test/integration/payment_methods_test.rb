@@ -1,4 +1,4 @@
-require 'test_helper'
+
 require 'integration_helper'
 require 'utility/rake_helper'
 
@@ -9,7 +9,6 @@ class PaymentMethodsTest < IntegrationHelper
     nuke_all_postings
     
     distributor = create_distributor
-    distributor.settings.update(conditional_payment: false)
     
     producer1 = create_producer(name = "producer1 name", email = "producer1@p.com", distributor)
     producer1.get_business_interface.update(payment_method: BusinessInterface.payment_methods[:PAYPAL])
@@ -17,7 +16,6 @@ class PaymentMethodsTest < IntegrationHelper
     posting1 = create_posting_recurrence(farmer = producer1, price = 10).current_posting
     
     producer2 = create_producer(name = "producer2 name", email = "producer2@p.com", distributor = nil, order_min = 0)
-    producer2.settings.update(conditional_payment: false)
     producer2.get_business_interface.update(payment_method: BusinessInterface.payment_methods[:CASH])
     assert producer2.reload.get_business_interface.payment_method?(:CASH)
     posting2 = create_posting_recurrence(farmer = producer2, price = 5).current_posting
@@ -64,10 +62,20 @@ class PaymentMethodsTest < IntegrationHelper
     assert ti1.reload.state?(:FILLED)
     assert ti2.reload.state?(:FILLED)
 
+    assert_not CreditorObligation.first.balanced?
+    assert_not CreditorObligation.last.balanced?
+
     travel_to posting1.delivery_date + 22.hours
     assert_equal 0, Payment.count
     RakeHelper.do_hourly_tasks
     assert_equal 1, Payment.count
+
+    assert_equal 1, CreditorObligation.first.payments.count
+    assert CreditorObligation.first.balanced?
+
+    assert_equal 0, CreditorObligation.last.payments.count
+    assert_not CreditorObligation.last.balanced?
+    assert CreditorObligation.last.balance > 0.0
 
     assert ti1.payment_payables.first.fully_paid
     assert_not ti2.payment_payables.first.fully_paid

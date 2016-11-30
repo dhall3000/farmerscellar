@@ -12,10 +12,48 @@ class BulkPaymentProcessing
 
     if deliveries_remaining_this_week
       puts "BulkPaymentProcessing.do_bulk_creditor_payment: there are still deliveries outstanding this week so we're not going to do a bulk payment today. quitting."
-    else      
-      values = bulk_payment_new
-      values = bulk_payment_create(values)      
-      email_report_to_admin(values[:bulk_payment], values[:payment_info_by_creditor_id])
+    else
+
+      unbalanced_creditor_obligations = CreditorObligation.joins(creditor_order: {creditor: :business_interface}).where("balance > 0.0").where("business_interfaces.payment_method = ?", BusinessInterface.payment_methods[:PAYPAL])
+
+      if unbalanced_creditor_obligations.count == 0
+        return
+      end
+
+      bp = BulkPayment.new(num_payees: unbalanced_creditor_obligations.count, total_payments_amount: unbalanced_creditor_obligations.sum(:balance))
+
+      #hack: this object is gnarly and lame but scabbing this new code in to some legacy junk so that old tests will pass
+      payment_info_by_creditor_id = {}
+
+      unbalanced_creditor_obligations.each do |co|
+
+        creditor = co.creditor_order.creditor
+
+        payment = Payment.new(amount: co.balance)
+        payment.payment_payables = co.payment_payables
+        bp.payment_payables += co.payment_payables
+
+        co.payment_payables.each do |pp|
+          pp.update(amount_paid: pp.amount, fully_paid: true)
+        end
+
+        payment.save
+        co.add_payment(payment)
+
+        posting_infos = get_posting_infos(co.payment_payables.pluck(:id))
+        ProducerNotificationsMailer.payment_invoice(creditor, payment, posting_infos).deliver_now
+
+        if payment_info_by_creditor_id[creditor.id].nil?
+          payment_info_by_creditor_id[creditor.id] = {amount: 0.0}
+        end
+
+        payment_info_by_creditor_id[creditor.id][:amount] = (payment_info_by_creditor_id[creditor.id][:amount] + payment.amount).round(2)
+
+      end
+
+      bp.save
+      email_report_to_admin(bp, payment_info_by_creditor_id)
+
     end
 
     puts "BulkPaymentProcessing.do_bulk_creditor_payment end"

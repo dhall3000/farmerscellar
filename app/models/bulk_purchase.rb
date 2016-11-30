@@ -100,14 +100,8 @@ class BulkPurchase < ApplicationRecord
         self.gross = (self.gross + purchase.gross_amount).round(2)
 
         prs.each do |pr|
-
-          if pr.tote_item.conditional_payment?
-            @num_payment_payables_created += pr.create_payment_payable(purchase)
-          end
-
           self.net = (self.net + get_producer_net_tote(pr.tote_items, filled = true)).round(2)
           self.commission = (self.commission + get_commission_tote(pr.tote_items, filled = true)).round(2)
-
         end
 
         self.payment_processor_fee_withheld_from_producer = (self.payment_processor_fee_withheld_from_producer + purchase.payment_processor_fee_withheld_from_producer).round(2)

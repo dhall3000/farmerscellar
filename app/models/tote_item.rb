@@ -33,6 +33,10 @@ class ToteItem < ApplicationRecord
   validates :state, inclusion: { in: ToteItem.states.values }
   validates :state, numericality: {only_integer: true}
 
+  def creditor_obligation
+    return posting.creditor_obligation
+  end
+
   def roll_until_filled?
     return subscription && subscription.on && subscription.kind?(:ROLLUNTILFILLED)
   end
@@ -108,7 +112,7 @@ class ToteItem < ApplicationRecord
         
         if quantity_filled > 0
           
-          create_funds_flow_objects(params[:creditor_obligation])
+          create_funds_flow_objects
 
           if subscription
             subscription.fill(params[:quantity_filled], self)
@@ -233,29 +237,11 @@ class ToteItem < ApplicationRecord
     
   end
 
-  #true if creditor is owed $ by FC only when and if FC successfully collects from customer
-  #false if creditor is owed $ by FC the moment the tote item gets filled
-  def conditional_payment?
-
-    if posting && posting.user && posting.get_creditor && posting.get_creditor.settings
-      return posting.get_creditor.settings.conditional_payment
-    end
-
-    return true
-
-  end
-
   private
 
-    def create_funds_flow_objects(creditor_obligation)
-
+    def create_funds_flow_objects
       pr = create_purchase_receivable
-
-      if !conditional_payment?
-        #we are saying we owe money to the creditor at the time of fill, regardless if we're able to collect from the customer or not
-        pr.create_payment_payable(purchase = nil, creditor_obligation)
-      end
-
+      pr.create_payment_payable(purchase = nil, creditor_obligation)
     end
 
     def create_purchase_receivable

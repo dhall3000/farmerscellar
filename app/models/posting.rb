@@ -10,6 +10,9 @@ class Posting < ApplicationRecord
   has_many :delivery_postings
   has_many :deliveries, through: :delivery_postings
 
+  has_many :creditor_order_postings
+  has_many :creditor_orders, through: :creditor_order_postings
+
   validates :description, :quantity_available, :price, :delivery_date, :commitment_zone_start, presence: true
   validates :quantity_available, numericality: { only_integer: true, greater_than: 0 }
   validates :price, numericality: { greater_than: 0 }
@@ -21,6 +24,14 @@ class Posting < ApplicationRecord
   before_create :delivery_date_must_be_after_today
 
   validates_presence_of :user, :product, :unit  
+
+  def creditor_order
+    return creditor_orders.last
+  end
+
+  def creditor_obligation
+    return creditor_order.creditor_obligation
+  end
 
   def self.postings_by_creditor(delivery_date)
 
@@ -247,14 +258,10 @@ class Posting < ApplicationRecord
 
   end
 
-  def fill(quantity, creditor_obligation = nil)
+  def fill(quantity)
 
     if quantity > 0 && creditor_obligation.nil?
-      #hack: if this condition ever holds it's a big problem. i should redesign this. or at the very least raise
-      #an exception on this condition. but not for now...i'm in a hurry. the condition creditor_obligation is allowed
-      #to be nil is when quantity is zero. quantity is zero when, at order cutoff, we CLOSE the posting due to
-      #insufficient orders. in this case no obligation is incurred so we can have nil. hence the condition: if
-      #quantity is > 0 there must be a creditor_obligation object to attribute the incurred charges to.
+      CreditorObligation.create(creditor_order: creditor_order, balance: 0.0)
     end
 
     quantity_remaining = quantity
@@ -271,7 +278,7 @@ class Posting < ApplicationRecord
         quantity_to_fill = [first_committed_tote_item.quantity, quantity_remaining].min
         quantity_remaining = quantity_remaining - quantity_to_fill
         quantity_filled = quantity_filled + quantity_to_fill
-        first_committed_tote_item.transition(:tote_item_filled, {quantity_filled: quantity_to_fill, creditor_obligation: creditor_obligation})
+        first_committed_tote_item.transition(:tote_item_filled, {quantity_filled: quantity_to_fill})
         tote_items_filled << first_committed_tote_item
 
         if first_committed_tote_item.partially_filled?

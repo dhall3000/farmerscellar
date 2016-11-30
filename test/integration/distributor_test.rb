@@ -113,17 +113,18 @@ class DistributorTest < BulkBuyer
     clear_mailer
 
     #now travel to one second past midnight on delivery day
-    travel_to posting.delivery_date + 1
+    travel_to posting.delivery_date + 1    
     #now do some fills
+    assert_equal 0, PaymentPayable.count
     assert_equal 0, PurchaseReceivable.count
     customer.tote_items.each do |tote_item|
       simulate_order_filling_for_postings([tote_item.posting], fill_all_tote_items = true)
-    end    
+    end
+    assert_equal 3, PaymentPayable.count
     #now travel to funds processing time
     travel_to posting.delivery_date + 22.hours
     #now process funds
-    clear_mailer
-    assert_equal 0, PaymentPayable.count
+    clear_mailer    
     RakeHelper.do_hourly_tasks
 
     #there are 3 tote items and there should be 1 pp for every ti
@@ -173,7 +174,7 @@ class DistributorTest < BulkBuyer
     #verify funds sent to the right address
     #this also is handled indirectly through all the email checking below.
 
-    #there should be purchase receipt to customer, payment invoice to f8 and d1, bulk purchase report to admin, bulk payment report to admin
+    #there should be purchase receipt to customer, payment receipt to f8 and d1, bulk purchase report to admin, bulk payment report to admin
     assert_equal 5, ActionMailer::Base.deliveries.count
     #purchase receipt (to customer)
     assert_appropriate_email_exists("c18@c.com", "Purchase receipt", "Hello c18")
@@ -245,16 +246,16 @@ class DistributorTest < BulkBuyer
     travel_to posting.delivery_date + 22.hours
     #now process funds
     clear_mailer
-    assert_equal 0, PaymentPayable.count
-    RakeHelper.do_hourly_tasks
-
     #there are 3 tote items and there should be 1 pp for every ti
     assert_equal 3, PaymentPayable.where(fully_paid: false).count
+    RakeHelper.do_hourly_tasks
+
     #there were 3 postings belonging to 3 different producers. but 2 of the producers have a common distributor. the 3rd posting
     #belogns to producer who is his own creditor. so there should eventually be two payments but as of right now there should be 0 because neither of the
     #creditors accept paypal
     assert_equal 0, Payment.count
 
+#there's a note in the development file with section title "6.5  Tests to Fix" about why short-circuited here and when to come back and fix
 travel_back
 next
 

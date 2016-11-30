@@ -16,6 +16,10 @@ class CreditorObligation < ApplicationRecord
   #balance == 0: we're square with creditor
   #balance > 0: we owe creditor
   #balance < 0: creditor owes us
+
+  def balanced?
+    return balance == 0.0
+  end
   
   def add_payment(payment)
     payments << payment

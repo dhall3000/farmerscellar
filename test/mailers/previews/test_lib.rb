@@ -1,5 +1,16 @@
 module TestLib
 
+  def transition_to_authorized(tote_item)
+
+    assert tote_item
+    assert tote_item.state?(:ADDED)
+
+    tote_item.transition(:customer_authorized)
+
+    assert tote_item.reload.state?(:AUTHORIZED)
+
+  end
+
   def clear_mailer
     ActionMailer::Base.deliveries.clear
     assert_equal 0, ActionMailer::Base.deliveries.count
@@ -295,8 +306,6 @@ module TestLib
       farm_name: "#{name} Farms")
 
     producer = user.reload
-
-    producer.settings.update(conditional_payment: true)
     create_business_interface(producer)
 
     return producer

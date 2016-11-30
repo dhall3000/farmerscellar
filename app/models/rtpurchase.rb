@@ -43,6 +43,8 @@ class Rtpurchase < ApplicationRecord
       @amount_to_capture = (@amount_to_capture + amount).round(2)
     end
 
+    save
+
     amount_to_capture_in_cents = (@amount_to_capture * 100).round(2)
     
     if USEGATEWAY
@@ -71,6 +73,10 @@ class Rtpurchase < ApplicationRecord
     end
 
     if success?
+
+      tote_items = ToteItem.joins(:purchase_receivables).where(purchase_receivables: {id: purchase_receivables}).distinct
+      payment_processor_fee_tote = get_payment_processor_fee_tote(tote_items, filled = true)    
+      self.payment_processor_fee_withheld_from_producer = payment_processor_fee_tote
 
       #apply purchase amount to purchase receivables
           

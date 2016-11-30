@@ -13,7 +13,6 @@ class CaseTechTest < IntegrationHelper
     commitment_zone_start = delivery_date - 2.days
 
     distributor = create_producer("distributor", "distributor@d.com")
-    distributor.settings.update(conditional_payment: false)
     distributor.create_business_interface(name: "Distributor Inc.", order_email_accepted: true, order_email: distributor.email, payment_method: BusinessInterface.payment_methods[:PAYPAL], paypal_email: distributor.email)
 
     producer1 = create_producer("producer1", "producer1@p.com")
@@ -55,7 +54,8 @@ class CaseTechTest < IntegrationHelper
     #create posting
     delivery_date = get_delivery_date(days_from_now)
     commitment_zone_start = delivery_date - 2.days
-    farmer = users(:f1)
+    farmer = create_producer(name = "farmer bob", email = "producer@p.com", distributor = nil, order_min = 0)
+ 
     product = products(:apples)
     unit = units(:pound)
 

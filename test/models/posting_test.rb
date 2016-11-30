@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'utility/rake_helper'
 
 class PostingTest < ActiveSupport::TestCase
   include ToteItemsHelper
@@ -422,6 +423,9 @@ class PostingTest < ActiveSupport::TestCase
 
     assert_equal num_items, c1.tote_items.joins(:posting).where("postings.id = ?", @posting.id).count
 
+    travel_to @posting.commitment_zone_start
+    RakeHelper.do_hourly_tasks
+
     @posting.fill(quantity_received_from_producer)
 
     c1_items = c1.tote_items.joins(:posting).where("postings.id = ?", @posting.id)
@@ -452,6 +456,8 @@ class PostingTest < ActiveSupport::TestCase
     end
 
     assert num_items, count
+
+    travel_back
 
   end
 

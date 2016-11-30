@@ -26,6 +26,7 @@ class Rtba < ApplicationRecord
 
     if !agreement_details || !agreement_details.params || agreement_details.params["billing_agreement_status"] != "Active"
       deactivate
+      reload
     end
 
     return active

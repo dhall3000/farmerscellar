@@ -366,6 +366,7 @@ class BulkPurchasesTest < BulkBuyer
     #COMMENT KEY 000
     assert_equal 2, ToteItem.where(user: customers, state: ToteItem.states[:REMOVED]).count
     verify_legitimacy_of_bulk_purchase
+
     verify_proper_number_of_payment_payables    
     bulk_purchase = assigns(:bulk_purchase)
 
@@ -396,7 +397,8 @@ class BulkPurchasesTest < BulkBuyer
     post bulk_payments_path, params: {payment_info_by_creditor_id: payment_info_by_creditor_id}
     bulk_payment = assigns(:bulk_payment)
 
-    assert_equal bulk_purchase.net, bulk_payment.total_payments_amount    
+    assert bulk_purchase.net > 0
+    assert bulk_payment.total_payments_amount, bulk_purchase.net
 
     FakeCaptureResponse.toggle_success = false    
     FakeCaptureResponse.succeed = true
@@ -422,8 +424,10 @@ class BulkPurchasesTest < BulkBuyer
     assert_not_nil payment_info_by_creditor_id
     post bulk_payments_path, params: {payment_info_by_creditor_id: payment_info_by_creditor_id}
     bulk_payment = assigns(:bulk_payment)
-    assert_equal bulk_purchase.net, bulk_payment.total_payments_amount
 
+    assert bulk_purchase.net > 0
+    assert bulk_payment.total_payments_amount > bulk_purchase.net
+    
     FakeCaptureResponse.toggle_success = false    
     FakeCaptureResponse.succeed = true
     customers = [@c3, @c4]
@@ -845,24 +849,13 @@ class BulkPurchasesTest < BulkBuyer
   end
 
   def verify_proper_number_of_payment_payables
+
+    assert_equal PurchaseReceivable.count, PaymentPayable.count
     purchase_receivables = assigns(:purchase_receivables)
-
-    #total_expected_number_payment_payables_generated represents the computed amount of how many PurchaseReceivables we should have...
-    total_expected_number_payment_payables_generated = 0
-
-    for pr in purchase_receivables
-      total_expected_number_payment_payables_generated += expected_number_payment_payables_generated(pr)
-    end
 
     #this is the actual number of payment_payables created by this action...    
     num_payment_payables_created = assigns(:num_payment_payables_created)
 
-    assert_equal total_expected_number_payment_payables_generated, num_payment_payables_created
-
-    #find out how many successful prs there are
-    num_successful_prs = PurchaseReceivable.count - number_of_failed_prs(PurchaseReceivable.all)    
-    #there is a one-to-many relationship between a pr and a pp
-    assert PaymentPayable.count >= num_successful_prs
     assert PaymentPayable.count > 0
   end
 

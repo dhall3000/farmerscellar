@@ -236,14 +236,22 @@ class RakeTasksTest < BulkBuyer
         #check the bulkpayment amount is in line with the bulkpurchases' amounts
         assert_equal BulkPayment.last.total_payments_amount, (BulkPurchase.first.net + BulkPurchase.last.net).round(2), "The sum of the two BulkPurchases should equal the total BulkPayment masspayment payout"
 
-        assert_equal 6, ActionMailer::Base.deliveries.count
+        assert_equal 7, ActionMailer::Base.deliveries.count
         assert_appropriate_email(emails[0], "c7@c.com", "Purchase receipt", "Here is your Farmer's Cellar purchase receipt.")
-
         assert_appropriate_email(emails[1], "c6@c.com", "Purchase receipt", "Here is your Farmer's Cellar purchase receipt.")          
         assert_appropriate_email(emails[2], "david@farmerscellar.com", "bulk purchase report", "BulkPurchase id: 2")
         assert_appropriate_email(emails[3], "f1@f.com", "Payment receipt", "We just sent you a total of")
-        assert_appropriate_email(emails[4], "f2@f.com", "Payment receipt", "We just sent you a total of")
-        assert_appropriate_email(emails[5], "david@farmerscellar.com", "BulkPayment report", "The sum of paypal payments is")
+        #yep, there should be two to f1. reason is because F1 had a delivery on Monday and another on Wednesday. they have different order cutoffs so they got submitted to
+        #producer on different orders so they get different payments even though payment went through on the same day. we want it this way because a 1-1 ration of
+        #orders and payments will make reconciliation easier. plus, it's unlikely we'll have same farmer delivering on different days in same week.
+        assert_appropriate_email(emails[4], "f1@f.com", "Payment receipt", "We just sent you a total of")
+        assert_appropriate_email(emails[5], "f2@f.com", "Payment receipt", "We just sent you a total of")
+        assert_appropriate_email(emails[6], "david@farmerscellar.com", "BulkPayment report", "The sum of paypal payments is")
+
+        assert_equal 0, CreditorObligation.where("balance > 0").count
+        assert_equal 0, CreditorObligation.where("balance < 0").count
+        assert_equal 3, CreditorObligation.where("balance = 0").count
+
       end
 
       #this is after the nightly tasks on the 2nd Monday delivery
@@ -291,7 +299,9 @@ class RakeTasksTest < BulkBuyer
 
     #ok, food arrived. now fill some orders        
     fill_all_tote_items = true
-    simulate_order_filling_for_postings(Posting.where("delivery_date < ?", Time.zone.now), fill_all_tote_items)    
+
+    postings = Posting.joins(tote_items: :user).distinct.where(users: {id: customers}).distinct
+    simulate_order_filling_for_postings(postings, fill_all_tote_items)    
 
     #now time travel to 10pm on delivery day
     delivery_date = @c1.tote_items[1].posting.delivery_date

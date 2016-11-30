@@ -111,8 +111,12 @@ class Subscription < ApplicationRecord
 
   end
 
+  def rtauthorization
+    return rtauthorizations.order("rtauthorizations.id").last
+  end
+
   def authorized?
-    return rtauthorizations && rtauthorizations.order("rtauthorizations.id").last && rtauthorizations.order("rtauthorizations.id").last.authorized?
+    return rtauthorization && rtauthorization.authorized?
   end
 
   def friendly_frequency

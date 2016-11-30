@@ -3,6 +3,37 @@ require 'utility/rake_helper'
 
 class IntegrationHelper < ActionDispatch::IntegrationTest
 
+  def log_in_dropsite_user(dropsite_user)
+    log_in_as(dropsite_user)
+    assert :success
+    assert_redirected_to new_pickup_path
+    follow_redirect!
+    assert_template 'pickups/new'
+  end
+
+  def do_pickup_for(dropsite_user, pickup_user)
+
+    log_in_dropsite_user(dropsite_user)
+    post pickups_path, params: {pickup_code: pickup_user.pickup_code.code}
+    assert_response :success
+
+    tote_items = assigns(:tote_items)
+
+    if pickup_user.delivery_since_last_dropsite_clearout? || pickup_user.account_type_is?(:PRODUCER) || pickup_user.account_type_is?(:ADMIN)
+      assert_template 'pickups/create'
+    else
+      assert_template 'pickups/new'
+    end    
+    
+    return tote_items
+
+  end
+
+  def log_out_dropsite_user
+    get pickups_log_out_dropsite_user_path
+    follow_redirect!
+  end
+
   def fully_fill_all_creditor_orders
 
     log_in_as(users(:a1))
@@ -21,8 +52,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     
     assert co
     assert co.postings
-    fills = []
-
+    
     log_in_as(users(:a1))
     
     get creditor_order_path(co)
@@ -33,11 +63,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     assert_response :success
     assert_template 'creditor_orders/edit'
 
-    co.postings.each do |posting|
-      assert_not posting.state?(:CLOSED)
-      fill = {posting_id: posting.id, quantity: posting.total_quantity_ordered_from_creditor}
-      fills << fill
-    end
+    fills = get_fully_filled_creditor_order_fills_params(co.postings)
     
     patch creditor_order_path(co), params: {fills: fills}
     assert_response :redirect
@@ -47,6 +73,23 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
       assert posting.state?(:CLOSED)
     end
 
+  end
+
+  def get_fully_filled_creditor_order_fills_params(postings)
+
+    fills = []
+
+    postings.each do |posting|
+      assert_not posting.state?(:CLOSED)
+      fills += get_creditor_order_fills_param(posting.id, posting.total_quantity_ordered_from_creditor)      
+    end
+
+    return fills
+
+  end
+
+  def get_creditor_order_fills_param(posting_id, quantity)    
+    return [{posting_id: posting_id, quantity: quantity}]
   end
 
   def create_posting_recurrence(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = nil)
@@ -103,6 +146,10 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
   def create_posting(farmer, price, product, unit, delivery_date, commitment_zone_start, units_per_case)
 
+    if ProducerProductUnitCommission.where(user: farmer, product: product, unit: unit).count == 0
+      ProducerProductUnitCommission.create(user: farmer, product: product, unit: unit, commission: 0.05)
+    end
+
     posting_params = {
       description: "describe description",
       quantity_available: 100,
@@ -117,8 +164,13 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     }
 
     log_in_as(farmer)
-    post postings_path, params: {posting: posting_params}
+    post postings_path, params: {posting: posting_params}    
     posting = assigns(:posting)
+
+    assert_response :redirect
+    assert_redirected_to postings_path
+    follow_redirect!
+
     verify_post_presence(posting.price, posting.unit, exists = true, posting.id)
     
     return posting
@@ -246,7 +298,6 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     commitment_zone_start = delivery_date - 2.days
 
     distributor = create_producer("distributor", "distributor@d.com")
-    distributor.settings.update(conditional_payment: false)
     distributor.create_business_interface(name: "Distributor Inc.", order_email_accepted: true, order_email: distributor.email, payment_method: BusinessInterface.payment_methods[:PAYPAL], paypal_email: distributor.email)
 
     #maybe we can/will parameterize this later?
@@ -315,7 +366,6 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     commitment_zone_start = delivery_date - 2.days
 
     distributor = create_producer("distributor", "distributor@d.com")
-    distributor.settings.update(conditional_payment: false)
     distributor.create_business_interface(name: "Distributor Inc.", order_email_accepted: true, order_email: distributor.email, payment_method: BusinessInterface.payment_methods[:PAYPAL], paypal_email: distributor.email)
 
     #maybe we can/will parameterize this later?
@@ -457,11 +507,16 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
   end
 
   def fill_posting(posting, quantity)
+
     a1 = users(:a1)
     log_in_as(a1)
     assert is_logged_in?
-    assert posting.reload.state?(:COMMITMENTZONE)
-    post postings_fill_path, params: {posting_id: posting.id, quantity: quantity}
+    fills = get_creditor_order_fills_param(posting.id, quantity)
+    patch creditor_order_path(posting.creditor_order), params: {fills: fills}
+    assert_response :redirect
+    assert_redirected_to creditor_orders_path
+    follow_redirect!
+    assert_template 'creditor_orders/index'
     assert posting.reload.state?(:CLOSED)
 
     #TODO: do something smart here with the fill_report. maybe some legitimacy checks?

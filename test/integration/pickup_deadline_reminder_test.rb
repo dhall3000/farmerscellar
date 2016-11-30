@@ -64,7 +64,8 @@ class PickupDeadlineReminderTest < IntegrationHelper
     assert_equal expected_num_pickups, bob.pickups.count
     travel 1.day
     assert Time.zone.now.thursday?
-    do_pickup_for(bob)
+    do_pickup_for(users(:dropsite1), bob)
+    log_out_dropsite_user
     assert_equal expected_num_pickups + 1, bob.reload.pickups.count
 
     fill_and_deliver(friday_posting.reload, quantity_to_fill = quantity)
@@ -113,7 +114,7 @@ class PickupDeadlineReminderTest < IntegrationHelper
     travel 1.day
     #verify it's thursday
     assert Time.zone.now.thursday?
-    do_pickup_for(bob)
+    do_pickup_for(users(:dropsite1), bob)
     assert_equal expected_num_pickups + 1, bob.pickups.count
 
     #skip to pickup deadline warning time
@@ -214,13 +215,6 @@ class PickupDeadlineReminderTest < IntegrationHelper
   def travel_to_warning_day_time
     travel_to_warning_day
     travel_to Time.zone.now.midnight + FOODCLEAROUTWARNINGDAYTIME[:hour].hours
-  end
-
-  def do_pickup_for(user)
-    log_in_as(users(:dropsite1))
-    post pickups_path, params: {pickup_code: user.pickup_code.code}
-    get pickups_log_out_dropsite_user_path
-    follow_redirect!
   end
 
   def verify_pickup_deadline_reminder_does_not_go_out_next_week
