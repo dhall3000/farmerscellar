@@ -1159,7 +1159,7 @@ class SubscriptionsTest < IntegrationHelper
         elsif Time.zone.now > second_last.delivery_date + 12.hours
 
           if !second_last.state?(:CLOSED)
-            second_last.fill(1000)
+            fill_posting(second_last, 1000)
             #refresh
             num_closed_postings = posting_recurrence.postings.where(state: Posting.states[:CLOSED]).count
           end

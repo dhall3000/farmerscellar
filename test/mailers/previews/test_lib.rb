@@ -262,6 +262,29 @@ module TestLib
 
   end
 
+  def get_admin
+
+    admin = User.where(account_type: User.types[:ADMIN]).first
+
+    if admin
+      return admin
+    end
+
+    return create_admin
+
+  end
+
+  def create_admin(name = "Mr. Admin", email = "admin@a.com")
+    
+    admin = create_user(name, email)
+    assert admin.valid?
+    admin.update(account_type: User.types[:ADMIN])
+    assert admin.reload.account_type_is?(:ADMIN)
+
+    return admin
+
+  end
+
   def create_user(name = "customer name", email = "customer@c.com")
 
     user = User.find_by(email: email)

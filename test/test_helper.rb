@@ -129,32 +129,6 @@ class ActiveSupport::TestCase
 
   end
 
-  def create_rt_authorization_for_customer(customer)
-
-    set_dropsite(customer)
-    items_total_gross = get_items_total_gross(customer)
-
-    if customer.rtbas.count == 0 || !customer.rtbas.last.ba_valid?
-
-      checkouts_count = Checkout.count
-      post checkouts_path, params: {amount: items_total_gross, use_reference_transaction: "1"}
-      assert_equal nil, flash[:danger]
-      assert_equal checkouts_count + 1, Checkout.count
-      assert_equal true, Checkout.last.is_rt
-      checkout = assigns(:checkout)
-      follow_redirect!
-      post rtauthorizations_create_path, params: {token: checkout.token}
-
-    else
-      post rtauthorizations_create_path, params: {token: customer.rtbas.last.token}    
-    end
-    
-    rtauthorization = assigns(:rtauthorization)
-
-    return rtauthorization
-
-  end
-
   def set_dropsite(customer)
 
     log_in_as(customer)

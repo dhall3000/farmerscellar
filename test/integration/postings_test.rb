@@ -1,7 +1,8 @@
 require 'test_helper'
 require 'utility/rake_helper'
+require 'integration_helper'
 
-class PostingsTest < ActionDispatch::IntegrationTest
+class PostingsTest < IntegrationHelper
 
   def setup
     @farmer = users(:f1)
@@ -74,7 +75,7 @@ class PostingsTest < ActionDispatch::IntegrationTest
     assert_appropriate_email(ActionMailer::Base.deliveries[0], posting.user.get_business_interface.order_email, "Current orders for upcoming deliveries", "1")
 
     #now once farmer delivers we want to verify we partially filled
-    fill_report = posting.fill(posting.inbound_num_units_ordered)
+    fill_report = fill_posting(posting, posting.inbound_num_units_ordered)
 
     posting.reload
     assert_equal 1, posting.tote_items.count
