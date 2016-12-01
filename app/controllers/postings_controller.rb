@@ -1,7 +1,6 @@
 class PostingsController < ApplicationController
   before_action :logged_in_user, only: [:new, :create, :show, :edit, :update]
   before_action :redirect_to_root_if_not_producer, only: [:new, :create, :edit, :update]
-  before_action :redirect_to_root_if_user_not_admin, only: :fill
   
   def new  	
 
@@ -114,29 +113,6 @@ class PostingsController < ApplicationController
 
   def show
     @posting = Posting.find(params[:id])
-  end
-
-  def fill  
-
-    if !params[:posting_id].nil? && !params[:quantity].nil? && params[:quantity].to_i >= 0
-      @posting = Posting.find_by(id: params[:posting_id].to_i)
-      if @posting
-        if Time.zone.now >= @posting.delivery_date          
-          if @posting.creditor_order
-            @fill_report = @posting.fill(params[:quantity].to_i)
-          else
-            flash.now[:danger] = "Couldn't find an associated CreditorOrder for this posting so we did not do the fill operation"
-          end
-        else
-          flash.now[:danger] = "The delivery date for this posting is #{@posting.delivery_date}"
-        end
-      else
-        flash.now[:danger] = "No posting was found with posting_id = #{params[:posting_id]}"
-      end
-    else
-      flash.now[:danger] = "Something wasn't right. This condition failed: if !params[:posting_id].nil? && !params[:quantity].nil? && params[:quantity].to_i >= 0"
-    end
-
   end
 
   private

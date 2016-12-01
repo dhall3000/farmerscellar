@@ -28,9 +28,14 @@ class CreditorOrdersController < ApplicationController
     fills.each do |fill|
 
       posting_id = fill[:posting_id].to_i
-      quantity = fill[:quantity].to_i
 
-      if quantity < 0
+      if fill[:quantity].nil?
+        quantity = nil
+      else
+        quantity = fill[:quantity].to_i
+      end      
+
+      if quantity.nil? || quantity < 0
         next
       end
 
@@ -40,7 +45,7 @@ class CreditorOrdersController < ApplicationController
         next
       end      
 
-      fill_report = posting.fill(quantity)
+      @fill_report = posting.fill(quantity)
 
     end
 

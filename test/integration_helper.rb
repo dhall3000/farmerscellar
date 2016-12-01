@@ -34,15 +34,6 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     follow_redirect!
   end
 
-  def fully_fill_posting(posting)
-
-    travel_to posting.delivery_date + 12.hours
-    #log in as admin and process a fill
-    log_in_as(users(:a1))
-    post postings_fill_path, params: {posting_id: posting.id, quantity: posting.total_quantity_authorized_or_committed}
-
-  end
-
   def go_to_delivery_day_and_fill_posting(posting, quantity = nil)
     
     travel_to posting.delivery_date + 12.hours
@@ -67,14 +58,18 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     assert is_logged_in?
     fills = get_creditor_order_fills_param(posting.id, quantity)
     patch creditor_order_path(posting.creditor_order), params: {fills: fills}
+    fill_report = assigns(:fill_report)
     assert_response :redirect
     assert_redirected_to creditor_orders_path
     follow_redirect!
     assert_template 'creditor_orders/index'
-    assert posting.reload.state?(:CLOSED)
 
-    #TODO: do something smart here with the fill_report. maybe some legitimacy checks?
-    fill_report = assigns(:fill_report)
+    if quantity >= 0
+      assert posting.reload.state?(:CLOSED)
+    end
+
+    return fill_report
+
   end
 
   def fully_fill_all_creditor_orders

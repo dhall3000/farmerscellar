@@ -1377,8 +1377,7 @@ class SubscriptionsTest < IntegrationHelper
               if posting.total_quantity_authorized_or_committed > 0
                 puts Time.zone.now.strftime("%A %B %d")
                 #it is now noon on delivery_date of this posting so do some fills
-                log_in_as(users(:a1))
-                post postings_fill_path, params: {posting_id: posting.id, quantity: posting.total_quantity_authorized_or_committed}
+                fill_posting(posting)
               end              
             end
           end        

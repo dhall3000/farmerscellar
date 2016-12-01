@@ -1,7 +1,8 @@
 require 'test_helper'
 require 'utility/rake_helper'
+require 'integration_helper'
 
-class PostingsControllerTest < ActionDispatch::IntegrationTest
+class PostingsControllerTest < IntegrationHelper
 
   def setup
   	@farmer = users(:f1)    
@@ -125,11 +126,10 @@ class PostingsControllerTest < ActionDispatch::IntegrationTest
     ti.update(quantity: 2)
     ######################end setup######################
 
-    fill(9)
-    assert_select 'p', "quantity remaining: 0", {count: 1}
-    assert_select 'span.alert.alert-danger', "num partially filled items: 1", {count: 1}
-    assert_select 'td span.alert.alert-danger', "3 of 4", {count: 1}
-    assert_select 'span.alert.alert-danger', "3 of 4", {count: 1}
+    fill_report = fill(9)
+
+    assert_equal 0, fill_report[:quantity_remaining]
+    assert_equal 1, fill_report[:partially_filled_tote_items].count
 
   end
 
@@ -153,20 +153,19 @@ class PostingsControllerTest < ActionDispatch::IntegrationTest
     assert_equal Posting.states[:COMMITMENTZONE], posting.state
 
     travel_to posting.delivery_date + 1
+    fill_report = fill_posting(posting, quantity)
 
-    post postings_fill_path, params: {posting_id: posting.id, quantity: quantity}
     #verify success
     assert :success
-    posting = assigns(:posting)
+    posting.reload
     #verify appropriate template displayed
-    assert_template 'postings/fill'
+    assert_template 'creditor_orders/index'
+
     #TODO: verify proper contents of template displayed
     #verify all tote items got filled
     filled_quantity = posting.tote_items.where(state: ToteItem.states[:FILLED]).sum(:quantity_filled)
     not_filled_quantity = posting.tote_items.where(state: [ToteItem.states[:NOTFILLED], ToteItem.states[:FILLED]]).sum(:quantity) - filled_quantity
-
-    fill_report = assigns(:fill_report)
-
+    
     if quantity == 8
       #if we were given quantity 8 by the producer, our first three tote items are for quantities 1,2 & 3
       #which is a total of 6. the 4th toteitem has quantity of 4
@@ -215,6 +214,8 @@ class PostingsControllerTest < ActionDispatch::IntegrationTest
     posting.reload
     assert_equal Posting.states[:CLOSED], posting.state    
 
+    return fill_report
+
   end
 
   test "should fill" do
@@ -227,35 +228,14 @@ class PostingsControllerTest < ActionDispatch::IntegrationTest
     
     #here is the non-failing "good" case
     travel_to posting.delivery_date + 1
-    post postings_fill_path, params: {posting_id: posting.id, quantity: 28}
+    fill_report = fill_posting(posting, 28)
     assert :success
-    assert_template 'postings/fill'
-    assert_select 'p', "quantity filled: 28", {count: 1}
-    assert_select 'p', "quantity not filled: 0", {count: 1}
-    assert_select 'p', "quantity remaining: 0", {count: 1}
+    
+    assert_equal 28, fill_report[:quantity_filled]
+    assert_equal 0, fill_report[:quantity_not_filled]
+    assert_equal 0, fill_report[:quantity_remaining]
+
     travel_back
-
-  end
-
-  test "should not fill if posting id is nil" do
-
-    log_in_as(@admin)
-    posting = postings(:postingf5apples)        
-
-    #posting_id is nil
-    travel_to posting.delivery_date + 1
-    post postings_fill_path, params: {posting_id: nil, quantity: 28}
-    assert :success
-    assert_template 'postings/fill'
-    #assert fail message in body is there
-    assert_select 'p', "@fill_report is nil"
-    #assert report info not there
-    assert_select 'p', {text: "quantity filled: 28", count: 0}
-
-    #assert flash is present
-    assert_not flash.now[:danger].empty?
-    assert_equal flash.now[:danger], "Something wasn't right. This condition failed: if !params[:posting_id].nil? && !params[:quantity].nil? && params[:quantity].to_i >= 0"
-    travel_back    
 
   end
 
@@ -263,42 +243,20 @@ class PostingsControllerTest < ActionDispatch::IntegrationTest
 
     log_in_as(@admin)
     posting = postings(:postingf5apples)        
+    travel_to posting.commitment_zone_start
+    RakeHelper.do_hourly_tasks
 
     travel_to posting.delivery_date + 1
     #quantity is nil
-    post postings_fill_path, params: {posting_id: posting.id, quantity: nil}
+    a1 = users(:a1)
+    log_in_as(a1)
+    assert is_logged_in?
+    fills = get_creditor_order_fills_param(posting.id, nil)
+    patch creditor_order_path(posting.creditor_order), params: {fills: fills}
+    fill_report = assigns(:fill_report)
     assert :success
-    assert_template 'postings/fill'
-    #assert fail message in body is there
-    assert_select 'p', "@fill_report is nil"
-    #assert report info not there
-    assert_select 'p', {text: "quantity filled: 28", count: 0}
-    #assert flash is present
-    assert_not flash.now[:danger].empty?
-    assert_equal flash.now[:danger], "Something wasn't right. This condition failed: if !params[:posting_id].nil? && !params[:quantity].nil? && params[:quantity].to_i >= 0"
-    travel_back    
+    assert fill_report.nil?
 
-  end
-
-  test "should not fill if quantity non number" do
-    #TODO: we're not going to do this cause it's non obvious how to ensure the fill quantity param is a number
-    return
-
-    log_in_as(@admin)
-    posting = postings(:postingf5apples)        
-    
-    travel_to posting.delivery_date + 1
-    #quantity is not a number
-    post postings_fill_path, params: {posting_id: posting.id, quantity: 'abcd'}
-    assert :success
-    assert_template 'postings/fill'
-    #assert fail message in body is there
-    assert_select 'p', "@fill_report is nil"
-    #assert report info not there
-    assert_select 'p', {text: "quantity filled: 28", count: 0}
-    #assert flash is present
-    assert_not flash.now[:danger].empty?
-    assert_equal flash.now[:danger], "Something wasn't right. This condition failed: if !params[:posting_id].nil? && !params[:quantity].nil? && params[:quantity].to_i >= 0"
     travel_back    
 
   end
@@ -307,24 +265,20 @@ class PostingsControllerTest < ActionDispatch::IntegrationTest
 
     log_in_as(@admin)
     posting = postings(:postingf5apples)        
-    
+    travel_to posting.commitment_zone_start
+    RakeHelper.do_hourly_tasks
+
     travel_to posting.delivery_date + 1
     #quantity is negative
-    post postings_fill_path, params: {posting_id: posting.id, quantity: -1}
+    fill_report = fill_posting(posting, -1)
     assert :success
-    assert_template 'postings/fill'
-    #assert fail message in body is there
-    assert_select 'p', "@fill_report is nil"
-    #assert report info not there
-    assert_select 'p', {text: "quantity filled: 28", count: 0}
-    #assert flash is present
-    assert_not flash.now[:danger].empty?
-    assert_equal flash.now[:danger], "Something wasn't right. This condition failed: if !params[:posting_id].nil? && !params[:quantity].nil? && params[:quantity].to_i >= 0"
+    assert fill_report.nil?
+
     travel_back    
 
   end
 
-  test "should not fill if posting does not exist" do
+  test "should not fill if creditor order does not exist" do
 
     log_in_as(@admin)
     posting = postings(:postingf5apples)        
@@ -332,36 +286,36 @@ class PostingsControllerTest < ActionDispatch::IntegrationTest
     travel_to posting.delivery_date + 1
     #posting does not exist
     fake_posting_id = 987654
-    post postings_fill_path, params: {posting_id: fake_posting_id, quantity: 28}
+    a1 = users(:a1)
+    log_in_as(a1)
+    assert is_logged_in?
+    fills = get_creditor_order_fills_param(fake_posting_id, 28)
+    fake_creditor_order_id = 21975
+    patch creditor_order_path(fake_creditor_order_id), params: {fills: fills}
+    fill_report = assigns(:fill_report)
+
     assert :success
-    assert_template 'postings/fill'
-    #assert fail message in body is there
-    assert_select 'p', "@fill_report is nil"
-    #assert report info not there
-    assert_select 'p', {text: "quantity filled: 28", count: 0}
-    #assert flash is present
-    assert_not flash.now[:danger].empty?
-    assert_equal flash.now[:danger], "No posting was found with posting_id = #{fake_posting_id}"
+    assert fill_report.nil?
+    
     travel_back    
 
   end
 
-  test "should not fill if posting has not been delivered yet" do
+  test "should fill if posting has been ordered even if still before delivery date" do
 
     log_in_as(@admin)
     posting = postings(:postingf5apples)        
+    travel_to posting.commitment_zone_start
+    RakeHelper.do_hourly_tasks
 
     travel_to posting.delivery_date - 1
-    post postings_fill_path, params: {posting_id: posting.id, quantity: 28}
+    
+    fill_report = fill_posting(posting, 28)
     assert :success
-    assert_template 'postings/fill'
-    #assert fail message in body is there
-    assert_select 'p', "@fill_report is nil"
-    #assert report info not there
-    assert_select 'p', {text: "quantity filled: 28", count: 0}
-    #assert flash is present
-    assert_not flash.now[:danger].empty?
-    assert_equal flash.now[:danger], "The delivery date for this posting is #{@posting.delivery_date}"
+
+    assert_equal 28, fill_report[:quantity_filled]
+    assert posting.reload.state?(:CLOSED)
+
     travel_back    
 
   end
@@ -413,13 +367,6 @@ class PostingsControllerTest < ActionDispatch::IntegrationTest
   test "should get index for admin" do
     log_in_as(@admin)
     successfully_get_index
-
-    #additionally, the admin postings index page should have a table with 'Edit' and 'Go!' columns
-    assert_select 'tbody' do
-      assert_select 'a[href=?]', edit_posting_path(@posting), {count: 1, text: "Edit"}
-      assert_select 'form input[type=hidden][value=?]', @posting.id.to_s, {count: 1}
-    end    
-
   end
 
   test "should get index for non users" do

@@ -158,15 +158,6 @@
                   <div>
                     <%= link_to "Edit", edit_posting_path(posting), class: "btn btn-primary btn-lg fat-finger-spacing" %>
                   </div>
-                  <div>
-                    <%= form_tag postings_fill_path do %>
-                      <% quantity_id = "quantity" + posting.id.to_s %>
-                      <% units = Unit.find_by(id: posting.unit_id).name + "s" %>
-                      <%= hidden_field_tag :posting_id, posting.id %>                
-                      <%= number_field_tag :quantity, nil, {id: quantity_id, class: "input-lg", placeholder: "Enter quantity received"} %>
-                      <%= submit_tag "Fill", class: 'btn btn-lg btn-primary', onclick: "return confirm('Are you sure you want to fill ' + document.getElementById('" + quantity_id + "').value + ' " + units + "?' )" %>
-                    <% end %>
-                  </div>                               
                 <% end %>
 
               </td>
