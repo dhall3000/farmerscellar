@@ -956,7 +956,7 @@ class SubscriptionsTest < IntegrationHelper
 
   def do_subscription_turn_off(posting_frequency, subscription_frequency)
 
-    posting = create_posting_recurrence(farmer = nil, price = 1.27, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, posting_frequency).current_posting
+    posting = create_posting(farmer = nil, price = 1.27, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, posting_frequency)
 
     user = users(:c17)
     assert_equal 0, ToteItem.where(user_id: user.id).count

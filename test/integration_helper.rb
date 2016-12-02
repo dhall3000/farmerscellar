@@ -130,12 +130,16 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     return [{posting_id: posting_id, quantity: quantity}]
   end
 
-  def create_posting_recurrence(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = nil)
+  def create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = nil)
 
     if farmer.nil?
       farmer = create_producer("john", "john@j.com")
       assert farmer.valid?
       assert farmer.producer?
+    end
+
+    if price.nil?
+      price = 1.0
     end
 
     if product.nil?
@@ -148,10 +152,6 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
     if !ProducerProductUnitCommission.where(user: farmer, product: product, unit: unit).any?
       create_commission(farmer, product, unit, 0.05)
-    end
-
-    if price.nil?
-      price = 1.0
     end
 
     if delivery_date.nil?
@@ -167,39 +167,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     end
 
     if frequency.nil?
-      frequency = 1
-    end
-
-    posting = create_posting(farmer, price, product, unit, delivery_date, commitment_zone_start, units_per_case)
-    assert posting.valid?
-
-    posting_recurrence = PostingRecurrence.new(frequency: frequency, on: true)
-    posting_recurrence.postings << posting
-
-    assert posting_recurrence.save
-
-    return posting.reload.posting_recurrence
-
-  end
-
-  def create_posting(farmer, price, product, unit, delivery_date, commitment_zone_start, units_per_case)
-
-    if farmer.nil?
-      farmer = create_producer("john", "john@j.com")
-      assert farmer.valid?
-      assert farmer.producer?
-    end
-
-    if product.nil?
-      product = products(:apples)
-    end
-
-    if unit.nil?
-      unit = units(:pound)
-    end
-
-    if ProducerProductUnitCommission.where(user: farmer, product: product, unit: unit).count == 0
-      ProducerProductUnitCommission.create(user: farmer, product: product, unit: unit, commission: 0.05)
+      frequency = 0
     end
 
     posting_params = {
@@ -212,18 +180,29 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
       live: true,
       delivery_date: delivery_date,
       commitment_zone_start: commitment_zone_start,
-      units_per_case: units_per_case
-    }
+      units_per_case: units_per_case,
+      posting_recurrence: {frequency: frequency, on: true}
+    }    
 
     log_in_as(farmer)
     post postings_path, params: {posting: posting_params}    
     posting = assigns(:posting)
+    assert posting.valid?
 
     assert_response :redirect
     assert_redirected_to postings_path
     follow_redirect!
 
     verify_post_presence(posting.price, posting.unit, exists = true, posting.id)
+
+    if frequency == 0
+      assert_not posting.posting_recurrence
+    end
+
+    if frequency > 0
+      assert posting.posting_recurrence
+      assert posting.posting_recurrence.valid?
+    end
     
     return posting
 
@@ -388,7 +367,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     producer1.save
     
     create_commission(producer1, products(:apples), units(:pound), 0.05)
-    posting1 = create_posting_recurrence(producer1, 1.00, products(:apples), units(:pound), delivery_date, commitment_zone_start, units_per_case = 1, frequency = 1).current_posting
+    posting1 = create_posting(producer1, 1.00, products(:apples), units(:pound), delivery_date, commitment_zone_start, units_per_case = 1, frequency = 1)
 
     bob = create_user("bob", "bob@b.com")
     

@@ -7,7 +7,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
 
     nuke_all_postings
 
-    pr = create_posting_recurrence
+    pr = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1).posting_recurrence    
     pr.current_posting.update(price: 1)
     pr.current_posting.user.update(order_minimum_producer_net: 20)
 
@@ -75,7 +75,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
 
     nuke_all_postings
 
-    pr = create_posting_recurrence
+    pr = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1).posting_recurrence    
     pr.current_posting.update(price: 1)
     pr.current_posting.user.update(order_minimum_producer_net: 20)
 
@@ -159,7 +159,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
 
     nuke_all_postings
 
-    pr = create_posting_recurrence
+    pr = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1).posting_recurrence
     pr.current_posting.update(price: 1)
     pr.current_posting.user.update(order_minimum_producer_net: 20)
 
@@ -238,7 +238,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
 
     nuke_all_postings
 
-    pr = create_posting_recurrence
+    pr = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1).posting_recurrence    
     pr.current_posting.update(price: 1)
     pr.current_posting.user.update(order_minimum_producer_net: 20)
 
@@ -283,7 +283,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
 
     nuke_all_postings
 
-    pr = create_posting_recurrence
+    pr = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1).posting_recurrence    
     pr.current_posting.update(price: 1)
     pr.current_posting.user.update(order_minimum_producer_net: 20)
 
@@ -324,7 +324,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     bob = create_user("bob", "bob@b.com")
     
     #2 create rtf subscription
-    pr_celery_rtf = create_posting_recurrence(farmer = nil, price = 2.29, product = products(:celery), unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1)
+    pr_celery_rtf = create_posting(farmer = nil, price = 2.29, product = products(:celery), unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1).posting_recurrence
     celery_subscription = create_tote_item(bob, pr_celery_rtf.current_posting, quantity = 3, frequency = 0, roll_until_filled = true).subscription
     assert celery_subscription
     assert celery_subscription.kind?(:ROLLUNTILFILLED)
@@ -364,13 +364,15 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     nuke_all_postings
     bob = create_user("bob", "bob@b.com")
     #1 create regular subscription
-    pr_apples = create_posting_recurrence(farmer = nil, price = 1, product = products(:apples), unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1)
+    pr_apples = create_posting(farmer = nil, price = 1, product = products(:apples), unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1).posting_recurrence
+
     assert pr_apples.valid?
     apples_subscription = create_tote_item(bob, pr_apples.current_posting, quantity = 2, frequency = 1).subscription
     assert apples_subscription
     
     #2 create rtf subscription
-    pr_celery_rtf = create_posting_recurrence(farmer = pr_apples.current_posting.user, price = 2.29, product = products(:celery), unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1)
+    pr_celery_rtf = create_posting(farmer = pr_apples.current_posting.user, price = 2.29, product = products(:celery), unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1).posting_recurrence
+
     celery_subscription = create_tote_item(bob, pr_celery_rtf.current_posting, quantity = 3, frequency = 0, roll_until_filled = true).subscription
     assert celery_subscription
     assert celery_subscription.kind?(:ROLLUNTILFILLED)
@@ -396,14 +398,14 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
 
     nuke_all_postings
     bob = create_user("bob", "bob@b.com")
-    #1 create regular subscription
-    pr_apples = create_posting_recurrence(farmer = nil, price = 1, product = products(:apples), unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1)
+    #1 create regular subscription    
+    pr_apples = create_posting(farmer = nil, price = 1, product = products(:apples), unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1).posting_recurrence
     assert pr_apples.valid?
     ti = create_tote_item(bob, pr_apples.current_posting, quantity = 2, frequency = 1)
     assert ti.subscription
     
     #2 create rtf subscription
-    pr_celery_rtf = create_posting_recurrence(farmer = pr_apples.current_posting.user, price = 2.29, product = products(:celery), unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1)
+    pr_celery_rtf = create_posting(farmer = pr_apples.current_posting.user, price = 2.29, product = products(:celery), unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1).posting_recurrence
     ti = create_tote_item(bob, pr_celery_rtf.current_posting, quantity = 3, frequency = 0, roll_until_filled = true)
     assert ti.subscription
     assert ti.subscription.kind?(:ROLLUNTILFILLED)
@@ -433,7 +435,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
 
     nuke_all_postings
 
-    pr = create_posting_recurrence
+    pr = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1).posting_recurrence
     pr.current_posting.update(price: 1)
     pr.current_posting.user.update(order_minimum_producer_net: 20)
 

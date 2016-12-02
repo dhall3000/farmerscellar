@@ -13,12 +13,12 @@ class PaymentMethodsTest < IntegrationHelper
     producer1 = create_producer(name = "producer1 name", email = "producer1@p.com", distributor)
     producer1.get_business_interface.update(payment_method: BusinessInterface.payment_methods[:PAYPAL])
     assert producer1.reload.get_business_interface.payment_method?(:PAYPAL)
-    posting1 = create_posting_recurrence(farmer = producer1, price = 10).current_posting
+    posting1 = create_posting(farmer = producer1, price = 10, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = nil)
     
     producer2 = create_producer(name = "producer2 name", email = "producer2@p.com", distributor = nil, order_min = 0)
     producer2.get_business_interface.update(payment_method: BusinessInterface.payment_methods[:CASH])
     assert producer2.reload.get_business_interface.payment_method?(:CASH)
-    posting2 = create_posting_recurrence(farmer = producer2, price = 5).current_posting
+    posting2 = create_posting(farmer = producer2, price = 5, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = nil)
 
     bob = create_new_customer("bob", "bob@b.com")
     ti1 = create_tote_item(bob, posting1, quantity = 10)        

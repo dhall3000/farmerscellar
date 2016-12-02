@@ -1,7 +1,8 @@
 require 'test_helper'
 require 'utility/rake_helper'
+require 'integration_helper'
 
-class ToteItemsControllerTest < ActionDispatch::IntegrationTest
+class ToteItemsControllerTest < IntegrationHelper
 
   def setup
     @c1 = users(:c1)
@@ -56,7 +57,7 @@ class ToteItemsControllerTest < ActionDispatch::IntegrationTest
     nuke_all_postings
 
     #create posting recurrence
-    pr = create_posting_recurrence(1, get_delivery_date(days_from_now = 1), get_delivery_date(days_from_now = 3))
+    pr = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = get_delivery_date(days_from_now = 3), commitment_zone_start = get_delivery_date(days_from_now = 1), units_per_case = nil, frequency = 1).posting_recurrence
     #skip ahead to the order cutoff of the first posting and trigger it to generate the 2nd posting. this will put
     #the first posting in a CLOSED state
     travel_to pr.current_posting.commitment_zone_start
