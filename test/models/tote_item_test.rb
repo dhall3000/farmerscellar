@@ -176,7 +176,7 @@ class ToteItemTest < ActiveSupport::TestCase
     delivery_date = get_delivery_date(7)
     price = 5
     order_minimum_producer_net = 100
-    posting = create_posting(producer, price, products(:apples), units(:pound), delivery_date, delivery_date - 2.days, commission = 0.05, order_minimum_producer_net)
+    posting = create_posting(producer, price, product = nil, unit = nil, delivery_date, commitment_zone_start = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net)
     customer = create_user("bob", "bob@b.com")
     quantity = 10
     ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting, user: customer)
@@ -219,7 +219,7 @@ class ToteItemTest < ActiveSupport::TestCase
     delivery_date = get_delivery_date(7)
     price = 5
     order_minimum_producer_net = 100
-    posting = create_posting(producer, price, products(:apples), units(:pound), delivery_date, delivery_date - 2.days, commission = 0.05, order_minimum_producer_net)
+    posting = create_posting(producer, price, product = nil, unit = nil, delivery_date, commitment_zone_start = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net)
     customer = create_user("bob", "bob@b.com")
     quantity = 25
     ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting, user: customer)

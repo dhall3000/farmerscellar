@@ -143,7 +143,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
   end
 
   test "should have legit subscription options" do
-    monthly_posting_recurrence = create_posting_recurrence(5)
+    monthly_posting_recurrence = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 5, order_minimum_producer_net = 0).posting_recurrence
     monthly_options = monthly_posting_recurrence.subscription_create_options
 
     options = @posting_recurrence.subscription_create_options
@@ -217,11 +217,17 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
   end
 
   test "verify get delivery dates method 1 for monthly recurrence" do
+    
     posting_recurrence_frequency = 5
+
     order_cutoff = Time.zone.local(2016, 8, 29, 8)
     delivery_date = Time.zone.local(2016, 9, 2)
 
-    monthly_posting_recurrence = create_posting_recurrence(posting_recurrence_frequency, order_cutoff, delivery_date)
+    #you have to travel to prior to order cutoff cause otherwise the posting will not .save properly
+    travel_to order_cutoff - 1.day
+
+    monthly_posting_recurrence = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date, order_cutoff, units_per_case = nil, posting_recurrence_frequency, order_minimum_producer_net = 0).posting_recurrence
+
     delivery_dates = monthly_posting_recurrence.get_delivery_dates_for(delivery_date, delivery_date + (8 * 31).days)
     assert_equal 8, delivery_dates.count
     
@@ -233,6 +239,9 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     assert_equal Time.zone.local(2017,3,3), delivery_dates[5]
     assert_equal Time.zone.local(2017,4,7), delivery_dates[6]
     assert_equal Time.zone.local(2017,5,5), delivery_dates[7]
+
+    travel_back
+
   end
 
   test "verify get delivery dates method 2" do

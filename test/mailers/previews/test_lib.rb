@@ -37,38 +37,37 @@ module TestLib
 
     tis = []
     postings = []
-    
     #create distributor D1
     distributor = create_distributor("distributor", "distributor@d.com", 100)
-    posting1 = create_posting(distributor, 10, get_product("Product1"), get_unit("Pound"), delivery_date, order_cutoff1)
+    posting1 = create_posting(distributor, price = 10, get_product("Product1"), get_unit("Pound"), delivery_date, order_cutoff1, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
     tis << create_tote_item(posting1, 1, bob)
-    posting2 = create_posting(distributor, 10, get_product("Product2"), get_unit("Pound"), delivery_date, order_cutoff2)
+    posting2 = create_posting(distributor, price = 10, get_product("Product2"), get_unit("Pound"), delivery_date, order_cutoff2, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
     tis << create_tote_item(posting2, 1, bob)
-    posting3 = create_posting(distributor, 10, get_product("Product3"), get_unit("Pound"), delivery_date, order_cutoff3) 
+    posting3 = create_posting(distributor, price = 10, get_product("Product3"), get_unit("Pound"), delivery_date, order_cutoff3, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
     tis << create_tote_item(posting3, 1, bob)
 
     f1 = create_producer("producer1", "producer1@p.com", distributor, order_min = 50)
-    posting4 = create_posting(f1, 10, get_product("Product4"), get_unit("Pound"), delivery_date, order_cutoff1)
+    posting4 = create_posting(f1, price = 10, get_product("Product4"), get_unit("Pound"), delivery_date, order_cutoff1, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
     tis << create_tote_item(posting4, 7, bob)
-    posting5 = create_posting(f1, 10, get_product("Product5"), get_unit("Pound"), delivery_date, order_cutoff2, 0.05, 20)
+    posting5 = create_posting(f1, price = 10, get_product("Product5"), get_unit("Pound"), delivery_date, order_cutoff2, units_per_case = nil, frequency = nil, order_minimum_producer_net = 20)
     tis << create_tote_item(posting5, 1, bob)
-    posting6 = create_posting(f1, 10, get_product("Product6"), get_unit("Pound"), delivery_date, order_cutoff3)
+    posting6 = create_posting(f1, price = 10, get_product("Product6"), get_unit("Pound"), delivery_date, order_cutoff3, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
     tis << create_tote_item(posting6, 7, bob)
 
     f2 = create_producer("producer2", "producer2@p.com", distributor, order_min = 50)
-    posting7 = create_posting(f2, 10, get_product("Product7"), get_unit("Pound"), delivery_date, order_cutoff1)
+    posting7 = create_posting(f2, price = 10, get_product("Product7"), get_unit("Pound"), delivery_date, order_cutoff1, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
     tis << create_tote_item(posting7, 1, bob)
-    posting8 = create_posting(f2, 10, get_product("Product8"), get_unit("Pound"), delivery_date, order_cutoff2)
+    posting8 = create_posting(f2, price = 10, get_product("Product8"), get_unit("Pound"), delivery_date, order_cutoff2, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
     tis << create_tote_item(posting8, 1, bob)
-    posting9 = create_posting(f2, 10, get_product("Product9"), get_unit("Pound"), delivery_date, order_cutoff3)
+    posting9 = create_posting(f2, price = 10, get_product("Product9"), get_unit("Pound"), delivery_date, order_cutoff3, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
     tis << create_tote_item(posting9, 1, bob)
 
     f3 = create_producer("producer3", "producer3@p.com", distributor)
-    posting10 = create_posting(f3, 10, get_product("Product10"), get_unit("Pound"), delivery_date, order_cutoff1)
+    posting10 = create_posting(f3, price = 10, get_product("Product10"), get_unit("Pound"), delivery_date, order_cutoff1, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
     tis << create_tote_item(posting10, 12, bob)
-    posting11 = create_posting(f3, 10, get_product("Product11"), get_unit("Pound"), delivery_date, order_cutoff2)
+    posting11 = create_posting(f3, price = 10, get_product("Product11"), get_unit("Pound"), delivery_date, order_cutoff2, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
     tis << create_tote_item(posting11, 12, bob)
-    posting12 = create_posting(f3, 10, get_product("Product12"), get_unit("Pound"), delivery_date, order_cutoff3)
+    posting12 = create_posting(f3, price = 10, get_product("Product12"), get_unit("Pound"), delivery_date, order_cutoff3, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
     tis << create_tote_item(posting12, 12, bob)
 
     tis.each do |ti|
@@ -148,7 +147,29 @@ module TestLib
 
   end
 
-  def create_posting(producer, price, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, commission = nil, order_minimum_producer_net = nil)
+  def create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
+
+    if commitment_zone_start && delivery_date
+      assert commitment_zone_start < delivery_date
+    end
+
+    if farmer.nil?
+      farmer = create_producer("john", "john@j.com")
+      assert farmer.valid?
+      assert farmer.producer?
+    end
+
+    if price.nil?
+      price = 1.0
+    end
+
+    if product.nil?
+      product = products(:apples)
+    end
+
+    if unit.nil?
+      unit = units(:pound)
+    end
 
     if delivery_date.nil?
       delivery_date = get_delivery_date(days_from_now = 7)
@@ -158,77 +179,44 @@ module TestLib
       commitment_zone_start = delivery_date - 2.days
     end
 
-    if Rails.env.test?
-
-      if product.nil?
-        product = products(:apples)
-      end
-
-      if unit.nil?
-        unit = units(:pound)
-      end
-
+    if units_per_case.nil?
+      units_per_case = 1
     end
 
-    if commission.nil?
-      commission = 0.05
+    if frequency.nil?
+      frequency = 0
     end
 
-    create_commission(producer, product, unit, commission)
-
-    if order_minimum_producer_net
-
-      posting = Posting.create(
-        live: true,
-        delivery_date: delivery_date,
-        commitment_zone_start: commitment_zone_start,
-        product_id: product.id,
-        quantity_available: 100,
-        price: price,
-        user_id: producer.id,
-        unit_id: unit.id,
-        description: "this is a description of the posting",
-        order_minimum_producer_net: order_minimum_producer_net
-        )
-
-    else
-
-      posting = Posting.create(
-        live: true,
-        delivery_date: delivery_date,
-        commitment_zone_start: commitment_zone_start,
-        product_id: product.id,
-        quantity_available: 100,
-        price: price,
-        user_id: producer.id,
-        unit_id: unit.id,
-        description: "this is a description of the posting"
-        )
-
+    if !ProducerProductUnitCommission.where(user: farmer, product: product, unit: unit).any?
+      create_commission(farmer, product, unit, 0.05)
     end
+
+    posting = Posting.create(
+      live: true,
+      delivery_date: delivery_date,
+      commitment_zone_start: commitment_zone_start,
+      product_id: product.id,
+      quantity_available: 100,
+      price: price,
+      user_id: farmer.id,
+      unit_id: unit.id,
+      description: "this is a description of the posting",
+      order_minimum_producer_net: order_minimum_producer_net
+      )
+
+    assert posting.save
 
     if Rails.env.test?
       assert posting.valid?
+    end    
+
+    if frequency && frequency > 0
+      posting_recurrence = PostingRecurrence.new(frequency: frequency, on: true)
+      posting_recurrence.postings << posting
+      assert posting_recurrence.save
     end
 
     return posting
-
-  end
-
-  def create_posting_recurrence(posting_recurrence_frequency = nil, order_cutoff = nil, delivery_date = nil)
-
-    posting = create_posting(create_producer("john", "john@j.com"), 1.25)
-    posting_recurrence = PostingRecurrence.new(frequency: posting_recurrence_frequency, on: true)
-    posting_recurrence.postings << posting
-    assert posting_recurrence.save
-
-    if order_cutoff && delivery_date
-      assert order_cutoff < delivery_date
-      posting.update(commitment_zone_start: order_cutoff, delivery_date: delivery_date)
-      assert posting.valid?
-    end
-
-    return posting_recurrence
 
   end
 

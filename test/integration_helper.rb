@@ -150,10 +150,6 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
       unit = units(:pound)
     end
 
-    if !ProducerProductUnitCommission.where(user: farmer, product: product, unit: unit).any?
-      create_commission(farmer, product, unit, 0.05)
-    end
-
     if delivery_date.nil?
       delivery_date = get_delivery_date(days_from_now = 7)
     end
@@ -168,6 +164,10 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
     if frequency.nil?
       frequency = 0
+    end
+
+    if !ProducerProductUnitCommission.where(user: farmer, product: product, unit: unit).any?
+      create_commission(farmer, product, unit, 0.05)
     end
 
     posting_params = {
