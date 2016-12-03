@@ -1,6 +1,7 @@
 require 'test_helper'
+require 'integration_helper'
 
-class PartnerUsersTest < ActionDispatch::IntegrationTest
+class PartnerUsersTest < IntegrationHelper
 
   test "new partner user should have good delivery notification and pickup experience" do
 

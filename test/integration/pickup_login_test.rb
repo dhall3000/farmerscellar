@@ -149,13 +149,12 @@ class PickupLoginTest < IntegrationHelper
     travel_to posting_apples.commitment_zone_start
     RakeHelper.do_hourly_tasks
 
-    travel_to posting_carrots.delivery_date + 12.hours
-    fully_fill_all_creditor_orders    
+    fully_fill_creditor_order(posting_carrots.creditor_order)
 
     #verify carrots can be picked up
     travel 1.minute
     assert_equal 0, Pickup.count
-    assert_equal 1, bob.tote_items_to_pickup.count
+    assert_equal 1, bob.reload.tote_items_to_pickup.count
     assert_equal "Carrots", bob.tote_items_to_pickup.first.posting.product.name
     tote_items = do_pickup_for(@dropsite_user, bob.reload)
     log_out_dropsite_user
@@ -169,8 +168,7 @@ class PickupLoginTest < IntegrationHelper
     assert_not tote_items.any?
     assert_equal 2, Pickup.count
 
-    travel_to posting_apples.delivery_date + 12.hours
-    fully_fill_all_creditor_orders
+    fully_fill_creditor_order(posting_apples.creditor_order)
 
     travel 1.minute
     tote_items = do_pickup_for(@dropsite_user, bob.reload)

@@ -1,7 +1,8 @@
 require 'test_helper'
 require 'utility/rake_helper'
+require 'integration_helper'
 
-class RakeTaskSendReceivingReportTest < ActionDispatch::IntegrationTest
+class RakeTaskSendReceivingReportTest < IntegrationHelper
   include TestLib
 
   test "should send receiving report to admin" do

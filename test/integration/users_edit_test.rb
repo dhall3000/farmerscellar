@@ -1,6 +1,7 @@
 require 'test_helper'
+require 'integration_helper'
 
-class UsersEditTest < ActionDispatch::IntegrationTest
+class UsersEditTest < IntegrationHelper
   # test "the truth" do
   #   assert true
   # end

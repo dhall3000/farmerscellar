@@ -168,16 +168,6 @@ class ActiveSupport::TestCase
 
   end
 
-  def nuke_all_users
-    User.delete_all
-    assert_equal 0, User.count
-  end
-
-  def nuke_all_postings
-    Posting.delete_all
-    assert_equal 0, Posting.count
-  end
-
   def get_last_wednesday
 
     now = Time.zone.now
@@ -305,22 +295,6 @@ class ActiveSupport::TestCase
     else
       session[:user_id] = user.id
     end
-  end
-
-  def get_access_code    
-    @a1 = users(:a1)
-    log_in_as(@a1)
-    post access_codes_path, params: {access_code: {notes: "empty notes"}}
-    code = assigns(:code)
-
-    return code
-
-  end
-
-  def get_access_for(user)
-    code = get_access_code
-    log_in_as(user)
-    patch user_path(user), params: {user: { access_code: code }}
   end
 
   def get_error_messages(active_record_object)

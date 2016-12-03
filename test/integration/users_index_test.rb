@@ -1,6 +1,7 @@
 require 'test_helper'
+require 'integration_helper'
 
-class UsersIndexTest < ActionDispatch::IntegrationTest
+class UsersIndexTest < IntegrationHelper
   
   def setup
     @user = users(:c1)

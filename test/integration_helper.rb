@@ -3,6 +3,15 @@ require 'utility/rake_helper'
 
 class IntegrationHelper < ActionDispatch::IntegrationTest
 
+  def do_authorized_through_funds_transfer(posting)
+    #transition tote items from authorized -> committed
+    do_hourly_tasks_at(posting.commitment_zone_start)
+    #do fill    
+    fully_fill_creditor_order(posting.creditor_order)
+    #transfer funds
+    do_hourly_tasks_at(posting.delivery_date + 22.hours)
+  end
+
   def log_in_dropsite_user(dropsite_user)
     log_in_as(dropsite_user)
     assert :success
@@ -86,28 +95,30 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
   end
 
-  def fully_fill_creditor_order(co)
+  def fully_fill_creditor_order(creditor_order)
+
+    travel_to creditor_order.delivery_date + 12.hours
     
-    assert co
-    assert co.postings
+    assert creditor_order
+    assert creditor_order.postings
     
-    log_in_as(users(:a1))
+    log_in_as(get_admin)
     
-    get creditor_order_path(co)
+    get creditor_order_path(creditor_order)
     assert_response :success
     assert_template 'creditor_orders/show'
 
-    get edit_creditor_order_path(co)
+    get edit_creditor_order_path(creditor_order)
     assert_response :success
     assert_template 'creditor_orders/edit'
 
-    fills = get_fully_filled_creditor_order_fills_params(co.postings)
+    fills = get_fully_filled_creditor_order_fills_params(creditor_order.postings)
     
-    patch creditor_order_path(co), params: {fills: fills}
+    patch creditor_order_path(creditor_order), params: {fills: fills}
     assert_response :redirect
     assert_redirected_to creditor_orders_path
 
-    co.reload.postings.each do |posting|
+    creditor_order.reload.postings.each do |posting|
       assert posting.state?(:CLOSED)
     end
 
@@ -129,8 +140,8 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
   def get_creditor_order_fills_param(posting_id, quantity)    
     return [{posting_id: posting_id, quantity: quantity}]
   end
-
-  def create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = nil)
+  
+  def create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
 
     if farmer.nil?
       farmer = create_producer("john", "john@j.com")
@@ -181,6 +192,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
       delivery_date: delivery_date,
       commitment_zone_start: commitment_zone_start,
       units_per_case: units_per_case,
+      order_minimum_producer_net: order_minimum_producer_net,
       posting_recurrence: {frequency: frequency, on: true}
     }    
 
@@ -193,7 +205,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     assert_redirected_to postings_path
     follow_redirect!
 
-    verify_post_presence(posting.price, posting.unit, exists = true, posting.id)
+    verify_post(posting.price, posting.unit, exists = true, posting.id)
 
     if frequency == 0
       assert_not posting.posting_recurrence
@@ -220,17 +232,38 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     assert_not user.activated?
     #log in before activation.
     log_in_as(user)
-    
     # Valid activation token
     get edit_account_activation_path(user.activation_token, email: user.email)
     assert user.reload.activated?
+    assert_response :redirect
+    assert_redirected_to postings_path
     follow_redirect!    
+
     get_access_for(user)
+
+    log_in_as(user)
     get user_path(user)
     assert_template 'users/show'
     assert is_logged_in?
 
     return user
+
+  end
+
+  def get_access_for(user)
+    code = get_access_code
+    log_in_as(user)
+    patch user_path(user), params: {user: { access_code: code }}
+  end  
+
+  def get_access_code
+
+    a1 = get_admin
+    log_in_as(a1)
+    post access_codes_path, params: {access_code: {notes: "empty notes"}}
+    code = assigns(:code)
+
+    return code
 
   end
 
@@ -309,7 +342,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
     follow_redirect!
 
-    if  frequency == 0 && !roll_until_filled
+    if frequency == 0 && !roll_until_filled
       if posting.posting_recurrence.nil? || !posting.posting_recurrence.on
         assert_equal "Tote item added", flash[:success]
         return tote_item
@@ -480,7 +513,18 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
   end
 
+  def verify_post(price, unit, exists, posting_id = nil)
+    
+    get postings_path
+    assert :success
 
+    if exists
+      assert_select "body div.panel h4.panel-title", {text: ActiveSupport::NumberHelper.number_to_currency(price) + " / " + unit.name, minimum: 1}
+    else
+      assert_select "body div.panel h4.panel-title", {text: ActiveSupport::NumberHelper.number_to_currency(price) + " / " + unit.name, count: 0}
+    end
+    
+  end
 
   def verify_post_presence(price, unit, exists, posting_id = nil)
 

@@ -8,25 +8,46 @@ class BulkPurchasesTest < BulkBuyer
     #this test is for beta / launch mode when we're charging flat processor fees and 0% commission service fee
     #in this scenario we can/will end up with transactions we're upside down on...paying more to the producer
     #than we're collecting from Paypal. fun.
+
+    assert_equal 0, PaymentPayable.where("amount <> amount_paid").count
+
     customers = [@c_one_tote_item]
     purchase_receivables = setup_bulk_purchase(customers)
-    post bulk_purchases_path, params: {purchase_receivables: purchase_receivables}
+
+    posting = @c_one_tote_item.tote_items.first.posting
+
+    travel_to posting.commitment_zone_start
+    RakeHelper.do_hourly_tasks
+    travel_to posting.delivery_date + 12.hours
+    fill_posting(posting)
+    travel_to posting.delivery_date + 22.hours
+    RakeHelper.do_hourly_tasks
+
     verify_legitimacy_of_bulk_purchase({sales_underwater: 1, commission_zero: 1})
-    bulk_purchase = assigns(:bulk_purchase)
     do_standard_payment(customers)
-    bulk_payment = assigns(:bulk_payment)
+
+    travel_back
 
   end
 
   test "do ricky tests" do
 
-    customers = [@c1]
+    customers = [@c1]    
     purchase_receivables = setup_bulk_purchase(customers)
-    post bulk_purchases_path, params: {purchase_receivables: purchase_receivables}
+    assert_equal 0, BulkPurchase.count
+
+    posting = @c1.tote_items.first.posting    
+    travel_to posting.commitment_zone_start
+    RakeHelper.do_hourly_tasks
+    travel_to posting.delivery_date + 22.hours
+    RakeHelper.do_hourly_tasks
+    assert_equal 1, BulkPurchase.count
+
     verify_legitimacy_of_bulk_purchase
-    bulk_purchase = assigns(:bulk_purchase)
     do_standard_payment(customers)
-    bulk_payment = assigns(:bulk_payment)
+
+    bulk_purchase = BulkPurchase.last
+    bulk_payment = BulkPayment.last
 
     ti = bulk_purchase.purchase_receivables[2].tote_items.first
     c1_charge_amount = (ti.quantity * ti.price).round(2)
@@ -39,67 +60,24 @@ class BulkPurchasesTest < BulkBuyer
 
   def do_standard_payment(customers)
     verify_proper_number_of_payment_payables    
-    bulk_purchase = assigns(:bulk_purchase)
-
+    bulk_purchase = BulkPurchase.last
     verify_proper_account_states(customers)
     log_in_as(@a1)
 
-    get new_bulk_payment_path
-    assert :success
-    unpaid_payment_payables = assigns(:unpaid_payment_payables)
+    unpaid_payment_payables = PaymentPayable.where("amount <> amount_paid")
+
     assert_not_nil unpaid_payment_payables
     grand_total_payout = assigns(:grand_total_payout)
-    payment_info_by_creditor_id = assigns(:payment_info_by_creditor_id)    
-    assert_not_nil payment_info_by_creditor_id
-    post bulk_payments_path, params: {payment_info_by_creditor_id: payment_info_by_creditor_id}
-    bulk_payment = assigns(:bulk_payment)
+    bulk_payment = BulkPayment.last
 
-    assert_equal bulk_purchase.net, bulk_payment.total_payments_amount    
-
-    #these tests are to verify that the html table in the producer payment invoice has values
-    #that all make sense. that is, the unit_count times unit_price should equal the sub_total and
-    #the sum of the sub_totals should equal the total
-    #@payment_invoice_infos << {total: total_amount, posting_infos: posting_infos}
-    #posting_info looks like this: {unit_count: 0, unit_price: 0, sub_total: 0}
-    payment_invoice_infos = assigns(:payment_invoice_infos)
-    payment_invoice_infos.each do |payment_invoice_info|
-      verify_payment_invoice_info(payment_invoice_info)
-    end   
-    
-  end
-
-  #a posting info is a hash like this: #{unit_count: 0, unit_price: 0, sub_total: 0}
-  #it comes from bulkpaymentscontroller#get_posting_infos
-  def verify_payment_invoice_info(payment_invoice_info)
-
-    total = payment_invoice_info[:total]
-    posting_infos = payment_invoice_info[:posting_infos]
-
-    sub_totals = 0
-
-    posting_infos.each do |posting, value|
-      
-      sub_total = value[:sub_total]
-      units_sum = 0
-      i = 0
-      while i < value[:unit_count]
-        units_sum = (units_sum + value[:unit_price]).round(2)
-        i = i + 1
-      end
-
-      assert_equal sub_total, units_sum
-      sub_totals = (sub_totals + sub_total).round(2)
-
-    end
-
-    assert_equal total.to_f, sub_totals
-
+    assert_equal bulk_purchase.net, bulk_payment.total_payments_amount        
   end
 
   #bundle exec rake test test/integration/bulk_purchases_test.rb test_do_bulk_buy
   test "do bulk buy" do
     do_bulk_buy
     do_delivery
+    travel_back
   end
 
   test "do pickups" do    
@@ -230,25 +208,34 @@ class BulkPurchasesTest < BulkBuyer
   end
 
   def do_bulk_buy
+
+    assert_equal 0, BulkPurchase.count
+    assert_equal 0, BulkPayment.count
+
     customers = [@c1, @c2, @c3, @c4]
     purchase_receivables = setup_bulk_purchase(customers)
-    post bulk_purchases_path, params: {purchase_receivables: purchase_receivables}
+
+    now = Time.zone.now
+    travel_to now.midnight + 22.hours
+    RakeHelper.do_hourly_tasks
+    travel_to now
+
+    assert_equal 1, BulkPurchase.count
+    assert_equal 1, BulkPayment.count
+
     verify_legitimacy_of_bulk_purchase
-
     verify_proper_number_of_payment_payables
-    bulk_purchase = assigns(:bulk_purchase)
+    
+    bulk_purchase = BulkPurchase.last
 
-    get new_bulk_payment_path
     assert :success
-    unpaid_payment_payables = assigns(:unpaid_payment_payables)
+    unpaid_payment_payables = PaymentPayable.where("amount_paid < amount")
+
     assert_not_nil unpaid_payment_payables
-    grand_total_payout = assigns(:grand_total_payout)
-    payment_info_by_creditor_id = assigns(:payment_info_by_creditor_id)    
-    assert_not_nil payment_info_by_creditor_id
-    post bulk_payments_path, params: {payment_info_by_creditor_id: payment_info_by_creditor_id}
-    bulk_payment = assigns(:bulk_payment)
+    bulk_payment = BulkPayment.last
 
     assert_equal bulk_purchase.net, bulk_payment.total_payments_amount    
+
   end
 
   def do_delivery
@@ -327,6 +314,10 @@ class BulkPurchasesTest < BulkBuyer
   test "do bulk buy with purchase failures" do
   
     customers = [@c1, @c2, @c3, @c4]
+
+    assert_equal 0, BulkPurchase.count
+    assert_equal 0, BulkPayment.count
+
     purchase_receivables = setup_bulk_purchase(customers)
 
     #COMMENT KEY 000: we're going to set up c1 so that he has some toteitems in a bulk purchase that fail but at the moment of fail
@@ -359,16 +350,19 @@ class BulkPurchasesTest < BulkBuyer
     ActionMailer::Base.deliveries.clear
     previous_user_account_state_count = UserAccountState.count
 
+    posting = @c1.tote_items.first.posting
+
     log_in_as(@a1)
     FakeCaptureResponse.toggle_success = true    
-    post bulk_purchases_path, params: {purchase_receivables: purchase_receivables}
+    travel_to posting.delivery_date + 22.hours
+    RakeHelper.do_hourly_tasks
     
     #COMMENT KEY 000
     assert_equal 2, ToteItem.where(user: customers, state: ToteItem.states[:REMOVED]).count
     verify_legitimacy_of_bulk_purchase
 
     verify_proper_number_of_payment_payables    
-    bulk_purchase = assigns(:bulk_purchase)
+    bulk_purchase = BulkPurchase.last
 
     failed_pr_count = 0
     bulk_purchase.purchase_receivables.each do |pr|
@@ -381,21 +375,11 @@ class BulkPurchasesTest < BulkBuyer
     assert UserAccountState.count, previous_user_account_state_count
     assert 1, UserAccountState.order(:created_at).last.account_state.state
     
-    bulk_purchase.do_bulk_email_communication
     verify_proper_purchase_receipt_emails(bulk_purchase)
-
     verify_proper_account_states(customers)
     log_in_as(@a1)
-
-    get new_bulk_payment_path
-    assert :success
-    unpaid_payment_payables = assigns(:unpaid_payment_payables)
-    assert_not_nil unpaid_payment_payables
-    grand_total_payout = assigns(:grand_total_payout)
-    payment_info_by_creditor_id = assigns(:payment_info_by_creditor_id)    
-    assert_not_nil payment_info_by_creditor_id
-    post bulk_payments_path, params: {payment_info_by_creditor_id: payment_info_by_creditor_id}
-    bulk_payment = assigns(:bulk_payment)
+    
+    bulk_payment = BulkPayment.last
 
     assert bulk_purchase.net > 0
     assert bulk_payment.total_payments_amount, bulk_purchase.net
@@ -403,70 +387,78 @@ class BulkPurchasesTest < BulkBuyer
     FakeCaptureResponse.toggle_success = false    
     FakeCaptureResponse.succeed = true
 
+    travel_back
+
   end
 
   test "sequential bulk buys with some purchase failures" do
 
-    FakeCaptureResponse.toggle_success = true    
-    customers = [@c1, @c2]
+    nuke_all_tote_items
+    nuke_all_postings
+    nuke_all_users
 
-    purchase_receivables = setup_bulk_purchase(customers)    
-    post bulk_purchases_path, params: {purchase_receivables: purchase_receivables}
+    admin = create_admin
+    producer1 = create_producer(name = "producer1", email = "producer1@p.com")
+    producer2 = create_producer(name = "producer2", email = "producer2@p.com")
+
+    x1 = create_new_customer("x1", "x1@c.com")
+    x2 = create_new_customer("x2", "x2@c.com")
+    x3 = create_new_customer("x3", "x3@c.com")
+    x4 = create_new_customer("x4", "x4@c.com")
+
+    posting11 = create_posting(producer1, price = 2, get_product("Apples"), get_unit("Pound"), get_delivery_date(7), get_delivery_date(5))
+    posting12 = create_posting(producer1, price = 4, get_product("Mango"), get_unit("Pound"), get_delivery_date(7), get_delivery_date(5))
+    posting21 = create_posting(producer2, price = 8, get_product("Giraffe Milk"), get_unit("Pound"), get_delivery_date(14), get_delivery_date(12))
+    posting22 = create_posting(producer2, price = 16, get_product("Raisin"), get_unit("Pound"), get_delivery_date(14), get_delivery_date(12))
+
+    create_tote_item(x1, posting11, quantity = 2)
+    create_tote_item(x1, posting12, quantity = 2)
+    create_tote_item(x2, posting11, quantity = 2)
+    create_tote_item(x2, posting12, quantity = 2)
+
+    create_tote_item(x3, posting21, quantity = 2)
+    create_tote_item(x3, posting22, quantity = 2)
+    create_tote_item(x4, posting21, quantity = 2)
+    create_tote_item(x4, posting22, quantity = 2)
+
+    create_one_time_authorization_for_customer(x1)
+    create_one_time_authorization_for_customer(x2)
+    create_one_time_authorization_for_customer(x3)
+    create_one_time_authorization_for_customer(x4)
+
+    FakeCaptureResponse.toggle_success = true    
+
+    assert_equal 0, BulkPurchase.count
+    assert_equal 0, BulkPayment.count
+
+    do_authorized_through_funds_transfer(posting11)
+
+    assert_equal 1, BulkPurchase.count
+    assert_equal 1, BulkPayment.count
+
     verify_legitimacy_of_bulk_purchase
     verify_proper_number_of_payment_payables    
-    bulk_purchase = assigns(:bulk_purchase)    
-    get new_bulk_payment_path
-    assert :success
-    unpaid_payment_payables = assigns(:unpaid_payment_payables)
-    assert_not_nil unpaid_payment_payables
-    grand_total_payout = assigns(:grand_total_payout)
-    payment_info_by_creditor_id = assigns(:payment_info_by_creditor_id)    
-    assert_not_nil payment_info_by_creditor_id
-    post bulk_payments_path, params: {payment_info_by_creditor_id: payment_info_by_creditor_id}
-    bulk_payment = assigns(:bulk_payment)
+
+    bulk_purchase = BulkPurchase.last
+    bulk_payment = BulkPayment.last    
 
     assert bulk_purchase.net > 0
     assert bulk_payment.total_payments_amount > bulk_purchase.net
-    
+
     FakeCaptureResponse.toggle_success = false    
     FakeCaptureResponse.succeed = true
-    customers = [@c3, @c4]
 
+    do_authorized_through_funds_transfer(posting22)
 
-
-
-    #MASSIVELY, MASSIVELY, MASSIVE HACK-A-BILLY
-    #this is an ancient test and totally hocus pocus. we're trying to do this back to back thing but we're using overlapping postings. what i mean is if you take
-    #customers c1 and c2 (as above) and move their associated toteitems/postings through the sequence (i.e. added, auth'd, committed, filled, paid etc) you're
-    #have several postings go through this process twice. doesn't work because once you get to this line of code, to go forward you need postings in
-    #their natural initial state....'0', aka OPEN. but many of them are CLOSED. so since the whole test is one big hack, hack it further. if this gets too
-    #much worse in the future might want to just rewrite the test.
-    Posting.where.not(state: Posting.states[:OPEN]).update_all(state: Posting.states[:OPEN])
-
-
-
-
-    purchase_receivables = setup_bulk_purchase(customers)    
-    num_prs_just_created = purchase_receivables.count
-    post bulk_purchases_path, params: {purchase_receivables: purchase_receivables}
-
-    #here we want to verify that this bulk purchase is not picking up any failed purchasereceivables from
-    #the prior bulk purchase
-    bulk_purchase = assigns(:bulk_purchase)
-    assert_equal num_prs_just_created, bulk_purchase.purchase_receivables.count
+    assert_equal 2, BulkPurchase.count
+    assert_equal 2, BulkPayment.count
 
     verify_legitimacy_of_bulk_purchase    
     verify_proper_number_of_payment_payables    
-    bulk_purchase = assigns(:bulk_purchase)    
-    get new_bulk_payment_path
-    assert :success
-    unpaid_payment_payables = assigns(:unpaid_payment_payables)
-    assert_not_nil unpaid_payment_payables
-    grand_total_payout = assigns(:grand_total_payout)
-    payment_info_by_creditor_id = assigns(:payment_info_by_creditor_id)    
-    assert_not_nil payment_info_by_creditor_id
-    post bulk_payments_path, params: {payment_info_by_creditor_id: payment_info_by_creditor_id}
-    bulk_payment = assigns(:bulk_payment)
+
+    bulk_purchase = BulkPurchase.last
+    bulk_payment = BulkPayment.last    
+    
     assert_equal bulk_purchase.net, bulk_payment.total_payments_amount
 
     travel_back
@@ -474,10 +466,8 @@ class BulkPurchasesTest < BulkBuyer
   end
 
   def verify_legitimacy_of_bulk_purchase(options = {})
-    assert :success
-    assert_template 'bulk_purchases/create'
-    purchase_receivables = assigns(:purchase_receivables)    
-    bp = assigns(:bulk_purchase)
+    bp = BulkPurchase.last
+    purchase_receivables = bp.purchase_receivables
     assert_not_nil bp
 
     prs = bp.purchase_receivables
@@ -560,7 +550,7 @@ class BulkPurchasesTest < BulkBuyer
     assert bp.gross > bp.net
     assert bp.net > bp.commission
   
-    verify_legitimacy_of_purchase_receivables
+    verify_legitimacy_of_purchase_receivables(purchase_receivables)
 
   end
 
@@ -581,6 +571,7 @@ class BulkPurchasesTest < BulkBuyer
   def verify_proper_purchase_receipt_emails(bulk_purchase)
     
     user_ids = []
+    
     bulk_purchase.purchase_receivables.each do |pr|
 
       user = pr.users.last
@@ -593,7 +584,6 @@ class BulkPurchasesTest < BulkBuyer
 
       mail = messages[0]
       if mail.to == ["david@farmerscellar.com"]
-
       else
 
         assert_equal [user.email], mail.to
@@ -616,14 +606,27 @@ class BulkPurchasesTest < BulkBuyer
 
     uniq_user_ids = user_ids.uniq
 
+    num_purchase_receipts = 0
+    ActionMailer::Base.deliveries.each do |mail|
+
+      if mail.subject == "Purchase receipt"
+        num_purchase_receipts += 1
+      end
+
+    end
+
     #there should be one email (purchase receipt) mailed for each customer represented in the
     #bulk_purchase.purchase_receivables association
-    assert_equal uniq_user_ids.count + 1, ActionMailer::Base.deliveries.count
+    assert_equal uniq_user_ids.count, num_purchase_receipts
     
   end
 
-  def verify_legitimacy_of_purchase_receivables
-    prs = assigns(:purchase_receivables)
+  def verify_legitimacy_of_purchase_receivables(prs = nil)
+
+    if prs.nil?
+      prs = assigns(:purchase_receivables)
+    end
+
     for pr in prs
       #there should now be at least one purchase in the purchases collection
       assert pr.purchases.count > 0
@@ -711,17 +714,19 @@ class BulkPurchasesTest < BulkBuyer
     
     assert_equal total_purchased, total_amount_purchased
 
-    verify_legitimacy_of_purchases
+    verify_legitimacy_of_purchases(prs)
   end
 
-  def verify_legitimacy_of_purchases
+  def verify_legitimacy_of_purchases(purchase_receivables = nil)
 
     assert Purchase.count > 0
 
     assert_equal Purchase.count, ToteItem.select(:user_id).where(state: [ToteItem.states[:FILLED]]).distinct.count
     assert_equal PurchaseReceivable.count, ToteItem.where(state: [ToteItem.states[:FILLED]]).distinct.count
 
-    purchase_receivables = assigns(:purchase_receivables)
+    if purchase_receivables.nil?
+      purchase_receivables = assigns(:purchase_receivables)
+    end
 
     for pr in purchase_receivables
       purchase = pr.purchases.last

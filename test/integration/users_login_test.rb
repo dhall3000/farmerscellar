@@ -1,6 +1,7 @@
 require 'test_helper'
+require 'integration_helper'
 
-class UsersLoginTest < ActionDispatch::IntegrationTest
+class UsersLoginTest < IntegrationHelper
   # test "the truth" do
   #   assert true
   # end

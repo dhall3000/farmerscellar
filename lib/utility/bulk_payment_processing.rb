@@ -20,7 +20,7 @@ class BulkPaymentProcessing
         return
       end
 
-      bp = BulkPayment.new(num_payees: unbalanced_creditor_obligations.count, total_payments_amount: unbalanced_creditor_obligations.sum(:balance))
+      bp = BulkPayment.new(num_payees: unbalanced_creditor_obligations.count, total_payments_amount: unbalanced_creditor_obligations.sum(:balance).round(2))
 
       #hack: this object is gnarly and lame but scabbing this new code in to some legacy junk so that old tests will pass
       payment_info_by_creditor_id = {}

@@ -1,5 +1,10 @@
 module TestLib
 
+  def do_hourly_tasks_at(date_time)
+    travel_to date_time
+    RakeHelper.do_hourly_tasks
+  end
+
   def transition_to_authorized(tote_item)
 
     assert tote_item
@@ -39,36 +44,36 @@ module TestLib
     postings = []
     #create distributor D1
     distributor = create_distributor("distributor", "distributor@d.com", 100)
-    posting1 = create_posting(distributor, price = 10, get_product("Product1"), get_unit("Pound"), delivery_date, order_cutoff1, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
-    tis << create_tote_item(posting1, 1, bob)
+    posting1 = create_posting(distributor, price = 10, get_product("Product1"), get_unit("Pound"), delivery_date, order_cutoff1, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)    
+    tis << create_tote_item(bob, posting1, 1)
     posting2 = create_posting(distributor, price = 10, get_product("Product2"), get_unit("Pound"), delivery_date, order_cutoff2, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
-    tis << create_tote_item(posting2, 1, bob)
+    tis << create_tote_item(bob, posting2, 1)
     posting3 = create_posting(distributor, price = 10, get_product("Product3"), get_unit("Pound"), delivery_date, order_cutoff3, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
-    tis << create_tote_item(posting3, 1, bob)
+    tis << create_tote_item(bob, posting3, 1)
 
     f1 = create_producer("producer1", "producer1@p.com", distributor, order_min = 50)
     posting4 = create_posting(f1, price = 10, get_product("Product4"), get_unit("Pound"), delivery_date, order_cutoff1, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
-    tis << create_tote_item(posting4, 7, bob)
+    tis << create_tote_item(bob, posting4, 7)        
     posting5 = create_posting(f1, price = 10, get_product("Product5"), get_unit("Pound"), delivery_date, order_cutoff2, units_per_case = nil, frequency = nil, order_minimum_producer_net = 20)
-    tis << create_tote_item(posting5, 1, bob)
+    tis << create_tote_item(bob, posting5, 1)
     posting6 = create_posting(f1, price = 10, get_product("Product6"), get_unit("Pound"), delivery_date, order_cutoff3, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
-    tis << create_tote_item(posting6, 7, bob)
+    tis << create_tote_item(bob, posting6, 7)
 
     f2 = create_producer("producer2", "producer2@p.com", distributor, order_min = 50)
     posting7 = create_posting(f2, price = 10, get_product("Product7"), get_unit("Pound"), delivery_date, order_cutoff1, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
-    tis << create_tote_item(posting7, 1, bob)
+    tis << create_tote_item(bob, posting7, 1)
     posting8 = create_posting(f2, price = 10, get_product("Product8"), get_unit("Pound"), delivery_date, order_cutoff2, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
-    tis << create_tote_item(posting8, 1, bob)
+    tis << create_tote_item(bob, posting8, 1)
     posting9 = create_posting(f2, price = 10, get_product("Product9"), get_unit("Pound"), delivery_date, order_cutoff3, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
-    tis << create_tote_item(posting9, 1, bob)
+    tis << create_tote_item(bob, posting9, 1)
 
     f3 = create_producer("producer3", "producer3@p.com", distributor)
     posting10 = create_posting(f3, price = 10, get_product("Product10"), get_unit("Pound"), delivery_date, order_cutoff1, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
-    tis << create_tote_item(posting10, 12, bob)
+    tis << create_tote_item(bob, posting10, 12)
     posting11 = create_posting(f3, price = 10, get_product("Product11"), get_unit("Pound"), delivery_date, order_cutoff2, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
-    tis << create_tote_item(posting11, 12, bob)
+    tis << create_tote_item(bob, posting11, 12)
     posting12 = create_posting(f3, price = 10, get_product("Product12"), get_unit("Pound"), delivery_date, order_cutoff3, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
-    tis << create_tote_item(posting12, 12, bob)
+    tis << create_tote_item(bob, posting12, 12)
 
     tis.each do |ti|
       ti.transition(:customer_authorized)
@@ -220,12 +225,24 @@ module TestLib
 
   end
 
-  def create_tote_item(posting, quantity, user)
+  def create_tote_item(customer, posting, quantity)
 
-    tote_item = ToteItem.create(user: user, posting: posting, quantity: quantity, price: posting.price, state: ToteItem.states[:ADDED])
+    tote_item = ToteItem.create(user: customer, posting: posting, quantity: quantity, price: posting.price, state: ToteItem.states[:ADDED])
     assert tote_item.valid?
 
     return tote_item
+
+  end
+
+  def create_one_time_authorization_for_customer(customer)
+
+    assert customer
+
+    customer.tote_items.each do |tote_item|
+      tote_item.transition(:customer_authorized)
+      tote_item.reload
+      assert tote_item.state?(:AUTHORIZED)
+    end
 
   end
 
@@ -353,6 +370,21 @@ module TestLib
 
     return delivery_date
 
+  end
+
+  def nuke_all_tote_items
+    ToteItem.delete_all
+    assert_equal 0, ToteItem.count
+  end
+
+  def nuke_all_users
+    User.delete_all
+    assert_equal 0, User.count
+  end
+
+  def nuke_all_postings
+    Posting.delete_all
+    assert_equal 0, Posting.count
   end
 
 end

@@ -1,6 +1,7 @@
 require 'test_helper'
+require 'integration_helper'
 
-class WebsiteSettingsAccessControlTest < ActionDispatch::IntegrationTest
+class WebsiteSettingsAccessControlTest < IntegrationHelper
 
   def setup
   	@admin = users(:a1)

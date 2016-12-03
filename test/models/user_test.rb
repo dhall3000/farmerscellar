@@ -47,15 +47,15 @@ class UserTest < ActiveSupport::TestCase
     sam = create_user("sam", "sam@s.com")
 
     #tote items producer1 1, price 3.00, order min: $20, contribution: $54
-    ti_bob_carrots = create_tote_item(posting_carrots, quantity = 6, bob)
+    ti_bob_carrots = create_tote_item(bob, posting_carrots, quantity = 6)
     ti_bob_carrots.update(state: ToteItem.states[:COMMITTED])
-    ti_chris_carrots = create_tote_item(posting_carrots, quantity = 12, chris)
+    ti_chris_carrots = create_tote_item(chris, posting_carrots, quantity = 12)
     ti_chris_carrots.update(state: ToteItem.states[:COMMITTED])
 
     #tote items producer1 2, price 4.00, order min: $20, contribution: $24
-    ti_sam_milk = create_tote_item(posting_milk, quantity = 3, sam)
+    ti_sam_milk = create_tote_item(sam, posting_milk, quantity = 3)
     ti_sam_milk.update(state: ToteItem.states[:COMMITTED])
-    ti_chris_milk = create_tote_item(posting_milk, quantity = 3, chris)
+    ti_chris_milk = create_tote_item(chris, posting_milk, quantity = 3)
     ti_chris_milk.update(state: ToteItem.states[:COMMITTED])
     
     report = producer1.outbound_order_report(posting_carrots.commitment_zone_start)    
@@ -127,41 +127,41 @@ class UserTest < ActiveSupport::TestCase
     sam = create_user("sam", "sam@s.com")
 
     #tote items oxbow 1, price 1.00, contribution = $5.00
-    ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
+    ti_bob_celery = create_tote_item(bob, posting_celery, quantity = 3)
     ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
-    ti_sam_celery = create_tote_item(posting_celery, quantity = 2, sam)
+    ti_sam_celery = create_tote_item(sam, posting_celery, quantity = 2)
     ti_sam_celery.update(state: ToteItem.states[:COMMITTED])
 
     #tote items producer1 1, price 3.00, order min: $20, contribution: $54
-    ti_bob_carrots = create_tote_item(posting_carrots, quantity = 6, bob)
+    ti_bob_carrots = create_tote_item(bob, posting_carrots, quantity = 6)
     ti_bob_carrots.update(state: ToteItem.states[:COMMITTED])
-    ti_chris_carrots = create_tote_item(posting_carrots, quantity = 12, chris)
+    ti_chris_carrots = create_tote_item(chris, posting_carrots, quantity = 12)
     ti_chris_carrots.update(state: ToteItem.states[:COMMITTED])
 
     #tote items producer2 1, price 5.00, units_per_case: 10, num_units: 12, num_cases: 1, contribution: $50
-    ti_sam_beef = create_tote_item(posting_beef, quantity = 6, sam)
+    ti_sam_beef = create_tote_item(sam, posting_beef, quantity = 6)
     ti_sam_beef.update(state: ToteItem.states[:COMMITTED])
-    ti_chris_beef = create_tote_item(posting_beef, quantity = 6, chris)
+    ti_chris_beef = create_tote_item(chris, posting_beef, quantity = 6)
     ti_chris_beef.update(state: ToteItem.states[:COMMITTED])
 
     #-----------------------------------------------------------------------------------------------
 
     #tote items oxbow 2, price 2.00, contribution = $10
-    ti_bob_apples = create_tote_item(posting_apples, quantity = 3, bob)
+    ti_bob_apples = create_tote_item(bob, posting_apples, quantity = 3)
     ti_bob_apples.update(state: ToteItem.states[:COMMITTED])
-    ti_sam_apples = create_tote_item(posting_apples, quantity = 2, sam)
+    ti_sam_apples = create_tote_item(sam, posting_apples, quantity = 2)
     ti_sam_apples.update(state: ToteItem.states[:COMMITTED])
 
     #tote items producer1 2, price 4.00, order min: $20, contribution: $24
-    ti_sam_milk = create_tote_item(posting_milk, quantity = 3, sam)
+    ti_sam_milk = create_tote_item(sam, posting_milk, quantity = 3)
     ti_sam_milk.update(state: ToteItem.states[:COMMITTED])
-    ti_chris_milk = create_tote_item(posting_milk, quantity = 3, chris)
+    ti_chris_milk = create_tote_item(chris, posting_milk, quantity = 3)
     ti_chris_milk.update(state: ToteItem.states[:COMMITTED])    
 
     #tote items producer2 2, price 6.00, contribution: $36
-    ti_sam_milk = create_tote_item(posting_milk, quantity = 3, sam)
+    ti_sam_milk = create_tote_item(sam, posting_milk, quantity = 3)
     ti_sam_milk.update(state: ToteItem.states[:COMMITTED])
-    ti_chris_milk = create_tote_item(posting_milk, quantity = 3, chris)
+    ti_chris_milk = create_tote_item(chris, posting_milk, quantity = 3)
     ti_chris_milk.update(state: ToteItem.states[:COMMITTED])
 
     #get producer net by first commitment zone
@@ -272,41 +272,41 @@ class UserTest < ActiveSupport::TestCase
     sam = create_user("sam", "sam@s.com")
 
     #tote items oxbow 1, price 1.00, contribution = $5.00
-    ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
+    ti_bob_celery = create_tote_item(bob, posting_celery, quantity = 3)
     ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
-    ti_sam_celery = create_tote_item(posting_celery, quantity = 2, sam)
+    ti_sam_celery = create_tote_item(sam, posting_celery, quantity = 2)
     ti_sam_celery.update(state: ToteItem.states[:COMMITTED])
 
     #tote items producer1 1, price 3.00, order min: $20, contribution: $54
-    ti_bob_carrots = create_tote_item(posting_carrots, quantity = 6, bob)
+    ti_bob_carrots = create_tote_item(bob, posting_carrots, quantity = 6)
     ti_bob_carrots.update(state: ToteItem.states[:COMMITTED])
-    ti_chris_carrots = create_tote_item(posting_carrots, quantity = 12, chris)
+    ti_chris_carrots = create_tote_item(chris, posting_carrots, quantity = 12)
     ti_chris_carrots.update(state: ToteItem.states[:COMMITTED])
 
     #tote items producer2 1, price 5.00, units_per_case: 10, num_units: 6, contribution: $0
-    ti_sam_beef = create_tote_item(posting_beef, quantity = 3, sam)
+    ti_sam_beef = create_tote_item(sam, posting_beef, quantity = 3)
     ti_sam_beef.update(state: ToteItem.states[:COMMITTED])
-    ti_chris_beef = create_tote_item(posting_beef, quantity = 3, chris)
+    ti_chris_beef = create_tote_item(chris, posting_beef, quantity = 3)
     ti_chris_beef.update(state: ToteItem.states[:COMMITTED])
 
     #-----------------------------------------------------------------------------------------------
 
     #tote items oxbow 2, price 2.00, contribution = $10
-    ti_bob_apples = create_tote_item(posting_apples, quantity = 3, bob)
+    ti_bob_apples = create_tote_item(bob, posting_apples, quantity = 3)
     ti_bob_apples.update(state: ToteItem.states[:COMMITTED])
-    ti_sam_apples = create_tote_item(posting_apples, quantity = 2, sam)
+    ti_sam_apples = create_tote_item(sam, posting_apples, quantity = 2)
     ti_sam_apples.update(state: ToteItem.states[:COMMITTED])
 
     #tote items producer1 2, price 4.00, order min: $20, contribution: $24
-    ti_sam_milk = create_tote_item(posting_milk, quantity = 3, sam)
+    ti_sam_milk = create_tote_item(sam, posting_milk, quantity = 3)
     ti_sam_milk.update(state: ToteItem.states[:COMMITTED])
-    ti_chris_milk = create_tote_item(posting_milk, quantity = 3, chris)
+    ti_chris_milk = create_tote_item(chris, posting_milk, quantity = 3)
     ti_chris_milk.update(state: ToteItem.states[:COMMITTED])    
 
     #tote items producer2 2, price 6.00, contribution: $36
-    ti_sam_milk = create_tote_item(posting_milk, quantity = 3, sam)
+    ti_sam_milk = create_tote_item(sam, posting_milk, quantity = 3)
     ti_sam_milk.update(state: ToteItem.states[:COMMITTED])
-    ti_chris_milk = create_tote_item(posting_milk, quantity = 3, chris)
+    ti_chris_milk = create_tote_item(chris, posting_milk, quantity = 3)
     ti_chris_milk.update(state: ToteItem.states[:COMMITTED])
 
     #get producer net by first commitment zone
@@ -400,41 +400,41 @@ class UserTest < ActiveSupport::TestCase
     sam = create_user("sam", "sam@s.com")
 
     #tote items oxbow 1, price 1.00, contribution = $5.00
-    ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
+    ti_bob_celery = create_tote_item(bob, posting_celery, quantity = 3)
     ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
-    ti_sam_celery = create_tote_item(posting_celery, quantity = 2, sam)
+    ti_sam_celery = create_tote_item(sam, posting_celery, quantity = 2)
     ti_sam_celery.update(state: ToteItem.states[:COMMITTED])
 
     #tote items producer1 1, price 3.00, order min: $20, contribution: $15
-    ti_bob_carrots = create_tote_item(posting_carrots, quantity = 3, bob)
+    ti_bob_carrots = create_tote_item(bob, posting_carrots, quantity = 3)
     ti_bob_carrots.update(state: ToteItem.states[:COMMITTED])
-    ti_chris_carrots = create_tote_item(posting_carrots, quantity = 2, chris)
+    ti_chris_carrots = create_tote_item(chris, posting_carrots, quantity = 2)
     ti_chris_carrots.update(state: ToteItem.states[:COMMITTED])
 
     #tote items producer2 1, price 5.00, units_per_case: 10, num_units: 6, contribution: $0
-    ti_sam_beef = create_tote_item(posting_beef, quantity = 3, sam)
+    ti_sam_beef = create_tote_item(sam, posting_beef, quantity = 3)
     ti_sam_beef.update(state: ToteItem.states[:COMMITTED])
-    ti_chris_beef = create_tote_item(posting_beef, quantity = 3, chris)
+    ti_chris_beef = create_tote_item(chris, posting_beef, quantity = 3)
     ti_chris_beef.update(state: ToteItem.states[:COMMITTED])
 
     #-----------------------------------------------------------------------------------------------
 
     #tote items oxbow 2, price 2.00, contribution = $10
-    ti_bob_apples = create_tote_item(posting_apples, quantity = 3, bob)
+    ti_bob_apples = create_tote_item(bob, posting_apples, quantity = 3)
     ti_bob_apples.update(state: ToteItem.states[:COMMITTED])
-    ti_sam_apples = create_tote_item(posting_apples, quantity = 2, sam)
+    ti_sam_apples = create_tote_item(sam, posting_apples, quantity = 2)
     ti_sam_apples.update(state: ToteItem.states[:COMMITTED])
 
     #tote items producer1 2, price 4.00, order min: $20, contribution: $24
-    ti_sam_milk = create_tote_item(posting_milk, quantity = 3, sam)
+    ti_sam_milk = create_tote_item(sam, posting_milk, quantity = 3)
     ti_sam_milk.update(state: ToteItem.states[:COMMITTED])
-    ti_chris_milk = create_tote_item(posting_milk, quantity = 3, chris)
+    ti_chris_milk = create_tote_item(chris, posting_milk, quantity = 3)
     ti_chris_milk.update(state: ToteItem.states[:COMMITTED])    
 
     #tote items producer2 2, price 6.00, contribution: $36
-    ti_sam_milk = create_tote_item(posting_milk, quantity = 3, sam)
+    ti_sam_milk = create_tote_item(sam, posting_milk, quantity = 3)
     ti_sam_milk.update(state: ToteItem.states[:COMMITTED])
-    ti_chris_milk = create_tote_item(posting_milk, quantity = 3, chris)
+    ti_chris_milk = create_tote_item(chris, posting_milk, quantity = 3)
     ti_chris_milk.update(state: ToteItem.states[:COMMITTED])
 
     #oxbow has om $50 and only has gross sales of $5. producer1 has om $20 and only has gross sales of $13.75
@@ -490,25 +490,25 @@ class UserTest < ActiveSupport::TestCase
     sam = create_user("sam", "sam@s.com")
 
     #create tote items for all postings
-    ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
+    ti_bob_celery = create_tote_item(bob, posting_celery, quantity = 3)
     ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
-    ti_chris_celery = create_tote_item(posting_celery, quantity = 6, chris)
+    ti_chris_celery = create_tote_item(chris, posting_celery, quantity = 6)
     ti_chris_celery.update(state: ToteItem.states[:COMMITTED])
-    ti_sam_celery = create_tote_item(posting_celery, quantity = 9, sam)
+    ti_sam_celery = create_tote_item(sam, posting_celery, quantity = 9)
     ti_sam_celery.update(state: ToteItem.states[:COMMITTED])
 
-    ti_bob_apples = create_tote_item(posting_apples, quantity = 2, bob)
+    ti_bob_apples = create_tote_item(bob, posting_apples, quantity = 2)
     ti_bob_apples.update(state: ToteItem.states[:COMMITTED])    
-    ti_chris_apples = create_tote_item(posting_apples, quantity = 4, chris)
+    ti_chris_apples = create_tote_item(chris, posting_apples, quantity = 4)
     ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
-    ti_sam_apples = create_tote_item(posting_apples, quantity = 6, sam)
+    ti_sam_apples = create_tote_item(sam, posting_apples, quantity = 6)
     ti_sam_apples.update(state: ToteItem.states[:COMMITTED])
 
-    ti_bob_milk = create_tote_item(posting_milk, quantity = 1, bob)
+    ti_bob_milk = create_tote_item(bob, posting_milk, quantity = 1)
     ti_bob_milk.update(state: ToteItem.states[:COMMITTED])    
-    ti_chris_milk = create_tote_item(posting_milk, quantity = 2, chris)
+    ti_chris_milk = create_tote_item(chris, posting_milk, quantity = 2)
     ti_chris_milk.update(state: ToteItem.states[:COMMITTED])
-    ti_sam_milk = create_tote_item(posting_milk, quantity = 3, sam)
+    ti_sam_milk = create_tote_item(sam, posting_milk, quantity = 3)
     ti_sam_milk.update(state: ToteItem.states[:COMMITTED])
 
     expected_celery_posting_value = 41.04
@@ -541,14 +541,14 @@ class UserTest < ActiveSupport::TestCase
     bob = create_user("bob", "bob@b.com")
     chris = create_user("chris", "chris@c.com")
 
-    ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
+    ti_bob_celery = create_tote_item(bob, posting_celery, quantity = 3)
     ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
-    ti_chris_celery = create_tote_item(posting_celery, quantity = 6, chris)
+    ti_chris_celery = create_tote_item(chris, posting_celery, quantity = 6)
     ti_chris_celery.update(state: ToteItem.states[:COMMITTED])
 
-    ti_bob_apples = create_tote_item(posting_apples, quantity = 2, bob)
+    ti_bob_apples = create_tote_item(bob, posting_apples, quantity = 2)
     ti_bob_apples.update(state: ToteItem.states[:COMMITTED])    
-    ti_chris_apples = create_tote_item(posting_apples, quantity = 4, chris)
+    ti_chris_apples = create_tote_item(chris, posting_apples, quantity = 4)
     ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
 
     #verify inbound_order_value_producer_net value
@@ -603,14 +603,14 @@ class UserTest < ActiveSupport::TestCase
     bob = create_user("bob", "bob@b.com")
     chris = create_user("chris", "chris@c.com")
 
-    ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
+    ti_bob_celery = create_tote_item(bob, posting_celery, quantity = 3)
     ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
-    ti_chris_celery = create_tote_item(posting_celery, quantity = 6, chris)
+    ti_chris_celery = create_tote_item(chris, posting_celery, quantity = 6)
     ti_chris_celery.update(state: ToteItem.states[:COMMITTED])
 
-    ti_bob_apples = create_tote_item(posting_apples, quantity = 2, bob)
+    ti_bob_apples = create_tote_item(bob, posting_apples, quantity = 2)
     ti_bob_apples.update(state: ToteItem.states[:COMMITTED])    
-    ti_chris_apples = create_tote_item(posting_apples, quantity = 4, chris)
+    ti_chris_apples = create_tote_item(chris, posting_apples, quantity = 4)
     ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
 
     #verify inbound_order_value_producer_net value
@@ -664,14 +664,14 @@ class UserTest < ActiveSupport::TestCase
     bob = create_user("bob", "bob@b.com")
     chris = create_user("chris", "chris@c.com")
 
-    ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
+    ti_bob_celery = create_tote_item(bob, posting_celery, quantity = 3)
     ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
-    ti_chris_celery = create_tote_item(posting_celery, quantity = 6, chris)
+    ti_chris_celery = create_tote_item(chris, posting_celery, quantity = 6)
     ti_chris_celery.update(state: ToteItem.states[:COMMITTED])
 
-    ti_bob_apples = create_tote_item(posting_apples, quantity = 2, bob)
+    ti_bob_apples = create_tote_item(bob, posting_apples, quantity = 2)
     ti_bob_apples.update(state: ToteItem.states[:COMMITTED])    
-    ti_chris_apples = create_tote_item(posting_apples, quantity = 4, chris)
+    ti_chris_apples = create_tote_item(chris, posting_apples, quantity = 4)
     ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
 
     #verify inbound_order_value_producer_net value
@@ -727,14 +727,14 @@ class UserTest < ActiveSupport::TestCase
     bob = create_user("bob", "bob@b.com")
     chris = create_user("chris", "chris@c.com")
 
-    ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
+    ti_bob_celery = create_tote_item(bob, posting_celery, quantity = 3)
     ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
-    ti_chris_celery = create_tote_item(posting_celery, quantity = 6, chris)
+    ti_chris_celery = create_tote_item(chris, posting_celery, quantity = 6)
     ti_chris_celery.update(state: ToteItem.states[:COMMITTED])
 
-    ti_bob_apples = create_tote_item(posting_apples, quantity = 2, bob)
+    ti_bob_apples = create_tote_item(bob, posting_apples, quantity = 2)
     ti_bob_apples.update(state: ToteItem.states[:COMMITTED])    
-    ti_chris_apples = create_tote_item(posting_apples, quantity = 4, chris)
+    ti_chris_apples = create_tote_item(chris, posting_apples, quantity = 4)
     ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
 
     #verify inbound_order_value_producer_net value
@@ -793,14 +793,14 @@ class UserTest < ActiveSupport::TestCase
     bob = create_user("bob", "bob@b.com")
     chris = create_user("chris", "chris@c.com")
 
-    ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
+    ti_bob_celery = create_tote_item(bob, posting_celery, quantity = 3)
     ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
-    ti_chris_celery = create_tote_item(posting_celery, quantity = 6, chris)
+    ti_chris_celery = create_tote_item(chris, posting_celery, quantity = 6)
     ti_chris_celery.update(state: ToteItem.states[:COMMITTED])
 
-    ti_bob_apples = create_tote_item(posting_apples, quantity = 2, bob)
+    ti_bob_apples = create_tote_item(bob, posting_apples, quantity = 2)
     ti_bob_apples.update(state: ToteItem.states[:COMMITTED])    
-    ti_chris_apples = create_tote_item(posting_apples, quantity = 4, chris)
+    ti_chris_apples = create_tote_item(chris, posting_apples, quantity = 4)
     ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
 
     #verify inbound_order_value_producer_net value
@@ -859,14 +859,14 @@ class UserTest < ActiveSupport::TestCase
     bob = create_user("bob", "bob@b.com")
     chris = create_user("chris", "chris@c.com")
 
-    ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
+    ti_bob_celery = create_tote_item(bob, posting_celery, quantity = 3)
     ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
-    ti_chris_celery = create_tote_item(posting_celery, quantity = 6, chris)
+    ti_chris_celery = create_tote_item(chris, posting_celery, quantity = 6)
     ti_chris_celery.update(state: ToteItem.states[:COMMITTED])
 
-    ti_bob_apples = create_tote_item(posting_apples, quantity = 2, bob)
+    ti_bob_apples = create_tote_item(bob, posting_apples, quantity = 2)
     ti_bob_apples.update(state: ToteItem.states[:COMMITTED])    
-    ti_chris_apples = create_tote_item(posting_apples, quantity = 4, chris)
+    ti_chris_apples = create_tote_item(chris, posting_apples, quantity = 4)
     ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
 
     #verify inbound_order_value_producer_net value
@@ -931,14 +931,14 @@ class UserTest < ActiveSupport::TestCase
     bob = create_user("bob", "bob@b.com")
     chris = create_user("chris", "chris@c.com")
 
-    ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
+    ti_bob_celery = create_tote_item(bob, posting_celery, quantity = 3)
     ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
-    ti_chris_celery = create_tote_item(posting_celery, quantity = 6, chris)
+    ti_chris_celery = create_tote_item(chris, posting_celery, quantity = 6)
     ti_chris_celery.update(state: ToteItem.states[:COMMITTED])
 
-    ti_bob_apples = create_tote_item(posting_apples, quantity = 2, bob)
+    ti_bob_apples = create_tote_item(bob, posting_apples, quantity = 2)
     ti_bob_apples.update(state: ToteItem.states[:COMMITTED])    
-    ti_chris_apples = create_tote_item(posting_apples, quantity = 4, chris)
+    ti_chris_apples = create_tote_item(chris, posting_apples, quantity = 4)
     ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
 
     #verify inbound_order_value_producer_net value
@@ -1000,17 +1000,17 @@ class UserTest < ActiveSupport::TestCase
     bob = create_user("bob", "bob@b.com")
     chris = create_user("chris", "chris@c.com")
 
-    ti_bob_milk = create_tote_item(posting_milk, quantity = 1, bob)
+    ti_bob_milk = create_tote_item(bob, posting_milk, quantity = 1)
     ti_bob_milk.update(state: ToteItem.states[:COMMITTED])
 
-    ti_bob_celery = create_tote_item(posting_celery, quantity = 3, bob)
+    ti_bob_celery = create_tote_item(bob, posting_celery, quantity = 3)
     ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
-    ti_chris_celery = create_tote_item(posting_celery, quantity = 6, chris)
+    ti_chris_celery = create_tote_item(chris, posting_celery, quantity = 6)
     ti_chris_celery.update(state: ToteItem.states[:COMMITTED])
 
-    ti_bob_apples = create_tote_item(posting_apples, quantity = 2, bob)
+    ti_bob_apples = create_tote_item(bob, posting_apples, quantity = 2)
     ti_bob_apples.update(state: ToteItem.states[:COMMITTED])    
-    ti_chris_apples = create_tote_item(posting_apples, quantity = 4, chris)
+    ti_chris_apples = create_tote_item(chris, posting_apples, quantity = 4)
     ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
 
     #verify inbound_order_value_producer_net value

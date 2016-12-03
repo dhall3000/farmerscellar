@@ -293,20 +293,23 @@ class ToteItemTest < ActiveSupport::TestCase
 
     #three merry shoppers come along and add+auth a total of quantity 6
     c1 = users(:c1)
-    ti = create_tote_item(c1, @posting, 3, authorize = true)
+    ti = create_tote_item(c1, @posting, 3)
+    create_one_time_authorization_for_customer(c1)
     assert_equal 7, ti.additional_units_required_to_fill_my_case
 
     c2 = users(:c2)
-    ti = create_tote_item(c2, @posting, 1, authorize = true)
+    ti = create_tote_item(c2, @posting, 1)
+    create_one_time_authorization_for_customer(c2)
     assert_equal 6, ti.additional_units_required_to_fill_my_case
 
     c3 = users(:c3)
-    ti = create_tote_item(c3, @posting, 2, authorize = true)
+    ti = create_tote_item(c3, @posting, 2)
+    create_one_time_authorization_for_customer(c3)
     assert_equal 4, ti.additional_units_required_to_fill_my_case
 
     #then c4 comes along and adds 5. this fills the first case with quantity 1 left over for the 2nd case
     c4 = users(:c4)
-    ti = create_tote_item(c4, @posting, 5, authorize = false)
+    ti = create_tote_item(c4, @posting, 5)
     #consequently, we should report '9' remaining to fill the 2nd case
     assert_equal 9, ti.additional_units_required_to_fill_my_case
     #and if nothing changes, this item will partially fill
@@ -326,14 +329,15 @@ class ToteItemTest < ActiveSupport::TestCase
     assert_equal 0, @posting.tote_items.count
 
     c4 = users(:c4)
-    ti = create_tote_item(c4, @posting, 3, authorize = true)
+    ti = create_tote_item(c4, @posting, 3)
+    create_one_time_authorization_for_customer(c4)
     assert_equal 7, ti.additional_units_required_to_fill_my_case
     
     c1 = users(:c1)
-    ti3 = create_tote_item(c1, @posting, 3, authorize = false)
+    ti3 = create_tote_item(c1, @posting, 3)
     assert_equal 4, ti3.additional_units_required_to_fill_my_case
 
-    ti5 = create_tote_item(c1, @posting, 5, authorize = false)
+    ti5 = create_tote_item(c1, @posting, 5)
     assert_equal 9, ti5.additional_units_required_to_fill_my_case
 
     #if the user auth'd right now ti3 should fully fill. only ti5 should partially fill
@@ -341,35 +345,20 @@ class ToteItemTest < ActiveSupport::TestCase
     
   end
 
-  def create_tote_item(user, posting, quantity, authorize = false)
-    
-    tote_item = ToteItem.new(quantity: quantity, posting: posting, user: user, price: posting.price)
-    assert tote_item.valid?
-    assert tote_item.save
-
-    if authorize
-      tote_item.transition(:customer_authorized)
-      tote_item.reload
-      assert tote_item.state?(:AUTHORIZED)
-    end
-
-    return tote_item
-
-  end
-
   test "users first item should be shippable but not the second" do
     #make a test where anonymouse user auths 3 of a 10-unit-case posting. then c1 adds 3 so that 4 more are needed then c1 adds 5 so that his first item should
     #get shipped if he authorizes but the second item should report 9 more needed to ship.
     c2 = users(:c2)
-    tic2 = create_tote_item(c2, @posting, quantity = 3, authorize = true)
+    tic2 = create_tote_item(c2, @posting, quantity = 3)
+    create_one_time_authorization_for_customer(c2)
     assert_equal 7, tic2.additional_units_required_to_fill_my_case
 
     c1 = users(:c1)
-    tic1_1 = create_tote_item(c1, @posting, quantity = 3, authorize = false)
+    tic1_1 = create_tote_item(c1, @posting, quantity = 3)
     assert_equal 7, tic2.additional_units_required_to_fill_my_case
     assert_equal 4, tic1_1.additional_units_required_to_fill_my_case  
 
-    tic1_2 = create_tote_item(c1, @posting, quantity = 5, authorize = false)
+    tic1_2 = create_tote_item(c1, @posting, quantity = 5)
     assert_equal 7, tic2.additional_units_required_to_fill_my_case
     assert_equal 0, tic1_1.additional_units_required_to_fill_my_case  
     assert_equal 9, tic1_2.additional_units_required_to_fill_my_case  
@@ -381,15 +370,17 @@ class ToteItemTest < ActiveSupport::TestCase
     #this last item's case isn't filled. will it say that the user's original auth'd item comes up short?
 
     c1 = users(:c1)
-    ti1 = create_tote_item(c1, @posting, quantity = 3, authorize = true)
+    ti1 = create_tote_item(c1, @posting, quantity = 3)
+    create_one_time_authorization_for_customer(c1)
     assert_equal 7, ti1.additional_units_required_to_fill_my_case
 
     c4 = users(:c4)
-    ti2 = create_tote_item(c4, @posting, quantity = 7, authorize = true)
+    ti2 = create_tote_item(c4, @posting, quantity = 7)
+    create_one_time_authorization_for_customer(c4)
     assert_equal 0, ti1.additional_units_required_to_fill_my_case
     assert_equal 0, ti2.additional_units_required_to_fill_my_case    
 
-    ti3 = create_tote_item(c1, @posting, quantity = 2, authorize = false)
+    ti3 = create_tote_item(c1, @posting, quantity = 2)
     assert_equal 0, ti1.additional_units_required_to_fill_my_case
     assert_equal 0, ti2.additional_units_required_to_fill_my_case
     assert_equal 8, ti3.additional_units_required_to_fill_my_case

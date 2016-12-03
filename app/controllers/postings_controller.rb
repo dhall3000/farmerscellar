@@ -162,6 +162,7 @@ class PostingsController < ApplicationController
         :price_equivalency_description,
         :unit_equivalency_description,
         :product_identifier,
+        :order_minimum_producer_net,
         :units_per_case
         )
 
