@@ -22,8 +22,6 @@ Rails.application.routes.draw do
   delete 'logout' => 'sessions#destroy'
   post 'sessions/spoof'
   get 'sessions/unspoof'  
-  get 'bulk_payments/test_masspay' => 'bulk_payments#test_masspay'
-  post 'bulk_payments/test_masspay' => 'bulk_payments#test_masspay'
   get 'reference_transactions/new_ba'
   get 'reference_transactions/create_ba'
   post 'reference_transactions/create_capture'
@@ -50,10 +48,7 @@ Rails.application.routes.draw do
   resources :postings
   resources :tote_items, only: [:index, :new, :create, :destroy]
   resources :authorizations, only: [:new, :create]
-  resources :bulk_buys, only: [:new, :create]
   resources :checkouts, only: [:create]
-  resources :bulk_purchases, only: [:new, :create]
-  resources :bulk_payments, only: [:new, :create]      
   resources :access_codes, only: [:new, :create, :update]
   resources :dropsites
   resources :user_dropsites, only: [:create]

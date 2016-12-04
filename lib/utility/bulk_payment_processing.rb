@@ -14,7 +14,7 @@ class BulkPaymentProcessing
       puts "BulkPaymentProcessing.do_bulk_creditor_payment: there are still deliveries outstanding this week so we're not going to do a bulk payment today. quitting."
     else
 
-      unbalanced_creditor_obligations = CreditorObligation.joins(creditor_order: {creditor: :business_interface}).where("balance > 0.0").where("business_interfaces.payment_method = ?", BusinessInterface.payment_methods[:PAYPAL])
+      unbalanced_creditor_obligations = CreditorObligation.get_unbalanced
 
       if unbalanced_creditor_obligations.count == 0
         return
@@ -54,111 +54,21 @@ class BulkPaymentProcessing
       bp.save
       email_report_to_admin(bp, payment_info_by_creditor_id)
 
+      payment_infos_by_payment_method = get_payment_infos_by_payment_method(payment_info_by_creditor_id)
+      paypal_payment_info_by_creditor_id = payment_infos_by_payment_method[:paypal_payment_info_by_creditor_id]
+      manual_payment_info_by_creditor_id = payment_infos_by_payment_method[:manual_payment_info_by_creditor_id]
+
+      response = send_payments(paypal_payment_info_by_creditor_id)
+
+      if response
+        save_response(response, bp)
+      end
+      
+      bp.save   
+
     end
 
     puts "BulkPaymentProcessing.do_bulk_creditor_payment end"
-
-	end
-
-	def self.bulk_payment_new
-
-    puts "BulkPaymentProcessing.bulk_payment_new start"
-
-    unpaid_payment_payables = PaymentPayable.where(fully_paid: false).joins(users: :business_interface).where("business_interfaces.payment_method = ?", BusinessInterface.payment_methods[:PAYPAL])
-
-  	if unpaid_payment_payables.count == 0
-      puts "BulkPaymentProcessing.bulk_payment_new there are no unpaid PaymentPayables so quitting."
-      puts "BulkPaymentProcessing.bulk_payment_new end"
-  		return
-  	end
-
-  	grand_total_payout = 0
-  	payment_info_by_creditor_id = {}
-
-  	unpaid_payment_payables.each do |p|
-  	  creditor = p.users.order("users.id").last
-  	  if payment_info_by_creditor_id[creditor.id] == nil
-  	  	payment_info_by_creditor_id[creditor.id] = {amount: 0, payment_payable_ids: []}
-  	  end
-  	  amount_unpaid_on_this_payment_payable = p.amount - p.amount_paid  	  
-      payment_info_by_creditor_id[creditor.id][:amount] = (payment_info_by_creditor_id[creditor.id][:amount] + amount_unpaid_on_this_payment_payable).round(2)
-  	  payment_info_by_creditor_id[creditor.id][:payment_payable_ids] << p.id
-      grand_total_payout = (grand_total_payout + amount_unpaid_on_this_payment_payable).round(2)
-  	end
-
-    puts "BulkPaymentProcessing.bulk_payment_new end"
-
-  	return {unpaid_payment_payables: unpaid_payment_payables, grand_total_payout: grand_total_payout, payment_info_by_creditor_id: payment_info_by_creditor_id}
-
-	end
-  
-	def self.bulk_payment_create(params)
-
-    puts "BulkPaymentProcessing.bulk_payment_create start"
-
-    if params.nil? || params[:payment_info_by_creditor_id].nil?
-      puts "payment_info_by_creditor_id is nil. quitting."
-      puts "BulkPaymentProcessing.bulk_payment_create end"
-      return {payment_info_by_creditor_id: nil, messages: ["payment_info_by_creditor_id is nil. We cannot proceed with this bulk payment. Please do not touch the system any further until you can report this to a developer."]}
-    end
-
-    payment_info_by_creditor_id = params[:payment_info_by_creditor_id]
-
-    if payment_info_by_creditor_id.is_a? String
-      payment_info_by_creditor_id = eval payment_info_by_creditor_id
-    end
-
-  	num_payees = payment_info_by_creditor_id.keys.count
-  	cumulative_total_payout = 0
-  	payment_info_by_creditor_id.each do |creditor_id, payment_info|
-  	  cumulative_total_payout = (cumulative_total_payout + payment_info[:amount].to_f).round(2)
-  	end
-
-    payment_infos_by_payment_method = get_payment_infos_by_payment_method(payment_info_by_creditor_id)
-    paypal_payment_info_by_creditor_id = payment_infos_by_payment_method[:paypal_payment_info_by_creditor_id]
-    manual_payment_info_by_creditor_id = payment_infos_by_payment_method[:manual_payment_info_by_creditor_id]
-
-  	response = send_payments(paypal_payment_info_by_creditor_id)
-  	
-    puts "BulkPaymentProcessing.bulk_payment_create: returned from sending payments. now building a BulkPayment object to save to db."
-	  #create a BulkPayment object
-	  #create a Payment object for each payment in the BulkPayment
-    payment_invoice_infos = []
-	  bulk_payment = BulkPayment.new(num_payees: payment_info_by_creditor_id.keys.count, total_payments_amount: cumulative_total_payout)    
-	  payment_info_by_creditor_id.each do |creditor_id, payment_info|
-	  	payment = Payment.new(amount: payment_info[:amount])  	  	
-	  	payment_info[:payment_payable_ids].each do |payment_payable_id|
-	  	  payment_payable = PaymentPayable.find(payment_payable_id.to_i)
-        #TODO (Future):this isn't quite the right thing to do. we're unconditionally saying that every payment has been made when in fact it might not have
-        #gone through successfully. the reason for this is because i need to move on since we're in early-stage biz dev
-        #for now what i really want to make sure is that we're keeping all the information in case we get in to a snafu we can
-        #back our way out manually. in the future we should make it so that if there's an error in payment in will not flatten the
-        #payment below but rather leave it as is AND alert the admin that there was a payment problem. the details of how to do this are
-        #that when errors come down they have a funky identifier like 'L_EMAILn' where 'n' is the integer id of exactly which (of the potentially many)
-        #payments failed. so i'd have to write tedious code to correlate this funky id with the ids in my system. notgonnadoit right now.
-        payment_payable.update(amount_paid: payment_payable.amount, fully_paid: true)
-	  	  payment.payment_payables << payment_payable
-	  	  bulk_payment.payment_payables << payment_payable
-	  	end
-	  	payment.save
-      
-      creditor = User.find(creditor_id)
-      posting_infos = get_posting_infos(payment_info[:payment_payable_ids])
-      #NOTE: DO NOT REMOVE THIS ARRAY! it's used in test for verification
-      payment_invoice_infos << {total: payment.amount, posting_infos: posting_infos}
-      ProducerNotificationsMailer.payment_invoice(creditor, payment, posting_infos).deliver_now
-
-	  end
-
-    if response
-      save_response(response, bulk_payment)
-    end
-    
-	  bulk_payment.save  	
-
-    puts "BulkPaymentProcessing.bulk_payment_create end"
-
-  	return {payment_invoice_infos: payment_invoice_infos, messages: [], payment_info_by_creditor_id: payment_info_by_creditor_id, num_payees: num_payees, cumulative_total_payout: cumulative_total_payout, bulk_payment: bulk_payment}
 
 	end
 
@@ -426,14 +336,14 @@ class BulkPaymentProcessing
         return nil
       end
 
-      if !USEGATEWAY
-        response = FakeMasspayResponse.new
-        return response
-      end
-
       email_amount_pairs = get_email_amount_pairs(payment_info_by_creditor_id)
       payouts_params = get_payout_params(email_amount_pairs)
-      response = send_paypal_masspay(PAYPALCREDENTIALS, payouts_params)
+
+      if USEGATEWAY
+        response = send_paypal_masspay(PAYPALCREDENTIALS, payouts_params)
+      else
+        response = FakeMasspayResponse.new
+      end      
 
       puts "BulkPaymentProcessing.send_payments end"
 
@@ -535,7 +445,7 @@ class BulkPaymentProcessing
       response = nil
 
       if USEGATEWAY                
-  	    url = URI.parse(PAYPALMASSPAYENDPOINT)
+        url = URI.parse(PAYPALMASSPAYENDPOINT)
   	    http = Net::HTTP.new(url.host, url.port)
   	    http.use_ssl = true
 

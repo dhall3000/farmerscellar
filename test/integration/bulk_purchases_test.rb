@@ -48,11 +48,12 @@ class BulkPurchasesTest < BulkBuyer
 
     bulk_purchase = BulkPurchase.last
     bulk_payment = BulkPayment.last
-
-    ti = bulk_purchase.purchase_receivables[2].tote_items.first
+    
+    pj_ti_index = 8
+    ti = @c1.tote_items[pj_ti_index]
     c1_charge_amount = (ti.quantity * ti.price).round(2)
     ricky_proceeds = (c1_charge_amount * (0.965)).round(2)
-    assert_equal ricky_proceeds, bulk_payment.payment_payables[10].payments.first.amount
+    assert_equal ricky_proceeds, bulk_payment.payment_payables[pj_ti_index].payments.first.amount
 
     travel_back
 
@@ -281,18 +282,10 @@ class BulkPurchasesTest < BulkBuyer
   def verify_proper_account_state(customer)
     
     account_ok = customer.user_account_states.order(:created_at).last.account_state.state == AccountState.states[:OK]
-
-    #verify shopping tote empty. this actually technically doesn't have to be the case for customers with good standing
-    #but it is now true given the way the test is written
-    assert_equal ToteItem.where(state: ToteItem.states[:ADDED], user_id: customer.id).count, 0
-    assert_equal ToteItem.where(state: ToteItem.states[:AUTHORIZED], user_id: customer.id).count, 0
-    assert_equal ToteItem.where(state: ToteItem.states[:COMMITTED], user_id: customer.id).count, 0
-
-    posting_lettuce = postings(:postingf1lettuce)
     log_in_as(customer)   
 
     #try to pull up the buy form for a particular posting
-    get new_tote_item_path(posting_id: posting_lettuce.id)
+    get new_tote_item_path(posting_id: Posting.last.id)
 
     #check for the existence of nasty-gram related to account state
     if account_ok
@@ -306,59 +299,66 @@ class BulkPurchasesTest < BulkBuyer
       assert_select "table.table tbody tr td form.tote_addition_one_button_form input[disabled=?]", "disabled"
     end    
 
-    #verify can't add new tote items
+    #TODO: verify can't add new tote items
     
   end
 
   #bundle exec rake test test/integration/bulk_purchases_test.rb
   test "do bulk buy with purchase failures" do
-  
-    customers = [@c1, @c2, @c3, @c4]
 
-    assert_equal 0, BulkPurchase.count
-    assert_equal 0, BulkPayment.count
+    nuke_all_tote_items
+    nuke_all_postings
+    nuke_all_users
 
-    purchase_receivables = setup_bulk_purchase(customers)
+    admin = create_admin
+    producer1 = create_producer(name = "producer1", email = "producer1@p.com")
+    producer2 = create_producer(name = "producer2", email = "producer2@p.com")
 
-    #COMMENT KEY 000: we're going to set up c1 so that he has some toteitems in a bulk purchase that fail but at the moment of fail
-    #he also has a ti that's ADDED and another that's AUTHORIZED. the code should sense these latter two and
-    #switch them to state REMOVED. so we're going to first verify that we have zero in the REMOVED state and
-    #then after the purchase failure verify that we have 2 in the REMOVED state.
-    #I modified this assertion on 2016-11-22 because we added a RakeHelper.do_hourly_tasks in the code path to fix a different
-    #test break. this caused user c18's three tote items to get REMOVED. so i changed this test to just assert that c1-c4
-    #have zero REMOVED items
-    assert_equal 0, ToteItem.where(user: customers, state: ToteItem.states[:REMOVED]).count
+    x1 = create_new_customer("x1", "x1@c.com")
+    x2 = create_new_customer("x2", "x2@c.com")
+    x3 = create_new_customer("x3", "x3@c.com")
+    x4 = create_new_customer("x4", "x4@c.com")
 
-    #authorize some more tote items
-    log_in_as(@c1)
-    posting_lettuce = postings(:postingf1lettuce)
-    post tote_items_path, params: {tote_item: {quantity: 2, price: posting_lettuce.price, state: ToteItem.states[:ADDED], posting_id: posting_lettuce.id, user_id: @c1.id}}
-    get tote_items_path
-    total_amount_to_authorize = assigns(:total_amount_to_authorize)    
-    post checkouts_path, params: {amount: total_amount_to_authorize, use_reference_transaction: "0"}
-    follow_redirect!
-    authorization = assigns(:authorization)
-    post authorizations_path, params: {authorization: {token: authorization.token, payer_id: authorization.payer_id, amount: authorization.amount}}
-    authorization = assigns(:authorization)    
+    posting11 = create_posting(producer1, price = 2, get_product("Apples"), get_unit("Pound"), get_delivery_date(7), get_delivery_date(5))
+    posting12 = create_posting(producer1, price = 4, get_product("Mango"), get_unit("Pound"), get_delivery_date(7), get_delivery_date(5))
+    posting21 = create_posting(producer2, price = 8, get_product("Giraffe Milk"), get_unit("Pound"), get_delivery_date(14), get_delivery_date(12))
+    posting22 = create_posting(producer2, price = 16, get_product("Raisin"), get_unit("Pound"), get_delivery_date(14), get_delivery_date(12))
 
-    #add some more toteitems    
-    posting_tomato = postings(:postingf2tomato)
-    post tote_items_path, params: {tote_item: {quantity: 2, price: posting_tomato.price, state: ToteItem.states[:ADDED], posting_id: posting_tomato.id, user_id: @c1.id}}
+    create_tote_item(x1, posting11, quantity = 2)
+    create_tote_item(x1, posting12, quantity = 2)
+    create_tote_item(x1, posting21, quantity = 2)
+
+    create_tote_item(x2, posting11, quantity = 2)
+    create_tote_item(x2, posting12, quantity = 2)
+
+    create_tote_item(x3, posting21, quantity = 2)
+    create_tote_item(x3, posting22, quantity = 2)
+
+    create_tote_item(x4, posting21, quantity = 2)
+    create_tote_item(x4, posting22, quantity = 2)
+
+    create_one_time_authorization_for_customer(x1)
+    create_one_time_authorization_for_customer(x2)
+    create_one_time_authorization_for_customer(x3)
+    create_one_time_authorization_for_customer(x4)
 
     #by the time we get to this point c1 should have 10 toteitems, 8 in PURCHASEPENDING, 1 in ADDED and 1 in AUTHORIZED
 
     ActionMailer::Base.deliveries.clear
     previous_user_account_state_count = UserAccountState.count
 
-    posting = @c1.tote_items.first.posting
+    travel_to posting11.commitment_zone_start
+    RakeHelper.do_hourly_tasks
 
-    log_in_as(@a1)
+    fully_fill_creditor_order(posting11.reload.creditor_order)
+
+    log_in_as(get_admin)
     FakeCaptureResponse.toggle_success = true    
-    travel_to posting.delivery_date + 22.hours
+    travel_to posting11.delivery_date + 22.hours
     RakeHelper.do_hourly_tasks
     
     #COMMENT KEY 000
-    assert_equal 2, ToteItem.where(user: customers, state: ToteItem.states[:REMOVED]).count
+    assert_equal 1, ToteItem.where(user: x1, state: ToteItem.states[:REMOVED]).count
     verify_legitimacy_of_bulk_purchase
 
     verify_proper_number_of_payment_payables    
@@ -375,9 +375,9 @@ class BulkPurchasesTest < BulkBuyer
     assert UserAccountState.count, previous_user_account_state_count
     assert 1, UserAccountState.order(:created_at).last.account_state.state
     
-    verify_proper_purchase_receipt_emails(bulk_purchase)
-    verify_proper_account_states(customers)
-    log_in_as(@a1)
+    verify_proper_purchase_receipt_emails(bulk_purchase)    
+    verify_proper_account_states([x1, x2, x3, x4])
+    log_in_as(get_admin)
     
     bulk_payment = BulkPayment.last
 
@@ -468,12 +468,10 @@ class BulkPurchasesTest < BulkBuyer
   def verify_legitimacy_of_bulk_purchase(options = {})
     bp = BulkPurchase.last
     purchase_receivables = bp.purchase_receivables
-    assert_not_nil bp
-
-    prs = bp.purchase_receivables
+    assert_not_nil bp    
 
     total_amount_purchased = 0
-    for pr in prs
+    purchase_receivables.each do |pr|
       #NOTE!! it looks like i've done a good job to date of avoiding putting .round(2) in the test code anywhere. but
       #i came across a failure where it really seems like it's the summing of the total_amount_purchased var that is
       #causing the funky values. I was able to duplicte this in a terminal like this:
@@ -481,19 +479,10 @@ class BulkPurchasesTest < BulkBuyer
       #=> 424.40999999999997
       total_amount_purchased = (total_amount_purchased + pr.amount_purchased).round(2)
     end
-
-    #total up the amount purchased in another way and verify the two ways are equivalent
-    total_amount_purchased2 = 0
-
-    purchase_receivables.each do |pr|
-      total_amount_purchased2 = total_amount_purchased2 + pr.amount_purchased
-    end
-
-    assert_equal total_amount_purchased, total_amount_purchased2
-    
+   
     #verify sum of pr amountpurchaseds == bulkpurchase.totalgross
     assert_equal total_amount_purchased, bp.gross
-    all_purchases_succeeded = all_purchase_receivables_succeeded(prs)
+    all_purchases_succeeded = all_purchase_receivables_succeeded(purchase_receivables)
 
     #verify the total amount withheld from us equals the sum of the parts
     sum_of_payment_processor_fee_withheld_from_us = 0
@@ -746,7 +735,7 @@ class BulkPurchasesTest < BulkBuyer
       if purchase.response.success?
         assert_equal authorization.amount, purchase.gross_amount        
       else
-        assert_equal authorization.amount, pr.purchases.last.purchase_receivables.sum(:amount)
+        assert pr.purchases.last.purchase_receivables.sum(:amount) <= authorization.amount
         assert_equal 0, pr.purchases.last.purchase_receivables.sum(:amount_purchased)
       end
 
@@ -777,26 +766,42 @@ class BulkPurchasesTest < BulkBuyer
 
   def setup_bulk_purchase(customers)
     
-    fill_all_tote_items = true
-    create_bulk_buy(customers, fill_all_tote_items)
-    get new_bulk_purchase_path
-    assert :success
-    assert_template 'bulk_purchases/new'
-    #puts @response.body
-    bulk_purchase = assigns(:bulk_purchase)
-    assert_not_nil bulk_purchase
+    order_cutoffs = []    
 
-    #assert there are some purchase receivables
-    assert_not_nil bulk_purchase.purchase_receivables
-    assert bulk_purchase.purchase_receivables.to_a.count > 0
-    puts "bulk_purchase.purchase_receivables.to_a.count: #{bulk_purchase.purchase_receivables.to_a.count}"
+    customers.each do |customer|
+      
+      create_one_time_authorization_for_customer(customer)
+
+      customer.tote_items.each do |tote_item|
+        order_cutoffs << tote_item.posting.commitment_zone_start
+      end
+
+    end
+
+    assert_equal 0, CreditorOrder.count
+
+    order_cutoffs = order_cutoffs.uniq.sort
+
+    order_cutoffs.each do |order_cutoff|
+      travel_to order_cutoff
+      RakeHelper.do_hourly_tasks
+    end
+
+    assert_equal 0, PurchaseReceivable.count
+
+    CreditorOrder.all.each do |creditor_order|
+      fully_fill_creditor_order(creditor_order)
+    end
+
+    assert PurchaseReceivable.count > 0
+    assert_equal 0, BulkPurchase.count
 
     #verify that all the pr's are legit
-    for purchase_receivable in bulk_purchase.purchase_receivables
+    PurchaseReceivable.all.each do |purchase_receivable|
       #the amount should always be positive
       assert purchase_receivable.amount > 0
       #this should be zero here because we haven't done the producer payments yet
-      assert_equal purchase_receivable.amount_purchased, 0
+      assert_equal 0, purchase_receivable.amount_purchased
       assert_equal PurchaseReceivable.states[:READY], purchase_receivable.state
       assert_not_nil purchase_receivable.bulk_buys
 
@@ -822,7 +827,7 @@ class BulkPurchasesTest < BulkBuyer
     purchase_receivables = []
 
     #build up an array of purchase_receivable ids to simulate the post to create a bulk purchase
-    for pr in bulk_purchase.purchase_receivables
+    for pr in PurchaseReceivable.all
       purchase_receivables << pr.id
     end    
 

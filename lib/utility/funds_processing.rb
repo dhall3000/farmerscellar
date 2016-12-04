@@ -11,23 +11,16 @@ class FundsProcessing
     puts "FundsProcessing.do_bulk_customer_purchase start"
 		
 		#do bulk purchase
-		values = bulk_purchase_new    
+		bulk_purchase = bulk_purchase_new
 
-		purchase_receivable_ids = []
-
-    if !values.nil? && values[:bulk_purchase] != nil && values[:bulk_purchase].purchase_receivables != nil && values[:bulk_purchase].purchase_receivables.any?
-      values[:bulk_purchase].purchase_receivables.each do |pr|
-        purchase_receivable_ids << pr.id
-      end
+    if bulk_purchase.nil?
+      puts "FundsProcessing.do_bulk_customer_purchase: no purchases to make so no bulk purchase to make. short circuiting."
+      puts "FundsProcessing.do_bulk_customer_purchase end"
+      return
     end
 
-    if purchase_receivable_ids.any?
-      bulk_purchase = bulk_purchase_create(purchase_receivable_ids)[:bulk_purchase]    
-    end		
-
-    if bulk_purchase != nil
-      bulk_purchase.do_bulk_email_communication
-    end
+    bulk_purchase.go
+    bulk_purchase.do_bulk_email_communication
 
     puts "FundsProcessing.do_bulk_customer_purchase end"
 
@@ -43,8 +36,10 @@ class FundsProcessing
     if bulk_purchase.purchase_receivables.size < 1
       puts "zero purchase_receivables"
       puts "FundsProcessing.bulk_purchase_new end"
-      return
+      return nil
     end
+
+    bulk_purchase.save
 
     puts "------"
     s = JunkCloset.puts_helper("", "BulkPurchase id", bulk_purchase.id.to_s)
@@ -62,30 +57,8 @@ class FundsProcessing
       
     puts "FundsProcessing.bulk_purchase_new end"
 
-  	return {bulk_purchase: bulk_purchase}
+  	return bulk_purchase
   	
-	end
-
-	def self.bulk_purchase_create(purchase_receivable_ids)
-
-    puts "FundsProcessing.bulk_purchase_create start"
-    
-    if purchase_receivable_ids != nil
-    	purchase_receivables = PurchaseReceivable.find(purchase_receivable_ids)
-    	if purchase_receivables != nil && purchase_receivables.count > 0
-        puts JunkCloset.puts_helper("", "num PurchaseReceivables we're about to loop over", purchase_receivables.count.to_s)
-    	  bulk_purchase = BulkPurchase.new(gross: 0, payment_processor_fee_withheld_from_us: 0, commission: 0, net: 0)
-    	  for pr in purchase_receivables
-    	    bulk_purchase.purchase_receivables << pr
-    	  end
-        bulk_purchase.go
-      end
-    end
-
-    puts "FundsProcessing.bulk_purchase_create end"
-
-    return {bulk_purchase: bulk_purchase}
-
 	end
 
 end

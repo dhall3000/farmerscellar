@@ -4,12 +4,19 @@ require 'utility/rake_helper'
 class IntegrationHelper < ActionDispatch::IntegrationTest
 
   def do_authorized_through_funds_transfer(posting)
+    
     #transition tote items from authorized -> committed
     do_hourly_tasks_at(posting.commitment_zone_start)
     #do fill    
     fully_fill_creditor_order(posting.creditor_order)
+    #there should now be an unbalanced CreditorObligation associated with this
+    num_unbalanced_creditor_obligations = CreditorObligation.get_unbalanced.count
+    assert num_unbalanced_creditor_obligations > 0
     #transfer funds
     do_hourly_tasks_at(posting.delivery_date + 22.hours)
+    #there should now be one less unbalanced CreditorObligation after payment was made
+    assert_equal num_unbalanced_creditor_obligations - 1, CreditorObligation.get_unbalanced.count
+
   end
 
   def log_in_dropsite_user(dropsite_user)
