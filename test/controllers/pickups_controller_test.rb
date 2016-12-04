@@ -75,7 +75,7 @@ class PickupsControllerTest < ActionDispatch::IntegrationTest
       user.set_dropsite(Dropsite.first)
     end
 
-    ti.posting.update(delivery_date: Time.zone.now.midnight, commitment_zone_start: Time.zone.now.midnight - 2.days)
+    ti.posting.update(delivery_date: Time.zone.now.midnight, order_cutoff: Time.zone.now.midnight - 2.days)
     travel_to Time.zone.now.midnight + 12.hours
 
   end

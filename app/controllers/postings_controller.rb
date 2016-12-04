@@ -157,7 +157,7 @@ class PostingsController < ApplicationController
         :unit_id,
         :live,
         :delivery_date,
-        :commitment_zone_start,
+        :order_cutoff,
         :product_attributes,
         :price_equivalency_description,
         :unit_equivalency_description,

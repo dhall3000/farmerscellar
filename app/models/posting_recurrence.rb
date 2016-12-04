@@ -37,7 +37,7 @@ class PostingRecurrence < ApplicationRecord
   #constraints:
   #can't be sunday or monday
   #must be in the future relative to current_posting
-  #commitment_zone_start must be modified independantly
+  #order_cutoff must be modified independantly
   #
   #here's how you should use this: say a farmer tells you he wants to switch from wednesday delivery to thursday.
   #and he wants his first thursday delivery to be on september 7th. wait until after the system generates the
@@ -231,7 +231,7 @@ class PostingRecurrence < ApplicationRecord
     now = Time.zone.now
 
     #if we're not between the most recently posted post's commit zone and delivery date, just quit
-    if now < old_post.commitment_zone_start || now > old_post.delivery_date
+    if now < old_post.order_cutoff || now > old_post.delivery_date
       return
     end
 
@@ -243,8 +243,8 @@ class PostingRecurrence < ApplicationRecord
     new_post.delivery_date = get_delivery_dates_for(old_post.delivery_date, old_post.delivery_date + (10 * 7).days)[0]
 
     #set new_post commitment zone start
-    commitment_zone_window = old_post.delivery_date - old_post.commitment_zone_start
-    new_post.commitment_zone_start = new_post.delivery_date - commitment_zone_window
+    commitment_zone_window = old_post.delivery_date - old_post.order_cutoff
+    new_post.order_cutoff = new_post.delivery_date - commitment_zone_window
     new_post.live = true
     #if there doesn't already exist a post with these parameters
     reload

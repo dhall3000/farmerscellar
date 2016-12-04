@@ -17,7 +17,7 @@ class DistributorTest < BulkBuyer
     #do one time checkout and authorization
     create_authorization_for_customer(customer)
     #travel to commitment zone start time    
-    travel_to customer.tote_items.first.posting.commitment_zone_start
+    travel_to customer.tote_items.first.posting.order_cutoff
     #this should move postings from OPEN to COMMITMENTZONE
     clear_mailer
     RakeHelper.do_hourly_tasks    
@@ -63,7 +63,7 @@ class DistributorTest < BulkBuyer
     create_authorization_for_customer(customer)
     #travel to commitment zone start time
     posting = customer.tote_items.first.posting
-    travel_to posting.commitment_zone_start
+    travel_to posting.order_cutoff
     #this should move postings from OPEN to COMMITMENTZONE
     clear_mailer
     RakeHelper.do_hourly_tasks    
@@ -96,7 +96,7 @@ class DistributorTest < BulkBuyer
     create_authorization_for_customer(customer)
     #travel to commitment zone start time
     posting = customer.tote_items.first.posting
-    travel_to posting.commitment_zone_start
+    travel_to posting.order_cutoff
     #this should move postings from OPEN to COMMITMENTZONE
     clear_mailer
     RakeHelper.do_hourly_tasks    
@@ -219,7 +219,7 @@ class DistributorTest < BulkBuyer
     create_authorization_for_customer(customer)
     #travel to commitment zone start time
     posting = customer.tote_items.first.posting
-    travel_to posting.commitment_zone_start
+    travel_to posting.order_cutoff
     #this should move postings from OPEN to COMMITMENTZONE
     clear_mailer
     RakeHelper.do_hourly_tasks    

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161129183129) do
+ActiveRecord::Schema.define(version: 20161204050626) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -338,7 +338,7 @@ ActiveRecord::Schema.define(version: 20161129183129) do
     t.datetime "updated_at",                                    null: false
     t.boolean  "live",                          default: false
     t.datetime "delivery_date",                                 null: false
-    t.datetime "commitment_zone_start",                         null: false
+    t.datetime "order_cutoff",                                  null: false
     t.integer  "posting_recurrence_id"
     t.integer  "state",                         default: 0,     null: false
     t.boolean  "late_adds_allowed",             default: false
@@ -349,7 +349,7 @@ ActiveRecord::Schema.define(version: 20161129183129) do
     t.integer  "units_per_case",                default: 1
     t.string   "product_id_code"
     t.float    "order_minimum_producer_net",    default: 0.0
-    t.index ["commitment_zone_start"], name: "index_postings_on_commitment_zone_start"
+    t.index ["order_cutoff"], name: "index_postings_on_order_cutoff"
     t.index ["posting_recurrence_id"], name: "index_postings_on_posting_recurrence_id"
     t.index ["product_id"], name: "index_postings_on_product_id"
     t.index ["state"], name: "index_postings_on_state"

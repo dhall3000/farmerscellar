@@ -161,7 +161,7 @@ class ActiveSupport::TestCase
   def do_current_posting_order_cutoff_tasks(posting_recurrence)
     
     posting = posting_recurrence.current_posting
-    travel_to posting.commitment_zone_start
+    travel_to posting.order_cutoff
     RakeHelper.do_hourly_tasks
     
     return posting.reload

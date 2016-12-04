@@ -152,10 +152,10 @@ module TestLib
 
   end
 
-  def create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
+  def create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
 
-    if commitment_zone_start && delivery_date
-      assert commitment_zone_start < delivery_date
+    if order_cutoff && delivery_date
+      assert order_cutoff < delivery_date
     end
 
     if farmer.nil?
@@ -180,8 +180,8 @@ module TestLib
       delivery_date = get_delivery_date(days_from_now = 7)
     end
 
-    if commitment_zone_start.nil?
-      commitment_zone_start = delivery_date - 2.days
+    if order_cutoff.nil?
+      order_cutoff = delivery_date - 2.days
     end
 
     if units_per_case.nil?
@@ -199,7 +199,7 @@ module TestLib
     posting = Posting.create(
       live: true,
       delivery_date: delivery_date,
-      commitment_zone_start: commitment_zone_start,
+      order_cutoff: order_cutoff,
       product_id: product.id,
       quantity_available: 100,
       price: price,

@@ -97,7 +97,7 @@ class ToteItem < ApplicationRecord
         new_state = ToteItem.states[:REMOVED]
       when :system_removed
         new_state = ToteItem.states[:REMOVED]
-      when :commitment_zone_started
+      when :order_cutoffed
         new_state = ToteItem.states[:COMMITTED]      
       end
 

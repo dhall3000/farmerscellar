@@ -250,10 +250,10 @@ class PickupDeadlineReminderTest < IntegrationHelper
   def create_following_friday_posting(wednesday_posting)
 
     delivery_date = wednesday_posting.delivery_date + 2.days
-    commitment_zone_start = delivery_date - 2.days
+    order_cutoff = delivery_date - 2.days
 
     create_commission(wednesday_posting.user, products(:milk), units(:gallon), 0.05)
-    posting = create_posting(wednesday_posting.user, 2.00, products(:milk), units(:gallon), delivery_date, commitment_zone_start, units_per_case = 1)
+    posting = create_posting(wednesday_posting.user, 2.00, products(:milk), units(:gallon), delivery_date, order_cutoff, units_per_case = 1)
 
     return posting
 
@@ -263,7 +263,7 @@ class PickupDeadlineReminderTest < IntegrationHelper
 
     #create a posting
     delivery_date = get_next_wednesday
-    commitment_zone_start = delivery_date - 2.days
+    order_cutoff = delivery_date - 2.days
 
     distributor = create_producer("distributor", "distributor@d.com")
     distributor.create_business_interface(name: "Distributor Inc.", order_email_accepted: true, order_email: distributor.email, payment_method: BusinessInterface.payment_methods[:PAYPAL], paypal_email: distributor.email)
@@ -273,7 +273,7 @@ class PickupDeadlineReminderTest < IntegrationHelper
     producer1.save
 
     create_commission(producer1, products(:apples), units(:pound), 0.05)
-    posting = create_posting(producer1, 1.00, products(:apples), units(:pound), delivery_date, commitment_zone_start, units_per_case = 1)
+    posting = create_posting(producer1, 1.00, products(:apples), units(:pound), delivery_date, order_cutoff, units_per_case = 1)
 
     return posting
 
@@ -289,7 +289,7 @@ class PickupDeadlineReminderTest < IntegrationHelper
   end
 
   def transition_posting_to_commitment_zone(posting)
-    travel_to posting.commitment_zone_start
+    travel_to posting.order_cutoff
     do_hourly_tasks
   end
 

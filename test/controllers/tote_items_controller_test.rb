@@ -57,10 +57,10 @@ class ToteItemsControllerTest < IntegrationHelper
     nuke_all_postings
 
     #create posting recurrence
-    pr = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = get_delivery_date(days_from_now = 3), commitment_zone_start = get_delivery_date(days_from_now = 1), units_per_case = nil, frequency = 1).posting_recurrence
+    pr = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = get_delivery_date(days_from_now = 3), order_cutoff = get_delivery_date(days_from_now = 1), units_per_case = nil, frequency = 1).posting_recurrence
     #skip ahead to the order cutoff of the first posting and trigger it to generate the 2nd posting. this will put
     #the first posting in a CLOSED state
-    travel_to pr.current_posting.commitment_zone_start
+    travel_to pr.current_posting.order_cutoff
     RakeHelper.do_hourly_tasks
     assert_equal 2, pr.postings.count
     

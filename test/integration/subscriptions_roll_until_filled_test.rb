@@ -7,7 +7,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
 
     nuke_all_postings
 
-    pr = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1).posting_recurrence    
+    pr = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1).posting_recurrence    
     pr.current_posting.update(price: 1)
     pr.current_posting.user.update(order_minimum_producer_net: 20)
 
@@ -30,7 +30,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
 
     #move to posting 1 order cutoff
     first_posting = pr.current_posting
-    travel_to first_posting.commitment_zone_start
+    travel_to first_posting.order_cutoff
     ActionMailer::Base.deliveries.clear
     #generate producer order and 'next' tote items
     RakeHelper.do_hourly_tasks
@@ -57,7 +57,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     #verify subscription object off
     assert_not first_ti.subscription.on    
     #verify no more items get generated
-    travel_to second_ti.posting.commitment_zone_start    
+    travel_to second_ti.posting.order_cutoff    
     RakeHelper.do_hourly_tasks
     assert_equal 2, sam.reload.tote_items.count
 
@@ -75,7 +75,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
 
     nuke_all_postings
 
-    pr = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1).posting_recurrence    
+    pr = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1).posting_recurrence    
     pr.current_posting.update(price: 1)
     pr.current_posting.user.update(order_minimum_producer_net: 20)
 
@@ -98,7 +98,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
 
     #move to posting 1 order cutoff
     first_posting = pr.current_posting
-    travel_to first_posting.commitment_zone_start
+    travel_to first_posting.order_cutoff
     ActionMailer::Base.deliveries.clear
     #generate producer order and 'next' tote items
     RakeHelper.do_hourly_tasks
@@ -136,7 +136,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     verify_proper_delivery_notification_email(ActionMailer::Base.deliveries.last, ti_sam)
     
     #verify no more items get generated
-    travel_to first_posting.posting_recurrence.current_posting.commitment_zone_start    
+    travel_to first_posting.posting_recurrence.current_posting.order_cutoff    
     RakeHelper.do_hourly_tasks
     assert_equal 2, sam.reload.tote_items.count
 
@@ -159,7 +159,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
 
     nuke_all_postings
 
-    pr = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1).posting_recurrence
+    pr = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1).posting_recurrence
     pr.current_posting.update(price: 1)
     pr.current_posting.user.update(order_minimum_producer_net: 20)
 
@@ -182,7 +182,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
 
     #move to posting 1 order cutoff
     first_posting = pr.current_posting
-    travel_to first_posting.commitment_zone_start
+    travel_to first_posting.order_cutoff
     ActionMailer::Base.deliveries.clear
     #generate producer order and 'next' tote items
     RakeHelper.do_hourly_tasks
@@ -226,7 +226,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     verify_proper_delivery_notification_email(ActionMailer::Base.deliveries.last, ti_sam)
     
     #verify no more items get generated
-    travel_to first_posting.posting_recurrence.current_posting.commitment_zone_start    
+    travel_to first_posting.posting_recurrence.current_posting.order_cutoff    
     RakeHelper.do_hourly_tasks
     assert_equal 2, sam.reload.tote_items.count
 
@@ -238,7 +238,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
 
     nuke_all_postings
 
-    pr = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1).posting_recurrence    
+    pr = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1).posting_recurrence    
     pr.current_posting.update(price: 1)
     pr.current_posting.user.update(order_minimum_producer_net: 20)
 
@@ -270,7 +270,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     #verify no more items get generated
     assert_equal 1, sam.tote_items.count
     first_posting = pr.current_posting
-    travel_to first_posting.commitment_zone_start
+    travel_to first_posting.order_cutoff
     ActionMailer::Base.deliveries.clear
     RakeHelper.do_hourly_tasks
     assert_equal 1, sam.reload.tote_items.count
@@ -283,7 +283,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
 
     nuke_all_postings
 
-    pr = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1).posting_recurrence    
+    pr = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1).posting_recurrence    
     pr.current_posting.update(price: 1)
     pr.current_posting.user.update(order_minimum_producer_net: 20)
 
@@ -309,7 +309,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     #verify no more items get generated
     assert_equal 1, sam.tote_items.count
     first_posting = pr.current_posting
-    travel_to first_posting.commitment_zone_start
+    travel_to first_posting.order_cutoff
     ActionMailer::Base.deliveries.clear
     RakeHelper.do_hourly_tasks
     assert_equal 1, sam.reload.tote_items.count
@@ -324,7 +324,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     bob = create_user("bob", "bob@b.com")
     
     #2 create rtf subscription
-    pr_celery_rtf = create_posting(farmer = nil, price = 2.29, product = products(:celery), unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1).posting_recurrence
+    pr_celery_rtf = create_posting(farmer = nil, price = 2.29, product = products(:celery), unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1).posting_recurrence
     celery_subscription = create_tote_item(bob, pr_celery_rtf.current_posting, quantity = 3, frequency = 0, roll_until_filled = true).subscription
     assert celery_subscription
     assert celery_subscription.kind?(:ROLLUNTILFILLED)
@@ -364,14 +364,14 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     nuke_all_postings
     bob = create_user("bob", "bob@b.com")
     #1 create regular subscription
-    pr_apples = create_posting(farmer = nil, price = 1, product = products(:apples), unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1).posting_recurrence
+    pr_apples = create_posting(farmer = nil, price = 1, product = products(:apples), unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1).posting_recurrence
 
     assert pr_apples.valid?
     apples_subscription = create_tote_item(bob, pr_apples.current_posting, quantity = 2, frequency = 1).subscription
     assert apples_subscription
     
     #2 create rtf subscription
-    pr_celery_rtf = create_posting(farmer = pr_apples.current_posting.user, price = 2.29, product = products(:celery), unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1).posting_recurrence
+    pr_celery_rtf = create_posting(farmer = pr_apples.current_posting.user, price = 2.29, product = products(:celery), unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1).posting_recurrence
 
     celery_subscription = create_tote_item(bob, pr_celery_rtf.current_posting, quantity = 3, frequency = 0, roll_until_filled = true).subscription
     assert celery_subscription
@@ -399,13 +399,13 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     nuke_all_postings
     bob = create_user("bob", "bob@b.com")
     #1 create regular subscription    
-    pr_apples = create_posting(farmer = nil, price = 1, product = products(:apples), unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1).posting_recurrence
+    pr_apples = create_posting(farmer = nil, price = 1, product = products(:apples), unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1).posting_recurrence
     assert pr_apples.valid?
     ti = create_tote_item(bob, pr_apples.current_posting, quantity = 2, frequency = 1)
     assert ti.subscription
     
     #2 create rtf subscription
-    pr_celery_rtf = create_posting(farmer = pr_apples.current_posting.user, price = 2.29, product = products(:celery), unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1).posting_recurrence
+    pr_celery_rtf = create_posting(farmer = pr_apples.current_posting.user, price = 2.29, product = products(:celery), unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1).posting_recurrence
     ti = create_tote_item(bob, pr_celery_rtf.current_posting, quantity = 3, frequency = 0, roll_until_filled = true)
     assert ti.subscription
     assert ti.subscription.kind?(:ROLLUNTILFILLED)
@@ -435,7 +435,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
 
     nuke_all_postings
 
-    pr = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1).posting_recurrence
+    pr = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1).posting_recurrence
     pr.current_posting.update(price: 1)
     pr.current_posting.user.update(order_minimum_producer_net: 20)
 
@@ -454,7 +454,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     create_rt_authorization_for_customer(sam)
 
     first_posting = pr.current_posting
-    travel_to first_posting.commitment_zone_start
+    travel_to first_posting.order_cutoff
     ActionMailer::Base.deliveries.clear
     RakeHelper.do_hourly_tasks
     #verify that order email did not get sent
@@ -481,7 +481,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     create_rt_authorization_for_customer(bob)
 
     #7
-    travel_to second_posting.commitment_zone_start
+    travel_to second_posting.order_cutoff
     ActionMailer::Base.deliveries.clear
     RakeHelper.do_hourly_tasks
     #verify that order email did get sent
@@ -513,7 +513,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     assert_not_equal second_posting, third_posting
     assert third_posting.id > second_posting.id
 
-    travel_to third_posting.commitment_zone_start
+    travel_to third_posting.order_cutoff
     RakeHelper.do_hourly_tasks
 
     #sam should still have the same number of tote items as the last check cause his subscription should have been turned off

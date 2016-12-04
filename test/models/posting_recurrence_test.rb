@@ -26,13 +26,13 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
 
     #change to a static delivery date to make computation stuff easier
     #this is a wednesday
-    posting_recurrence.postings.first.update(commitment_zone_start: Time.zone.local(2016,9,5))
+    posting_recurrence.postings.first.update(order_cutoff: Time.zone.local(2016,9,5))
     posting_recurrence.postings.first.update(delivery_date: Time.zone.local(2016,9,7))
     #verify first posting is on wednesday
     assert_equal 3, posting_recurrence.reload.postings.first.delivery_date.wday
 
     #change to posting 1's order cutoff and generate next posting
-    travel_to posting_recurrence.postings.first.commitment_zone_start
+    travel_to posting_recurrence.postings.first.order_cutoff
     RakeHelper.do_hourly_tasks
     #verify another posting was created
     assert_equal 2, posting_recurrence.postings.count
@@ -46,7 +46,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     assert_equal Time.zone.local(2016,9,15), posting_recurrence.reload.postings.last.delivery_date
 
     #travel to last posting's order cutoff, generate new posting and verify the new posting is on a thursday
-    travel_to posting_recurrence.postings.last.commitment_zone_start
+    travel_to posting_recurrence.postings.last.order_cutoff
     RakeHelper.do_hourly_tasks
     assert_equal 3, posting_recurrence.postings.count
     assert_equal 4, posting_recurrence.reload.postings.last.delivery_date.wday
@@ -65,13 +65,13 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
 
     #change to a static delivery date to make computation stuff easier
     #this is a thursday
-    posting_recurrence.postings.first.update(commitment_zone_start: Time.zone.local(2016,9,6))
+    posting_recurrence.postings.first.update(order_cutoff: Time.zone.local(2016,9,6))
     posting_recurrence.postings.first.update(delivery_date: Time.zone.local(2016,9,8))
     #verify first posting is on thursday
     assert_equal 4, posting_recurrence.reload.postings.first.delivery_date.wday
 
     #change to posting 1's order cutoff and generate next posting
-    travel_to posting_recurrence.postings.first.commitment_zone_start
+    travel_to posting_recurrence.postings.first.order_cutoff
     RakeHelper.do_hourly_tasks
     #verify another posting was created
     assert_equal 2, posting_recurrence.postings.count
@@ -85,7 +85,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     assert_equal Time.zone.local(2016,9,14), posting_recurrence.reload.postings.last.delivery_date
 
     #travel to last posting's order cutoff, generate new posting and verify the new posting is on a wednesday
-    travel_to posting_recurrence.postings.last.commitment_zone_start
+    travel_to posting_recurrence.postings.last.order_cutoff
     RakeHelper.do_hourly_tasks
     assert_equal 3, posting_recurrence.postings.count
     assert_equal 3, posting_recurrence.reload.postings.last.delivery_date.wday
@@ -102,8 +102,8 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     posting_recurrence.save
     assert_equal 1, posting_recurrence.postings.count
 
-    travel_to posting_recurrence.postings.last.commitment_zone_start + 1
-    posting_recurrence.postings.last.transition(:commitment_zone_started)
+    travel_to posting_recurrence.postings.last.order_cutoff + 1
+    posting_recurrence.postings.last.transition(:order_cutoffed)
     assert_equal 2, posting_recurrence.postings.count
 
     assert_equal 0, posting_recurrence.postings.first.tote_items.count
@@ -143,7 +143,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
   end
 
   test "should have legit subscription options" do
-    monthly_posting_recurrence = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 5, order_minimum_producer_net = 0).posting_recurrence
+    monthly_posting_recurrence = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 5, order_minimum_producer_net = 0).posting_recurrence
     monthly_options = monthly_posting_recurrence.subscription_create_options
 
     options = @posting_recurrence.subscription_create_options
@@ -196,7 +196,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     posting = postings(:postingf1apples)
     mar29 = Time.zone.local(2016,3,29)    
     posting.delivery_date = mar29
-    posting.commitment_zone_start = mar29 - 2.days
+    posting.order_cutoff = mar29 - 2.days
     posting.save
     posting_recurrence.postings << posting
     posting_recurrence.save
@@ -250,7 +250,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     posting = postings(:postingf1apples)
     mar29 = Time.zone.local(2016,3,29)    
     posting.delivery_date = mar29
-    posting.commitment_zone_start = mar29 - 2.days
+    posting.order_cutoff = mar29 - 2.days
     posting.save
     posting_recurrence.postings << posting
     posting_recurrence.save
@@ -272,7 +272,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     posting = postings(:postingf1apples)
     mar29 = Time.zone.local(2016,3,29)    
     posting.delivery_date = mar29
-    posting.commitment_zone_start = mar29 - 2.days
+    posting.order_cutoff = mar29 - 2.days
     posting.save
     posting_recurrence.postings << posting
     posting_recurrence.save
@@ -292,7 +292,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     posting = postings(:postingf1apples)
     mar29 = Time.zone.local(2016,3,29)    
     posting.delivery_date = mar29
-    posting.commitment_zone_start = mar29 - 2.days
+    posting.order_cutoff = mar29 - 2.days
     posting.save
     posting_recurrence.postings << posting
     posting_recurrence.save
@@ -312,7 +312,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     posting = postings(:postingf1apples)
     mar29 = Time.zone.local(2016,3,29)    
     posting.delivery_date = mar29
-    posting.commitment_zone_start = mar29 - 2.days
+    posting.order_cutoff = mar29 - 2.days
     posting.save
     posting_recurrence.postings << posting
     posting_recurrence.save
@@ -335,7 +335,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     posting = postings(:postingf1apples)
     mar15 = Time.zone.local(2016,3,15)    
     posting.delivery_date = mar15
-    posting.commitment_zone_start = mar15 - 2.days
+    posting.order_cutoff = mar15 - 2.days
     posting.save
     posting_recurrence.postings << posting
     posting_recurrence.save
@@ -369,7 +369,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
 
     current_num_postings = posting_recurrence.postings.count
 
-    travel_to posting_recurrence.postings.last.commitment_zone_start + 1
+    travel_to posting_recurrence.postings.last.order_cutoff + 1
     posting_recurrence.recur
     assert_equal current_num_postings, posting_recurrence.postings.count
 
@@ -405,10 +405,10 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
 
     old_post = posting_recurrence.postings.last
 
-    travel_to old_post.commitment_zone_start + 1    
+    travel_to old_post.order_cutoff + 1    
 
     assert_equal 1, posting_recurrence.postings.count
-    old_post.transition(:commitment_zone_started)
+    old_post.transition(:order_cutoffed)
     assert_equal 2, posting_recurrence.postings.count
     assert_equal false, old_post.live
     assert_equal true, posting_recurrence.postings.last.live
@@ -477,7 +477,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     if delivery_date.sunday?
       delivery_date += 1.day
     end
-    commitment_zone_start = delivery_date - 2.days
+    order_cutoff = delivery_date - 2.days
 
     post = Posting.new(
       description: "my descrip",
@@ -488,7 +488,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
       unit_id: units(:pound).id,
       live: true,
       delivery_date: delivery_date,
-      commitment_zone_start: commitment_zone_start
+      order_cutoff: order_cutoff
       )    
 
     post.save

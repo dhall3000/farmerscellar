@@ -56,10 +56,10 @@ class User < ApplicationRecord
     postings = []
 
     #get list of unique order_cutoffs with the given delivery date
-    order_cutoffs = postings_by_delivery_date(delivery_date).select(:commitment_zone_start).distinct        
+    order_cutoffs = postings_by_delivery_date(delivery_date).select(:order_cutoff).distinct        
     #call outbound order report on each unique order cutoff
     order_cutoffs.each do |order_cutoff|
-      postings += outbound_order_report(order_cutoff.commitment_zone_start)[:postings_order_requirements_met]            
+      postings += outbound_order_report(order_cutoff.order_cutoff)[:postings_order_requirements_met]            
     end    
     
     return postings
@@ -85,7 +85,7 @@ class User < ApplicationRecord
     order_value_producer_net = 0
     
     #loop through my postings and sum their order value
-    postings.where(commitment_zone_start: order_cutoff).each do |posting|
+    postings.where(order_cutoff: order_cutoff).each do |posting|
 
       posting_outbound_order_value_producer_net = posting.outbound_order_value_producer_net
 

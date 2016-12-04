@@ -100,13 +100,13 @@ class PickupLoginTest < IntegrationHelper
     delivery_date = get_delivery_date(days_from_now = 14)
     days_shift = delivery_date.wday - 3
     delivery_date = delivery_date - days_shift.days
-    posting_carrots = create_posting(producer, price = 1.50, product = products(:carrots), unit = units(:pound), delivery_date, commitment_zone_start = delivery_date - 2.days, units_per_case = 1)    
+    posting_carrots = create_posting(producer, price = 1.50, product = products(:carrots), unit = units(:pound), delivery_date, order_cutoff = delivery_date - 2.days, units_per_case = 1)    
     bob = create_user("bob", "bob@b.com")
     bob.set_dropsite(Dropsite.first)
     ti_bob_carrots = create_tote_item(bob, posting_carrots, quantity = 6)    
     create_one_time_authorization_for_customer(bob)
     assert ti_bob_carrots.reload.state?(:AUTHORIZED)
-    travel_to posting_carrots.commitment_zone_start
+    travel_to posting_carrots.order_cutoff
     now = Time.zone.now
     RakeHelper.do_hourly_tasks
     assert ti_bob_carrots.reload.state?(:COMMITTED)
@@ -130,8 +130,8 @@ class PickupLoginTest < IntegrationHelper
     delivery_date = delivery_date - days_shift.days
     delivery_date2 = delivery_date + 2.days
 
-    posting_carrots = create_posting(producer, price = 1.50, product = products(:carrots), unit = units(:pound), delivery_date, commitment_zone_start = delivery_date - 2.days, units_per_case = 1)    
-    posting_apples  = create_posting(producer, price = 2.50, product = products(:apples), unit = units(:pound), delivery_date2, commitment_zone_start = delivery_date2 - 2.days, units_per_case = 1)    
+    posting_carrots = create_posting(producer, price = 1.50, product = products(:carrots), unit = units(:pound), delivery_date, order_cutoff = delivery_date - 2.days, units_per_case = 1)    
+    posting_apples  = create_posting(producer, price = 2.50, product = products(:apples), unit = units(:pound), delivery_date2, order_cutoff = delivery_date2 - 2.days, units_per_case = 1)    
 
     bob = create_user("bob", "bob@b.com")
     bob.set_dropsite(Dropsite.first)    
@@ -144,9 +144,9 @@ class PickupLoginTest < IntegrationHelper
     assert ti_bob_carrots.reload.state?(:AUTHORIZED)
     assert ti_bob_apples.reload.state?(:AUTHORIZED)
 
-    travel_to posting_carrots.commitment_zone_start
+    travel_to posting_carrots.order_cutoff
     RakeHelper.do_hourly_tasks
-    travel_to posting_apples.commitment_zone_start
+    travel_to posting_apples.order_cutoff
     RakeHelper.do_hourly_tasks
 
     fully_fill_creditor_order(posting_carrots.creditor_order)

@@ -114,14 +114,14 @@ class RakeHelper
 
       puts "transition_open_postings: start"
 
-      postings = Posting.where("state = ? AND commitment_zone_start <= ?", Posting.states[:OPEN], Time.zone.now)
+      postings = Posting.where("state = ? AND order_cutoff <= ?", Posting.states[:OPEN], Time.zone.now)
       puts "transition_open_postings: #{postings.count.to_s} OPEN posting(s)"
 
       transitioned_postings = []
 
       postings.each do |posting|
         puts "transition_open_postings: transitioning posting id #{posting.id.to_s} to COMMITMENTZONE"
-        posting.transition(:commitment_zone_started)
+        posting.transition(:order_cutoffed)
         transitioned_postings << posting.id
       end
 
@@ -146,7 +146,7 @@ class RakeHelper
 		  postings.each do |posting|
 
 		  	creditor = posting.get_creditor
-		  	order_cutoff = posting.commitment_zone_start
+		  	order_cutoff = posting.order_cutoff
 
 		  	if !creditors[creditor]
 		  		creditors[creditor] = {}

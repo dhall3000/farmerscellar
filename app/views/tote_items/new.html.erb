@@ -86,7 +86,7 @@
               <h3>Order</h3>
               <ul class="list-group">                                
                 <li class="list-group-item">
-                  <%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff") %>: <%= @posting.commitment_zone_start.strftime("%A, %B %-d, %l:%M %p") %>                  
+                  <%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff") %>: <%= @posting.order_cutoff.strftime("%A, %B %-d, %l:%M %p") %>                  
                 </li>
               </ul>
 

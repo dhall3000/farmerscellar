@@ -20,12 +20,12 @@ class SubscriptionsTest < IntegrationHelper
     producer = create_producer("producer1", "producer1@p.com")        
     jan6 = Time.zone.local(2016, 1, 6)
     delivery_date = jan6
-    commitment_zone_start = delivery_date - 2.days
+    order_cutoff = delivery_date - 2.days
 
     #jump to first commitment zone in the series
-    travel_to commitment_zone_start
+    travel_to order_cutoff
     #Monday Jan 4
-    posting = create_posting(producer, 2.50, product = nil, unit = nil, delivery_date, commitment_zone_start, units_per_case = 1)
+    posting = create_posting(producer, 2.50, product = nil, unit = nil, delivery_date, order_cutoff, units_per_case = 1)
     posting_recurrence = PostingRecurrence.new(frequency: 1, on: true)
     posting_recurrence.postings << posting
     posting_recurrence.save
@@ -64,7 +64,7 @@ class SubscriptionsTest < IntegrationHelper
     
     count = 0
     while count < 4
-      travel_to posting_recurrence.reload.current_posting.commitment_zone_start
+      travel_to posting_recurrence.reload.current_posting.order_cutoff
       RakeHelper.do_hourly_tasks            
       count += 1
       assert_equal 3 + count, posting_recurrence.reload.postings.count      
@@ -90,9 +90,9 @@ class SubscriptionsTest < IntegrationHelper
     assert_equal posting_recurrence.reload.current_posting.delivery_date, subscription.tote_items.last.posting.delivery_date
 
     #go to current_posting order cutoff
-    travel_to posting_recurrence.reload.current_posting.commitment_zone_start
+    travel_to posting_recurrence.reload.current_posting.order_cutoff
     #Mon Feb 15
-    assert_equal Time.zone.local(2016,2,15), posting_recurrence.reload.current_posting.commitment_zone_start
+    assert_equal Time.zone.local(2016,2,15), posting_recurrence.reload.current_posting.order_cutoff
     RakeHelper.do_hourly_tasks
 
     #verify new posting created for feb 25 delivery
@@ -114,12 +114,12 @@ class SubscriptionsTest < IntegrationHelper
     producer = create_producer("producer1", "producer1@p.com")        
     jan6 = Time.zone.local(2016, 1, 6)
     delivery_date = jan6
-    commitment_zone_start = delivery_date - 2.days
+    order_cutoff = delivery_date - 2.days
 
     #jump to first commitment zone in the series
-    travel_to commitment_zone_start
+    travel_to order_cutoff
     #Monday Jan 4
-    posting = create_posting(producer, 2.50, product = nil, unit = nil, delivery_date, commitment_zone_start, units_per_case = 1)
+    posting = create_posting(producer, 2.50, product = nil, unit = nil, delivery_date, order_cutoff, units_per_case = 1)
     posting_recurrence = PostingRecurrence.new(frequency: 1, on: true)
     posting_recurrence.postings << posting
     posting_recurrence.save
@@ -156,7 +156,7 @@ class SubscriptionsTest < IntegrationHelper
 
 
 
-    travel_to posting_recurrence.reload.current_posting.commitment_zone_start
+    travel_to posting_recurrence.reload.current_posting.order_cutoff
     #Monday Jan 18
     assert_equal Time.zone.local(2016, 1, 18), Time.zone.now
 
@@ -825,7 +825,7 @@ class SubscriptionsTest < IntegrationHelper
     assert_equal ToteItem.states[:AUTHORIZED], ToteItem.where(user_id: user.id).first.state
 
     #let nature take its course. purchase should occur off the first checkout
-    travel_to tote_item.posting.commitment_zone_start    
+    travel_to tote_item.posting.order_cutoff    
     has_created_skip_dates = false
 
     30.times do
@@ -885,7 +885,7 @@ class SubscriptionsTest < IntegrationHelper
     assert_equal ToteItem.states[:AUTHORIZED], ToteItem.where(user_id: user.id).first.state
 
     #let nature take its course. purchase should occur off the first checkout
-    travel_to tote_item.posting.commitment_zone_start
+    travel_to tote_item.posting.order_cutoff
 
     num_tote_items = user.tote_items.count
     pause_time = Time.zone.now - 1.year
@@ -919,7 +919,7 @@ class SubscriptionsTest < IntegrationHelper
         assert_not subscription.paused
       end
 
-      travel_to subscription.posting_recurrence.current_posting.commitment_zone_start
+      travel_to subscription.posting_recurrence.current_posting.order_cutoff
 
     end
 
@@ -956,7 +956,7 @@ class SubscriptionsTest < IntegrationHelper
 
   def do_subscription_turn_off(posting_frequency, subscription_frequency)
 
-    posting = create_posting(farmer = nil, price = 1.27, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, posting_frequency)
+    posting = create_posting(farmer = nil, price = 1.27, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, posting_frequency)
 
     user = users(:c17)
     assert_equal 0, ToteItem.where(user_id: user.id).count
@@ -971,7 +971,7 @@ class SubscriptionsTest < IntegrationHelper
     assert_equal ToteItem.states[:AUTHORIZED], ToteItem.where(user_id: user.id).first.state
 
     #let nature take its course. purchase should occur off the first checkout
-    travel_to tote_item.posting.commitment_zone_start
+    travel_to tote_item.posting.order_cutoff
 
     num_tote_items = user.tote_items.count
     pause_time = Time.zone.now - 1.year
@@ -1107,7 +1107,7 @@ class SubscriptionsTest < IntegrationHelper
     quantity = 2    
 
     posting_recurrence = posting.posting_recurrence
-    travel_to posting_recurrence.postings.last.commitment_zone_start - 1.hour
+    travel_to posting_recurrence.postings.last.order_cutoff - 1.hour
 
     num_tote_items_start = user.tote_items.count    
     num_tote_items_end = user.tote_items.count + 4
@@ -1305,7 +1305,7 @@ class SubscriptionsTest < IntegrationHelper
       unit_id: unit.id,
       live: true,
       delivery_date: delivery_date,
-      commitment_zone_start: delivery_date - 2.days,
+      order_cutoff: delivery_date - 2.days,
       posting_recurrence: {frequency: frequency, on: true}
     }}
 
@@ -1352,7 +1352,7 @@ class SubscriptionsTest < IntegrationHelper
 
   def time_loop(posting_recurrences, num_days)
 
-    current_time = get_nearest_posting(posting_recurrences).commitment_zone_start - 1.hour
+    current_time = get_nearest_posting(posting_recurrences).order_cutoff - 1.hour
     end_minute = current_time + num_days.days
 
     travel_to current_time

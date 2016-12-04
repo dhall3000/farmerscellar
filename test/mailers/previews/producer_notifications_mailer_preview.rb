@@ -19,7 +19,7 @@ class ProducerNotificationsMailerPreview < ActionMailer::Preview
     end
 
     ProducerProductUnitCommission.create(user: farmer, product: Product.first, unit: Unit.first, commission: 0.05)
-    posting = Posting.new(unit: Unit.first, product: Product.first, user: farmer, description: "descrip", quantity_available: 100, price: 1.25, live: true, commitment_zone_start: Time.zone.now - 1.second, delivery_date: delivery_date)
+    posting = Posting.new(unit: Unit.first, product: Product.first, user: farmer, description: "descrip", quantity_available: 100, price: 1.25, live: true, order_cutoff: Time.zone.now - 1.second, delivery_date: delivery_date)
     posting.save
     #make some tote items for that posting
     user = User.find_by(email: "c1@c.com")    
@@ -44,7 +44,7 @@ class ProducerNotificationsMailerPreview < ActionMailer::Preview
     end
 
     ProducerProductUnitCommission.create(user: farmer, product: Product.first, unit: Unit.first, commission: 0.05)
-    posting1 = Posting.new(unit: Unit.first, product: Product.first, user: farmer, description: "descrip", quantity_available: 100, price: 1.25, live: true, commitment_zone_start: Time.zone.now - 1.second, delivery_date: delivery_date, product_id_code: "awesomxyz")
+    posting1 = Posting.new(unit: Unit.first, product: Product.first, user: farmer, description: "descrip", quantity_available: 100, price: 1.25, live: true, order_cutoff: Time.zone.now - 1.second, delivery_date: delivery_date, product_id_code: "awesomxyz")
     posting1.save
     #make some tote items for that posting
     user = User.find_by(email: "c1@c.com")    
@@ -54,7 +54,7 @@ class ProducerNotificationsMailerPreview < ActionMailer::Preview
     ti2.save
 
 
-    posting2 = Posting.new(unit: Unit.first, product: Product.first, user: farmer, description: "descrip", quantity_available: 100, price: 1.25, live: true, commitment_zone_start: Time.zone.now - 1.second, delivery_date: delivery_date)
+    posting2 = Posting.new(unit: Unit.first, product: Product.first, user: farmer, description: "descrip", quantity_available: 100, price: 1.25, live: true, order_cutoff: Time.zone.now - 1.second, delivery_date: delivery_date)
     posting2.save
     #make some tote items for that posting
     user = User.find_by(email: "c1@c.com")    
@@ -80,7 +80,7 @@ class ProducerNotificationsMailerPreview < ActionMailer::Preview
     end
 
     ProducerProductUnitCommission.create(user: farmer, product: Product.first, unit: Unit.first, commission: 0.05)
-    posting1 = Posting.new(unit: Unit.first, product: Product.first, user: farmer, description: "descrip", quantity_available: 100, price: 1.25, live: true, commitment_zone_start: Time.zone.now - 1.second, delivery_date: delivery_date, product_id_code: "awesomxyz")
+    posting1 = Posting.new(unit: Unit.first, product: Product.first, user: farmer, description: "descrip", quantity_available: 100, price: 1.25, live: true, order_cutoff: Time.zone.now - 1.second, delivery_date: delivery_date, product_id_code: "awesomxyz")
     posting1.save
     #make some tote items for that posting
     user = User.find_by(email: "c1@c.com")    
@@ -90,7 +90,7 @@ class ProducerNotificationsMailerPreview < ActionMailer::Preview
     ti2.save
 
 
-    posting2 = Posting.new(unit: Unit.first, product: Product.first, user: farmer, description: "descrip", quantity_available: 100, price: 1.25, live: true, commitment_zone_start: Time.zone.now - 1.second, delivery_date: delivery_date)
+    posting2 = Posting.new(unit: Unit.first, product: Product.first, user: farmer, description: "descrip", quantity_available: 100, price: 1.25, live: true, order_cutoff: Time.zone.now - 1.second, delivery_date: delivery_date)
     posting2.save
     #make some tote items for that posting
     user = User.find_by(email: "c1@c.com")    
@@ -99,7 +99,7 @@ class ProducerNotificationsMailerPreview < ActionMailer::Preview
     ti2 = ToteItem.new(quantity: 3, posting: posting2, user: user, price: posting2.price, state: ToteItem.states[:COMMITTED])
     ti2.save
 
-    posting3 = Posting.new(unit: Unit.first, product: Product.first, user: farmer, description: "descrip", quantity_available: 100, price: 1.25, live: true, commitment_zone_start: Time.zone.now - 1.second, delivery_date: delivery_date, units_per_case: 2)
+    posting3 = Posting.new(unit: Unit.first, product: Product.first, user: farmer, description: "descrip", quantity_available: 100, price: 1.25, live: true, order_cutoff: Time.zone.now - 1.second, delivery_date: delivery_date, units_per_case: 2)
     posting3.save
     #make some tote items for that posting
     user = User.find_by(email: "c1@c.com")    

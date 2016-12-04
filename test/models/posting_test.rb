@@ -16,7 +16,7 @@ class PostingTest < ActiveSupport::TestCase
       delivery_date = Time.zone.today + 4.days
     end
 
-    @posting = Posting.new(unit: @unit, product: @product, user: @farmer, description: "descrip", quantity_available: 100, price: 1.25, live: true, commitment_zone_start: delivery_date - 2.days, delivery_date: delivery_date)
+    @posting = Posting.new(unit: @unit, product: @product, user: @farmer, description: "descrip", quantity_available: 100, price: 1.25, live: true, order_cutoff: delivery_date - 2.days, delivery_date: delivery_date)
     @posting.save
   end
 
@@ -269,7 +269,7 @@ class PostingTest < ActiveSupport::TestCase
     ti = ToteItem.new(quantity: 100, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: @user)
     assert ti.save
     ti.transition(:customer_authorized)
-    ti.transition(:commitment_zone_started)
+    ti.transition(:order_cutoffed)
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
     assert @posting.requirements_met_to_send_order?    
@@ -280,7 +280,7 @@ class PostingTest < ActiveSupport::TestCase
     ti = ToteItem.new(quantity: 1, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: @user)
     assert ti.save
     ti.transition(:customer_authorized)
-    ti.transition(:commitment_zone_started)
+    ti.transition(:order_cutoffed)
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
     assert_not @posting.requirements_met_to_send_order?    
@@ -293,7 +293,7 @@ class PostingTest < ActiveSupport::TestCase
     ti = ToteItem.new(quantity: 1, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: @user)
     assert ti.save
     ti.transition(:customer_authorized)
-    ti.transition(:commitment_zone_started)
+    ti.transition(:order_cutoffed)
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
     assert_not @posting.requirements_met_to_send_order?    
@@ -316,7 +316,7 @@ class PostingTest < ActiveSupport::TestCase
     ti = ToteItem.new(quantity: 1, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: @user)
     assert ti.save
     ti.transition(:customer_authorized)
-    ti.transition(:commitment_zone_started)
+    ti.transition(:order_cutoffed)
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
     assert @posting.requirements_met_to_send_order?
@@ -330,7 +330,7 @@ class PostingTest < ActiveSupport::TestCase
     ti = ToteItem.new(quantity: case_size + 1, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: @user)
     assert ti.save
     ti.transition(:customer_authorized)
-    ti.transition(:commitment_zone_started)
+    ti.transition(:order_cutoffed)
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
     assert @posting.requirements_met_to_send_order?
@@ -344,7 +344,7 @@ class PostingTest < ActiveSupport::TestCase
     ti = ToteItem.new(quantity: case_size + 1, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: @user)
     assert ti.save
     ti.transition(:customer_authorized)
-    ti.transition(:commitment_zone_started)
+    ti.transition(:order_cutoffed)
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
     
@@ -360,7 +360,7 @@ class PostingTest < ActiveSupport::TestCase
     ti = ToteItem.new(quantity: unit_count, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: @user)
     assert ti.save
     ti.transition(:customer_authorized)
-    ti.transition(:commitment_zone_started)
+    ti.transition(:order_cutoffed)
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state    
     assert_equal unit_count, @posting.inbound_num_units_ordered
@@ -375,7 +375,7 @@ class PostingTest < ActiveSupport::TestCase
     ti = ToteItem.new(quantity: case_size - 1, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: @user)
     assert ti.save
     ti.transition(:customer_authorized)
-    ti.transition(:commitment_zone_started)
+    ti.transition(:order_cutoffed)
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
     assert_not @posting.requirements_met_to_send_order?
@@ -418,12 +418,12 @@ class PostingTest < ActiveSupport::TestCase
       ti = ToteItem.new(quantity: quantity_per_item, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user_id: c1.id)      
       assert ti.save
       ti.transition(:customer_authorized)
-      ti.transition(:commitment_zone_started)
+      ti.transition(:order_cutoffed)
     end
 
     assert_equal num_items, c1.tote_items.joins(:posting).where("postings.id = ?", @posting.id).count
 
-    travel_to @posting.commitment_zone_start
+    travel_to @posting.order_cutoff
     RakeHelper.do_hourly_tasks
 
     @posting.fill(quantity_received_from_producer)
@@ -660,7 +660,7 @@ class PostingTest < ActiveSupport::TestCase
 
     posting = Posting.new(
       delivery_date: delivery_date,
-      commitment_zone_start: delivery_date - 1.day,
+      order_cutoff: delivery_date - 1.day,
       product: @product,
       quantity_available: 100,
       price: 10,
@@ -698,7 +698,7 @@ class PostingTest < ActiveSupport::TestCase
 
     posting = Posting.new(
       delivery_date: delivery_date,
-      commitment_zone_start: delivery_date - 1.day,
+      order_cutoff: delivery_date - 1.day,
       product: @product,
       quantity_available: 100,
       price: 10,
@@ -746,7 +746,7 @@ class PostingTest < ActiveSupport::TestCase
   end
 
   test "commitment zone must be present" do
-    @posting.commitment_zone_start = nil
+    @posting.order_cutoff = nil
     assert_not @posting.valid?, get_error_messages(@posting)
   end
 

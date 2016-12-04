@@ -18,7 +18,7 @@ class ToteItemTest < ActiveSupport::TestCase
       delivery_date = Time.zone.today + 4.days
     end
 
-    @posting = Posting.new(units_per_case: 10, unit: @unit, product: @product, user: @farmer, description: "descrip", quantity_available: 100, price: 1.25, live: true, commitment_zone_start: delivery_date - 2.days, delivery_date: delivery_date)
+    @posting = Posting.new(units_per_case: 10, unit: @unit, product: @product, user: @farmer, description: "descrip", quantity_available: 100, price: 1.25, live: true, order_cutoff: delivery_date - 2.days, delivery_date: delivery_date)
     @posting.save
 
     creditor_order = CreditorOrder.new(delivery_date: @posting.delivery_date, creditor: @posting.get_creditor, order_value_producer_net: 1.0)
@@ -66,15 +66,15 @@ class ToteItemTest < ActiveSupport::TestCase
     #verify that the amount left for the posting is > 0
     assert posting_f1.order_minimum_producer_net_outstanding > 0
     #verify that the amount left for the distributor is > 0
-    assert distributor.order_minimum_producer_net_outstanding(posting_f1.commitment_zone_start) > 0
+    assert distributor.order_minimum_producer_net_outstanding(posting_f1.order_cutoff) > 0
 
     #verify that the amount left for the producer is greater than the amount left for the posting
-    assert farm1.order_minimum_producer_net_outstanding(posting_f1.commitment_zone_start) > posting_f1.order_minimum_producer_net_outstanding
+    assert farm1.order_minimum_producer_net_outstanding(posting_f1.order_cutoff) > posting_f1.order_minimum_producer_net_outstanding
     #verify that the amount left for the producer is greater than the amount left for the distributor
-    assert farm1.order_minimum_producer_net_outstanding(posting_f1.commitment_zone_start) > distributor.order_minimum_producer_net_outstanding(posting_f1.commitment_zone_start)
+    assert farm1.order_minimum_producer_net_outstanding(posting_f1.order_cutoff) > distributor.order_minimum_producer_net_outstanding(posting_f1.order_cutoff)
 
     #verify the biggest amount outstanding reported by the posting is correct (hint: should be equal to the producer's amount outstanding since it's the biggest of the three)
-    assert_equal farm1.order_minimum_producer_net_outstanding(posting_f1.commitment_zone_start), posting_f1.biggest_order_minimum_producer_net_outstanding
+    assert_equal farm1.order_minimum_producer_net_outstanding(posting_f1.order_cutoff), posting_f1.biggest_order_minimum_producer_net_outstanding
 
   end
 
@@ -99,7 +99,7 @@ class ToteItemTest < ActiveSupport::TestCase
     make_some_orders(farm2, customer)
     make_some_orders(farm3, customer)
 
-    order_cutoff = distributor.postings.first.commitment_zone_start
+    order_cutoff = distributor.postings.first.order_cutoff
     assert_equal 0, distributor.outbound_order_value_producer_net(order_cutoff)
     #OM for the distributor is 100. distributor has 3 producers, each of which has 3 postings. the distributor himself also has 3 postings. the customer buys quantity of 4 from each of
     #the 12 postings. that's quantity of 48. the retail price is $2 so the retail producer net for the distributor is $96. multiply this by 0.915 to account for paypal fees
@@ -158,14 +158,14 @@ class ToteItemTest < ActiveSupport::TestCase
 
     retail = quantity * 3 * price
 
-    assert producer.inbound_order_value_producer_net(posting_a.commitment_zone_start) > 0
-    assert producer.inbound_order_value_producer_net(posting_a.commitment_zone_start) < producer.order_minimum_producer_net
-    assert_equal 0, producer.outbound_order_value_producer_net(posting_a.commitment_zone_start)
-    assert producer.order_minimum_producer_net_outstanding(posting_a.commitment_zone_start) > 0
-    assert producer.order_minimum_producer_net_outstanding(posting_a.commitment_zone_start) < producer.order_minimum_producer_net
+    assert producer.inbound_order_value_producer_net(posting_a.order_cutoff) > 0
+    assert producer.inbound_order_value_producer_net(posting_a.order_cutoff) < producer.order_minimum_producer_net
+    assert_equal 0, producer.outbound_order_value_producer_net(posting_a.order_cutoff)
+    assert producer.order_minimum_producer_net_outstanding(posting_a.order_cutoff) > 0
+    assert producer.order_minimum_producer_net_outstanding(posting_a.order_cutoff) < producer.order_minimum_producer_net
 
     #the sum of the posting values + the producer's amount outstanding equals the producers order minimum
-    assert_equal producer.order_minimum_producer_net, (posting_a.outbound_order_value_producer_net * 3).round(2) + producer.order_minimum_producer_net_outstanding(posting_a.commitment_zone_start)
+    assert_equal producer.order_minimum_producer_net, (posting_a.outbound_order_value_producer_net * 3).round(2) + producer.order_minimum_producer_net_outstanding(posting_a.order_cutoff)
     
   end
 
@@ -176,7 +176,7 @@ class ToteItemTest < ActiveSupport::TestCase
     delivery_date = get_delivery_date(7)
     price = 5
     order_minimum_producer_net = 100
-    posting = create_posting(producer, price, product = nil, unit = nil, delivery_date, commitment_zone_start = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net)
+    posting = create_posting(producer, price, product = nil, unit = nil, delivery_date, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net)
     customer = create_user("bob", "bob@b.com")
     quantity = 10
     ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting, user: customer)
@@ -219,7 +219,7 @@ class ToteItemTest < ActiveSupport::TestCase
     delivery_date = get_delivery_date(7)
     price = 5
     order_minimum_producer_net = 100
-    posting = create_posting(producer, price, product = nil, unit = nil, delivery_date, commitment_zone_start = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net)
+    posting = create_posting(producer, price, product = nil, unit = nil, delivery_date, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net)
     customer = create_user("bob", "bob@b.com")
     quantity = 25
     ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting, user: customer)
@@ -393,7 +393,7 @@ class ToteItemTest < ActiveSupport::TestCase
 
     assert_equal ToteItem.states[:ADDED], @tote_item.state
     @tote_item.transition(:customer_authorized)
-    @tote_item.transition(:commitment_zone_started)
+    @tote_item.transition(:order_cutoffed)
     @tote_item.posting.fill(@tote_item.quantity / 2)
 
     @tote_item.reload
@@ -448,7 +448,7 @@ class ToteItemTest < ActiveSupport::TestCase
     pr_count = PurchaseReceivable.count
     @tote_item.update(state: ToteItem.states[:ADDED])
     @tote_item.transition(:customer_authorized)
-    @tote_item.transition(:commitment_zone_started)    
+    @tote_item.transition(:order_cutoffed)    
     @tote_item.reload
     @tote_item.posting.fill(@tote_item.quantity)
     assert_equal pr_count + 1, PurchaseReceivable.count    

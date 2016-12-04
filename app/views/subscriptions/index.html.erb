@@ -99,7 +99,7 @@
                       <tr>
                         <td class="borderless" colspan="3">
                           <div id=<%= "#{count.to_s}helpInfo" %> class="collapse">
-                            <p>Order Cutoff was <%= skip_date[:tote_item].posting.commitment_zone_start.strftime("%-m/%d at %l%p") %>. Delivery can't be skipped after Order Cutoff. <%= link_to("More info", how_things_work_path(anchor: "cancellation")) %>.</p>
+                            <p>Order Cutoff was <%= skip_date[:tote_item].posting.order_cutoff.strftime("%-m/%d at %l%p") %>. Delivery can't be skipped after Order Cutoff. <%= link_to("More info", how_things_work_path(anchor: "cancellation")) %>.</p>
                           </div>                          
                         </td>
                       </tr>

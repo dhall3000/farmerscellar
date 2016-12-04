@@ -16,7 +16,7 @@ class PostingsTest < IntegrationHelper
       delivery_date = Time.zone.today + 4.days
     end
 
-    @posting_case = Posting.new(units_per_case: 10, unit: @unit, product: @product, user: @farmer, description: "descrip", quantity_available: 100, price: 1.25, live: true, commitment_zone_start: delivery_date - 2.days, delivery_date: delivery_date)
+    @posting_case = Posting.new(units_per_case: 10, unit: @unit, product: @product, user: @farmer, description: "descrip", quantity_available: 100, price: 1.25, live: true, order_cutoff: delivery_date - 2.days, delivery_date: delivery_date)
     @posting_case.save
 
   end
@@ -29,7 +29,7 @@ class PostingsTest < IntegrationHelper
     assert_equal 0, posting.tote_items.count
     assert_equal Posting.states[:OPEN], posting.state
 
-    travel_to posting.commitment_zone_start
+    travel_to posting.order_cutoff
     ActionMailer::Base.deliveries.clear
     assert_equal 0, ActionMailer::Base.deliveries.count
     RakeHelper.do_hourly_tasks
@@ -56,7 +56,7 @@ class PostingsTest < IntegrationHelper
     ti.transition(:customer_authorized)
     assert_equal ToteItem.states[:AUTHORIZED], ti.reload.state
 
-    travel_to posting.commitment_zone_start
+    travel_to posting.order_cutoff
     ActionMailer::Base.deliveries.clear
     assert_equal 0, ActionMailer::Base.deliveries.count
     RakeHelper.do_hourly_tasks
@@ -115,7 +115,7 @@ class PostingsTest < IntegrationHelper
     ti.transition(:customer_authorized)
     assert_equal ToteItem.states[:AUTHORIZED], ti.reload.state
 
-    travel_to posting.commitment_zone_start
+    travel_to posting.order_cutoff
     ActionMailer::Base.deliveries.clear
     assert_equal 0, ActionMailer::Base.deliveries.count
     RakeHelper.do_hourly_tasks
@@ -337,7 +337,7 @@ class PostingsTest < IntegrationHelper
     posting.update(late_adds_allowed: false)
     
     #let nature take its course. purchase should occur off the first checkout
-    travel_to tote_item.posting.commitment_zone_start - 1.hour
+    travel_to tote_item.posting.order_cutoff - 1.hour
 
     assert_equal ToteItem.states[:ADDED], tote_item.state
     assert_not posting.late_adds_allowed
@@ -346,7 +346,7 @@ class PostingsTest < IntegrationHelper
 
       RakeHelper.do_hourly_tasks
 
-      if Time.zone.now == tote_item.posting.commitment_zone_start
+      if Time.zone.now == tote_item.posting.order_cutoff
         tote_item.reload
         assert_equal ToteItem.states[:REMOVED], tote_item.state
       end
@@ -374,7 +374,7 @@ class PostingsTest < IntegrationHelper
       delivery_date += 1.day
     end
 
-    commitment_zone_start = delivery_date - 2.days
+    order_cutoff = delivery_date - 2.days
     post postings_path, params: {posting: {
       description: "my recurring posting",
       quantity_available: 100,
@@ -384,7 +384,7 @@ class PostingsTest < IntegrationHelper
       unit_id: @unit.id,
       live: true,
       delivery_date: delivery_date,
-      commitment_zone_start: commitment_zone_start,
+      order_cutoff: order_cutoff,
       posting_recurrence: {frequency: 1, on: true}
     }}
     #verify exactly one post exists
@@ -395,10 +395,10 @@ class PostingsTest < IntegrationHelper
     #add a toteitem to this posting. this is necessary or the rake helper won't transition this posting to committed
     posting.tote_items.create(quantity: 2, price: price, state: ToteItem.states[:AUTHORIZED], user: users(:c1))
 
-    last_minute = posting.commitment_zone_start - 10.minutes
+    last_minute = posting.order_cutoff - 10.minutes
     travel_to last_minute
 
-    while Time.zone.now < posting.commitment_zone_start + 10.minutes
+    while Time.zone.now < posting.order_cutoff + 10.minutes
       top_of_hour = Time.zone.now.min == 0
 
       if top_of_hour
@@ -407,7 +407,7 @@ class PostingsTest < IntegrationHelper
 
       #as long as we're prior to the commitment zone start of the first posting we should
       #be able to see the post on the shopping page
-      if Time.zone.now < posting.commitment_zone_start
+      if Time.zone.now < posting.order_cutoff
         verify_post_presence(price, @unit, true, posting.id)
       end
 
@@ -514,7 +514,7 @@ class PostingsTest < IntegrationHelper
       unit_id: posting.unit_id,
       live: posting.live,
       delivery_date: posting.delivery_date,
-      commitment_zone_start: posting.commitment_zone_start
+      order_cutoff: posting.order_cutoff
     }}
 
     get postings_path
@@ -538,7 +538,7 @@ class PostingsTest < IntegrationHelper
       delivery_date += 1.day
     end
 
-    commitment_zone_start = delivery_date - 2.days
+    order_cutoff = delivery_date - 2.days
 
     posting_params = {
       description: "describe description",
@@ -549,7 +549,7 @@ class PostingsTest < IntegrationHelper
       unit_id: @unit.id,
       live: true,
       delivery_date: delivery_date,
-      commitment_zone_start: commitment_zone_start,
+      order_cutoff: order_cutoff,
       units_per_case: 10
     }
 
@@ -589,7 +589,7 @@ class PostingsTest < IntegrationHelper
       unit_id: @unit.id,
       live: true,
       delivery_date: delivery_date,
-      commitment_zone_start: delivery_date - 2.days
+      order_cutoff: delivery_date - 2.days
       }}
 
     assert :success

@@ -35,7 +35,7 @@ class RtauthorizationssTest < BulkBuyer
     assert_equal true, Checkout.last.is_rt
 
     #let nature take its course. purchase should occur off the first checkout
-    travel_to tote_item.posting.commitment_zone_start - 1.hour
+    travel_to tote_item.posting.order_cutoff - 1.hour
 
     100.times do
 

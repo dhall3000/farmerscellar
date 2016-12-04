@@ -26,7 +26,7 @@ class RakeTasksTest < BulkBuyer
     ActionMailer::Base.deliveries.clear
     assert_equal 0, ActionMailer::Base.deliveries.count
 
-    travel_to @posting_apples.commitment_zone_start
+    travel_to @posting_apples.order_cutoff
     RakeHelper.do_hourly_tasks    
     assert_equal 0, ActionMailer::Base.deliveries.count
     ActionMailer::Base.deliveries.clear
@@ -78,7 +78,7 @@ class RakeTasksTest < BulkBuyer
     assert ActionMailer::Base.deliveries.count > 0
     ActionMailer::Base.deliveries.clear
 
-    travel_to @p1.commitment_zone_start - 1.hour
+    travel_to @p1.order_cutoff - 1.hour
 
     #loop over 10 days worth of minutes
     14400.times do
@@ -101,23 +101,23 @@ class RakeTasksTest < BulkBuyer
 
         #this is the first of the postings to enter the commitment zone so there should only be items related to this
         #posting in the total committed tote item count
-        if Time.zone.now == @p1.commitment_zone_start
+        if Time.zone.now == @p1.order_cutoff
           assert_equal 3, committed_tote_item_count          
           assert_equal 1, email_count          
           assert_appropriate_email(current_order_mail, @p1.user.email, "Current orders for upcoming deliveries", "Below are orders for your upcoming delivery")
-        elsif Time.zone.now == @p2.commitment_zone_start         
+        elsif Time.zone.now == @p2.order_cutoff         
           #at the time we enter the commitment zone for posting p2 we won't have delivered the items for p1 yet
           #so the total committed tote item count should be all the items for postings p1 and p2        
           assert_equal 4, committed_tote_item_count
           assert_equal 1, email_count
           assert_appropriate_email(current_order_mail, @p2.user.email, "Current orders for upcoming deliveries", "Below are orders for your upcoming delivery")
-        elsif Time.zone.now == @p3.commitment_zone_start         
+        elsif Time.zone.now == @p3.order_cutoff         
           #by the time we get to p3's commitment zone, p1's items should have been tranitioned out of the COMMITTED state
           #so they no longer contribute to the total committed tote item count. it's only p2 and p3 that contribute.        
           assert_equal 3, committed_tote_item_count
           assert_equal 1, email_count
           assert_appropriate_email(current_order_mail, @p3.user.email, "Current orders for upcoming deliveries", "Below are orders for your upcoming delivery")
-        elsif Time.zone.now == @p4.commitment_zone_start        
+        elsif Time.zone.now == @p4.order_cutoff        
           #the weekend has elapsed since p3's delivery, so by the time we get to this monday - p4's delivery - all other
           #tote items should have transitioned out of the committed state        
           assert_equal 1, committed_tote_item_count
@@ -281,7 +281,7 @@ class RakeTasksTest < BulkBuyer
     assert ActionMailer::Base.deliveries.count > 0
     ActionMailer::Base.deliveries.clear
 
-    travel_to (@c1.tote_items[1].posting.commitment_zone_start - 1.hour)
+    travel_to (@c1.tote_items[1].posting.order_cutoff - 1.hour)
 
     #now transition them to committed
     3.times do |i|
@@ -361,7 +361,7 @@ class RakeTasksTest < BulkBuyer
     assert_equal authorized_tote_items_count, ToteItem.where(state: ToteItem.states[:AUTHORIZED]).count
     
     #time travel to 65 minutes before commitment zone start time
-    travel_to (@posting_apples.commitment_zone_start - 65.minutes)
+    travel_to (@posting_apples.order_cutoff - 65.minutes)
 
     #now loop over the next 130 minutes
     130.times do |i|
@@ -375,12 +375,12 @@ class RakeTasksTest < BulkBuyer
       #run the task
       RakeHelper.do_hourly_tasks
 
-      if Time.zone.now < @posting_apples.commitment_zone_start
+      if Time.zone.now < @posting_apples.order_cutoff
         #before transition
         tote_items_compare_equal
         #verify no emails sent
         assert_equal 0, ActionMailer::Base.deliveries.count    
-      elsif Time.zone.now == @posting_apples.commitment_zone_start
+      elsif Time.zone.now == @posting_apples.order_cutoff
         #at transition
 
         #this is how many committed tote items we expect to see

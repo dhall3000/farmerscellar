@@ -39,7 +39,7 @@ class ProducerProductUnitCommissionsControllerTest < ActionDispatch::Integration
       unit_id: units(:ton).id,
       live: true,
       delivery_date: delivery_date,
-      commitment_zone_start: czs
+      order_cutoff: czs
       )
 
     assert postingTon.save
@@ -53,7 +53,7 @@ class ProducerProductUnitCommissionsControllerTest < ActionDispatch::Integration
       unit_id: units(:pound).id,
       live: true,
       delivery_date: delivery_date,
-      commitment_zone_start: czs
+      order_cutoff: czs
       )
 
     assert postingPound.save

@@ -13,12 +13,12 @@ class PaymentMethodsTest < IntegrationHelper
     producer1 = create_producer(name = "producer1 name", email = "producer1@p.com", distributor)
     producer1.get_business_interface.update(payment_method: BusinessInterface.payment_methods[:PAYPAL])
     assert producer1.reload.get_business_interface.payment_method?(:PAYPAL)
-    posting1 = create_posting(farmer = producer1, price = 10, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = nil)
+    posting1 = create_posting(farmer = producer1, price = 10, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil)
     
     producer2 = create_producer(name = "producer2 name", email = "producer2@p.com", distributor = nil, order_min = 0)
     producer2.get_business_interface.update(payment_method: BusinessInterface.payment_methods[:CASH])
     assert producer2.reload.get_business_interface.payment_method?(:CASH)
-    posting2 = create_posting(farmer = producer2, price = 5, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = nil)
+    posting2 = create_posting(farmer = producer2, price = 5, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil)
 
     bob = create_new_customer("bob", "bob@b.com")
     ti1 = create_tote_item(bob, posting1, quantity = 10)        
@@ -32,7 +32,7 @@ class PaymentMethodsTest < IntegrationHelper
     assert ti2.reload.state?(:AUTHORIZED)
 
     assert_equal posting1.delivery_date, posting2.delivery_date
-    travel_to posting1.commitment_zone_start
+    travel_to posting1.order_cutoff
 
     assert_equal 0, CreditorOrder.count
     RakeHelper.do_hourly_tasks

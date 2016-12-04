@@ -12,10 +12,10 @@ class OrderMinimumsTest < IntegrationHelper
     if (delivery_date - 1.day).sunday?
       delivery_date += 1.day
     end
-    commitment_zone_start = delivery_date - 2.days
+    order_cutoff = delivery_date - 2.days
 
     delivery_date_decoy = delivery_date - 1.day
-    commitment_zone_start_decoy = delivery_date_decoy - 2.days
+    order_cutoff_decoy = delivery_date_decoy - 2.days
 
     distributor = create_producer("distributor", "distributor@d.com")
     distributor.create_business_interface(name: "Distributor Inc.", order_email_accepted: true, order_email: distributor.email, payment_method: BusinessInterface.payment_methods[:PAYPAL], paypal_email: distributor.email)
@@ -33,13 +33,13 @@ class OrderMinimumsTest < IntegrationHelper
     producer_decoy.create_business_interface(name: producer_decoy.farm_name, order_email_accepted: true, order_email: producer_decoy.email, payment_method: BusinessInterface.payment_methods[:PAYPAL], paypal_email: producer_decoy.email)
 
     create_commission(producer1, products(:apples), units(:pound), 0.05)
-    posting1 = create_posting(producer1, 1.00, products(:apples), units(:pound), delivery_date, commitment_zone_start, units_per_case = 1)
+    posting1 = create_posting(producer1, 1.00, products(:apples), units(:pound), delivery_date, order_cutoff, units_per_case = 1)
 
     create_commission(producer2, products(:celery), units(:bunch), 0.05)
-    posting2 = create_posting(producer2, 2.00, products(:celery), units(:bunch), delivery_date, commitment_zone_start, units_per_case = 1)
+    posting2 = create_posting(producer2, 2.00, products(:celery), units(:bunch), delivery_date, order_cutoff, units_per_case = 1)
 
     create_commission(producer_decoy, products(:milk), units(:gallon), 0.05)
-    posting_decoy = create_posting(producer_decoy, 10.50, products(:milk), units(:gallon), delivery_date_decoy, commitment_zone_start_decoy, units_per_case = 1)
+    posting_decoy = create_posting(producer_decoy, 10.50, products(:milk), units(:gallon), delivery_date_decoy, order_cutoff_decoy, units_per_case = 1)
 
     bob = create_user("bob", "bob@b.com")
     sam = create_user("sam", "sam@s.com")
@@ -58,7 +58,7 @@ class OrderMinimumsTest < IntegrationHelper
     create_one_time_authorization_for_customer(bob)
     create_one_time_authorization_for_customer(sam)
 
-    travel_to commitment_zone_start_decoy
+    travel_to order_cutoff_decoy
     ActionMailer::Base.deliveries.clear
     RakeHelper.do_hourly_tasks
 
@@ -66,7 +66,7 @@ class OrderMinimumsTest < IntegrationHelper
     assert_equal 1, ActionMailer::Base.deliveries.count
     verify_proper_order_submission_email(ActionMailer::Base.deliveries.last, producer_decoy.get_creditor, posting_decoy, num_decoy_units, units_per_case = "", number_of_cases = "")
 
-    travel_to commitment_zone_start
+    travel_to order_cutoff
     ActionMailer::Base.deliveries.clear
     RakeHelper.do_hourly_tasks
 

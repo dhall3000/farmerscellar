@@ -16,7 +16,7 @@ class BulkPurchasesTest < BulkBuyer
 
     posting = @c_one_tote_item.tote_items.first.posting
 
-    travel_to posting.commitment_zone_start
+    travel_to posting.order_cutoff
     RakeHelper.do_hourly_tasks
     travel_to posting.delivery_date + 12.hours
     fill_posting(posting)
@@ -37,7 +37,7 @@ class BulkPurchasesTest < BulkBuyer
     assert_equal 0, BulkPurchase.count
 
     posting = @c1.tote_items.first.posting    
-    travel_to posting.commitment_zone_start
+    travel_to posting.order_cutoff
     RakeHelper.do_hourly_tasks
     travel_to posting.delivery_date + 22.hours
     RakeHelper.do_hourly_tasks
@@ -347,7 +347,7 @@ class BulkPurchasesTest < BulkBuyer
     ActionMailer::Base.deliveries.clear
     previous_user_account_state_count = UserAccountState.count
 
-    travel_to posting11.commitment_zone_start
+    travel_to posting11.order_cutoff
     RakeHelper.do_hourly_tasks
 
     fully_fill_creditor_order(posting11.reload.creditor_order)
@@ -773,7 +773,7 @@ class BulkPurchasesTest < BulkBuyer
       create_one_time_authorization_for_customer(customer)
 
       customer.tote_items.each do |tote_item|
-        order_cutoffs << tote_item.posting.commitment_zone_start
+        order_cutoffs << tote_item.posting.order_cutoff
       end
 
     end

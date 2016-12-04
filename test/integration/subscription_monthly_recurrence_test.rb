@@ -14,7 +14,7 @@ class SubscriptionMonthlyRecurrenceTest < IntegrationHelper
 
     monthly_recurrence_frequency = 5
     subscription_frequency = 1 #every recurrence delivery
-    posting_recurrence = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = 1).posting_recurrence
+    posting_recurrence = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1).posting_recurrence
     posting_recurrence.update(frequency: monthly_recurrence_frequency)
 
     posting = posting_recurrence.current_posting
@@ -22,7 +22,7 @@ class SubscriptionMonthlyRecurrenceTest < IntegrationHelper
     user = create_user("bob", "bob@b.com")
     quantity = 2
 
-    travel_to posting_recurrence.current_posting.commitment_zone_start
+    travel_to posting_recurrence.current_posting.order_cutoff
 
     num_tote_items_start = user.tote_items.count    
     num_tote_items_end = user.tote_items.count + 4

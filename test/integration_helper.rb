@@ -6,16 +6,20 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
   def do_authorized_through_funds_transfer(posting)
     
     #transition tote items from authorized -> committed
-    do_hourly_tasks_at(posting.commitment_zone_start)
+    do_hourly_tasks_at(posting.order_cutoff)
     #do fill    
     fully_fill_creditor_order(posting.creditor_order)
     #there should now be an unbalanced CreditorObligation associated with this
     num_unbalanced_creditor_obligations = CreditorObligation.get_unbalanced.count
     assert num_unbalanced_creditor_obligations > 0
+    #check that method send_payments actually gets called and does something
+    #this check might actually become obsolete if/when we implement non-paypal payment methods?
+    num_paypal_responses = PpMpCommon.count
     #transfer funds
     do_hourly_tasks_at(posting.delivery_date + 22.hours)
     #there should now be one less unbalanced CreditorObligation after payment was made
     assert_equal num_unbalanced_creditor_obligations - 1, CreditorObligation.get_unbalanced.count
+    assert_equal num_paypal_responses + 1, PpMpCommon.count
 
   end
 
@@ -148,7 +152,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     return [{posting_id: posting_id, quantity: quantity}]
   end
   
-  def create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, commitment_zone_start = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
+  def create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
 
     if farmer.nil?
       farmer = create_producer("john", "john@j.com")
@@ -172,8 +176,8 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
       delivery_date = get_delivery_date(days_from_now = 7)
     end
 
-    if commitment_zone_start.nil?
-      commitment_zone_start = delivery_date - 2.days
+    if order_cutoff.nil?
+      order_cutoff = delivery_date - 2.days
     end
 
     if units_per_case.nil?
@@ -197,7 +201,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
       unit_id: unit.id,
       live: true,
       delivery_date: delivery_date,
-      commitment_zone_start: commitment_zone_start,
+      order_cutoff: order_cutoff,
       units_per_case: units_per_case,
       order_minimum_producer_net: order_minimum_producer_net,
       posting_recurrence: {frequency: frequency, on: true}
@@ -392,7 +396,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     if (delivery_date - 1.day).sunday?
       delivery_date += 1.day
     end
-    commitment_zone_start = delivery_date - 2.days
+    order_cutoff = delivery_date - 2.days
 
     distributor = create_producer("distributor", "distributor@d.com")
     distributor.create_business_interface(name: "Distributor Inc.", order_email_accepted: true, order_email: distributor.email, payment_method: BusinessInterface.payment_methods[:PAYPAL], paypal_email: distributor.email)
@@ -407,7 +411,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     producer1.save
     
     create_commission(producer1, products(:apples), units(:pound), 0.05)
-    posting1 = create_posting(producer1, 1.00, products(:apples), units(:pound), delivery_date, commitment_zone_start, units_per_case = 1, frequency = 1)
+    posting1 = create_posting(producer1, 1.00, products(:apples), units(:pound), delivery_date, order_cutoff, units_per_case = 1, frequency = 1)
 
     bob = create_user("bob", "bob@b.com")
     
@@ -423,7 +427,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
     num_units = ti.quantity
     
-    travel_to posting.commitment_zone_start
+    travel_to posting.order_cutoff
     ActionMailer::Base.deliveries.clear
     RakeHelper.do_hourly_tasks
 
@@ -460,7 +464,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     if (delivery_date - 1.day).sunday?
       delivery_date += 1.day
     end
-    commitment_zone_start = delivery_date - 2.days
+    order_cutoff = delivery_date - 2.days
 
     distributor = create_producer("distributor", "distributor@d.com")
     distributor.create_business_interface(name: "Distributor Inc.", order_email_accepted: true, order_email: distributor.email, payment_method: BusinessInterface.payment_methods[:PAYPAL], paypal_email: distributor.email)
@@ -475,7 +479,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     producer1.save
     
     create_commission(producer1, products(:apples), units(:pound), 0.05)
-    posting1 = create_posting(producer1, 1.00, products(:apples), units(:pound), delivery_date, commitment_zone_start, units_per_case = 1)
+    posting1 = create_posting(producer1, 1.00, products(:apples), units(:pound), delivery_date, order_cutoff, units_per_case = 1)
 
     bob = create_user("bob", "bob@b.com")
     
@@ -491,7 +495,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
     num_units = ti.quantity
     
-    travel_to posting.commitment_zone_start
+    travel_to posting.order_cutoff
     ActionMailer::Base.deliveries.clear
     RakeHelper.do_hourly_tasks
 

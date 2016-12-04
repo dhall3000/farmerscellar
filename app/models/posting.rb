@@ -13,14 +13,14 @@ class Posting < ApplicationRecord
   has_many :creditor_order_postings
   has_many :creditor_orders, through: :creditor_order_postings
 
-  validates :description, :quantity_available, :price, :delivery_date, :commitment_zone_start, presence: true
+  validates :description, :quantity_available, :price, :delivery_date, :order_cutoff, presence: true
   validates :quantity_available, numericality: { only_integer: true, greater_than: 0 }
   validates :price, numericality: { greater_than: 0 }
   validates :units_per_case, numericality: {only_integer: true, greater_than_or_equal_to: 0}
   #the weird syntax below is due to some serious gotchas having to do with how booleans are stores or something? I have no idea. See here:
   #http://stackoverflow.com/questions/10506575/rails-database-defaults-and-model-validation-for-boolean-fields
   validates :live, inclusion: { in: [true, false] }
-  validate :delivery_date_not_sunday, :commitment_zone_start_must_be_before_delivery_date, :commission_is_set
+  validate :delivery_date_not_sunday, :order_cutoff_must_be_before_delivery_date, :commission_is_set
   before_create :delivery_date_must_be_after_today
 
   validates_presence_of :user, :product, :unit  
@@ -105,14 +105,14 @@ class Posting < ApplicationRecord
       biggest_outstanding = temp
     end
 
-    temp = user.order_minimum_producer_net_outstanding(commitment_zone_start)
+    temp = user.order_minimum_producer_net_outstanding(order_cutoff)
 
     if temp > biggest_outstanding
       biggest_outstanding = temp
     end
 
     if user.distributor
-      temp = user.distributor.order_minimum_producer_net_outstanding(commitment_zone_start)
+      temp = user.distributor.order_minimum_producer_net_outstanding(order_cutoff)
       if temp > biggest_outstanding
         biggest_outstanding = temp
       end
@@ -204,9 +204,9 @@ class Posting < ApplicationRecord
   end
 
   #OPEN means open for customers to place orders. but that's somewhat confusing because if late_adds_allowed then customer can place order even in the COMMITMENTZONE
-  #so really all OPEN means right now is the period of time before commitment_zone_start. the meaning isn't even yet comingled/intermingled iwth the concept of 'live'.
+  #so really all OPEN means right now is the period of time before order_cutoff. the meaning isn't even yet comingled/intermingled iwth the concept of 'live'.
   #yuck. it is what it is. we'll clean it up eventually
-  #COMMITMENTZONE is the period of time between commitment_zone_start and when product is CLOSED
+  #COMMITMENTZONE is the period of time between order_cutoff and when product is CLOSED
   #CLOSED is either when the posting is canceled or filled. we don't even have 'canceled' built in. eventually we'll put a control for the admin (or producer, i guess) to
   #cancel the posting. if/when you want to 'cancel' a posting we'll probably need to implement it. it will depend on if there are outstanding orders or not.
   def self.states
@@ -226,9 +226,9 @@ class Posting < ApplicationRecord
 
     when Posting.states[:OPEN]
       case input
-      when :commitment_zone_started
+      when :order_cutoffed
 
-        if Time.zone.now >= commitment_zone_start
+        if Time.zone.now >= order_cutoff
           new_state = Posting.states[:COMMITMENTZONE]
 
           #'late adds' are a customer authorizing a tote item in between commitment zone start and delivery date.
@@ -247,7 +247,7 @@ class Posting < ApplicationRecord
           end
 
           tote_items.where(state: ToteItem.states[:AUTHORIZED]).each do |tote_item|
-            tote_item.transition(:commitment_zone_started)
+            tote_item.transition(:order_cutoffed)
           end
 
           if !posting_recurrence.nil? && posting_recurrence.on
@@ -514,15 +514,15 @@ class Posting < ApplicationRecord
 
     end
 
-    def commitment_zone_start_must_be_before_delivery_date
+    def order_cutoff_must_be_before_delivery_date
 
       if delivery_date.nil?
         errors.add(:delivery_date, "Delivery date must be specified")
         return
       end
 
-      if delivery_date.nil? || commitment_zone_start.nil? || commitment_zone_start > delivery_date
-        errors.add(:commitment_zone_start, "Commitment zone must start prior to delivery date")
+      if delivery_date.nil? || order_cutoff.nil? || order_cutoff > delivery_date
+        errors.add(:order_cutoff, "Commitment zone must start prior to delivery date")
       end
 
     end

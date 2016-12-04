@@ -34,7 +34,7 @@ class RtauthorizationTest < ActiveSupport::TestCase
 
 		#move the ti state to committed
 		@tote_item.transition(:customer_authorized)
-		@tote_item.transition(:commitment_zone_started)
+		@tote_item.transition(:order_cutoffed)
 		#verify ti state is committed
 		assert @tote_item.state?(:COMMITTED)		
 		#call rtauth.deauth

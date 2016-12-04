@@ -10,7 +10,7 @@ class CaseTechTest < IntegrationHelper
     if (delivery_date - 1.day).sunday?
       delivery_date += 1.day
     end
-    commitment_zone_start = delivery_date - 2.days
+    order_cutoff = delivery_date - 2.days
 
     distributor = create_producer("distributor", "distributor@d.com")
     distributor.create_business_interface(name: "Distributor Inc.", order_email_accepted: true, order_email: distributor.email, payment_method: BusinessInterface.payment_methods[:PAYPAL], paypal_email: distributor.email)
@@ -20,7 +20,7 @@ class CaseTechTest < IntegrationHelper
     producer1.save
     
     create_commission(producer1, products(:apples), units(:pound), 0.05)
-    posting1 = create_posting(producer1, 1.00, products(:apples), units(:pound), delivery_date, commitment_zone_start, units_per_case = 10, frequency = 1)
+    posting1 = create_posting(producer1, 1.00, products(:apples), units(:pound), delivery_date, order_cutoff, units_per_case = 10, frequency = 1)
 
     bob = create_user("bob", "bob@b.com")
     
@@ -53,7 +53,7 @@ class CaseTechTest < IntegrationHelper
 
     #create posting
     delivery_date = get_delivery_date(days_from_now)
-    commitment_zone_start = delivery_date - 2.days
+    order_cutoff = delivery_date - 2.days
     farmer = create_producer(name = "farmer bob", email = "producer@p.com", distributor = nil, order_min = 0)
  
     product = products(:apples)
@@ -61,7 +61,7 @@ class CaseTechTest < IntegrationHelper
 
     ppuc = create_commission(farmer, product, unit, commission)
     
-    posting = create_posting(farmer, price, product, unit, delivery_date, commitment_zone_start, units_per_case)
+    posting = create_posting(farmer, price, product, unit, delivery_date, order_cutoff, units_per_case)
     #create customer
     customer = create_new_customer("bob", "bob@fc.com")
     customer.set_dropsite(Dropsite.first)
@@ -71,7 +71,7 @@ class CaseTechTest < IntegrationHelper
     create_one_time_authorization_for_customer(customer)
     #fast forward to commitment zone
     assert posting.state?(:OPEN)
-    travel_to posting.commitment_zone_start
+    travel_to posting.order_cutoff
     ActionMailer::Base.deliveries.clear
     RakeHelper.do_hourly_tasks
     assert posting.reload.state?(:COMMITMENTZONE)

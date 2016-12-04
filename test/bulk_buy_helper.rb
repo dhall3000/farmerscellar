@@ -41,7 +41,7 @@ class BulkBuyer < Authorizer
     #now change all the tote_items from AUTHORIZED to COMMITTED
     order_cutoffs = []
     ToteItem.where(state: ToteItem.states[:AUTHORIZED]).each do |tote_item|
-      order_cutoffs << tote_item.posting.commitment_zone_start
+      order_cutoffs << tote_item.posting.order_cutoff
     end
 
     order_cutoffs = order_cutoffs.uniq.sort

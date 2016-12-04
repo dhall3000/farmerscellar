@@ -58,7 +58,7 @@ class UserTest < ActiveSupport::TestCase
     ti_chris_milk = create_tote_item(chris, posting_milk, quantity = 3)
     ti_chris_milk.update(state: ToteItem.states[:COMMITTED])
     
-    report = producer1.outbound_order_report(posting_carrots.commitment_zone_start)    
+    report = producer1.outbound_order_report(posting_carrots.order_cutoff)    
     producer1_net_value = 49.32    
     assert_equal producer1_net_value, report[:order_value_producer_net]
 
@@ -93,12 +93,12 @@ class UserTest < ActiveSupport::TestCase
     price_celery = 1.00
     posting_celery = create_posting(oxbow, price_celery, product = products(:celery), unit = units(:pound), delivery_date1)
     delivery_date1_postings << posting_celery
-    czs1 = posting_celery.commitment_zone_start
+    czs1 = posting_celery.order_cutoff
 
     price_apples = 2.00
     posting_apples = create_posting(oxbow, price_apples, product = products(:apples), unit = units(:pound), delivery_date2)
     delivery_date2_postings << posting_apples
-    czs2 = posting_apples.commitment_zone_start
+    czs2 = posting_apples.order_cutoff
     
     #producer 1 postings, order min: $20
     price_carrots = 3.00
@@ -182,13 +182,13 @@ class UserTest < ActiveSupport::TestCase
     #verify values if we call the 'orderable' methods
     #{postings_to_order: [], postings_to_close: postings_all, outbound_order_value_producer_net: 0}
 
-    report = oxbow.outbound_order_report(delivery_date1_postings.first.commitment_zone_start)
+    report = oxbow.outbound_order_report(delivery_date1_postings.first.order_cutoff)
     assert_equal first_czs_oxbow_net, report[:order_value_producer_net]
 
-    report = producer1.outbound_order_report(posting_carrots.commitment_zone_start)
+    report = producer1.outbound_order_report(posting_carrots.order_cutoff)
     assert_equal producer1_net_value, report[:order_value_producer_net]
 
-    report = producer2.outbound_order_report(posting_beef.commitment_zone_start)
+    report = producer2.outbound_order_report(posting_beef.order_cutoff)
     assert_equal producer2_net_value, report[:order_value_producer_net]
 
   end
@@ -238,12 +238,12 @@ class UserTest < ActiveSupport::TestCase
     price_celery = 1.00
     posting_celery = create_posting(oxbow, price_celery, product = products(:celery), unit = units(:pound), delivery_date1)
     delivery_date1_postings << posting_celery
-    czs1 = posting_celery.commitment_zone_start
+    czs1 = posting_celery.order_cutoff
 
     price_apples = 2.00
     posting_apples = create_posting(oxbow, price_apples, product = products(:apples), unit = units(:pound), delivery_date2)
     delivery_date2_postings << posting_apples
-    czs2 = posting_apples.commitment_zone_start
+    czs2 = posting_apples.order_cutoff
     
     #producer 1 postings, order min: $20
     price_carrots = 3.00
@@ -326,13 +326,13 @@ class UserTest < ActiveSupport::TestCase
     #verify values if we call the 'orderable' methods
     #{postings_to_order: [], postings_to_close: postings_all, outbound_order_value_producer_net: 0}
 
-    report = oxbow.outbound_order_report(delivery_date1_postings.first.commitment_zone_start)
+    report = oxbow.outbound_order_report(delivery_date1_postings.first.order_cutoff)
     assert_equal first_czs_oxbow_net, report[:order_value_producer_net]
 
-    report = producer1.outbound_order_report(posting_carrots.commitment_zone_start)
+    report = producer1.outbound_order_report(posting_carrots.order_cutoff)
     assert_equal producer1_net_value, report[:order_value_producer_net]
 
-    report = producer2.outbound_order_report(posting_beef.commitment_zone_start)
+    report = producer2.outbound_order_report(posting_beef.order_cutoff)
     assert_equal 0, report[:order_value_producer_net]
 
   end
@@ -366,12 +366,12 @@ class UserTest < ActiveSupport::TestCase
     price_celery = 1.00
     posting_celery = create_posting(oxbow, price_celery, product = products(:celery), unit = units(:pound), delivery_date1)
     delivery_date1_postings << posting_celery
-    czs1 = posting_celery.commitment_zone_start
+    czs1 = posting_celery.order_cutoff
 
     price_apples = 2.00
     posting_apples = create_posting(oxbow, price_apples, product = products(:apples), unit = units(:pound), delivery_date2)
     delivery_date2_postings << posting_apples
-    czs2 = posting_apples.commitment_zone_start
+    czs2 = posting_apples.order_cutoff
     
     #producer 1 postings, order min: $20
     price_carrots = 3.00
@@ -441,14 +441,14 @@ class UserTest < ActiveSupport::TestCase
     #producer2 has no om but does have case size of 10 and only 6 units sold
     #so each of the three producers should have individual outbound order of $0 which means the sum is also $0
 
-    assert_equal 1, producer1.postings.where(commitment_zone_start: czs1).count
-    p1p = producer1.postings.where(commitment_zone_start: czs1).first
+    assert_equal 1, producer1.postings.where(order_cutoff: czs1).count
+    p1p = producer1.postings.where(order_cutoff: czs1).first
     assert_equal 13.70, p1p.outbound_order_value_producer_net
     assert_equal 20, producer1.order_minimum_producer_net
     assert_equal 0, producer1.outbound_order_value_producer_net(czs1)
 
-    assert_equal 1, producer2.postings.where(commitment_zone_start: czs1).count
-    p2p = producer2.postings.where(commitment_zone_start: czs1).first
+    assert_equal 1, producer2.postings.where(order_cutoff: czs1).count
+    p2p = producer2.postings.where(order_cutoff: czs1).first
     assert_equal 10, p2p.units_per_case
     assert_equal 6, p2p.total_quantity_authorized_or_committed
     assert_equal 0, producer2.outbound_order_value_producer_net(czs1)
@@ -461,10 +461,10 @@ class UserTest < ActiveSupport::TestCase
     report = oxbow.outbound_order_report(czs1)
     assert_equal 0, report[:order_value_producer_net]
 
-    report = producer1.outbound_order_report(p1p.commitment_zone_start)
+    report = producer1.outbound_order_report(p1p.order_cutoff)
     assert_equal 0, report[:order_value_producer_net]
 
-    report = producer2.outbound_order_report(p2p.commitment_zone_start)
+    report = producer2.outbound_order_report(p2p.order_cutoff)
     assert_equal 0, report[:order_value_producer_net]
 
   end
@@ -483,7 +483,7 @@ class UserTest < ActiveSupport::TestCase
     price_milk = 1.00
     posting_milk = create_posting(producer, price_milk, product = products(:milk))
     #change this order cutoff time so that it's not included in the order value computation
-    posting_milk.update(commitment_zone_start: posting_milk.commitment_zone_start - 1)
+    posting_milk.update(order_cutoff: posting_milk.order_cutoff - 1)
     
     bob = create_user("bob", "bob@b.com")
     chris = create_user("chris", "chris@c.com")
@@ -519,7 +519,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal expected_celery_posting_value, posting_celery.inbound_order_value_producer_net
     assert_equal expected_apples_posting_value, posting_apples.inbound_order_value_producer_net
 
-    czs = posting_celery.commitment_zone_start
+    czs = posting_celery.order_cutoff
     producer_net = producer.outbound_order_value_producer_net(czs)
 
     assert_equal expected_order_value, producer_net
@@ -575,7 +575,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal expected_producer_net, producer_net
 
     #outbound_order_report(postings_presently_transitioning_to_commitment_zone) should return postings
-    report = producer.outbound_order_report(posting_celery.commitment_zone_start)
+    report = producer.outbound_order_report(posting_celery.order_cutoff)
     #verify all postings returned
     assert_equal report[:postings_order_requirements_met].first, posting_celery
     assert_equal report[:postings_order_requirements_met].last, posting_apples
@@ -637,7 +637,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal expected_producer_net, producer_net
 
     #outbound_order_report(postings_presently_transitioning_to_commitment_zone) should return postings
-    report = producer.outbound_order_report(posting_celery.commitment_zone_start)
+    report = producer.outbound_order_report(posting_celery.order_cutoff)
     #verify all postings returned
     assert_equal report[:postings_order_requirements_met].first, posting_celery
     assert_equal report[:postings_order_requirements_met].last, posting_apples
@@ -698,7 +698,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal expected_producer_net, producer_net
 
     #outbound_order_report(postings_presently_transitioning_to_commitment_zone) should return postings
-    report = producer.outbound_order_report(posting_celery.commitment_zone_start)
+    report = producer.outbound_order_report(posting_celery.order_cutoff)
     #verify all postings returned
     assert_equal 0, report[:postings_order_requirements_met].count
     assert_equal report[:postings_order_requirements_unmet].first, posting_celery
@@ -761,7 +761,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal expected_producer_net, producer_net
 
     #outbound_order_report(postings_presently_transitioning_to_commitment_zone) should return postings
-    report = distributor.outbound_order_report(posting_celery.commitment_zone_start)
+    report = distributor.outbound_order_report(posting_celery.order_cutoff)
     #verify all postings returned
     assert_equal report[:postings_order_requirements_met].first, posting_celery
     assert_equal report[:postings_order_requirements_met].last, posting_apples
@@ -827,7 +827,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal expected_producer_net, producer_net
 
     #outbound_order_report(postings_presently_transitioning_to_commitment_zone) should return postings
-    report = distributor.outbound_order_report(posting_celery.commitment_zone_start)
+    report = distributor.outbound_order_report(posting_celery.order_cutoff)
     #verify all postings returned
     assert_equal report[:postings_order_requirements_met].first, posting_celery
     assert_equal report[:postings_order_requirements_met].last, posting_apples
@@ -893,7 +893,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal expected_producer_net, producer_net
 
     #outbound_order_report(postings_presently_transitioning_to_commitment_zone) should return postings
-    report = distributor.outbound_order_report(posting_celery.commitment_zone_start)
+    report = distributor.outbound_order_report(posting_celery.order_cutoff)
     #verify all postings returned
     assert_equal 0, report[:postings_order_requirements_met].count
 
@@ -965,7 +965,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal expected_producer_net, producer_net
 
     #outbound_order_report(postings_presently_transitioning_to_commitment_zone) should return postings
-    report = distributor.outbound_order_report(posting_celery.commitment_zone_start)
+    report = distributor.outbound_order_report(posting_celery.order_cutoff)
     #verify all postings returned
     assert_equal 1, report[:postings_order_requirements_met].count
     assert_equal posting_apples, report[:postings_order_requirements_met].last
@@ -1046,7 +1046,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal expected_producer_net, producer_net
 
     #outbound_order_report(postings_presently_transitioning_to_commitment_zone) should return postings
-    report = distributor.outbound_order_report(posting_celery.commitment_zone_start)
+    report = distributor.outbound_order_report(posting_celery.order_cutoff)
     #verify all postings returned
     assert_equal 0, report[:postings_order_requirements_unmet].count
     assert_equal 3, report[:postings_order_requirements_met].count
@@ -1089,7 +1089,7 @@ class UserTest < ActiveSupport::TestCase
       tote_item.update(state: ToteItem.states[:ADDED])
       tote_item.transition(:customer_authorized)
       assert tote_item.reload.state?(:AUTHORIZED)
-      order_cutoffs << tote_item.posting.commitment_zone_start
+      order_cutoffs << tote_item.posting.order_cutoff
     end
 
     order_cutoffs = order_cutoffs.uniq.sort

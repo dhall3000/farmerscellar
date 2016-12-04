@@ -19,7 +19,7 @@ class PostingsControllerTest < IntegrationHelper
     posting.tote_items.each do |tote_item|
       tote_item.update(state: ToteItem.states[:ADDED])
       tote_item.transition(:customer_authorized)
-      tote_item.transition(:commitment_zone_started)    
+      tote_item.transition(:order_cutoffed)    
     end
 
     #now in order for these tests to come out right i have to set the quantities according to the id number progression
@@ -147,7 +147,7 @@ class PostingsControllerTest < IntegrationHelper
     
     assert_equal 0, PurchaseReceivable.count
     assert_equal Posting.states[:OPEN], posting.state
-    travel_to posting.commitment_zone_start + 1
+    travel_to posting.order_cutoff + 1
     RakeHelper.do_hourly_tasks
     posting.reload
     assert_equal Posting.states[:COMMITMENTZONE], posting.state
@@ -223,7 +223,7 @@ class PostingsControllerTest < IntegrationHelper
     log_in_as(@admin)
     posting = postings(:postingf5apples)        
 
-    travel_to posting.commitment_zone_start
+    travel_to posting.order_cutoff
     RakeHelper.do_hourly_tasks
     
     #here is the non-failing "good" case
@@ -243,7 +243,7 @@ class PostingsControllerTest < IntegrationHelper
 
     log_in_as(@admin)
     posting = postings(:postingf5apples)        
-    travel_to posting.commitment_zone_start
+    travel_to posting.order_cutoff
     RakeHelper.do_hourly_tasks
 
     travel_to posting.delivery_date + 1
@@ -265,7 +265,7 @@ class PostingsControllerTest < IntegrationHelper
 
     log_in_as(@admin)
     posting = postings(:postingf5apples)        
-    travel_to posting.commitment_zone_start
+    travel_to posting.order_cutoff
     RakeHelper.do_hourly_tasks
 
     travel_to posting.delivery_date + 1
@@ -305,7 +305,7 @@ class PostingsControllerTest < IntegrationHelper
 
     log_in_as(@admin)
     posting = postings(:postingf5apples)        
-    travel_to posting.commitment_zone_start
+    travel_to posting.order_cutoff
     RakeHelper.do_hourly_tasks
 
     travel_to posting.delivery_date - 1
@@ -556,7 +556,7 @@ class PostingsControllerTest < IntegrationHelper
   end
 
   test "should not update attributes as farmer" do
-    #disallow: user_id, product_id, unit_category_id, unit_kind_id, delivery_date, commitment_zone_start, posting_recurrence values
+    #disallow: user_id, product_id, unit_category_id, unit_kind_id, delivery_date, order_cutoff, posting_recurrence values
 
     log_in_as(@farmer)
 
@@ -569,7 +569,7 @@ class PostingsControllerTest < IntegrationHelper
       product_id: @posting2.product_id,
       unit_id: @posting2.unit_id,
       delivery_date: @posting2.delivery_date + 2.days,
-      commitment_zone_start: @posting2.commitment_zone_start + 2.days      
+      order_cutoff: @posting2.order_cutoff + 2.days      
     })
 
     #first make sure we were sent to the right place
@@ -585,12 +585,12 @@ class PostingsControllerTest < IntegrationHelper
     assert @posting.product_id == posting_old.product_id
     assert @posting.unit_id == posting_old.unit_id
     assert @posting.delivery_date == posting_old.delivery_date
-    assert @posting.commitment_zone_start == posting_old.commitment_zone_start    
+    assert @posting.order_cutoff == posting_old.order_cutoff    
 
   end
 
   test "should redirect update because invalid values" do
-    #disallow: user_id, product_id, unit_category_id, unit_kind_id, delivery_date, commitment_zone_start, posting_recurrence values
+    #disallow: user_id, product_id, unit_category_id, unit_kind_id, delivery_date, order_cutoff, posting_recurrence values
 
     log_in_as(@farmer)
 
@@ -656,7 +656,7 @@ class PostingsControllerTest < IntegrationHelper
       delivery_date: delivery_date,
       product_id: @posting.product_id,
       unit_id: @posting.unit.id,
-      commitment_zone_start: delivery_date - 2.days,
+      order_cutoff: delivery_date - 2.days,
       units_per_case: 5,
       product_identifier: "XBZ-15"
     }
