@@ -13,6 +13,7 @@
         <li><a href="#paying">Paying</a></li>
         <li><a href="#delivery">Delivery</a></li>
         <li><a href="#pickup">Pickup</a></li>
+        <li><a href="#miscellaneous">Miscellaneous</a></li>
         <li><a href="#questions">Questions</a></li>        
       </ul>
     </div>
@@ -25,6 +26,7 @@
         <li><a href="#paying">Paying</a></li>
         <li><a href="#delivery">Delivery</a></li>
         <li><a href="#pickup">Pickup</a></li>
+        <li><a href="#miscellaneous">Miscellaneous</a></li>
         <li><a href="#questions">Questions</a></li>        
       </ul>
     </div>
@@ -79,6 +81,9 @@
         <p>
           You can cancel an order for any product, even after you've checked out. But only up until the <%= link_to("Order Cutoff", how_things_work_path(anchor: "cutoff")) %>. Beyond the Order Cutoff point any checked out orders become committed. This means that you cannot cancel the order after the order cutoff and you are obligated to pay for the product if the producer delivers on your behalf. The reason for this is to protect the producer from wasting his effort and product on an order that never gets paid on.
         </p>
+        <p>
+          This cancellation policy also applies to each item authorized as a result of a subscription. Please see <%= link_to "Subscription Item Cancellation", how_things_work_path(anchor: "subscription_item_cancellation") %>.
+        </p>
       </div>
     </div>
 
@@ -102,24 +107,88 @@
       </div>
     </div>
 
+    <div class="anchor" id="miscellaneous">
+      <h2>Miscellaneous</h2>
+
+      <div class="anchor" id="beta_mode">
+        <h3>Beta Mode</h3>
+        <p>
+          Farmer's Cellar is still very much in beta mode. As such we have a long way to go and are making due with meager resources in the meantime as we progress. Although we always have and will strive for excellence, the reality is we'll probably have a higher rate of mistakes than a more established business and sometimes our communication might not be ideal. If that's not for you we completely understand. Best bet for you now is probably to patronize a more established business and check back in with us down the road. Hopefully by then we'll be better able to meet your needs.
+        </p>
+        <p>
+          That said, our hope is that you choose to actively participate in our progress by not only becoming a customer now but also, more importantly, giving us your feedback about what you do and don't like about our service and suggestions for how we could improve.
+        </p>
+      </div>
+
+      <div class="anchor" id="subscription_item_cancellation">
+        <h3>Subscription Item Cancellation</h3>
+        <p>
+          Subscriptions just automatically place individual orders for you on the schedule you select (e.g. weekly, monthly etc.). As such, individual item orders placed automatically by subscriptions are subject to our usual <%= link_to "Order Cancellation policy", how_things_work_path(anchor: "cancellation") %>. You can only cancel individual subscription items for which the <%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff") %> has not yet passed. For example, if you have a subscription for a product whose <%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff") %> is Monday with a Friday delivery, it won't work for you to wait until Wednesday to cancel your item for the next delivery. In this example, if you waited until Wednesday, the nearest item you'd be able to cancel is the following week's delivery.
+        </p>
+        <p>
+          For this reason it's important to remain aware of Order Cutoffs on an ongoing basis for all subscriptions. It is 100% your responsibility to be aware of the Order Cutoff times for any product subscriptions you authorize.
+        </p>
+      </div>
+
+      <div class="anchor" id="delivery_not_guaranteed">
+        <h3>Delivery Not Guaranteed</h3>
+        <p>
+          Farmer's Cellar never guarantees ordered products will get delivered. Here's why:
+        </p>
+        <p>
+          We serve small farmers only. It can be challenging for small farms to know exactly how much product they have available because it's still on the tree/vine/stalk etc. So we built Farmer's Cellar from day #1 with what we call 'farmer flexibility' in mind. What this means is that when a customer places an order the customer is obligated to pay if the farmer delivers but the farmer is never obligated to deliver. This frees the farmer up to focus more on making high quality food and less on 'inventory' precision. A downside is that sometimes a customer won't get food they ordered. If you don't get ordered food you don't get charged.
+        </p>
+      </div>
+
+      <div class="anchor" id="order_minimums">
+        <h3>Community Order Minimums</h3>
+        <p>
+          Lots of our products are subject to a Community Order Minimum. That means the customer community will need to collectively order at least the given amount (e.g. $200) or else your individual order will be cancelled. For more details, please see <%= link_to "Order Minimums", support_path(anchor: "order_minimums") %> on our support page.          
+        </p>
+      </div>
+
+      <div class="anchor" id="cooling_equipment_outages">
+        <h3>Cooling Equipment Outages</h3>
+        <p>
+          We always work to keep our refrigerators and freezers in top running condition. Regardless, sometimes things break unexpectedly and sometimes the electrical power goes out. If that happens neither we nor our producers are responsible for food spoilage. Food spoilage due to electrical or equipment failure would be a loss to you and is one of the risks you incur patronizing our <%= link_to "Beta Mode", how_things_work_path(anchor: "beta_mode") %> business.
+        </p>
+        <p>
+          That said, we've never had this scenario happen but if it ever does, we will try our best to send out an emergency notification email as soon as we become aware a cooler isn't working for whatever reason. Should you ever get an email like this, be aware that by law we are bound to dispose of the food after 4 hours of a cooler going out. In other words, once an emergency notification email goes out you have 4 hours to pick up your food.
+        </p>
+      </div>
+
+      <div class="anchor" id="return_policy">
+        <h3>Return Policy</h3>
+        <p>
+          We have no return policy. There is none. The reason for this is because we select high quality producers so we've never had a situation where someone wanted to return food. But in case someone ever did want a refund we couldn't afford it because we don't make money doing this (see <%= link_to "Beta Mode", how_things_work_path(anchor: "beta_mode") %>). We do it because we love good local food and we love helping people with that same love connect with local farmers. If we gave refunds it would come straight out of our pocket and we're not in a position to do that. So, all purchases are final.
+        </p>
+      </div>
+    </div>
+
     <div class="anchor" id="questions">
       <h2>Questions</h2>
       <div>                        
 
-        <h3>Why pre-order only?</h3>
-        <p>
-          Pre-order eliminates warehouses and inventory. This reduces cost and waste and increases quality, taste, variety and nutrition. Pre-order gets you as close as possible to picking the food right off the vine yourself. Well, U-pick probably would be closer...
-        </p>
+        <div class="anchor" id="why_pre_order_only">
+          <h3>Why pre-order only?</h3>
+          <p>
+            Pre-order eliminates warehouses and inventory. This reduces cost and waste and increases quality, taste, variety and nutrition. Pre-order gets you as close as possible to picking the food right off the vine yourself. Well, U-pick probably would be closer...
+          </p>
+        </div>
 
-        <h3>Where does the food come from?</h3>
-        <p>
-          We're all local. And no, not because 'local' is a fad. We're in to local because proximity fosters relationship. And relationship is important because words like 'organic' and 'natural' don't really convey all the nuances of each farmer. Each farm is different. Each farmer is different. These differences are going to affect the stuff you're putting in your body so we think it's pretty important to know more about where your food is made, how it's made and how it got to you. This is what Farmer's Cellar is all about; helping you know your food, its source and its journey.
-        </p>
+        <div class="anchor" id="where_does_food_come_from">
+          <h3>Where does the food come from?</h3>
+          <p>
+            We're all local. And no, not because 'local' is a fad. We're in to local because proximity fosters relationship. And relationship is important because words like 'organic' and 'natural' don't really convey all the nuances of each farmer. Each farm is different. Each farmer is different. These differences are going to affect the stuff you're putting in your body so we think it's pretty important to know more about where your food is made, how it's made and how it got to you. This is what Farmer's Cellar is all about; helping you know your food, its source and its journey.
+          </p>
+        </div>
 
-        <h3>What does 'Local' mean?</h3>
-        <p>
-          There is no legal definition of 'local'. We define it as however far a truck driver can get and return in a single 12 hour shift. In other words, 6 hours out, 6 hours back. Keeping distances short makes it easier for you to visit the sources of your food which, by the way, we recommend doing. Visiting your farmers makes a wonderful day or weekend trip and makes each subsequent meal a very different experience. Sounds a little corny (pun), but it really is true. Eating food when you personally know the land and people where it came from feels very different than consuming mystery food.
-        </p>
+        <div class="anchor" id="what_does_local_mean">
+          <h3>What does 'Local' mean?</h3>
+          <p>
+            There is no legal definition of 'local'. We define it as however far a truck driver can get and return in a single 12 hour shift. In other words, 6 hours out, 6 hours back. Keeping distances short makes it easier for you to visit the sources of your food which, by the way, we recommend doing. Visiting your farmers makes a wonderful day or weekend trip and makes each subsequent meal a very different experience. Sounds a little corny (pun), but it really is true. Eating food when you personally know the land and people where it came from feels very different than consuming mystery food.
+          </p>
+        </div>
 
         <div class="anchor" id="incorrect_product_pickup">
           <h3>What happens if I accidentally pickup the wrong product?</h3>
