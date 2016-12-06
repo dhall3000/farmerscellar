@@ -17,12 +17,15 @@
         <h2>What we're up to</h2>
       </div>
       <div class="panel-body">
-        <p>As of Monday, November 14th, 2016...</p>
+
+        <% if @update_time %>      
+          <p>Last update: <%= @update_time.strftime("%A, %B %d, %Y") %></p>
+        <% end %>
+
         <h3>Current Work</h3>
         <ul>
           <li>We're working to add</li>
           <ul>
-            <li>More <%= link_to "Blue Valley Meats", "http://shop.bluevalleymeats.com", target: "_blank" %> products (next couple months)</li>
             <li>More <%= link_to "Palouse Pastured Poultry", "http://palousepasturedpoultry.com/", target: "_blank" %> products (next couple weeks)</li>
             <ul>
               <li>Frozen whole chickens</li>
@@ -44,7 +47,6 @@
           <li><%= link_to "Fila Farms", "https://www.facebook.com/pg/filafarmsllc", target: "_blank" %></li>
           <li><%= link_to "Palouse Pastured Poultry", "http://palousepasturedpoultry.com/", target: "_blank" %></li>
           <li><%= link_to "Pure Eire", "http://www.pureeiredairy.com/", target: "_blank" %></li>
-          <li><%= link_to "Blue Valley Meats", "http://shop.bluevalleymeats.com", target: "_blank" %></li>
           <li><%= link_to "Pride and Joy Dairy", "http://www.prideandjoypugetsound.com/index.htm", target: "_blank" %></li>
           <li><%= link_to "St. John Creamery", "http://www.stjohncreamery.com/", target: "_blank" %></li>
         </ul>
@@ -56,7 +58,6 @@
           <li>All natural pastured eggs</li>
           <li>All natural pastured duck eggs</li>
           <li>Whole organic 100% grass-fed cow milk</li>
-          <li>Grass-fed Ground Beef</li>
           <li>Raw, organic, grass fed milk</li>
           <li>Raw, grass fed goat milk</li>
         </ul>

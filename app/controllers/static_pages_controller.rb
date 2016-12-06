@@ -2,6 +2,7 @@ class StaticPagesController < ApplicationController
   before_action :redirect_to_root_if_user_not_admin, only: [:test_page, :test_exception, :toggle_garage_door]
 
   def news
+    @update_time = PageUpdate.find_by(name: "News").update_time
   end
   
   def home
@@ -15,6 +16,7 @@ class StaticPagesController < ApplicationController
   end
 
   def how_things_work
+    @update_time = PageUpdate.find_by(name: "HowThingsWork").update_time
   end
 
   def support    

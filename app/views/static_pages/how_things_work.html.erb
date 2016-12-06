@@ -1,5 +1,4 @@
 <% provide(:title, "How Things Work") %>
-<% #TODO: finish all content %>
 <h1>How Things Work</h1>
 
 <div class="row">
@@ -34,6 +33,10 @@
   </div>
 
   <div class="col-xs-12 col-sm-9">
+
+    <% if @update_time %>      
+      <p>Last update: <%= @update_time.strftime("%B %d, %Y") %></p>        
+    <% end %>
 
     <div class="anchor" id="the_simple_version">
       <h2>The Simple Version</h2>

@@ -346,3 +346,6 @@ BusinessInterface.create(name: "F4 FARM", order_email_accepted: true, order_emai
 if develop_creditor_orders_controller
   RakeHelper.do_hourly_tasks
 end
+
+PageUpdate.create(name: "HowThingsWork", update_time: Time.zone.now)
+PageUpdate.create(name: "News", update_time: Time.zone.now)
