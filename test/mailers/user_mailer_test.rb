@@ -129,7 +129,7 @@ class UserMailerTest < ActionMailer::TestCase
     assert authorized_amount > 0
     assert_match number_to_currency(authorized_amount), mail.body.encoded
     assert_match "The total payment amount authorized is", mail.body.encoded
-    assert_match "We'll email you again on each of the delivery dates listed above to let you know if product has been delivered for you or not.", mail.body.encoded    
+    assert_match "We'll send a delivery notification email on each of the delivery dates listed above", mail.body.encoded    
    
   end
 
@@ -161,7 +161,7 @@ class UserMailerTest < ActionMailer::TestCase
     assert_match number_to_currency(authorized_amount), mail.body.encoded
     assert_match "Additionally, you authorized future charges to your payment account associated with the following subscription", mail.body.encoded
     assert_match user.subscriptions.last.description, mail.body.encoded
-    assert_match "We'll email you again on each of the delivery dates listed above to let you know if product has been delivered for you or not.", mail.body.encoded    
+    assert_match "We'll send a delivery notification email on each of the delivery dates listed above", mail.body.encoded    
 
   end
 

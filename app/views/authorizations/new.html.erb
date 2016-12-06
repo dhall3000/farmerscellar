@@ -11,7 +11,7 @@
       <%= f.hidden_field :amount %>
       <%= f.submit "Confirm", class: "btn btn-primary btn-lg", data: { disable_with: "Please wait..." } %>      
     <% end %>
-    <span class="small">(By clicking 'Confirm' you authorize and agree to payment for the above items in accordance with our operational policies and procedures outlined on our <%= link_to "How Things Work", how_things_work_path %> page)</span>
+    <span class="small">(By clicking 'Confirm' you authorize and agree to payment for the above items in accordance with our policies and operational procedures detailed on our <%= link_to "How Things Work", how_things_work_path %> page)</span>
   <% end %>
 
   <%= render partial: 'shared/payflow_action', locals: { action_title: "Confirmation needed" } %>

@@ -57,13 +57,22 @@ Here is the product information for which you authorized payment:
 
 <% end %>
 
-<p>
-Charges to your payment account will be made after products are delivered on your behalf. Keep in mind, however, that Farmer's Cellar cannot guarantee products will be delivered on your behalf. In that case your payment account will not be charged.
-</p>
+<% if @policies_update_time %>
+  <p>
+    <%= link_to "Our policies", how_things_work_url %> were last updated <%= @policies_update_time.strftime("%A, %B %d, %Y") %>.
+  </p>
+<% end %>
 
 <p>
-We'll email you again on each of the delivery dates listed above to let you know if product has been delivered for you or not. Note delivered products must be picked up by 8PM the Monday following delivery according to <%= link_to "our pickup deadline policy", how_things_work_url(anchor: "pickup_deadline") %>.
+Please keep in mind we never guarantee ordered products will be delivered. If your products are delivered:
 </p>
+
+<ul>
+  <li>We'll send a delivery notification email on each of the delivery dates listed above</li>
+  <li>The delivery notification email will contain all information necessary to pick up your products</li>
+  <li>Delivered products must be picked up by 8PM the Monday following delivery</li>
+  <li>Charges to your payment account will be made after products are delivered</li>  
+</ul>
 
 <p>
 Thanks!

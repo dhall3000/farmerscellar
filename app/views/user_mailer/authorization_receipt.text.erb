@@ -18,10 +18,17 @@ The total payment amount authorized for the products listed above is <%= number_
 <% else %>
 The total payment amount authorized is <%= number_to_currency(@amount) %>.
 <% end %>
+<% if @policies_update_time %>
 
-Charges to your payment account will be made after products are delivered on your behalf. Keep in mind, however, that Farmer's Cellar cannot guarantee products will be delivered on your behalf. In that case your payment account will not be charged.
+Our policies were last updated <%= @policies_update_time.strftime("%A, %B %d, %Y") %> and are detailed here: <%= how_things_work_url %>.
+<% end %>
 
-We'll email you again on each of the delivery dates listed above to let you know if product has been delivered for you or not. Note delivered products must be picked up by 8PM the Monday following delivery according to our pickup deadline policy outlined here: <%= how_things_work_url(anchor: "pickup_deadline") %>
+Please keep in mind we never guarantee ordered products will be delivered. If your products are delivered:
+
+-We'll send a delivery notification email on each of the delivery dates listed above
+-The delivery notification email will contain all information necessary to pick up your products
+-Delivered products must be picked up by 8PM the Monday following delivery
+-Charges to your payment account will be made after products are delivered
 
 Thanks!
 

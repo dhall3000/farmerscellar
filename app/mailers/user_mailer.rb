@@ -25,6 +25,7 @@ class UserMailer < ApplicationMailer
   #the 'authorization' param can be either a Authorization or a Rtauthorization
   def authorization_receipt(user, authorization, tote_items_getting_authorized = nil, subscriptions = nil)
     
+    @policies_update_time = PageUpdate.get_update_time("HowThingsWork")
     @user = user    
 
     if tote_items_getting_authorized
