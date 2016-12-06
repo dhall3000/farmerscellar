@@ -4,7 +4,7 @@ class PageUpdate < ApplicationRecord
 
     update_time = nil
 
-    db_entry = PageUpdate.find_by(name: "News")
+    db_entry = PageUpdate.find_by(name: page_name)
     if db_entry
       update_time = db_entry.update_time
     end
