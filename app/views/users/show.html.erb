@@ -82,7 +82,7 @@
 										    <% farmInfo = farmInfo + "<p>" + "<u>Producer Website</u><p><a href='" + posting.user.website + "' target='_blank'>" + posting.user.website + "</a>"%>
 										  <% end %>
 									    <tr>	                    
-							          <td><a tabindex="0" class="btn btn-primary btn-block" role="button" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%= posting.description %>"><%= Product.find_by(id: posting.product_id).name %></a></td>
+							          <td><a tabindex="0" class="btn btn-primary btn-block" role="button" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%= posting.description_body %>"><%= Product.find_by(id: posting.product_id).name %></a></td>
 							          <td class="text-center"><%= number_to_currency(posting.price) %></td>
 							          <td class="text-center"><%= Unit.find_by(id: posting.unit_id).name %></td>
 							          <td class="text-center"><%= posting.total_quantity_ordered %></td>	          

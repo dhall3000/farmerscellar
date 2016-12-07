@@ -20,17 +20,17 @@
 		<%= f.label :product_id %>
 		<%= f.collection_select(:product_id, @products, :id, :name, {prompt: true}, {class: 'form-control'}) %>		
 
-		<%= f.label :product_attributes %>
-		<%= f.text_field :product_attributes, class: 'form-control' %>
-
 		<%= f.label :description %>
 		<%= f.text_field :description, class: 'form-control' %>
+
+		<%= f.label :description_body %>
+		<%= f.text_field :description_body, class: 'form-control' %>
 
 		<%= f.label :unit_id %>
 		<%= f.collection_select(:unit_id, @units, :id, :name, {prompt: true}, {class: 'form-control'}) %>		
 
-		<%= f.label :unit_equivalency_description %>
-		<%= f.text_field :unit_equivalency_description, class: 'form-control' %>
+		<%= f.label :unit_body %>
+		<%= f.text_field :unit_body, class: 'form-control' %>
 
 		<%= f.label :product_identifier %>
 		<%= f.text_field :product_identifier, class: 'form-control' %>
@@ -44,8 +44,8 @@
 		<%= f.label :price, "Price per Unit" %>
 		<%= f.number_field :price, min: 0.01, step: 0.01, class: 'form-control' %>
 
-		<%= f.label :price_equivalency_description %>
-		<%= f.text_field :price_equivalency_description, class: 'form-control' %>
+		<%= f.label :price_body %>
+		<%= f.text_field :price_body, class: 'form-control' %>
 
 		<%= f.label :delivery_date, "Delivery Date (Date only)" %>
 	    <div class="input-group date" id="dtpDeliveryDate">

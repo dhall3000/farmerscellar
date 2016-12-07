@@ -16,7 +16,7 @@ class PostingTest < ActiveSupport::TestCase
       delivery_date = Time.zone.today + 4.days
     end
 
-    @posting = Posting.new(unit: @unit, product: @product, user: @farmer, description: "descrip", quantity_available: 100, price: 1.25, live: true, order_cutoff: delivery_date - 2.days, delivery_date: delivery_date)
+    @posting = Posting.new(unit: @unit, product: @product, user: @farmer, description_body: "descrip", quantity_available: 100, price: 1.25, live: true, order_cutoff: delivery_date - 2.days, delivery_date: delivery_date)
     @posting.save
   end
 
@@ -615,7 +615,7 @@ class PostingTest < ActiveSupport::TestCase
   end
 
   test "description must be present" do
-    @posting.description = nil
+    @posting.description_body = nil
     assert_not @posting.valid?, get_error_messages(@posting)
   end
 
@@ -666,7 +666,7 @@ class PostingTest < ActiveSupport::TestCase
       price: 10,
       user: @farmer,
       unit: @unit,
-      description: "crisp, crunchy organic apples. you'll love them.",
+      description_body: "crisp, crunchy organic apples. you'll love them.",
       live: true,
       late_adds_allowed: false
       )
@@ -704,7 +704,7 @@ class PostingTest < ActiveSupport::TestCase
       price: 10,
       user: @farmer,
       unit: @unit,
-      description: "crisp, crunchy organic apples. you'll love them.",
+      description_body: "crisp, crunchy organic apples. you'll love them.",
       live: true,
       late_adds_allowed: false
       )

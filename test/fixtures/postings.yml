@@ -34,7 +34,7 @@ f9posting:
   price: 4
   user: f9
   unit: pound
-  description: crispy apples
+  description_body: crispy apples
   live: true
   late_adds_allowed: false
 
@@ -47,7 +47,7 @@ f6posting:
   price: 1
   user: f6
   unit: pound
-  description: crisp, crunchy organic apples. you'll love them.
+  description_body: crisp, crunchy organic apples. you'll love them.
   live: true
   late_adds_allowed: false
 
@@ -59,7 +59,7 @@ f7posting:
   price: 2
   user: f7
   unit: pound
-  description: asparagus description...yum!
+  description_body: asparagus description_body...yum!
   live: true
   late_adds_allowed: false
 
@@ -71,7 +71,7 @@ f8posting:
   price: 4
   user: f8
   unit: gallon
-  description: raw milk description
+  description_body: raw milk description_body
   live: true
   late_adds_allowed: false
 
@@ -84,7 +84,7 @@ posting_subscription_farmer:
   price: 4.29
   user: f_subscriptions
   unit: pound
-  description: crisp, crunchy organic apples. you'll love them.
+  description_body: crisp, crunchy organic apples. you'll love them.
   live: true
   late_adds_allowed: true
 
@@ -98,7 +98,7 @@ postingf5apples:
   price: 4.29
   user: f5
   unit: pound
-  description: crisp, crunchy organic apples. you'll love them.
+  description_body: crisp, crunchy organic apples. you'll love them.
   live: true
   late_adds_allowed: true
 
@@ -110,7 +110,7 @@ p_recurrence_off:
   price: 5.21
   user: f2
   unit: pound
-  description: beef description
+  description_body: beef description_body
   live: true  
   posting_recurrence: two
   late_adds_allowed: true
@@ -123,7 +123,7 @@ p_recurrence_on:
   price: 5.21
   user: f2
   unit: pound
-  description: beef description
+  description_body: beef description_body
   live: true  
   posting_recurrence: one
   late_adds_allowed: true
@@ -136,7 +136,7 @@ p_recurrence_three:
   price: 5.21
   user: f2
   unit: pound
-  description: beef description
+  description_body: beef description_body
   live: true  
   posting_recurrence: three
   late_adds_allowed: true
@@ -150,7 +150,7 @@ p5:
   price: 5.21
   user: f2
   unit: pound
-  description: beef description
+  description_body: beef description_body
   live: true  
   late_adds_allowed: true
 #--------------------------------------------------------------
@@ -163,7 +163,7 @@ p1:
   price: 2.89
   user: f1
   unit: pound
-  description: these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.
+  description_body: these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.
   live: true  
   late_adds_allowed: true
 
@@ -175,7 +175,7 @@ p2:
   price: 2.74
   user: f1
   unit: pound
-  description: asparagus description
+  description_body: asparagus description_body
   live: true  
   late_adds_allowed: true
 
@@ -187,7 +187,7 @@ p3:
   price: 5.00
   user: f2
   unit: gallon
-  description: milk description
+  description_body: milk description_body
   live: true  
   late_adds_allowed: true
 
@@ -199,12 +199,12 @@ p4:
   price: 5.21
   user: f2
   unit: pound
-  description: beef description
+  description_body: beef description_body
   live: true  
   late_adds_allowed: true
 
 #Apples
-#Posting.create(delivery_date: next_friday, product_id: 1, quantity_available: 1000, price: 2.75, user_id: 1, unit_category_id: 2, unit_kind_id: 8, description: "these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
+#Posting.create(delivery_date: next_friday, product_id: 1, quantity_available: 1000, price: 2.75, user_id: 1, unit_category_id: 2, unit_kind_id: 8, description_body: "these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
 postingf1apples:
   delivery_date: <%= delivery_date %>
   order_cutoff: <%= delivery_date - 2.days %>
@@ -213,12 +213,12 @@ postingf1apples:
   price: 2.75
   user: f1
   unit: pound
-  description: these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.
+  description_body: these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.
   live: true
   late_adds_allowed: true
 
 #Asparagus
-#Posting.create(delivery_date: next_friday, product_id: 6, quantity_available: 100, price: 3.25, user_id: 1, unit_category_id: 2, unit_kind_id: 8, description: "these Asparagus are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
+#Posting.create(delivery_date: next_friday, product_id: 6, quantity_available: 100, price: 3.25, user_id: 1, unit_category_id: 2, unit_kind_id: 8, description_body: "these Asparagus are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
 postingf1asparagus:
   delivery_date: <%= delivery_date %>
   order_cutoff: <%= delivery_date - 2.days %>  
@@ -227,7 +227,7 @@ postingf1asparagus:
   price: 3.25
   user: f1
   unit: pound
-  description: these Asparagus are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.
+  description_body: these Asparagus are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.
   live: true
   late_adds_allowed: true
 
@@ -240,12 +240,12 @@ postingf1lettuce:
   price: 4.25
   user: f1
   unit: pound
-  description: delicious lettuce
+  description_body: delicious lettuce
   live: true
   late_adds_allowed: true
 
 #Milk
-#Posting.create(delivery_date: next_friday, product_id: 3, quantity_available: 25, price: 2.00, user_id: 2, unit_category_id: 1, unit_kind_id: 5, description: "these milks are all organic grown with no pesticides. they are raw. no homogeneization. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
+#Posting.create(delivery_date: next_friday, product_id: 3, quantity_available: 25, price: 2.00, user_id: 2, unit_category_id: 1, unit_kind_id: 5, description_body: "these milks are all organic grown with no pesticides. they are raw. no homogeneization. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
 postingf2milk:
   delivery_date: <%= delivery_date %>
   order_cutoff: <%= delivery_date - 2.days %>  
@@ -254,12 +254,12 @@ postingf2milk:
   price: 2.00
   user: f2
   unit: gallon
-  description: these milks are all organic grown with no pesticides. they are raw. no homogeneization. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.
+  description_body: these milks are all organic grown with no pesticides. they are raw. no homogeneization. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.
   live: true
   late_adds_allowed: true
 
 #Beef
-#Posting.create(delivery_date: next_friday, product_id: 4, quantity_available: 10, price: 3.75, user_id: 2, unit_category_id: 3, unit_kind_id: 11, description: "these beefs are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
+#Posting.create(delivery_date: next_friday, product_id: 4, quantity_available: 10, price: 3.75, user_id: 2, unit_category_id: 3, unit_kind_id: 11, description_body: "these beefs are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
 postingf2beef:
   delivery_date: <%= delivery_date %>
   order_cutoff: <%= delivery_date - 2.days %>  
@@ -268,7 +268,7 @@ postingf2beef:
   price: 3.75
   user: f2
   unit: quarter
-  description: these beefs are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.
+  description_body: these beefs are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.
   live: true
   late_adds_allowed: true
 
@@ -281,12 +281,12 @@ postingf2tomato:
   price: 2.99
   user: f2
   unit: whole
-  description: delicious tomato description
+  description_body: delicious tomato description_body
   live: true
   late_adds_allowed: true
 
 #Carrots
-#Posting.create(delivery_date: next_friday, product_id: 2, quantity_available: 15, price: 2.25, user_id: 3, unit_category_id: 2, unit_kind_id: 8, description: "yummy, crunchy carrots. tastiest ever!")
+#Posting.create(delivery_date: next_friday, product_id: 2, quantity_available: 15, price: 2.25, user_id: 3, unit_category_id: 2, unit_kind_id: 8, description_body: "yummy, crunchy carrots. tastiest ever!")
 postingf3carrots:
   delivery_date: <%= delivery_date %>
   order_cutoff: <%= delivery_date - 2.days %>  
@@ -295,12 +295,12 @@ postingf3carrots:
   price: 2.25
   user: f3
   unit: pound
-  description: yummy, crunchy carrots. tastiest ever!
+  description_body: yummy, crunchy carrots. tastiest ever!
   live: true
   late_adds_allowed: true
 
 #Chicken
-#Posting.create(delivery_date: next_friday, product_id: 5, quantity_available: 50, price: 1.50, user_id: 3, unit_category_id: 3, unit_kind_id: 10, description: "best whole chickens around. all grass fed on clean, organic fields. no antibiotics. no supplements. just lots of grass and all the bugs they can eat! :)")
+#Posting.create(delivery_date: next_friday, product_id: 5, quantity_available: 50, price: 1.50, user_id: 3, unit_category_id: 3, unit_kind_id: 10, description_body: "best whole chickens around. all grass fed on clean, organic fields. no antibiotics. no supplements. just lots of grass and all the bugs they can eat! :)")
 postingf3chicken:
   delivery_date: <%= delivery_date %>
   order_cutoff: <%= delivery_date - 2.days %>  
@@ -309,12 +309,12 @@ postingf3chicken:
   price: 1.50
   user: f3
   unit: whole
-  description: best whole chickens around. all grass fed on clean, organic fields. no antibiotics. no supplements. just lots of grass and all the bugs they can eat! :)
+  description_body: best whole chickens around. all grass fed on clean, organic fields. no antibiotics. no supplements. just lots of grass and all the bugs they can eat! :)
   live: true
   late_adds_allowed: true
 
 #Oranges
-#Posting.create(delivery_date: next_friday, product_id: 7, quantity_available: 100, price: 1.25, user_id: 4, unit_category_id: 2, unit_kind_id: 8, description: "best oranges ever!")
+#Posting.create(delivery_date: next_friday, product_id: 7, quantity_available: 100, price: 1.25, user_id: 4, unit_category_id: 2, unit_kind_id: 8, description_body: "best oranges ever!")
 postingf4oranges:
   delivery_date: <%= delivery_date %>
   order_cutoff: <%= delivery_date - 2.days %>  
@@ -323,12 +323,12 @@ postingf4oranges:
   price: 1.25
   user: f4
   unit: pound
-  description: best oranges ever!
+  description_body: best oranges ever!
   live: true
   late_adds_allowed: true
 
 #Celery
-#Posting.create(delivery_date: next_friday, product_id: 8, quantity_available: 100, price: 2.50, user_id: 4, unit_category_id: 2, unit_kind_id: 8, description: "best celery ever!")
+#Posting.create(delivery_date: next_friday, product_id: 8, quantity_available: 100, price: 2.50, user_id: 4, unit_category_id: 2, unit_kind_id: 8, description_body: "best celery ever!")
 postingf4celery:
   delivery_date: <%= delivery_date %>
   order_cutoff: <%= delivery_date - 2.days %>  
@@ -337,7 +337,7 @@ postingf4celery:
   price: 2.50
   user: f4
   unit: pound
-  description: best celery ever!
+  description_body: best celery ever!
   live: true
   late_adds_allowed: true
 
@@ -350,7 +350,7 @@ postingf4avocado:
   price: 2.97
   user: f4
   unit: whole
-  description: best avocado ever!
+  description_body: best avocado ever!
   live: true
   late_adds_allowed: true
 
@@ -363,7 +363,7 @@ postingf4basil:
   price: 2.27
   user: f4
   unit: bunch
-  description: best basil ever!
+  description_body: best basil ever!
   live: true
   late_adds_allowed: true
 
@@ -375,7 +375,7 @@ baron_farms_eggs:
   price: 6.25
   user: baron_farms
   unit: whole
-  description: pastured eggs
+  description_body: pastured eggs
   live: true
   late_adds_allowed: true
 
@@ -387,6 +387,6 @@ pride_and_joy_milk:
   price: 10.50
   user: pride_and_joy
   unit: gallon
-  description: pastured organic raw milk
+  description_body: pastured organic raw milk
   live: true
   late_adds_allowed: true

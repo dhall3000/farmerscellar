@@ -13,7 +13,7 @@ class Posting < ApplicationRecord
   has_many :creditor_order_postings
   has_many :creditor_orders, through: :creditor_order_postings
 
-  validates :description, :quantity_available, :price, :delivery_date, :order_cutoff, presence: true
+  validates :description_body, :quantity_available, :price, :delivery_date, :order_cutoff, presence: true
   validates :quantity_available, numericality: { only_integer: true, greater_than: 0 }
   validates :price, numericality: { greater_than: 0 }
   validates :units_per_case, numericality: {only_integer: true, greater_than_or_equal_to: 0}

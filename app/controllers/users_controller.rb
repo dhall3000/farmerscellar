@@ -99,7 +99,7 @@ class UsersController < ApplicationController
         params[:user][:account_type] = 0.to_s
       end
 
-      params.require(:user).permit(:name, :email, :password, :password_confirmation, :account_type, :address, :farm_name, :description, :agreement, :beta, :zip)
+      params.require(:user).permit(:name, :email, :password, :password_confirmation, :account_type, :address, :farm_name, :description_body, :agreement, :beta, :zip)
 
     end
 

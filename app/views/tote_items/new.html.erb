@@ -34,18 +34,18 @@
 
             <ul class="list-group">
               <li class="list-group-item"><%= User.find_by(id: @posting.user_id).farm_name %> <%= Product.find_by(id: @posting.product_id).name %></li>              
-              <% if @posting.product_attributes %>
-                <li class="list-group-item"><%= @posting.product_attributes %></li>
+              <% if @posting.description %>
+                <li class="list-group-item"><%= @posting.description %></li>
               <% end %>              
               <li class="list-group-item">
                 <%= number_to_currency(@posting.price) %> / <%= Unit.find_by(id: @posting.unit_id).name %>
-                <% if @posting.unit_equivalency_description || @posting.price_equivalency_description %>
+                <% if @posting.unit_body || @posting.price_body %>
                   <ul>
-                    <% if @posting.unit_equivalency_description %>
-                      <li><%= @posting.unit_equivalency_description %></li>
+                    <% if @posting.unit_body %>
+                      <li><%= @posting.unit_body %></li>
                     <% end %>
-                    <% if @posting.price_equivalency_description %>
-                      <li><%= @posting.price_equivalency_description %></li>
+                    <% if @posting.price_body %>
+                      <li><%= @posting.price_body %></li>
                     <% end %>
                   </ul>
               <% end %>
@@ -102,8 +102,8 @@
 
               <h3>Product</h3>
               <ul class="list-group">
-                <% if !@posting.description.blank? %>
-                  <li class="list-group-item"><%= @posting.description %></a></li>              
+                <% if !@posting.description_body.blank? %>
+                  <li class="list-group-item"><%= @posting.description_body %></a></li>              
                 <% end %>                   
               </ul>      
 

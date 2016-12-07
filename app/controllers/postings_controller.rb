@@ -7,7 +7,7 @@ class PostingsController < ApplicationController
     if params[:posting_id].nil?
       @posting = current_user.postings.new(live: true)                  
       #if you are doing dev work on the create method and want the new form autopopulated for sanity's sake, uncomment this line
-      #@posting = Posting.new(live: true, delivery_date: Time.zone.now + 4.days, product_id: 8, quantity_available: 100, price: 2.50, user_id: User.find_by(name: "f4"), unit_category_id: UnitCategory.find_by(name: "Weight"), unit_kind_id: UnitKind.find_by(name: "Pound"), description: "best celery ever!")
+      #@posting = Posting.new(live: true, delivery_date: Time.zone.now + 4.days, product_id: 8, quantity_available: 100, price: 2.50, user_id: User.find_by(name: "f4"), unit_category_id: UnitCategory.find_by(name: "Weight"), unit_kind_id: UnitKind.find_by(name: "Pound"), description_body: "best celery ever!")
     else
       posting_to_clone = Posting.find(params[:posting_id])
       @posting = posting_to_clone.dup
@@ -149,7 +149,7 @@ class PostingsController < ApplicationController
     def posting_params
 
       posting = params.require(:posting).permit(
-        :description,
+        :description_body,
         :quantity_available,
         :price,
         :user_id,
@@ -158,9 +158,9 @@ class PostingsController < ApplicationController
         :live,
         :delivery_date,
         :order_cutoff,
-        :product_attributes,
-        :price_equivalency_description,
-        :unit_equivalency_description,
+        :description,
+        :price_body,
+        :unit_body,
         :product_identifier,
         :order_minimum_producer_net,
         :units_per_case
@@ -180,12 +180,12 @@ class PostingsController < ApplicationController
         end
       end
 
-      if posting[:unit_equivalency_description].blank?
-        posting[:unit_equivalency_description] = nil
+      if posting[:unit_body].blank?
+        posting[:unit_body] = nil
       end
 
-      if posting[:price_equivalency_description].blank?
-        posting[:price_equivalency_description] = nil
+      if posting[:price_body].blank?
+        posting[:price_body] = nil
       end
 
       posting
@@ -195,7 +195,7 @@ class PostingsController < ApplicationController
     def posting_params_update
       
       posting = params.require(:posting).permit(
-        :description,
+        :description_body,
         :quantity_available,
         :price,
         :live

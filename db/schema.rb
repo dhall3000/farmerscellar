@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161206204514) do
+ActiveRecord::Schema.define(version: 20161207204344) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -336,27 +336,29 @@ ActiveRecord::Schema.define(version: 20161206204514) do
   end
 
   create_table "postings", force: :cascade do |t|
-    t.string   "description",                                   null: false
-    t.integer  "quantity_available",            default: 0
-    t.float    "price",                         default: 0.0
-    t.integer  "user_id",                                       null: false
-    t.integer  "product_id",                                    null: false
-    t.integer  "unit_id",                                       null: false
-    t.datetime "created_at",                                    null: false
-    t.datetime "updated_at",                                    null: false
-    t.boolean  "live",                          default: false
-    t.datetime "delivery_date",                                 null: false
-    t.datetime "order_cutoff",                                  null: false
+    t.string   "description_body",                           null: false
+    t.integer  "quantity_available",         default: 0
+    t.float    "price",                      default: 0.0
+    t.integer  "user_id",                                    null: false
+    t.integer  "product_id",                                 null: false
+    t.integer  "unit_id",                                    null: false
+    t.datetime "created_at",                                 null: false
+    t.datetime "updated_at",                                 null: false
+    t.boolean  "live",                       default: false
+    t.datetime "delivery_date",                              null: false
+    t.datetime "order_cutoff",                               null: false
     t.integer  "posting_recurrence_id"
-    t.integer  "state",                         default: 0,     null: false
-    t.boolean  "late_adds_allowed",             default: false
-    t.string   "product_attributes"
-    t.string   "price_equivalency_description"
-    t.string   "unit_equivalency_description"
+    t.integer  "state",                      default: 0,     null: false
+    t.boolean  "late_adds_allowed",          default: false
+    t.string   "description"
+    t.string   "price_body"
+    t.string   "unit_body"
     t.string   "product_identifier"
-    t.integer  "units_per_case",                default: 1
+    t.integer  "units_per_case",             default: 1
     t.string   "product_id_code"
-    t.float    "order_minimum_producer_net",    default: 0.0
+    t.float    "order_minimum_producer_net", default: 0.0
+    t.string   "important_notes"
+    t.string   "important_notes_body"
     t.index ["order_cutoff"], name: "index_postings_on_order_cutoff"
     t.index ["posting_recurrence_id"], name: "index_postings_on_posting_recurrence_id"
     t.index ["product_id"], name: "index_postings_on_product_id"

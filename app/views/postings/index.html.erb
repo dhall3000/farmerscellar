@@ -58,11 +58,11 @@
                     <div id=<%= "#{count.to_s}productDetails" %> class="panel-collapse collapse" role="tabpanel" aria-labelledby=<%= "#{count.to_s}product" %>>
                       <div class="panel-body">
                         <ul class="list-group">
-                          <% if posting.product_attributes != nil %>
-                            <li class="list-group-item"><%= posting.product_attributes %></li>                
-                          <% end %>
                           <% if posting.description != nil %>
                             <li class="list-group-item"><%= posting.description %></li>                
+                          <% end %>
+                          <% if posting.description_body != nil %>
+                            <li class="list-group-item"><%= posting.description_body %></li>                
                           <% end %>
                         </ul>
                       </div>
@@ -70,7 +70,7 @@
                   </div>
 
 
-                  <% if posting.unit_equivalency_description || posting.price_equivalency_description %>
+                  <% if posting.unit_body || posting.price_body %>
 
                     <div class="panel panel-default">
                       <div class="panel-heading" role="tab" id=<%= "#{count.to_s}price" %>>
@@ -83,11 +83,11 @@
                       <div id=<%= "#{count.to_s}priceDetails" %> class="panel-collapse collapse" role="tabpanel" aria-labelledby=<%= "#{count.to_s}price" %>>
                         <div class="panel-body">
                           <ul class="list-group">
-                            <% if posting.unit_equivalency_description %>
-                              <li class="list-group-item"><%= posting.unit_equivalency_description %></li>
+                            <% if posting.unit_body %>
+                              <li class="list-group-item"><%= posting.unit_body %></li>
                             <% end %>
-                            <% if posting.price_equivalency_description %>
-                              <li class="list-group-item"><%= posting.price_equivalency_description %></li>
+                            <% if posting.price_body %>
+                              <li class="list-group-item"><%= posting.price_body %></li>
                             <% end %>
                           </ul>
                         </div>
