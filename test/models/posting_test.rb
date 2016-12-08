@@ -5,6 +5,7 @@ class PostingTest < ActiveSupport::TestCase
   include ToteItemsHelper
 
   def setup
+
     @user = users(:c1)
     @farmer = users(:f1)
     @product = products(:apples)
@@ -16,8 +17,236 @@ class PostingTest < ActiveSupport::TestCase
       delivery_date = Time.zone.today + 4.days
     end
 
-    @posting = Posting.new(unit: @unit, product: @product, user: @farmer, description_body: "descrip", price: 1.25, live: true, order_cutoff: delivery_date - 2.days, delivery_date: delivery_date)
+    @posting = Posting.new(unit: @unit, product: @product, user: @farmer, description: "descrip", price: 1.25, live: true, order_cutoff: delivery_date - 2.days, delivery_date: delivery_date)
     @posting.save
+
+  end
+
+  test "validate validations" do
+
+    assert @posting.valid?
+
+    #description_body
+    tester = @posting.dup
+    assert tester.valid?
+    tester.description_body = nil
+    tester.description_body = 6 #seems to me like this shouldn't be allowed but somehow it still passes validation
+    assert tester.valid?
+
+    #price
+    tester = @posting.dup
+    assert tester.valid?
+    tester.price = nil
+    assert_not tester.valid?
+
+    tester = @posting.dup
+    assert tester.valid?
+    tester.price = -1.0
+    assert_not tester.valid?
+
+    tester = @posting.dup
+    assert tester.valid?
+    tester.price = "hello"
+    assert_not tester.valid?
+
+    tester = @posting.dup
+    assert tester.valid?
+    tester.price = 1.0
+    assert tester.valid?
+
+    #delivery_date
+    tester = @posting.dup    
+    assert tester.valid?
+    tester.delivery_date = nil
+    assert_not tester.valid?
+
+    tester = @posting.dup    
+    assert tester.valid?
+    tester.delivery_date = Time.zone.now - 1.day
+    assert_not tester.valid?
+
+    tester = @posting.dup    
+    assert tester.valid?
+    tester.delivery_date = "hello"
+    assert_not tester.valid?
+
+    tester = @posting.dup    
+    assert tester.valid?
+    tester.delivery_date = 78
+    assert_not tester.valid?
+
+    #TODO: there should be a test that delivery date is not on Sunday. too lazy...
+
+    #order_cutoff
+    tester = @posting.dup    
+    assert tester.valid?
+    tester.order_cutoff = nil
+    assert_not tester.valid?
+
+    tester = @posting.dup    
+    assert tester.valid?
+    tester.order_cutoff = tester.delivery_date + 1.day
+    assert_not tester.valid?
+
+    tester = @posting.dup    
+    assert tester.valid?
+    tester.order_cutoff = "hello"
+    assert_not tester.valid?
+
+    tester = @posting.dup    
+    assert tester.valid?
+    tester.order_cutoff = 78
+    assert_not tester.valid?
+
+    #state
+    tester = @posting.dup    
+    assert tester.valid?
+    tester.state = nil
+    assert_not tester.valid?
+
+    tester = @posting.dup    
+    assert tester.valid?
+    tester.state = -1
+    assert_not tester.valid?
+
+    tester = @posting.dup    
+    assert tester.valid?
+    tester.state = 10
+    assert_not tester.valid?
+
+    #description
+    tester = @posting.dup
+    assert tester.valid?
+    tester.description = nil    
+    assert_not tester.valid?
+
+    #price_body
+    tester = @posting.dup
+    assert tester.valid?
+    tester.price_body = nil    
+    assert tester.valid?
+
+    tester = @posting.dup
+    assert tester.valid?
+    tester.price_body = "hello"
+    assert tester.valid?
+
+    #unit_body
+    tester = @posting.dup
+    assert tester.valid?
+    tester.unit_body = nil    
+    assert tester.valid?
+
+    tester = @posting.dup
+    assert tester.valid?
+    tester.unit_body = "hello"
+    assert tester.valid?
+
+    #units_per_case
+    tester = @posting.dup
+    assert tester.valid?
+    tester.units_per_case = nil    
+    assert tester.valid?
+
+    tester = @posting.dup
+    assert tester.valid?
+    tester.units_per_case = "hello"
+    assert_not tester.valid?
+
+    tester = @posting.dup
+    assert tester.valid?
+    tester.units_per_case = 0
+    assert_not tester.valid?
+
+    tester = @posting.dup
+    assert tester.valid?
+    tester.units_per_case = -1
+    assert_not tester.valid?
+
+    tester = @posting.dup
+    assert tester.valid?
+    tester.units_per_case = 1.5
+    assert_not tester.valid?
+
+    tester = @posting.dup
+    assert tester.valid?
+    tester.units_per_case = 1
+    assert tester.valid?
+
+    tester = @posting.dup
+    assert tester.valid?
+    tester.units_per_case = 10
+    assert tester.valid?
+
+    #product_id_code
+    tester = @posting.dup
+    assert tester.valid?
+    tester.product_id_code = nil    
+    assert tester.valid?
+
+    tester = @posting.dup
+    assert tester.valid?
+    tester.product_id_code = "hello"
+    assert tester.valid?
+
+    #order_minimum_producer_net
+    tester = @posting.dup
+    assert tester.valid?
+    tester.order_minimum_producer_net = nil    
+    assert tester.valid?
+
+    tester = @posting.dup
+    assert tester.valid?
+    tester.order_minimum_producer_net = "hello"
+    assert_not tester.valid?
+
+    tester = @posting.dup
+    assert tester.valid?
+    tester.order_minimum_producer_net = 0
+    assert tester.valid?
+
+    tester = @posting.dup
+    assert tester.valid?
+    tester.order_minimum_producer_net = -1
+    assert_not tester.valid?
+
+    tester = @posting.dup
+    assert tester.valid?
+    tester.order_minimum_producer_net = 1.5
+    assert tester.valid?
+
+    tester = @posting.dup
+    assert tester.valid?
+    tester.order_minimum_producer_net = 1
+    assert tester.valid?
+
+    tester = @posting.dup
+    assert tester.valid?
+    tester.order_minimum_producer_net = 10
+    assert tester.valid?
+
+    #important_notes
+    tester = @posting.dup
+    assert tester.valid?
+    tester.important_notes = nil    
+    assert tester.valid?
+
+    tester = @posting.dup
+    assert tester.valid?
+    tester.important_notes = "hello"
+    assert tester.valid?
+
+    #important_notes_body
+    tester = @posting.dup
+    assert tester.valid?
+    tester.important_notes_body = nil    
+    assert tester.valid?
+
+    tester = @posting.dup
+    assert tester.valid?
+    tester.important_notes_body = "hello"
+    assert tester.valid?
+
   end
 
   test "outbound order value producer net should report zero when inbound orders below order minimums 4" do
@@ -232,7 +461,7 @@ class PostingTest < ActiveSupport::TestCase
     @posting.update(units_per_case: 10)
     assert_equal 10, @posting.units_per_case
     #posting has no OM
-    assert_equal 0, @posting.order_minimum_producer_net
+    assert_equal nil, @posting.order_minimum_producer_net
     #posting has no items
     assert_equal 0, @posting.tote_items.count
     #u1 orders 9
@@ -354,7 +583,6 @@ class PostingTest < ActiveSupport::TestCase
 
   test "should submit order for all committed quantity when cases not in use" do
     unit_count = 11
-    @posting.units_per_case = 0
     assert @posting.save
     assert_equal 0, @posting.tote_items.count
     ti = ToteItem.new(quantity: unit_count, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: @user)
@@ -615,7 +843,7 @@ class PostingTest < ActiveSupport::TestCase
   end
 
   test "description must be present" do
-    @posting.description_body = nil
+    @posting.description = nil
     assert_not @posting.valid?, get_error_messages(@posting)
   end
 
@@ -654,7 +882,7 @@ class PostingTest < ActiveSupport::TestCase
       price: 10,
       user: @farmer,
       unit: @unit,
-      description_body: "crisp, crunchy organic apples. you'll love them.",
+      description: "crisp, crunchy organic apples. you'll love them.",
       live: true
       )
 
@@ -690,7 +918,7 @@ class PostingTest < ActiveSupport::TestCase
       price: 10,
       user: @farmer,
       unit: @unit,
-      description_body: "crisp, crunchy organic apples. you'll love them.",
+      description: "crisp, crunchy organic apples. you'll love them.",
       live: true
       )
 
@@ -734,10 +962,5 @@ class PostingTest < ActiveSupport::TestCase
     @posting.order_cutoff = nil
     assert_not @posting.valid?, get_error_messages(@posting)
   end
-
-  test "live must be present" do
-  	@posting.live = nil
-  	assert_not @posting.valid?, get_error_messages(@posting)
-  end  
 
 end

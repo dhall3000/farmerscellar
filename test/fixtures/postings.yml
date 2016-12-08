@@ -33,7 +33,7 @@ f9posting:
   price: 4
   user: f9
   unit: pound
-  description_body: crispy apples
+  description: crispy apples
   live: true
 
 #------------------------------------------------------------
@@ -44,7 +44,7 @@ f6posting:
   price: 1
   user: f6
   unit: pound
-  description_body: crisp, crunchy organic apples. you'll love them.
+  description: crisp, crunchy organic apples. you'll love them.
   live: true
 
 f7posting:
@@ -54,7 +54,7 @@ f7posting:
   price: 2
   user: f7
   unit: pound
-  description_body: asparagus description_body...yum!
+  description: asparagus description_body...yum!
   live: true
 
 f8posting:
@@ -64,7 +64,7 @@ f8posting:
   price: 4
   user: f8
   unit: gallon
-  description_body: raw milk description_body
+  description: raw milk description_body
   live: true
 
 #--------------------------------------------------------------
@@ -75,7 +75,7 @@ posting_subscription_farmer:
   price: 4.29
   user: f_subscriptions
   unit: pound
-  description_body: crisp, crunchy organic apples. you'll love them.
+  description: crisp, crunchy organic apples. you'll love them.
   live: true
 
 #--------------------------------------------------------------
@@ -87,7 +87,7 @@ postingf5apples:
   price: 4.29
   user: f5
   unit: pound
-  description_body: crisp, crunchy organic apples. you'll love them.
+  description: crisp, crunchy organic apples. you'll love them.
   live: true
 
 p_recurrence_off:
@@ -97,7 +97,7 @@ p_recurrence_off:
   price: 5.21
   user: f2
   unit: pound
-  description_body: beef description_body
+  description: beef description_body
   live: true  
   posting_recurrence: two
 
@@ -108,7 +108,7 @@ p_recurrence_on:
   price: 5.21
   user: f2
   unit: pound
-  description_body: beef description_body
+  description: beef description_body
   live: true  
   posting_recurrence: one
 
@@ -119,7 +119,7 @@ p_recurrence_three:
   price: 5.21
   user: f2
   unit: pound
-  description_body: beef description_body
+  description: beef description_body
   live: true  
   posting_recurrence: three
 
@@ -131,7 +131,7 @@ p5:
   price: 5.21
   user: f2
   unit: pound
-  description_body: beef description_body
+  description: beef description_body
   live: true  
 #--------------------------------------------------------------
 
@@ -142,7 +142,7 @@ p1:
   price: 2.89
   user: f1
   unit: pound
-  description_body: these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.
+  description: these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.
   live: true  
 
 p2:
@@ -152,7 +152,7 @@ p2:
   price: 2.74
   user: f1
   unit: pound
-  description_body: asparagus description_body
+  description: asparagus description_body
   live: true  
 
 p3:
@@ -162,7 +162,7 @@ p3:
   price: 5.00
   user: f2
   unit: gallon
-  description_body: milk description_body
+  description: milk description_body
   live: true  
 
 p4:
@@ -172,7 +172,7 @@ p4:
   price: 5.21
   user: f2
   unit: pound
-  description_body: beef description_body
+  description: beef description_body
   live: true  
 
 #Apples
@@ -183,7 +183,7 @@ postingf1apples:
   price: 2.75
   user: f1
   unit: pound
-  description_body: these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.
+  description: these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.
   live: true
 
 #Asparagus
@@ -194,7 +194,7 @@ postingf1asparagus:
   price: 3.25
   user: f1
   unit: pound
-  description_body: these Asparagus are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.
+  description: these Asparagus are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.
   live: true
 
 #Lettuce
@@ -205,7 +205,7 @@ postingf1lettuce:
   price: 4.25
   user: f1
   unit: pound
-  description_body: delicious lettuce
+  description: delicious lettuce
   live: true
 
 #Milk
@@ -216,7 +216,7 @@ postingf2milk:
   price: 2.00
   user: f2
   unit: gallon
-  description_body: these milks are all organic grown with no pesticides. they are raw. no homogeneization. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.
+  description: these milks are all organic grown with no pesticides. they are raw. no homogeneization. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.
   live: true
 
 #Beef
@@ -227,7 +227,7 @@ postingf2beef:
   price: 3.75
   user: f2
   unit: quarter
-  description_body: these beefs are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.
+  description: these beefs are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.
   live: true
 
 #Tomato
@@ -238,7 +238,7 @@ postingf2tomato:
   price: 2.99
   user: f2
   unit: whole
-  description_body: delicious tomato description_body
+  description: delicious tomato description_body
   live: true
 
 #Carrots
@@ -249,7 +249,7 @@ postingf3carrots:
   price: 2.25
   user: f3
   unit: pound
-  description_body: yummy, crunchy carrots. tastiest ever!
+  description: yummy, crunchy carrots. tastiest ever!
   live: true
 
 #Chicken
@@ -260,7 +260,7 @@ postingf3chicken:
   price: 1.50
   user: f3
   unit: whole
-  description_body: best whole chickens around. all grass fed on clean, organic fields. no antibiotics. no supplements. just lots of grass and all the bugs they can eat! :)
+  description: best whole chickens around. all grass fed on clean, organic fields. no antibiotics. no supplements. just lots of grass and all the bugs they can eat! :)
   live: true
 
 #Oranges
@@ -271,7 +271,7 @@ postingf4oranges:
   price: 1.25
   user: f4
   unit: pound
-  description_body: best oranges ever!
+  description: best oranges ever!
   live: true
 
 #Celery
@@ -282,7 +282,7 @@ postingf4celery:
   price: 2.50
   user: f4
   unit: pound
-  description_body: best celery ever!
+  description: best celery ever!
   live: true
 
 #Avocado
@@ -293,7 +293,7 @@ postingf4avocado:
   price: 2.97
   user: f4
   unit: whole
-  description_body: best avocado ever!
+  description: best avocado ever!
   live: true
 
 #Basil
@@ -304,7 +304,7 @@ postingf4basil:
   price: 2.27
   user: f4
   unit: bunch
-  description_body: best basil ever!
+  description: best basil ever!
   live: true
 
 baron_farms_eggs:
@@ -314,7 +314,7 @@ baron_farms_eggs:
   price: 6.25
   user: baron_farms
   unit: whole
-  description_body: pastured eggs
+  description: pastured eggs
   live: true
 
 pride_and_joy_milk:
@@ -324,5 +324,5 @@ pride_and_joy_milk:
   price: 10.50
   user: pride_and_joy
   unit: gallon
-  description_body: pastured organic raw milk
+  description: pastured organic raw milk
   live: true

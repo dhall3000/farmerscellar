@@ -16,15 +16,14 @@ class PostingsTest < IntegrationHelper
       delivery_date = Time.zone.today + 4.days
     end
 
-    @posting_case = Posting.new(units_per_case: 10, unit: @unit, product: @product, user: @farmer, description_body: "descrip", price: 1.25, live: true, order_cutoff: delivery_date - 2.days, delivery_date: delivery_date)
+    @posting_case = Posting.new(units_per_case: 10, unit: @unit, product: @product, user: @farmer, description: "descrip", price: 1.25, live: true, order_cutoff: delivery_date - 2.days, delivery_date: delivery_date)
     @posting_case.save
 
   end
 
   test "dont send order email if unit count zero" do
 
-    posting = create_standard_posting
-    posting.units_per_case = 0
+    posting = create_standard_posting    
     assert posting.save
     assert_equal 0, posting.tote_items.count
     assert_equal Posting.states[:OPEN], posting.state
@@ -372,7 +371,7 @@ class PostingsTest < IntegrationHelper
 
     order_cutoff = delivery_date - 2.days
     post postings_path, params: {posting: {
-      description_body: "my recurring posting",
+      description: "my recurring posting",
       price: price,
       user_id: @farmer.id,
       product_id: @product.id,      
@@ -464,7 +463,7 @@ class PostingsTest < IntegrationHelper
     mynotlive = !@posting.live
 
     patch posting_path(@posting), params: {posting: {
-      description_body: "edited description",
+      description: "edited description",
       price: @posting.price,
       live: mynotlive
     }}
@@ -484,7 +483,7 @@ class PostingsTest < IntegrationHelper
     
     #turn off the existing posting
     patch posting_path(@posting), params: {posting: {
-      description_body: "edited description",
+      description: "edited description",
       price: @posting.price,
       live: false
     }}
@@ -499,7 +498,7 @@ class PostingsTest < IntegrationHelper
     get new_posting_path, params: {posting_id: @posting.id}
     posting = assigns(:posting)
     post postings_path, params: {posting: {
-      description_body: posting.description_body,
+      description: posting.description,
       price: posting.price,
       user_id: posting.user_id,
       product_id: posting.product_id,      
@@ -533,7 +532,7 @@ class PostingsTest < IntegrationHelper
     order_cutoff = delivery_date - 2.days
 
     posting_params = {
-      description_body: "describe description",
+      description: "describe description",
       price: 5.25,
       user_id: @farmer.id,
       product_id: @product.id,
@@ -572,7 +571,7 @@ class PostingsTest < IntegrationHelper
     end
 
     post postings_path, params: {posting: {
-      description_body: "hi",
+      description: "hi",
       price: 2.97,
       user_id: @farmer.id,
       product_id: @product.id,      

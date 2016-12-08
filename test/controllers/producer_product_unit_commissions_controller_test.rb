@@ -31,7 +31,7 @@ class ProducerProductUnitCommissionsControllerTest < ActionDispatch::Integration
 
     #create the postings
     postingTon = Posting.new(
-      description_body: "good apples",
+      description: "good apples",
       price: 10,
       user_id: @farmer.id,
       product_id: @product.id,
@@ -44,7 +44,7 @@ class ProducerProductUnitCommissionsControllerTest < ActionDispatch::Integration
     assert postingTon.save
 
     postingPound = Posting.new(
-      description_body: "good apples",
+      description: "good apples",
       price: 10,
       user_id: @farmer.id,
       product_id: @product.id,

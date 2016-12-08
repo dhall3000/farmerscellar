@@ -193,7 +193,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     end
 
     posting_params = {
-      description_body: "describe description",
+      description: "describe description",
       price: price,
       user_id: farmer.id,
       product_id: product.id,

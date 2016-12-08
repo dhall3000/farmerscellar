@@ -489,7 +489,7 @@ class PostingsControllerTest < IntegrationHelper
 
     #update the posting with the new values
     patch posting_path(@posting, posting: {
-      description_body: @posting.description_body + "new text",      
+      description: @posting.description + "new text",      
       price: @posting.price + 1.0,
       live: !(@posting.live)
     })
@@ -501,7 +501,7 @@ class PostingsControllerTest < IntegrationHelper
 
     #update the posting with the new values
     patch posting_path(@posting, posting: {
-      description_body: @posting.description_body + "new text",      
+      description: @posting.description + "new text",      
       price: @posting.price + 1.0,
       live: !(@posting.live)
     })
@@ -524,7 +524,7 @@ class PostingsControllerTest < IntegrationHelper
 
     #update the posting with the new values
     patch posting_path(@posting, posting: {
-      description_body: @posting.description_body + "new text",      
+      description: @posting.description + "new text",      
       price: @posting.price + 1.0,
       live: !(@posting.live)
     })
@@ -539,7 +539,7 @@ class PostingsControllerTest < IntegrationHelper
     @posting.reload
     
     #verify all the values have been changed
-    assert @posting.description_body != posting_old.description_body    
+    assert @posting.description != posting_old.description    
     assert @posting.price != posting_old.price
     assert @posting.live != posting_old.live
 
@@ -589,7 +589,7 @@ class PostingsControllerTest < IntegrationHelper
 
     #set price to a negative value to trigger a fail
     patch posting_path(@posting, posting: {
-      description_body: @posting.description_body + "new text",      
+      description: @posting.description + "new text",      
       price: -1.0,
       live: !(@posting.live)
     })
@@ -638,7 +638,7 @@ class PostingsControllerTest < IntegrationHelper
 
     posting = {
       user_id: @farmer.id,
-      description_body: "descrip",
+      description: "descrip",
       price: 1,      
       live: true,
       delivery_date: delivery_date,

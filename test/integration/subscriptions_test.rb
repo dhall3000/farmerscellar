@@ -1297,7 +1297,7 @@ class SubscriptionsTest < IntegrationHelper
     
     delivery_date = next_day_of_week_after(Time.zone.now, 5, 7)
     post postings_path, params: {posting: {
-      description_body: "#{product.name} description",
+      description: "#{product.name} description",
       price: 2,
       user_id: farmer.id,
       product_id: product.id,

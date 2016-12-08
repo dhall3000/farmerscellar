@@ -204,7 +204,7 @@ module TestLib
       price: price,
       user_id: farmer.id,
       unit_id: unit.id,
-      description_body: "this is a description of the posting",
+      description: "this is a description of the posting",
       order_minimum_producer_net: order_minimum_producer_net
       )
 

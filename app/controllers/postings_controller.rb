@@ -193,7 +193,7 @@ class PostingsController < ApplicationController
     def posting_params_update
       
       posting = params.require(:posting).permit(
-        :description_body,
+        :description,
         :price,
         :live
         )      

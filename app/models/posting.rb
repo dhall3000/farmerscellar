@@ -13,16 +13,28 @@ class Posting < ApplicationRecord
   has_many :creditor_order_postings
   has_many :creditor_orders, through: :creditor_order_postings
 
-  validates :description_body, :price, :delivery_date, :order_cutoff, presence: true  
-  validates :price, numericality: { greater_than: 0 }
-  validates :units_per_case, numericality: {only_integer: true, greater_than_or_equal_to: 0}
-  #the weird syntax below is due to some serious gotchas having to do with how booleans are stores or something? I have no idea. See here:
-  #http://stackoverflow.com/questions/10506575/rails-database-defaults-and-model-validation-for-boolean-fields
-  validates :live, inclusion: { in: [true, false] }
-  validate :delivery_date_not_sunday, :order_cutoff_must_be_before_delivery_date, :commission_is_set
-  before_create :delivery_date_must_be_after_today
+  #OPEN means open for customers to place orders. the meaning isn't even yet comingled/intermingled iwth the concept of 'live'.
+  #yuck. it is what it is. we'll clean it up eventually
+  #COMMITMENTZONE is the period of time between order_cutoff and when product is CLOSED
+  #CLOSED is either when the posting is canceled or filled. we don't even have 'canceled' built in. eventually we'll put a control for the admin (or producer, i guess) to
+  #cancel the posting. if/when you want to 'cancel' a posting we'll probably need to implement it. it will depend on if there are outstanding orders or not.
+  def self.states
+    {OPEN: 0, COMMITMENTZONE: 1, CLOSED: 2}
+  end
 
-  validates_presence_of :user, :product, :unit  
+  #required attributes: price, description, live, delivery_date, order_cutoff, state, user_id, product_id, unit_id
+  #optional attributes: description_body, price_body, unit_body, important_notes, important_notes_body, product_id_code, units_per_case, order_minimum_producer_net, posting_recurrence_id
+
+  validates :price, :description, :delivery_date, :order_cutoff, :state, presence: true
+  validates :state, inclusion: Posting.states.values
+  validates_presence_of :user, :product, :unit
+  validates :price, numericality: { greater_than: 0 }
+
+  validates :units_per_case, numericality: { greater_than: 0, only_integer: true }, allow_nil: true
+  validates :order_minimum_producer_net, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true    
+
+  validate :delivery_date_not_sunday, :order_cutoff_must_be_before_delivery_date, :commission_is_set
+  before_create :delivery_date_must_be_after_today  
 
   def self.close(postings_closeable)
 
@@ -145,7 +157,13 @@ class Posting < ApplicationRecord
 
   def outbound_order_value_producer_net
 
-    if (inbound = inbound_order_value_producer_net) > order_minimum_producer_net
+    inbound = inbound_order_value_producer_net
+
+    if order_minimum_producer_net.nil?
+      return inbound
+    end
+
+    if inbound > order_minimum_producer_net
       return inbound
     else
       return 0
@@ -200,15 +218,6 @@ class Posting < ApplicationRecord
     
     return (num_units * price).round(2)
 
-  end
-
-  #OPEN means open for customers to place orders. the meaning isn't even yet comingled/intermingled iwth the concept of 'live'.
-  #yuck. it is what it is. we'll clean it up eventually
-  #COMMITMENTZONE is the period of time between order_cutoff and when product is CLOSED
-  #CLOSED is either when the posting is canceled or filled. we don't even have 'canceled' built in. eventually we'll put a control for the admin (or producer, i guess) to
-  #cancel the posting. if/when you want to 'cancel' a posting we'll probably need to implement it. it will depend on if there are outstanding orders or not.
-  def self.states
-    {OPEN: 0, COMMITMENTZONE: 1, CLOSED: 2}
   end
 
   def state?(state_key)
@@ -413,6 +422,10 @@ class Posting < ApplicationRecord
   end
 
   def additional_units_required_to_fill_items_case(tote_item)
+
+    if units_per_case.nil?
+      return 0
+    end
 
     if tote_item.state?(:ADDED)
       

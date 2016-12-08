@@ -480,7 +480,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     order_cutoff = delivery_date - 2.days
 
     post = Posting.new(
-      description_body: "my descrip",
+      description: "my descrip",
       price: 10,
       user_id: users(:f1).id,
       product_id: products(:apples).id,
