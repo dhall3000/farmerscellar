@@ -280,6 +280,7 @@ class Posting < ApplicationRecord
 
     if quantity > 0 && creditor_obligation.nil?
       CreditorObligation.create(creditor_order: creditor_order, balance: 0.0)
+      reload
     end
 
     quantity_remaining = quantity

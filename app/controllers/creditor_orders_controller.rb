@@ -2,7 +2,7 @@ class CreditorOrdersController < ApplicationController
   before_action :redirect_to_root_if_user_not_admin
 
   def index
-    @creditor_orders = CreditorOrder.where("delivery_date > ?", Time.zone.now - 6.weeks).order(delivery_date: :asc)
+    @creditor_orders = CreditorOrder.where("delivery_date > ?", Time.zone.now - 6.weeks).order(delivery_date: :desc)
     split = split_on_closed_postings(@creditor_orders)
     @unclosed_creditor_orders = split[:unclosed_creditor_orders]
     @closed_creditor_orders = split[:closed_creditor_orders]
