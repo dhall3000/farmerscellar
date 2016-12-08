@@ -4,6 +4,7 @@ class NukeNullsInPostingsLive < ActiveRecord::Migration[5.0]
     Posting.all.each do |posting|
       if posting.live.nil?
         posting.live = true
+        posting.save
       end
     end
 
