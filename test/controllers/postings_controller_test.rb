@@ -645,8 +645,7 @@ class PostingsControllerTest < IntegrationHelper
       product_id: @posting.product_id,
       unit_id: @posting.unit.id,
       order_cutoff: delivery_date - 2.days,
-      units_per_case: 5,
-      product_identifier: "XBZ-15"
+      units_per_case: 5
     }
 
     return posting
@@ -669,7 +668,6 @@ class PostingsControllerTest < IntegrationHelper
     post postings_path, params: { id: @farmer.id, posting: parms}
     posting = assigns(:posting)        
     assert posting.units_per_case > 1
-    assert_not posting.product_identifier.empty?
     assert_not posting.nil?
     #the params were sent up to teh #create action with recurrence set to not repeat so we want to verify that .posting_recurrence is nil
     #because we don't want to create a db object for postings that don't repeat

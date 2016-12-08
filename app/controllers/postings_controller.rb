@@ -160,7 +160,6 @@ class PostingsController < ApplicationController
         :description,
         :price_body,
         :unit_body,
-        :product_identifier,
         :order_minimum_producer_net,
         :units_per_case
         )

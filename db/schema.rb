@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161208180654) do
+ActiveRecord::Schema.define(version: 20161208185713) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -351,7 +351,6 @@ ActiveRecord::Schema.define(version: 20161208180654) do
     t.string   "description"
     t.string   "price_body"
     t.string   "unit_body"
-    t.string   "product_identifier"
     t.integer  "units_per_case",             default: 1
     t.string   "product_id_code"
     t.float    "order_minimum_producer_net", default: 0.0
