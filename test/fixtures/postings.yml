@@ -30,7 +30,6 @@ f9posting:
   delivery_date: <%= delivery_date %>
   order_cutoff: <%= delivery_date - 2.days %>  
   product: apples
-  quantity_available: 1000
   price: 4
   user: f9
   unit: pound
@@ -43,7 +42,6 @@ f6posting:
   delivery_date: <%= delivery_date %>
   order_cutoff: <%= delivery_date - 2.days %>  
   product: apples
-  quantity_available: 1000
   price: 1
   user: f6
   unit: pound
@@ -55,7 +53,6 @@ f7posting:
   delivery_date: <%= delivery_date %>
   order_cutoff: <%= delivery_date - 2.days %>  
   product: asparagus
-  quantity_available: 1000
   price: 2
   user: f7
   unit: pound
@@ -67,7 +64,6 @@ f8posting:
   delivery_date: <%= delivery_date %>
   order_cutoff: <%= delivery_date - 2.days %>  
   product: milk
-  quantity_available: 1000
   price: 4
   user: f8
   unit: gallon
@@ -80,7 +76,6 @@ posting_subscription_farmer:
   delivery_date: <%= delivery_date %>
   order_cutoff: <%= delivery_date - 2.days %>  
   product: apples
-  quantity_available: 1000
   price: 4.29
   user: f_subscriptions
   unit: pound
@@ -94,7 +89,6 @@ postingf5apples:
   delivery_date: <%= delivery_date %>
   order_cutoff: <%= delivery_date - 2.days %>  
   product: apples
-  quantity_available: 1000
   price: 4.29
   user: f5
   unit: pound
@@ -106,7 +100,6 @@ p_recurrence_off:
   delivery_date: <%= monday_after_base_monday + 7.days %>
   order_cutoff: <%= monday_after_base_monday + 5.days %>
   product: beef
-  quantity_available: 1000
   price: 5.21
   user: f2
   unit: pound
@@ -119,7 +112,6 @@ p_recurrence_on:
   delivery_date: <%= monday_after_base_monday + 7.days %>
   order_cutoff: <%= monday_after_base_monday + 5.days %>
   product: beef
-  quantity_available: 1000
   price: 5.21
   user: f2
   unit: pound
@@ -132,7 +124,6 @@ p_recurrence_three:
   delivery_date: <%= Time.zone.local(2016, 4, 26, 0, 0) %>
   order_cutoff: <%= Time.zone.local(2016, 4, 26, 0, 0) - 15.hours %>
   product: beef
-  quantity_available: 1000
   price: 5.21
   user: f2
   unit: pound
@@ -146,7 +137,6 @@ p5:
   delivery_date: <%= delivery_date %>
   order_cutoff: <%= delivery_date - 2.days %>
   product: beef
-  quantity_available: 1000
   price: 5.21
   user: f2
   unit: pound
@@ -159,7 +149,6 @@ p1:
   delivery_date: <%= base_monday %>
   order_cutoff: <%= base_monday - 2.days %>
   product: apples
-  quantity_available: 1000
   price: 2.89
   user: f1
   unit: pound
@@ -171,7 +160,6 @@ p2:
   delivery_date: <%= wednesday_after_base_monday %>
   order_cutoff: <%= wednesday_after_base_monday - 2.days %>
   product: asparagus
-  quantity_available: 1000
   price: 2.74
   user: f1
   unit: pound
@@ -183,7 +171,6 @@ p3:
   delivery_date: <%= friday_after_base_monday %>
   order_cutoff: <%= friday_after_base_monday - 2.days %>
   product: milk
-  quantity_available: 1000
   price: 5.00
   user: f2
   unit: gallon
@@ -195,7 +182,6 @@ p4:
   delivery_date: <%= monday_after_base_monday %>
   order_cutoff: <%= monday_after_base_monday - 2.days %>
   product: beef
-  quantity_available: 1000
   price: 5.21
   user: f2
   unit: pound
@@ -204,12 +190,10 @@ p4:
   late_adds_allowed: true
 
 #Apples
-#Posting.create(delivery_date: next_friday, product_id: 1, quantity_available: 1000, price: 2.75, user_id: 1, unit_category_id: 2, unit_kind_id: 8, description_body: "these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
 postingf1apples:
   delivery_date: <%= delivery_date %>
   order_cutoff: <%= delivery_date - 2.days %>
   product: apples
-  quantity_available: 1000
   price: 2.75
   user: f1
   unit: pound
@@ -218,12 +202,10 @@ postingf1apples:
   late_adds_allowed: true
 
 #Asparagus
-#Posting.create(delivery_date: next_friday, product_id: 6, quantity_available: 100, price: 3.25, user_id: 1, unit_category_id: 2, unit_kind_id: 8, description_body: "these Asparagus are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
 postingf1asparagus:
   delivery_date: <%= delivery_date %>
   order_cutoff: <%= delivery_date - 2.days %>  
   product: asparagus
-  quantity_available: 100
   price: 3.25
   user: f1
   unit: pound
@@ -236,7 +218,6 @@ postingf1lettuce:
   delivery_date: <%= delivery_date_next %>
   order_cutoff: <%= delivery_date_next - 2.days %>  
   product: lettuce
-  quantity_available: 100
   price: 4.25
   user: f1
   unit: pound
@@ -245,12 +226,10 @@ postingf1lettuce:
   late_adds_allowed: true
 
 #Milk
-#Posting.create(delivery_date: next_friday, product_id: 3, quantity_available: 25, price: 2.00, user_id: 2, unit_category_id: 1, unit_kind_id: 5, description_body: "these milks are all organic grown with no pesticides. they are raw. no homogeneization. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
 postingf2milk:
   delivery_date: <%= delivery_date %>
   order_cutoff: <%= delivery_date - 2.days %>  
   product: milk
-  quantity_available: 25
   price: 2.00
   user: f2
   unit: gallon
@@ -259,12 +238,10 @@ postingf2milk:
   late_adds_allowed: true
 
 #Beef
-#Posting.create(delivery_date: next_friday, product_id: 4, quantity_available: 10, price: 3.75, user_id: 2, unit_category_id: 3, unit_kind_id: 11, description_body: "these beefs are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
 postingf2beef:
   delivery_date: <%= delivery_date %>
   order_cutoff: <%= delivery_date - 2.days %>  
   product: beef
-  quantity_available: 10
   price: 3.75
   user: f2
   unit: quarter
@@ -277,7 +254,6 @@ postingf2tomato:
   delivery_date: <%= delivery_date_next %>
   order_cutoff: <%= delivery_date_next - 2.days %>  
   product: tomato
-  quantity_available: 10
   price: 2.99
   user: f2
   unit: whole
@@ -286,12 +262,10 @@ postingf2tomato:
   late_adds_allowed: true
 
 #Carrots
-#Posting.create(delivery_date: next_friday, product_id: 2, quantity_available: 15, price: 2.25, user_id: 3, unit_category_id: 2, unit_kind_id: 8, description_body: "yummy, crunchy carrots. tastiest ever!")
 postingf3carrots:
   delivery_date: <%= delivery_date %>
   order_cutoff: <%= delivery_date - 2.days %>  
   product: carrots
-  quantity_available: 15
   price: 2.25
   user: f3
   unit: pound
@@ -300,12 +274,10 @@ postingf3carrots:
   late_adds_allowed: true
 
 #Chicken
-#Posting.create(delivery_date: next_friday, product_id: 5, quantity_available: 50, price: 1.50, user_id: 3, unit_category_id: 3, unit_kind_id: 10, description_body: "best whole chickens around. all grass fed on clean, organic fields. no antibiotics. no supplements. just lots of grass and all the bugs they can eat! :)")
 postingf3chicken:
   delivery_date: <%= delivery_date %>
   order_cutoff: <%= delivery_date - 2.days %>  
   product: chicken
-  quantity_available: 50
   price: 1.50
   user: f3
   unit: whole
@@ -314,12 +286,10 @@ postingf3chicken:
   late_adds_allowed: true
 
 #Oranges
-#Posting.create(delivery_date: next_friday, product_id: 7, quantity_available: 100, price: 1.25, user_id: 4, unit_category_id: 2, unit_kind_id: 8, description_body: "best oranges ever!")
 postingf4oranges:
   delivery_date: <%= delivery_date %>
   order_cutoff: <%= delivery_date - 2.days %>  
   product: oranges
-  quantity_available: 100
   price: 1.25
   user: f4
   unit: pound
@@ -328,12 +298,10 @@ postingf4oranges:
   late_adds_allowed: true
 
 #Celery
-#Posting.create(delivery_date: next_friday, product_id: 8, quantity_available: 100, price: 2.50, user_id: 4, unit_category_id: 2, unit_kind_id: 8, description_body: "best celery ever!")
 postingf4celery:
   delivery_date: <%= delivery_date %>
   order_cutoff: <%= delivery_date - 2.days %>  
   product: celery
-  quantity_available: 100
   price: 2.50
   user: f4
   unit: pound
@@ -346,7 +314,6 @@ postingf4avocado:
   delivery_date: <%= next_non_sunday_or_monday %>
   order_cutoff: <%= next_non_sunday_or_monday - 2.days %>
   product: avocado
-  quantity_available: 100
   price: 2.97
   user: f4
   unit: whole
@@ -359,7 +326,6 @@ postingf4basil:
   delivery_date: <%= next_non_sunday_or_monday %>
   order_cutoff: <%= next_non_sunday_or_monday - 2.days %>
   product: basil
-  quantity_available: 100
   price: 2.27
   user: f4
   unit: bunch
@@ -371,7 +337,6 @@ baron_farms_eggs:
   delivery_date: <%= delivery_date %>
   order_cutoff: <%= delivery_date - 2.days %>  
   product: eggs
-  quantity_available: 100
   price: 6.25
   user: baron_farms
   unit: whole
@@ -383,7 +348,6 @@ pride_and_joy_milk:
   delivery_date: <%= delivery_date %>
   order_cutoff: <%= delivery_date - 2.days %>  
   product: milk
-  quantity_available: 100
   price: 10.50
   user: pride_and_joy
   unit: gallon

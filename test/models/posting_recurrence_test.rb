@@ -481,7 +481,6 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
 
     post = Posting.new(
       description_body: "my descrip",
-      quantity_available: 100,
       price: 10,
       user_id: users(:f1).id,
       product_id: products(:apples).id,

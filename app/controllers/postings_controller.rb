@@ -7,7 +7,7 @@ class PostingsController < ApplicationController
     if params[:posting_id].nil?
       @posting = current_user.postings.new(live: true)                  
       #if you are doing dev work on the create method and want the new form autopopulated for sanity's sake, uncomment this line
-      #@posting = Posting.new(live: true, delivery_date: Time.zone.now + 4.days, product_id: 8, quantity_available: 100, price: 2.50, user_id: User.find_by(name: "f4"), unit_category_id: UnitCategory.find_by(name: "Weight"), unit_kind_id: UnitKind.find_by(name: "Pound"), description_body: "best celery ever!")
+      #@posting = Posting.new(live: true, delivery_date: Time.zone.now + 4.days, product_id: 8, price: 2.50, user_id: User.find_by(name: "f4"), unit_category_id: UnitCategory.find_by(name: "Weight"), unit_kind_id: UnitKind.find_by(name: "Pound"), description_body: "best celery ever!")
     else
       posting_to_clone = Posting.find(params[:posting_id])
       @posting = posting_to_clone.dup
@@ -150,7 +150,6 @@ class PostingsController < ApplicationController
 
       posting = params.require(:posting).permit(
         :description_body,
-        :quantity_available,
         :price,
         :user_id,
         :product_id,
@@ -196,7 +195,6 @@ class PostingsController < ApplicationController
       
       posting = params.require(:posting).permit(
         :description_body,
-        :quantity_available,
         :price,
         :live
         )      

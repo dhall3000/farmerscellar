@@ -18,7 +18,7 @@ class ToteItemTest < ActiveSupport::TestCase
       delivery_date = Time.zone.today + 4.days
     end
 
-    @posting = Posting.new(units_per_case: 10, unit: @unit, product: @product, user: @farmer, description_body: "descrip", quantity_available: 100, price: 1.25, live: true, order_cutoff: delivery_date - 2.days, delivery_date: delivery_date)
+    @posting = Posting.new(units_per_case: 10, unit: @unit, product: @product, user: @farmer, description_body: "descrip", price: 1.25, live: true, order_cutoff: delivery_date - 2.days, delivery_date: delivery_date)
     @posting.save
 
     creditor_order = CreditorOrder.new(delivery_date: @posting.delivery_date, creditor: @posting.get_creditor, order_value_producer_net: 1.0)

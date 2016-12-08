@@ -16,7 +16,7 @@ class PostingTest < ActiveSupport::TestCase
       delivery_date = Time.zone.today + 4.days
     end
 
-    @posting = Posting.new(unit: @unit, product: @product, user: @farmer, description_body: "descrip", quantity_available: 100, price: 1.25, live: true, order_cutoff: delivery_date - 2.days, delivery_date: delivery_date)
+    @posting = Posting.new(unit: @unit, product: @product, user: @farmer, description_body: "descrip", price: 1.25, live: true, order_cutoff: delivery_date - 2.days, delivery_date: delivery_date)
     @posting.save
   end
 
@@ -619,17 +619,6 @@ class PostingTest < ActiveSupport::TestCase
     assert_not @posting.valid?, get_error_messages(@posting)
   end
 
-  test "quantity_available must be present and positive" do
-    @posting.quantity_available = nil
-    assert_not @posting.valid?, get_error_messages(@posting)
-    @posting.quantity_available = -1
-    assert_not @posting.valid?, get_error_messages(@posting)
-    @posting.quantity_available = 0
-    assert_not @posting.valid?, get_error_messages(@posting)
-    @posting.quantity_available = 1
-    assert @posting.valid?, get_error_messages(@posting)
-  end
-
   test "price must be present and positive" do
     @posting.price = nil
     assert_not @posting.valid?, get_error_messages(@posting)    
@@ -662,7 +651,6 @@ class PostingTest < ActiveSupport::TestCase
       delivery_date: delivery_date,
       order_cutoff: delivery_date - 1.day,
       product: @product,
-      quantity_available: 100,
       price: 10,
       user: @farmer,
       unit: @unit,
@@ -700,7 +688,6 @@ class PostingTest < ActiveSupport::TestCase
       delivery_date: delivery_date,
       order_cutoff: delivery_date - 1.day,
       product: @product,
-      quantity_available: 100,
       price: 10,
       user: @farmer,
       unit: @unit,

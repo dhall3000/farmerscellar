@@ -249,25 +249,25 @@ f4.producer_product_unit_commissions.create(product: product_basil, commission: 
 standard_order_cutoff = next_friday - 2.days
 
 #Apples
-posting_apples = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_apples.id, quantity_available: 1000, price: 2.75, user_id: f1.id, unit_id: 8, description: "product attribute x, y & z", description_body: "these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
+posting_apples = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_apples.id, price: 2.75, user_id: f1.id, unit_id: 8, description: "product attribute x, y & z", description_body: "these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
 #Asparagus
-posting_asparagus = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_asparagus.id, quantity_available: 100, price: 3.25, user_id: f1.id, unit_id: 8, description: "product attribute x, y & z", description_body: "these Asparagus are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
+posting_asparagus = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_asparagus.id, price: 3.25, user_id: f1.id, unit_id: 8, description: "product attribute x, y & z", description_body: "these Asparagus are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
 #Milk
-posting_milk = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_milk.id, quantity_available: 25, price: 2.00, user_id: f2.id, unit_id: 5, description: "product attribute x, y & z", description_body: "these milks are all organic grown with no pesticides. they are raw. no homogeneization. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
+posting_milk = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_milk.id, price: 2.00, user_id: f2.id, unit_id: 5, description: "product attribute x, y & z", description_body: "these milks are all organic grown with no pesticides. they are raw. no homogeneization. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
 #Beef
-posting_beef = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_beef.id, quantity_available: 10, price: 3.75, user_id: f2.id, unit_id: 11, description: "product attribute x, y & z", description_body: "these beefs are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
+posting_beef = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_beef.id, price: 3.75, user_id: f2.id, unit_id: 11, description: "product attribute x, y & z", description_body: "these beefs are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
 #Carrots
-posting_carrots = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_carrots.id, quantity_available: 15, price: 2.25, user_id: f3.id, unit_id: 8, description: "product attribute x, y & z", description_body: "yummy, crunchy carrots. tastiest ever!")
+posting_carrots = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_carrots.id, price: 2.25, user_id: f3.id, unit_id: 8, description: "product attribute x, y & z", description_body: "yummy, crunchy carrots. tastiest ever!")
 #Chicken
-posting_chicken = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_chicken.id, quantity_available: 50, price: 1.50, user_id: f3.id, unit_id: 10, description: "product attribute x, y & z", description_body: "best whole chickens around. all grass fed on clean, organic fields. no antibiotics. no supplements. just lots of grass and all the bugs they can eat! :)")
+posting_chicken = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_chicken.id, price: 1.50, user_id: f3.id, unit_id: 10, description: "product attribute x, y & z", description_body: "best whole chickens around. all grass fed on clean, organic fields. no antibiotics. no supplements. just lots of grass and all the bugs they can eat! :)")
 #Oranges
-posting_oranges = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_oranges.id, quantity_available: 100, price: 1.25, user_id: f4.id, unit_id: 8, description: "product attribute x, y & z", description_body: "best oranges ever!")
+posting_oranges = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_oranges.id, price: 1.25, user_id: f4.id, unit_id: 8, description: "product attribute x, y & z", description_body: "best oranges ever!")
 #Celery
-posting_celery = Posting.create(product_id_code: "ZXB-9F", units_per_case: 10, live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_celery.id, quantity_available: 100, price: 1.00, user_id: f4.id, unit_id: 8, description: "product attribute x, y & z", description_body: "best celery ever!")
+posting_celery = Posting.create(product_id_code: "ZXB-9F", units_per_case: 10, live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_celery.id, price: 1.00, user_id: f4.id, unit_id: 8, description: "product attribute x, y & z", description_body: "best celery ever!")
 #Avocado
-posting_avocado = Posting.create(live: true, delivery_date: Time.zone.today, order_cutoff: Time.zone.today - 2.days, product_id: product_avocado.id, quantity_available: 100, price: 2.29, user_id: f4.id, unit_id: whole.id, description: "product attribute x, y & z", description_body: "best avocado ever!")
+posting_avocado = Posting.create(live: true, delivery_date: Time.zone.today, order_cutoff: Time.zone.today - 2.days, product_id: product_avocado.id, price: 2.29, user_id: f4.id, unit_id: whole.id, description: "product attribute x, y & z", description_body: "best avocado ever!")
 #Basil
-posting_basil = Posting.create(live: true, delivery_date: Time.zone.today, order_cutoff: Time.zone.today - 2.days, product_id: product_basil.id, quantity_available: 100, price: 2.97, user_id: f4.id, unit_id: bunch.id, unit_body: "A 'bunch' is about as much as you can grab with one handful", description: "product attribute x, y & z", description_body: "best basil ever!")
+posting_basil = Posting.create(live: true, delivery_date: Time.zone.today, order_cutoff: Time.zone.today - 2.days, product_id: product_basil.id, price: 2.97, user_id: f4.id, unit_id: bunch.id, unit_body: "A 'bunch' is about as much as you can grab with one handful", description: "product attribute x, y & z", description_body: "best basil ever!")
 
 develop_creditor_orders_controller = false
 
@@ -297,8 +297,7 @@ milk = Posting.create(
       live: true,
       delivery_date: delivery_date,
       order_cutoff: Time.zone.yesterday,
-      product_id: 3,
-      quantity_available: 25,
+      product_id: 3,      
       price: 2.00,
       user_id: f2.id,
       unit_id: 5,

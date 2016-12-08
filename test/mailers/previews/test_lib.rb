@@ -201,7 +201,6 @@ module TestLib
       delivery_date: delivery_date,
       order_cutoff: order_cutoff,
       product_id: product.id,
-      quantity_available: 100,
       price: price,
       user_id: farmer.id,
       unit_id: unit.id,

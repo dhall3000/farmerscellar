@@ -16,7 +16,7 @@ class PostingsTest < IntegrationHelper
       delivery_date = Time.zone.today + 4.days
     end
 
-    @posting_case = Posting.new(units_per_case: 10, unit: @unit, product: @product, user: @farmer, description_body: "descrip", quantity_available: 100, price: 1.25, live: true, order_cutoff: delivery_date - 2.days, delivery_date: delivery_date)
+    @posting_case = Posting.new(units_per_case: 10, unit: @unit, product: @product, user: @farmer, description_body: "descrip", price: 1.25, live: true, order_cutoff: delivery_date - 2.days, delivery_date: delivery_date)
     @posting_case.save
 
   end
@@ -377,7 +377,6 @@ class PostingsTest < IntegrationHelper
     order_cutoff = delivery_date - 2.days
     post postings_path, params: {posting: {
       description_body: "my recurring posting",
-      quantity_available: 100,
       price: price,
       user_id: @farmer.id,
       product_id: @product.id,      
@@ -470,7 +469,6 @@ class PostingsTest < IntegrationHelper
 
     patch posting_path(@posting), params: {posting: {
       description_body: "edited description",
-      quantity_available: @posting.quantity_available,
       price: @posting.price,
       live: mynotlive
     }}
@@ -491,7 +489,6 @@ class PostingsTest < IntegrationHelper
     #turn off the existing posting
     patch posting_path(@posting), params: {posting: {
       description_body: "edited description",
-      quantity_available: @posting.quantity_available,
       price: @posting.price,
       live: false
     }}
@@ -507,7 +504,6 @@ class PostingsTest < IntegrationHelper
     posting = assigns(:posting)
     post postings_path, params: {posting: {
       description_body: posting.description_body,
-      quantity_available: posting.quantity_available,
       price: posting.price,
       user_id: posting.user_id,
       product_id: posting.product_id,      
@@ -542,7 +538,6 @@ class PostingsTest < IntegrationHelper
 
     posting_params = {
       description_body: "describe description",
-      quantity_available: 100,
       price: 5.25,
       user_id: @farmer.id,
       product_id: @product.id,
@@ -582,7 +577,6 @@ class PostingsTest < IntegrationHelper
 
     post postings_path, params: {posting: {
       description_body: "hi",
-      quantity_available: 100,
       price: 2.97,
       user_id: @farmer.id,
       product_id: @product.id,      

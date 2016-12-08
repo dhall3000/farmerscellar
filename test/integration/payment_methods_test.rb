@@ -70,12 +70,12 @@ class PaymentMethodsTest < IntegrationHelper
     RakeHelper.do_hourly_tasks
     assert_equal 1, Payment.count
 
-    assert_equal 1, CreditorObligation.first.payments.count
-    assert CreditorObligation.first.balanced?
+    assert_equal 1, CreditorObligation.last.payments.count
+    assert CreditorObligation.last.balanced?
 
-    assert_equal 0, CreditorObligation.last.payments.count
-    assert_not CreditorObligation.last.balanced?
-    assert CreditorObligation.last.balance > 0.0
+    assert_equal 0, CreditorObligation.first.payments.count
+    assert_not CreditorObligation.first.balanced?
+    assert CreditorObligation.first.balance > 0.0
 
     assert ti1.payment_payables.first.fully_paid
     assert_not ti2.payment_payables.first.fully_paid

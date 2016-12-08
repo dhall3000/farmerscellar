@@ -347,12 +347,6 @@ class PostingsControllerTest < IntegrationHelper
     assert_response :success
     assert_template 'postings/new'
 
-    #there should be a new posting form that's prepopulated with the old posting's values
-    #do a spot check of one of the input fields to see if this is true
-    assert_select '#posting_quantity_available' do
-      assert_select "[value=?]", @posting.quantity_available.to_s
-    end
-
   end
 
 #INDEX TESTS
@@ -495,8 +489,7 @@ class PostingsControllerTest < IntegrationHelper
 
     #update the posting with the new values
     patch posting_path(@posting, posting: {
-      description_body: @posting.description_body + "new text",
-      quantity_available: @posting.quantity_available + 1,
+      description_body: @posting.description_body + "new text",      
       price: @posting.price + 1.0,
       live: !(@posting.live)
     })
@@ -508,8 +501,7 @@ class PostingsControllerTest < IntegrationHelper
 
     #update the posting with the new values
     patch posting_path(@posting, posting: {
-      description_body: @posting.description_body + "new text",
-      quantity_available: @posting.quantity_available + 1,
+      description_body: @posting.description_body + "new text",      
       price: @posting.price + 1.0,
       live: !(@posting.live)
     })
@@ -532,8 +524,7 @@ class PostingsControllerTest < IntegrationHelper
 
     #update the posting with the new values
     patch posting_path(@posting, posting: {
-      description_body: @posting.description_body + "new text",
-      quantity_available: @posting.quantity_available + 1,
+      description_body: @posting.description_body + "new text",      
       price: @posting.price + 1.0,
       live: !(@posting.live)
     })
@@ -548,8 +539,7 @@ class PostingsControllerTest < IntegrationHelper
     @posting.reload
     
     #verify all the values have been changed
-    assert @posting.description_body != posting_old.description_body
-    assert @posting.quantity_available != posting_old.quantity_available
+    assert @posting.description_body != posting_old.description_body    
     assert @posting.price != posting_old.price
     assert @posting.live != posting_old.live
 
@@ -599,8 +589,7 @@ class PostingsControllerTest < IntegrationHelper
 
     #set price to a negative value to trigger a fail
     patch posting_path(@posting, posting: {
-      description_body: @posting.description_body + "new text",
-      quantity_available: @posting.quantity_available + 1,
+      description_body: @posting.description_body + "new text",      
       price: -1.0,
       live: !(@posting.live)
     })
@@ -650,8 +639,7 @@ class PostingsControllerTest < IntegrationHelper
     posting = {
       user_id: @farmer.id,
       description_body: "descrip",
-      price: 1,
-      quantity_available: 10,
+      price: 1,      
       live: true,
       delivery_date: delivery_date,
       product_id: @posting.product_id,

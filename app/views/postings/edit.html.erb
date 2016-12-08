@@ -9,10 +9,7 @@
 
 		<%= f.label :description %>
 		<%= f.text_field :description, class: 'form-control' %>
-
-		<%= f.label :quantity_available, "Approximate Number of Units for Sale" %>
-		<%= f.number_field :quantity_available, min: 1, step: 1, class: 'form-control' %>
-
+		
 		<%= f.label :price, "Price per Unit" %>
 		<%= f.number_field :price, min: 0.01, step: 0.01, class: 'form-control' %>
 
