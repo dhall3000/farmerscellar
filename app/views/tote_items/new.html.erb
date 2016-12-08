@@ -17,7 +17,7 @@
 
   <div class="row">
     <div class="col-xs-12 col-md-4 col-md-offset-4">
-      <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+      <div class="panel-group" id="accordion">
 
 
 
@@ -26,42 +26,82 @@
 
 
         <div class="panel panel-default">
-          <div class="panel-heading" role="tab" id="overviewHeading">
-            <h4 class="panel-title">Overview</h4>
+          <div class="panel-heading">
+            <h4 class="panel-title">Product Info</h4>
           </div>
-          <div id="overviewBody" class="panel-body" role="tabpanel" aria-labelledby="overviewHeading">
+          <div class="panel-body">
             
 
             <ul class="list-group">
-              <li class="list-group-item"><%= User.find_by(id: @posting.user_id).farm_name %> <%= Product.find_by(id: @posting.product_id).name %></li>              
-              <% if @posting.description %>
-                <li class="list-group-item"><%= @posting.description %></li>
-              <% end %>              
+
               <li class="list-group-item">
-                <%= number_to_currency(@posting.price) %> / <%= Unit.find_by(id: @posting.unit_id).name %>
-                <% if @posting.unit_body || @posting.price_body %>
+                <a class="collapsed non-blue" data-toggle="collapse" data-parent="#accordion" href="#producerDescriptionBody">
+                  <%= User.find_by(id: @posting.user_id).farm_name %> <%= Product.find_by(id: @posting.product_id).name %><span class="glyphicon glyphicon-chevron-up pull-right"></span>
+                </a>
+                <div id="producerDescriptionBody" class="panel-collapse collapse">
                   <ul>
-                    <% if @posting.unit_body %>
-                      <li><%= @posting.unit_body %></li>
+                    <li><%= "#{@posting.user.city}, #{@posting.user.state}"  %></li>
+                    <% if @posting.user.website %>
+                      <li>
+                        <a href=<%= "#{@posting.user.website}" %> target='_blank'><%= @posting.user.website %></a>
+                      </li>
                     <% end %>
-                    <% if @posting.price_body %>
-                      <li><%= @posting.price_body %></li>
-                    <% end %>
-                  </ul>
-              <% end %>
-              </li>              
-              <li class="list-group-item"><%= "#{@posting.user.city}, #{@posting.user.state}"  %></li>              
-              <li class="list-group-item">Delivery <%= @posting.delivery_date.strftime("%A, %B %-d") %></li>
-              <li class="list-group-item">
-                <div
-                  class="fb-like"             
-                  data-href=<%= new_tote_item_url(posting_id: @posting.id) %>
-                  data-share="true"
-                  data-width="200"
-                  data-size="large"
-                  data-show-faces="true">
+                  </ul>                
+
+                  <% if @posting.user.description %>
+                    <div>
+                      <%= @posting.user.description %>
+                    </div>
+                  <% end %>
                 </div>
               </li>
+
+              <li class="list-group-item">
+                <% if @posting.description_body %>
+                  <a class="collapsed non-blue" data-toggle="collapse" data-parent="#accordion" href="#descriptionBody">
+                    <%= @posting.description %><span class="glyphicon glyphicon-chevron-up pull-right" aria-hidden="true"></span>
+                  </a>
+                  <div id="descriptionBody" class="panel-collapse collapse">
+                    <%= @posting.description_body %>
+                  </div>
+                <% else %>
+                  <%= @posting.description %>                
+                <% end %>
+              </li>              
+
+              <li class="list-group-item">
+                <% if @posting.unit_body || @posting.price_body %>
+                  <a class="collapsed non-blue" data-toggle="collapse" data-parent="#accordion" href="#priceOrUnitBody">
+                    <%= number_to_currency(@posting.price) %> / <%= Unit.find_by(id: @posting.unit_id).name %><span class="glyphicon glyphicon-chevron-up pull-right" aria-hidden="true"></span>
+                  </a>
+                  <div id="priceOrUnitBody" class="panel-collapse collapse">
+                    <ul>
+                      <% if @posting.unit_body %>
+                        <li><%= @posting.unit_body %></li>
+                      <% end %>
+                      <% if @posting.price_body %>
+                        <li><%= @posting.price_body %></li>
+                      <% end %>
+                    </ul>
+                  </div>
+                <% else %>                  
+                  <%= number_to_currency(@posting.price) %> / <%= Unit.find_by(id: @posting.unit_id).name %>
+                <% end %>                
+              </li>
+              
+              <li class="list-group-item">
+                <a class="collapsed non-blue" data-toggle="collapse" data-parent="#accordion" href="#orderCutoff">
+                  Delivery <%= @posting.delivery_date.strftime("%A, %B %-d") %><span class="glyphicon glyphicon-chevron-up pull-right" aria-hidden="true"></span>
+                </a>
+                <div id="orderCutoff" class="panel-collapse collapse">
+                  <ul>
+                    <li>
+                      <%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff") %>: <%= @posting.order_cutoff.strftime("%A, %B %-d, %l:%M %p") %>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+
             </ul>
             
                         
@@ -70,79 +110,14 @@
 
 
 
-
-
-
-        <div class="panel panel-default">
-          <div class="panel-heading" role="tab" id="detailsHeading">
-            <h4 class="panel-title">
-              <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#detailsBody" aria-expanded="false" aria-controls="detailsBody">
-                <span class="glyphicon glyphicon-expand" aria-hidden="true"></span> Details
-              </a>
-            </h4>
-          </div>          
-          <div id="detailsBody" class="panel-collapse collapse" role="tabpanel" aria-labelledby="detailsHeading">
-            <div class="panel-body">
-              <h3>Order</h3>
-              <ul class="list-group">                                
-                <li class="list-group-item">
-                  <%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff") %>: <%= @posting.order_cutoff.strftime("%A, %B %-d, %l:%M %p") %>                  
-                </li>
-              </ul>
-
-              <h3>Producer</h3>
-              <ul class="list-group">
-                <% if !@posting.user.website.blank? %>
-                  <li class="list-group-item">Website: <a href=<%= "#{@posting.user.website}" %> target='_blank'><%= @posting.user.website %></a></li>              
-                <% end %>   
-                <% if @posting.user.description != nil %>                       
-                  <li class="list-group-item"><%= @posting.user.description %></li>
-                <% end %>
-              </ul>
-
-              <h3>Product</h3>
-              <ul class="list-group">
-                <% if !@posting.description_body.blank? %>
-                  <li class="list-group-item"><%= @posting.description_body %></a></li>              
-                <% end %>                   
-              </ul>      
-
-            </div>
-          </div>
-        </div>
-
-
-
-
-
-
-
-
-
-
         <div class="panel panel-default">
           <div class="panel-heading" role="tab" id="quantityHeading">
-            <h4 class="panel-title">Quantity</h4>
+            <h4 class="panel-title">Order Quantity</h4>
           </div>
           <div id="quantityBody" class="panel-body" role="tabpanel" aria-labelledby="quantityHeading">
             <%= render partial: "add_quantity", locals: { tote_item: @tote_item, posting: @posting, account_on_hold: @account_on_hold } %>
           </div>
         </div>            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

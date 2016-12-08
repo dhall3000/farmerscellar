@@ -299,3 +299,13 @@ input {
   font-size: 1.5em;
   text-align: center;
 }
+
+a.non-blue { color: inherit; }
+
+.glyphicon-chevron-up{
+  transition:transform 180ms ease-in;
+}
+.glyphicon-chevron-up.rotate-180{
+  transform: rotate(180deg);
+  transition:transform 180ms ease-in;
+}
