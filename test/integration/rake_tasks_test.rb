@@ -362,6 +362,7 @@ class RakeTasksTest < BulkBuyer
     
     #time travel to 65 minutes before commitment zone start time
     travel_to (@posting_apples.order_cutoff - 65.minutes)
+    RakeHelper.do_hourly_tasks
 
     #now loop over the next 130 minutes
     130.times do |i|

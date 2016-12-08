@@ -13,14 +13,7 @@ class RtauthorizationssTest < BulkBuyer
     c = users(:c_one_tote_item)
     tote_item = c.tote_items.first
     posting = tote_item.posting
-
-    #cheating. i'm scabbing some late_adds_allowed code in here so i can move fast after having added this feature.
-    #if the feature works this test purchase should go through just fine even though the posting removes all
-    #ADDED tote items when it transitions from OPEN to COMMITMENTZONE
-    assert posting.late_adds_allowed
-    posting.update(late_adds_allowed: false)
     posting.reload
-    assert_not posting.late_adds_allowed
 
     gross_tote_item_value = get_gross_item(tote_item)
 
@@ -69,8 +62,6 @@ class RtauthorizationssTest < BulkBuyer
     assert gross_tote_item_value > 0
     tote_item.reload
     assert_equal get_gross_item(tote_item, filled = true), PurchaseReceivable.last.amount
-
-    posting.update(late_adds_allowed: true)
 
   end
 

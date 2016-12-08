@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161208172059) do
+ActiveRecord::Schema.define(version: 20161208180654) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -348,7 +348,6 @@ ActiveRecord::Schema.define(version: 20161208172059) do
     t.datetime "order_cutoff",                               null: false
     t.integer  "posting_recurrence_id"
     t.integer  "state",                      default: 0,     null: false
-    t.boolean  "late_adds_allowed",          default: false
     t.string   "description"
     t.string   "price_body"
     t.string   "unit_body"

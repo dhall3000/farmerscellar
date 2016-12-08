@@ -61,20 +61,6 @@ class BulkBuyer < Authorizer
 
   end
 
-  #this fills toteitems for all postings, regardless of prior state of the toteitems
-  def simulate_order_filling(fill_all_tote_items, time_travel_to_delivery_dates = false)
-
-    get postings_path
-    assert_template 'postings/index'
-    postings = assigns(:postings)
-    assert_not_nil postings
-    puts "there are #{postings.count} postings"
-
-    postings = postings.where(state: Posting.states[:COMMITMENTZONE])
-    simulate_order_filling_for_postings(postings, fill_all_tote_items, time_travel_to_delivery_dates)
-
-  end
-
   #this only fills the toteitems for the given postings
   def simulate_order_filling_for_postings(postings, fill_all_tote_items, time_travel_to_delivery_dates = false)
 
@@ -100,9 +86,16 @@ class BulkBuyer < Authorizer
 
   def create_bulk_buy(customers, fill_all_tote_items)
     create_authorization_for_customers(customers)
+    assert_equal 0, Posting.where(state: Posting.states[:COMMITMENTZONE]).count
+    assert_equal 0, Posting.where(state: Posting.states[:CLOSED]).count
     transition_authorized_tote_items_to_committed(customers)
+    postings = Posting.where(state: Posting.states[:COMMITMENTZONE])
+    assert postings.count > 0
+
     time_travel_to_delivery_dates = true
-    simulate_order_filling(fill_all_tote_items, time_travel_to_delivery_dates)
+    
+
+    simulate_order_filling_for_postings(postings, fill_all_tote_items, time_travel_to_delivery_dates)
 
     #verify there are no authorized
     assert_equal 0, ToteItem.where(state: ToteItem.states[:AUTHORIZED]).count    

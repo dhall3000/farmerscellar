@@ -14,11 +14,17 @@ class NotFilledToteItemsTest < BulkBuyer
     assert ToteItem.where(state: ToteItem.states[:AUTHORIZED]).count > 0
     assert_equal 0, ToteItem.where(state: ToteItem.states[:COMMITTED]).count
     assert_equal 0, ToteItem.where(state: ToteItem.states[:FILLED]).count
+    assert_equal 0, Posting.where(state: Posting.states[:COMMITMENTZONE]).count
+    assert_equal 0, Posting.where(state: Posting.states[:CLOSED]).count
 
     transition_authorized_tote_items_to_committed(customers)
+    postings = Posting.where(state: Posting.states[:COMMITMENTZONE])
+    assert postings.count > 0
+
     fill_all_tote_items = false
     time_travel_to_delivery_dates = true
-    simulate_order_filling(fill_all_tote_items, time_travel_to_delivery_dates)
+
+    simulate_order_filling_for_postings(postings, fill_all_tote_items, time_travel_to_delivery_dates)
 
     assert_equal 0, ToteItem.where(state: ToteItem.states[:AUTHORIZED]).count    
     assert_equal 0, ToteItem.where(state: ToteItem.states[:COMMITTED]).count

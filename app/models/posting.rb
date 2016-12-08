@@ -202,8 +202,7 @@ class Posting < ApplicationRecord
 
   end
 
-  #OPEN means open for customers to place orders. but that's somewhat confusing because if late_adds_allowed then customer can place order even in the COMMITMENTZONE
-  #so really all OPEN means right now is the period of time before order_cutoff. the meaning isn't even yet comingled/intermingled iwth the concept of 'live'.
+  #OPEN means open for customers to place orders. the meaning isn't even yet comingled/intermingled iwth the concept of 'live'.
   #yuck. it is what it is. we'll clean it up eventually
   #COMMITMENTZONE is the period of time between order_cutoff and when product is CLOSED
   #CLOSED is either when the posting is canceled or filled. we don't even have 'canceled' built in. eventually we'll put a control for the admin (or producer, i guess) to
@@ -230,20 +229,11 @@ class Posting < ApplicationRecord
         if Time.zone.now >= order_cutoff
           new_state = Posting.states[:COMMITMENTZONE]
 
-          #'late adds' are a customer authorizing a tote item in between commitment zone start and delivery date.
-          #(FYI by default late adds are not allowed)
-          #if late adds are not allowed, here - when transitioning the posting from OPEN to COMMITMENTZONE - we need
-          #to give all non-authorized tote items the boot...transition them from ADDED to REMOVED. otherwise it will
-          #happen that user will add a tote item before the CZS but not auth it. they'll wait a day or two, then come
-          #back to their tote (now in the commitment zone) and just authorize it. when customer does this an email goes
-          #out at the top of the next hour to the producer telling them they have more order. this is confusing if they
-          #aren't expecting it. so we just boot the customer here so they can't authorize late.
-          if !late_adds_allowed
-            update(live: false)
-            tote_items.where(state: ToteItem.states[:ADDED]).each do |tote_item|
-              tote_item.transition(:system_removed)
-            end            
-          end
+          update(live: false)
+          
+          tote_items.where(state: ToteItem.states[:ADDED]).each do |tote_item|
+            tote_item.transition(:system_removed)
+          end            
 
           tote_items.where(state: ToteItem.states[:AUTHORIZED]).each do |tote_item|
             tote_item.transition(:order_cutoffed)

@@ -35,7 +35,6 @@ f9posting:
   unit: pound
   description_body: crispy apples
   live: true
-  late_adds_allowed: false
 
 #------------------------------------------------------------
 f6posting:
@@ -47,7 +46,6 @@ f6posting:
   unit: pound
   description_body: crisp, crunchy organic apples. you'll love them.
   live: true
-  late_adds_allowed: false
 
 f7posting:
   delivery_date: <%= delivery_date %>
@@ -58,7 +56,6 @@ f7posting:
   unit: pound
   description_body: asparagus description_body...yum!
   live: true
-  late_adds_allowed: false
 
 f8posting:
   delivery_date: <%= delivery_date %>
@@ -69,7 +66,6 @@ f8posting:
   unit: gallon
   description_body: raw milk description_body
   live: true
-  late_adds_allowed: false
 
 #--------------------------------------------------------------
 posting_subscription_farmer:
@@ -81,7 +77,6 @@ posting_subscription_farmer:
   unit: pound
   description_body: crisp, crunchy organic apples. you'll love them.
   live: true
-  late_adds_allowed: true
 
 #--------------------------------------------------------------
 
@@ -94,7 +89,6 @@ postingf5apples:
   unit: pound
   description_body: crisp, crunchy organic apples. you'll love them.
   live: true
-  late_adds_allowed: true
 
 p_recurrence_off:
   delivery_date: <%= monday_after_base_monday + 7.days %>
@@ -106,7 +100,6 @@ p_recurrence_off:
   description_body: beef description_body
   live: true  
   posting_recurrence: two
-  late_adds_allowed: true
 
 p_recurrence_on:
   delivery_date: <%= monday_after_base_monday + 7.days %>
@@ -118,7 +111,6 @@ p_recurrence_on:
   description_body: beef description_body
   live: true  
   posting_recurrence: one
-  late_adds_allowed: true
 
 p_recurrence_three:
   delivery_date: <%= Time.zone.local(2016, 4, 26, 0, 0) %>
@@ -130,7 +122,6 @@ p_recurrence_three:
   description_body: beef description_body
   live: true  
   posting_recurrence: three
-  late_adds_allowed: true
 
 #--------------------------------------------------------------
 p5:
@@ -142,7 +133,6 @@ p5:
   unit: pound
   description_body: beef description_body
   live: true  
-  late_adds_allowed: true
 #--------------------------------------------------------------
 
 p1:
@@ -154,7 +144,6 @@ p1:
   unit: pound
   description_body: these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.
   live: true  
-  late_adds_allowed: true
 
 p2:
   delivery_date: <%= wednesday_after_base_monday %>
@@ -165,7 +154,6 @@ p2:
   unit: pound
   description_body: asparagus description_body
   live: true  
-  late_adds_allowed: true
 
 p3:
   delivery_date: <%= friday_after_base_monday %>
@@ -176,7 +164,6 @@ p3:
   unit: gallon
   description_body: milk description_body
   live: true  
-  late_adds_allowed: true
 
 p4:
   delivery_date: <%= monday_after_base_monday %>
@@ -187,7 +174,6 @@ p4:
   unit: pound
   description_body: beef description_body
   live: true  
-  late_adds_allowed: true
 
 #Apples
 postingf1apples:
@@ -199,7 +185,6 @@ postingf1apples:
   unit: pound
   description_body: these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.
   live: true
-  late_adds_allowed: true
 
 #Asparagus
 postingf1asparagus:
@@ -211,7 +196,6 @@ postingf1asparagus:
   unit: pound
   description_body: these Asparagus are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.
   live: true
-  late_adds_allowed: true
 
 #Lettuce
 postingf1lettuce:
@@ -223,7 +207,6 @@ postingf1lettuce:
   unit: pound
   description_body: delicious lettuce
   live: true
-  late_adds_allowed: true
 
 #Milk
 postingf2milk:
@@ -235,7 +218,6 @@ postingf2milk:
   unit: gallon
   description_body: these milks are all organic grown with no pesticides. they are raw. no homogeneization. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.
   live: true
-  late_adds_allowed: true
 
 #Beef
 postingf2beef:
@@ -247,7 +229,6 @@ postingf2beef:
   unit: quarter
   description_body: these beefs are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.
   live: true
-  late_adds_allowed: true
 
 #Tomato
 postingf2tomato:
@@ -259,7 +240,6 @@ postingf2tomato:
   unit: whole
   description_body: delicious tomato description_body
   live: true
-  late_adds_allowed: true
 
 #Carrots
 postingf3carrots:
@@ -271,7 +251,6 @@ postingf3carrots:
   unit: pound
   description_body: yummy, crunchy carrots. tastiest ever!
   live: true
-  late_adds_allowed: true
 
 #Chicken
 postingf3chicken:
@@ -283,7 +262,6 @@ postingf3chicken:
   unit: whole
   description_body: best whole chickens around. all grass fed on clean, organic fields. no antibiotics. no supplements. just lots of grass and all the bugs they can eat! :)
   live: true
-  late_adds_allowed: true
 
 #Oranges
 postingf4oranges:
@@ -295,7 +273,6 @@ postingf4oranges:
   unit: pound
   description_body: best oranges ever!
   live: true
-  late_adds_allowed: true
 
 #Celery
 postingf4celery:
@@ -307,7 +284,6 @@ postingf4celery:
   unit: pound
   description_body: best celery ever!
   live: true
-  late_adds_allowed: true
 
 #Avocado
 postingf4avocado:
@@ -319,7 +295,6 @@ postingf4avocado:
   unit: whole
   description_body: best avocado ever!
   live: true
-  late_adds_allowed: true
 
 #Basil
 postingf4basil:
@@ -331,7 +306,6 @@ postingf4basil:
   unit: bunch
   description_body: best basil ever!
   live: true
-  late_adds_allowed: true
 
 baron_farms_eggs:
   delivery_date: <%= delivery_date %>
@@ -342,7 +316,6 @@ baron_farms_eggs:
   unit: whole
   description_body: pastured eggs
   live: true
-  late_adds_allowed: true
 
 pride_and_joy_milk:
   delivery_date: <%= delivery_date %>
@@ -353,4 +326,3 @@ pride_and_joy_milk:
   unit: gallon
   description_body: pastured organic raw milk
   live: true
-  late_adds_allowed: true

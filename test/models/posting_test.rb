@@ -655,8 +655,7 @@ class PostingTest < ActiveSupport::TestCase
       user: @farmer,
       unit: @unit,
       description_body: "crisp, crunchy organic apples. you'll love them.",
-      live: true,
-      late_adds_allowed: false
+      live: true
       )
 
     #as the object is now it could be created
@@ -692,8 +691,7 @@ class PostingTest < ActiveSupport::TestCase
       user: @farmer,
       unit: @unit,
       description_body: "crisp, crunchy organic apples. you'll love them.",
-      live: true,
-      late_adds_allowed: false
+      live: true
       )
 
     #as the object is now it could be created
