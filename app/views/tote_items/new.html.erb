@@ -34,7 +34,7 @@
 
             <ul class="list-group">
 
-              <li class="list-group-item">
+              <li class="list-group-item clearfix">
                 <a class="collapsed non-blue" data-toggle="collapse" data-parent="#accordion" href="#producerDescriptionBody">
                   <%= User.find_by(id: @posting.user_id).farm_name %> <%= Product.find_by(id: @posting.product_id).name %><span class="glyphicon glyphicon-chevron-up pull-right"></span>
                 </a>
@@ -56,7 +56,7 @@
                 </div>
               </li>
 
-              <li class="list-group-item">
+              <li class="list-group-item clearfix">
                 <% if @posting.description_body %>
                   <a class="collapsed non-blue" data-toggle="collapse" data-parent="#accordion" href="#descriptionBody">
                     <%= @posting.description %><span class="glyphicon glyphicon-chevron-up pull-right" aria-hidden="true"></span>
@@ -69,7 +69,7 @@
                 <% end %>
               </li>              
 
-              <li class="list-group-item">
+              <li class="list-group-item clearfix">
                 <% if @posting.unit_body || @posting.price_body %>
                   <a class="collapsed non-blue" data-toggle="collapse" data-parent="#accordion" href="#priceOrUnitBody">
                     <%= number_to_currency(@posting.price) %> / <%= Unit.find_by(id: @posting.unit_id).name %><span class="glyphicon glyphicon-chevron-up pull-right" aria-hidden="true"></span>
@@ -89,7 +89,7 @@
                 <% end %>                
               </li>
               
-              <li class="list-group-item">
+              <li class="list-group-item clearfix">
                 <a class="collapsed non-blue" data-toggle="collapse" data-parent="#accordion" href="#orderCutoff">
                   Delivery <%= @posting.delivery_date.strftime("%A, %B %-d") %><span class="glyphicon glyphicon-chevron-up pull-right" aria-hidden="true"></span>
                 </a>
