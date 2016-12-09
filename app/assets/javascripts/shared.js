@@ -6,13 +6,11 @@ $(function()
     $('.spin-continuously').toggleClass('rotate-360');
   }
 
-  //this was originally added for the Add to Tote page, currently at app/views/tote_items/new.html.erb
-  //so you can search there for the accordion element for reference if ever a change is needed
-  function toggleChevron(e) {
-    $(e.target).parent().find('span').toggleClass('rotate-180');
-  }
-  $('#accordion').on('hide.bs.collapse', toggleChevron);
-  $('#accordion').on('show.bs.collapse', toggleChevron);
+  $('.collapse').on('show.bs.collapse', toggleChevron);
+  $('.collapse').on('hide.bs.collapse', toggleChevron);
+  function toggleChevron(e) {        
+    $(e.target).parent().find('span.glyphicon-chevron-up').toggleClass('rotate-180');
+  }  
 
   $('#access_code_explanation').popover();
   $('.popover_init').popover();

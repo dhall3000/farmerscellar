@@ -35,35 +35,42 @@
             <ul class="list-group">
 
               <li class="list-group-item clearfix">
-                <a class="collapsed non-blue" data-toggle="collapse" data-parent="#accordion" href="#producerDescriptionBody">
-                  <%= User.find_by(id: @posting.user_id).farm_name %> <%= Product.find_by(id: @posting.product_id).name %><span class="glyphicon glyphicon-chevron-up pull-right"></span>
-                </a>
-                <div id="producerDescriptionBody" class="panel-collapse collapse">
-                  <ul>
-                    <li><%= "#{@posting.user.city}, #{@posting.user.state}"  %></li>
-                    <% if @posting.user.website %>
-                      <li>
-                        <a href=<%= "#{@posting.user.website}" %> target='_blank'><%= @posting.user.website %></a>
-                      </li>
-                    <% end %>
-                  </ul>                
+                
+                <div class='spin-chevron'>
+                  <a class="non-blue" data-toggle="collapse" data-parent="#accordion" href="#producerDescriptionBody">
+                    <%= User.find_by(id: @posting.user_id).farm_name %> <%= Product.find_by(id: @posting.product_id).name %><span class="glyphicon glyphicon-chevron-up pull-right"></span>
+                  </a>                
 
-                  <% if @posting.user.description %>
-                    <div>
-                      <%= @posting.user.description %>
-                    </div>
-                  <% end %>
+                  <div id="producerDescriptionBody" class="panel-collapse collapse">
+                    <ul>
+                      <li><%= "#{@posting.user.city}, #{@posting.user.state}"  %></li>
+                      <% if @posting.user.website %>
+                        <li>
+                          <a href=<%= "#{@posting.user.website}" %> target='_blank'><%= @posting.user.website %></a>
+                        </li>
+                      <% end %>
+                    </ul>                
+
+                    <% if @posting.user.description %>
+                      <div>
+                        <%= @posting.user.description %>
+                      </div>
+                    <% end %>
+                  </div>
                 </div>
+
               </li>
 
               <li class="list-group-item clearfix">
                 <% if @posting.description_body %>
-                  <a class="collapsed non-blue" data-toggle="collapse" data-parent="#accordion" href="#descriptionBody">
-                    <%= @posting.description %><span class="glyphicon glyphicon-chevron-up pull-right" aria-hidden="true"></span>
-                  </a>
-                  <div id="descriptionBody" class="panel-collapse collapse">
-                    <%= @posting.description_body %>
-                  </div>
+                  <div class='spin-chevron'>
+                    <a class="non-blue" data-toggle="collapse" data-parent="#accordion" href="#descriptionBody">
+                      <%= @posting.description %><span class="glyphicon glyphicon-chevron-up pull-right"></span>
+                    </a>                  
+                    <div id="descriptionBody" class="panel-collapse collapse">
+                      <%= @posting.description_body %>
+                    </div>
+                  <div>
                 <% else %>
                   <%= @posting.description %>                
                 <% end %>
@@ -71,18 +78,20 @@
 
               <li class="list-group-item clearfix">
                 <% if @posting.unit_body || @posting.price_body %>
-                  <a class="collapsed non-blue" data-toggle="collapse" data-parent="#accordion" href="#priceOrUnitBody">
-                    <%= number_to_currency(@posting.price) %> / <%= Unit.find_by(id: @posting.unit_id).name %><span class="glyphicon glyphicon-chevron-up pull-right"></span>
-                  </a>
-                  <div id="priceOrUnitBody" class="panel-collapse collapse">
-                    <ul>
-                      <% if @posting.unit_body %>
-                        <li><%= @posting.unit_body %></li>
-                      <% end %>
-                      <% if @posting.price_body %>
-                        <li><%= @posting.price_body %></li>
-                      <% end %>
-                    </ul>
+                  <div class="spin-chevron">
+                    <a class="non-blue" data-toggle="collapse" data-parent="#accordion" href="#priceOrUnitBody">
+                      <%= number_to_currency(@posting.price) %> / <%= Unit.find_by(id: @posting.unit_id).name %><span class="glyphicon glyphicon-chevron-up pull-right"></span>
+                    </a>                  
+                    <div id="priceOrUnitBody" class="panel-collapse collapse">
+                      <ul>
+                        <% if @posting.unit_body %>
+                          <li><%= @posting.unit_body %></li>
+                        <% end %>
+                        <% if @posting.price_body %>
+                          <li><%= @posting.price_body %></li>
+                        <% end %>
+                      </ul>
+                    </div>
                   </div>
                 <% else %>                  
                   <%= number_to_currency(@posting.price) %> / <%= Unit.find_by(id: @posting.unit_id).name %>
@@ -90,36 +99,42 @@
               </li>
               
               <li class="list-group-item clearfix">
-                <a class="collapsed non-blue" data-toggle="collapse" data-parent="#accordion" href="#orderCutoff">
-                  Delivery <%= @posting.delivery_date.strftime("%A, %B %-d") %><span class="glyphicon glyphicon-chevron-up pull-right"></span>
-                </a>
-                <div id="orderCutoff" class="panel-collapse collapse">
-                  <ul>
-                    <li>
-                      <%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff") %>: <%= @posting.order_cutoff.strftime("%A, %B %-d, %l:%M %p") %>
-                    </li>
-                  </ul>
+                <div class="spin-chevron">
+                  <a class="non-blue" data-toggle="collapse" data-parent="#accordion" href="#orderCutoff">
+                    Delivery <%= @posting.delivery_date.strftime("%A, %B %-d") %><span class="glyphicon glyphicon-chevron-up pull-right"></span>
+                  </a>
+                
+                  <div id="orderCutoff" class="panel-collapse collapse">
+                    <ul>
+                      <li>
+                        <%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff") %>: <%= @posting.order_cutoff.strftime("%A, %B %-d, %l:%M %p") %>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </li>
 
               <li class="list-group-item clearfix">
                 <% if @posting.important_notes && !@posting.important_notes.empty? %>
                   <% if @posting.important_notes_body && !@posting.important_notes_body.empty? %>
-                    <a class="collapsed non-blue" data-toggle="collapse" data-parent="#accordion" href="#important-notes-body">
-                      <%= @posting.important_notes %>
-                      <span id="important-notes-info-glyph" class="alert-info glyphicon glyphicon-info-sign spin-continuously"></span>
-                      <span id="important-notes-chevron-glyph" class="glyphicon glyphicon-chevron-up pull-right"></span>                      
-                    </a>
-                    <div id="important-notes-body" class="panel-collapse collapse">
-                      <%= @posting.important_notes_body %>
-                    </div>                    
+                    <div class="spin-chevron">
+                      <a class="non-blue" data-toggle="collapse" data-parent="#accordion" href="#important-notes-body">
+                        <%= @posting.important_notes %>
+                        <span id="important-notes-info-glyph" class="alert-info glyphicon glyphicon-info-sign spin-continuously"></span>
+                        <span id="important-notes-chevron-glyph" class="glyphicon glyphicon-chevron-up pull-right"></span>                      
+                      </a>
+                    
+                      <div id="important-notes-body" class="panel-collapse collapse">
+                        <%= @posting.important_notes_body %>
+                      </div>                    
+                    </div>
                   <% else %>
                     <%= @posting.important_notes %>
                     <span id="important-notes-info-glyph" class="alert-info glyphicon glyphicon-info-sign spin-continuously"></span>
                   <% end %>
                 <% end %>
               </li>
-              
+
             </ul>
 
 
