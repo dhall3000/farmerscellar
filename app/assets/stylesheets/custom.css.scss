@@ -305,7 +305,17 @@ a.non-blue { color: inherit; }
 .glyphicon-chevron-up{
   transition:transform 180ms ease-in;
 }
+
 .glyphicon-chevron-up.rotate-180{
   transform: rotate(180deg);
   transition:transform 180ms ease-in;
+}
+
+.glyphicon{
+  transition:transform 360ms ease-in;
+}
+
+.glyphicon.rotate-360{
+  transform: rotate(360deg);
+  transition:transform 360ms ease-in;
 }

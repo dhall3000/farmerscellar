@@ -9,6 +9,40 @@ class ToteItemsControllerTest < IntegrationHelper
     @posting_apples = postings(:postingf1apples)
   end
 
+  test "posting important notes should display properly" do
+    #we're going to test that the important_notes/important_notes_body do/don't show up at the right time
+
+    log_in_as(@c1)
+
+    #first verify that when there are no important notes, nothing is displayed
+    @posting_apples.update(important_notes: nil, important_notes_body: nil)
+    get new_tote_item_path(posting_id: @posting_apples.id)
+    assert_response :success
+    assert_template 'tote_items/new'
+    assert_select '#important-notes-info-glyph', {count: 0}
+    assert_select '#important-notes-chevron-glyph', {count: 0}
+
+    #next verify that when there are important notes they are displayed
+    @posting_apples.update(important_notes: "important notes title", important_notes_body: nil)
+    get new_tote_item_path(posting_id: @posting_apples.id)
+    assert_response :success
+    assert_template 'tote_items/new'
+    assert_select '#important-notes-info-glyph', {count: 1}
+    assert_select '#important-notes-chevron-glyph', {count: 0}
+    assert_match @posting_apples.important_notes, response.body
+
+    #now verify that when there are important notes_body they also are displayed
+    @posting_apples.update(important_notes: "important notes title", important_notes_body: "important notes body")
+    get new_tote_item_path(posting_id: @posting_apples.id)
+    assert_response :success
+    assert_template 'tote_items/new'
+    assert_select '#important-notes-info-glyph', {count: 1}
+    assert_select '#important-notes-chevron-glyph', {count: 1}
+    assert_match @posting_apples.important_notes, response.body
+    assert_match @posting_apples.important_notes_body, response.body
+
+  end
+
   test "tote item helper methods should return correct values" do
     tote_items = ToteItemsController.helpers.unauthorized_items_for(@c1)
     assert_equal 11, tote_items.count

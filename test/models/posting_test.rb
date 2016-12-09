@@ -244,8 +244,11 @@ class PostingTest < ActiveSupport::TestCase
 
     tester = @posting.dup
     assert tester.valid?
-    tester.important_notes_body = "hello"
-    assert tester.valid?
+    tester.important_notes = nil
+    tester.important_notes_body = "hello body"
+    #notice we're asserting not. the reason is because it's illegal to have a _body without the 'title'
+    #(can't have important_notes_body without having importante_notes)
+    assert_not tester.valid?
 
   end
 

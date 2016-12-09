@@ -1,12 +1,5 @@
 $(function(){
 
-  function toggleChevron(e) {
-    $(e.target).parent().find('span').toggleClass('rotate-180');
-  }
-
-  $('#accordion').on('hide.bs.collapse', toggleChevron);
-  $('#accordion').on('show.bs.collapse', toggleChevron);
-
 	$('.popover_init').popover();
 
 	$(function () {

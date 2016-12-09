@@ -33,7 +33,7 @@ class Posting < ApplicationRecord
   validates :units_per_case, numericality: { greater_than: 0, only_integer: true }, allow_nil: true
   validates :order_minimum_producer_net, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true    
 
-  validate :delivery_date_not_sunday, :order_cutoff_must_be_before_delivery_date, :commission_is_set
+  validate :important_notes_body_not_present_without_important_notes, :delivery_date_not_sunday, :order_cutoff_must_be_before_delivery_date, :commission_is_set
   before_create :delivery_date_must_be_after_today  
 
   def self.close(postings_closeable)
@@ -498,7 +498,20 @@ class Posting < ApplicationRecord
 
     def get_first_committed_tote_item
       return tote_items.where(state: ToteItem.states[:COMMITTED]).order("tote_items.id").first    
-    end  
+    end
+
+    def important_notes_body_not_present_without_important_notes
+
+      if important_notes_body
+        if important_notes.nil? || important_notes.empty?
+          errors.add(:important_notes, "Can't have important_notes_body without important_notes")
+          return false
+        end
+      end
+
+      return true
+
+    end
     
     def delivery_date_not_sunday
       if delivery_date != nil && delivery_date.sunday?
