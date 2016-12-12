@@ -10,184 +10,271 @@
       <p>Last update: <%= @update_time.strftime("%B %d, %Y") %></p>        
     <% end %>
 
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 
-    <div class="anchor" id="the_simple_version">
-      <h2>The Simple Version</h2>
-      <ol>
-        <li>Pre-order online</li>        
-        <li>Pickup whenever</li>
-      </ol>
-    </div>
-
-    <div class="anchor" id="more_details">
-      <h2>More Details</h2>      
-      <ul>
-        <li>We are dropsite based. We don't do any kind of delivery.</li>
-        <li>A dropsite is just a common site where products are dropped off so that customers can come to pick them up at their convenience.</li>
-        <li>Dropsites are secure and have plenty of dry storage, refrigeration and freezer space.</li>
-        <li>We never hold any inventory; every product in our dropsites is already paid for by pre-order customers.</li>        
-        <li>You get notified the moment your products arrive at the dropsite so that you can pick up whenever you want.</li>
-        <li>Products can arrive at the dropsite on different days since we don't hold them in a warehouse anywhere.</li>
-        <li>Feel free to pick up right when products are delivered (for maximum freshness) or wait until all your products arrive and make a single stop (for maximum convenience). You control the balance between convenience and freshness.</li>
-      </ul>
-    </div>
-
-    <div class="anchor" id="ordering">      
-      <h2>Ordering</h2>
-
-      <div class="anchor" id="placing">
-        <h3>Placing an Order</h3>
-        <p>The basic ordering process is like any online shopping experience. First you have to place items in your tote. Then you have to check out. Your order will only get submitted to the producer if you've authorized payment by checking out. Items in your shopping tote that haven't been checked out won't get submitted to the producer so they won't get filled.</p>
-      </div>
-
-      <div class="anchor" id="cutoff">
-        <h3>Order Cutoff</h3>
-        <p>This is the latest date and time you can place an order and still get delivery on the date specified. At the moment of the Order Cutoff, the producer gets notified and begins to fill your order.</p> 
-
-        <p>To view Order Cutoff ...</p>
-        <ul>
-          <li>...from your Tote: expand the little blue arrow icon to the left of any item row</li>
-          <li>...while shopping: tap 'Order' then expand the 'Details' section by tapping on it</li>
-        </ul>
-
-      </div>
-
-      <div class="anchor" id="cancellation">
-        <h3>Order Cancellation</h3>
-        <p>
-          You can cancel an order for any product, even after you've checked out. But only up until the <%= link_to("Order Cutoff", how_things_work_path(anchor: "cutoff")) %>. Beyond the Order Cutoff point any checked out orders become committed. This means that you cannot cancel the order after the order cutoff and you are obligated to pay for the product if the producer delivers on your behalf. The reason for this is to protect the producer from wasting his effort and product on an order that never gets paid on.
-        </p>
-        <p>
-          This cancellation policy also applies to each item authorized as a result of a subscription. Please see <%= link_to "Subscription Item Cancellation", how_things_work_path(anchor: "subscription_item_cancellation") %>.
-        </p>
-      </div>
-    </div>
-
-    <div class="anchor" id="paying">
-      <h2>Paying</h2>
-      <p>We accept credit card or Paypal. No cash, no check. Subscriptions require a Paypal account but only email and password are needed to set up. Pretty easy.</p>
-    </div>
-
-    <div class="anchor" id="delivery">
-      <h2>Delivery</h2>
-      <p>Each product posting specifies its delivery date. The exact time of arrival is not known before hand but you'll always be notified by email once the day's deliveries are completed.</p>
-    </div>
-
-    <div class="anchor" id="pickup">
-      <h2>Pickup</h2>
-      <h3>Dropsite Access Information</h3>
-      <p>You'll get a delivery notification email the day your products arrive. This email will contain everything you need to pickup your products.</p>
-      <div class="anchor" id="pickup_deadline">
-        <h3>Pickup Deadline</h3>
-        <p>You are encouraged to pickup any day and time that is convenient for you after delivery. However, all products must be picked up by 8PM the Monday following delivery. Products not picked up by this time are non-refundable and will be removed from the dropsite and donated. The purpose for this policy is to prevent mixups of old and new product and to conserve dropsite resources.</p>
-      </div>
-    </div>
-
-    <div class="anchor" id="miscellaneous">
-      <h2>Miscellaneous</h2>
-
-      <div class="anchor" id="beta_mode">
-        <h3>Beta Mode</h3>
-        <p>
-          Farmer's Cellar is still very much in beta mode. As such we have a long way to go and are making due with meager resources in the meantime as we progress. Although we always have and will strive for excellence, the reality is we'll probably have a higher rate of mistakes than a more established business and sometimes our communication might not be ideal. If that's not for you we completely understand. Best bet for you now is probably to patronize a more established business and check back in with us down the road. Hopefully by then we'll be better able to meet your needs.
-        </p>
-        <p>
-          That said, our hope is that you choose to actively participate in our progress by not only becoming a customer now but also, more importantly, giving us your feedback about what you do and don't like about our service and suggestions for how we could improve.
-        </p>
-      </div>
-
-      <div class="anchor" id="subscription_item_cancellation">
-        <h3>Subscription Item Cancellation</h3>
-        <p>
-          Subscriptions just automatically place individual orders for you on the schedule you select (e.g. weekly, monthly etc.). As such, individual item orders placed automatically by subscriptions are subject to our usual <%= link_to "Order Cancellation policy", how_things_work_path(anchor: "cancellation") %>. You can only cancel individual subscription items for which the <%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff") %> has not yet passed. For example, if you have a subscription for a product whose <%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff") %> is Monday with a Friday delivery, it won't work for you to wait until Wednesday to cancel your item for the next delivery. In this example, if you waited until Wednesday, the nearest item you'd be able to cancel is the following week's delivery.
-        </p>
-        <p>
-          For this reason it's important to remain aware of Order Cutoffs on an ongoing basis for all subscriptions. It is 100% your responsibility to be aware of the Order Cutoff times for any product subscriptions you authorize.
-        </p>
-      </div>
-
-      <div class="anchor" id="delivery_not_guaranteed">
-        <h3>Delivery Not Guaranteed</h3>
-        <p>
-          Farmer's Cellar never guarantees ordered products will get delivered. Here's why:
-        </p>
-        <p>
-          We serve small farmers only. It can be challenging for small farms to know exactly how much product they have available because it's still on the tree/vine/stalk etc. So we built Farmer's Cellar from day #1 with what we call 'farmer flexibility' in mind. What this means is that when a customer places an order the customer is obligated to pay if the farmer delivers but the farmer is never obligated to deliver. This frees the farmer up to focus more on making high quality food and less on 'inventory' precision. A downside is that sometimes a customer won't get food they ordered. If you don't get ordered food you don't get charged.
-        </p>
-      </div>
-
-      <div class="anchor" id="order_minimums">
-        <h3>Community Order Minimums</h3>
-        <p>
-          Lots of our products are subject to a Community Order Minimum. That means the customer community will need to collectively order at least the given amount (e.g. $200) or else your individual order will be cancelled. For more details, please see <%= link_to "Order Minimums", support_path(anchor: "order_minimums") %> on our support page.          
-        </p>
-      </div>
-
-      <div class="anchor" id="cooling_equipment_outages">
-        <h3>Cooling Equipment Outages</h3>
-        <p>
-          We always work to keep our refrigerators and freezers in top running condition. Regardless, sometimes things break unexpectedly and sometimes the electrical power goes out. If that happens neither we nor our producers are responsible for food spoilage. Food spoilage due to electrical or equipment failure would be a loss to you and is one of the risks you incur patronizing our <%= link_to "Beta Mode", how_things_work_path(anchor: "beta_mode") %> business.
-        </p>
-        <p>
-          That said, we've never had this scenario happen but if it ever does, we will try our best to send out an emergency notification email as soon as we become aware a cooler isn't working for whatever reason. Should you ever get an email like this, be aware that by law we are bound to dispose of the food after 4 hours of a cooler going out. In other words, once an emergency notification email goes out you have 4 hours to pick up your food.
-        </p>
-      </div>
-
-      <div class="anchor" id="return_policy">
-        <h3>Return Policy</h3>
-        <p>
-          We have no return policy. There is none. The reason for this is because we select high quality producers so we've never had a situation where someone wanted to return food. But in case someone ever did want a refund we couldn't afford it because we don't make money doing this (see <%= link_to "Beta Mode", how_things_work_path(anchor: "beta_mode") %>). We do it because we love good local food and we love helping people with that same love connect with local farmers. If we gave refunds it would come straight out of our pocket and we're not in a position to do that. So, all purchases are final.
-        </p>
-      </div>
-
-      <div class="anchor" id="policy_updates">
-        <h3>Policy Updates</h3>
-        <p>          
-          Policies herein are added and updated periodically as we develop the business. Major changes happen infrequently and we will usually attempt to notify you of major or important changes but it remains entirely your responsibility to keep abreast of all changes to <%= link_to "How Things Work", how_things_work_path %> regardless of notification.
-        </p>
-      </div>
-
-    </div>
-
-    <div class="anchor" id="questions">
-      <h2>Questions</h2>
-      <div>                        
-
-        <div class="anchor" id="why_pre_order_only">
-          <h3>Why pre-order only?</h3>
-          <p>
-            Pre-order eliminates warehouses and inventory. This reduces cost and waste and increases quality, taste, variety and nutrition. Pre-order gets you as close as possible to picking the food right off the vine yourself. Well, U-pick probably would be closer...
-          </p>
+      <div class="panel panel-default">
+        <div class="anchor panel-heading" id="the_simple_version">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseSimpleVersion">
+              The Simple Version<span class="glyphicon glyphicon-chevron-up pull-right"></span>
+            </a>
+          </h4>
         </div>
-
-        <div class="anchor" id="where_does_food_come_from">
-          <h3>Where does the food come from?</h3>
-          <p>
-            We're all local. And no, not because 'local' is a fad. We're in to local because proximity fosters relationship. And relationship is important because words like 'organic' and 'natural' don't really convey all the nuances of each farmer. Each farm is different. Each farmer is different. These differences are going to affect the stuff you're putting in your body so we think it's pretty important to know more about where your food is made, how it's made and how it got to you. This is what Farmer's Cellar is all about; helping you know your food, its source and its journey.
-          </p>
-        </div>
-
-        <div class="anchor" id="what_does_local_mean">
-          <h3>What does 'Local' mean?</h3>
-          <p>
-            There is no legal definition of 'local'. We define it as however far a truck driver can get and return in a single 12 hour shift. In other words, 6 hours out, 6 hours back. Keeping distances short makes it easier for you to visit the sources of your food which, by the way, we recommend doing. Visiting your farmers makes a wonderful day or weekend trip and makes each subsequent meal a very different experience. Sounds a little corny (pun), but it really is true. Eating food when you personally know the land and people where it came from feels very different than consuming mystery food.
-          </p>
-        </div>
-
-        <div class="anchor" id="incorrect_product_pickup">
-          <h3>What happens if I accidentally pickup the wrong product?</h3>
-          <p>
-            For liability reasons, we do not accept products back once they've been removed from the dropsite. If you take someone else's products you must reimburse them and pay them a $15 inconvenience fee. Here's why: All products in our dropsite belong to someone who's already paid. If you take product that wasn't delivered for you, you just took someone else's product. They won't discover you took their product until they make the trip to the dropsite to pick it up and find that it's not there. This is very inconvenient for them. This is why it seems fair for you to pay them $15 for the inconvenience you caused by taking their product.
-          </p>
-          <p>
-            Especially note that a $15 inconvenience fee will be charged for each inconvenienced customer. For example, if you ordered 3 gallons of milk but the farmer is only able to deliver 1 gallon for you, your delivery notification will say "1 gallon" was delivered for you. In this case, if you don't read the delivery notification and just take 3 gallons from the dropsite you will be charged for the 2 extra gallons of milk and at least one $15 "inconvenience fee" but possibly two (for a total of $30, in this example) because those 2 extra gallons you took might have belonged to two different “inconvenienced” people.
-          </p>
-          <p>
-            You are 100% responsible for picking up the correct product. The key to picking up the correct product is to read your delivery notifications thoroughly every time. This is important because Farmer's Cellar never guarantees you'll get the quantity you ordered.                             
-          </p>
+        <div id="collapseSimpleVersion" class="panel-collapse collapse">
+          <div class="panel-body">
+            <ol>
+              <li>Pre-order online</li>        
+              <li>Pickup whenever</li>
+            </ol> 
+          </div>
         </div>
       </div>
+
+
+      <div class="panel panel-default">
+        <div class="anchor panel-heading" id="more_details">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseMoreDetails">
+              More Details<span class="glyphicon glyphicon-chevron-up pull-right"></span>
+            </a>
+          </h4>
+        </div>
+        <div id="collapseMoreDetails" class="panel-collapse collapse">
+          <div class="panel-body">
+            <ul>
+              <li>We are dropsite based. We don't do any kind of delivery.</li>
+              <li>A dropsite is just a common site where products are dropped off so that customers can come to pick them up at their convenience.</li>
+              <li>Dropsites are secure and have plenty of dry storage, refrigeration and freezer space.</li>
+              <li>We never hold any inventory; every product in our dropsites is already paid for by pre-order customers.</li>        
+              <li>You get notified the moment your products arrive at the dropsite so that you can pick up whenever you want.</li>
+              <li>Products can arrive at the dropsite on different days since we don't hold them in a warehouse anywhere.</li>
+              <li>Feel free to pick up right when products are delivered (for maximum freshness) or wait until all your products arrive and make a single stop (for maximum convenience). You control the balance between convenience and freshness.</li>
+            </ul> 
+          </div>
+        </div>
+      </div>
+
+
+      <div class="panel panel-default">
+        <div class="anchor panel-heading" id="ordering">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOrdering">
+              Ordering<span class="glyphicon glyphicon-chevron-up pull-right"></span>
+            </a>
+          </h4>
+        </div>
+        <div id="collapseOrdering" class="panel-collapse collapse">
+          <div class="panel-body">
+            <div class="anchor" id="placing">
+              <h3>Placing an Order</h3>
+              <p>The basic ordering process is like any online shopping experience. First you have to place items in your tote. Then you have to check out. Your order will only get submitted to the producer if you've authorized payment by checking out. Items in your shopping tote that haven't been checked out won't get submitted to the producer so they won't get filled.</p>
+            </div>
+
+            <div class="anchor" id="cutoff">
+              <h3>Order Cutoff</h3>
+              <p>This is the latest date and time you can place an order and still get delivery on the date specified. At the moment of the Order Cutoff, the producer gets notified and begins to fill your order.</p> 
+
+              <p>To view Order Cutoff ...</p>
+              <ul>
+                <li>...from your Tote: expand the little blue arrow icon to the left of any item row</li>
+                <li>...while shopping: tap 'Order' then expand the 'Details' section by tapping on it</li>
+              </ul>
+
+            </div>
+
+            <div class="anchor" id="cancellation">
+              <h3>Order Cancellation</h3>
+              <p>
+                You can cancel an order for any product, even after you've checked out. But only up until the <%= link_to("Order Cutoff", how_things_work_path(anchor: "cutoff")) %>. Beyond the Order Cutoff point any checked out orders become committed. This means that you cannot cancel the order after the order cutoff and you are obligated to pay for the product if the producer delivers on your behalf. The reason for this is to protect the producer from wasting his effort and product on an order that never gets paid on.
+              </p>
+              <p>
+                This cancellation policy also applies to each item authorized as a result of a subscription. Please see <%= link_to "Subscription Item Cancellation", how_things_work_path(anchor: "subscription_item_cancellation") %>.
+              </p>
+            </div> 
+          </div>
+        </div>
+      </div>
+
+
+      <div class="panel panel-default">
+        <div class="anchor panel-heading" id="paying">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapsePaying">
+              Paying<span class="glyphicon glyphicon-chevron-up pull-right"></span>
+            </a>
+          </h4>
+        </div>
+        <div id="collapsePaying" class="panel-collapse collapse">
+          <div class="panel-body">
+            <p>We accept credit card or Paypal. No cash, no check. Subscriptions require a Paypal account but only email and password are needed to set up. Pretty easy.</p> 
+          </div>
+        </div>
+      </div>
+
+
+      <div class="panel panel-default">
+        <div class="anchor panel-heading" id="delivery">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseDelivery">
+              Delivery<span class="glyphicon glyphicon-chevron-up pull-right"></span>
+            </a>
+          </h4>
+        </div>
+        <div id="collapseDelivery" class="panel-collapse collapse">
+          <div class="panel-body">
+            <p>Each product posting specifies its delivery date. The exact time of arrival is not known before hand but you'll always be notified by email once the day's deliveries are completed.</p>
+          </div>
+        </div>
+      </div>
+
+
+
+      <div class="panel panel-default">
+        <div class="anchor panel-heading" id="pickup">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapsePickup">
+              Pickup<span class="glyphicon glyphicon-chevron-up pull-right"></span>
+            </a>
+          </h4>
+        </div>
+        <div id="collapsePickup" class="panel-collapse collapse">
+          <div class="panel-body">
+            <h3>Dropsite Access Information</h3>
+            <p>You'll get a delivery notification email the day your products arrive. This email will contain everything you need to pickup your products.</p>
+            <div class="anchor" id="pickup_deadline">
+              <h3>Pickup Deadline</h3>
+              <p>You are encouraged to pickup any day and time that is convenient for you after delivery. However, all products must be picked up by 8PM the Monday following delivery. Products not picked up by this time are non-refundable and will be removed from the dropsite and donated. The purpose for this policy is to prevent mixups of old and new product and to conserve dropsite resources.</p>
+            </div> 
+          </div>
+        </div>
+      </div>
+
+
+      <div class="panel panel-default">
+        <div class="anchor panel-heading" id="miscellaneous">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseMiscellaneous">
+              Miscellaneous<span class="glyphicon glyphicon-chevron-up pull-right"></span>
+            </a>
+          </h4>
+        </div>
+        <div id="collapseMiscellaneous" class="panel-collapse collapse">
+          <div class="panel-body"> 
+            <div class="anchor" id="beta_mode">
+              <h3>Beta Mode</h3>
+              <p>
+                Farmer's Cellar is still very much in beta mode. As such we have a long way to go and are making due with meager resources in the meantime as we progress. Although we always have and will strive for excellence, the reality is we'll probably have a higher rate of mistakes than a more established business and sometimes our communication might not be ideal. If that's not for you we completely understand. Best bet for you now is probably to patronize a more established business and check back in with us down the road. Hopefully by then we'll be better able to meet your needs.
+              </p>
+              <p>
+                That said, our hope is that you choose to actively participate in our progress by not only becoming a customer now but also, more importantly, giving us your feedback about what you do and don't like about our service and suggestions for how we could improve.
+              </p>
+            </div>
+
+            <div class="anchor" id="subscription_item_cancellation">
+              <h3>Subscription Item Cancellation</h3>
+              <p>
+                Subscriptions just automatically place individual orders for you on the schedule you select (e.g. weekly, monthly etc.). As such, individual item orders placed automatically by subscriptions are subject to our usual <%= link_to "Order Cancellation policy", how_things_work_path(anchor: "cancellation") %>. You can only cancel individual subscription items for which the <%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff") %> has not yet passed. For example, if you have a subscription for a product whose <%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff") %> is Monday with a Friday delivery, it won't work for you to wait until Wednesday to cancel your item for the next delivery. In this example, if you waited until Wednesday, the nearest item you'd be able to cancel is the following week's delivery.
+              </p>
+              <p>
+                For this reason it's important to remain aware of Order Cutoffs on an ongoing basis for all subscriptions. It is 100% your responsibility to be aware of the Order Cutoff times for any product subscriptions you authorize.
+              </p>
+            </div>
+
+            <div class="anchor" id="delivery_not_guaranteed">
+              <h3>Delivery Not Guaranteed</h3>
+              <p>
+                Farmer's Cellar never guarantees ordered products will get delivered. Here's why:
+              </p>
+              <p>
+                We serve small farmers only. It can be challenging for small farms to know exactly how much product they have available because it's still on the tree/vine/stalk etc. So we built Farmer's Cellar from day #1 with what we call 'farmer flexibility' in mind. What this means is that when a customer places an order the customer is obligated to pay if the farmer delivers but the farmer is never obligated to deliver. This frees the farmer up to focus more on making high quality food and less on 'inventory' precision. A downside is that sometimes a customer won't get food they ordered. If you don't get ordered food you don't get charged.
+              </p>
+            </div>
+
+            <div class="anchor" id="order_minimums">
+              <h3>Community Order Minimums</h3>
+              <p>
+                Lots of our products are subject to a Community Order Minimum. That means the customer community will need to collectively order at least the given amount (e.g. $200) or else your individual order will be cancelled. For more details, please see <%= link_to "Order Minimums", support_path(anchor: "order_minimums") %> on our support page.          
+              </p>
+            </div>
+
+            <div class="anchor" id="cooling_equipment_outages">
+              <h3>Cooling Equipment Outages</h3>
+              <p>
+                We always work to keep our refrigerators and freezers in top running condition. Regardless, sometimes things break unexpectedly and sometimes the electrical power goes out. If that happens neither we nor our producers are responsible for food spoilage. Food spoilage due to electrical or equipment failure would be a loss to you and is one of the risks you incur patronizing our <%= link_to "Beta Mode", how_things_work_path(anchor: "beta_mode") %> business.
+              </p>
+              <p>
+                That said, we've never had this scenario happen but if it ever does, we will try our best to send out an emergency notification email as soon as we become aware a cooler isn't working for whatever reason. Should you ever get an email like this, be aware that by law we are bound to dispose of the food after 4 hours of a cooler going out. In other words, once an emergency notification email goes out you have 4 hours to pick up your food.
+              </p>
+            </div>
+
+            <div class="anchor" id="return_policy">
+              <h3>Return Policy</h3>
+              <p>
+                We have no return policy. There is none. The reason for this is because we select high quality producers so we've never had a situation where someone wanted to return food. But in case someone ever did want a refund we couldn't afford it because we don't make money doing this (see <%= link_to "Beta Mode", how_things_work_path(anchor: "beta_mode") %>). We do it because we love good local food and we love helping people with that same love connect with local farmers. If we gave refunds it would come straight out of our pocket and we're not in a position to do that. So, all purchases are final.
+              </p>
+            </div>
+
+            <div class="anchor" id="policy_updates">
+              <h3>Policy Updates</h3>
+              <p>          
+                Policies herein are added and updated periodically as we develop the business. Major changes happen infrequently and we will usually attempt to notify you of major or important changes but it remains entirely your responsibility to keep abreast of all changes to <%= link_to "How Things Work", how_things_work_path %> regardless of notification.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="anchor panel-heading" id="questions">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseQuestions">
+              Questions<span class="glyphicon glyphicon-chevron-up pull-right"></span>
+            </a>
+          </h4>
+        </div>
+        <div id="collapseQuestions" class="panel-collapse collapse">
+          <div class="panel-body">
+            <div class="anchor" id="why_pre_order_only">
+              <h3>Why pre-order only?</h3>
+              <p>
+                Pre-order eliminates warehouses and inventory. This reduces cost and waste and increases quality, taste, variety and nutrition. Pre-order gets you as close as possible to picking the food right off the vine yourself. Well, U-pick probably would be closer...
+              </p>
+            </div>
+
+            <div class="anchor" id="where_does_food_come_from">
+              <h3>Where does the food come from?</h3>
+              <p>
+                We're all local. And no, not because 'local' is a fad. We're in to local because proximity fosters relationship. And relationship is important because words like 'organic' and 'natural' don't really convey all the nuances of each farmer. Each farm is different. Each farmer is different. These differences are going to affect the stuff you're putting in your body so we think it's pretty important to know more about where your food is made, how it's made and how it got to you. This is what Farmer's Cellar is all about; helping you know your food, its source and its journey.
+              </p>
+            </div>
+
+            <div class="anchor" id="what_does_local_mean">
+              <h3>What does 'Local' mean?</h3>
+              <p>
+                There is no legal definition of 'local'. We define it as however far a truck driver can get and return in a single 12 hour shift. In other words, 6 hours out, 6 hours back. Keeping distances short makes it easier for you to visit the sources of your food which, by the way, we recommend doing. Visiting your farmers makes a wonderful day or weekend trip and makes each subsequent meal a very different experience. Sounds a little corny (pun), but it really is true. Eating food when you personally know the land and people where it came from feels very different than consuming mystery food.
+              </p>
+            </div>
+
+            <div class="anchor" id="incorrect_product_pickup">
+              <h3>What happens if I accidentally pickup the wrong product?</h3>
+              <p>
+                For liability reasons, we do not accept products back once they've been removed from the dropsite. If you take someone else's products you must reimburse them and pay them a $15 inconvenience fee. Here's why: All products in our dropsite belong to someone who's already paid. If you take product that wasn't delivered for you, you just took someone else's product. They won't discover you took their product until they make the trip to the dropsite to pick it up and find that it's not there. This is very inconvenient for them. This is why it seems fair for you to pay them $15 for the inconvenience you caused by taking their product.
+              </p>
+              <p>
+                Especially note that a $15 inconvenience fee will be charged for each inconvenienced customer. For example, if you ordered 3 gallons of milk but the farmer is only able to deliver 1 gallon for you, your delivery notification will say "1 gallon" was delivered for you. In this case, if you don't read the delivery notification and just take 3 gallons from the dropsite you will be charged for the 2 extra gallons of milk and at least one $15 "inconvenience fee" but possibly two (for a total of $30, in this example) because those 2 extra gallons you took might have belonged to two different “inconvenienced” people.
+              </p>
+              <p>
+                You are 100% responsible for picking up the correct product. The key to picking up the correct product is to read your delivery notifications thoroughly every time. This is important because Farmer's Cellar never guarantees you'll get the quantity you ordered.                             
+              </p>
+            </div> 
+          </div>
+        </div>
+      </div>
+
     </div>
+
+
+
 
   </div>
 </div>

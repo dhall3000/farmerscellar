@@ -15,9 +15,4 @@ $(function(){
 		
 	});
 
-  //for any element that has a collapse class, when it gets collapses, collapse everything else that is collapsible and currently being shown
-	$('.collapse').on('show.bs.collapse', function () {
-		$('.collapse.in').collapse('hide');
-	});
-
 });
