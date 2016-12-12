@@ -114,26 +114,28 @@
                 </div>
               </li>
 
-              <li class="list-group-item clearfix">
+              
                 <% if @posting.important_notes && !@posting.important_notes.empty? %>
-                  <% if @posting.important_notes_body && !@posting.important_notes_body.empty? %>
-                    <div class="spin-chevron">
-                      <a class="non-blue" data-toggle="collapse" data-parent="#accordion" href="#important-notes-body">
-                        <%= @posting.important_notes %>
-                        <span id="important-notes-info-glyph" class="alert-info glyphicon glyphicon-info-sign spin-continuously"></span>
-                        <span id="important-notes-chevron-glyph" class="glyphicon glyphicon-chevron-up pull-right"></span>                      
-                      </a>
-                    
-                      <div id="important-notes-body" class="panel-collapse collapse">
-                        <%= @posting.important_notes_body %>
-                      </div>                    
-                    </div>
-                  <% else %>
-                    <%= @posting.important_notes %>
-                    <span id="important-notes-info-glyph" class="alert-info glyphicon glyphicon-info-sign spin-continuously"></span>
-                  <% end %>
+                  <li class="list-group-item clearfix">
+                    <% if @posting.important_notes_body && !@posting.important_notes_body.empty? %>
+                      <div class="spin-chevron">
+                        <a class="non-blue" data-toggle="collapse" data-parent="#accordion" href="#important-notes-body">
+                          <%= @posting.important_notes %>
+                          <span id="important-notes-info-glyph" class="alert-info glyphicon glyphicon-info-sign spin-continuously"></span>
+                          <span id="important-notes-chevron-glyph" class="glyphicon glyphicon-chevron-up pull-right"></span>                      
+                        </a>
+                      
+                        <div id="important-notes-body" class="panel-collapse collapse">
+                          <%= @posting.important_notes_body %>
+                        </div>                    
+                      </div>
+                    <% else %>
+                      <%= @posting.important_notes %>
+                      <span id="important-notes-info-glyph" class="alert-info glyphicon glyphicon-info-sign spin-continuously"></span>
+                    <% end %>
+                  </li>
                 <% end %>
-              </li>
+              
 
             </ul>
 
