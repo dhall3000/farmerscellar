@@ -23,9 +23,11 @@
         <div class="panel panel-default">
           <div class="anchor panel-heading">
             <h4 class="panel-title">
-              <span data-toggle="collapse" data-parent="#accordion" data-target="#producerDescriptionBody">
-                <%= User.find_by(id: @posting.user_id).farm_name %> <%= Product.find_by(id: @posting.product_id).name %><span class="glyphicon glyphicon-chevron-up pull-right"></span>
-              </span>
+              <div class="clearfix">
+                <span data-toggle="collapse" data-parent="#accordion" data-target="#producerDescriptionBody">
+                  <%= User.find_by(id: @posting.user_id).farm_name %> <%= Product.find_by(id: @posting.product_id).name %><span class="glyphicon glyphicon-chevron-up pull-right"></span>
+                </span>
+              </div>
             </h4>
           </div>
           <div id="producerDescriptionBody" class="panel-collapse collapse">
@@ -56,9 +58,11 @@
           <div class="anchor panel-heading">
             <h4 class="panel-title">
               <% if @posting.description_body %>
-                <span data-toggle="collapse" data-parent="#accordion" data-target="#descriptionBody">
-                  <%= @posting.description %><span class="glyphicon glyphicon-chevron-up pull-right"></span>
-                </span>
+                <div class="clearfix">                
+                  <span data-toggle="collapse" data-parent="#accordion" data-target="#descriptionBody">
+                    <%= @posting.description %><span class="glyphicon glyphicon-chevron-up pull-right"></span>
+                  </span>
+                </div>
               <% else %>
                 <span><%= @posting.description %></span>
               <% end %>
@@ -81,9 +85,11 @@
           <div class="anchor panel-heading">
             <h4 class="panel-title">
               <% if @posting.unit_body || @posting.price_body %>
-                <span data-toggle="collapse" data-parent="#accordion" data-target="#priceOrUnitBody">
-                  <%= number_to_currency(@posting.price) %> / <%= Unit.find_by(id: @posting.unit_id).name %><span class="glyphicon glyphicon-chevron-up pull-right"></span>
-                </span>
+                <div class="clearfix">
+                  <span data-toggle="collapse" data-parent="#accordion" data-target="#priceOrUnitBody">
+                    <%= number_to_currency(@posting.price) %> / <%= Unit.find_by(id: @posting.unit_id).name %><span class="glyphicon glyphicon-chevron-up pull-right"></span>
+                  </span>
+                </div>
               <% else %>
                 <span><%= number_to_currency(@posting.price) %> / <%= Unit.find_by(id: @posting.unit_id).name %></span>
               <% end %>
@@ -112,9 +118,11 @@
         <div class="panel panel-default">
           <div class="anchor panel-heading" id="heading">
             <h4 class="panel-title">
-              <span data-toggle="collapse" data-parent="#accordion" data-target="#orderCutoff">
-                Delivery <%= @posting.delivery_date.strftime("%A, %B %-d") %><span class="glyphicon glyphicon-chevron-up pull-right"></span>
-              </span>
+              <div class="clearfix">
+                <span data-toggle="collapse" data-parent="#accordion" data-target="#orderCutoff">
+                  Delivery <%= @posting.delivery_date.strftime("%A, %B %-d") %><span class="glyphicon glyphicon-chevron-up pull-right"></span>
+                </span>
+              </div>
             </h4>
           </div>
           <div id="orderCutoff" class="panel-collapse collapse">
@@ -136,9 +144,11 @@
                 
                 <% if @posting.important_notes_body && !@posting.important_notes_body.empty? %>
                   <span data-toggle="collapse" data-parent="#accordion" data-target="#important-notes-body">
-                  <span id="important-notes-info-glyph" class="alert-info glyphicon glyphicon-info-sign spin-continuously"></span>
-                    <%= @posting.important_notes %><span class="glyphicon glyphicon-chevron-up pull-right"></span>
-                  </span>
+                  <div class="clearfix">
+                    <span id="important-notes-info-glyph" class="alert-info glyphicon glyphicon-info-sign spin-continuously"></span>
+                      <%= @posting.important_notes %><span class="glyphicon glyphicon-chevron-up pull-right"></span>
+                    </span>
+                  </div>
                 <% else %>                    
                   <span id="important-notes-info-glyph" class="alert-info glyphicon glyphicon-info-sign spin-continuously"></span>
                   <span><%= @posting.important_notes %></span>
@@ -161,11 +171,13 @@
           <div class="panel panel-default">
             <div class="anchor panel-heading">
               <h4 class="panel-title">                
-                <span data-toggle="collapse" data-parent="#accordion" data-target="#unmetOrderMinBody">
-                  <span id="important-notes-info-glyph" class="alert-danger glyphicon glyphicon-exclamation-sign spin-continuously"></span>
-                  Unmet Order Minimum
-                  <span class="glyphicon glyphicon-chevron-up pull-right"></span>
-                </span>
+                <div class="clearfix">
+                  <span data-toggle="collapse" data-parent="#accordion" data-target="#unmetOrderMinBody">
+                    <span id="important-notes-info-glyph" class="alert-danger glyphicon glyphicon-exclamation-sign spin-continuously"></span>
+                    Unmet Order Minimum
+                    <span class="glyphicon glyphicon-chevron-up pull-right"></span>
+                  </span>
+                </div>
               </h4>
             </div>
             <div id="unmetOrderMinBody" class="panel-collapse collapse">
