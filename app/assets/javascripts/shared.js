@@ -26,15 +26,22 @@ $(function()
     expandCollapseWithHash(this.hash);
   });  
 
-  function expandCollapseWithHash(hash) {
-    //find a collapse above or below
-    var $collapses = $(hash).parents('.collapse');
+  $('.collapse').on('show.bs.collapse', rotateGlyph180);
+  $('.collapse').on('hide.bs.collapse', rotateGlyph180);
 
-    //if collapse found
-    if ($collapses.length > 0) {
-      var $collapse = $collapses.first();
-      $collapse.collapse('show');
+  function expandCollapseWithHash(hash) {
+
+    var $collapse = $(hash).parents('.collapse').first();
+
+    if ($collapse.length == 0) {
+      $collapse = $(hash).siblings('.collapse').first();
     }
+
+    if ($collapse.length == 0) {
+      return;
+    }
+
+    $collapse.collapse('show');
 
   }
 
@@ -47,9 +54,6 @@ $(function()
     }
 
   }
-
-  $('.collapse').on('show.bs.collapse', rotateGlyph180);
-  $('.collapse').on('hide.bs.collapse', rotateGlyph180);
 
   function rotateGlyph180(e) {    
     rotateGlyphTarget180($(e.target));
