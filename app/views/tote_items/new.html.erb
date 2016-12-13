@@ -133,12 +133,14 @@
           <div class="panel panel-default">
             <div class="anchor panel-heading" id="heading">
               <h4 class="panel-title">                
-                <span id="important-notes-info-glyph" class="alert-info glyphicon glyphicon-info-sign spin-continuously"></span>
+                
                 <% if @posting.important_notes_body && !@posting.important_notes_body.empty? %>
                   <span data-toggle="collapse" data-parent="#accordion" data-target="#important-notes-body">
+                  <span id="important-notes-info-glyph" class="alert-info glyphicon glyphicon-info-sign spin-continuously"></span>
                     <%= @posting.important_notes %><span class="glyphicon glyphicon-chevron-up pull-right"></span>
                   </span>
                 <% else %>                    
+                  <span id="important-notes-info-glyph" class="alert-info glyphicon glyphicon-info-sign spin-continuously"></span>
                   <span><%= @posting.important_notes %></span>
                 <% end %>                
               </h4>
@@ -151,6 +153,26 @@
                 </div>
               </div>
             <% end %>
+          </div>
+        <% end %>
+
+
+        <% if @biggest_order_minimum_producer_net_outstanding && @biggest_order_minimum_producer_net_outstanding > 0 %>
+          <div class="panel panel-default">
+            <div class="anchor panel-heading">
+              <h4 class="panel-title">                
+                <span data-toggle="collapse" data-parent="#accordion" data-target="#unmetOrderMinBody">
+                  <span id="important-notes-info-glyph" class="alert-danger glyphicon glyphicon-exclamation-sign spin-continuously"></span>
+                  Unmet Order Minimum
+                  <span class="glyphicon glyphicon-chevron-up pull-right"></span>
+                </span>
+              </h4>
+            </div>
+            <div id="unmetOrderMinBody" class="panel-collapse collapse">
+              <div class="panel-body">
+                <p>This product is subject to a <%= link_to "Community Order Minimum", how_things_work_path(anchor: "order_minimums") %>. Currently the minimum is unmet. There is <%= number_to_currency(@biggest_order_minimum_producer_net_outstanding) %> more to go to meet the minimum.</p>
+              </div>
+            </div>
           </div>
         <% end %>
 

@@ -84,6 +84,7 @@ class ToteItemsController < ApplicationController
 
     @account_on_hold = account_on_hold
     @tote_item = ToteItem.new
+    @biggest_order_minimum_producer_net_outstanding = @posting.biggest_order_minimum_producer_net_outstanding
 
   end
 
@@ -127,6 +128,7 @@ class ToteItemsController < ApplicationController
       end
 
       @account_on_hold = account_on_hold
+      @biggest_order_minimum_producer_net_outstanding = @posting.biggest_order_minimum_producer_net_outstanding
       render 'new'
     end
   end

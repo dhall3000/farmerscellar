@@ -36,8 +36,7 @@ class ToteItemsControllerTest < IntegrationHelper
     get new_tote_item_path(posting_id: @posting_apples.id)
     assert_response :success
     assert_template 'tote_items/new'
-    assert_select '#important-notes-info-glyph', {count: 1}
-    assert_select '#important-notes-chevron-glyph', {count: 1}
+    assert_select '#important-notes-info-glyph', {count: 1}    
     assert_match @posting_apples.important_notes, response.body
     assert_match @posting_apples.important_notes_body, response.body
 
