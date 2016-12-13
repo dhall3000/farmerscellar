@@ -15,9 +15,9 @@
       <div class="panel panel-default">
         <div class="anchor panel-heading" id="the_simple_version">
           <h4 class="panel-title">
-            <a data-toggle="collapse" data-parent="#accordion" href="#collapseSimpleVersion">
+            <span data-toggle="collapse" data-parent="#accordion" data-target="#collapseSimpleVersion">
               The Simple Version<span class="glyphicon glyphicon-chevron-up pull-right"></span>
-            </a>
+            </span>
           </h4>
         </div>
         <div id="collapseSimpleVersion" class="panel-collapse collapse">
@@ -34,9 +34,9 @@
       <div class="panel panel-default">
         <div class="anchor panel-heading" id="more_details">
           <h4 class="panel-title">
-            <a data-toggle="collapse" data-parent="#accordion" href="#collapseMoreDetails">
+            <span data-toggle="collapse" data-parent="#accordion" data-target="#collapseMoreDetails">
               More Details<span class="glyphicon glyphicon-chevron-up pull-right"></span>
-            </a>
+            </span>
           </h4>
         </div>
         <div id="collapseMoreDetails" class="panel-collapse collapse">
@@ -58,9 +58,9 @@
       <div class="panel panel-default">
         <div class="anchor panel-heading" id="ordering">
           <h4 class="panel-title">
-            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOrdering">
+            <span data-toggle="collapse" data-parent="#accordion" data-target="#collapseOrdering">
               Ordering<span class="glyphicon glyphicon-chevron-up pull-right"></span>
-            </a>
+            </span>
           </h4>
         </div>
         <div id="collapseOrdering" class="panel-collapse collapse">
@@ -85,10 +85,10 @@
             <div class="anchor" id="cancellation">
               <h3>Order Cancellation</h3>
               <p>
-                You can cancel an order for any product, even after you've checked out. But only up until the <%= link_to("Order Cutoff", how_things_work_path(anchor: "cutoff")) %>. Beyond the Order Cutoff point any checked out orders become committed. This means that you cannot cancel the order after the order cutoff and you are obligated to pay for the product if the producer delivers on your behalf. The reason for this is to protect the producer from wasting his effort and product on an order that never gets paid on.
+                You can cancel an order for any product, even after you've checked out. But only up until the <%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff"), class: "self-link" %>. Beyond the Order Cutoff point any checked out orders become committed. This means that you cannot cancel the order after the order cutoff and you are obligated to pay for the product if the producer delivers on your behalf. The reason for this is to protect the producer from wasting his effort and product on an order that never gets paid on.
               </p>
               <p>
-                This cancellation policy also applies to each item authorized as a result of a subscription. Please see <%= link_to "Subscription Item Cancellation", how_things_work_path(anchor: "subscription_item_cancellation") %>.
+                This cancellation policy also applies to each item authorized as a result of a subscription. Please see <%= link_to "Subscription Item Cancellation", how_things_work_path(anchor: "subscription_item_cancellation"), class: "self-link" %>.
               </p>
             </div> 
           </div>
@@ -99,9 +99,9 @@
       <div class="panel panel-default">
         <div class="anchor panel-heading" id="paying">
           <h4 class="panel-title">
-            <a data-toggle="collapse" data-parent="#accordion" href="#collapsePaying">
+            <span data-toggle="collapse" data-parent="#accordion" data-target="#collapsePaying">
               Paying<span class="glyphicon glyphicon-chevron-up pull-right"></span>
-            </a>
+            </span>
           </h4>
         </div>
         <div id="collapsePaying" class="panel-collapse collapse">
@@ -115,9 +115,9 @@
       <div class="panel panel-default">
         <div class="anchor panel-heading" id="delivery">
           <h4 class="panel-title">
-            <a data-toggle="collapse" data-parent="#accordion" href="#collapseDelivery">
+            <span data-toggle="collapse" data-parent="#accordion" data-target="#collapseDelivery">
               Delivery<span class="glyphicon glyphicon-chevron-up pull-right"></span>
-            </a>
+            </span>
           </h4>
         </div>
         <div id="collapseDelivery" class="panel-collapse collapse">
@@ -132,9 +132,9 @@
       <div class="panel panel-default">
         <div class="anchor panel-heading" id="pickup">
           <h4 class="panel-title">
-            <a data-toggle="collapse" data-parent="#accordion" href="#collapsePickup">
+            <span data-toggle="collapse" data-parent="#accordion" data-target="#collapsePickup">
               Pickup<span class="glyphicon glyphicon-chevron-up pull-right"></span>
-            </a>
+            </span>
           </h4>
         </div>
         <div id="collapsePickup" class="panel-collapse collapse">
@@ -153,9 +153,9 @@
       <div class="panel panel-default">
         <div class="anchor panel-heading" id="miscellaneous">
           <h4 class="panel-title">
-            <a data-toggle="collapse" data-parent="#accordion" href="#collapseMiscellaneous">
+            <span data-toggle="collapse" data-parent="#accordion" data-target="#collapseMiscellaneous">
               Miscellaneous<span class="glyphicon glyphicon-chevron-up pull-right"></span>
-            </a>
+            </span>
           </h4>
         </div>
         <div id="collapseMiscellaneous" class="panel-collapse collapse">
@@ -173,7 +173,7 @@
             <div class="anchor" id="subscription_item_cancellation">
               <h3>Subscription Item Cancellation</h3>
               <p>
-                Subscriptions just automatically place individual orders for you on the schedule you select (e.g. weekly, monthly etc.). As such, individual item orders placed automatically by subscriptions are subject to our usual <%= link_to "Order Cancellation policy", how_things_work_path(anchor: "cancellation") %>. You can only cancel individual subscription items for which the <%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff") %> has not yet passed. For example, if you have a subscription for a product whose <%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff") %> is Monday with a Friday delivery, it won't work for you to wait until Wednesday to cancel your item for the next delivery. In this example, if you waited until Wednesday, the nearest item you'd be able to cancel is the following week's delivery.
+                Subscriptions just automatically place individual orders for you on the schedule you select (e.g. weekly, monthly etc.). As such, individual item orders placed automatically by subscriptions are subject to our usual <%= link_to "Order Cancellation policy", how_things_work_path(anchor: "cancellation"), class: "self-link" %>. You can only cancel individual subscription items for which the <%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff"), class: "self-link" %> has not yet passed. For example, if you have a subscription for a product whose <%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff"), class: "self-link" %> is Monday with a Friday delivery, it won't work for you to wait until Wednesday to cancel your item for the next delivery. In this example, if you waited until Wednesday, the nearest item you'd be able to cancel is the following week's delivery.
               </p>
               <p>
                 For this reason it's important to remain aware of Order Cutoffs on an ongoing basis for all subscriptions. It is 100% your responsibility to be aware of the Order Cutoff times for any product subscriptions you authorize.
@@ -200,7 +200,7 @@
             <div class="anchor" id="cooling_equipment_outages">
               <h3>Cooling Equipment Outages</h3>
               <p>
-                We always work to keep our refrigerators and freezers in top running condition. Regardless, sometimes things break unexpectedly and sometimes the electrical power goes out. If that happens neither we nor our producers are responsible for food spoilage. Food spoilage due to electrical or equipment failure would be a loss to you and is one of the risks you incur patronizing our <%= link_to "Beta Mode", how_things_work_path(anchor: "beta_mode") %> business.
+                We always work to keep our refrigerators and freezers in top running condition. Regardless, sometimes things break unexpectedly and sometimes the electrical power goes out. If that happens neither we nor our producers are responsible for food spoilage. Food spoilage due to electrical or equipment failure would be a loss to you and is one of the risks you incur patronizing our <%= link_to "Beta Mode", how_things_work_path(anchor: "beta_mode"), class: "self-link" %> business.
               </p>
               <p>
                 That said, we've never had this scenario happen but if it ever does, we will try our best to send out an emergency notification email as soon as we become aware a cooler isn't working for whatever reason. Should you ever get an email like this, be aware that by law we are bound to dispose of the food after 4 hours of a cooler going out. In other words, once an emergency notification email goes out you have 4 hours to pick up your food.
@@ -210,7 +210,7 @@
             <div class="anchor" id="return_policy">
               <h3>Return Policy</h3>
               <p>
-                We have no return policy. There is none. The reason for this is because we select high quality producers so we've never had a situation where someone wanted to return food. But in case someone ever did want a refund we couldn't afford it because we don't make money doing this (see <%= link_to "Beta Mode", how_things_work_path(anchor: "beta_mode") %>). We do it because we love good local food and we love helping people with that same love connect with local farmers. If we gave refunds it would come straight out of our pocket and we're not in a position to do that. So, all purchases are final.
+                We have no return policy. There is none. The reason for this is because we select high quality producers so we've never had a situation where someone wanted to return food. But in case someone ever did want a refund we couldn't afford it because we don't make money doing this (see <%= link_to "Beta Mode", how_things_work_path(anchor: "beta_mode"), class: "self-link" %>). We do it because we love good local food and we love helping people with that same love connect with local farmers. If we gave refunds it would come straight out of our pocket and we're not in a position to do that. So, all purchases are final.
               </p>
             </div>
 
@@ -227,9 +227,9 @@
       <div class="panel panel-default">
         <div class="anchor panel-heading" id="questions">
           <h4 class="panel-title">
-            <a data-toggle="collapse" data-parent="#accordion" href="#collapseQuestions">
+            <span data-toggle="collapse" data-parent="#accordion" data-target="#collapseQuestions">
               Questions<span class="glyphicon glyphicon-chevron-up pull-right"></span>
-            </a>
+            </span>
           </h4>
         </div>
         <div id="collapseQuestions" class="panel-collapse collapse">
