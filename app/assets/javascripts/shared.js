@@ -16,6 +16,7 @@ $(function()
   */
   //////////////////////////////////////////////////////////////////////////
 
+  //on collapse shown event, jump to anchor if exist
   $('.collapse').on('shown.bs.collapse', function() {
     if (location.hash) {      
       location.href = location.hash;
@@ -62,11 +63,11 @@ $(function()
   function rotateGlyphTarget180(collapseElement) {    
     collapseElement.parent().find('span.glyphicon-chevron-up').toggleClass('rotate-180');
   }
-
-  setInterval(spinContinuously, 720);
+  
   $('#access_code_explanation').popover();
   $('.popover_init').popover();
   
+  setInterval(spinContinuously, 720);
   function spinContinuously() {
     $('.spin-continuously').toggleClass('rotate-360');
   }

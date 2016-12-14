@@ -91,20 +91,20 @@
                     %>
 
                     <td colspan="5" class="hidden-xs borderless">
-                      <div>
-                        <a href="#<%= 'toteItemDetails' + tote_item.id.to_s %>" data-toggle="collapse">
-                          <span class="glyphicon glyphicon-expand" aria-hidden="true"></span>
+                      <div>                        
+                        <span data-toggle="collapse" data-target="#<%= 'toteItemDetails' + tote_item.id.to_s %>">                          
+                          <span class="glyphicon glyphicon-chevron-up"></span>
                           <% if additional_units_required_to_fill_my_case > 0 || biggest_order_minimum_producer_net_outstanding > 0 %>
-                            <span class="alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-                          <% end %>
-                        </a>
+                            <span class="spin-continuously alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                          <% end %>                          
+                        </span>
                         <% if show_remove_button %>
                           <div style="float:right;">
                             <% if tote_item.state == ToteItem.states[:ADDED] || tote_item.state == ToteItem.states[:AUTHORIZED] || tote_item.roll_until_filled? %>
-                              <%= link_to "", tote_item, class: "glyphicon glyphicon-remove", method: :delete %>
+                              <%= link_to "", tote_item, class: "non-blue glyphicon glyphicon-remove", method: :delete %>
                             <% else %>
                               <% data_content = "This item cannot be removed. It is 'committed' because it is past its Order Cutoff. Please see " + link_to("Order Cancellation", how_things_work_path(anchor: "cancellation")) + "." %>
-                              <a tabindex="0" role="button" data-container="body" data-placement="left" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=data_content%>"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+                              <a class="non-blue" tabindex="0" role="button" data-container="body" data-placement="left" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=data_content%>"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
                             <% end %>
                           </div>
                         <% end %>
@@ -117,20 +117,20 @@
 
                   
                     <td colspan="4" class="hidden-sm hidden-md hidden-lg borderless">
-                      <div>
-                        <a href="#xs<%= 'toteItemDetails' + tote_item.id.to_s %>" data-toggle="collapse">
-                          <span class="glyphicon glyphicon-expand" aria-hidden="true"></span>
+                      <div>                        
+                        <span data-toggle="collapse" data-target="#xs<%= 'toteItemDetails' + tote_item.id.to_s %>">                          
+                          <span class="glyphicon glyphicon-chevron-up"></span>
                           <% if additional_units_required_to_fill_my_case > 0 || biggest_order_minimum_producer_net_outstanding > 0 %>
-                            <span class="alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-                          <% end %>
-                        </a>
+                            <span class="spin-continuously alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                          <% end %>                          
+                        </span>
                         <% if show_remove_button %>
                           <div style="float:right;">
                             <% if tote_item.state == ToteItem.states[:ADDED] || tote_item.state == ToteItem.states[:AUTHORIZED] || tote_item.roll_until_filled? %>
-                              <%= link_to "", tote_item, class: "glyphicon glyphicon-remove", method: :delete %>
+                              <%= link_to "", tote_item, class: "non-blue glyphicon glyphicon-remove", method: :delete %>
                             <% else %>
                               <% data_content = "This item cannot be removed. It is 'committed' because it is past its Order Cutoff. Please see " + link_to("Order Cancellation", how_things_work_path(anchor: "cancellation")) + "." %>
-                              <a tabindex="0" role="button" data-container="body" data-placement="left" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=data_content%>"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+                              <a class="non-blue" tabindex="0" role="button" data-container="body" data-placement="left" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=data_content%>"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
                             <% end %>
                           </div>
                         <% end %>                    
