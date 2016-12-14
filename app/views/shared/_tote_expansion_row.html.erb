@@ -10,12 +10,7 @@
 
           <% if additional_units_required_to_fill_my_case > 0 || biggest_order_minimum_producer_net_outstanding > 0 %>
             <li class="list-group-item">
-              <div class="fat-finger-spacing">                
-
-
-
-
-
+              <div class="fat-finger-spacing">
                 <p class="alert alert-danger"><span class="spin-continuously alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
                   <% if tote_item.will_partially_fill? && biggest_order_minimum_producer_net_outstanding == 0 %>                
                     <span> Currently this item will only partially ship</span>
@@ -25,9 +20,6 @@
                     <% fully = "" %>
                   <% end %>              
                 </p>
-
-
-
               </div>              
               <div>
                 <%= form_tag tote_items_pout_path do %>
@@ -37,6 +29,22 @@
                     <%= submit_tag "More info", class: "btn btn-lg btn-primary" %>
                  <% end %>                                
               </div>              
+            </li>
+          <% end %>
+
+          <% if tote_item.posting.important_notes %>
+            <li class="list-group-item">
+              <div class="alert alert-info">              
+                <p>
+                  <span class="glyphicon glyphicon-info-sign spin-continuously"></span>
+                  <%= tote_item.posting.important_notes %>
+                </p>
+                <% if tote_item.posting.important_notes_body && !tote_item.posting.important_notes_body.empty? %>
+                  <p>
+                    <%= tote_item.posting.important_notes_body %>
+                  </p>                
+                <% end %>
+              </div>
             </li>
           <% end %>
 

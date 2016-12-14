@@ -97,6 +97,9 @@
                           <% if additional_units_required_to_fill_my_case > 0 || biggest_order_minimum_producer_net_outstanding > 0 %>
                             <span class="spin-continuously alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
                           <% end %>                          
+                          <% if tote_item.posting.important_notes && !tote_item.posting.important_notes.empty? %>
+                            <span class="alert-info glyphicon glyphicon-info-sign spin-continuously"></span>
+                          <% end %>
                         </span>
                         <% if show_remove_button %>
                           <div style="float:right;">
@@ -122,7 +125,10 @@
                           <span class="glyphicon glyphicon-chevron-up"></span>
                           <% if additional_units_required_to_fill_my_case > 0 || biggest_order_minimum_producer_net_outstanding > 0 %>
                             <span class="spin-continuously alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-                          <% end %>                          
+                          <% end %>
+                          <% if tote_item.posting.important_notes && !tote_item.posting.important_notes.empty? %>
+                            <span class="alert-info glyphicon glyphicon-info-sign spin-continuously"></span>
+                          <% end %>
                         </span>
                         <% if show_remove_button %>
                           <div style="float:right;">
