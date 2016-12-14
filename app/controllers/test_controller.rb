@@ -2,6 +2,18 @@ class TestController < ApplicationController
 	
 	before_action :redirect_to_root_if_user_not_admin
 
+  def send_email
+
+    to = params[:to]
+    body = params[:body]
+
+    AdminNotificationMailer.email_test(to, body).deliver_now
+
+    flash[:success] = "Test email sent to #{to}"
+    redirect_to root_path
+
+  end
+
   def garage_door
 
     #http://10.0.0.19:1984/client?command=door2

@@ -1,5 +1,10 @@
 class AdminNotificationMailer < ApplicationMailer
 
+  def email_test(send_to, body)
+    @body = body
+    mail to: send_to, subject: "Email test"
+  end
+
   def general_message(subject, body, body_lines = nil)  	
     @body = body
     @body_lines = body_lines
