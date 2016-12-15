@@ -3,6 +3,202 @@ require 'integration_helper'
 
 class PoutPageTest < IntegrationHelper
 
+  test "should not say user item will partially fill if om still unmet" do
+    #tote shows  ! icon. pout shows This item will not/partially ship  case not filled, this much remaining to fill case
+
+    posting = producer_posting_user_setup
+    posting.user.update(order_minimum_producer_net: 200)
+    
+    bob = get_bob
+    sam = get_sam    
+
+    #this will make it so that the OM is theoretically unmet and the 1st case is not yet full
+    ti_bob = create_tote_item(bob, posting, quantity = 11, frequency = nil, roll_until_filled = nil)
+    ti_sam = create_tote_item(sam, posting, quantity = 2, frequency = nil, roll_until_filled = nil)
+
+    do_authorizations
+
+    ti_bob = get_bob_ti
+    ti_sam = get_sam_ti
+
+    assert ti_bob.reload.state?(:AUTHORIZED)    
+    assert ti_sam.reload.state?(:AUTHORIZED)
+
+    #bob's item spans a case so he should get partially filled except that OM unmet so he should be told he'll
+    #get partially filled
+    assert_equal 7, ti_bob.additional_units_required_to_fill_my_case
+    #OM should be unmet. only one case should be orderable at this point which is $100 retail but minus costs
+    #the producer net orderable (inbound) should be  < 100. this means the amount outstanding should be > 100
+    assert posting.biggest_order_minimum_producer_net_outstanding < 120
+    assert posting.biggest_order_minimum_producer_net_outstanding > 100
+
+    #bob should see an exclamation in his tote
+    log_in_as(get_bob)
+    get tote_items_path, params: {orders: true}
+    assert_response :success
+    assert_template 'tote_items/orders'
+
+    #the reason for '4' is because there's elements for big and small screen and each of them have an expansion row containing a !
+    assert_select '.glyphicon-exclamation-sign', {count: 4}
+    #help text in the expansion row should exist
+    assert_select 'li div p span.wont-fully-ship', {count: 2, text: "Currently this item will not ship"}        
+    #there should be a 'More info' button to get user to the pout page
+    assert_select 'input[type=?][value=?]', "submit", "More info", 2#, {count: 2, text: "More info"}
+
+    #user clicks 'More info' button
+    post tote_items_pout_path, params: {id: ti_bob.id}
+    assert_response :success
+    assert_template 'tote_items/pout'
+
+    additional_units_required_to_fill_my_case = assigns(:additional_units_required_to_fill_my_case)
+    biggest_order_minimum_producer_net_outstanding = assigns(:biggest_order_minimum_producer_net_outstanding)
+
+    assert_equal 7, additional_units_required_to_fill_my_case
+    assert biggest_order_minimum_producer_net_outstanding > 100
+
+    #we want to not tell bob that his order will only partially fill
+    assert_select 'p span', {count: 1, text: "Currently this item will not ship"}
+    assert_select 'p span', {count: 0, text: "Currently this item will only partially ship"}
+    assert_select 'li ul li', {count: 0, text: "Currently only 10 of the 11 units ordered are set to ship"}
+    #there is an OM deficiency in this case but let's not confuse the matter...let's just tell him about the case issues
+    #once he solves that we can inform him about the OM problem
+    assert_select 'li ul li a', {count: 0, text: "Group Order Minimum"}
+    assert_select 'li ul li', {count: 1, text: "Reason: the case that your order will ship in is not yet full"}
+    assert_select 'li h5', count: 1, text: "Resolution"
+    assert_select 'li ul li div p', {count: 0, text: "Other customer orders may increase total ordered amount above the minimum, causing your order to ship."}
+    assert_select 'li ul li div p', {count: 1, text: "Other customer orders may fill this case, causing your order to ship."}    
+
+    #sam should see an exclamation in his tote
+    log_in_as(get_sam)
+    get tote_items_path, params: {orders: true}
+    assert_response :success
+    assert_template 'tote_items/orders'
+
+    #the reason for '4' is because there's elements for big and small screen and each of them have an expansion row containing a !
+    assert_select '.glyphicon-exclamation-sign', {count: 4}
+    #help text in the expansion row should exist
+    assert_select 'li div p span.wont-fully-ship', {count: 2, text: "Currently this item will not ship"}        
+    #there should be a 'More info' button to get user to the pout page
+    assert_select 'input[type=?][value=?]', "submit", "More info", 2#, {count: 2, text: "More info"}
+
+    #user clicks 'More info' button
+    post tote_items_pout_path, params: {id: ti_sam.id}
+    assert_response :success
+    assert_template 'tote_items/pout'
+
+    additional_units_required_to_fill_my_case = assigns(:additional_units_required_to_fill_my_case)
+    biggest_order_minimum_producer_net_outstanding = assigns(:biggest_order_minimum_producer_net_outstanding)
+
+    assert_equal 7, additional_units_required_to_fill_my_case
+    assert biggest_order_minimum_producer_net_outstanding > 100
+
+    #we want to not tell sam that his order will only partially fill
+    assert_select 'p span', {count: 1, text: "Currently this item will not ship"}
+    assert_select 'p span', {count: 0, text: "Currently this item will only partially ship"}    
+    #there is an OM deficiency in this case but let's not confuse the matter...let's just tell him about the case issues
+    #once he solves that we can inform him about the OM problem
+    assert_select 'li ul li a', {count: 0, text: "Group Order Minimum"}
+    assert_select 'li ul li', {count: 1, text: "Reason: the case that your order will ship in is not yet full"}
+    assert_select 'li h5', count: 1, text: "Resolution"
+    assert_select 'li ul li div p', {count: 0, text: "Other customer orders may increase total ordered amount above the minimum, causing your order to ship."}
+    assert_select 'li ul li div p', {count: 1, text: "Other customer orders may fill this case, causing your order to ship."}    
+
+  end
+
+  test "should show proper pout helps when order min met but user item wont ship cause case not full" do
+    #tote shows  ! icon. pout shows This item will not/partially ship  case not filled, this much remaining to fill case
+
+    posting = producer_posting_user_setup
+    
+    bob = get_bob
+    sam = get_sam    
+
+    #this will make it so that the OM is theoretically unmet and the 1st case is not yet full
+    ti_bob = create_tote_item(bob, posting, quantity = 11, frequency = nil, roll_until_filled = nil)
+    ti_sam = create_tote_item(sam, posting, quantity = 2, frequency = nil, roll_until_filled = nil)
+
+    do_authorizations
+
+    ti_bob = get_bob_ti
+    ti_sam = get_sam_ti
+
+    assert ti_bob.reload.state?(:AUTHORIZED)    
+    assert ti_sam.reload.state?(:AUTHORIZED)
+
+    #bob's item spans a case so he should get partially filled
+    assert_equal 7, ti_bob.additional_units_required_to_fill_my_case
+    #OM should be met
+    assert_equal 0, posting.biggest_order_minimum_producer_net_outstanding
+    
+    #bob should see an exclamation in his tote
+    log_in_as(get_bob)
+    get tote_items_path, params: {orders: true}
+    assert_response :success
+    assert_template 'tote_items/orders'
+
+    #the reason for '4' is because there's elements for big and small screen and each of them have an expansion row containing a !
+    assert_select '.glyphicon-exclamation-sign', {count: 4}
+    #help text in the expansion row should exist
+    assert_select 'li div p span', {count: 2, text: "Currently this item will only partially ship"}
+    #there should be a 'More info' button to get user to the pout page
+    assert_select 'input[type=?][value=?]', "submit", "More info", 2#, {count: 2, text: "More info"}
+
+    #user clicks 'More info' button
+    post tote_items_pout_path, params: {id: ti_bob.id}
+    assert_response :success
+    assert_template 'tote_items/pout'
+
+    additional_units_required_to_fill_my_case = assigns(:additional_units_required_to_fill_my_case)
+    biggest_order_minimum_producer_net_outstanding = assigns(:biggest_order_minimum_producer_net_outstanding)
+
+    assert_equal 7, additional_units_required_to_fill_my_case
+    assert_equal 0, biggest_order_minimum_producer_net_outstanding
+
+    #we want to tell bob that his order will only partially fill
+    assert_select 'p span', {count: 1, text: "Currently this item will only partially ship"}
+    assert_select 'li ul li', {count: 1, text: "Currently only 10 of the 11 units ordered are set to ship"}
+    #we want to make sure to not tell him there's an OM problem
+    assert_select 'li ul li a', {count: 0, text: "Group Order Minimum"}
+    assert_select 'li ul li', {count: 1, text: "Reason: the case that your order will ship in is not yet full"}
+    assert_select 'li h5', count: 1, text: "Resolution"
+    assert_select 'li ul li div p', {count: 1, text: "Other customer orders may fill this case, causing your order to fully ship."}
+
+    #now, what is the experience like from sam's perspective?
+    log_in_as(get_sam)
+    get tote_items_path, params: {orders: true}
+    assert_response :success
+    assert_template 'tote_items/orders'
+
+    #the reason for '4' is because there's elements for big and small screen and each of them have an expansion row containing a !
+    assert_select '.glyphicon-exclamation-sign', {count: 4}
+    #help text in the expansion row should exist
+    assert_select 'li div p span', {count: 2, text: "Currently this item will not ship"}
+    #there should be a 'More info' button to get user to the pout page
+    assert_select 'input[type=?][value=?]', "submit", "More info", 2#, {count: 2, text: "More info"}
+
+    #user clicks 'More info' button
+    post tote_items_pout_path, params: {id: ti_sam.id}
+    assert_response :success
+    assert_template 'tote_items/pout'
+
+    additional_units_required_to_fill_my_case = assigns(:additional_units_required_to_fill_my_case)
+    biggest_order_minimum_producer_net_outstanding = assigns(:biggest_order_minimum_producer_net_outstanding)
+
+    assert_equal 7, additional_units_required_to_fill_my_case
+    assert_equal 0, biggest_order_minimum_producer_net_outstanding
+
+    #we want to tell sam that his order will not ship because the case is not full
+    assert_select 'p span', {count: 1, text: "Currently this item will not ship"}
+    #we want to make sure the 'partially filled' message is not present
+    assert_no_match "units ordered are set to ship", response.body
+    #we want to make sure to not tell him there's an OM problem
+    assert_select 'li ul li a', {count: 0, text: "Group Order Minimum"}
+    assert_select 'li ul li', {count: 1, text: "Reason: the case that your order will ship in is not yet full"}
+    assert_select 'li h5', count: 1, text: "Resolution"
+    assert_select 'li ul li div p', {count: 1, text: "Other customer orders may fill this case, causing your order to ship."}
+
+  end
+
   test "should show proper pout helps when case constraints met and order min met" do
     #tote shows no icon. pout shows no help text “all good”
 
@@ -245,7 +441,8 @@ class PoutPageTest < IntegrationHelper
 
     #since there's a problem with both case and OM we only want to display case issues
     assert_select 'p span', {count: 1, text: "Currently this item will not ship"}    
-    assert_select 'li ul li', {count: 0, text: "Order minimum unmet"}
+    #there should not be a link telling user about unmet group OM
+    assert_select 'li ul li a', {count: 0, text: "Group Order Minimum"}
     assert_select 'li ul li', {count: 1, text: "Reason: the case that your order will ship in is not yet full"}
     assert_select 'li h5', count: 1, text: "Resolution"
     assert_select 'li ul li div p', {count: 1, text: "Other customer orders may fill this case, causing your order to ship."}

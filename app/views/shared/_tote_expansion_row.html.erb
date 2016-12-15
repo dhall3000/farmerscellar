@@ -13,10 +13,10 @@
               <div class="fat-finger-spacing">
                 <p class="alert alert-danger"><span class="spin-continuously alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
                   <% if tote_item.will_partially_fill? && biggest_order_minimum_producer_net_outstanding == 0 %>                
-                    <span> Currently this item will only partially ship</span>
+                    <span class="wont-fully-ship"> Currently this item will only partially ship</span>
                     <% fully = " fully" %>
                   <% else %>
-                    <span> Currently this item will not ship</span>
+                    <span class="wont-fully-ship"> Currently this item will not ship</span>
                     <% fully = "" %>
                   <% end %>              
                 </p>

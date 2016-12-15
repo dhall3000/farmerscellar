@@ -125,7 +125,7 @@
                             <td class="borderless" colspan="2">
                               <div id=<%= "#{count.to_s}helpInfo" %> class="collapse" data-chevron=<%= "##{count.to_s}helpInfoChevron" %>>
                                 <p>
-                                  <%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff") %> was <%= skip_date[:tote_item].posting.order_cutoff.strftime("%a %-m/%d at %l:%M %p") %>. <%= link_to "Order Cancellation", how_things_work_path(anchor: "cancellation") %> for this delivery was only allowable before then.
+                                  <%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff") %> was <%= skip_date[:tote_item].posting.order_cutoff.strftime("%a %-m/%d at %l:%M %p") %>. <%= link_to "Order Cancellation", how_things_work_path(anchor: "cancellation") %> for this delivery was required before then.
                                 </p>                            
                               </div>                          
                             </td>

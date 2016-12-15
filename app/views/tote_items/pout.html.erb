@@ -31,6 +31,7 @@
             %>
 
             <p class="alert alert-danger"><span class="alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+
               <% if @will_partially_fill %>                
                 <span> Currently this item will only partially ship<%= subscription_text %></span>
                 <% fully = " fully" %>
@@ -75,21 +76,22 @@
                 <li class="list-group-item">
                   <h5>Resolution</h5>
                   <ul>
-
-                    <%
-                      if @additional_units_required_to_fill_my_case > 0
-                        do_nothing_text = "Other customer orders may fill this case, causing your order to#{fully} ship."
-                      elsif @biggest_order_minimum_producer_net_outstanding > 0
-                        do_nothing_text = "Other customer orders may increase total ordered amount above the minimum, causing your order to ship."
-                      end
-                    %>
-
                     <li>
                       <span data-toggle="collapse" data-target="#doNothingExplanation">
                         Leave this order alone<span id="doNothingExplanationChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>
                       </span>
                       <div id="doNothingExplanation" class="panel-collapse collapse" data-chevron="#doNothingExplanationChevron">
+
+                        <%
+                          if @additional_units_required_to_fill_my_case > 0
+                            do_nothing_text = "Other customer orders may fill this case, causing your order to#{fully} ship."
+                          elsif @biggest_order_minimum_producer_net_outstanding > 0
+                            do_nothing_text = "Other customer orders may increase total ordered amount above the minimum, causing your order to ship."
+                          end
+                        %>
+
                         <p><%= do_nothing_text %></p>
+
                       </div>                      
                     </li>
                     <li>Order more yourself</li>
