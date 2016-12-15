@@ -174,7 +174,7 @@
                 <div class="clearfix">
                   <span data-toggle="collapse" data-parent="#accordion" data-target="#unmetOrderMinBody">
                     <span id="important-notes-info-glyph" class="alert-danger glyphicon glyphicon-exclamation-sign spin-continuously"></span>
-                    Unmet Order Minimum
+                    Unmet Group Order Minimum
                     <span class="glyphicon glyphicon-chevron-down pull-right"></span>
                   </span>
                 </div>
@@ -182,7 +182,7 @@
             </div>
             <div id="unmetOrderMinBody" class="panel-collapse collapse">
               <div class="panel-body">
-                <p>This product is subject to a <%= link_to "Community Order Minimum", how_things_work_path(anchor: "order_minimums") %>. Currently the minimum is unmet. There is <%= number_to_currency(@biggest_order_minimum_producer_net_outstanding) %> more to go to meet the minimum.</p>
+                <p>This product is subject to a <%= link_to "Group Order Minimum", how_things_work_path(anchor: "order_minimums") %>. To meet the minimum, you or the community must order an additional <%= number_to_currency(@biggest_order_minimum_producer_net_outstanding) %>.</p>
               </div>
             </div>
           </div>

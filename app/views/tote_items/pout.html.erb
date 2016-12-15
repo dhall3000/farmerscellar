@@ -32,10 +32,10 @@
 
             <p class="alert alert-danger"><span class="alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
               <% if @will_partially_fill %>                
-                <span> Currently this order will only partially ship<%= subscription_text %></span>
+                <span> Currently this item will only partially ship<%= subscription_text %></span>
                 <% fully = " fully" %>
               <% else %>
-                <span> Currently this order will not ship<%= subscription_text %></span>
+                <span> Currently this item will not ship<%= subscription_text %></span>
                 <% fully = "" %>
               <% end %>              
             </p>
@@ -58,7 +58,7 @@
 
                   <% elsif @biggest_order_minimum_producer_net_outstanding > 0 %>
 
-                    <li>Order minimum unmet</li>
+                    <li><%= link_to "Group Order Minimum", how_things_work_path(anchor: "order_minimums") %> unmet</li>
                     <li><%= number_to_currency(@biggest_order_minimum_producer_net_outstanding) %> more required</li>
 
                   <% end %>
@@ -78,13 +78,20 @@
 
                     <%
                       if @additional_units_required_to_fill_my_case > 0
-                        do_nothing_text = "(other customer orders may fill this case, causing your order to#{fully} ship)"
+                        do_nothing_text = "Other customer orders may fill this case, causing your order to#{fully} ship."
                       elsif @biggest_order_minimum_producer_net_outstanding > 0
-                        do_nothing_text = "(other customer orders may increase total ordered amount above the minimum, causing your order to ship)"
+                        do_nothing_text = "Other customer orders may increase total ordered amount above the minimum, causing your order to ship."
                       end
                     %>
 
-                    <li>Leave this order alone <%= do_nothing_text %></li>
+                    <li>
+                      <span data-toggle="collapse" data-target="#doNothingExplanation">
+                        Leave this order alone<span class="glyphicon glyphicon-chevron-down pull-right"></span>
+                      </span>
+                      <div id="doNothingExplanation" class="panel-collapse collapse">
+                        <p><%= do_nothing_text %></p>
+                      </div>                      
+                    </li>
                     <li>Order more yourself</li>
                     <li>Recruit community</li>                
                   </ul>

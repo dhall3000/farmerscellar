@@ -12,17 +12,25 @@
         <div class="anchor panel-heading" id="order_minimums">
           <h4 class="panel-title">
             <span data-toggle="collapse" data-parent="#accordion" data-target="#orderMinimumsBody">
-              Order Minimums<span class="glyphicon glyphicon-chevron-down pull-right"></span>
+              Group Order Minimums<span class="glyphicon glyphicon-chevron-down pull-right"></span>
             </span>
           </h4>
         </div>
         <div id="orderMinimumsBody" class="panel-collapse collapse">
           <div class="panel-body">            
             <div class="anchor" id="have_order_minimums_been_met">
-              <h3>How can I Tell if Order Minimums Have Been Met?</h3>
-              <p>
-                We are working on improving this technology but for now, any time you see a red exclamation point you can click on it to find out more information such as how much more needs to be ordered to achieve the order minimum. In particular, once you've selected product and want to place your order, go to your Tote. Any items with unmet Order Minimums will have a red exclamation point. Click to find out more details. And if you do proceed to order a product with unmet Order Minimums and later want to see if the community has achieved the minimum yet, just log back in to your account and click 'Orders' in the header bar up top. There again you'll see red exclamation points next to any items with unmet minimums. Click the exclamation point to find out how much remains to meet the Order Minimum.
-              </p>      
+              <div class="anchor" id="determine_order_minimums_before_ordering">              
+                <h3>How Can I Tell if Group Order Minimums Have Been Met Before I Order?</h3>
+                <p>
+                  Click ‘Shop’, then find the product of interest. Click ‘Order’. If there is a <%= link_to "Group Order Minimum", how_things_work_path(anchor: "order_minimums") %> and it hasn’t been achieved you’ll see a spinning red exclamation point. Click that and you’ll see how much remains to achieve the minimum.
+                </p>
+              </div>
+              <div class="anchor" id="determine_order_minimums_before_ordering">              
+                <h3>How Can I Tell if Group Order Minimums Have Been Met After I Order?</h3>
+                <p>
+                  If you’ve already ordered and later want to see if a <%= link_to "Group Order Minimum", how_things_work_path(anchor: "order_minimums") %> has been achieved, log in to your Farmer’s Cellar account and go to the black header at the top of the page. Click either ‘Tote’ or ‘Orders’ depending on if you’ve authorized payment or not. If any of the products you’ve selected still have unmet Group Order Minimums you’ll see a spinning red exclamation point. Click that to find out more information.
+                </p>
+              </div>
             </div>            
           </div>
         </div>

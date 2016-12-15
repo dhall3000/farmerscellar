@@ -132,8 +132,8 @@ class PoutPageTest < IntegrationHelper
     assert_equal posting.biggest_order_minimum_producer_net_outstanding, biggest_order_minimum_producer_net_outstanding
 
     #there's a problem with OM but not with case so we don't want to show any text related to case technology
-    assert_select 'p span', {count: 1, text: "Currently this order will not ship"}
-    assert_select 'p span', {count: 0, text: "Currently this order will only partially ship"}    
+    assert_select 'p span', {count: 1, text: "Currently this item will not ship"}
+    assert_select 'p span', {count: 0, text: "Currently this item will only partially ship"}    
     assert_select 'li ul li', {count: 1, text: "Order minimum unmet"}
     assert_select 'li ul li', {count: 0, text: "Reason: the case that your order will ship in is not yet full"}
     assert_select 'li h5', count: 1, text: "Resolution"
@@ -244,7 +244,7 @@ class PoutPageTest < IntegrationHelper
     assert_equal 50, biggest_order_minimum_producer_net_outstanding
 
     #since there's a problem with both case and OM we only want to display case issues
-    assert_select 'p span', {count: 1, text: "Currently this order will not ship"}    
+    assert_select 'p span', {count: 1, text: "Currently this item will not ship"}    
     assert_select 'li ul li', {count: 0, text: "Order minimum unmet"}
     assert_select 'li ul li', {count: 1, text: "Reason: the case that your order will ship in is not yet full"}
     assert_select 'li h5', count: 1, text: "Resolution"
