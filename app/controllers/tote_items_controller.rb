@@ -136,8 +136,6 @@ class ToteItemsController < ApplicationController
   def pout
 
     @tote_item = ToteItem.find_by(id: params[:id])
-    @additional_units_required_to_fill_my_case = params[:additional_units_required_to_fill_my_case].to_i
-    @biggest_order_minimum_producer_net_outstanding = params[:biggest_order_minimum_producer_net_outstanding].to_f
 
     if @tote_item.nil?
       #this should be impossible. email admin.
@@ -146,6 +144,9 @@ class ToteItemsController < ApplicationController
       redirect_to postings_path
       return    
     end
+
+    @additional_units_required_to_fill_my_case = @tote_item.additional_units_required_to_fill_my_case
+    @biggest_order_minimum_producer_net_outstanding = @tote_item.posting.biggest_order_minimum_producer_net_outstanding
 
     @posting = @tote_item.posting
     @will_partially_fill = @tote_item.will_partially_fill?

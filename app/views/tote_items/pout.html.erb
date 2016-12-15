@@ -46,12 +46,7 @@
                 <h5>Details</h5>
                 <ul>
 
-                  <% if @biggest_order_minimum_producer_net_outstanding > 0 %>
-
-                    <li>Order minimum unmet</li>
-                    <li><%= number_to_currency(@biggest_order_minimum_producer_net_outstanding) %> more required</li>
-
-                  <% elsif @additional_units_required_to_fill_my_case > 0 %>                    
+                  <% if @additional_units_required_to_fill_my_case > 0 %>
 
                     <% if @will_partially_fill %>                    
                       <li><%= "Currently only #{@expected_fill_quantity.to_s} of the #{@tote_item.quantity.to_s} " %><%= "unit".pluralize(@additional_units_required_to_fill_my_case) + " ordered are set to ship" %></li>
@@ -60,6 +55,11 @@
                     <% if @tote_item.cancelable? %>
                       <li><%= @additional_units_required_to_fill_my_case.to_s %> more <%= "unit".pluralize(@additional_units_required_to_fill_my_case) %> required to fill this case<%= subscription_text %></li>                    
                     <% end %>
+
+                  <% elsif @biggest_order_minimum_producer_net_outstanding > 0 %>
+
+                    <li>Order minimum unmet</li>
+                    <li><%= number_to_currency(@biggest_order_minimum_producer_net_outstanding) %> more required</li>
 
                   <% end %>
 
@@ -75,7 +75,16 @@
                 <li class="list-group-item">
                   <h5>Resolution</h5>
                   <ul>
-                    <li>Leave this order alone (other customer orders may fill this case, causing your order to<%= fully%> ship)</li>
+
+                    <%
+                      if @additional_units_required_to_fill_my_case > 0
+                        do_nothing_text = "(other customer orders may fill this case, causing your order to#{fully} ship)"
+                      elsif @biggest_order_minimum_producer_net_outstanding > 0
+                        do_nothing_text = "(other customer orders may increase total ordered amount above the minimum, causing your order to ship)"
+                      end
+                    %>
+
+                    <li>Leave this order alone <%= do_nothing_text %></li>
                     <li>Order more yourself</li>
                     <li>Recruit community</li>                
                   </ul>
