@@ -32,9 +32,9 @@
 
                       <%= link_to subscription_path(subscription) do %>
                         <% if subscription.paused %>
-                          <span class="glyphicon glyphicon-pause alert-danger" aria-hidden="true"></span>
+                          <span class="glyphicon glyphicon-pause alert-danger"></span>
                         <% else %>
-                          <span class="glyphicon glyphicon-play alert-success" aria-hidden="true"></span>
+                          <span class="glyphicon glyphicon-play alert-success"></span>
                         <% end %>
                       <% end %>
                       
@@ -87,7 +87,14 @@
                       
                       <td class="text-center">
                         <% if skip_date[:disabled] %>                          
-                          <a href=<%= "##{count.to_s}helpInfo" %> data-toggle="collapse"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></a>
+                          <span data-toggle="collapse" data-target=<%= "##{count.to_s}helpInfo" %>>
+                            <div>
+                              <span class="alert-info glyphicon glyphicon-info-sign"></span>
+                            </div>
+                            <div>
+                              <span id=<%= "#{count.to_s}helpInfoChevron" %> class="glyphicon glyphicon-chevron-down"></span>
+                            </div>
+                          </span>                          
                         <% else %>                          
                           <%= check_box_tag "skip_dates[#{skip_date[:subscription].id.to_s}][]", skip_date[:date], skip_date[:skip] %>
                         <% end %>
@@ -98,8 +105,10 @@
 
                       <tr>
                         <td class="borderless" colspan="3">
-                          <div id=<%= "#{count.to_s}helpInfo" %> class="collapse">
-                            <p>Order Cutoff was <%= skip_date[:tote_item].posting.order_cutoff.strftime("%-m/%d at %l%p") %>. Delivery can't be skipped after Order Cutoff. <%= link_to("More info", how_things_work_path(anchor: "cancellation")) %>.</p>
+                          <div id=<%= "#{count.to_s}helpInfo" %> class="collapse" data-chevron=<%= "##{count.to_s}helpInfoChevron" %>>
+                            <p>
+                              <%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff") %> was <%= skip_date[:tote_item].posting.order_cutoff.strftime("%a %-m/%d at %l:%M %p") %>. <%= link_to "Order Cancellation", how_things_work_path(anchor: "cancellation") %> for this delivery was only allowable before then.
+                            </p>                            
                           </div>                          
                         </td>
                       </tr>

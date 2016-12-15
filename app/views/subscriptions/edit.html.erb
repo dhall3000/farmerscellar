@@ -91,16 +91,47 @@
 	                </thead>
 	                <tbody>
 	                  <% subscription_ids = [] %>
+                    <% count = 0 %>
 	                  <% @skip_dates.each do |skip_date| %>                
-	                    <% if skip_date[:skip] %>
+                      <% count = count + 1 %>
+	                    
+                      <% if skip_date[:skip] %>
 	                      <tr class="alert-danger">
 	                    <% else %>
 	                      <tr>
 	                    <% end %>	                    
-	                      <% subscription_ids << skip_date[:subscription].id %>
-	                      <td class="text-center"><%= skip_date[:date].strftime("%a %b %d") %></td>
-	                      <td class="text-center"><%= check_box_tag "skip_dates[#{skip_date[:subscription].id.to_s}][]", skip_date[:date], skip_date[:skip] %></td>
-	                    </tr>
+
+                          <% subscription_ids << skip_date[:subscription].id %>
+                          <td class="text-center"><%= skip_date[:date].strftime("%a %b %d") %></td>	                      
+                          <td class="text-center">
+                            <% if skip_date[:disabled] %>                          
+                              <span data-toggle="collapse" data-target=<%= "##{count.to_s}helpInfo" %>>
+                                <div>
+                                  <span class="alert-info glyphicon glyphicon-info-sign"></span>
+                                </div>
+                                <div>
+                                  <span id=<%= "#{count.to_s}helpInfoChevron" %> class="glyphicon glyphicon-chevron-down"></span>
+                                </div>
+                              </span>                          
+                            <% else %>                          
+                              <%= check_box_tag "skip_dates[#{skip_date[:subscription].id.to_s}][]", skip_date[:date], skip_date[:skip] %>                          
+                            <% end %>
+                          </td>
+	                      </tr>
+
+
+                        <% if skip_date[:disabled] && skip_date[:tote_item] %>
+                          <tr>
+                            <td class="borderless" colspan="2">
+                              <div id=<%= "#{count.to_s}helpInfo" %> class="collapse" data-chevron=<%= "##{count.to_s}helpInfoChevron" %>>
+                                <p>
+                                  <%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff") %> was <%= skip_date[:tote_item].posting.order_cutoff.strftime("%a %-m/%d at %l:%M %p") %>. <%= link_to "Order Cancellation", how_things_work_path(anchor: "cancellation") %> for this delivery was only allowable before then.
+                                </p>                            
+                              </div>                          
+                            </td>
+                          </tr>
+                        <% end %>
+
 	                  <% end %>
 	                </tbody>
 	              </table>
