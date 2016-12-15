@@ -61,7 +61,7 @@ $(function()
   }
 
   function rotateGlyphTarget180(collapseElement) {    
-    collapseElement.parent().find('span.glyphicon-chevron-up').toggleClass('rotate-180');
+    collapseElement.parent().find('span.glyphicon-chevron-down').toggleClass('rotate-180');
   }
   
   $('#access_code_explanation').popover();

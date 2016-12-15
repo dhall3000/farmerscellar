@@ -298,11 +298,11 @@ input {
 
 a.non-blue { color: inherit; }
 
-.glyphicon-chevron-up{
+.glyphicon-chevron-down{
   transition:transform 180ms ease-in;
 }
 
-.glyphicon-chevron-up.rotate-180{
+.glyphicon-chevron-down.rotate-180{
   transform: rotate(180deg);
   transition:transform 180ms ease-in;
 }

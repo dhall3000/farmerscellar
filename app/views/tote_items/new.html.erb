@@ -25,7 +25,7 @@
             <h4 class="panel-title">
               <div class="clearfix">
                 <span data-toggle="collapse" data-parent="#accordion" data-target="#producerDescriptionBody">
-                  <%= User.find_by(id: @posting.user_id).farm_name %> <%= Product.find_by(id: @posting.product_id).name %><span class="glyphicon glyphicon-chevron-up pull-right"></span>
+                  <%= User.find_by(id: @posting.user_id).farm_name %> <%= Product.find_by(id: @posting.product_id).name %><span class="glyphicon glyphicon-chevron-down pull-right"></span>
                 </span>
               </div>
             </h4>
@@ -60,7 +60,7 @@
               <% if @posting.description_body %>
                 <div class="clearfix">                
                   <span data-toggle="collapse" data-parent="#accordion" data-target="#descriptionBody">
-                    <%= @posting.description %><span class="glyphicon glyphicon-chevron-up pull-right"></span>
+                    <%= @posting.description %><span class="glyphicon glyphicon-chevron-down pull-right"></span>
                   </span>
                 </div>
               <% else %>
@@ -87,7 +87,7 @@
               <% if @posting.unit_body || @posting.price_body %>
                 <div class="clearfix">
                   <span data-toggle="collapse" data-parent="#accordion" data-target="#priceOrUnitBody">
-                    <%= number_to_currency(@posting.price) %> / <%= Unit.find_by(id: @posting.unit_id).name %><span class="glyphicon glyphicon-chevron-up pull-right"></span>
+                    <%= number_to_currency(@posting.price) %> / <%= Unit.find_by(id: @posting.unit_id).name %><span class="glyphicon glyphicon-chevron-down pull-right"></span>
                   </span>
                 </div>
               <% else %>
@@ -120,7 +120,7 @@
             <h4 class="panel-title">
               <div class="clearfix">
                 <span data-toggle="collapse" data-parent="#accordion" data-target="#orderCutoff">
-                  Delivery <%= @posting.delivery_date.strftime("%A, %B %-d") %><span class="glyphicon glyphicon-chevron-up pull-right"></span>
+                  Delivery <%= @posting.delivery_date.strftime("%A, %B %-d") %><span class="glyphicon glyphicon-chevron-down pull-right"></span>
                 </span>
               </div>
             </h4>
@@ -146,7 +146,7 @@
                   <span data-toggle="collapse" data-parent="#accordion" data-target="#important-notes-body">
                   <div class="clearfix">
                     <span id="important-notes-info-glyph" class="alert-info glyphicon glyphicon-info-sign spin-continuously"></span>
-                      <%= @posting.important_notes %><span class="glyphicon glyphicon-chevron-up pull-right"></span>
+                      <%= @posting.important_notes %><span class="glyphicon glyphicon-chevron-down pull-right"></span>
                     </span>
                   </div>
                 <% else %>                    
@@ -175,7 +175,7 @@
                   <span data-toggle="collapse" data-parent="#accordion" data-target="#unmetOrderMinBody">
                     <span id="important-notes-info-glyph" class="alert-danger glyphicon glyphicon-exclamation-sign spin-continuously"></span>
                     Unmet Order Minimum
-                    <span class="glyphicon glyphicon-chevron-up pull-right"></span>
+                    <span class="glyphicon glyphicon-chevron-down pull-right"></span>
                   </span>
                 </div>
               </h4>
