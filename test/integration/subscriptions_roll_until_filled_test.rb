@@ -3,6 +3,232 @@ require 'integration_helper'
 
 class SubscriptionsRollUntilFilledTest < IntegrationHelper
 
+  test "should not show just once option when order minimum unmet" do
+
+    #this functionality is intended for FC's bootstrap launching phase. that is, right now it's 12/16/16 and we have products with $1000 OM
+    #and very few customers. we want to accrue customers over a long period of time to hit that OM so we want to steer people away from
+    #the vanilla Just Once option because almost certainly they won't get filled and won't come back. instead, for now, we'll remove that
+    #option so the only option they have left is Just Once (Roll Until Filled). hopefully more people will select this so that we can
+    #hit the OM. so, if we ever succeed, yank this functionality cause it won't matter once fc sales are $10M USD / month. for example.
+
+    nuke_all_postings
+    nuke_all_users
+
+    producer = create_producer(name = "producer name", email = "producer@p.com", distributor = nil, order_min = 50)
+    posting = create_posting(producer, price = 10, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1, order_minimum_producer_net = 0)
+
+    bob = create_new_customer("bob", "bob@b.com")
+
+    log_in_as(bob)
+    assert is_logged_in?
+
+    post tote_items_path, params: {tote_item: {quantity: 2, posting_id: posting.id}}
+    tote_item = assigns(:tote_item)
+
+    assert :redirected
+    assert_response :redirect
+
+    follow_redirect!
+
+    assert_template 'subscriptions/new'
+
+    assert_select 'div div div form input[type=?][value=?]', "submit", "Just once", 0
+    assert_select 'div div div form input[type=?][value=?]', "submit", "Just once (roll until filled)", 1
+
+  end
+
+  test "should show just once option when order minimum met" do
+
+    #this functionality is intended for FC's bootstrap launching phase. that is, right now it's 12/16/16 and we have products with $1000 OM
+    #and very few customers. we want to accrue customers over a long period of time to hit that OM so we want to steer people away from
+    #the vanilla Just Once option because almost certainly they won't get filled and won't come back. instead, for now, we'll remove that
+    #option so the only option they have left is Just Once (Roll Until Filled). hopefully more people will select this so that we can
+    #hit the OM. so, if we ever succeed, yank this functionality cause it won't matter once fc sales are $10M USD / month. for example.
+
+    nuke_all_postings
+    nuke_all_users
+
+    producer = create_producer(name = "producer name", email = "producer@p.com", distributor = nil, order_min = 50)
+    posting = create_posting(producer, price = 10, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1, order_minimum_producer_net = 0)
+
+    bob = create_new_customer("bob", "bob@b.com")
+
+    log_in_as(bob)
+    assert is_logged_in?
+
+    post tote_items_path, params: {tote_item: {quantity: 6, posting_id: posting.id}}    
+
+    assert :redirected
+    assert_response :redirect
+
+    follow_redirect!
+
+    assert_template 'subscriptions/new'
+
+    assert_select 'div div div form input[type=?][value=?]', "submit", "Just once", 0
+    assert_select 'div div div form input[type=?][value=?]', "submit", "Just once (roll until filled)", 1
+
+    create_rt_authorization_for_customer(bob)
+
+    #ok, now the vanilla Just Once option should show up since OM has now been met
+    post tote_items_path, params: {tote_item: {quantity: 6, posting_id: posting.id}}    
+
+    assert :redirected
+    assert_response :redirect
+
+    follow_redirect!
+
+    assert_template 'subscriptions/new'
+
+    assert_select 'div div div form input[type=?][value=?]', "submit", "Just once", 1
+    assert_select 'div div div form input[type=?][value=?]', "submit", "Just once (roll until filled)", 1
+
+  end
+
+  test "should not show just once option when case constraints unmet" do
+    #this functionality is intended for FC's bootstrap launching phase. that is, right now it's 12/16/16 and we have products with $1000 OM
+    #and very few customers. we want to accrue customers over a long period of time to hit that OM so we want to steer people away from
+    #the vanilla Just Once option because almost certainly they won't get filled and won't come back. instead, for now, we'll remove that
+    #option so the only option they have left is Just Once (Roll Until Filled). hopefully more people will select this so that we can
+    #hit the OM. so, if we ever succeed, yank this functionality cause it won't matter once fc sales are $10M USD / month. for example.
+
+    nuke_all_postings
+    nuke_all_users
+
+    producer = create_producer(name = "producer name", email = "producer@p.com", distributor = nil, order_min = 0)
+    posting = create_posting(producer, price = 10, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = 10, frequency = 1, order_minimum_producer_net = 0)
+
+    bob = create_new_customer("bob", "bob@b.com")
+
+    log_in_as(bob)
+    assert is_logged_in?
+
+    post tote_items_path, params: {tote_item: {quantity: 2, posting_id: posting.id}}
+    tote_item = assigns(:tote_item)
+
+    assert :redirected
+    assert_response :redirect
+
+    follow_redirect!
+
+    assert_template 'subscriptions/new'
+
+    assert_select 'div div div form input[type=?][value=?]', "submit", "Just once", 0
+    assert_select 'div div div form input[type=?][value=?]', "submit", "Just once (roll until filled)", 1
+
+  end
+
+  test "should show just once option once case constraints met" do
+    #this functionality is intended for FC's bootstrap launching phase. that is, right now it's 12/16/16 and we have products with $1000 OM
+    #and very few customers. we want to accrue customers over a long period of time to hit that OM so we want to steer people away from
+    #the vanilla Just Once option because almost certainly they won't get filled and won't come back. instead, for now, we'll remove that
+    #option so the only option they have left is Just Once (Roll Until Filled). hopefully more people will select this so that we can
+    #hit the OM. so, if we ever succeed, yank this functionality cause it won't matter once fc sales are $10M USD / month. for example.
+
+    nuke_all_postings
+    nuke_all_users
+
+    producer = create_producer(name = "producer name", email = "producer@p.com", distributor = nil, order_min = 0)
+    posting = create_posting(producer, price = 10, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = 10, frequency = 1, order_minimum_producer_net = 0)
+
+    bob = create_new_customer("bob", "bob@b.com")
+
+    log_in_as(bob)
+    assert is_logged_in?
+
+    post tote_items_path, params: {tote_item: {quantity: 12, posting_id: posting.id}}
+    tote_item = assigns(:tote_item)
+
+    assert :redirected
+    assert_response :redirect
+
+    follow_redirect!
+
+    assert_template 'subscriptions/new'
+
+    assert_select 'div div div form input[type=?][value=?]', "submit", "Just once", 0
+    assert_select 'div div div form input[type=?][value=?]', "submit", "Just once (roll until filled)", 1
+
+    create_rt_authorization_for_customer(bob)
+
+    #now vanilla just once option should be shown since the 1st case is full
+    post tote_items_path, params: {tote_item: {quantity: 12, posting_id: posting.id}}
+    tote_item = assigns(:tote_item)
+
+    assert :redirected
+    assert_response :redirect
+
+    follow_redirect!
+
+    assert_template 'subscriptions/new'
+
+    assert_select 'div div div form input[type=?][value=?]', "submit", "Just once", 1
+    assert_select 'div div div form input[type=?][value=?]', "submit", "Just once (roll until filled)", 1
+
+  end
+
+  test "should not show just once option when order minimum and case constraints unmet" do
+    #this functionality is intended for FC's bootstrap launching phase. that is, right now it's 12/16/16 and we have products with $1000 OM
+    #and very few customers. we want to accrue customers over a long period of time to hit that OM so we want to steer people away from
+    #the vanilla Just Once option because almost certainly they won't get filled and won't come back. instead, for now, we'll remove that
+    #option so the only option they have left is Just Once (Roll Until Filled). hopefully more people will select this so that we can
+    #hit the OM. so, if we ever succeed, yank this functionality cause it won't matter once fc sales are $10M USD / month. for example.
+
+    nuke_all_postings
+    nuke_all_users
+
+    producer = create_producer(name = "producer name", email = "producer@p.com", distributor = nil, order_min = 50)
+    posting = create_posting(producer, price = 10, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = 10, frequency = 1, order_minimum_producer_net = 0)
+
+    bob = create_new_customer("bob", "bob@b.com")
+
+    log_in_as(bob)
+    assert is_logged_in?
+
+    post tote_items_path, params: {tote_item: {quantity: 2, posting_id: posting.id}}
+    tote_item = assigns(:tote_item)
+
+    assert :redirected
+    assert_response :redirect
+
+    follow_redirect!
+
+    assert_template 'subscriptions/new'
+
+    assert_select 'div div div form input[type=?][value=?]', "submit", "Just once", 0
+    assert_select 'div div div form input[type=?][value=?]', "submit", "Just once (roll until filled)", 1
+    
+    #now make case and OM constraints met and vanilla just once option should show up
+    post tote_items_path, params: {tote_item: {quantity: 12, posting_id: posting.id}}
+    tote_item = assigns(:tote_item)
+
+    assert :redirected
+    assert_response :redirect
+
+    follow_redirect!
+
+    assert_template 'subscriptions/new'
+
+    assert_select 'div div div form input[type=?][value=?]', "submit", "Just once", 0
+    assert_select 'div div div form input[type=?][value=?]', "submit", "Just once (roll until filled)", 1
+
+    create_rt_authorization_for_customer(bob)
+
+    post tote_items_path, params: {tote_item: {quantity: 1, posting_id: posting.id}}
+    tote_item = assigns(:tote_item)
+
+    assert :redirected
+    assert_response :redirect
+
+    follow_redirect!
+
+    assert_template 'subscriptions/new'
+
+    assert_select 'div div div form input[type=?][value=?]', "submit", "Just once", 1
+    assert_select 'div div div form input[type=?][value=?]', "submit", "Just once (roll until filled)", 1    
+
+  end
+
   test "should cancel authorized order when user cancels between first postings cutoff and delivery order does not fill" do
 
     nuke_all_postings
