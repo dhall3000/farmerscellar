@@ -3,6 +3,40 @@ require 'integration_helper'
 
 class SubscriptionsRollUntilFilledTest < IntegrationHelper
 
+  test "should show just once option when no constraints present" do
+
+    #this functionality is intended for FC's bootstrap launching phase. that is, right now it's 12/16/16 and we have products with $1000 OM
+    #and very few customers. we want to accrue customers over a long period of time to hit that OM so we want to steer people away from
+    #the vanilla Just Once option because almost certainly they won't get filled and won't come back. instead, for now, we'll remove that
+    #option so the only option they have left is Just Once (Roll Until Filled). hopefully more people will select this so that we can
+    #hit the OM. so, if we ever succeed, yank this functionality cause it won't matter once fc sales are $10M USD / month. for example.
+
+    nuke_all_postings
+    nuke_all_users
+
+    producer = create_producer(name = "producer name", email = "producer@p.com", distributor = nil, order_min = 0)
+    posting = create_posting(producer, price = 10, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1, order_minimum_producer_net = nil)
+
+    bob = create_new_customer("bob", "bob@b.com")
+
+    log_in_as(bob)
+    assert is_logged_in?
+
+    post tote_items_path, params: {tote_item: {quantity: 6, posting_id: posting.id}}    
+
+    assert :redirected
+    assert_response :redirect
+
+    follow_redirect!
+
+    assert_template 'subscriptions/new'
+
+    #there are no constraints so both options should be present
+    assert_select 'div div div form input[type=?][value=?]', "submit", "Just once", 1
+    assert_select 'div div div form input[type=?][value=?]', "submit", "Just once (roll until filled)", 1
+
+  end
+
   test "should not show just once option when order minimum unmet" do
 
     #this functionality is intended for FC's bootstrap launching phase. that is, right now it's 12/16/16 and we have products with $1000 OM
