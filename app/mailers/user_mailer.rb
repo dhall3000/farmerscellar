@@ -113,7 +113,7 @@ class UserMailer < ApplicationMailer
       
       end    
 
-      return Authorization.find(auths.uniq)
+      return Authorization.where(id: auths.uniq)
 
     end
 
