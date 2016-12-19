@@ -55,7 +55,7 @@
         <div class="panel panel-default">
           <div class="anchor panel-heading">
             <h4 class="panel-title" data-toggle="collapse" data-parent="#accordion" data-target="#descriptionBody">
-              <% if @posting.description_body %>
+              <% if !@posting.description_body.blank? %>
                 <div class="clearfix">                                  
                   <%= @posting.description %><span id="descriptionBodyChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>
                 </div>
@@ -64,7 +64,7 @@
               <% end %>
             </h4>
           </div>
-          <% if @posting.description_body %>
+          <% if !@posting.description_body.blank? %>
             <div id="descriptionBody" class="panel-collapse collapse" data-chevron="#descriptionBodyChevron">
               <div class="panel-body">    
                 <%= @posting.description_body %>              
@@ -171,7 +171,7 @@
             </div>
             <div id="unmetOrderMinBody" class="panel-collapse collapse" data-chevron="#unmetOrderMinBodyChevron">
               <div class="panel-body">
-                <p>This product is subject to a <%= link_to "Group Order Minimum", how_things_work_path(anchor: "order_minimums") %>. To meet the minimum, you or the community must order an additional <%= number_to_currency(@biggest_order_minimum_producer_net_outstanding) %>.</p>
+                <p>This product is subject to a <%= link_to "Group Order Minimum", how_things_work_path(anchor: "order_minimums") %>. To meet the minimum, the customer community must collectively order an additional <%= number_to_currency(@biggest_order_minimum_producer_net_outstanding) %>.</p>
               </div>
             </div>
           </div>
