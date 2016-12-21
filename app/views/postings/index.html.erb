@@ -26,13 +26,13 @@
               <div id=<%= "#{count.to_s}producerDetails" %> class="panel-collapse collapse" data-chevron=<%= "#producerDetailsChevron#{count.to_s}" %>>
                 <div class="panel-body">
                   <ul class="list-group">
-                    <% if posting.user.city && posting.user.state %>
+                    <% if !posting.user.city.blank? && !posting.user.state.blank? %>
                       <li class="list-group-item">Location: <%= "#{posting.user.city}, #{posting.user.state}" %></li>              
                     <% end %>
                     <% if !posting.user.website.blank? %>
                       <li class="list-group-item">Website: <a href=<%= "#{posting.user.website}" %> target='_blank'><%= posting.user.website %></a></li>              
                     <% end %>   
-                    <% if posting.user.description != nil %>                       
+                    <% if !posting.user.description.blank? %>                       
                       <li class="list-group-item"><%= posting.user.description %></li>
                     <% end %>
                   </ul>
@@ -51,10 +51,10 @@
               <div id=<%= "#{count.to_s}productDetails" %> class="panel-collapse collapse" data-chevron=<%= "#productDetailsChevron#{count.to_s}" %>>                
                 <div class="panel-body">
                   <ul class="list-group">
-                    <% if posting.description != nil %>
+                    <% if !posting.description.blank? %>
                       <li class="list-group-item"><%= posting.description %></li>                
                     <% end %>
-                    <% if posting.description_body != nil %>
+                    <% if !posting.description_body.blank? %>
                       <li class="list-group-item"><%= posting.description_body %></li>                
                     <% end %>
                   </ul>
@@ -64,7 +64,7 @@
 
 
 
-            <% if posting.unit_body || posting.price_body %>
+            <% if !posting.unit_body.blank? || !posting.price_body.blank? %>
 
               <div class="panel panel-default">
                 <div class="panel-heading" id=<%= "#{count.to_s}price" %>>
@@ -76,10 +76,10 @@
                 <div id=<%= "#{count.to_s}priceDetails" %> class="panel-collapse collapse" data-chevron=<%= "#priceDetailsChevron#{count.to_s}" %>>
                   <div class="panel-body">
                     <ul class="list-group">
-                      <% if posting.unit_body %>
+                      <% if !posting.unit_body.blank? %>
                         <li class="list-group-item"><%= posting.unit_body %></li>
                       <% end %>
-                      <% if posting.price_body %>
+                      <% if !posting.price_body.blank? %>
                         <li class="list-group-item"><%= posting.price_body %></li>
                       <% end %>
                     </ul>
