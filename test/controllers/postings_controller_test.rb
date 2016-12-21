@@ -781,10 +781,10 @@ class PostingsControllerTest < IntegrationHelper
     assert_template 'postings/index'
 
     #assert that there are at least several postings (this should be the case as long as there
-    #are "at least several" postings in the posting.yml file)
-    assert_select 'tbody' do |elements|
+    #are "at least several" postings in the posting.yml file)    
+    assert_select 'h4' do |elements|
       elements.each do |element|
-        assert_select 'tr', minimum: 3
+        assert_select 'span', minimum: 3
       end
     end
   end
