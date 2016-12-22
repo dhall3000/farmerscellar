@@ -38,17 +38,21 @@ class ProducerProductUnitCommissionsController < ApplicationController
       producer_net = params[:producer_net].to_f
       commission_factor = make_commission_factor(retail, producer_net)      
       @ppc = ProducerProductUnitCommission.new(user_id: user_id, product_id: product_id, unit_id: unit_id, commission: commission_factor)
+      @ppc.retail = retail
+      @ppc.producer_net = producer_net
     else
       @ppc = ProducerProductUnitCommission.new(producer_product_unit_commission_params)
     end    
 
     if @ppc.save
-      flash[:success] = "Commission creation succeeded."
-      redirect_to producer_product_unit_commission_path(id: 1, product_id: product_id, user_id: user_id)
+      flash.now[:success] = "Commission creation succeeded #{@ppc.commission.to_s}"
+      @ppc = @ppc.dup
     else
-      load_data
-      render 'new'
+      flash.now[:danger] = "Commission creation failed"
     end
+
+    load_data
+    render 'new'
 
   end
 

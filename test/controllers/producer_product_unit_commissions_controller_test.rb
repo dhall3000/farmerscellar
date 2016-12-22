@@ -81,7 +81,8 @@ class ProducerProductUnitCommissionsControllerTest < ActionDispatch::Integration
     log_in_as(@admin)
     new_commission = 0.05
     post producer_product_unit_commissions_path, params: {producer_product_unit_commission: {product_id: @product.id, unit_id: units(:pound).id, user_id: @farmer.id, commission: new_commission}}
-    assert_redirected_to producer_product_unit_commission_path(id: 1, product_id: @product.id, user_id: @farmer.id)    
+    assert_response :success
+    assert_template 'producer_product_unit_commissions/new'
 
     ppc = assigns(:ppc)
     assert_not ppc.nil?
@@ -102,7 +103,8 @@ class ProducerProductUnitCommissionsControllerTest < ActionDispatch::Integration
     @farmer = users(:f9)
 
     post producer_product_unit_commissions_path, params: {producer_product_unit_commission: {product_id: @product.id, unit_id: units(:pound).id, user_id: @farmer.id}, retail: 11, producer_net: 10}
-    assert_redirected_to producer_product_unit_commission_path(id: 1, product_id: @product.id, user_id: @farmer.id)
+    assert_response :success
+    assert_template 'producer_product_unit_commissions/new'
 
     ppc = assigns(:ppc)
     assert_not ppc.nil?
@@ -139,7 +141,8 @@ class ProducerProductUnitCommissionsControllerTest < ActionDispatch::Integration
   test "should create new commission" do
     log_in_as(@admin)
     post producer_product_unit_commissions_path, params: {producer_product_unit_commission: { user_id: @farmer.id, product_id: @product.id, unit_id: units(:pound).id, commission: 0.02 }}
-    assert_redirected_to producer_product_unit_commission_path(id: 1, product_id: @product.id, user_id: @farmer.id)    
+    assert_response :success
+    assert_template 'producer_product_unit_commissions/new'
   end
 
   test "should not create new commission" do
