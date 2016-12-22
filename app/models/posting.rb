@@ -178,20 +178,7 @@ class Posting < ApplicationRecord
   end
 
   def get_commission_factor
-
-    commission_factors = ProducerProductUnitCommission.where(user: user, product: product, unit: unit)
-
-    #TODO: the following line is superfluous, as far as i can tell. however, i get a sqlliteexception without it. strange!
-    #i don't think there's anything magical about calling .to_a. when creating this i was able to get things to succeed
-    #as intended when i used a variety of reading methods instead of .to_a
-    commission_factors.to_a
-
-    if commission_factors.order(:created_at).last.nil?
-      return 0
-    else
-      return commission_factors.order(:created_at).last.commission
-    end    
-
+    return ProducerProductUnitCommission.get_current_commission_factor(user, product, unit)
   end
 
   def order_minimum_retail

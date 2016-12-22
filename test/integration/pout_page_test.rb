@@ -64,7 +64,7 @@ class PoutPageTest < IntegrationHelper
     #once he solves that we can inform him about the OM problem
     assert_select 'li ul li a', {count: 0, text: "Group Order Minimum"}
     assert_select 'li ul li', {count: 1, text: "Reason: the case that your order will ship in is not yet full"}
-    assert_select 'li h5', count: 1, text: "Resolution"
+    assert_select 'li h5', count: 1, text: "Resolution options"
     assert_select 'li ul li div p', {count: 0, text: "Other customer orders may increase total ordered amount above the minimum, causing your order to ship."}
     assert_select 'li ul li div p', {count: 1, text: "Other customer orders may fill this case, causing your order to ship."}    
 
@@ -99,7 +99,7 @@ class PoutPageTest < IntegrationHelper
     #once he solves that we can inform him about the OM problem
     assert_select 'li ul li a', {count: 0, text: "Group Order Minimum"}
     assert_select 'li ul li', {count: 1, text: "Reason: the case that your order will ship in is not yet full"}
-    assert_select 'li h5', count: 1, text: "Resolution"
+    assert_select 'li h5', count: 1, text: "Resolution options"
     assert_select 'li ul li div p', {count: 0, text: "Other customer orders may increase total ordered amount above the minimum, causing your order to ship."}
     assert_select 'li ul li div p', {count: 1, text: "Other customer orders may fill this case, causing your order to ship."}    
 
@@ -160,7 +160,7 @@ class PoutPageTest < IntegrationHelper
     #we want to make sure to not tell him there's an OM problem
     assert_select 'li ul li a', {count: 0, text: "Group Order Minimum"}
     assert_select 'li ul li', {count: 1, text: "Reason: the case that your order will ship in is not yet full"}
-    assert_select 'li h5', count: 1, text: "Resolution"
+    assert_select 'li h5', count: 1, text: "Resolution options"
     assert_select 'li ul li div p', {count: 1, text: "Other customer orders may fill this case, causing your order to fully ship."}
 
     #now, what is the experience like from sam's perspective?
@@ -194,7 +194,7 @@ class PoutPageTest < IntegrationHelper
     #we want to make sure to not tell him there's an OM problem
     assert_select 'li ul li a', {count: 0, text: "Group Order Minimum"}
     assert_select 'li ul li', {count: 1, text: "Reason: the case that your order will ship in is not yet full"}
-    assert_select 'li h5', count: 1, text: "Resolution"
+    assert_select 'li h5', count: 1, text: "Resolution options"
     assert_select 'li ul li div p', {count: 1, text: "Other customer orders may fill this case, causing your order to ship."}
 
   end
@@ -332,7 +332,7 @@ class PoutPageTest < IntegrationHelper
     assert_select 'p span', {count: 0, text: "Currently this item will only partially ship"}    
     assert_select 'li ul li a', {count: 1, text: "Group Order Minimum"}
     assert_select 'li ul li', {count: 0, text: "Reason: the case that your order will ship in is not yet full"}
-    assert_select 'li h5', count: 1, text: "Resolution"
+    assert_select 'li h5', count: 1, text: "Resolution options"
     assert_select 'li ul li div p', {count: 1, text: "Other customer orders may increase total ordered amount above the minimum, causing your order to ship."}
     assert_select 'li ul li div p', {count: 0, text: "Other customer orders may fill this case, causing your order to ship."}    
 
@@ -444,7 +444,7 @@ class PoutPageTest < IntegrationHelper
     #there should not be a link telling user about unmet group OM
     assert_select 'li ul li a', {count: 0, text: "Group Order Minimum"}
     assert_select 'li ul li', {count: 1, text: "Reason: the case that your order will ship in is not yet full"}
-    assert_select 'li h5', count: 1, text: "Resolution"
+    assert_select 'li h5', count: 1, text: "Resolution options"
     assert_select 'li ul li div p', {count: 1, text: "Other customer orders may fill this case, causing your order to ship."}
 
   end
