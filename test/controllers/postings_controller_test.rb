@@ -35,6 +35,167 @@ class PostingsControllerTest < IntegrationHelper
 
   end
 
+  test "producer net field should not show up on new if farmer is making the posting" do
+
+    log_in_as(users(:f1))
+    get new_posting_path
+    assert_response :success
+    assert_template 'postings/new'
+
+    assert_select 'form label', {count: 0, text: "Producer net"}
+    assert_select 'form input[type=number][name=producer_net]', 0
+
+    producer = users(:f1)
+    product = products(:apples)
+    unit = units(:pound)
+
+    old_commission = ProducerProductUnitCommission.get_current_commission_factor(producer, product, unit)
+
+    post postings_path, params: {
+      
+      posting: {
+        price: 10,
+        user_id: producer.id,
+        product_id: product.id,
+        unit_id: unit.id,
+        live: true,
+        delivery_date: get_delivery_date(5),
+        order_cutoff: get_delivery_date(3),
+        description: "my description"
+      }
+    }
+
+    posting = assigns(:posting)
+    assert posting.valid?
+
+    new_commission = ProducerProductUnitCommission.get_current_commission_factor(producer, product, unit)
+    assert old_commission == new_commission
+
+  end
+
+  test "if producer somehow posts producer net during posting creation commission should not update" do
+
+    log_in_as(users(:f1))
+    get new_posting_path
+    assert_response :success
+    assert_template 'postings/new'
+
+    assert_select 'form label', {count: 0, text: "Producer net"}
+    assert_select 'form input[type=number][name=producer_net]', 0
+
+    producer = users(:f1)
+    product = products(:apples)
+    unit = units(:pound)
+
+    old_commission = ProducerProductUnitCommission.get_current_commission_factor(producer, product, unit)
+
+    post postings_path, params: {
+      producer_net: 9,      
+      posting: {
+        price: 10,
+        user_id: producer.id,
+        product_id: product.id,
+        unit_id: unit.id,
+        live: true,
+        delivery_date: get_delivery_date(5),
+        order_cutoff: get_delivery_date(3),
+        description: "my description"
+      }
+    }
+
+    posting = assigns(:posting)
+    assert posting.valid?
+
+    new_commission = ProducerProductUnitCommission.get_current_commission_factor(producer, product, unit)
+    assert old_commission == new_commission
+
+  end
+
+  test "admin should be able to create a commission on the fly while spoofing farmer to create new posting" do
+
+    log_in_as(users(:a1))
+    post sessions_spoof_path, params: {email: "f1@f.com"}
+    assert_equal "Now spoofing user f1@f.com", flash[:success]
+    assert_redirected_to root_url
+
+    get new_posting_path
+    assert_response :success
+    assert_template 'postings/new'
+
+    assert_select 'form label', {count: 1, text: "Producer net"}
+    assert_select 'form input[type=number][name=producer_net]', 1
+
+    producer = users(:f1)
+    product = products(:apples)
+    unit = units(:pound)
+
+    old_commission = ProducerProductUnitCommission.get_current_commission_factor(producer, product, unit)
+
+    post postings_path, params: {
+      producer_net: 9,
+      posting: {
+        price: 10,
+        user_id: producer.id,
+        product_id: product.id,
+        unit_id: unit.id,
+        live: true,
+        delivery_date: get_delivery_date(5),
+        order_cutoff: get_delivery_date(3),
+        description: "my description"
+      }
+    }
+
+    posting = assigns(:posting)
+    assert posting.valid?
+
+    new_commission = ProducerProductUnitCommission.get_current_commission_factor(producer, product, unit)
+    assert old_commission != new_commission
+
+  end
+
+  test "should leave old commission in place when spoofing admin creates posting without specifying producer net" do
+
+    log_in_as(users(:a1))
+    post sessions_spoof_path, params: {email: "f1@f.com"}
+    assert_equal "Now spoofing user f1@f.com", flash[:success]
+    assert_redirected_to root_url
+
+    get new_posting_path
+    assert_response :success
+    assert_template 'postings/new'
+
+    assert_select 'form label', {count: 1, text: "Producer net"}
+    assert_select 'form input[type=number][name=producer_net]', 1
+
+    producer = users(:f1)
+    product = products(:apples)
+    unit = units(:pound)
+
+    old_commission = ProducerProductUnitCommission.get_current_commission_factor(producer, product, unit)
+
+    post postings_path, params: {
+      producer_net: "", #if i just omit this var it evaluates to nil in the controller. but nil isn't what happens in the browser
+      #what happens in the browser is as above...""
+      posting: {
+        price: 10,
+        user_id: producer.id,
+        product_id: product.id,
+        unit_id: unit.id,
+        live: true,
+        delivery_date: get_delivery_date(5),
+        order_cutoff: get_delivery_date(3),
+        description: "my description"
+      }
+    }
+
+    posting = assigns(:posting)
+    assert posting.valid?
+
+    new_commission = ProducerProductUnitCommission.get_current_commission_factor(producer, product, unit)
+    assert old_commission == new_commission
+
+  end
+
   test "do not create if commission not set for producer product unit" do
 
     #this producer does not have a commission set for this product
@@ -47,7 +208,7 @@ class PostingsControllerTest < IntegrationHelper
     posting_params[:product_id] = product.id
     commission = ProducerProductUnitCommission.where(user: @farmer, product: product, unit_id: posting_params[:unit_id])
     assert_equal 0, commission.count
-    post postings_path, params: { id: @farmer.id, posting: posting_params}
+    post postings_path, params: {posting: posting_params}
     posting = assigns(:posting)
     assert_not posting.valid?
     assert_not flash.empty?
@@ -665,7 +826,7 @@ class PostingsControllerTest < IntegrationHelper
 
     parms = get_posting_params_hash
     parms[:posting_recurrence] = {frequency: PostingRecurrence.frequency[0][1], on: false}
-    post postings_path, params: { id: @farmer.id, posting: parms}
+    post postings_path, params: {posting: parms}
     posting = assigns(:posting)        
     assert posting.units_per_case > 1
     assert_not posting.nil?
@@ -704,7 +865,7 @@ class PostingsControllerTest < IntegrationHelper
 
     parms = get_posting_params_hash
     parms[:posting_recurrence] = {frequency: posting_frequency, on: true}
-    post postings_path, params: { id: @farmer.id, posting: parms}
+    post postings_path, params: {posting: parms}
     posting = assigns(:posting)        
     assert_not posting.nil?
     assert posting.posting_recurrence.valid?
@@ -728,7 +889,7 @@ class PostingsControllerTest < IntegrationHelper
       delivery_date += 1.day
     end
 
-    post postings_path, params: { id: @farmer.id, posting: get_posting_params_hash}
+    post postings_path, params: {posting: get_posting_params_hash}
     posting = assigns(:posting)        
     assert_not posting.nil?
     #the params were sent up to teh #create action with no recurrence set so we want to verify that .posting_recurrence is nil
@@ -753,7 +914,7 @@ class PostingsControllerTest < IntegrationHelper
     #actually, because of a feature change this now does nothing. on the next line when we 'post' the live var will get set to 'true'
     posting_hash[:live] = false
 
-    post postings_path, params: { id: @farmer.id, posting: posting_hash}
+    post postings_path, params: {posting: posting_hash}
     posting = assigns(:posting)
     assert_not posting.nil?
     assert posting.valid?, get_error_messages(posting)
@@ -790,7 +951,7 @@ class PostingsControllerTest < IntegrationHelper
   end
 
   def fail_to_create(posting_params)
-    post postings_path, params: { id: @farmer.id, posting: posting_params}
+    post postings_path, params: {posting: posting_params}
 
     #verify redirection    
     assert_template 'postings/new'

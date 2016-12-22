@@ -45,6 +45,16 @@ class PostingsController < ApplicationController
       posting_recurrence.postings << @posting            
     end
 
+    #if this is an admin making a new posting he has a feature where he can short-circuit manually creating the commission by just specifying the 
+    #producer_net right on the posting creation form. here we're checking for that and creating a new commission on the fly
+    if spoofing? && !params[:producer_net].blank?
+      producer_net = params[:producer_net].to_f
+      if producer_net > 0
+        commission_factor = make_commission_factor(@posting.price, producer_net)
+        ProducerProductUnitCommission.create(user_id: @posting.user.id, product_id: @posting.product.id, unit_id: @posting.unit.id, commission: commission_factor)
+      end
+    end
+
     #first check to see if we have a commission set for this creation attempt
     commission = ProducerProductUnitCommission.where(user_id: posting_params[:user_id], product_id: posting_params[:product_id], unit_id: posting_params[:unit_id])
 
@@ -162,9 +172,7 @@ class PostingsController < ApplicationController
         :unit_body,
         :order_minimum_producer_net,
         :units_per_case
-        )
-
-      unit = Unit.all.find_by(id: posting[:unit_id])
+        )      
 
       #this hocus pocus has to do with some strange gotchas. a check box sends in a "1" or "0", both of which evaluate to true for a boolean type,
       #which the live attribute is. so i'm just hackishly converting from one to the other to be ridiculously specific

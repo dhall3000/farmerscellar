@@ -71,7 +71,7 @@
                 <li><%= link_to "Settings", edit_user_path(current_user) %></li>                
                 <li><%= link_to "Info", user_path(current_user) %></li>
                 <% if current_user.account_type_is?(:PRODUCER) %>
-                  <li><%= link_to "Create new posting", new_posting_path(current_user) %></li>
+                  <li><%= link_to "Create new posting", new_posting_path %></li>
                 <% end %>
               <% end %>
               <li class="divider"></li>

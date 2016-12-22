@@ -291,7 +291,7 @@ module ToteItemsHelper
 
   def make_commission_factor(retail, producer_net)
 
-    commission = retail - producer_net - get_payment_processor_fee_unit(retail)
+    commission = (retail - producer_net - get_payment_processor_fee_unit(retail)).round(2)
     commission_factor = commission / retail
 
     return commission_factor

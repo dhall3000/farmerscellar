@@ -13,4 +13,21 @@ class ProducerProductUnitCommission < ApplicationRecord
   #of redundant mouse clicking. these attributes partially ease that burden. for now (2016-12-21).
   attr_accessor :retail, :producer_net
 
+  def self.get_current_commission_factor(producer, product, unit)
+
+    commission_factors = ProducerProductUnitCommission.where(user: producer, product: product, unit: unit)
+
+    #TODO: the following line is superfluous, as far as i can tell. however, i get a sqlliteexception without it. strange!
+    #i don't think there's anything magical about calling .to_a. when creating this i was able to get things to succeed
+    #as intended when i used a variety of reading methods instead of .to_a
+    commission_factors.to_a
+
+    if commission_factors.order(:created_at).last.nil?
+      return 0
+    else
+      return commission_factors.order(:created_at).last.commission
+    end    
+
+  end
+
 end
