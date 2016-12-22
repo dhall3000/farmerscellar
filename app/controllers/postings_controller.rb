@@ -129,9 +129,9 @@ class PostingsController < ApplicationController
 
     def load_posting_choices
       @products = Product.all.order(:name)
-      @units = Unit.all
+      @units = Unit.all.order(:name)
       @delivery_dates = next_delivery_dates
-      @producers = User.where(account_type: User.types[:PRODUCER])
+      @producers = User.where(account_type: User.types[:PRODUCER]).order(:farm_name)
     end
 
     def posting_recurrence_params
