@@ -35,6 +35,15 @@ class PostingsControllerTest < IntegrationHelper
 
   end
 
+  test "product id code should stick on posting creation" do
+    
+    pid_code = "davidproductcode"
+    posting = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0, product_id_code = pid_code)
+    assert posting.valid?
+    assert_equal pid_code, posting.product_id_code
+
+  end
+
   test "producer net field should not show up on new if farmer is making the posting" do
 
     log_in_as(users(:f1))

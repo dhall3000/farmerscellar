@@ -152,7 +152,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     return [{posting_id: posting_id, quantity: quantity}]
   end
   
-  def create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
+  def create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil)
 
     if farmer.nil?
       farmer = create_producer("john", "john@j.com")
@@ -203,7 +203,8 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
       order_cutoff: order_cutoff,
       units_per_case: units_per_case,
       order_minimum_producer_net: order_minimum_producer_net,
-      posting_recurrence: {frequency: frequency, on: true}
+      posting_recurrence: {frequency: frequency, on: true},
+      product_id_code: product_id_code
     }    
 
     log_in_as(farmer)

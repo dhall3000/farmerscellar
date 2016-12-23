@@ -175,7 +175,8 @@ class PostingsController < ApplicationController
         :price_body,
         :unit_body,
         :order_minimum_producer_net,
-        :units_per_case
+        :units_per_case,
+        :product_id_code
         )      
 
       #this hocus pocus has to do with some strange gotchas. a check box sends in a "1" or "0", both of which evaluate to true for a boolean type,
