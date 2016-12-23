@@ -6,61 +6,61 @@
 	<div class="col-md-6 col-md-offset-3">
 		<%= form_for @posting do |f| %>
 
-		<% if true %>
 		  <%= render 'shared/error_messages_posting' %>
-		<% end %>
 
-		<% if current_user.account_type == User.types[:ADMIN] %>
-		  <%= f.label :user_id, "Producer" %>
-		  <%= f.collection_select(:user_id, @producers, :id, :farm_name, prompt: true, selected: @posting.user_id, class: 'form-control') %>
-		<% else %>
-		  <%= f.hidden_field :user_id %>
-		<% end %>
+  		<% if current_user.account_type == User.types[:ADMIN] %>
+  		  <%= f.label :user_id, "Producer" %>
+  		  <%= f.collection_select(:user_id, @producers, :id, :farm_name, prompt: true, selected: @posting.user_id, class: 'form-control') %>
+  		<% else %>
+  		  <%= f.hidden_field :user_id %>
+  		<% end %>
 
-		<%= f.label :product_id %>
-		<%= f.collection_select(:product_id, @products, :id, :name, {prompt: true}, {class: 'form-control'}) %>		
+  		<%= f.label :product_id %>
+  		<%= f.collection_select(:product_id, @products, :id, :name, {prompt: true}, {class: 'form-control'}) %>		
 
-		<%= f.label :description %>
-		<%= f.text_field :description, class: 'form-control' %>
+  		<%= f.label :description %>
+  		<%= f.text_field :description, class: 'form-control' %>
 
-		<%= f.label :description_body %>
-		<%= f.text_field :description_body, class: 'form-control' %>
+  		<%= f.label :description_body %>
+  		<%= f.text_field :description_body, class: 'form-control' %>
 
-		<%= f.label :unit_id %>
-		<%= f.collection_select(:unit_id, @units, :id, :name, {prompt: true}, {class: 'form-control'}) %>		
+  		<%= f.label :unit_id %>
+  		<%= f.collection_select(:unit_id, @units, :id, :name, {prompt: true}, {class: 'form-control'}) %>		
 
-		<%= f.label :unit_body %>
-		<%= f.text_field :unit_body, class: 'form-control' %>
+  		<%= f.label :unit_body %>
+  		<%= f.text_field :unit_body, class: 'form-control' %>
 
-		<%= f.label :units_per_case %>
-		<%= f.number_field :units_per_case, min: 1, step: 1, class: 'form-control' %>
+  		<%= f.label :units_per_case %>
+  		<%= f.number_field :units_per_case, min: 1, step: 1, class: 'form-control' %>
 
-		<%= f.label :price, "Price per Unit" %>
-		<%= f.number_field :price, min: 0.01, step: 0.01, class: 'form-control' %>
+  		<%= f.label :price, "Price per Unit" %>
+  		<%= f.number_field :price, min: 0.01, step: 0.01, class: 'form-control' %>
 
-    <% if spoofing? %>
-      <%= label_tag :producer_net %>
-      <%= number_field_tag :producer_net, nil, {min: 0.0, step: 0.01, class: 'form-control'} %>
-    <% end %>
+      <% if spoofing? %>
+        <%= label_tag :producer_net %>
+        <%= number_field_tag :producer_net, nil, {min: 0.0, step: 0.01, class: 'form-control'} %>
+      <% end %>
 
-		<%= f.label :price_body %>
-		<%= f.text_field :price_body, class: 'form-control' %>
+  		<%= f.label :price_body %>
+  		<%= f.text_field :price_body, class: 'form-control' %>
 
-		<%= f.label :delivery_date, "Delivery Date (Date only)" %>
-	    <div class="input-group date" id="dtpDeliveryDate">
-		  <%= f.text_field :delivery_date, class: 'form-control', readonly: true %>
-		  <span class="input-group-addon">
-        <span class="glyphicon glyphicon-calendar"></span>
-      </span>
-	    </div>
-		
-		<%= f.label :order_cutoff, "Order Cutoff (Date & Time)", id: "czsLabel" %>
-	    <div class="input-group date" id="dtpCommitmentZoneStart">	      
-		  <%= f.text_field :order_cutoff, class: 'form-control', readonly: true %>
-		  <span class="input-group-addon">
-            <span class="glyphicon glyphicon-calendar"></span>
-          </span>
-	    </div>
+  		<%= f.label :delivery_date, "Delivery Date (Date only)" %>
+
+
+      <div class="input-group date" id="dtpDeliveryDate" data-deliverydate=<%= @posting.delivery_date.strftime("%Y-%m-%d %H:%M") %>>
+  		  <%= f.text_field :delivery_date, class: 'form-control', readonly: true %>
+  		  <span class="input-group-addon">
+          <span class="glyphicon glyphicon-calendar"></span>
+        </span>
+      </div>
+
+      <%= f.label :order_cutoff, "Order Cutoff (Date & Time)", id: "czsLabel" %>
+      <div class="input-group date" id="dtpOrderCutoff" data-ordercutoff=<%= @posting.order_cutoff.strftime("%Y-%m-%d %H:%M") %>>
+        <%= f.text_field :order_cutoff, class: 'form-control', readonly: true %>
+        <span class="input-group-addon">
+          <span class="glyphicon glyphicon-calendar"></span>
+        </span>
+      </div>		
 
 	    <%= f.hidden_field :live %>
 
@@ -71,16 +71,13 @@
 			      <%= posting_recurrence_f.select(:frequency, options_for_select(PostingRecurrence.frequency), {}, {class: 'form-control'}) %>
 			    <% end %>
 		    </div>
-
-		    <% else %>
-		    
+      <% else %>		    
 		      <div class="form_element_spacing">
 		      	<% #this is a hack to get the form elemetn spacing right %>
 		      </div>
-
 	    <% end %>
 
-		<%= f.submit "Create new posting", class: "btn btn-primary" %>
+		  <%= f.submit "Create new posting", class: "btn btn-primary" %>
 
 		<% end %>
 	</div>

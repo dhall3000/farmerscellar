@@ -14,8 +14,8 @@ gem 'coffee-rails',         '4.1.0'
 gem 'jquery-rails',         '4.0.3'
 gem 'jbuilder'
 gem 'sdoc',                 '0.4.0', group: :doc
-gem 'momentjs-rails',       '2.9.0'
-gem 'bootstrap3-datetimepicker-rails', '4.17.37'
+gem 'momentjs-rails',       '2.11.0'
+gem 'bootstrap3-datetimepicker-rails', '4.17.43'
 
 group :development do
   gem 'web-console', '>= 3.3.0'

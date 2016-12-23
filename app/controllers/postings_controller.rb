@@ -5,7 +5,7 @@ class PostingsController < ApplicationController
   def new  	
 
     if params[:posting_id].nil?
-      @posting = current_user.postings.new(live: true)                  
+      @posting = current_user.postings.new(live: true, delivery_date: Time.zone.now.midnight + 2.days, order_cutoff: Time.zone.now.midnight + 1.day)
       #if you are doing dev work on the create method and want the new form autopopulated for sanity's sake, uncomment this line
       #@posting = Posting.new(live: true, delivery_date: Time.zone.now + 4.days, product_id: 8, price: 2.50, user_id: User.find_by(name: "f4"), unit_category_id: UnitCategory.find_by(name: "Weight"), unit_kind_id: UnitKind.find_by(name: "Pound"), description_body: "best celery ever!")
     else
