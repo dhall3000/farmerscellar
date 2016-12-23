@@ -47,7 +47,7 @@
   		<%= f.label :delivery_date, "Delivery Date (Date only)" %>
 
 
-      <div class="input-group date" id="dtpDeliveryDate" data-deliverydate=<%= @posting.delivery_date.strftime("%Y-%m-%d %H:%M") %>>
+      <div class="input-group date" id="dtpDeliveryDate" data-deliverydate="<%= @posting.delivery_date.strftime("%Y-%m-%d %H:%M") %>">
   		  <%= f.text_field :delivery_date, class: 'form-control', readonly: true %>
   		  <span class="input-group-addon">
           <span class="glyphicon glyphicon-calendar"></span>
@@ -55,7 +55,7 @@
       </div>
 
       <%= f.label :order_cutoff, "Order Cutoff (Date & Time)", id: "czsLabel" %>
-      <div class="input-group date" id="dtpOrderCutoff" data-ordercutoff=<%= @posting.order_cutoff.strftime("%Y-%m-%d %H:%M") %>>
+      <div class="input-group date" id="dtpOrderCutoff" data-ordercutoff="<%= @posting.order_cutoff.strftime("%Y-%m-%d %H:%M") %>">
         <%= f.text_field :order_cutoff, class: 'form-control', readonly: true %>
         <span class="input-group-addon">
           <span class="glyphicon glyphicon-calendar"></span>
