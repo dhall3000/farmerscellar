@@ -38,7 +38,7 @@
 
       <% if spoofing? %>
         <%= label_tag :producer_net %>
-        <%= number_field_tag :producer_net, nil, {min: 0.0, step: 0.01, class: 'form-control'} %>
+        <%= number_field_tag :producer_net, @producer_net, {min: 0.0, step: 0.01, class: 'form-control'} %>
       <% end %>
 
   		<%= f.label :price_body %>

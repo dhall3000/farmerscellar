@@ -11,6 +11,10 @@ class PostingsController < ApplicationController
     else
       posting_to_clone = Posting.find(params[:posting_id])
       @posting = posting_to_clone.dup
+
+      if spoofing?
+        @producer_net = posting_to_clone.get_producer_net_unit
+      end
     end
 
     @posting.build_posting_recurrence
