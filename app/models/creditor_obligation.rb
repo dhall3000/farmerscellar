@@ -11,6 +11,10 @@ class CreditorObligation < ApplicationRecord
   validates_presence_of :creditor_order
   validates :balance, presence: true
 
+  def creditor
+    return creditor_order.creditor
+  end
+
   #consider 'balance' to be our value piggy bank. if our piggy bank has positive value in it it's 
   #because we're presently holding more than our fair share of the deal
   #balance == 0: we're square with creditor

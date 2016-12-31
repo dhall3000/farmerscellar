@@ -58,7 +58,7 @@ class Purchase < ApplicationRecord
     self.payment_processor_fee_withheld_from_us = response.params["fee_amount"].to_f.round(2)
     self.net_amount = (gross_amount - payment_processor_fee_withheld_from_us).round(2)
 
-    if response.success?
+    if success?
 
       tote_items = ToteItem.joins(:purchase_receivables).where(purchase_receivables: {id: purchase_receivables}).distinct
       payment_processor_fee_tote = get_payment_processor_fee_tote(tote_items, filled = true)    

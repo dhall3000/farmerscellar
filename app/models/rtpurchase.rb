@@ -41,9 +41,7 @@ class Rtpurchase < ApplicationRecord
       purchase_receivables << pr
       amount = (pr.amount - pr.amount_purchased).round(2)
       @amount_to_capture = (@amount_to_capture + amount).round(2)
-    end
-
-    save
+    end    
 
     amount_to_capture_in_cents = (@amount_to_capture * 100).round(2)
     
@@ -53,27 +51,26 @@ class Rtpurchase < ApplicationRecord
       response = FakeRtpurchaseResponseSuccess.new(@amount_to_capture)      
     end
 
-    if response
-      self.success = response.success?
-      self.message = response.message
-      self.correlation_id = response.params["correlation_id"]
-      self.transaction_id = response.params["transaction_id"]
-      self.ba_id = response.params["billing_agreement_id"]
-      self.gross_amount = response.params["gross_amount"].to_f.round(2)
-      self.payment_processor_fee_withheld_from_us = response.params["fee_amount"].to_f.round(2)      
-      self.ack = response.params["ack"]
+    self.transaction_id = response.params["transaction_id"]
+    self.success = response.success?
+    self.gross_amount = response.params["gross_amount"].to_f.round(2)
+    self.payment_processor_fee_withheld_from_us = response.params["fee_amount"].to_f.round(2)      
+    self.message = response.message
+    self.correlation_id = response.params["correlation_id"]    
+    self.ba_id = response.params["billing_agreement_id"]        
+    self.ack = response.params["ack"]
 
-      #this is correct. when purchase succeeds there won't be an "error_codes" value in the response so we'll just be writing
-      #nil to the database. if you want to see an example of this look in file 'referenceTransactionResponses.txt' for this:
-      #"error_codes"=>"10201"
-      #there's actually 2 instances of that string in that file. the 2nd one is of interest.
-      self.error_codes = response.params["error_codes"]      
-    else
-
-    end
+    #this is correct. when purchase succeeds there won't be an "error_codes" value in the response so we'll just be writing
+    #nil to the database. if you want to see an example of this look in file 'referenceTransactionResponses.txt' for this:
+    #"error_codes"=>"10201"
+    #there's actually 2 instances of that string in that file. the 2nd one is of interest.
+    self.error_codes = response.params["error_codes"]      
 
     if success?
 
+      save #this save has to be here otherwise this line returns zero items:
+      #tote_items = ToteItem.joins(:purchase_receivables).where(purchase_receivables: {id: purchase_receivables}).distinct
+      #and if that happens then self.payment_processor_fee_withheld_from_producer evaluates to $0
       tote_items = ToteItem.joins(:purchase_receivables).where(purchase_receivables: {id: purchase_receivables}).distinct
       payment_processor_fee_tote = get_payment_processor_fee_tote(tote_items, filled = true)    
       self.payment_processor_fee_withheld_from_producer = payment_processor_fee_tote

@@ -37,6 +37,14 @@ class ToteItem < ApplicationRecord
     return posting.creditor_obligation
   end
 
+  def creditor_order
+    return creditor_obligation.creditor_order
+  end
+
+  def creditor
+    return creditor_order.creditor
+  end
+
   def roll_until_filled?
     return subscription && subscription.on && subscription.kind?(:ROLLUNTILFILLED)
   end
@@ -49,7 +57,8 @@ class ToteItem < ApplicationRecord
     return posting.additional_units_required_to_fill_items_case(self)
   end
 
-  #this will tell you if the tote item is crossing a case boundary and hence will only partially fill of nothing changes
+  #this will tell you if the tote item is crossing a case boundary and hence will only partially fill if nothing changes
+  #it should get a name change to .spans_case_boundary?
   def will_partially_fill?
     efq = expected_fill_quantity
     return efq > 0 && efq < quantity
@@ -109,6 +118,14 @@ class ToteItem < ApplicationRecord
       when :tote_item_filled
         new_state = ToteItem.states[:FILLED]
         update(quantity_filled: params[:quantity_filled])
+
+        #TODO: for right now this works cause we only ever do a single funds transfer per tote item. however, if down the road we ever want to
+        #make it so that for a $9 item a person could make three $3 payments we'd need to make the "funds flow objects" created below to key
+        #off the inbound quantity_filled, not the self.quantity_filled amount. there's some complexity there which i don't want to deal with now.
+        #you'd have to go in to the toeitemhelper methods and change the way it keys off of tote_item.quantity_filled because if you had qf of
+        #0 and then you added 3, 3 and then 3 to complete, it would now return values of $3, $6 and $9 for a total of $18. not good.
+
+        #also, the implemnentation of create_funds_flow_objects should reject if self.state != FILLED
         
         if quantity_filled > 0
           
@@ -240,8 +257,8 @@ class ToteItem < ApplicationRecord
   private
 
     def create_funds_flow_objects
-      pr = create_purchase_receivable
-      pr.create_payment_payable(purchase = nil, creditor_obligation)
+      create_purchase_receivable
+      create_payment_payable
     end
 
     def create_purchase_receivable
@@ -252,6 +269,28 @@ class ToteItem < ApplicationRecord
       pr.save
       
       return pr
+
+    end
+
+    def create_payment_payable
+      
+      if !creditor
+        return
+      end
+
+      net = get_producer_net_tote([self], filled = true)
+
+      if net == 0.0
+        return
+      end
+
+      payment_payable = PaymentPayable.new(amount: net.round(2), amount_paid: 0, fully_paid: false)
+
+      payment_payable.users << creditor
+      payment_payable.tote_items << self
+
+      payment_payable.save
+      creditor_obligation.add_payment_payable(payment_payable)
 
     end
 

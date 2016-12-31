@@ -26,9 +26,7 @@ class BulkPaymentProcessing
       payment_info_by_creditor_id = {}
 
       unbalanced_creditor_obligations.each do |co|
-
-        creditor = co.creditor_order.creditor
-
+        
         payment = Payment.new(amount: co.balance)
         payment.payment_payables = co.payment_payables
         bp.payment_payables += co.payment_payables
@@ -41,13 +39,13 @@ class BulkPaymentProcessing
         co.add_payment(payment)
 
         posting_infos = get_posting_infos(co.payment_payables.pluck(:id))
-        ProducerNotificationsMailer.payment_invoice(creditor, payment, posting_infos).deliver_now
+        ProducerNotificationsMailer.payment_invoice(co.creditor, payment, posting_infos).deliver_now
 
-        if payment_info_by_creditor_id[creditor.id].nil?
-          payment_info_by_creditor_id[creditor.id] = {amount: 0.0}
+        if payment_info_by_creditor_id[co.creditor.id].nil?
+          payment_info_by_creditor_id[co.creditor.id] = {amount: 0.0}
         end
 
-        payment_info_by_creditor_id[creditor.id][:amount] = (payment_info_by_creditor_id[creditor.id][:amount] + payment.amount).round(2)
+        payment_info_by_creditor_id[co.creditor.id][:amount] = (payment_info_by_creditor_id[co.creditor.id][:amount] + payment.amount).round(2)
 
       end
 

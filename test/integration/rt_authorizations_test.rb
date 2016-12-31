@@ -8,6 +8,29 @@ class RtauthorizationssTest < BulkBuyer
     super  
   end
 
+  test "rtpurchase object should be created" do
+
+    nuke_all_tote_items
+    assert_equal 0, ToteItem.count    
+    assert_equal 0, BulkPurchase.count
+    assert_equal 0, Rtpurchase.count
+    setup_basic_subscription_through_delivery
+    assert_equal 2, Posting.count    
+    travel_to Posting.first.delivery_date + 22.hours    
+    RakeHelper.do_hourly_tasks
+    assert_equal 1, BulkPurchase.count
+    assert_equal 1, Rtpurchase.count
+    bp = BulkPurchase.first
+
+    #this line is really what the test is all about. in rtpurchase.rb's .go method theres an 'if success?'
+    #line. right after that there's a save. that save was added because without it the 'tote_items = ' line
+    #was returning zero results so payment_processor_fee_withheld_from_producer was evaluating to zero
+    assert bp.payment_processor_fee_withheld_from_producer > 0
+
+    travel_back
+
+  end
+
   test "purchase should succeed despite unfinished billing agreement after one time authorization" do
     
     c = users(:c_one_tote_item)
