@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161208204115) do
+ActiveRecord::Schema.define(version: 20170103211149) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -208,8 +208,10 @@ ActiveRecord::Schema.define(version: 20161208204115) do
     t.datetime "updated_at",                             null: false
     t.integer  "creditor_id"
     t.float    "order_value_producer_net", default: 0.0, null: false
+    t.integer  "state",                    default: 0,   null: false
     t.index ["creditor_id"], name: "index_creditor_orders_on_creditor_id"
     t.index ["delivery_date"], name: "index_creditor_orders_on_delivery_date"
+    t.index ["state"], name: "index_creditor_orders_on_state"
   end
 
   create_table "deliveries", force: :cascade do |t|

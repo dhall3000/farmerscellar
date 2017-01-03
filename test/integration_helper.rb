@@ -8,15 +8,34 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     #transition tote items from authorized -> committed
     do_hourly_tasks_at(posting.order_cutoff)
     #do fill    
+
+    #the corder should be OPEN
+    assert posting.creditor_order.state?(:OPEN)
+    #but there shouldn't be a cobligation yet cause no value has exchanged hands
+    assert_not posting.creditor_order.creditor_obligation    
     fully_fill_creditor_order(posting.creditor_order)
+
+    #now value has exchanged hands so corder should still be OPEN
+    assert posting.creditor_order.state?(:OPEN)
+    #and there should be a cobligation
+    assert posting.creditor_order.creditor_obligation
+    #and that cobligation's balance should be positive since we received goods
+    assert posting.creditor_order.creditor_obligation.balance > 0
     #there should now be an unbalanced CreditorObligation associated with this
     num_unbalanced_creditor_obligations = CreditorObligation.get_unbalanced.count
     assert num_unbalanced_creditor_obligations > 0
+    assert CreditorOrder.where(state: CreditorOrder.state(:OPEN)).count > 0        
     #check that method send_payments actually gets called and does something
     #this check might actually become obsolete if/when we implement non-paypal payment methods?
     num_paypal_responses = PpMpCommon.count
     #transfer funds
     do_hourly_tasks_at(posting.delivery_date + 22.hours)
+
+    #now the cobligation should be balanced
+    assert_equal 0.0, posting.reload.creditor_order.creditor_obligation.balance
+    #and the corder should be closed
+    assert posting.reload.creditor_order.state?(:CLOSED)
+
     #there should now be one less unbalanced CreditorObligation after payment was made
     assert_equal num_unbalanced_creditor_obligations - 1, CreditorObligation.get_unbalanced.count
     assert_equal num_paypal_responses + 1, PpMpCommon.count
@@ -426,18 +445,33 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     posting = Posting.first
 
     num_units = ti.quantity
-    
+
+    #there shouldn't be any orders placed yet
+    assert_equal 0, CreditorOrder.count
     travel_to posting.order_cutoff
     ActionMailer::Base.deliveries.clear
     RakeHelper.do_hourly_tasks
+
+    #now there should be one order
+    assert_equal 1, CreditorOrder.count
+    creditor_order = CreditorOrder.first
+    #and this order should be OPEN since that's the default state when we submit order to producer/creditor/farmer whatever etc.
+    assert creditor_order.state?(:OPEN)
+    #there's no obligation yet because value hasn't actually exchanged hands yet
+    assert_not creditor_order.creditor_obligation
 
     assert_equal 1, ActionMailer::Base.deliveries.count
     verify_proper_order_submission_email(ActionMailer::Base.deliveries.last, posting.get_creditor, posting, num_units, units_per_case = "", number_of_cases = "")
 
     #do fill
     travel_to posting.delivery_date + 12.hours
-
     fill_posting(posting.reload, num_units)
+    #now value has exchanged (food came to us) so there should be an obligation
+
+    assert creditor_order.reload.creditor_obligation
+    #our 'piggy bank' (so to speak) now has positive value in it
+    assert creditor_order.creditor_obligation.balance > 0
+    assert creditor_order.state?(:OPEN)
 
     #distributor posting should be closed
     assert posting.reload.state?(:CLOSED)

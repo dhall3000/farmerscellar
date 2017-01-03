@@ -27,18 +27,27 @@ class CreditorObligation < ApplicationRecord
   
   def add_payment(payment)
     payments << payment
-    self.balance = (self.balance - payment.amount).round(2)
-    save
+    value_exchanged_hands
   end
 
   def add_payment_payable(payment_payable)
     payment_payables << payment_payable
-    self.balance = (self.balance + payment_payable.amount - payment_payable.amount_paid).round(2)
-    save
+    value_exchanged_hands
   end
 
   def self.get_unbalanced
     return CreditorObligation.joins(creditor_order: {creditor: :business_interface}).where("balance > 0.0").where("business_interfaces.payment_method = ?", BusinessInterface.payment_methods[:PAYPAL])
   end
+
+  private
+    def value_exchanged_hands
+      #lead with a .save to ensure data consistency before recomputing 'balance'
+      save
+      payment_payables_sum = payment_payables.sum(:amount).round(2)
+      payments_sum = payments.sum(:amount).round(2)
+      update(balance: (payment_payables_sum - payments_sum).round(2))
+      #now tell the order there's a new balance
+      creditor_order.transition(:value_exchanged_hands)
+    end
 
 end

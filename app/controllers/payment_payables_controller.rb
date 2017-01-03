@@ -6,10 +6,12 @@ class PaymentPayablesController < ApplicationController
     creditor_id = params[:creditor_id]
 
     if creditor_id.nil?
+      #pulls up list of unpaid creditors and shows total amount due
       #if no creditor id param fetch summary data
       @pps_by_creditor = get_pps_by_creditor
       render 'index'
     else
+      #pulls up list of unpaid PPs for given creditor and shows total amount due
       #if creditor id param fetch / display pp's just for that user
       @creditor = User.find(creditor_id.to_i)
       @unpaid_payment_payables = PaymentPayable.joins(:users).where(fully_paid: false).where("users.id = ?", @creditor.id)
