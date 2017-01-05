@@ -28,16 +28,10 @@ class BulkPaymentProcessing
       unbalanced_creditor_obligations.each do |co|
         
         payment = Payment.new(amount: co.balance)
-        payment.payment_payables = co.payment_payables
-        bp.payment_payables += co.payment_payables
-
-        co.payment_payables.each do |pp|
-          pp.update(amount_paid: pp.amount, fully_paid: true)
-        end
-
         payment.save
         co.add_payment(payment)
-
+        bp.payment_payables += co.payment_payables
+        
         posting_infos = get_posting_infos(co.payment_payables.pluck(:id))
         ProducerNotificationsMailer.payment_invoice(co.creditor, payment, posting_infos).deliver_now
 
@@ -99,7 +93,7 @@ class BulkPaymentProcessing
           next
         end
         bi = creditor.get_business_interface
-        if bi.payment_method?(:PAYPAL)
+        if bi.payment_method?(:PAYPAL) #we eventually may want to change this to consider bi.payment_time in addition to bi.payment_method
           paypal_payment_info_by_creditor_id[creditor_id] = payment_info
         else
           manual_payment_info_by_creditor_id[creditor_id] = payment_info

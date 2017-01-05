@@ -53,6 +53,30 @@ class CreditorOrder < ApplicationRecord
 
   end
 
+  def balanced?
+    return creditor_obligation.nil? || creditor_obligation.balanced?
+  end
+
+  def add_payment(payment)
+
+    if creditor_obligation.nil?      
+      create_creditor_obligation
+    end
+
+    creditor_obligation.add_payment(payment)
+
+  end
+
+  def add_payment_payable(payment_payable)
+
+    if creditor_obligation.nil?      
+      create_creditor_obligation
+    end
+
+    creditor_obligation.add_payment_payable(payment_payable)
+
+  end
+
   def transition(input)
 
     case state
@@ -97,12 +121,6 @@ class CreditorOrder < ApplicationRecord
 
     return true
 
-  end
-
-  def add_posting(posting)
-    ovpn = self.order_value_producer_net
-    ovpn = (ovpn + posting.outbound_order_value_producer_net).round(2)
-    update(order_value_producer_net: ovpn)
   end
 
 end

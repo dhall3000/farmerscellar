@@ -1,5 +1,31 @@
 module TestLib
 
+  def create_creditor_order(creditor = nil, postings = nil, customer = nil)
+
+    if creditor.nil?      
+      creditor = create_producer
+    end
+
+    if postings.nil?
+      postings = [create_posting(creditor)]
+    end
+
+    if customer.nil?
+      customer = create_user
+    end
+
+    postings.each do |posting|
+      create_tote_item(customer, posting, 2)
+    end
+    
+    create_one_time_authorization_for_customer(customer)
+    corder = CreditorOrder.submit(creditor, postings.first.delivery_date, postings, order_value_producer_net = 1)
+    assert corder.valid?
+
+    return corder
+
+  end
+
   def do_hourly_tasks_at(date_time)
     travel_to date_time
     RakeHelper.do_hourly_tasks
@@ -343,7 +369,7 @@ module TestLib
     return create_producer(name, email, distributor = nil, order_min)
   end
 
-  def create_business_interface(creditor, order_email_accepted = true, order_instructions = "order instructions", payment_method = BusinessInterface.payment_methods[:PAYPAL], payment_instructions = "payment instructions")
+  def create_business_interface(creditor, order_email_accepted = true, order_instructions = "order instructions", payment_method = BusinessInterface.payment_methods[:PAYPAL], payment_instructions = "payment instructions", payment_time = BusinessInterface.payment_times[:AFTERDELIVERY])
 
     creditor.create_business_interface(
       name: "#{creditor.name} #{creditor.name}, Inc.",
@@ -352,7 +378,8 @@ module TestLib
       order_instructions: order_instructions,
       payment_method: payment_method,
       paypal_email: creditor.email,
-      payment_instructions: payment_instructions
+      payment_instructions: payment_instructions,
+      payment_time: payment_time
       )
 
   end

@@ -27,11 +27,54 @@ class CreditorObligation < ApplicationRecord
   
   def add_payment(payment)
     payments << payment
+
+    amount_remaining_to_apply = payment.amount
+
+    payment_payables.where(fully_paid: false).each do |pp|
+      if amount_remaining_to_apply > 0.0        
+        
+        amount_to_apply = [pp.amount_outstanding, amount_remaining_to_apply].min
+        amount_actually_applied = pp.apply(amount_to_apply)
+        payment.apply(amount_actually_applied)
+        amount_remaining_to_apply = (amount_remaining_to_apply - amount_actually_applied).round(2)
+
+        if amount_actually_applied > 0.0
+          payment.payment_payables << pp
+        end
+
+      end
+    end
+
+    payment.save
+
     value_exchanged_hands
   end
 
   def add_payment_payable(payment_payable)
     payment_payables << payment_payable
+
+    payments.each do |payment|
+      
+      if payment.amount_outstanding == 0.0
+        next
+      end
+
+      if payment_payable.amount_outstanding == 0.0
+        next
+      end
+
+      amount_to_apply = [payment.amount_outstanding, payment_payable.amount_outstanding].min
+
+      if amount_to_apply > 0.0
+        payment_payable.apply(amount_to_apply)
+        payment.apply(amount_to_apply)
+        payment.payment_payables << payment_payable
+        payment.save
+        payment_payable.reload
+      end
+
+    end
+
     value_exchanged_hands
   end
 

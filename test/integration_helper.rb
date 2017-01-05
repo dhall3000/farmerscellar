@@ -3,6 +3,67 @@ require 'utility/rake_helper'
 
 class IntegrationHelper < ActionDispatch::IntegrationTest
 
+  def do_setup_for_payments_work
+
+    #clean house
+    nuke_all_postings
+    nuke_all_users
+    admin = create_admin
+
+    #create a bunch of producers and postings
+    create_producer_and_posting_for_each_payment_method_and_time
+    #create a customer
+    bob = create_new_customer("bob", "bob@b.com")
+
+    #new customer does a bunch of shopping
+    Posting.all.each do |posting|
+      create_tote_item(bob, posting, 2)
+    end
+
+    #then new customer checks out
+    create_one_time_authorization_for_customer(bob)
+
+    #at this point no orders should be submitted
+    assert_equal 0, CreditorOrder.count
+
+    do_hourly_tasks_at(Posting.first.order_cutoff)
+
+    #now all the orders should be submitted, one for each posting
+    assert_equal Posting.count, CreditorOrder.count
+    #all the CreditorOrders should be in state OPEN
+    assert_equal CreditorOrder.count, CreditorOrder.where(state: CreditorOrder.state(:OPEN)).count
+    #no value has exchanged hands so there should be zero obligations
+    assert_equal 0, CreditorObligation.count
+    #all postings should be in COMMITMENTZONE
+    assert_equal Posting.count, Posting.where(state: Posting.states[:COMMITMENTZONE]).count
+
+    #fill all orders
+    CreditorOrder.all.each do |co|    
+      fully_fill_creditor_order(co)
+    end
+
+    #since value has now exchanged hands there should be obligation objects, one for each creditor order
+    assert_equal CreditorOrder.count, CreditorObligation.count
+    #the balance of each obligation should be postive since we now owe the producers
+    assert_equal CreditorObligation.count, CreditorObligation.where("balance > 0.0").count
+
+    #process auto payments
+    do_hourly_tasks_at(Posting.first.delivery_date + 22.hours)
+
+    #at this point auto paypal payments should be complete. note the way the code works is it makes auto paypal payments after delivery.
+    #the code is this line:
+    #if bi.payment_method?(:PAYPAL) #we eventually may want to change this to consider bi.payment_time in addition to bi.payment_method
+    #it does not consider bi.payment_time (yet). in this test we've created one producer/posting/creditororder etc for each combination of
+    #PAYPAL method with the various payment_times. so although we're here processing auto paypal payments at an AFTERDELIVERY time, all the
+    #PAYPAL BI's are getting processed    
+    num_paypal_obligations_auto_paid_on = BusinessInterface.payment_times.count
+    #these obligations should be balanced
+    assert_equal num_paypal_obligations_auto_paid_on, CreditorObligation.where("balance = 0.0").count
+
+    return admin
+
+  end
+
   def do_authorized_through_funds_transfer(posting)
     
     #transition tote items from authorized -> committed
