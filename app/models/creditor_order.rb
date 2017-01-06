@@ -16,11 +16,22 @@ class CreditorOrder < ApplicationRecord
     return states[key]
   end
 
-  def self.submit(creditor, delivery_date, postings, order_value_producer_net)
+  def self.submit(postings)
+
+    if postings.nil? || !postings.any?
+      return nil
+    end
+
+    reference_posting = postings.first
+    creditor = reference_posting.get_creditor    
 
     if !all_postings_share_creditor?(postings, creditor)
       return nil
     end
+
+    delivery_date = reference_posting.delivery_date
+    order_report = creditor.outbound_order_report(reference_posting.order_cutoff)
+    order_value_producer_net = order_report[:order_value_producer_net]    
 
     co = CreditorOrder.create(creditor: creditor, delivery_date: delivery_date, postings: postings, order_value_producer_net: order_value_producer_net, state: CreditorOrder.state(:OPEN))
 
@@ -71,6 +82,12 @@ class CreditorOrder < ApplicationRecord
 
     if creditor_obligation.nil?      
       create_creditor_obligation
+    end
+
+    #we want to attribute this pp to the creditor if that hasn't already been done
+    if payment_payable.users.where(id: creditor.id).count == 0
+      payment_payable.users << creditor
+      payment_payable.save
     end
 
     creditor_obligation.add_payment_payable(payment_payable)

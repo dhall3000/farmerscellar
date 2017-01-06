@@ -19,7 +19,7 @@ module TestLib
     end
     
     create_one_time_authorization_for_customer(customer)
-    corder = CreditorOrder.submit(creditor, postings.first.delivery_date, postings, order_value_producer_net = 1)
+    corder = CreditorOrder.submit(postings)
     assert corder.valid?
 
     return corder

@@ -196,7 +196,7 @@ class RakeHelper
         order_value_producer_net = order_report[:order_value_producer_net]
 
         if postings_orderable && postings_orderable.any?                  
-          CreditorOrder.submit(creditor, postings_orderable[0].delivery_date, postings_orderable, order_value_producer_net)
+          CreditorOrder.submit(postings_orderable)
         end
 
         if postings_closeable && postings_closeable.any?

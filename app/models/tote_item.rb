@@ -33,16 +33,12 @@ class ToteItem < ApplicationRecord
   validates :state, inclusion: { in: ToteItem.states.values }
   validates :state, numericality: {only_integer: true}
 
-  def creditor_obligation
-    return posting.creditor_obligation
+  def creditor
+    return creditor_order.creditor
   end
 
   def creditor_order
-    return creditor_obligation.creditor_order
-  end
-
-  def creditor
-    return creditor_order.creditor
+    return posting.creditor_order
   end
 
   def roll_until_filled?
@@ -274,23 +270,16 @@ class ToteItem < ApplicationRecord
 
     def create_payment_payable
       
-      if !creditor
-        return
-      end
-
       net = get_producer_net_tote([self], filled = true)
 
       if net == 0.0
         return
       end
 
-      payment_payable = PaymentPayable.new(amount: net.round(2), amount_paid: 0, fully_paid: false)
-
-      payment_payable.users << creditor
+      payment_payable = PaymentPayable.new(amount: net.round(2), amount_paid: 0, fully_paid: false)      
       payment_payable.tote_items << self
-
       payment_payable.save
-      creditor_obligation.add_payment_payable(payment_payable)
+      creditor_order.add_payment_payable(payment_payable)
 
     end
 

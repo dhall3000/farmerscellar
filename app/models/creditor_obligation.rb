@@ -78,7 +78,7 @@ class CreditorObligation < ApplicationRecord
     value_exchanged_hands
   end
 
-  def self.get_unbalanced
+  def self.get_positive_balanced
     return CreditorObligation.joins(creditor_order: {creditor: :business_interface}).where("balance > 0.0").where("business_interfaces.payment_method = ?", BusinessInterface.payment_methods[:PAYPAL])
   end
 

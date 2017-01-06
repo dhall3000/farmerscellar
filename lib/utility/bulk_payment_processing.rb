@@ -14,18 +14,18 @@ class BulkPaymentProcessing
       puts "BulkPaymentProcessing.do_bulk_creditor_payment: there are still deliveries outstanding this week so we're not going to do a bulk payment today. quitting."
     else
 
-      unbalanced_creditor_obligations = CreditorObligation.get_unbalanced
+      positive_balanced_creditor_obligations = CreditorObligation.get_positive_balanced
 
-      if unbalanced_creditor_obligations.count == 0
+      if positive_balanced_creditor_obligations.count == 0
         return
       end
 
-      bp = BulkPayment.new(num_payees: unbalanced_creditor_obligations.count, total_payments_amount: unbalanced_creditor_obligations.sum(:balance).round(2))
+      bp = BulkPayment.new(num_payees: positive_balanced_creditor_obligations.count, total_payments_amount: positive_balanced_creditor_obligations.sum(:balance).round(2))
 
       #hack: this object is gnarly and lame but scabbing this new code in to some legacy junk so that old tests will pass
       payment_info_by_creditor_id = {}
 
-      unbalanced_creditor_obligations.each do |co|
+      positive_balanced_creditor_obligations.each do |co|
         
         payment = Payment.new(amount: co.balance)
         payment.save

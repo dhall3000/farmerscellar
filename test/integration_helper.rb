@@ -83,8 +83,8 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     #and that cobligation's balance should be positive since we received goods
     assert posting.creditor_order.creditor_obligation.balance > 0
     #there should now be an unbalanced CreditorObligation associated with this
-    num_unbalanced_creditor_obligations = CreditorObligation.get_unbalanced.count
-    assert num_unbalanced_creditor_obligations > 0
+    num_positive_balanced_creditor_obligations = CreditorObligation.get_positive_balanced.count
+    assert num_positive_balanced_creditor_obligations > 0
     assert CreditorOrder.where(state: CreditorOrder.state(:OPEN)).count > 0        
     #check that method send_payments actually gets called and does something
     #this check might actually become obsolete if/when we implement non-paypal payment methods?
@@ -98,7 +98,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     assert posting.reload.creditor_order.state?(:CLOSED)
 
     #there should now be one less unbalanced CreditorObligation after payment was made
-    assert_equal num_unbalanced_creditor_obligations - 1, CreditorObligation.get_unbalanced.count
+    assert_equal num_positive_balanced_creditor_obligations - 1, CreditorObligation.get_positive_balanced.count
     assert_equal num_paypal_responses + 1, PpMpCommon.count
 
   end

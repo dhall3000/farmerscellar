@@ -58,10 +58,6 @@ class Posting < ApplicationRecord
     return creditor_orders.last
   end
 
-  def creditor_obligation
-    return creditor_order.creditor_obligation
-  end
-
   def self.postings_by_creditor(delivery_date)
 
     all_postings = Posting.where(delivery_date: delivery_date)
@@ -262,11 +258,6 @@ class Posting < ApplicationRecord
   end
 
   def fill(quantity)
-
-    if quantity > 0 && creditor_obligation.nil?
-      CreditorObligation.create(creditor_order: creditor_order, balance: 0.0)
-      reload
-    end
 
     quantity_remaining = quantity
     quantity_filled = 0
