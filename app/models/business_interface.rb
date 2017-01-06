@@ -24,6 +24,10 @@ class BusinessInterface < ApplicationRecord
     return payment_time == BusinessInterface.payment_times[time_key]
   end
 
+  def friendly_payment_description
+    return "#{friendly_payment_method} #{friendly_payment_time}"
+  end
+
   def friendly_payment_method
     
     case payment_method
@@ -35,6 +39,23 @@ class BusinessInterface < ApplicationRecord
         friendly_payment_method = "Plastic"
       when BusinessInterface.payment_methods[:CHECK]
         friendly_payment_method = "Check"
+      else
+        friendly_payment_method = "Unknown"
+    end
+
+    return friendly_payment_method
+
+  end
+
+  def friendly_payment_time
+    
+    case payment_time
+      when BusinessInterface.payment_times[:ATORDER]
+        friendly_payment_method = "At order"
+      when BusinessInterface.payment_times[:ONDELIVERY]
+        friendly_payment_method = "On delivery"
+      when BusinessInterface.payment_times[:AFTERDELIVERY]
+        friendly_payment_method = "After delivery"
       else
         friendly_payment_method = "Unknown"
     end

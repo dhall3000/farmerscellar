@@ -100,7 +100,7 @@ class CreditorOrder < ApplicationRecord
       when CreditorOrder.state(:OPEN)
         case input
           when :value_exchanged_hands
-            if creditor_obligation.balance == 0
+            if balanced?
               update(state: CreditorOrder.state(:CLOSED))              
             end
             return
@@ -110,7 +110,7 @@ class CreditorOrder < ApplicationRecord
       when CreditorOrder.state(:CLOSED)
         case input
           when :value_exchanged_hands
-            if creditor_obligation.balance != 0
+            if !balanced?
               update(state: CreditorOrder.state(:OPEN))              
             end
             return
