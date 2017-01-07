@@ -5,12 +5,14 @@ class BusinessInterface < ApplicationRecord
 
   validates :payment_method, :payment_time, presence: true
 
+  #'AUTOMATIC' means we leave payment info with the creditor and they tap it at the time they fill our order
   def self.payment_methods
-    {PAYPAL: 0, CASH: 1, PLASTIC: 2, CHECK: 3}
+    {PAYPAL: 0, CASH: 1, PLASTIC: 2, CHECK: 3, AUTOMATIC: 4}
   end
 
+  #'VARIOUS' was originally intended for method AUTOMATIC
   def self.payment_times
-    {ATORDER: 0, ONDELIVERY: 1, AFTERDELIVERY: 2}
+    {ATORDER: 0, ONDELIVERY: 1, AFTERDELIVERY: 2, VARIOUS: 3}
   end
 
   validates :payment_method, inclusion: BusinessInterface.payment_methods.values
@@ -39,6 +41,8 @@ class BusinessInterface < ApplicationRecord
         friendly_payment_method = "Plastic"
       when BusinessInterface.payment_methods[:CHECK]
         friendly_payment_method = "Check"
+      when BusinessInterface.payment_methods[:AUTOMATIC]
+        friendly_payment_method = "Automatic"
       else
         friendly_payment_method = "Unknown"
     end
@@ -51,11 +55,13 @@ class BusinessInterface < ApplicationRecord
     
     case payment_time
       when BusinessInterface.payment_times[:ATORDER]
-        friendly_payment_method = "At order"
+        friendly_payment_method = "at order"
       when BusinessInterface.payment_times[:ONDELIVERY]
-        friendly_payment_method = "On delivery"
+        friendly_payment_method = "on delivery"
       when BusinessInterface.payment_times[:AFTERDELIVERY]
-        friendly_payment_method = "After delivery"
+        friendly_payment_method = "after delivery"
+      when BusinessInterface.payment_times[:VARIOUS]
+        friendly_payment_method = "various"
       else
         friendly_payment_method = "Unknown"
     end

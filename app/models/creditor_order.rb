@@ -75,6 +75,7 @@ class CreditorOrder < ApplicationRecord
     end
 
     creditor_obligation.add_payment(payment)
+    transition(:value_exchanged_hands)
 
   end
 
@@ -91,6 +92,7 @@ class CreditorOrder < ApplicationRecord
     end
 
     creditor_obligation.add_payment_payable(payment_payable)
+    transition(:value_exchanged_hands)
 
   end
 

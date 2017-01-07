@@ -88,9 +88,7 @@ class CreditorObligation < ApplicationRecord
       save
       payment_payables_sum = payment_payables.sum(:amount).round(2)
       payments_sum = payments.sum(:amount).round(2)
-      update(balance: (payment_payables_sum - payments_sum).round(2))
-      #now tell the order there's a new balance
-      creditor_order.transition(:value_exchanged_hands)
+      update(balance: (payment_payables_sum - payments_sum).round(2))      
     end
 
 end

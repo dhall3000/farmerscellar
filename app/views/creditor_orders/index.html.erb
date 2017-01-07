@@ -1,6 +1,6 @@
 <h1>Creditor Orders</h1>
 
-<% if @unclosed_creditor_orders && @unclosed_creditor_orders.any? %>
+<% if @open_orders && @open_orders.any? %>
   <h2>Unclosed Orders</h2>
   <table class="table">
     <thead>
@@ -10,7 +10,7 @@
       </tr>
     </thead>
     <tbody>
-      <% @unclosed_creditor_orders.each do |co| %>
+      <% @open_orders.each do |co| %>
         <tr>
           <td class="text-left">
             <%= link_to co.creditor.get_business_interface.name, creditor_order_path(co) %>
@@ -24,7 +24,7 @@
   </table>
 <% end %>
 
-<% if @closed_creditor_orders && @closed_creditor_orders.any? %>
+<% if @closed_orders && @closed_orders.any? %>
   <h2>Closed Orders</h2>
   <table class="table">
     <thead>
@@ -34,7 +34,7 @@
       </tr>
     </thead>
     <tbody>
-      <% @closed_creditor_orders.each do |co| %>
+      <% @closed_orders.each do |co| %>
         <tr>
           <td class="text-left">
             <%= link_to co.creditor.get_business_interface.name, creditor_order_path(co) %>

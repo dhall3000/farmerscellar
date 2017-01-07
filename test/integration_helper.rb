@@ -179,8 +179,8 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     assert_response :success
     assert_template 'creditor_orders/index'
 
-    unclosed_creditor_orders = assigns(:unclosed_creditor_orders)
-    unclosed_creditor_orders.each do |uco|
+    open_orders = assigns(:open_orders)
+    open_orders.each do |uco|
       fully_fill_creditor_order(uco)
     end
 

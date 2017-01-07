@@ -2,10 +2,8 @@ class CreditorOrdersController < ApplicationController
   before_action :redirect_to_root_if_user_not_admin
 
   def index
-    @creditor_orders = CreditorOrder.where("delivery_date > ?", Time.zone.now - 6.weeks).order(delivery_date: :desc)
-    split = split_on_closed_postings(@creditor_orders)
-    @unclosed_creditor_orders = split[:unclosed_creditor_orders]
-    @closed_creditor_orders = split[:closed_creditor_orders]
+    @open_orders = CreditorOrder.where(state: CreditorOrder.state(:OPEN)).order(delivery_date: :asc)
+    @closed_orders = CreditorOrder.where(state: CreditorOrder.state(:CLOSED)).order(delivery_date: :desc)
   end
 
   def show
@@ -61,28 +59,5 @@ class CreditorOrdersController < ApplicationController
 
   def destroy
   end
-
-  private
-
-    def split_on_closed_postings(creditor_orders)
-      
-      if creditor_orders.nil?
-        return
-      end
-
-      closed_creditor_orders = []
-      unclosed_creditor_orders = []
-
-      creditor_orders.each do |creditor_order|
-        if creditor_order.all_postings_closed?
-          closed_creditor_orders << creditor_order
-        else
-          unclosed_creditor_orders << creditor_order
-        end
-      end
-
-      return {closed_creditor_orders: closed_creditor_orders, unclosed_creditor_orders: unclosed_creditor_orders}
-
-    end
 
 end

@@ -29,8 +29,8 @@ class BulkPaymentProcessing
         
         payment = Payment.new(amount: co.balance)
         payment.save
-        co.add_payment(payment)
-        bp.payment_payables += co.payment_payables
+        co.creditor_order.add_payment(payment)
+        bp.payment_payables += co.reload.payment_payables
         
         posting_infos = get_posting_infos(co.payment_payables.pluck(:id))
         ProducerNotificationsMailer.payment_invoice(co.creditor, payment, posting_infos).deliver_now
