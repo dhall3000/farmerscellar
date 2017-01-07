@@ -7,7 +7,17 @@ class CreditorOrdersController < ApplicationController
   end
 
   def show
+    
     @creditor_order = CreditorOrder.find(params[:id])
+
+    @payment_payables_sum = 0
+    @payments_sum = 0
+
+    if @creditor_order && @creditor_order.creditor_obligation
+      @payment_payables_sum = @creditor_order.creditor_obligation.payment_payables.sum(:amount).round(2)
+      @payments_sum = @creditor_order.creditor_obligation.payments.sum(:amount).round(2)
+    end
+
   end
 
   def edit

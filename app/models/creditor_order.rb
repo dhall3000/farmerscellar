@@ -16,8 +16,11 @@ class CreditorOrder < ApplicationRecord
 
   #OPEN means this order has been submitted to the creditor and we're awaiting activity based off that order
   #CLOSED means no further activity is expected on this order, neither fills nor funds
+  def self.states
+    return {OPEN: 0, CLOSED: 1}
+  end
+
   def self.state(key)
-    states = {OPEN: 0, CLOSED: 1}
     return states[key]
   end
 
@@ -66,6 +69,19 @@ class CreditorOrder < ApplicationRecord
     end
 
     return true
+
+  end
+
+  def state_key
+
+    states_copy = CreditorOrder.states
+    states_copy.each do |key, value|
+      if value == state
+        return key
+      end
+    end
+
+    return nil
 
   end
 

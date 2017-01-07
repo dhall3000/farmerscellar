@@ -6,8 +6,16 @@ class PaymentsController < ApplicationController
   end
 
   def new
+    @creditor_order = CreditorOrder.find_by(id: new_params[:creditor_order_id].to_i)
   end
 
   def create
   end
+
+  private
+
+    def new_params
+      params.permit(:creditor_order_id)
+    end
+
 end
