@@ -349,3 +349,10 @@ end
 
 PageUpdate.create(name: "HowThingsWork", update_time: Time.zone.now)
 PageUpdate.create(name: "News", update_time: Time.zone.now)
+
+co = CreditorOrder.submit(f1.postings)
+co.add_payment(Payment.create(amount: 100))
+
+co = CreditorOrder.submit(f2.postings)
+co.add_payment(Payment.create(amount: 100))
+co.add_payment_payable(PaymentPayable.create(amount: 100, amount_paid: 0, fully_paid: false))

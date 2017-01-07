@@ -1,4 +1,9 @@
 class CreditorOrder < ApplicationRecord
+  #delivery_date:datetime
+  #creditor_id:integer
+  #order_value_producer_net:float
+  #state:integer
+
   has_many :creditor_order_postings
   has_many :postings, through: :creditor_order_postings
 
@@ -36,8 +41,8 @@ class CreditorOrder < ApplicationRecord
     co = CreditorOrder.create(creditor: creditor, delivery_date: delivery_date, postings: postings, order_value_producer_net: order_value_producer_net, state: CreditorOrder.state(:OPEN))
 
     if co.valid?
-      puts "CreditorOrder.submit: sending order for #{postings.count.to_s} posting(s) to #{creditor.get_business_interface.name}"
-      ProducerNotificationsMailer.current_orders(creditor, postings).deliver_now
+      puts "CreditorOrder.submit: sending order for #{co.postings.count.to_s} posting(s) to #{co.business_interface.name}"
+      ProducerNotificationsMailer.current_orders(co).deliver_now
     else
       puts "CreditorOrder.submit: creation of new CreditorOrder object failed. New object is invalid. Errors: #{co.errors}"
     end
@@ -64,8 +69,22 @@ class CreditorOrder < ApplicationRecord
 
   end
 
+  def business_interface
+    return creditor.get_business_interface
+  end
+
   def balanced?
     return creditor_obligation.nil? || creditor_obligation.balanced?
+  end
+
+  def balance
+
+    if creditor_obligation.nil?
+      return 0.0
+    end
+
+    return creditor_obligation.balance
+
   end
 
   def add_payment(payment)

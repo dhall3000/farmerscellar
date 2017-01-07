@@ -3,7 +3,7 @@ class CreditorOrdersController < ApplicationController
 
   def index
     @open_orders = CreditorOrder.where(state: CreditorOrder.state(:OPEN)).order(delivery_date: :asc)
-    @closed_orders = CreditorOrder.where(state: CreditorOrder.state(:CLOSED)).order(delivery_date: :desc)
+    @closed_orders = CreditorOrder.joins(:postings).distinct.where(state: CreditorOrder.state(:CLOSED)).where("postings.delivery_date > ?", Time.zone.now.midnight - 8.weeks).order(delivery_date: :desc)
   end
 
   def show

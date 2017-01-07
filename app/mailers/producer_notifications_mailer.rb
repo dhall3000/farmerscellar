@@ -6,20 +6,24 @@ class ProducerNotificationsMailer < ApplicationMailer
   #
   #   en.producer_notifications_mailer.current_orders.subject
   #
-  def current_orders(creditor, postings)
+  def current_orders(creditor_order)
 
-  	if postings.nil? || !postings.any?
+    if creditor_order.nil?
+      return
+    end
+
+  	if creditor_order.postings.nil? || !creditor_order.postings.any?
   	  return
   	end
 
   	@posting_infos = {}
     @total = 0
 
-    @business_interface = creditor.get_business_interface
+    @business_interface = creditor_order.business_interface
 
     if !@business_interface
       #this is a major problem. order email didn't go out. admin needs to be notified
-      AdminNotificationMailer.general_message("major problem. order email didn't go out.", "creditor id #{creditor.id.to_s}").deliver_now
+      AdminNotificationMailer.general_message("major problem. order email didn't go out.", "creditor id #{creditor_order.creditor.id.to_s}").deliver_now
       return
     end
 
@@ -35,7 +39,7 @@ class ProducerNotificationsMailer < ApplicationMailer
     @column_product_id_code = false
     @column_cases = false
 
-  	postings.each do |posting|
+  	creditor_order.postings.each do |posting|
 
       committed_items = posting.tote_items.where(state: ToteItem.states[:COMMITTED])
   	  if committed_items.count < 1

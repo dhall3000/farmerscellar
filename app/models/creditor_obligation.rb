@@ -1,4 +1,6 @@
 class CreditorObligation < ApplicationRecord
+  #creditor_order_id:integer
+  #balance:float
 
   belongs_to :creditor_order
 

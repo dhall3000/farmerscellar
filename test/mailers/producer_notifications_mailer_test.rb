@@ -4,8 +4,21 @@ class ProducerNotificationsMailerTest < ActionMailer::TestCase
   test "current_orders" do  	
   	tote_items = ToteItem.all
   	tote_items.update_all(state: ToteItem.states[:COMMITTED])
-  	ps = Posting.all
-    mail = ProducerNotificationsMailer.current_orders(ps.first.get_creditor, ps).deliver_now
+    ps = Posting.all.where(user: users(:f1))
+
+    #ugh, there's some dumb invalid posting in this lot so strip it out
+    ps_keep = []
+
+    count = 0
+    while count < ps.count
+      if ps[count].valid?
+        ps_keep << ps[count]
+      end
+      count += 1
+    end
+
+    CreditorOrder.submit(ps_keep)
+    mail = ActionMailer::Base.deliveries.last    
 
     assert_equal "Current orders for upcoming deliveries", mail.subject
     assert_equal [ps.first.user.email], mail.to
