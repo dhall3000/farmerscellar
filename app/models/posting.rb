@@ -353,6 +353,10 @@ class Posting < ApplicationRecord
     return tote_items.where(state: ToteItem.states[:FILLED]).sum(:quantity_filled)
   end
 
+  def num_units_unfilled
+    return total_quantity_ordered_from_creditor - num_units_filled
+  end
+
   def inbound_num_cases_ordered
     
     if units_per_case.nil? || units_per_case < 1

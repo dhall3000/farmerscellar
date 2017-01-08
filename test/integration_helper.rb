@@ -160,9 +160,9 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     patch creditor_order_path(posting.creditor_order), params: {fills: fills}
     fill_report = assigns(:fill_report)
     assert_response :redirect
-    assert_redirected_to creditor_orders_path
+    assert_redirected_to creditor_order_path(assigns(:creditor_order))
     follow_redirect!
-    assert_template 'creditor_orders/index'
+    assert_template 'creditor_orders/show'
 
     if quantity >= 0
       assert posting.reload.state?(:CLOSED)
@@ -207,8 +207,10 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     
     patch creditor_order_path(creditor_order), params: {fills: fills}
     assert_response :redirect
-    assert_redirected_to creditor_orders_path
-
+    assert_redirected_to creditor_order_path(assigns(:creditor_order))
+    follow_redirect!
+    assert_template 'creditor_orders/show'
+    
     creditor_order.reload.postings.each do |posting|
       assert posting.state?(:CLOSED)
     end

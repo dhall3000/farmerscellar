@@ -329,7 +329,7 @@ class PostingsControllerTest < IntegrationHelper
     assert :success
     posting.reload
     #verify appropriate template displayed
-    assert_template 'creditor_orders/index'
+    assert_template 'creditor_orders/show'
 
     #TODO: verify proper contents of template displayed
     #verify all tote items got filled

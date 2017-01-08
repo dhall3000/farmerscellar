@@ -57,7 +57,14 @@ class CreditorOrdersController < ApplicationController
 
     end
 
-    redirect_to creditor_orders_path
+    @creditor_order = CreditorOrder.find_by(id: params[:id])
+
+    if @creditor_order
+      redirect_to creditor_order_path(@creditor_order)
+    else
+      flash[:danger] = "Couldn't find CreditorOrder id: #{params[:id].to_s}"
+      redirect_to creditor_orders_path
+    end    
 
   end
 

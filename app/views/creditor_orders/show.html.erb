@@ -1,12 +1,13 @@
 <h1>Creditor Order</h1>
 
+<%= link_to "Creditor Orders", creditor_orders_path %>
 <div class="panel-group">
 
   <div class="panel panel-default">
     <div class="panel-heading">
       <h2>Vitals</h2>
     </div>
-    <div class="panel-body">      
+    <div class="panel-body">            
       <table class="table">
         <tbody>
           <tr>
@@ -121,7 +122,7 @@
               %>
               <td><%= units_per_case %></td>
               <td><%= num_cases_ordered %></td>                    
-              <td class="text-center"><%= posting.tote_items.where("tote_items.state = ?", ToteItem.states[:FILLED]).sum(:quantity) %></td>
+              <td class="text-center"><%= posting.num_units_filled %></td>
             </tr>
           <% end %>
         </tbody>
