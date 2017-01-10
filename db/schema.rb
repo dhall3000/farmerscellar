@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170105212718) do
+ActiveRecord::Schema.define(version: 20170110195404) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -309,10 +309,11 @@ ActiveRecord::Schema.define(version: 20170105212718) do
   end
 
   create_table "payments", force: :cascade do |t|
-    t.float    "amount"
+    t.float    "amount",         default: 0.0, null: false
     t.datetime "created_at",                   null: false
     t.datetime "updated_at",                   null: false
     t.float    "amount_applied", default: 0.0, null: false
+    t.text     "notes"
   end
 
   create_table "pickup_codes", force: :cascade do |t|

@@ -4,7 +4,8 @@ class Payment < ApplicationRecord
   has_many :payment_payables, through: :payment_payable_payments
 
   #'applied' means to a payment payable
-  validates :amount_applied, presence: true
+  validates :amount, :amount_applied, presence: true
+  validates :amount, :amount_applied, numericality: true
 
   def amount_outstanding
     return (amount - amount_applied).round(2)

@@ -130,30 +130,22 @@
             <div class="anchor" id="delivery_not_guaranteed">
               <h3>Delivery Not Guaranteed</h3>
               <p>
-                Farmer's Cellar never guarantees ordered products will get delivered for several reasons. Here's why:
+                Farmer's Cellar never guarantees ordered products will be delivered for several reasons:
               </p>
+              <ol>
+                <li>Farmer doesn't have enough product (see <%= link_to "Farmer Flexibility", how_things_work_path(anchor: "farmer_flexibility"), class: "self-link" %>)</li>
+                <li>A Group Order Minimum wasn't met (see <%= link_to "Group Order Minimums", how_things_work_path(anchor: "order_minimums"), class: "self-link" %>)</li>
+                <li>A case wasn't fully filled (see <%= link_to "Case Constraints", how_things_work_path(anchor: "case_constraints"), class: "self-link" %>)</li>
+              </ol>
 
-              <dl>
-
-                <dt class="anchor" id="farmer_flexibility">Farmer Flexibility</dt>
-                <dd>
-                  We serve small farmers only. It can be challenging for small farms to know exactly how much product they have available because it's still on the tree/vine/stalk etc. So we built Farmer's Cellar from day #1 with what we call 'farmer flexibility' in mind. What this means is that when a customer places an order the customer is obligated to pay if the farmer delivers but the farmer is never obligated to deliver. This frees the farmer up to focus more on making high quality food and less on 'inventory' precision. A downside is that sometimes a customer won't get food they ordered. If you don't get ordered food you don't get charged.
-                </dd>
-
-                <dt>Unmet Group Order Minimums</dt>
-                <dd>Please see <%= link_to "Group Order Minimums", how_things_work_path(anchor: "order_minimums"), class: "self-link" %>.</dd>
-
-                <dt>Unfilled Case</dt>
-                <dd>Please see <%= link_to "Case Constraints", how_things_work_path(anchor: "case_constraints"), class: "self-link" %>.</dd>
-
-              </dl>
+              <p>See <%= link_to "Skipped Deliveries", how_things_work_path(anchor: "skipped_deliveries"), class: "self-link" %> if your product was not delivered.</p>
 
             </div>
 
             <div class="anchor" id="skipped_deliveries">
               <h3>Skipped Deliveries</h3>
               <p>
-                We don't guarantee delivery on the <%= link_to "Scheduled Delivery Date", how_things_work_path(anchor: "scheduled_delivery_date"), class: "self-link" %> (See <%= link_to "Delivery Not Guaranteed", how_things_work_path(anchor: "delivery_not_guaranteed") %>). If delivery is skipped, we won't notify you. Instead, we'll just keep rolling your order to the next Scheduled Delivery Date and notify you once it fills. Please see <%= link_to "How Can I Tell What my Order's Currently Scheduled Delivery Date is?", support_path(anchor: "where_is_currently_scheduled_delivery_date") %>
+                We don't guarantee delivery on the <%= link_to "Scheduled Delivery Date", how_things_work_path(anchor: "scheduled_delivery_date"), class: "self-link" %> (See <%= link_to "Delivery Not Guaranteed", how_things_work_path(anchor: "delivery_not_guaranteed") %>). If delivery is skipped, we won't notify you. Instead, unless you <%= link_to "cancel your order", how_things_work_path(anchor: "cancellation"), class: "self-link" %>, we'll just keep rolling your order to the next Scheduled Delivery Date and notify you once it fills. Please see <%= link_to "How Can I Tell What my Order's Currently Scheduled Delivery Date is?", support_path(anchor: "where_is_currently_scheduled_delivery_date") %>
               </p>
             </div>
 
@@ -209,6 +201,13 @@
               </p>
               <p>
                 For this reason it's important to remain aware of Order Cutoffs on an ongoing basis for all subscriptions. It is 100% your responsibility to be aware of the Order Cutoff times for any product subscriptions you authorize.
+              </p>
+            </div>
+
+            <div class="anchor" id="farmer_flexibility">
+              <h3>Farmer Flexibility</h3>
+              <p>
+                We serve small farmers only. It can be challenging for small farms to know exactly how much product they have available because it's still on the tree/vine/stalk etc. So we built Farmer's Cellar from day #1 with what we call 'Farmer Flexibility' in mind. What this means is that when a customer places an order the customer is obligated to pay if the farmer delivers but the farmer is never obligated to deliver (see <%= link_to "Delivery Not Guaranteed", how_things_work_path(anchor: "delivery_not_guaranteed"), class: "self-link" %>). This frees the farmer up to focus more on making high quality food and less on 'inventory' precision. A downside is that sometimes a customer won't get food they ordered. If you don't get ordered food you don't get charged.
               </p>
             </div>
 

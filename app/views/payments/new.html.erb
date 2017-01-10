@@ -1,2 +1,22 @@
-<h1>Payments#new</h1>
-<p>Find me in app/views/payments/new.html.erb</p>
+<h1>New Payment</h1>
+
+<%= form_for @payment do |f| %>
+  
+  <%= render partial: 'shared/error_messages_general', locals: { active_record_object: @payment } %>
+
+  <%= f.label :amount %>
+  <%= f.number_field :amount, class: 'form-control' %>
+  
+  <%= f.label :notes %>  
+  <%= f.text_area :notes, class: "form-control", rows: "8" %>
+
+  <%= f.hidden_field :amount_applied, class: 'form-control' %>
+
+  <% if @creditor_order %>
+    <%= hidden_field_tag :creditor_order_id, @creditor_order.id, class: 'form-control' %>
+  <% end %>
+
+  <%= f.submit "Create payment", class: "btn btn-lg btn-primary" %>
+
+<% end %>
+
