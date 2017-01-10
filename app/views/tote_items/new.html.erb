@@ -113,14 +113,25 @@
           <div class="anchor panel-heading" id="heading">
             <h4 class="panel-title" data-toggle="collapse" data-parent="#accordion" data-target="#orderCutoff">
               <div class="clearfix">                
-                Delivery <%= @posting.delivery_date.strftime("%A, %B %-d") %><span id="orderCutoffChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>
-                
+                Scheduled Delivery <%= @posting.delivery_date.strftime("%a, %b %-d") %>
+                <span id="orderCutoffChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>
+                <span class="alert-info glyphicon glyphicon-asterisk pull-right"></span>
               </div>
             </h4>
           </div>
           <div id="orderCutoff" class="panel-collapse collapse" data-chevron="#orderCutoffChevron">
-            <div class="panel-body">                            
-              <%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff") %>: <%= @posting.order_cutoff.strftime("%A, %B %-d, %l:%M %p") %>
+            <div class="panel-body">
+              <ul class="list-group">
+
+                <li class="list-group-item">
+                  <%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff") %>: <%= @posting.order_cutoff.strftime("%a, %b %-d, %l:%M %p") %>
+                </li>
+                <li class="list-group-item">
+                  <span class="alert-info glyphicon glyphicon-asterisk"></span> Deliveries occur on schedule subject to several constraints. Please be aware of our <%= link_to "Delivery Not Guaranteed", how_things_work_path(anchor: "delivery_not_guaranteed") %> policy.
+                </li>
+
+                
+              </ul>
             </div>
           </div>
         </div>

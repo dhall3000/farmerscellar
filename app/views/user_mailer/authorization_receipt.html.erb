@@ -16,7 +16,7 @@ Here is the product information for which you authorized payment:
       <th align="left">ID</th>
       <th align="left">Producer</th>
       <th align="left">Product</th>
-      <th align="left">Delivery Date</th>
+      <th align="left" style="background-color:#DFFCD2;">Scheduled Delivery*</th>
       <th align="left">Price</th>
       <th align="center">Quantity</th>
       <th align="center">Sub Total</th>
@@ -57,22 +57,22 @@ Here is the product information for which you authorized payment:
 
 <% end %>
 
+<p>
+<span style="background-color:#DFFCD2;">*Please be aware of our <%= link_to "Delivery Not Guaranteed", how_things_work_url(anchor: "delivery_not_guaranteed") %> policy</span>. When products are delivered:
+</p>
+
+<ul>
+  <li>We'll send a delivery notification email on any day that product is delivered</li>
+  <li>The delivery notification email will contain all information necessary to pick up your products</li>
+  <li>Delivered products must be picked up by 8PM the Monday following delivery</li>
+  <li>Charges to your payment account will be made after products are delivered</li>  
+</ul>
+
 <% if @policies_update_time %>
   <p>
     <%= link_to "Our policies", how_things_work_url %> were last updated <%= @policies_update_time.strftime("%A, %B %d, %Y") %>.
   </p>
 <% end %>
-
-<p>
-Please keep in mind we never guarantee ordered products will be delivered. If your products are delivered:
-</p>
-
-<ul>
-  <li>We'll send a delivery notification email on each of the delivery dates listed above</li>
-  <li>The delivery notification email will contain all information necessary to pick up your products</li>
-  <li>Delivered products must be picked up by 8PM the Monday following delivery</li>
-  <li>Charges to your payment account will be made after products are delivered</li>  
-</ul>
 
 <p>
 Thanks!

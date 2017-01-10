@@ -6,7 +6,7 @@ Here is the product information for which you authorized payment:
 
 <% @tote_items.each do |tote_item| %>
 --------------------------------------------------------------------------------------------------------
-ID=<%= tote_item.id %>, <%= tote_item.posting.user.farm_name %> <%= tote_item.posting.product.name %> quantity <%= tote_item.quantity %> @ <%= number_to_currency(tote_item.price) %> per <%= tote_item.posting.unit.name %>, Sub Total <%= number_to_currency(get_gross_item(tote_item)) %>, delivered on <%= tote_item.posting.delivery_date.strftime("%A %b %d, %Y") %>
+ID=<%= tote_item.id %>, <%= tote_item.posting.user.farm_name %> <%= tote_item.posting.product.name %> quantity <%= tote_item.quantity %> @ <%= number_to_currency(tote_item.price) %> per <%= tote_item.posting.unit.name %>, Sub Total <%= number_to_currency(get_gross_item(tote_item)) %>, scheduled delivery* on <%= tote_item.posting.delivery_date.strftime("%A %b %d, %Y") %>
 <% end %>
 
 <% if @subscriptions %>
@@ -18,17 +18,19 @@ The total payment amount authorized for the products listed above is <%= number_
 <% else %>
 The total payment amount authorized is <%= number_to_currency(@amount) %>.
 <% end %>
+
+*Please be aware of our Delivery Not Guaranteed policy: <%= how_things_work_url(anchor: "delivery_not_guaranteed") %>
+
+When products are delivered:
+
+-We'll send a delivery notification email on any day that product is delivered
+-The delivery notification email will contain all information necessary to pick up your products
+-Delivered products must be picked up by 8PM the Monday following delivery
+-Charges to your payment account will be made after products are delivered
 <% if @policies_update_time %>
 
 Our policies were last updated <%= @policies_update_time.strftime("%A, %B %d, %Y") %> and are detailed here: <%= how_things_work_url %>.
 <% end %>
-
-Please keep in mind we never guarantee ordered products will be delivered. If your products are delivered:
-
--We'll send a delivery notification email on each of the delivery dates listed above
--The delivery notification email will contain all information necessary to pick up your products
--Delivered products must be picked up by 8PM the Monday following delivery
--Charges to your payment account will be made after products are delivered
 
 Thanks!
 

@@ -100,39 +100,29 @@
             <% end %>
 
 
-
-
-            <% if posting.posting_recurrence && posting.posting_recurrence.on %>
-
-              <div class="panel panel-default">
-                <div class="panel-heading" id=<%= "#{count.to_s}delivery" %>>
-                  <h4 class="panel-title" data-toggle="collapse" data-parent=<%= "##{count.to_s}accordion" %> data-target=<%= "##{count.to_s}deliveryDetails" %>>
-                    Next Delivery <%= posting.delivery_date.strftime("%A %b %d") %>
-                    <span id=<%= "deliveryDetailsChevron#{count.to_s}" %> class="glyphicon glyphicon-chevron-down pull-right"></span>
-                  </h4>
-                </div>          
-                <div id=<%= "#{count.to_s}deliveryDetails" %> class="panel-collapse collapse" data-chevron=<%= "#deliveryDetailsChevron#{count.to_s}" %>>
-                  <div class="panel-body">
-                    <ul class="list-group">                            
+            <div class="panel panel-default">
+              <div class="panel-heading" id=<%= "#{count.to_s}delivery" %>>
+                <h4 class="clearfix panel-title" data-toggle="collapse" data-parent=<%= "##{count.to_s}accordion" %> data-target=<%= "##{count.to_s}deliveryDetails" %>>
+                  Scheduled Delivery <%= posting.delivery_date.strftime("%a %b %d") %>                  
+                  <span id=<%= "deliveryDetailsChevron#{count.to_s}" %> class="glyphicon glyphicon-chevron-down pull-right"></span>
+                  <span class="alert-info glyphicon glyphicon-asterisk pull-right"></span>
+                </h4>
+              </div>          
+              <div id=<%= "#{count.to_s}deliveryDetails" %> class="panel-collapse collapse" data-chevron=<%= "#deliveryDetailsChevron#{count.to_s}" %>>
+                <div class="panel-body">
+                  <ul class="list-group">                            
+                    <% if posting.posting_recurrence && posting.posting_recurrence.on %>
                       <li class="list-group-item">
-                        <%= PostingRecurrence.frequency[posting.posting_recurrence.frequency][0] %>
+                        Deliveries scheduled <%= PostingRecurrence.frequency[posting.posting_recurrence.frequency][0].downcase %>
+                      </li>                    
+                    <% end %>
+                      <li class="list-group-item">
+                        <span class="alert-info glyphicon glyphicon-asterisk"></span> Deliveries occur on schedule subject to several constraints. Please be aware of our <%= link_to "Delivery Not Guaranteed", how_things_work_path(anchor: "delivery_not_guaranteed") %> policy.                        
                       </li>
-                    </ul>
-                  </div>
-                </div>                
-              </div>
-
-            <% else %>
-
-              <div class="panel panel-default">
-                <div class="panel-heading" id=<%= "#{count.to_s}delivery" %>>
-                  <h4 class="panel-title">                          
-                      Delivery <%= posting.delivery_date.strftime("%A %b %d") %>                    
-                  </h4>
-                </div>          
-              </div>
-
-            <% end %>
+                  </ul>
+                </div>
+              </div>                
+            </div>
 
 
 

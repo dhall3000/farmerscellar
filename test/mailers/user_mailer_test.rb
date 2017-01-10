@@ -99,18 +99,18 @@ class UserMailerTest < ActionMailer::TestCase
 
     user = users(:c1)
     user.tote_items.update_all(state: ToteItem.states[:AUTHORIZED])
-    checkout = Checkout.new(token: "mytoken", amount: get_gross_tote(user.tote_items), client_ip: "127.0.0.1", response: "response bla bla bla response", is_rt: false)
+    checkout = Checkout.new(token: "mytoken", amount: ToteItemsController.helpers.get_gross_tote(user.tote_items), client_ip: "127.0.0.1", response: "response bla bla bla response", is_rt: false)
     assert checkout.valid?
     assert checkout.save
     checkout.tote_items << user.tote_items
 
     authorization = Authorization.new(token: "mytoken",
       payer_id: "payid",
-      amount: get_gross_tote(user.tote_items),
+      amount: ToteItemsController.helpers.get_gross_tote(user.tote_items),
       correlation_id: "correlation_id",
       transaction_id: "transaction_id",
       payment_date: Time.zone.now,
-      gross_amount: get_gross_tote(user.tote_items) - 5,
+      gross_amount: ToteItemsController.helpers.get_gross_tote(user.tote_items) - 5,
       response: "response bla bla bla",
       ack: "success"
       )
@@ -125,11 +125,11 @@ class UserMailerTest < ActionMailer::TestCase
     assert_equal ["david@farmerscellar.com"], mail.from
 
     assert_match "This is your Farmer's Cellar receipt for payment authorization", mail.body.encoded
-    authorized_amount = get_gross_tote(checkout.tote_items)
+    authorized_amount = ToteItemsController.helpers.get_gross_tote(checkout.tote_items)
     assert authorized_amount > 0
-    assert_match number_to_currency(authorized_amount), mail.body.encoded
+    assert_match ActiveSupport::NumberHelper.number_to_currency(authorized_amount), mail.body.encoded
     assert_match "The total payment amount authorized is", mail.body.encoded
-    assert_match "We'll send a delivery notification email on each of the delivery dates listed above", mail.body.encoded    
+    assert_match "We'll send a delivery notification email on any day that product is delivered", mail.body.encoded    
    
   end
 
@@ -143,12 +143,12 @@ class UserMailerTest < ActionMailer::TestCase
     add_subscription_and_item_to_c1
     
     rtauthorization = Rtauthorization.new(rtba: rtba)
-    subscriptions = get_active_subscriptions_for(user)
+    subscriptions = ToteItemsController.helpers.get_active_subscriptions_for(user)
     rtauthorization.authorize_items_and_subscriptions(user.tote_items, subscriptions)
     assert rtauthorization.valid?
     assert rtauthorization.save
 
-    subscriptions = get_active_subscriptions_for(user)
+    subscriptions = ToteItemsController.helpers.get_active_subscriptions_for(user)
     mail = UserMailer.authorization_receipt(user, rtauthorization, user.tote_items, subscriptions)
 
     assert_equal "Authorization receipt", mail.subject
@@ -156,12 +156,12 @@ class UserMailerTest < ActionMailer::TestCase
     assert_equal ["david@farmerscellar.com"], mail.from
 
     assert_match "This is your Farmer's Cellar receipt for payment authorization", mail.body.encoded
-    authorized_amount = get_gross_tote(user.tote_items)
+    authorized_amount = ToteItemsController.helpers.get_gross_tote(user.tote_items)
     assert authorized_amount > 0
-    assert_match number_to_currency(authorized_amount), mail.body.encoded
+    assert_match ActiveSupport::NumberHelper.number_to_currency(authorized_amount), mail.body.encoded
     assert_match "Additionally, you authorized future charges to your payment account associated with the following subscription", mail.body.encoded
     assert_match user.subscriptions.last.description, mail.body.encoded
-    assert_match "We'll send a delivery notification email on each of the delivery dates listed above", mail.body.encoded    
+    assert_match "We'll send a delivery notification email on any day that product is delivered", mail.body.encoded    
 
   end
 

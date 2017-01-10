@@ -307,11 +307,13 @@ a.non-blue { color: inherit; }
   transition:transform 180ms ease-in;
 }
 
-.glyphicon{
+.glyphicon {
   transition:transform 360ms ease-in;
+  background:transparent;
 }
 
 .glyphicon.rotate-360{
   transform: rotate(360deg);
   transition:transform 360ms ease-in;
 }
+
