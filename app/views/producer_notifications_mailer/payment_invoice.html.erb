@@ -1,16 +1,11 @@
-<% if @business_interface.payment_method?(:PAYPAL) %>
-  <p>Hi <%= @business_interface.name %>,</p>
-  <p>We just sent you a total of <%= number_to_currency(@payment.amount) %> as payment for the following products / quantities:</p>
-<% else %>
-  <p>Hi <%= @email %>,</p>
-  <p>Get payment of <%= number_to_currency(@payment.amount) %> to <%= @business_interface.name %> for the following products / quantities:</p>
-<% end %>
+<p>Hi <%= @creditor_order.business_interface.name %>,</p>
+<p>Here's a 'paper' trail for the <%= number_to_currency(@payment.amount) %> payment we just made for the following products / quantities:</p>
 
 <table border="1">
   <thead>
     <tr>		    
       <th align="left">ID</th>
-      <% if @business_interface.user.distributor? %>
+      <% if @creditor_order.business_interface.user.distributor? %>
         <th align="center">Producer</th>
       <% end %>
       <th align="center">Product</th>
@@ -22,27 +17,24 @@
     </tr>
   </thead>
   <tbody>  
-    <% @posting_infos.each do |posting, value| %>    
+    <% @creditor_order.postings.each do |posting| %>    
       <tr>
         <td align="left"><%= posting.id %></td>
-        <% if @business_interface.user.distributor? %>
+        <% if @creditor_order.business_interface.user.distributor? %>
           <td align="left"><%= posting.user.farm_name %></td>
         <% end %>
         <td align="center"><%= posting.product.name %></td>
         <td align="center"><%= posting.delivery_date.strftime("%A %b %d, %Y") %></td>
         <td align="center"><%= posting.unit.name %></td>        
-        <td align="center"><%= value[:unit_count] %></td>
-        <td align="center"><%= number_to_currency(value[:unit_price]) %></td>
-        <td align="center"><%= number_to_currency(value[:sub_total]) %></td>
+        <td align="center"><%= posting.num_units_filled %></td>
+        <td align="center"><%= number_to_currency(posting.get_producer_net_unit) %></td>
+        <td align="center"><%= number_to_currency(posting.inbound_order_value_producer_net) %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
 
 <p>Payment ID# <%= @payment.id.to_s %></p>
-<% if !@business_interface.payment_method?(:PAYPAL) %>
-  <p>Payment Instructions: <%= @business_interface.payment_instructions %></p>
-<% end %>
 
 <p>
 Thanks!

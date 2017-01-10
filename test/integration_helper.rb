@@ -923,7 +923,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
     #verify proper summary statement
     payment_total = verify_producer_payment(postings)    
-    summary = "We just sent you a total of #{number_to_currency(payment_total)} as payment for the following products"
+    summary = "Here's a 'paper' trail for the #{number_to_currency(payment_total)} payment we just made for the following products / quantities:"
     assert_match summary, payment_receipt_mail.body.encoded
 
     #verify all the subtotal values exist

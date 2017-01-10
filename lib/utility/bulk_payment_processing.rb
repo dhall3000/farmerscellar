@@ -32,8 +32,7 @@ class BulkPaymentProcessing
         co.creditor_order.add_payment(payment)
         bp.payment_payables += co.reload.payment_payables
         
-        posting_infos = get_posting_infos(co.payment_payables.pluck(:id))
-        ProducerNotificationsMailer.payment_invoice(co.creditor, payment, posting_infos).deliver_now
+        ProducerNotificationsMailer.payment_invoice(co.creditor_order, payment).deliver_now
 
         if payment_info_by_creditor_id[co.creditor.id].nil?
           payment_info_by_creditor_id[co.creditor.id] = {amount: 0.0}
@@ -341,32 +340,6 @@ class BulkPaymentProcessing
 
       return response
 
-    end
-
-    def self.get_posting_infos(payment_payable_ids)
-      posting_infos = {}
-
-      payment_payable_ids.each do |payment_payable_id|
-
-        pp = PaymentPayable.find(payment_payable_id)
-
-        pp.tote_items.each do |tote_item|
-
-          if posting_infos.has_key?(tote_item.posting)
-            next
-          end
-
-          posting_infos[tote_item.posting] = {unit_count: 0, unit_price: 0, sub_total: 0}
-          posting_infos[tote_item.posting][:unit_count] = tote_item.posting.num_units_filled
-          posting_infos[tote_item.posting][:sub_total] = tote_item.posting.inbound_order_value_producer_net
-          posting_infos[tote_item.posting][:unit_price] = tote_item.posting.get_producer_net_unit
-
-        end
-
-      end
-
-      return posting_infos
-      
     end
 
     def self.get_credentials_hash

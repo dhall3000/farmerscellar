@@ -76,21 +76,17 @@ class ProducerNotificationsMailer < ApplicationMailer
 
   end
 
-  def payment_invoice(creditor, payment, posting_infos)
+  def payment_invoice(creditor_order, payment)
 
-    @business_interface = creditor.get_business_interface
+    @creditor_order = creditor_order    
 
     subject = "Payment receipt"
 
-    if @business_interface.payment_method?(:PAYPAL)
-      @email = @business_interface.paypal_email
-    else
-      @email = "david@farmerscellar.com"
-      subject = "admin action required: " + subject
+    if @creditor_order.business_interface.payment_method?(:PAYPAL)
+      @email = @creditor_order.business_interface.paypal_email    
     end
     
     @payment = payment
-    @posting_infos = posting_infos
 
     mail to: @email, subject: subject
 

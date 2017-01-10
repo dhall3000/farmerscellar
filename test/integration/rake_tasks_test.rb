@@ -240,12 +240,12 @@ class RakeTasksTest < BulkBuyer
         assert_appropriate_email(emails[0], "c7@c.com", "Purchase receipt", "Here is your Farmer's Cellar purchase receipt.")
         assert_appropriate_email(emails[1], "c6@c.com", "Purchase receipt", "Here is your Farmer's Cellar purchase receipt.")          
         assert_appropriate_email(emails[2], "david@farmerscellar.com", "bulk purchase report", "BulkPurchase id: 2")
-        assert_appropriate_email(emails[3], "f1@f.com", "Payment receipt", "We just sent you a total of")
+        assert_appropriate_email(emails[3], "f1@f.com", "Payment receipt", "Here's a 'paper' trail for the")
         #yep, there should be two to f1. reason is because F1 had a delivery on Monday and another on Wednesday. they have different order cutoffs so they got submitted to
         #producer on different orders so they get different payments even though payment went through on the same day. we want it this way because a 1-1 ration of
         #orders and payments will make reconciliation easier. plus, it's unlikely we'll have same farmer delivering on different days in same week.
-        assert_appropriate_email(emails[4], "f1@f.com", "Payment receipt", "We just sent you a total of")
-        assert_appropriate_email(emails[5], "f2@f.com", "Payment receipt", "We just sent you a total of")
+        assert_appropriate_email(emails[4], "f1@f.com", "Payment receipt", "Here's a 'paper' trail for the")
+        assert_appropriate_email(emails[5], "f2@f.com", "Payment receipt", "Here's a 'paper' trail for the")
         assert_appropriate_email(emails[6], "david@farmerscellar.com", "BulkPayment report", "The sum of paypal payments is")
 
         assert_equal 0, CreditorObligation.where("balance > 0").count
@@ -260,7 +260,7 @@ class RakeTasksTest < BulkBuyer
         assert_equal 4, ActionMailer::Base.deliveries.count
         assert_appropriate_email(emails[0], "c5@c.com", "Purchase receipt", "Here is your Farmer's Cellar purchase receipt.")
         assert_appropriate_email(emails[1], "david@farmerscellar.com", "bulk purchase report", "BulkPurchase id: 3")
-        assert_appropriate_email(emails[2], "f2@f.com", "Payment receipt", "We just sent you a total of")
+        assert_appropriate_email(emails[2], "f2@f.com", "Payment receipt", "Here's a 'paper' trail for the")
         assert_appropriate_email(emails[3], "david@farmerscellar.com", "BulkPayment report", "The sum of paypal payments is")
       end
 
