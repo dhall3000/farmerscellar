@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170110215151) do
+ActiveRecord::Schema.define(version: 20170110221430) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -133,7 +133,6 @@ ActiveRecord::Schema.define(version: 20170110215151) do
 
   create_table "business_interfaces", force: :cascade do |t|
     t.string   "name",                              null: false
-    t.boolean  "order_email_accepted"
     t.string   "order_email"
     t.string   "order_instructions"
     t.string   "paypal_email"

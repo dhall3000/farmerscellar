@@ -45,16 +45,16 @@ class DistributorTest < BulkBuyer
 
     #first modify the business interfaces properly
     bi = business_interfaces(:one)
-    bi.update(order_email_accepted: false, order_email: nil, order_instructions: "go to www.bigtimedistributor.com and manually submit order there. be sure to use a 1 when placing order.")
+    bi.update(order_email: nil, order_instructions: "go to www.bigtimedistributor.com and manually submit order there. be sure to use a 1 when placing order.")
     bi.reload
-    assert_not bi.order_email_accepted
+    assert_not bi.order_email
     assert_equal nil, bi.order_email
     assert_not bi.order_instructions.nil?
 
     bi = business_interfaces(:two)
-    bi.update(order_email_accepted: false, order_email: nil, order_instructions: "go to www.f8farm.com and manually submit order there. do this before noon!")
+    bi.update(order_email: nil, order_instructions: "go to www.f8farm.com and manually submit order there. do this before noon!")
     bi.reload
-    assert_not bi.order_email_accepted
+    assert_not bi.order_email
     assert_equal nil, bi.order_email
     assert_not bi.order_instructions.nil?
 

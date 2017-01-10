@@ -481,7 +481,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     order_cutoff = delivery_date - 2.days
 
     distributor = create_producer("distributor", "distributor@d.com")
-    distributor.create_business_interface(name: "Distributor Inc.", order_email_accepted: true, order_email: distributor.email, payment_method: BusinessInterface.payment_methods[:PAYPAL], paypal_email: distributor.email)
+    distributor.create_business_interface(name: "Distributor Inc.", order_email: distributor.email, payment_method: BusinessInterface.payment_methods[:PAYPAL], paypal_email: distributor.email)
 
     #maybe we can/will parameterize this later?
     if false
@@ -564,7 +564,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     order_cutoff = delivery_date - 2.days
 
     distributor = create_producer("distributor", "distributor@d.com")
-    distributor.create_business_interface(name: "Distributor Inc.", order_email_accepted: true, order_email: distributor.email, payment_method: BusinessInterface.payment_methods[:PAYPAL], paypal_email: distributor.email)
+    distributor.create_business_interface(name: "Distributor Inc.", order_email: distributor.email, payment_method: BusinessInterface.payment_methods[:PAYPAL], paypal_email: distributor.email)
 
     #maybe we can/will parameterize this later?
     if false
@@ -700,7 +700,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
     subject = "Current orders for upcoming deliveries"
 
-    if business_interface.order_email_accepted
+    if business_interface.order_email
       email = business_interface.order_email
     else
       email = "david@farmerscellar.com"

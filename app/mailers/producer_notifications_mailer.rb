@@ -29,7 +29,7 @@ class ProducerNotificationsMailer < ApplicationMailer
 
     subject = "Current orders for upcoming deliveries"
 
-    if @business_interface.order_email_accepted
+    if @business_interface.order_email
       @email = @business_interface.order_email      
     else
       @email = "david@farmerscellar.com"

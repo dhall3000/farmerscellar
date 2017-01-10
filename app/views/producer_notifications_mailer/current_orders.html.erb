@@ -1,4 +1,4 @@
-<% if @business_interface.order_email_accepted %>
+<% if @business_interface.order_email %>
   <p>
     Hi <%= @business_interface.name %>,
   </p>
@@ -63,7 +63,7 @@
   </tbody>
 </table>
 
-<% if !@business_interface.order_email_accepted && !@business_interface.order_instructions.empty? %>
+<% if !@business_interface.order_email && !@business_interface.order_instructions.empty? %>
 <p>Order Instructions: <%= @business_interface.order_instructions %></p>
 <% end %>
 
