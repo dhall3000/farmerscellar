@@ -29,6 +29,9 @@ class PaymentsController < ApplicationController
 
     if @creditor_order
       @creditor_order.add_payment(@payment)
+      if @creditor_order.business_interface.payment_receipt_email
+        ProducerNotificationsMailer.payment_receipt(@creditor_order, @payment).deliver_now
+      end
       redirect_to creditor_order_path(@creditor_order)
       return
     end    

@@ -76,7 +76,7 @@ class ProducerNotificationsMailer < ApplicationMailer
 
   end
 
-  def payment_invoice(creditor_order, payment)
+  def payment_receipt(creditor_order, payment)
 
     @creditor_order = creditor_order    
 

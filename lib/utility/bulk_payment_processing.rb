@@ -32,7 +32,7 @@ class BulkPaymentProcessing
         co.creditor_order.add_payment(payment)
         bp.payment_payables += co.reload.payment_payables
         
-        ProducerNotificationsMailer.payment_invoice(co.creditor_order, payment).deliver_now
+        ProducerNotificationsMailer.payment_receipt(co.creditor_order, payment).deliver_now
 
         if payment_info_by_creditor_id[co.creditor.id].nil?
           payment_info_by_creditor_id[co.creditor.id] = {amount: 0.0}

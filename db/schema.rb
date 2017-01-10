@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170110195404) do
+ActiveRecord::Schema.define(version: 20170110215151) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -132,17 +132,18 @@ ActiveRecord::Schema.define(version: 20170110195404) do
   end
 
   create_table "business_interfaces", force: :cascade do |t|
-    t.string   "name",                             null: false
+    t.string   "name",                              null: false
     t.boolean  "order_email_accepted"
     t.string   "order_email"
     t.string   "order_instructions"
     t.string   "paypal_email"
     t.string   "payment_instructions"
     t.integer  "user_id"
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
-    t.integer  "payment_method",       default: 0, null: false
-    t.integer  "payment_time",         default: 2, null: false
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+    t.integer  "payment_method",        default: 0, null: false
+    t.integer  "payment_time",          default: 2, null: false
+    t.string   "payment_receipt_email"
     t.index ["user_id"], name: "index_business_interfaces_on_user_id"
   end
 
