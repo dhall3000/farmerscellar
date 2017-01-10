@@ -5,42 +5,131 @@
   
   <div class="col-xs-12 col-sm-8 col-sm-offset-2">
 
+
+
     <div class="panel-group" id="accordion">
 
-      
+
+
       <div class="panel panel-default">        
-        <div class="anchor panel-heading" id="order_minimums">
-          <h4 class="panel-title" data-toggle="collapse" data-parent="#accordion" data-target="#orderMinimumsBody">
-            Group Order Minimums<span id="orderMinimumsBodyChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>            
-          </h4>
+        <div class="anchor panel-heading" id="ordering">
+          <div class="panel-title" data-toggle="collapse" data-parent="#accordion" data-target="#orderingBody">
+            Ordering<span id="orderingBodyChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>            
+          </div>
         </div>
-        <div id="orderMinimumsBody" class="panel-collapse collapse" data-chevron="#orderMinimumsBodyChevron">
-          <div class="panel-body">            
-            <div class="anchor" id="have_order_minimums_been_met">
-              <div class="anchor" id="determine_order_minimums_before_ordering">              
-                <h3>How Can I Tell if Group Order Minimums Have Been Met Before I Order?</h3>
+        <div id="orderingBody" class="panel-collapse collapse" data-chevron="#orderingBodyChevron">
+          <div class="panel-body">
+            
+            <div class="anchor" id="order_minimums">
+              <h3>Group Order Minimums</h3> 
+              
+              <div class="well">
+                <p>How can I tell if a Group Order Minimum has been met before I place my order?</p>
                 <p>
-                  Click ‘Shop’, then find the product of interest. Click ‘Order’. If there is a <%= link_to "Group Order Minimum", how_things_work_path(anchor: "order_minimums") %> and it hasn’t been achieved you’ll see a spinning red exclamation point. Click that and you’ll see how much remains to achieve the minimum.
+                  Click ‘Shop’, then find the product of interest. Click ‘Order’. If there is a <%= link_to "Group Order Minimum", how_things_work_path(anchor: "order_minimums") %> and it hasn’t been achieved you’ll see <span class="spin-continuously alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>. Whenever you see that spinning icon, click it and you’ll see how much remains to achieve the minimum.
                 </p>
               </div>
-              <div class="anchor" id="determine_order_minimums_before_ordering">              
-                <h3>How Can I Tell if Group Order Minimums Have Been Met After I Order?</h3>
+
+              <div class="well">
+                <p>How can I tell if a Group Order Minimum has been met after I place my order?</p>
                 <p>
-                  If you’ve already ordered and later want to see if a <%= link_to "Group Order Minimum", how_things_work_path(anchor: "order_minimums") %> has been achieved, log in to your Farmer’s Cellar account and go to the black header at the top of the page. Click either ‘Tote’ or ‘Orders’ depending on if you’ve authorized payment or not. If any of the products you’ve selected still have unmet Group Order Minimums you’ll see a spinning red exclamation point. Click that to find out more information.
+                  If you’ve already ordered and later want to see if a <%= link_to "Group Order Minimum", how_things_work_path(anchor: "order_minimums") %> has been achieved, log in to your Farmer’s Cellar account and go to the black header at the top of the page. Click either ‘Tote’ or ‘Orders’ depending on if you’ve authorized payment or not. If any of the products you’ve selected still have unmet Group Order Minimums you’ll see <span class="spin-continuously alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>. Whenever you see that spinning icon click it to find out more information.
                 </p>
               </div>
-            </div>            
+              
+            </div>
+
+            <div class="anchor" id="order_cutoff">
+              <h3>Order Cutoff</h3> 
+              
+              <div class="well">
+                <p>How can I view Order Cutoff?</p>
+                <p>
+                  <%= link_to "Order Cutoff", how_things_work_path(anchor: "order_cutoff") %> is the latest you can place or cancel an order. To find this date/time from your Tote or Orders page, click the <span class="glyphicon glyphicon-chevron-down"></span> to the left of any of the item rows. To find this information while shopping click the 'Order' button, then click the Scheduled Delivery date to reveal the Order Cutoff.
+                </p>
+              </div>
+              
+            </div>
+
           </div>
         </div>
       </div>
 
 
 
+
+      <div class="panel panel-default">        
+        <div class="anchor panel-heading" id="delivery">
+          <div class="panel-title" data-toggle="collapse" data-parent="#accordion" data-target="#deliveryBody">
+            Delivery<span id="deliveryBodyChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>            
+          </div>
+        </div>
+        <div id="deliveryBody" class="panel-collapse collapse" data-chevron="#deliveryBodyChevron">
+          <div class="panel-body">            
+            
+            <div class="anchor" id="where_is_currently_scheduled_delivery_date">              
+              <h3>How Can I Tell What my Order's Currently Scheduled Delivery Date is?</h3>
+              <p>
+                If you did not receive delivery on the date you were expecting it's possible your <%= link_to "delivery was skipped", how_things_work_path(anchor: "skipped_deliveries") %>. To find the currently <%= link_to "Scheduled Delivery Date", how_things_work_path(anchor: "scheduled_delivery_date") %> log in to your Farmer's Cellar account and click 'Orders' in the black header at the top of the page.
+              </p>
+            </div>
+                       
+          </div>
+        </div>
+      </div>
+
+
+
+
+      <div class="panel panel-default">        
+        <div class="anchor panel-heading" id="miscellaneous">
+          <div class="panel-title" data-toggle="collapse" data-parent="#accordion" data-target="#miscellaneousBody">
+            Miscellaneous<span id="miscellaneousBodyChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>            
+          </div>
+        </div>
+
+        <div id="miscellaneousBody" class="panel-collapse collapse" data-chevron="#miscellaneousBodyChevron">
+          <div class="panel-body">
+
+            <div class="anchor" id="icon_descriptions">
+              <h3>What Do the Various Icons Mean That I See on the Website?</h3>
+
+              <ul class="list-group">
+                <li id="spinning_red_exclamation_point" class="list-group-item anchor">
+                  <span class="spin-continuously alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> means there is some kind of problem that you definitely should be aware of. You can sometimes click the icon for more detailed information.
+                </li>
+                <li class="list-group-item">
+                  <span class="spin-continuously alert-info glyphicon glyphicon-info-sign" aria-hidden="true"></span> flags some kind of important information we'd like to make sure you're aware of. You can sometimes click the icon for more detailed information.
+                </li>
+                <li class="list-group-item">
+                  <div data-toggle="collapse" data-target="#chevronDescriptionBody">
+                    <span id="chevronDescriptionChevron" class="glyphicon glyphicon-chevron-down"></span> means you can click it to reveal more detailed information. Go ahead, click it...see what happens.
+                  </div>
+                  <div id="chevronDescriptionBody" class="collapse" data-chevron="#chevronDescriptionChevron">
+                    Simple enough.
+                  </div>
+                </li>
+              </ul>
+
+            </div>
+            
+
+
+
+
+          </div>
+        </div>
+      </div>
+
+
+
+
+
       <div class="panel panel-default">
         <div class="anchor panel-heading" id="detailed_posting_info">
-          <h4 class="panel-title" data-toggle="collapse" data-parent="#accordion" data-target="#detailed_posting_infoBody">
+          <div class="panel-title" data-toggle="collapse" data-parent="#accordion" data-target="#detailed_posting_infoBody">
             Detailed Posting Info<span id="detailed_posting_infoBodyChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>            
-          </h4>
+          </div>
         </div>
         <div id="detailed_posting_infoBody" class="panel-collapse collapse" data-chevron="#detailed_posting_infoBodyChevron">
           <div class="panel-body">
@@ -54,9 +143,9 @@
 
       <div class="panel panel-default">
         <div class="anchor panel-heading" id="password_reset_not_working">
-          <h4 class="panel-title" data-toggle="collapse" data-parent="#accordion" data-target="#password_reset_not_workingBody">            
+          <div class="panel-title" data-toggle="collapse" data-parent="#accordion" data-target="#password_reset_not_workingBody">            
             Password Reset Isn't Working<span id="password_reset_not_workingBodyChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>            
-          </h4>
+          </div>
         </div>
         <div id="password_reset_not_workingBody" class="panel-collapse collapse" data-chevron="#password_reset_not_workingBodyChevron">
           <div class="panel-body">

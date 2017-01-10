@@ -57,13 +57,25 @@
             <h2>Items</h2>
           </div>
           <div class="panel-body">
+            <div id="scheduledDeliveryExplanation" class="collapse" data-chevron="#scheduledDeliveryExplanationChevron">
+              <div class="alert alert-info">
+                <span class="glyphicon glyphicon-asterisk"></span> Deliveries occur on schedule subject to several constraints. Please be aware of our <%= link_to "Delivery Not Guaranteed", how_things_work_path(anchor: "delivery_not_guaranteed") %> policy.
+              </div>
+            </div>
             <table class="table">
               <thead>
                 <tr>          
                   <th class="text-left">Product</th>          
                   <th class="text-center hidden-xs">Quantity</th>
                   <th class="text-center hidden-xs">Price</th>
-                  <th class="text-center">Delivery</th>
+
+                  <th class="text-center">
+                    <span data-toggle="collapse" data-target="#scheduledDeliveryExplanation">Scheduled Delivery 
+                      <span class="alert-info glyphicon glyphicon-asterisk""></span>
+                      <span id="scheduledDeliveryExplanationChevron" class="glyphicon glyphicon-chevron-down"></span>
+                    </span>
+                  </th>
+
                   <th class="text-right">Sub total</th>                  
                 </tr>
               </thead>
