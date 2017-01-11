@@ -62,7 +62,8 @@
 
           <tr>
             <td class="text-left">Payment Type</td>
-            <td class="text-left"><%= "#{@creditor_order.business_interface.friendly_payment_method} #{@creditor_order.business_interface.friendly_payment_time}" %></td>
+            <td class="text-left"><%= @creditor_order.business_interface.friendly_payment_description %></td>
+
           </tr>
 
         </tbody>

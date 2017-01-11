@@ -29,7 +29,7 @@
                     <%= link_to co.business_interface.name, creditor_order_path(co) %>
                   </td>
                   <td class="text-center"><%= number_to_currency(co.order_value_producer_net) %></td>
-                  <td class="text-center"><%= "#{co.business_interface.friendly_payment_method} #{co.business_interface.friendly_payment_time}" %></td>
+                  <td class="text-center"><%= co.business_interface.friendly_payment_description %></td>
                   <td class="text-center"><%= number_to_currency(co.balance.to_f) %></td>
                   <td class="text-center">
                     <%= co.delivery_date.strftime("%A %B %d, %Y") %>

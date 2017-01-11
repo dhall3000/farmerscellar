@@ -4,6 +4,137 @@ require 'utility/rake_helper'
 
 class PaymentMethodsTest < IntegrationHelper
 
+  test "creditororder should balance on second payment when first cod payment insufficient" do
+    #payment comes before filling
+
+    assert_equal 0, CreditorOrder.count
+    admin = do_atorder_payment_setup(:CASH, :ONDELIVERY)
+    assert_equal 1, CreditorOrder.count
+    creditor_order = CreditorOrder.first
+
+    #ensure payment receipts are turned on
+    bi = creditor_order.business_interface
+    bi.update(payment_receipt_email: bi.order_email)
+    creditor_order.reload
+    
+    #verify this corder displays
+    creditor_orders_index_verify_presence(creditor_order)
+
+    #go to creditororder#show
+    get creditor_order_path(creditor_order)
+    assert_response :success
+    assert_template 'creditor_orders/show'
+    assert_select 'td.text-left', "OPEN"
+    assert_select 'td.text-left', number_to_currency(0)
+    #go to payment#new
+    get new_payment_path
+    assert_response :success
+    assert_template 'payments/new'    
+    #create a payment equal to a third the balance        
+    create_payment(creditor_order.order_value_producer_net / 3, amount_applied = 0, notes = "hello there", creditor_order)
+    #now do the fill
+    fully_fill_creditor_order(creditor_order)
+    assert creditor_order.reload.balance > 0
+    assert_not creditor_order.balanced?
+    #the new balance should be 2/3 the old balance
+    assert_equal ((creditor_order.order_value_producer_net * 2) / 3).round(2), creditor_order.balance    
+    #now create a payment equal to two thirds the balance, which is the remainder of the balance
+    create_payment_full_balance(creditor_order)
+
+    assert creditor_order.reload.balanced?
+    assert_equal 0, creditor_order.balance
+    assert creditor_order.state?(:CLOSED)
+
+    travel_back
+
+  end
+
+  test "creditororder should balance on second payment when first cod payment insufficient 2" do
+    #the only difference on this '2' test is that filling comes before payment
+
+    #this is so that later, once a PP has been created, we can pluck it out and verify that it's only partially paid.
+    #then after we square up with another payment we can again verify it, this time that it's been fully paid
+    assert_equal 0, PaymentPayable.count
+
+    assert_equal 0, CreditorOrder.count
+    admin = do_atorder_payment_setup(:CASH, :ONDELIVERY)
+    assert_equal 1, CreditorOrder.count
+    creditor_order = CreditorOrder.first
+
+    #ensure payment receipts are turned off
+    bi = creditor_order.business_interface
+    bi.update(payment_receipt_email: nil)
+    creditor_order.reload
+
+    fully_fill_creditor_order(creditor_order)
+    assert creditor_order.balance > 0
+    assert_not creditor_order.balanced?
+    original_balance = creditor_order.balance
+
+    log_in_as(admin)
+    #go to creditororder#index
+    get creditor_orders_path
+    assert_response :success
+    assert_template 'creditor_orders/index'    
+    #verify this corder displays
+    assert_select 'h2', "Open Orders"
+    assert_select 'td.text-center', "Cash on delivery"
+    #verify the business name shows up
+    assert_select 'a[href=?]', creditor_order_path(creditor_order), creditor_order.business_interface.name
+    #verify this corder has positive balance
+    assert_select 'td.text-center', number_to_currency(creditor_order.balance)
+    #go to creditororder#show
+    get creditor_order_path(creditor_order)
+    assert_response :success
+    assert_template 'creditor_orders/show'
+    assert_select 'td.text-left', "OPEN"
+    assert_select 'td.text-left', number_to_currency(creditor_order.balance)
+    #go to payment#new
+    get new_payment_path
+    assert_response :success
+    assert_template 'payments/new'
+    #create a payment equal to a third the balance
+    post payments_path, params: {creditor_order_id: creditor_order.id, payment: {amount: (creditor_order.balance / 3).round(2), amount_applied: 0, notes: "hello there!", }}
+    #verify now at creditororder#show
+    assert_response :redirect
+    assert_redirected_to creditor_order_path(creditor_order)
+    follow_redirect!
+
+    #verify there's a partially paid payment_payable
+    assert_equal 1, PaymentPayable.count
+    pp = PaymentPayable.first
+    assert pp.amount > 0
+    assert pp.amount_paid > 0
+    assert pp.amount > pp.amount_paid
+    assert_not pp.fully_paid
+
+    #verify balance displays
+    assert_select 'td.text-left', number_to_currency(creditor_order.reload.balance)
+    #verify balance is a third what it was but still positive
+    assert creditor_order.balance > 0
+    #the new balance should be 2/3 the old balance
+    assert_equal ((original_balance * 2) / 3).round(2), creditor_order.balance    
+    #now create a payment equal to two thirds the balance
+    post payments_path, params: {creditor_order_id: creditor_order.id, payment: {amount: ((original_balance * 2) / 3).round(2), amount_applied: 0, notes: "hello there!", }}
+    #verify now at creditororder#show
+    assert_response :redirect
+    assert_redirected_to creditor_order_path(creditor_order)
+    follow_redirect!
+    #verify balance displays zero
+    assert_select 'td.text-left', number_to_currency(0)
+    #verify state displays CLOSED
+    assert_select 'td.text-left', "CLOSED"
+
+    #verify that the previously partially paid pp is now fully paid
+    assert pp.reload.amount > 0
+    assert pp.amount_paid > 0
+    assert_equal pp.amount, pp.amount_paid
+    assert pp.fully_paid
+
+    travel_back
+
+  end
+
   test "automated payment engine should not process non paypal payment payables" do
     
     nuke_all_postings

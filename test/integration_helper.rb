@@ -3,22 +3,132 @@ require 'utility/rake_helper'
 
 class IntegrationHelper < ActionDispatch::IntegrationTest
 
-  def do_setup_for_payments_work
+  def log_in_as_admin(admin = nil)
+
+    if admin.nil?
+      admin = get_admin
+    end
+
+    log_in_as(admin)
+
+  end
+
+  def get_creditor_orders
+    log_in_as_admin
+    get creditor_orders_path
+    assert_response :success
+    assert_template 'creditor_orders/index'
+  end
+
+  def creditor_orders_index_verify_presence(creditor_order)
+    
+    get_creditor_orders
+
+    if creditor_order.state?(:OPEN)
+      open_or_closed = "Open Orders"
+    elsif creditor_order.state?(:CLOSED)
+      open_or_closed = "Closed Orders"
+    end
+
+    assert_select 'h2', open_or_closed
+    assert_select 'td.text-center', creditor_order.business_interface.friendly_payment_description
+
+    #verify the business name shows up
+    assert_select 'a[href=?]', creditor_order_path(creditor_order), creditor_order.business_interface.name
+    #verify the balance shows up
+    assert_select 'td.text-center', number_to_currency(creditor_order.balance)
+    
+  end
+
+  def create_payment(amount, amount_applied = 0, notes = nil, creditor_order = nil)
+    
+    log_in_as_admin
+        
+    if creditor_order
+      
+      creditor_order_id = creditor_order.id
+      prior_balance = creditor_order.balance
+
+      if creditor_order.creditor_obligation
+        prior_num_payments = creditor_order.creditor_obligation.payments.count
+      else
+        prior_num_payments = 0
+      end
+
+    else
+      creditor_order_id = nil
+    end
+
+    ActionMailer::Base.deliveries.clear
+    prior_mail_count = ActionMailer::Base.deliveries.count
+
+    post payments_path, params: {creditor_order_id: creditor_order_id, payment: {amount: amount.round(2), amount_applied: amount_applied.round(2), notes: notes}}
+
+    payment = assigns(:payment)
+    assert payment.valid?
+
+    if creditor_order
+
+      creditor_order.reload
+      #there positively must be an obligation object now that a payment has been made
+      assert creditor_order.creditor_obligation
+
+      if creditor_order.balance == 0
+        assert creditor_order.state?(:CLOSED)
+        assert creditor_order.balanced?
+      else
+        assert creditor_order.state?(:OPEN)
+      end
+
+      if creditor_order.business_interface.payment_receipt_email
+        assert_equal prior_mail_count + 1, ActionMailer::Base.deliveries.count
+        mail = ActionMailer::Base.deliveries.last
+        verify_payment_receipt_email(creditor_order.postings, payment)
+        #ProducerNotificationsMailer.payment_receipt(@creditor_order, @payment).deliver_now
+      else
+        assert_equal prior_mail_count, ActionMailer::Base.deliveries.count
+      end
+
+      #verify now at creditororder#show
+      assert_response :redirect
+      assert_redirected_to creditor_order_path(creditor_order)
+      follow_redirect!
+      #verify balance displays
+      assert_select 'td.text-left', number_to_currency(creditor_order.balance)
+      #verify the state displays
+      assert_select 'td.text-left', creditor_order.state_key.to_s
+      #verify balance reflects new payment
+      assert_equal (prior_balance - amount).round(2), creditor_order.balance
+      #verify creditor_order object now holds a reference to 1 more payment
+      assert_equal prior_num_payments + 1, creditor_order.creditor_obligation.payments.count
+      
+    end
+
+    return payment
+
+  end
+
+  def create_payment_full_balance(creditor_order)
+    return create_payment(creditor_order.balance, amount_applied = 0, notes = nil, creditor_order)
+  end
+
+  def do_atorder_payment_setup(payment_method_key, payment_time_key)
 
     #clean house
     nuke_all_postings
     nuke_all_users
     admin = create_admin
 
-    #create a bunch of producers and postings
-    create_producer_and_posting_for_each_payment_method_and_time
+    #create producer with the parameterized payments type
+    producer = create_creditor_with(payment_method_key, payment_time_key)
+    #create a posting for this producer
+    posting = create_posting(producer, price = 10)
+    
     #create a customer
     bob = create_new_customer("bob", "bob@b.com")
 
     #new customer does a bunch of shopping
-    Posting.all.each do |posting|
-      create_tote_item(bob, posting, 2)
-    end
+    create_tote_item(bob, posting, 2)
 
     #then new customer checks out
     create_one_time_authorization_for_customer(bob)
@@ -36,29 +146,6 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     assert_equal 0, CreditorObligation.count
     #all postings should be in COMMITMENTZONE
     assert_equal Posting.count, Posting.where(state: Posting.states[:COMMITMENTZONE]).count
-
-    #fill all orders
-    CreditorOrder.all.each do |co|    
-      fully_fill_creditor_order(co)
-    end
-
-    #since value has now exchanged hands there should be obligation objects, one for each creditor order
-    assert_equal CreditorOrder.count, CreditorObligation.count
-    #the balance of each obligation should be postive since we now owe the producers
-    assert_equal CreditorObligation.count, CreditorObligation.where("balance > 0.0").count
-
-    #process auto payments
-    do_hourly_tasks_at(Posting.first.delivery_date + 22.hours)
-
-    #at this point auto paypal payments should be complete. note the way the code works is it makes auto paypal payments after delivery.
-    #the code is this line:
-    #if bi.payment_method?(:PAYPAL) #we eventually may want to change this to consider bi.payment_time in addition to bi.payment_method
-    #it does not consider bi.payment_time (yet). in this test we've created one producer/posting/creditororder etc for each combination of
-    #PAYPAL method with the various payment_times. so although we're here processing auto paypal payments at an AFTERDELIVERY time, all the
-    #PAYPAL BI's are getting processed    
-    num_paypal_obligations_auto_paid_on = BusinessInterface.payment_times.count
-    #these obligations should be balanced
-    assert_equal num_paypal_obligations_auto_paid_on, CreditorObligation.where("balance = 0.0").count
 
     return admin
 
@@ -193,7 +280,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     assert creditor_order
     assert creditor_order.postings
     
-    log_in_as(get_admin)
+    log_in_as_admin
     
     get creditor_order_path(creditor_order)
     assert_response :success
@@ -206,6 +293,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     fills = get_fully_filled_creditor_order_fills_params(creditor_order.postings)
     
     patch creditor_order_path(creditor_order), params: {fills: fills}
+
     assert_response :redirect
     assert_redirected_to creditor_order_path(assigns(:creditor_order))
     follow_redirect!
@@ -213,6 +301,20 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     
     creditor_order.reload.postings.each do |posting|
       assert posting.state?(:CLOSED)
+    end
+
+    #there possibly already was a cobligation before this method call but now there positively must be one
+    assert creditor_order.creditor_obligation
+    #there must also now be payment_payables
+    assert creditor_order.creditor_obligation.payment_payables.count > 0
+    
+    if creditor_order.business_interface.payment_time?(:AFTERDELIVERY)
+      #if payment comes after delivery (which just happened now) then we must have a positive balance here
+      assert creditor_order.balance > 0
+    end
+
+    if creditor_order.balanced?
+      assert creditor_order.state?(:CLOSED)
     end
 
   end
@@ -904,7 +1006,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
   end
 
-  def verify_payment_receipt_email(postings)
+  def verify_payment_receipt_email(postings, payment = nil)
     payment_receipt_mail = get_mail_by_subject("Payment receipt")
     
     bi = postings.first.user.get_business_interface
@@ -913,8 +1015,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     if bi.payment_method?(:PAYPAL)
       email = bi.paypal_email
     else
-      email = "david@farmerscellar.com"
-      subject = "admin action required: " + subject
+      email = bi.payment_receipt_email
     end
 
     #verify proper email and subject
@@ -922,13 +1023,18 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     assert_match subject, payment_receipt_mail.subject
 
     #verify proper summary statement
-    payment_total = verify_producer_payment(postings)    
+    if payment
+      payment_total = payment.amount
+    else
+      payment_total = verify_producer_payment(postings)    
+    end
+    
     summary = "Here's a 'paper' trail for the #{number_to_currency(payment_total)} payment we just made for the following products / quantities:"
     assert_match summary, payment_receipt_mail.body.encoded
 
     #verify all the subtotal values exist
     postings.each do |posting|
-      sub_total = get_payment_subtotal(posting)
+      sub_total = posting.outbound_order_value_producer_net
       assert_match number_to_currency(sub_total), payment_receipt_mail.body.encoded
     end
 

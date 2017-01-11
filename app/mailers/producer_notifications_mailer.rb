@@ -84,6 +84,8 @@ class ProducerNotificationsMailer < ApplicationMailer
 
     if @creditor_order.business_interface.payment_method?(:PAYPAL)
       @email = @creditor_order.business_interface.paypal_email    
+    else
+      @email = @creditor_order.business_interface.payment_receipt_email          
     end
     
     @payment = payment

@@ -369,6 +369,18 @@ module TestLib
     return create_producer(name, email, distributor = nil, order_min)
   end
 
+  def create_creditor_with(payment_method_key, payment_time_key, creditor = nil)
+
+    if creditor.nil?
+      creditor = create_producer(name = "producer name", email = "producer@p.com")
+    end
+    bi = creditor.get_creditor.get_business_interface
+    bi.update(payment_method: BusinessInterface.payment_methods[payment_method_key], payment_time: BusinessInterface.payment_times[payment_time_key])
+
+    return creditor.reload
+
+  end
+
   def create_business_interface(creditor, order_instructions = "order instructions", payment_method = BusinessInterface.payment_methods[:PAYPAL], payment_instructions = "payment instructions", payment_time = BusinessInterface.payment_times[:AFTERDELIVERY])
 
     creditor.create_business_interface(

@@ -24,7 +24,7 @@ class PaymentsController < ApplicationController
       return
     end
 
-    flash[:success] = "Payment of #{ActiveSupport::NumberHelper.number_to_currency(@payment.amount)} created"
+    flash[:success] = "Payment ##{@payment.id.to_s} of #{ActiveSupport::NumberHelper.number_to_currency(@payment.amount)} created"
     @creditor_order = CreditorOrder.find_by(id: creditor_params[:creditor_order_id].to_i)
 
     if @creditor_order
