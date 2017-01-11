@@ -9,7 +9,9 @@ This is your Farmer's Cellar receipt for payment authorization #<%= @id %>.
 <p>
 Here is the product information for which you authorized payment:
 </p>
-
+<p>
+  <span style="background-color:#DFFCD2;">*Please be aware of our <%= link_to "Delivery Not Guaranteed", how_things_work_url(anchor: "delivery_not_guaranteed") %> policy</span>.
+</p>
 <table border="1">
   <thead>
     <tr>		    
@@ -58,7 +60,7 @@ Here is the product information for which you authorized payment:
 <% end %>
 
 <p>
-<span style="background-color:#DFFCD2;">*Please be aware of our <%= link_to "Delivery Not Guaranteed", how_things_work_url(anchor: "delivery_not_guaranteed") %> policy</span>. When products are delivered:
+When products are delivered:
 </p>
 
 <ul>

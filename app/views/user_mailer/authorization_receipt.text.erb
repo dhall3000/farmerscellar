@@ -4,6 +4,7 @@ This is your Farmer's Cellar receipt for payment authorization #<%= @id %>.
 
 Here is the product information for which you authorized payment:
 
+*Please be aware of our Delivery Not Guaranteed policy: <%= how_things_work_url(anchor: "delivery_not_guaranteed") %>
 <% @tote_items.each do |tote_item| %>
 --------------------------------------------------------------------------------------------------------
 ID=<%= tote_item.id %>, <%= tote_item.posting.user.farm_name %> <%= tote_item.posting.product.name %> quantity <%= tote_item.quantity %> @ <%= number_to_currency(tote_item.price) %> per <%= tote_item.posting.unit.name %>, Sub Total <%= number_to_currency(get_gross_item(tote_item)) %>, scheduled delivery* on <%= tote_item.posting.delivery_date.strftime("%A %b %d, %Y") %>
@@ -18,8 +19,6 @@ The total payment amount authorized for the products listed above is <%= number_
 <% else %>
 The total payment amount authorized is <%= number_to_currency(@amount) %>.
 <% end %>
-
-*Please be aware of our Delivery Not Guaranteed policy: <%= how_things_work_url(anchor: "delivery_not_guaranteed") %>
 
 When products are delivered:
 
