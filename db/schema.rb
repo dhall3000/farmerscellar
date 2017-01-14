@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170110221430) do
+ActiveRecord::Schema.define(version: 20170113044734) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -638,8 +638,6 @@ ActiveRecord::Schema.define(version: 20170110221430) do
     t.string   "state"
     t.string   "phone"
     t.string   "website"
-    t.boolean  "agreement"
-    t.boolean  "farmer_approval",            default: false
     t.string   "farm_name"
     t.boolean  "beta"
     t.integer  "zip"

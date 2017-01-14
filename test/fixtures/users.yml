@@ -14,8 +14,6 @@ f9:
   zip: 98119
   phone: 206-150-6579
   website: www.f9.com
-  agreement: 1
-  farmer_approval: t
   farm_name: F9 FARM
 
 c18:
@@ -61,8 +59,6 @@ f6:
   zip: 98119
   phone: 206-150-6579
   website: www.f6.com
-  agreement: 1
-  farmer_approval: t
   farm_name: F6 FARM
   distributor: d1
 
@@ -80,8 +76,6 @@ f7:
   zip: 98119
   phone: 206-150-6579
   website: www.f7.com
-  agreement: 1
-  farmer_approval: t
   farm_name: F7 FARM
   distributor: d1
 
@@ -99,8 +93,6 @@ f8:
   zip: 98119
   phone: 206-150-6579
   website: www.f8.com
-  agreement: 1
-  farmer_approval: t
   farm_name: F8 FARM
 
 c17:
@@ -130,8 +122,6 @@ f_subscriptions:
   zip: 98139
   phone: 206-199-6579
   website: www.sf.com
-  agreement: 1
-  farmer_approval: t
   farm_name: Subscription Farms
 
 c_subscription:
@@ -187,8 +177,6 @@ f5:
   zip: 98119
   phone: 206-150-6579
   website: www.f5.com
-  agreement: 1
-  farmer_approval: t
   farm_name: F5 FARM
 
 c9:
@@ -374,8 +362,6 @@ f1:
   zip: 98033
   phone: 206-588-6579
   website: www.f1.com
-  agreement: 1
-  farmer_approval: t
   farm_name: F1 FARM
   
 f2:
@@ -392,8 +378,6 @@ f2:
   zip: 98004
   phone: 206-599-6579
   website: www.f2.com
-  agreement: 1
-  farmer_approval: t
   farm_name: F2 FARM
   
 f3:
@@ -410,8 +394,6 @@ f3:
   zip: 98004
   phone: 206-590-6579
   website: www.f3.com
-  agreement: 1
-  farmer_approval: t
   farm_name: F3 FARM
 
 f4:
@@ -428,8 +410,6 @@ f4:
   zip: 98114
   phone: 206-650-6579
   website: www.f4.com
-  agreement: 1
-  farmer_approval: t
   farm_name: F4 FARM
 
 baron_farms:
@@ -446,8 +426,6 @@ baron_farms:
   zip: 98114
   phone: 206-650-6579
   website: www.baronfarms.com
-  agreement: 1
-  farmer_approval: t
   farm_name: Baron Farms
 
 pride_and_joy:
@@ -464,8 +442,6 @@ pride_and_joy:
   zip: 98114
   phone: 206-671-6579
   website: www.prideandjoydairy.com
-  agreement: 1
-  farmer_approval: t
   farm_name: Pride and Joy Dairy
 
 c1:

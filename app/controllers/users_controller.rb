@@ -51,7 +51,6 @@ class UsersController < ApplicationController
 
   def update    
     @user = User.find(params[:id])
-    agreement = @user.agreement            
 
     if params.has_key?(:user)
       if params[:user].has_key?(:access_code)
@@ -77,10 +76,7 @@ class UsersController < ApplicationController
       else        
         #user is just updating their profile
         if @user.update_attributes(user_params)
-          flash_message = "Profile updated"      
-          if agreement != true and @user.agreement == true
-            #flash_message = "Request for approval received. A staff member will be in touch with you shortly!"
-          end
+          flash_message = "Profile updated"          
           flash[:success] = flash_message
           redirect_to @user
         else

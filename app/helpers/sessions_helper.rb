@@ -56,7 +56,7 @@ module SessionsHelper
     end
 
     #does the current user have an access code plugged in? if so, they always have access
-    if !current_user.access_code.nil?
+    if current_user.access_code
       return true
     end
 
@@ -64,7 +64,7 @@ module SessionsHelper
     #posting garbage ads to our site. so what we're doing here is granting access to anybody who doesn't
     #have an access code if we're in a not-requiring-access-code state UNLESS you are a farmer
     if !WebsiteSetting.order("website_settings.id").last.new_customer_access_code_required
-      if current_user.account_type == 0 || current_user.account_type == 2 || current_user.account_type == 3
+      if current_user.account_type == 0 || current_user.account_type == 2 || current_user.account_type == 3 || spoofing?
         return true
       end
     end

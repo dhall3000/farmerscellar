@@ -37,7 +37,6 @@ f1 = User.create!(name:  "f1",
              zip: "98033",
              phone: "206-588-6579",
              website: "www.f1.com",
-             agreement: 1,
              farm_name: "F1 FARM",
              beta: false
              )
@@ -58,7 +57,6 @@ f2 = User.create!(name:  "f2",
              zip: "98004",
              phone: "206-599-6579",
              website: "www.f2.com",
-             agreement: 1,
              farm_name: "F2 FARM",
              beta: false
              )
@@ -79,7 +77,6 @@ f3 = User.create!(name:  "f3",
              zip: "98004",
              phone: "206-590-6579",
              website: "www.f3.com",
-             agreement: 1,
              farm_name: "F3 FARM",
              beta: false
              )
@@ -100,7 +97,6 @@ f4 = User.create!(name:  "f4",
              zip: "98114",
              phone: "206-650-6579",
              website: "www.f4.com",
-             agreement: 1,
              farm_name: "F4 FARM",
              beta: false,
              order_minimum_producer_net: 20
