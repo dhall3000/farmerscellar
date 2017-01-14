@@ -1,0 +1,23 @@
+<h1>Edit FoodCategory</h1>
+
+<p>
+  <span class="glyphicon glyphicon-arrow-left"></span>
+  <%= link_to "Show #{@food_category.name}", food_category_path(@food_category) %>
+</p>
+<%= form_for @food_category do |f| %>
+  
+  <%= render partial: 'shared/error_messages_general', locals: { active_record_object: @food_category } %>
+
+  <%= f.label :name %>
+  <%= f.text_field :name, class: 'form-control' %>
+
+  <%= f.label :parent %>
+  <% if @food_category.parent %>
+    <%= select_tag :parent, options_from_collection_for_select(@food_categories, "id", "name", @food_category.parent.id), class: 'form-control' %>
+  <% else %>
+    <%= select_tag :parent, options_from_collection_for_select(@food_categories, "id", "name"), class: 'form-control' %>
+  <% end %>
+  
+  <%= f.submit "Create FoodCategory", class: "btn btn-lg btn-primary" %>
+
+<% end %>

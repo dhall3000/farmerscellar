@@ -205,6 +205,13 @@ product_celery = Product.create(name: "Celery")
 product_avocado = Product.create(name: "Avocado")
 product_basil = Product.create(name: "Basil")
 
+shop = FoodCategory.create(name: "Shop")
+produce = FoodCategory.create(name: "Produce", parent: shop)
+fruit = FoodCategory.create(name: "Fruit", parent: produce)
+veggies = FoodCategory.create(name: "Vegetables", parent: produce)
+dairy = FoodCategory.create(name: "Dairy", parent: shop)
+meat = FoodCategory.create(name: "Meat", parent: shop)
+
 Unit.create(name: "Fluid Ounce")
 Unit.create(name: "Pint")
 Unit.create(name: "Quart")

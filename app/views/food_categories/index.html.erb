@@ -1,0 +1,12 @@
+<h1>Food Categories</h1>
+
+<p><span class="category-background">Category</span></p>
+<p><span class="product-background">Product</span></p>
+
+<% if @root %>
+  <%= render partial: 'food_category_branch', locals: { food_category: @root } %>
+<% else %>
+  <p>No categories yet</p>
+<% end %>
+
+<%= link_to "New FoodCategory", new_food_category_path, class: "btn btn-lg btn-primary" %>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170113044734) do
+ActiveRecord::Schema.define(version: 20170114035044) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -257,6 +257,7 @@ ActiveRecord::Schema.define(version: 20170113044734) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer  "parent_id"
+    t.index ["name"], name: "index_food_categories_on_name"
     t.index ["parent_id"], name: "index_food_categories_on_parent_id"
   end
 
@@ -402,8 +403,10 @@ ActiveRecord::Schema.define(version: 20170113044734) do
 
   create_table "products", force: :cascade do |t|
     t.string   "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+    t.integer  "food_category_id"
+    t.index ["food_category_id"], name: "index_products_on_food_category_id"
   end
 
   create_table "purchase_bulk_buys", id: false, force: :cascade do |t|

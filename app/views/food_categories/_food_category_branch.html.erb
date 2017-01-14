@@ -1,0 +1,10 @@
+<% #grab params from local_assigns
+  food_category = local_assigns[:food_category]  
+%>
+
+<ul>
+  <li><span class="category-background"><%= link_to food_category.name, food_category_path(food_category) %></span></li>
+  <% food_category.children.each do |child_food_category| %>    
+    <%= render partial: 'food_category_branch', locals: { food_category: child_food_category } %>    
+  <% end %>
+</ul>
