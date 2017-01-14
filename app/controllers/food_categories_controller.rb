@@ -3,7 +3,7 @@ class FoodCategoriesController < ApplicationController
 
   def index    
     @root = FoodCategory.where(parent: nil).first
-    @homeless_products = Product.where(food_category: nil)
+    @homeless_products = Product.where(food_category: nil).order(:name)
   end
 
   def show
