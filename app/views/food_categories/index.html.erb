@@ -1,12 +1,48 @@
 <h1>Food Categories</h1>
 
-<p><span class="category-background">Category</span></p>
-<p><span class="product-background">Product</span></p>
+<% if @root || @homeless_products.any? %>
 
-<% if @root %>
-  <%= render partial: 'food_category_branch', locals: { food_category: @root } %>
-<% else %>
-  <p>No categories yet</p>
+  <div class="panel-group">
+
+
+    
+    <div class="panel panel-default">
+      <div class="anchor panel-heading" id="the_simple_version">
+        <div class="panel-title">
+          Current Tree Structure
+        </div>
+      </div>
+      <div class="panel-body">
+        <% if @root %>
+          <p><span class="category-background">Category</span>, <span class="product-background">Product</span></p>          
+          <%= render partial: 'food_category_branch', locals: { food_category: @root } %>
+        <% else %>
+          <p>No categories yet</p>
+        <% end %>          
+      </div>
+    </div>
+    
+
+    <% if @homeless_products.any? %>
+      <div class="panel panel-default">
+        <div class="anchor panel-heading" id="the_simple_version">
+          <div class="panel-title">
+            Products without Assigned Food Category
+          </div>
+        </div>
+        <div class="panel-body">
+          <ul>
+            <% @homeless_products.each do |product| %>
+              <li><%= link_to product.name, edit_product_path(product) %></li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    <% end %>
+
+
+  </div>
+
 <% end %>
 
-<%= link_to "New FoodCategory", new_food_category_path, class: "btn btn-lg btn-primary" %>
+<%= link_to "New", new_food_category_path, class: "btn btn-lg btn-primary" %>

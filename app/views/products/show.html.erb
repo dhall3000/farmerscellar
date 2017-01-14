@@ -1,12 +1,18 @@
-<h1><%= @product.name %></h1>
+<h1>Product</h1>
 
 <p>
   <span class="glyphicon glyphicon-arrow-left"></span>
   <%= link_to "Products", products_path %>
 </p>
+<p>
+  <span class="glyphicon glyphicon-arrow-left"></span>
+  <%= link_to "Food Categories", food_categories_path %>
+</p>
+
+<h2><%= @product.name %></h2>
 
 <% if @product.food_category %>
-  <p>Food Category: <%= @product.food_category.name %></p>
+  <p>Food Category: <%= link_to @product.food_category.name, food_category_path(@product.food_category) %></p>
 <% else %>
   <p>Food Category: nil</p>
 <% end %>

@@ -3,10 +3,11 @@ class FoodCategoriesController < ApplicationController
 
   def index    
     @root = FoodCategory.where(parent: nil).first
+    @homeless_products = Product.where(food_category: nil)
   end
 
   def show
-    @food_category = FoodCategory.find(params[:id])
+    @food_category = FoodCategory.find(params[:id])    
   end
 
   def new

@@ -1,27 +1,32 @@
-<h1>FoodCategory</h1>
+<h1>Food Category</h1>
 
 <p>
   <span class="glyphicon glyphicon-arrow-left"></span>
   <%= link_to "Food Categories", food_categories_path %>
 </p>
-<h2><%= @food_category.name %></h2>
 
 <% if @food_category.children.any? || @food_category.products.any? %>
 
   <div class="panel-group">
 
-    <div class="panel panel-default">
-      <div class="anchor panel-heading" id="the_simple_version">
-        <div class="panel-title">
-          Parent
+    <% if @food_category.parent %>
+
+      <div class="panel panel-default">
+        <div class="anchor panel-heading" id="the_simple_version">
+          <div class="panel-title">
+            Parent
+          </div>
+        </div>
+        <div class="panel-body">
+          <ul>          
+            <li><%= link_to @food_category.parent.name, food_category_path(@food_category.parent) %></li>          
+          </ul>
         </div>
       </div>
-      <div class="panel-body">
-        <ul>          
-          <li><%= @food_category.parent.name %></li>          
-        </ul>
-      </div>
-    </div>
+
+    <% end %>
+
+<h2><%= @food_category.name %></h2>
 
     <% if @food_category.children.any? %>
       <div class="panel panel-default">
@@ -33,7 +38,7 @@
         <div class="panel-body">
           <ul>
             <% @food_category.children.each do |child| %>
-              <li><%= child.name %></li>
+              <li><%= link_to child.name, food_category_path(child) %></li>
             <% end %>
           </ul>
         </div>
@@ -48,8 +53,11 @@
           </div>
         </div>
         <div class="panel-body">
-          
-
+          <ul>
+            <% @food_category.products.each do |product| %>
+              <li><%= link_to product.name, product_path(product) %></li>
+            <% end %>
+          </ul>
         </div>
       </div>
     <% end %>
@@ -57,4 +65,4 @@
   </div>
 <% end %>
 
-<%= link_to "Edit #{@food_category.name}", edit_food_category_path(@food_category), class: "btn btn-lg btn-primary" %>
+<%= link_to "Edit", edit_food_category_path(@food_category), class: "btn btn-lg btn-primary" %>
