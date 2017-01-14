@@ -1,2 +1,14 @@
-<h1>Products#show</h1>
-<p>Find me in app/views/products/show.html.erb</p>
+<h1><%= @product.name %></h1>
+
+<p>
+  <span class="glyphicon glyphicon-arrow-left"></span>
+  <%= link_to "Products", products_path %>
+</p>
+
+<% if @product.food_category %>
+  <p>Food Category: <%= @product.food_category.name %></p>
+<% else %>
+  <p>Food Category: nil</p>
+<% end %>
+
+<%= link_to "Edit", edit_product_path(@product), class: "btn btn-lg btn-primary" %>

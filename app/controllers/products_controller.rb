@@ -3,9 +3,11 @@ class ProductsController < ApplicationController
 
   def new
     @product = Product.new
+    @food_categories = FoodCategory.all.order(:name)
   end
 
   def create
+
     @product = Product.new(product_params)
 
     if @product.save
@@ -18,12 +20,26 @@ class ProductsController < ApplicationController
   end
 
   def edit
+    @product = Product.find(params[:id])
+    @food_categories = FoodCategory.all.order(:name)
   end
 
   def update
+    @product = Product.find(params[:id])
+
+    if @product.update_attributes(product_params)
+      flash[:success] = "Product updated"
+      redirect_to product_path(@product)
+      return
+    else
+      flash[:danger] = "Product not updated"
+      redirect_to edit_product_path(@product)
+      return
+    end
   end
 
   def show
+    @product = Product.find(params[:id])
   end
 
   def index
@@ -35,6 +51,6 @@ class ProductsController < ApplicationController
 
   private
     def product_params
-      params.require(:product).permit(:name)
+      params.require(:product).permit(:name, :food_category_id)
     end
 end

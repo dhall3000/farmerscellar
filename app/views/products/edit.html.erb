@@ -1,2 +1,19 @@
-<h1>Products#edit</h1>
-<p>Find me in app/views/products/edit.html.erb</p>
+<h1><%= @product.name %></h1>
+
+<p>
+  <span class="glyphicon glyphicon-arrow-left"></span>
+  <%= link_to "Show", product_path(@product) %>
+</p>
+
+<%= form_for @product do |f| %>
+  <%= render partial: 'shared/error_messages_general', locals: { active_record_object: @product } %>
+  <%= f.label :name %>
+  <%= f.text_field :name, class: "form-control" %>
+  <%= f.label :food_category %>
+  <% if @product.food_category %>
+    <%= f.select :food_category_id, options_from_collection_for_select(@food_categories, "id", "name", @product.food_category.id), {}, class: 'form-control' %>
+  <% else %>
+    <%= f.select :food_category_id, options_from_collection_for_select(@food_categories, "id", "name"), {}, class: 'form-control' %>
+  <% end %>
+  <%= f.submit "Update", class: "btn btn-lg btn-primary" %>
+<% end %>
