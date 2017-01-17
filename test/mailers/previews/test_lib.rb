@@ -1,5 +1,14 @@
 module TestLib
 
+  def create_food_category(name, parent)
+
+    fc = FoodCategory.new(name: name, parent: parent)
+    assert fc.save
+
+    return fc
+
+  end
+
   def create_creditor_order(creditor = nil, postings = nil, customer = nil)
 
     if creditor.nil?      

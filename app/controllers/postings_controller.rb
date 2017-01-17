@@ -24,15 +24,17 @@ class PostingsController < ApplicationController
 
   def index
 
-    if current_user.nil? || current_user.account_type == User.types[:CUSTOMER] || current_user.account_type == User.types[:PRODUCER]
-      #for customers, we only want to pull postings whose delivery date is >= today and that are 'live'
-      @postings = Posting.where("delivery_date >= ? and live = ?", Time.zone.today, true).order(delivery_date: :asc, id: :desc)
-    elsif current_user.account_type == User.types[:ADMIN]
-      #for admins, same thing but we want to see the unlive as well
-      @postings = Posting.where("state <> ?", Posting.states[:CLOSED]).order(delivery_date: :asc, id: :desc)
+    @food_category = FoodCategory.where(name: params[:food_category]).first
+    if @food_category.nil?
+      @food_category = FoodCategory.where(parent: nil).first
     end
 
-    return @postings
+    #this is the upcoming sunday at midnight
+    next_week_start = start_of_next_week
+
+    @this_weeks_postings = Posting.joins(:product).where(product: @food_category.products).where("delivery_date >= ? and delivery_date < ? and live = ? and state = ?", Time.zone.now.midnight, next_week_start, true, Posting.states[:OPEN])
+    @next_weeks_postings = Posting.joins(:product).where(product: @food_category.products).where("delivery_date >= ? and delivery_date < ? and live = ? and state = ?", next_week_start, next_week_start + 7.days, true, Posting.states[:OPEN])
+    @future_postings = Posting.joins(:product).where(product: @food_category.products).where("delivery_date >= ? and live = ? and state = ?", next_week_start + 7.days, true, Posting.states[:OPEN])
 
   end
 

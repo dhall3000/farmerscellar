@@ -194,23 +194,23 @@ c = User.create!(name:  "a1",
 a1 = c
 AccessCode.create(user: c, notes: "code for user 9")
 
-product_apples = Product.create(name: "Fuji Apples")
-product_carrots = Product.create(name: "Carrots")
-product_milk = Product.create(name: "Milk")
-product_beef = Product.create(name: "Beef")
-product_chicken = Product.create(name: "Chicken")
-product_asparagus = Product.create(name: "Asparagus")
-product_oranges = Product.create(name: "Oranges")
-product_celery = Product.create(name: "Celery")
-product_avocado = Product.create(name: "Avocado")
-product_basil = Product.create(name: "Basil")
-
 shop = FoodCategory.create(name: "Shop")
 produce = FoodCategory.create(name: "Produce", parent: shop)
 fruit = FoodCategory.create(name: "Fruit", parent: produce)
 veggies = FoodCategory.create(name: "Vegetables", parent: produce)
 dairy = FoodCategory.create(name: "Dairy", parent: shop)
 meat = FoodCategory.create(name: "Meat", parent: shop)
+
+product_apples = Product.create(name: "Fuji Apples", food_category: fruit)
+product_carrots = Product.create(name: "Carrots", food_category: veggies)
+product_milk = Product.create(name: "Milk", food_category: dairy)
+product_beef = Product.create(name: "Beef", food_category: meat)
+product_chicken = Product.create(name: "Chicken", food_category: meat)
+product_asparagus = Product.create(name: "Asparagus", food_category: veggies)
+product_oranges = Product.create(name: "Oranges", food_category: fruit)
+product_celery = Product.create(name: "Celery", food_category: produce)
+product_avocado = Product.create(name: "Avocado", food_category: produce)
+product_basil = Product.create(name: "Basil", food_category: produce)
 
 Unit.create(name: "Fluid Ounce")
 Unit.create(name: "Pint")
@@ -246,7 +246,7 @@ f3.producer_product_unit_commissions.create(product: product_carrots, commission
 f3.producer_product_unit_commissions.create(product: product_chicken, commission: 0.07, unit: pound)
 f4.producer_product_unit_commissions.create(product: product_oranges, commission: 0.08, unit: pound)
 f4.producer_product_unit_commissions.create(product: product_celery, commission: 0.12, unit: pound)
-f4.producer_product_unit_commissions.create(product: product_avocado, commission: 0.08, unit: pound)
+f4.producer_product_unit_commissions.create(product: product_avocado, commission: 0.08, unit: whole)
 f4.producer_product_unit_commissions.create(product: product_basil, commission: 0.06, unit: bunch)
 
 standard_order_cutoff = next_friday - 2.days
@@ -258,19 +258,19 @@ posting_asparagus = Posting.create(live: true, delivery_date: next_friday, order
 #Milk
 posting_milk = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_milk.id, price: 2.00, user_id: f2.id, unit_id: 5, description: "product attribute x, y & z", description_body: "these milks are all organic grown with no pesticides. they are raw. no homogeneization. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
 #Beef
-posting_beef = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_beef.id, price: 3.75, user_id: f2.id, unit_id: 11, description: "product attribute x, y & z", description_body: "these beefs are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
+posting_beef = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_beef.id, price: 3.75, user_id: f2.id, unit_id: pound.id, description: "product attribute x, y & z", description_body: "these beefs are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
 #Carrots
 posting_carrots = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_carrots.id, price: 2.25, user_id: f3.id, unit_id: 8, description: "product attribute x, y & z", description_body: "yummy, crunchy carrots. tastiest ever!")
 #Chicken
-posting_chicken = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_chicken.id, price: 1.50, user_id: f3.id, unit_id: 10, description: "product attribute x, y & z", description_body: "best whole chickens around. all grass fed on clean, organic fields. no antibiotics. no supplements. just lots of grass and all the bugs they can eat! :)")
+posting_chicken = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_chicken.id, price: 1.50, user_id: f3.id, unit_id: pound.id, description: "product attribute x, y & z", description_body: "best whole chickens around. all grass fed on clean, organic fields. no antibiotics. no supplements. just lots of grass and all the bugs they can eat! :)")
 #Oranges
 posting_oranges = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_oranges.id, price: 1.25, user_id: f4.id, unit_id: 8, description: "product attribute x, y & z", description_body: "best oranges ever!")
 #Celery
 posting_celery = Posting.create(product_id_code: "ZXB-9F", units_per_case: 10, live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_celery.id, price: 1.00, user_id: f4.id, unit_id: 8, description: "product attribute x, y & z", description_body: "best celery ever!")
 #Avocado
-posting_avocado = Posting.create(live: true, delivery_date: Time.zone.today, order_cutoff: Time.zone.today - 2.days, product_id: product_avocado.id, price: 2.29, user_id: f4.id, unit_id: whole.id, description: "product attribute x, y & z", description_body: "best avocado ever!")
+posting_avocado = Posting.create(live: true, delivery_date: next_friday + 7.days, order_cutoff: Time.zone.today - 2.days, product_id: product_avocado.id, price: 2.29, user_id: f4.id, unit_id: whole.id, description: "product attribute x, y & z", description_body: "best avocado ever!")
 #Basil
-posting_basil = Posting.create(live: true, delivery_date: Time.zone.today, order_cutoff: Time.zone.today - 2.days, product_id: product_basil.id, price: 2.97, user_id: f4.id, unit_id: bunch.id, unit_body: "A 'bunch' is about as much as you can grab with one handful", description: "product attribute x, y & z", description_body: "best basil ever!")
+posting_basil = Posting.create(live: true, delivery_date: next_friday + 14.days, order_cutoff: Time.zone.today - 2.days, product_id: product_basil.id, price: 2.97, user_id: f4.id, unit_id: bunch.id, unit_body: "A 'bunch' is about as much as you can grab with one handful", description: "product attribute x, y & z", description_body: "best basil ever!")
 
 develop_creditor_orders_controller = false
 

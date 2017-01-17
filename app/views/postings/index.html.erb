@@ -1,149 +1,51 @@
-<% provide(:title, 'Postings') %>
+<% provide(:title, 'Shop') %>
 
-<h1>Postings</h1>
+<h1><%= @food_category.name %></h1>
         
-<% count = 0 %>
-<% @postings.each do |posting| %> 
+<div class="row">
+  <div class="col-xs-12 col-sm-offset-3 col-sm-6">
 
-  <div class="row">
-    <div class="col-xs-12 col-sm-offset-3 col-sm-6">
+    <% if @food_category.parent %>      
+      
+      <%= link_to postings_path(food_category: @food_category.parent.name) do %>
+      <span class="glyphicon glyphicon-arrow-left"></span>
+      <%= @food_category.parent.name %>
+      <% end %>
+    <% end %>
 
+    <% if !@food_category.children.any? && !@this_weeks_postings.any? && !@next_weeks_postings.any? && !@future_postings.any? %>
+      <p class="text-center">Apparently there is nothing to see in this category</p>
+    <% end %>
+
+    <% if @food_category.children.any? %>
       <div class="panel panel-default">
-        <div class="panel-body">
-
-
-
-          <div class="panel-group" id=<%= "#{count.to_s}accordion" %>>
-          
-            
-
-            <div class="panel panel-default">
-              <div class="panel-heading" id=<%= "#{count.to_s}producer_name" %>>
-                <h4 class="panel-title" data-toggle="collapse" data-parent=<%= "##{count.to_s}accordion" %> data-target=<%= "##{count.to_s}producerDetails" %>>
-                  <%= posting.user.farm_name %><span id=<%= "producerDetailsChevron#{count.to_s}" %> class="glyphicon glyphicon-chevron-down pull-right"></span>            
-                </h4>
-              </div>
-              <div id=<%= "#{count.to_s}producerDetails" %> class="panel-collapse collapse" data-chevron=<%= "#producerDetailsChevron#{count.to_s}" %>>
-                <div class="panel-body">
-                  <ul class="list-group">
-                    <% if !posting.user.city.blank? && !posting.user.state.blank? %>
-                      <li class="list-group-item">Location: <%= "#{posting.user.city}, #{posting.user.state}" %></li>              
-                    <% end %>
-                    <% if !posting.user.website.blank? %>
-                      <li class="list-group-item">Website: <a href=<%= "#{posting.user.website}" %> target='_blank'><%= posting.user.website %></a></li>              
-                    <% end %>   
-                    <% if !posting.user.description.blank? %>                       
-                      <li class="list-group-item"><%= posting.user.description %></li>
-                    <% end %>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-
-
-            <div class="panel panel-default">
-              <div class="panel-heading" id=<%= "#{count.to_s}product" %>>
-                <h4 class="panel-title" data-toggle="collapse" data-parent=<%= "##{count.to_s}accordion" %> data-target=<%= "##{count.to_s}productDetails" %>>
-                  <%= posting.product.name %><span id=<%= "productDetailsChevron#{count.to_s}" %> class="glyphicon glyphicon-chevron-down pull-right"></span>            
-                </h4>
-              </div>
-              <div id=<%= "#{count.to_s}productDetails" %> class="panel-collapse collapse" data-chevron=<%= "#productDetailsChevron#{count.to_s}" %>>                
-                <div class="panel-body">
-                  <ul class="list-group">
-                    <% if !posting.description.blank? %>
-                      <li class="list-group-item"><%= posting.description %></li>                
-                    <% end %>
-                    <% if !posting.description_body.blank? %>
-                      <li class="list-group-item"><%= posting.description_body %></li>                
-                    <% end %>
-                  </ul>
-                </div>                
-              </div>
-            </div>
-
-
-
-            <% if !posting.unit_body.blank? || !posting.price_body.blank? %>
-
-              <div class="panel panel-default">
-                <div class="panel-heading" id=<%= "#{count.to_s}price" %>>
-                  <h4 class="panel-title" data-toggle="collapse" data-parent=<%= "##{count.to_s}accordion" %> data-target=<%= "##{count.to_s}priceDetails" %>>
-                      <%= number_to_currency(posting.price) %> / <%= Unit.find_by(id: posting.unit_id).name %>
-                      <span id=<%= "priceDetailsChevron#{count.to_s}" %> class="glyphicon glyphicon-chevron-down pull-right"></span>
-                  </h4>
-                </div>          
-                <div id=<%= "#{count.to_s}priceDetails" %> class="panel-collapse collapse" data-chevron=<%= "#priceDetailsChevron#{count.to_s}" %>>
-                  <div class="panel-body">
-                    <ul class="list-group">
-                      <% if !posting.unit_body.blank? %>
-                        <li class="list-group-item"><%= posting.unit_body %></li>
-                      <% end %>
-                      <% if !posting.price_body.blank? %>
-                        <li class="list-group-item"><%= posting.price_body %></li>
-                      <% end %>
-                    </ul>
-                  </div>
-                </div>                
-              </div>
-
-            <% else %>
-
-              <div class="panel panel-default">
-                <div class="panel-heading" id=<%= "#{count.to_s}price" %>>
-                  <h4 class="panel-title">                          
-                    <%= number_to_currency(posting.price) %> / <%= Unit.find_by(id: posting.unit_id).name %>                          
-                  </h4>
-                </div>          
-              </div>
-
-            <% end %>
-
-
-            <div class="panel panel-default">
-              <div class="panel-heading" id=<%= "#{count.to_s}delivery" %>>
-                <h4 class="clearfix panel-title" data-toggle="collapse" data-parent=<%= "##{count.to_s}accordion" %> data-target=<%= "##{count.to_s}deliveryDetails" %>>
-                  Scheduled Delivery <%= posting.delivery_date.strftime("%a %b %d") %>                  
-                  <span id=<%= "deliveryDetailsChevron#{count.to_s}" %> class="glyphicon glyphicon-chevron-down pull-right"></span>
-                  <span class="alert-info glyphicon glyphicon-asterisk pull-right"></span>
-                </h4>
-              </div>          
-              <div id=<%= "#{count.to_s}deliveryDetails" %> class="panel-collapse collapse" data-chevron=<%= "#deliveryDetailsChevron#{count.to_s}" %>>
-                <div class="panel-body">
-                  <ul class="list-group">                            
-                    <% if posting.posting_recurrence && posting.posting_recurrence.on %>
-                      <li class="list-group-item">
-                        Deliveries scheduled <%= PostingRecurrence.frequency[posting.posting_recurrence.frequency][0].downcase %>
-                      </li>                    
-                    <% end %>
-                      <li class="list-group-item">
-                        <span class="alert-info glyphicon glyphicon-asterisk"></span> Deliveries occur on schedule subject to several constraints. Please be aware of our <%= link_to "Delivery Not Guaranteed", how_things_work_path(anchor: "delivery_not_guaranteed") %> policy.                        
-                      </li>
-                  </ul>
-                </div>
-              </div>                
-            </div>
-
-
-
-
-
+        <div class="panel-heading">
+          <div class="panel-title">
+            Sub Categories
           </div>
-
-          <div>                                                      
-            <p><%= link_to "Order", new_tote_item_path(posting_id: posting.id), class: "btn btn-primary btn-lg" %></p>
-          </div>
-
-
         </div>
+        <div class="panel-body">
+          <div class="text-center">
+          <% @food_category.children.each do |sub_category| %>              
+            <%= link_to sub_category.name, postings_path(food_category: sub_category.name), class: "btn btn-lg btn-primary shopping-buttons" %>
+          <% end %>            
+          </div>
+        </div>        
       </div>
+    <% end %>
+
+    <% if @this_weeks_postings.any? %>
+      <%= render partial: 'products_panel', locals: { panel_heading: "This Week's Delivery", postings: @this_weeks_postings } %>
+    <% end %>
+
+    <% if @next_weeks_postings.any? %>
+      <%= render partial: 'products_panel', locals: { panel_heading: "Next Week's Delivery", postings: @next_weeks_postings } %>
+    <% end %>
+
+    <% if @future_postings.any? %>
+      <%= render partial: 'products_panel', locals: { panel_heading: "Future Delivery", postings: @future_postings } %>
+    <% end %>
 
 
-
-
-
-    </div>
   </div>
-
-  <% count = count + 1 %>
-<% end %>
+</div>

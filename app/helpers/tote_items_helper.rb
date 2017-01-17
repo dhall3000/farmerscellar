@@ -1,5 +1,23 @@
 module ToteItemsHelper
 
+  def start_of_next_week(start_time = nil)
+
+    if start_time.nil?
+      start_time = Time.zone.now
+    end
+
+    start_time = start_time.midnight    
+
+    while start_time.wday != ENDOFWEEK
+      start_time += 1.day
+    end
+
+    next_week_start = start_time + 1.day
+
+    return next_week_start
+    
+  end
+
   def num_order_objects(user)
     tote_items = authorized_items_for(user)
     subscriptions = get_active_subscriptions_by_authorization_state(user, include_paused_subscriptions = false, kind = Subscription.kinds[:NORMAL])[:authorized]
