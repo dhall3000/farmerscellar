@@ -1,11 +1,11 @@
 <% #grab params from local_assigns
-  panel_heading = local_assigns[:panel_heading]
+  heading = local_assigns[:heading]
   postings = local_assigns[:postings]
 %>
 
 <% if postings.any? %>
 
-  <h2><%= panel_heading %></h2>
+  <h2><%= heading %></h2>
   <% postings.each do |posting| %>
 
 
