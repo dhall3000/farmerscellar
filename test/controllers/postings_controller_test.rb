@@ -225,40 +225,6 @@ class PostingsControllerTest < IntegrationHelper
 
   end
 
-  test "should display non closed postings for admin well after delivery day" do
-
-    #assert this posting is OPEN
-    assert_equal Posting.states[:OPEN], @posting.state
-
-    @posting.tote_items.update_all(state: 2)
-    travel_to @posting.delivery_date + 3.days
-
-    #transitions the posting from OPEN to COMMITMENTZONE
-    #this one is a bit artificial. this will happen automatically right at CZS
-    #it should work the same here though
-    RakeHelper.do_hourly_tasks
-    @posting.reload
-    assert_equal Posting.states[:COMMITMENTZONE], @posting.state
-
-    #in the old manner this next call would have transitioned the posting to CLOSED because it was automatically, unconditionally, arbitrarily
-    #transitioning to CLOSED at noon on delivery day
-    #we're now no longer doing that
-    RakeHelper.do_hourly_tasks
-    @posting.reload
-    assert_equal Posting.states[:COMMITMENTZONE], @posting.state
-
-    admin = users(:a1)
-    log_in_as(admin)
-    get postings_path
-    postings = assigns(:postings)
-
-    #even though we're well past delivery day admin should still see the posting cause it wasn't closed
-    assert_equal 1, postings.where(id: @posting.id).count
-    
-    travel_back
-
-  end
-
 #NEW TESTS
 
   test "should fill all tote items in this posting" do
@@ -603,6 +569,7 @@ class PostingsControllerTest < IntegrationHelper
   end
 
   test "unposted posting becomes posted after setting live" do
+    nuke_all_postings
     posting = successfully_create_posting_with_live_unset
     postings_count_prior = get_postings_count
     live_prior = posting.live
@@ -791,11 +758,13 @@ class PostingsControllerTest < IntegrationHelper
     
     log_in_as(@farmer)
     get postings_path
-    postings = assigns(:postings)        
-    assert_not postings.nil?
-    puts "postings.count = #{postings.count}"
+    this_weeks_postings = assigns(:this_weeks_postings)
+    next_weeks_postings = assigns(:next_weeks_postings)
+    future_postings = assigns(:future_postings)    
+    
+    postings_count = this_weeks_postings.count + next_weeks_postings.count + future_postings.count
 
-    return postings.count
+    return postings_count
 
   end
 

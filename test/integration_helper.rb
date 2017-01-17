@@ -724,8 +724,17 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
   end
 
   def verify_post(price, unit, exists, posting_id = nil)
+
+    posting = Posting.find posting_id
+    assert posting
+    assert posting.valid?
+
+    if posting.product.food_category
+      get postings_path(food_category: posting.product.food_category.name)
+    else
+      get postings_path
+    end
     
-    get postings_path
     assert :success
 
     if exists

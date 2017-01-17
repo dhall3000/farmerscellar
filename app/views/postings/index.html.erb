@@ -1,6 +1,7 @@
 <% provide(:title, 'Shop') %>
 
-<h1><%= @food_category.name %></h1>
+<% if @food_category %>
+  <h1><%= @food_category.name %></h1>
 
 <% if @food_category.parent || @food_category.children.any? %>
   <div class="row">
@@ -51,6 +52,9 @@
   <% end %>
 <% end %>
 
+<% else %>
+  <h1>Shop</h1>
+<% end %>
         
 <div class="row">
   <div class="col-xs-12 col-sm-offset-3 col-sm-6">
@@ -67,8 +71,10 @@
       <%= render partial: 'postings', locals: { heading: "Future Delivery", postings: @future_postings } %>
     <% end %>
 
-    <% if !@food_category.children.any? && !@this_weeks_postings.any? && !@next_weeks_postings.any? && !@future_postings.any? %>
-      <p class="text-center">Apparently there is nothing to see in this category</p>
+    <% if @food_category %>
+      <% if !@food_category.children.any? && !@this_weeks_postings.any? && !@next_weeks_postings.any? && !@future_postings.any? %>
+        <p class="text-center">Apparently there is nothing to see in this category</p>
+      <% end %>
     <% end %>
 
   </div>

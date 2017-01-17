@@ -29,12 +29,18 @@ class PostingsController < ApplicationController
       @food_category = FoodCategory.where(parent: nil).first
     end
 
+    if @food_category
+      products = @food_category.products
+    else
+      products = Product.all
+    end
+
     #this is the upcoming sunday at midnight
     next_week_start = start_of_next_week
 
-    @this_weeks_postings = Posting.joins(:product).where(product: @food_category.products).where("delivery_date >= ? and delivery_date < ? and live = ? and state = ?", Time.zone.now.midnight, next_week_start, true, Posting.states[:OPEN])
-    @next_weeks_postings = Posting.joins(:product).where(product: @food_category.products).where("delivery_date >= ? and delivery_date < ? and live = ? and state = ?", next_week_start, next_week_start + 7.days, true, Posting.states[:OPEN])
-    @future_postings = Posting.joins(:product).where(product: @food_category.products).where("delivery_date >= ? and live = ? and state = ?", next_week_start + 7.days, true, Posting.states[:OPEN])
+    @this_weeks_postings = Posting.joins(:product).where(product: products).where("delivery_date >= ? and delivery_date < ? and live = ? and state = ?", Time.zone.now.midnight, next_week_start, true, Posting.states[:OPEN])
+    @next_weeks_postings = Posting.joins(:product).where(product: products).where("delivery_date >= ? and delivery_date < ? and live = ? and state = ?", next_week_start, next_week_start + 7.days, true, Posting.states[:OPEN])
+    @future_postings = Posting.joins(:product).where(product: products).where("delivery_date >= ? and live = ? and state = ?", next_week_start + 7.days, true, Posting.states[:OPEN])
 
   end
 
