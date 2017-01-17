@@ -1,38 +1,59 @@
 <% provide(:title, 'Shop') %>
 
 <h1><%= @food_category.name %></h1>
+
+<% if @food_category.parent || @food_category.children.any? %>
+  <div class="row">
+    <div class="col-xs-12 col-sm-offset-3 col-sm-6">
+
+      <% if @food_category.parent %>      
+      
+        <%= link_to postings_path(food_category: @food_category.parent.name), class: "food-category-link" do %>
+          <span class="glyphicon glyphicon-arrow-left"></span>
+          <%= @food_category.parent.name %>
+        <% end %>
+
+      <% end %>
+
+      <% if @food_category.children.any? %>        
+        
+          <%= link_to postings_path(food_category: @food_category.children.first.name), class: "food-category-link pull-right" do %>            
+            <%= @food_category.children.first.name %>
+            <span class="glyphicon glyphicon-arrow-right"></span>
+          <% end %>        
+
+      <% end %>
+
+    </div>
+  </div>
+<% end %>
+
+<% if @food_category.children.count > 1 %>
+  <% @food_category.children.each do |sub_category| %>
+
+    <% 
+      if sub_category == @food_category.children.first 
+        next
+      end
+    %>
+
+    <div class="row">
+      <div class="col-xs-12 col-sm-offset-3 col-sm-6">
+
+      <%= link_to postings_path(food_category: sub_category.name), class: "food-category-link pull-right" do %>
+        <%= sub_category.name %>
+        <span class="glyphicon glyphicon-arrow-right"></span>      
+      <% end %>
+
+      </div>
+    </div>
+
+  <% end %>
+<% end %>
+
         
 <div class="row">
   <div class="col-xs-12 col-sm-offset-3 col-sm-6">
-
-    <% if @food_category.parent %>      
-      
-      <%= link_to postings_path(food_category: @food_category.parent.name) do %>
-      <span class="glyphicon glyphicon-arrow-left"></span>
-      <%= @food_category.parent.name %>
-      <% end %>
-    <% end %>
-
-    <% if !@food_category.children.any? && !@this_weeks_postings.any? && !@next_weeks_postings.any? && !@future_postings.any? %>
-      <p class="text-center">Apparently there is nothing to see in this category</p>
-    <% end %>
-
-    <% if @food_category.children.any? %>
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <div class="panel-title">
-            Sub Categories
-          </div>
-        </div>
-        <div class="panel-body">
-          <div class="text-center">
-          <% @food_category.children.each do |sub_category| %>              
-            <%= link_to sub_category.name, postings_path(food_category: sub_category.name), class: "btn btn-lg btn-primary shopping-buttons" %>
-          <% end %>            
-          </div>
-        </div>        
-      </div>
-    <% end %>
 
     <% if @this_weeks_postings.any? %>
       <%= render partial: 'postings', locals: { heading: "This Week's Delivery", postings: @this_weeks_postings } %>
@@ -46,6 +67,9 @@
       <%= render partial: 'postings', locals: { heading: "Future Delivery", postings: @future_postings } %>
     <% end %>
 
+    <% if !@food_category.children.any? && !@this_weeks_postings.any? && !@next_weeks_postings.any? && !@future_postings.any? %>
+      <p class="text-center">Apparently there is nothing to see in this category</p>
+    <% end %>
 
   </div>
 </div>
