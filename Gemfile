@@ -16,6 +16,9 @@ gem 'jbuilder'
 gem 'sdoc',                 '0.4.0', group: :doc
 gem 'momentjs-rails',       '2.11.0'
 gem 'bootstrap3-datetimepicker-rails', '4.17.43'
+gem 'carrierwave', '1.0.0'
+gem 'mini_magick'
+gem 'fog'
 
 group :development do
   gem 'web-console', '>= 3.3.0'

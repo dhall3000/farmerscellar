@@ -45,6 +45,10 @@ Rails.application.configure do
   config.active_support.test_order = :random
   config.action_mailer.default_url_options = { host: 'farmerscellar.com' }  
 
+  ENV['S3_KEY'] = ""
+  ENV['S3_SECRET'] = ""
+  ENV['S3_BUCKET_NAME'] = ""
+
   ENV['FOODCLEAROUTDAYTIME'] = "{wday: 1, hour: 20}"
   ENV['FOODCLEAROUTWARNINGDAYTIME'] = "{wday: 1, hour: 6}"    
 

@@ -37,6 +37,7 @@ Rails.application.routes.draw do
   post 'partner_users/create'
   post 'partner_users/send_delivery_notification'
 
+  resources :uploads
   resources :food_categories
   resources :payments, only: [:index, :new, :create]
   resources :payment_payables, only: [:index]
