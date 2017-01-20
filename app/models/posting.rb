@@ -487,9 +487,9 @@ class Posting < ApplicationRecord
 
     def important_notes_body_not_present_without_important_notes
 
-      if important_notes_body
-        if important_notes.nil? || important_notes.empty?
-          errors.add(:important_notes, "Can't have important_notes_body without important_notes")
+      if !important_notes_body.blank?
+        if important_notes.blank?
+          errors.add(:important_notes, "can't have important_notes_body without important_notes")
           return false
         end
       end
@@ -500,14 +500,14 @@ class Posting < ApplicationRecord
     
     def delivery_date_not_sunday
       if delivery_date != nil && delivery_date.sunday?
-        errors.add(:delivery_date, "Delivery date can not be Sunday")
+        errors.add(:delivery_date, "delivery date can not be Sunday")
       end
     end
 
     def delivery_date_must_be_after_today      
 
       if delivery_date.nil? || delivery_date <= Time.zone.today
-        errors.add(:delivery_date, "Delivery date must be after today")
+        errors.add(:delivery_date, "delivery date must be after today")
         return false
       end
 
@@ -518,12 +518,12 @@ class Posting < ApplicationRecord
     def order_cutoff_must_be_before_delivery_date
 
       if delivery_date.nil?
-        errors.add(:delivery_date, "Delivery date must be specified")
+        errors.add(:delivery_date, "delivery date must be specified")
         return
       end
 
       if delivery_date.nil? || order_cutoff.nil? || order_cutoff > delivery_date
-        errors.add(:order_cutoff, "Commitment zone must start prior to delivery date")
+        errors.add(:order_cutoff, "commitment zone must start prior to delivery date")
       end
 
     end
@@ -533,7 +533,7 @@ class Posting < ApplicationRecord
       commission = ProducerProductUnitCommission.where(user: user, product: product, unit: unit)
 
       if commission.count == 0
-        errors.add(:commission_is_set, "Commission must be set for producer/product/unit")
+        errors.add(:commission_is_set, "commission must be set for producer/product/unit")
         return false
       end
 

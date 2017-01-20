@@ -139,6 +139,8 @@ class PostingsController < ApplicationController
       flash[:success] = "Posting updated!"
       redirect_to current_user
     else
+      flash.now[:danger] = "Posting not updated"
+      @upload = Upload.new
       render 'edit'
     end
 

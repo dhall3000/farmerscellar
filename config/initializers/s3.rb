@@ -9,7 +9,7 @@ CarrierWave.configure do |config|
   
   if Rails.env.test? || Rails.env.development?
     config.storage           = :file
-    config.enable_processing = false
+    config.enable_processing = true
   elsif Rails.env.production?
     config.storage = :fog
     config.cache_dir        = "#{Rails.root}/public/tmp"
