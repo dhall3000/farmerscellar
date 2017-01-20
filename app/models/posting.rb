@@ -13,6 +13,9 @@ class Posting < ApplicationRecord
   has_many :creditor_order_postings
   has_many :creditor_orders, through: :creditor_order_postings
 
+  has_many :posting_uploads
+  has_many :uploads, through: :posting_uploads
+
   #OPEN means open for customers to place orders. the meaning isn't even yet comingled/intermingled iwth the concept of 'live'.
   #yuck. it is what it is. we'll clean it up eventually
   #COMMITMENTZONE is the period of time between order_cutoff and when product is CLOSED

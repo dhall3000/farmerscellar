@@ -36,20 +36,26 @@
       <%= f.label :product_id_code %>
       <%= f.text_field :product_id_code, class: 'form-control' %>
 
-  		<%= f.label :price, "Price per Unit" %>
-  		<%= f.number_field :price, min: 0.01, step: 0.01, class: 'form-control' %>
-
       <% if spoofing? %>
-        <%= label_tag :producer_net %>
+        <%= label_tag :producer_net, "Price per unit (producer net)" %>
         <%= number_field_tag :producer_net, @producer_net, {min: 0.0, step: 0.01, class: 'form-control'} %>
       <% end %>
+
+  		<%= f.label :price, "Price per unit (retail)" %>
+  		<%= f.number_field :price, min: 0.01, step: 0.01, class: 'form-control' %>
 
   		<%= f.label :price_body %>
   		<%= f.text_field :price_body, class: 'form-control' %>
 
-  		<%= f.label :delivery_date, "Delivery Date (Date only)" %>
+      <%= f.label :order_cutoff, "Order Cutoff (Date & Time)" %>
+      <div class="input-group date" id="dtpOrderCutoff" data-ordercutoff="<%= @posting.order_cutoff.strftime("%Y-%m-%d %H:%M") %>">
+        <%= f.text_field :order_cutoff, class: 'form-control', readonly: true %>
+        <span class="input-group-addon">
+          <span class="glyphicon glyphicon-calendar"></span>
+        </span>
+      </div>
 
-
+  		<%= f.label :delivery_date, "Delivery Date (Date only)", id: "czsLabel" %>
       <div class="input-group date" id="dtpDeliveryDate" data-deliverydate="<%= @posting.delivery_date.strftime("%Y-%m-%d %H:%M") %>">
   		  <%= f.text_field :delivery_date, class: 'form-control', readonly: true %>
   		  <span class="input-group-addon">
@@ -57,21 +63,13 @@
         </span>
       </div>
 
-      <%= f.label :order_cutoff, "Order Cutoff (Date & Time)", id: "czsLabel" %>
-      <div class="input-group date" id="dtpOrderCutoff" data-ordercutoff="<%= @posting.order_cutoff.strftime("%Y-%m-%d %H:%M") %>">
-        <%= f.text_field :order_cutoff, class: 'form-control', readonly: true %>
-        <span class="input-group-addon">
-          <span class="glyphicon glyphicon-calendar"></span>
-        </span>
-      </div>		
-
 	    <%= f.hidden_field :live %>
 
 	    <% if WebsiteSetting.order("website_settings.id").last.recurring_postings_enabled %>
 		    <div>
 			    <%= f.fields_for @posting.posting_recurrence do |posting_recurrence_f| %>
 			      <%= posting_recurrence_f.label :frequency, id: "posting_recurrence_label" %>	      
-			      <%= posting_recurrence_f.select(:frequency, options_for_select(PostingRecurrence.frequency), {}, {class: 'form-control'}) %>
+            <%= posting_recurrence_f.select(:frequency, options_for_select(PostingRecurrence.frequency, selected: @posting.posting_recurrence.frequency), {}, {class: 'form-control'}) %>
 			    <% end %>
 		    </div>
       <% else %>		    
@@ -80,7 +78,7 @@
 		      </div>
 	    <% end %>
 
-		  <%= f.submit "Create new posting", class: "btn btn-primary" %>
+		  <%= f.submit "Create new posting", class: "btn btn-lg btn-primary" %>
 
 		<% end %>
 	</div>

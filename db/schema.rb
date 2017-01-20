@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170118170942) do
+ActiveRecord::Schema.define(version: 20170119194001) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -338,6 +338,15 @@ ActiveRecord::Schema.define(version: 20170118170942) do
     t.boolean  "on",         default: false, null: false
     t.datetime "created_at",                 null: false
     t.datetime "updated_at",                 null: false
+  end
+
+  create_table "posting_uploads", force: :cascade do |t|
+    t.integer  "posting_id"
+    t.integer  "upload_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["posting_id"], name: "index_posting_uploads_on_posting_id"
+    t.index ["upload_id"], name: "index_posting_uploads_on_upload_id"
   end
 
   create_table "postings", force: :cascade do |t|

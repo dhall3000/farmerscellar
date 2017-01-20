@@ -723,6 +723,62 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
   end
 
+  def verify_producer_can_see_post_edit_option(producer, posting)
+    log_in_as(producer)
+    get user_path(producer)
+    assert_response :success
+    assert_template 'users/show'
+    assert_select 'td a', posting.product.name
+    assert_select 'td.text-center a[href=?]', edit_posting_path(posting), {text: "Edit posting"}
+  end
+
+  def get_edit_posting(producer, posting)
+    log_in_as(producer)
+    get edit_posting_path(posting)
+    assert_response :success
+    verify_posting_edit(posting)
+
+  end
+
+  def verify_posting_edit(posting)
+    assert_template 'postings/edit'
+    assert_select 'input.form-control[value=?]', posting.description
+
+    if posting.uploads.count > 0
+      assert_select 'div.panel-title', "Current Photos"
+
+      assert_select 'span img', {count: posting.uploads.count}
+
+      #NOTE: the above check should be as below. however right now i'm tryign to go fast and i don't wnat to fiddle with
+      #getting storage stuff set up in test. the way things currently are, when i grab response.body here i see this:
+      #<span><img src=>
+      #that's why all i'm verifying is just the span and the img
+
+      #posting.uploads.each do |upload|        
+        #assert_select 'span img[src=?]', upload.name.thumb.store_path
+      #end      
+
+    end
+
+    #verify there's a panel to enable photo additions
+    assert_select 'div.panel-title', "Add new photo"
+    assert_select 'input.form-control[type=file]'
+  end
+
+  def upload_photo_to_posting(producer, posting)
+    orig_upload_count = Upload.count
+    orig_posting_photo_count = posting.uploads.count
+
+    log_in_as(producer)    
+    post uploads_path, params: {upload: {name: "filename.jpg"}, posting_id: posting.id}
+    assert_response :redirect
+    assert_redirected_to edit_posting_path(posting)
+    follow_redirect!
+    verify_posting_edit(posting)
+    assert_equal orig_upload_count + 1, Upload.count
+    assert_equal orig_posting_photo_count + 1, posting.reload.uploads.count
+  end
+
   def verify_post(price, unit, exists, posting_id = nil)
 
     posting = Posting.find posting_id

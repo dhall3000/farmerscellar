@@ -131,7 +131,7 @@ class PostingsControllerTest < IntegrationHelper
     assert_response :success
     assert_template 'postings/new'
 
-    assert_select 'form label', {count: 1, text: "Producer net"}
+    assert_select 'form label', {count: 1, text: "Price per unit (producer net)"}
     assert_select 'form input[type=number][name=producer_net]', 1
 
     producer = users(:f1)
@@ -173,7 +173,7 @@ class PostingsControllerTest < IntegrationHelper
     assert_response :success
     assert_template 'postings/new'
 
-    assert_select 'form label', {count: 1, text: "Producer net"}
+    assert_select 'form label', {count: 1, text: "Price per unit (producer net)"}
     assert_select 'form input[type=number][name=producer_net]', 1
 
     producer = users(:f1)
@@ -677,7 +677,11 @@ class PostingsControllerTest < IntegrationHelper
     
     #verify all the values have been changed
     assert @posting.description != posting_old.description    
-    assert @posting.price != posting_old.price
+
+    #assert @posting.price != posting_old.price
+    #CHANGE: price can't be changed through the controller now
+    assert_equal @posting.price, posting_old.price
+
     assert @posting.live != posting_old.live
 
   end
@@ -720,6 +724,7 @@ class PostingsControllerTest < IntegrationHelper
     #disallow: user_id, product_id, unit_category_id, unit_kind_id, delivery_date, order_cutoff, posting_recurrence values
 
     log_in_as(@farmer)
+    get_access_for(@farmer)
 
     #copy the existing posting values so we can compare in the future to verify changes took effect
     posting_old = @posting.dup
@@ -730,6 +735,16 @@ class PostingsControllerTest < IntegrationHelper
       price: -1.0,
       live: !(@posting.live)
     })
+
+    #CHANGE: 2017-01-19
+    #i made it so price can't be updated in the private postingscontroller params method
+    #that makes it so that the change above passes just fine. you can pass a negative price in
+    #all day long from the browser and the controller will just ignore it (or any other price)
+    assert_response :redirect
+    assert_redirected_to @farmer
+    follow_redirect!
+    assert_template 'users/show'
+    return
 
     #now we should get sent back to the edit page with errors for user to see what went wrong
     assert :success

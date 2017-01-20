@@ -1,6 +1,7 @@
 class UploadsController < ApplicationController
   before_action :set_upload, only: [:show, :edit, :update, :destroy]
-  before_action :redirect_to_root_if_user_not_admin
+  before_action :redirect_to_root_if_user_not_admin, only: [:index, :edit, :update]
+  before_action :redirect_to_root_if_not_producer, only: [:show, :new, :create, :destroy]
  
   def index
     @uploads = Upload.all
@@ -17,13 +18,38 @@ class UploadsController < ApplicationController
   end
  
   def create
-    @upload = Upload.new(post_upload_params)
- 
-    if @upload.save
-      redirect_to @upload, notice: 'Upload was successfully created.'
-    else
-      render :new
+
+    if params[:upload].nil?
+      flash[:danger] = "Incorrect upload parameters"
+      redirect_to user_path(current_user)
+      return
     end
+
+    @upload = Upload.new(post_upload_params)
+    
+    if @upload.save
+
+      flash[:success] = "Uploaded successfully"
+
+      if params[:posting_id]
+        posting = Posting.find(params[:posting_id])
+        posting.uploads << @upload
+        posting.save
+        redirect_to edit_posting_path(posting)
+        return
+      else
+        redirect_to user_path(current_user)
+        return
+      end
+
+    else
+
+      flash[:danger] = "Upload failed"
+      redirect_to user_path(current_user)
+      return
+
+    end
+
   end
  
   def update
@@ -35,8 +61,29 @@ class UploadsController < ApplicationController
   end
  
   def destroy
+
+    #make sure no postings are pointing at this upload
+    @upload.postings.each do |posting|
+      @upload.postings.delete(posting)
+    end
+
+    posting = nil
+
+    #if we've gotten here with an associated posting, nuke the association
+    if params[:posting_id]
+      #make sure this posting is not pointing at this upload
+      posting = Posting.find(params[:posting_id])
+      posting.uploads.delete(@upload)
+    end
+
     @upload.destroy
-    redirect_to uploads_url, notice: 'Upload was successfully destroyed.'
+
+    if posting
+      redirect_to edit_posting_path(posting)
+    else
+      redirect_to uploads_path
+    end
+
   end
  
   private
@@ -46,7 +93,7 @@ class UploadsController < ApplicationController
     end
  
 
-    def post_upload_params
+    def post_upload_params      
       params.require(:upload).permit(:name)
     end
 end

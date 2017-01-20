@@ -4,21 +4,28 @@ class PostingsController < ApplicationController
   
   def new  	
 
-    if params[:posting_id].nil?
-      @posting = current_user.postings.new(live: true, delivery_date: Time.zone.now.midnight + 2.days, order_cutoff: Time.zone.now.midnight + 1.day)
-      #if you are doing dev work on the create method and want the new form autopopulated for sanity's sake, uncomment this line
-      #@posting = Posting.new(live: true, delivery_date: Time.zone.now + 4.days, product_id: 8, price: 2.50, user_id: User.find_by(name: "f4"), unit_category_id: UnitCategory.find_by(name: "Weight"), unit_kind_id: UnitKind.find_by(name: "Pound"), description_body: "best celery ever!")
-    else
+    posting_to_clone = nil
+
+    if params[:posting_id]
+      #we're copying a posting
       posting_to_clone = Posting.find(params[:posting_id])
       @posting = posting_to_clone.dup
 
       if spoofing?
         @producer_net = posting_to_clone.get_producer_net_unit
       end
+    else
+      @posting = current_user.postings.new(live: true, delivery_date: Time.zone.now.midnight + 2.days, order_cutoff: Time.zone.now.midnight + 1.day)
+      #if you are doing dev work on the create method and want the new form autopopulated for sanity's sake, uncomment this line
+      #@posting = Posting.new(live: true, delivery_date: Time.zone.now + 4.days, product_id: 8, price: 2.50, user_id: User.find_by(name: "f4"), unit_category_id: UnitCategory.find_by(name: "Weight"), unit_kind_id: UnitKind.find_by(name: "Pound"), description_body: "best celery ever!")
     end
 
     @posting.build_posting_recurrence
     load_posting_choices
+
+    if posting_to_clone && posting_to_clone.posting_recurrence
+      @posting.posting_recurrence.frequency = posting_to_clone.posting_recurrence.frequency
+    end
 
   end
 
@@ -107,13 +114,17 @@ class PostingsController < ApplicationController
     #posting live or not live
     @posting = Posting.find(params[:id])        
     @posting_recurrence = @posting.posting_recurrence
+
+    @upload = Upload.new
+
   end
 
   def update    
+
     @posting = Posting.find(params[:id])
     @posting_recurrence = @posting.posting_recurrence
 
-    if @posting_recurrence != nil && @posting_recurrence.on
+    if @posting_recurrence && @posting_recurrence.on
       #check to see if the user just turned the recurrence off. if they did we need to persist that.
 
       if params[:posting][:posting_recurrence][:on] == "0"
@@ -215,9 +226,13 @@ class PostingsController < ApplicationController
       
       posting = params.require(:posting).permit(
         :description,
-        :price,
+        :description_body,
+        :price_body,
+        :unit_body,
+        :important_notes,
+        :important_notes_body,
         :live
-        )      
+        )
 
       return posting
 
