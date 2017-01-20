@@ -76,7 +76,11 @@ class UploadsController < ApplicationController
       posting.uploads.delete(@upload)
     end
 
-    @upload.destroy
+    if @upload.destroy
+      flash[:success] = "Upload deleted"
+    else
+      flash[:danger] = "Upload not deleted"
+    end
 
     if posting
       redirect_to edit_posting_path(posting)

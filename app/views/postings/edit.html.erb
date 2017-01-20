@@ -76,7 +76,7 @@
             <% @posting.uploads.each do |upload| %>            
               <span>
                 <img src=<%= "#{upload.name.thumb}" %>>
-                <%= link_to "", upload_path(posting_id: @posting.id), class: "non-blue glyphicon glyphicon-remove", method: :delete, data: { confirm: 'Delete photo?' } %>
+                <%= link_to "", upload_path(upload, posting_id: @posting.id), class: "non-blue glyphicon glyphicon-remove", method: :delete, data: { confirm: 'Delete photo?' } %>
               </span>
             <% end %>
           </div>
