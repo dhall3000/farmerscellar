@@ -324,3 +324,79 @@ a.non-blue { color: inherit; }
   font-size: 1.5em;
   margin-bottom: 5px;
 }
+
+.section-divider {
+  margin-top: 20px;
+  margin-bottom: 0px;
+  height:1px;
+  border:none;
+  color:#333;
+  background-color:#333;
+}
+
+.section-heading {
+  margin-top: 10px;
+}
+
+.posting-thumbnail {
+  border: 1px solid $gray-lighter;
+}
+
+.hundred-percent-width {
+  width: 100%;
+}
+
+.thumbnail-content-padding {
+  padding-left: 3px;
+  padding-right: 3px;
+}
+
+.thumbnail-truncated-description {
+  white-space: nowrap;
+  text-overflow:ellipsis;
+  overflow: hidden;
+}
+
+.thumbnail-truncated-producer-name {
+  color: #999a9b;
+  font-size: 0.95em;
+  white-space: nowrap;
+  text-overflow:ellipsis;
+  overflow: hidden;
+}
+
+.thumbnail-price {
+  float: right;
+  padding-left: 3px;
+  padding-bottom: 2px;
+}
+
+//this came from http://arnique.net/web-design/58/a-quick-guide-to-changing-bootstraps-gutter-width/
+// 20px gutter
+.gutter-20.row {
+  margin-right: -10px;
+  margin-left: -10px;
+}
+.gutter-20 > [class^="col-"], .gutter-20 > [class^=" col-"] {
+  padding-right: 10px;
+  padding-left: 10px;
+}
+// 10px gutter
+.gutter-10.row {
+  margin-right: -5px;
+  margin-left: -5px;
+  padding-bottom: 10px;
+}
+.gutter-10 > [class^="col-"], .gutter-10 > [class^=" col-"] {
+  padding-right: 5px;
+  padding-left: 5px;
+}
+// 0px gutter
+.gutter-0.row {
+  margin-right: 0;
+  margin-left: 0;
+}
+.gutter-0 > [class^="col-"], .gutter-0 > [class^=" col-"]{
+  padding-right: 0;
+  padding-left: 0;
+}

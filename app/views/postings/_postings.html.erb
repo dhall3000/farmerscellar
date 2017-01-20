@@ -5,151 +5,35 @@
 
 <% if postings.any? %>
 
-  <h2><%= heading %></h2>
-  <% postings.each do |posting| %>
+  <hr class="section-divider" />
+  <h2 class="section-heading"><%= heading %></h2>
 
+  <% if postings && postings.any? %>
+    <%  
+    items_per_row = 2
+    num_rows_needed = postings.count / items_per_row
+    if postings.count % items_per_row > 0
+      num_rows_needed += 1
+    end
+    row_num = 0
+    while row_num < num_rows_needed
+      item_index = row_num * items_per_row
+    %>
+      <div class="row gutter-10">
+        <%= render partial: 'posting_thumbnail', locals: { posting: postings[item_index] } %>
 
+        <% 
+        item_index += 1
+        if postings.count > item_index
+        %>
+          <%= render partial: 'posting_thumbnail', locals: { posting: postings[row_num + 1] } %>
+        <% end %>
 
-
-
-
-      <div class="panel panel-default">
-        <div class="panel-body">
-
-
-
-          <div class="panel-group" id=<%= "#{posting.id.to_s}accordion" %>>
-          
-            
-
-            <div class="panel panel-default">
-              <div class="panel-heading" id=<%= "#{posting.id.to_s}producer_name" %>>
-                <h4 class="panel-title" data-toggle="collapse" data-parent=<%= "##{posting.id.to_s}accordion" %> data-target=<%= "##{posting.id.to_s}producerDetails" %>>
-                  <%= posting.user.farm_name %><span id=<%= "producerDetailsChevron#{posting.id.to_s}" %> class="glyphicon glyphicon-chevron-down pull-right"></span>            
-                </h4>
-              </div>
-              <div id=<%= "#{posting.id.to_s}producerDetails" %> class="panel-collapse collapse" data-chevron=<%= "#producerDetailsChevron#{posting.id.to_s}" %>>
-                <div class="panel-body">
-                  <ul class="list-group">
-                    <% if !posting.user.city.blank? && !posting.user.state.blank? %>
-                      <li class="list-group-item">Location: <%= "#{posting.user.city}, #{posting.user.state}" %></li>              
-                    <% end %>
-                    <% if !posting.user.website.blank? %>
-                      <li class="list-group-item">Website: <a href=<%= "#{posting.user.website}" %> target='_blank'><%= posting.user.website %></a></li>              
-                    <% end %>   
-                    <% if !posting.user.description.blank? %>                       
-                      <li class="list-group-item"><%= posting.user.description %></li>
-                    <% end %>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-
-
-            <div class="panel panel-default">
-              <div class="panel-heading" id=<%= "#{posting.id.to_s}product" %>>
-                <h4 class="panel-title" data-toggle="collapse" data-parent=<%= "##{posting.id.to_s}accordion" %> data-target=<%= "##{posting.id.to_s}productDetails" %>>
-                  <%= posting.product.name %><span id=<%= "productDetailsChevron#{posting.id.to_s}" %> class="glyphicon glyphicon-chevron-down pull-right"></span>            
-                </h4>
-              </div>
-              <div id=<%= "#{posting.id.to_s}productDetails" %> class="panel-collapse collapse" data-chevron=<%= "#productDetailsChevron#{posting.id.to_s}" %>>                
-                <div class="panel-body">
-                  <ul class="list-group">
-                    <% if !posting.description.blank? %>
-                      <li class="list-group-item"><%= posting.description %></li>                
-                    <% end %>
-                    <% if !posting.description_body.blank? %>
-                      <li class="list-group-item"><%= posting.description_body %></li>                
-                    <% end %>
-                  </ul>
-                </div>                
-              </div>
-            </div>
-
-
-
-            <% if !posting.unit_body.blank? || !posting.price_body.blank? %>
-
-              <div class="panel panel-default">
-                <div class="panel-heading" id=<%= "#{posting.id.to_s}price" %>>
-                  <h4 class="panel-title" data-toggle="collapse" data-parent=<%= "##{posting.id.to_s}accordion" %> data-target=<%= "##{posting.id.to_s}priceDetails" %>>
-                      <%= number_to_currency(posting.price) %> / <%= Unit.find_by(id: posting.unit_id).name %>
-                      <span id=<%= "priceDetailsChevron#{posting.id.to_s}" %> class="glyphicon glyphicon-chevron-down pull-right"></span>
-                  </h4>
-                </div>          
-                <div id=<%= "#{posting.id.to_s}priceDetails" %> class="panel-collapse collapse" data-chevron=<%= "#priceDetailsChevron#{posting.id.to_s}" %>>
-                  <div class="panel-body">
-                    <ul class="list-group">
-                      <% if !posting.unit_body.blank? %>
-                        <li class="list-group-item"><%= posting.unit_body %></li>
-                      <% end %>
-                      <% if !posting.price_body.blank? %>
-                        <li class="list-group-item"><%= posting.price_body %></li>
-                      <% end %>
-                    </ul>
-                  </div>
-                </div>                
-              </div>
-
-            <% else %>
-
-              <div class="panel panel-default">
-                <div class="panel-heading" id=<%= "#{posting.id.to_s}price" %>>
-                  <h4 class="panel-title">                          
-                    <%= number_to_currency(posting.price) %> / <%= Unit.find_by(id: posting.unit_id).name %>                          
-                  </h4>
-                </div>          
-              </div>
-
-            <% end %>
-
-
-            <div class="panel panel-default">
-              <div class="panel-heading" id=<%= "#{posting.id.to_s}delivery" %>>
-                <h4 class="clearfix panel-title" data-toggle="collapse" data-parent=<%= "##{posting.id.to_s}accordion" %> data-target=<%= "##{posting.id.to_s}deliveryDetails" %>>
-                  Scheduled Delivery <%= posting.delivery_date.strftime("%a %b %d") %>                  
-                  <span id=<%= "deliveryDetailsChevron#{posting.id.to_s}" %> class="glyphicon glyphicon-chevron-down pull-right"></span>
-                  <span class="alert-info glyphicon glyphicon-asterisk pull-right"></span>
-                </h4>
-              </div>          
-              <div id=<%= "#{posting.id.to_s}deliveryDetails" %> class="panel-collapse collapse" data-chevron=<%= "#deliveryDetailsChevron#{posting.id.to_s}" %>>
-                <div class="panel-body">
-                  <ul class="list-group">                            
-                    <% if posting.posting_recurrence && posting.posting_recurrence.on %>
-                      <li class="list-group-item">
-                        Deliveries scheduled <%= PostingRecurrence.frequency[posting.posting_recurrence.frequency][0].downcase %>
-                      </li>                    
-                    <% end %>
-                      <li class="list-group-item">
-                        <span class="alert-info glyphicon glyphicon-asterisk"></span> Deliveries occur on schedule subject to several constraints. Please be aware of our <%= link_to "Delivery Not Guaranteed", how_things_work_path(anchor: "delivery_not_guaranteed") %> policy.                        
-                      </li>
-                  </ul>
-                </div>
-              </div>                
-            </div>
-
-
-
-
-
-          </div>
-
-          <div>                                                      
-            <p><%= link_to "Order", new_tote_item_path(posting_id: posting.id), class: "btn btn-primary btn-lg" %></p>
-          </div>
-
-
-        </div>
       </div>
-
-
-
-
-
-
-
-
-
-  <% end %>  
+    <%
+      row_num += 1
+    end
+    %>
+  <% end %>
+  
 <% end %>

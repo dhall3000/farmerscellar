@@ -1,0 +1,31 @@
+<% #grab params from local_assigns
+  posting = local_assigns[:posting]
+%>
+
+<% if posting && posting.valid? %>
+  <div class="col-xs-6">
+    <div class="posting-thumbnail">
+      <% if posting.uploads.last %>        
+        <%= image_tag "#{posting.uploads.last.name.thumb}", class: "hundred-percent-width" %>
+      <% else %>
+        <%= image_tag "/favicon-152.png", class: "hundred-percent-width" %>
+      <% end %>
+
+      <div class="thumbnail-content-padding">
+
+        <div class="thumbnail-truncated-description">
+          <%= posting.description %>
+        </div>
+
+        <div class="thumbnail-price">
+          <strong><%= number_to_currency(posting.price) %></strong>        
+        </div>
+
+        <div class="thumbnail-truncated-producer-name">
+          <%= posting.user.farm_name %>
+        </div>
+
+      </div>
+    </div>
+  </div>
+<% end %>

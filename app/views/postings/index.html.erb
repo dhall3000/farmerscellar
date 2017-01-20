@@ -9,7 +9,7 @@
 
       <% if @food_category.parent %>      
       
-        <%= link_to postings_path(food_category: @food_category.parent.name), class: "food-category-link" do %>
+        <%= link_to postings_path(food_category: @food_category.parent.name), class: "food-category-link non-blue" do %>
           <span class="glyphicon glyphicon-arrow-left"></span>
           <%= @food_category.parent.name %>
         <% end %>
@@ -18,7 +18,7 @@
 
       <% if @food_category.children.any? %>        
         
-          <%= link_to postings_path(food_category: @food_category.children.first.name), class: "food-category-link pull-right" do %>            
+          <%= link_to postings_path(food_category: @food_category.children.first.name), class: "food-category-link pull-right non-blue" do %>            
             <%= @food_category.children.first.name %>
             <span class="glyphicon glyphicon-arrow-right"></span>
           <% end %>        
@@ -41,7 +41,7 @@
     <div class="row">
       <div class="col-xs-12 col-sm-offset-3 col-sm-6">
 
-      <%= link_to postings_path(food_category: sub_category.name), class: "food-category-link pull-right" do %>
+      <%= link_to postings_path(food_category: sub_category.name), class: "food-category-link pull-right non-blue" do %>
         <%= sub_category.name %>
         <span class="glyphicon glyphicon-arrow-right"></span>      
       <% end %>
@@ -55,27 +55,21 @@
 <% else %>
   <h1>Shop</h1>
 <% end %>
-        
-<div class="row">
-  <div class="col-xs-12 col-sm-offset-3 col-sm-6">
 
-    <% if @this_weeks_postings.any? %>
-      <%= render partial: 'postings', locals: { heading: "This Week's Delivery", postings: @this_weeks_postings } %>
-    <% end %>
+<% if @food_category %>
+  <% if !@food_category.children.any? && !@this_weeks_postings.any? && !@next_weeks_postings.any? && !@future_postings.any? %>
+    <p class="text-center">Apparently there is nothing to see in this category</p>
+  <% end %>
+<% end %>
 
-    <% if @next_weeks_postings.any? %>
-      <%= render partial: 'postings', locals: { heading: "Next Week's Delivery", postings: @next_weeks_postings } %>
-    <% end %>
+<% if @this_weeks_postings.any? %>
+  <%= render partial: 'postings', locals: { heading: "This Week's Delivery", postings: @this_weeks_postings } %>
+<% end %>
 
-    <% if @future_postings.any? %>
-      <%= render partial: 'postings', locals: { heading: "Future Delivery", postings: @future_postings } %>
-    <% end %>
+<% if @next_weeks_postings.any? %>
+  <%= render partial: 'postings', locals: { heading: "Next Week's Delivery", postings: @next_weeks_postings } %>
+<% end %>
 
-    <% if @food_category %>
-      <% if !@food_category.children.any? && !@this_weeks_postings.any? && !@next_weeks_postings.any? && !@future_postings.any? %>
-        <p class="text-center">Apparently there is nothing to see in this category</p>
-      <% end %>
-    <% end %>
-
-  </div>
-</div>
+<% if @future_postings.any? %>
+  <%= render partial: 'postings', locals: { heading: "Future Delivery", postings: @future_postings } %>
+<% end %>
