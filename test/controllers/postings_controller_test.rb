@@ -754,9 +754,12 @@ class PostingsControllerTest < IntegrationHelper
   end
 
 #SHOW TESTS
-  test "should not get show" do
+  test "should get show when not logged in" do
     get posting_path(@posting)
-    assert_redirected_to login_url
+    assert :success
+    assert_template 'postings/show'
+    posting = assigns(:posting)
+    assert posting.valid?
   end
 
   test "should get show" do
@@ -936,11 +939,8 @@ class PostingsControllerTest < IntegrationHelper
 
     #assert that there are at least several postings (this should be the case as long as there
     #are "at least several" postings in the posting.yml file)    
-    assert_select 'h4' do |elements|
-      elements.each do |element|
-        assert_select 'span', minimum: 3
-      end
-    end
+    assert_select "a.non-blue div.posting-thumbnail img.hundred-percent-width", minimum: 3
+
   end
 
   def fail_to_create(posting_params)

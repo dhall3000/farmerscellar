@@ -3,6 +3,16 @@ require 'utility/rake_helper'
 
 class IntegrationHelper < ActionDispatch::IntegrationTest
 
+  def verify_price_on_postings_page(price, count = nil)
+
+    if count
+      assert_select "div.right-of-truncated-text strong", {text: ActiveSupport::NumberHelper.number_to_currency(price), count: count}
+    else
+      assert_select "div.right-of-truncated-text strong", ActiveSupport::NumberHelper.number_to_currency(price)
+    end
+    
+  end
+
   def log_in_as_admin(admin = nil)
 
     if admin.nil?
@@ -794,9 +804,9 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     assert :success
 
     if exists
-      assert_select "body div.panel h4.panel-title", {text: ActiveSupport::NumberHelper.number_to_currency(price) + " / " + unit.name, minimum: 1}
+      assert_select "div.right-of-truncated-text strong", {text: ActiveSupport::NumberHelper.number_to_currency(price), minimum: 1}
     else
-      assert_select "body div.panel h4.panel-title", {text: ActiveSupport::NumberHelper.number_to_currency(price) + " / " + unit.name, count: 0}
+      assert_select "div.right-of-truncated-text strong", {text: ActiveSupport::NumberHelper.number_to_currency(price), count: 0}
     end
     
   end

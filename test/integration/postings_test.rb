@@ -438,7 +438,7 @@ class PostingsTest < IntegrationHelper
   def verify_post_visibility(price, unit, count)
     get postings_path
     assert :success
-    assert_select "body div.panel h4.panel-title", {text: ActiveSupport::NumberHelper.number_to_currency(price) + " / " + unit.name, count: count}
+    verify_price_on_postings_page(price, count)
   end
 
   def verify_post_existence(price, count, posting_id = nil)
@@ -479,7 +479,10 @@ class PostingsTest < IntegrationHelper
 
     get postings_path
     assert :success
-    assert_select "body div.panel h4.panel-title", {text: ActiveSupport::NumberHelper.number_to_currency("2.75") + " / " + "Pound", count: 1}
+
+    price = 2.75
+
+    verify_price_on_postings_page(price, count = 1)
     
     #turn off the existing posting
     patch posting_path(@posting), params: {posting: {
@@ -509,8 +512,8 @@ class PostingsTest < IntegrationHelper
     }}
 
     get postings_path
-    assert :success
-    assert_select "body div.panel h4.panel-title", {text: ActiveSupport::NumberHelper.number_to_currency("2.75") + " / " + "Pound", count: 1}
+    assert :success        
+    verify_price_on_postings_page(price, count = 1)
 
   end
 
@@ -570,9 +573,11 @@ class PostingsTest < IntegrationHelper
       delivery_date += 1.day
     end
 
+    price = 14.49
+
     post postings_path, params: {posting: {
       description: "hi",
-      price: 2.97,
+      price: price,
       user_id: @farmer.id,
       product_id: @product.id,      
       unit_id: @unit.id,
@@ -585,8 +590,8 @@ class PostingsTest < IntegrationHelper
     posting = assigns(:posting)
     assert_redirected_to postings_path
     follow_redirect!
-    assert_template 'postings/index'
-    assert_select "body div.panel h4.panel-title", {text: "$2.97 / Pound", count: 1}
+    assert_template 'postings/index'    
+    verify_price_on_postings_page(price, 1)
     
     return posting
 

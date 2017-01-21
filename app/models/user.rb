@@ -442,6 +442,11 @@ class User < ApplicationRecord
     end    
     
   end
+
+  def full_website
+    url = website
+    return /^http/i.match(url) ? url : "http://#{url}"
+  end
   
   private
 

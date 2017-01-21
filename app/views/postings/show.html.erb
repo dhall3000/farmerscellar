@@ -1,2 +1,141 @@
-<%= @posting.description_body %>
+<% provide(:title, @posting.product.name) %>
+<h1><%= @posting.product.name %></h1>
 
+<% if @posting_food_category %>
+  <div class="row gutter-10">
+    <div class="col-xs-12">
+      <%= link_to postings_path(food_category: @posting_food_category.name), class: "food-category-link non-blue" do %>
+        <span class="glyphicon glyphicon-arrow-left"></span>
+        <%= @posting_food_category.name %>
+      <% end %>
+      <hr class="section-divider" />
+    </div>
+  </div>
+<% end %>
+
+<div class="row gutter-10">
+  <div class="col-xs-11">
+    <div id="productDescription" class="truncated-text-line" data-toggle="collapse" data-target="#descriptionBody">
+      <%= @posting.description %>
+    </div>      
+    <div id="descriptionBody" class="collapse" data-chevron="#descriptionChevron">
+      <br>
+      <%= @posting.description_body %>
+      <hr>
+    </div>
+  </div>
+  <div class="col-xs-1">
+    <div style="padding-top: 3px;" data-toggle="collapse" data-target="#descriptionBody">
+      <span id="descriptionChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>            
+    </div>
+  </div>
+</div>
+
+<div class="row gutter-10">
+  <div class="col-xs-11">
+    <div id="producerName" class="truncated-text-line producer-name-font" data-toggle="collapse" data-target="#producerDetails">
+      <%= @posting.user.farm_name %>
+    </div>      
+    <div id="producerDetails" class="collapse" data-chevron="#producerDetailsChevron">
+
+      <%= link_to @posting.user.full_website, @posting.user.full_website, target: "_blank" %>
+      <br>
+      <%= @posting.user.description %>
+    </div>
+  </div>
+  <div class="col-xs-1">
+    <div style="padding-top: 3px;" data-toggle="collapse" data-target="#producerDetails">
+      <span id="producerDetailsChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>            
+    </div>
+  </div>
+</div>
+
+<div class="row gutter-10">
+  <div class="col-xs-12">
+    <strong><%= "#{@posting.user.city}, #{@posting.user.state}" %></strong>
+  </div>
+</div>
+
+<div class="row gutter-10">
+  <div class="col-xs-12">
+    <% if @posting.uploads.last %>
+      <%= image_tag "#{@posting.uploads.last.name.large}", class: "hundred-percent-width" %>
+    <% end %>
+  </div>
+</div>
+
+<% if !@posting.important_notes.blank? %>
+  <div class="row gutter-10">
+    <div class="col-xs-10">
+      <div id="importantNotes" class="truncated-text-line" data-toggle="collapse" data-target="#importantNotesBody">
+        <%= @posting.important_notes %>
+      </div>      
+      <div id="importantNotesBody" class="collapse" data-chevron="#importantNotesChevron">
+        <br>
+        <%= @posting.important_notes_body %>
+        <hr>
+      </div>
+    </div>
+    <div class="col-xs-2">
+      <div style="padding-top: 3px;" data-toggle="collapse" data-target="#importantNotesBody">
+        <span id="importantNotesChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>            
+        <span id="important-notes-info-glyph" class="alert-info glyphicon glyphicon-info-sign spin-continuously pull-right"></span>        
+      </div>
+    </div>
+  </div>
+<% end %>
+
+
+<div class="row gutter-10">
+  <div class="col-xs-10">
+    <div data-toggle="collapse" data-target="#deliveryBody">
+      Scheduled Delivery <%= @posting.delivery_date.strftime("%a, %b %-d") %>
+    </div>      
+    <div id="deliveryBody" class="collapse" data-chevron="#deliveryBodyChevron">
+      <div>
+        <%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff") %>: <%= @posting.order_cutoff.strftime("%a, %b %-d, %l:%M %p") %>      
+      </div>      
+      <div>        
+        <small>
+          <span class="alert-info glyphicon glyphicon-asterisk"></span>
+          Deliveries occur on schedule subject to several constraints. Please be aware of our <%= link_to "Delivery Not Guaranteed", how_things_work_path(anchor: "delivery_not_guaranteed") %> policy.
+        </small>
+      </div>
+      <hr>
+    </div>
+  </div>
+  <div class="col-xs-2">
+    <div style="padding-top: 3px;" data-toggle="collapse" data-target="#deliveryBody">
+      <span id="deliveryBodyChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>            
+      <span class="alert-info glyphicon glyphicon-asterisk pull-right"></span>      
+    </div>
+  </div>
+</div>
+
+
+<div style="padding-top: 20px;" class="row gutter-10">
+  <div class="col-xs-11">
+    <div id="pricePerUnit" class="truncated-text-line" data-toggle="collapse" data-target="#priceUnitBody">
+      <strong><%= "#{number_to_currency(@posting.price)} / #{@posting.unit.name}" %></strong>
+    </div>      
+    <% if !@posting.unit_body.blank? || !@posting.price_body.blank? %>
+      <div id="priceUnitBody" class="collapse" data-chevron="#priceUnitBodyChevron">
+        <ul>
+          <% if !@posting.unit_body.blank? %>
+            <li><%= @posting.unit_body %></li>
+          <% end %>
+          <% if !@posting.price_body.blank? %>
+            <li><%= @posting.price_body %></li>
+          <% end %>
+        </ul>        
+      </div>
+    <% end %>
+  </div>
+  <div class="col-xs-1">
+    <% if !@posting.unit_body.blank? || !@posting.price_body.blank? %>
+      <div style="padding-top: 3px;" data-toggle="collapse" data-target="#priceUnitBody">
+        <span id="priceUnitBodyChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>            
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -4,28 +4,33 @@
 
 <% if posting && posting.valid? %>
   <div class="col-xs-6">
-    <div class="posting-thumbnail">
-      <% if posting.uploads.last %>        
-        <%= image_tag "#{posting.uploads.last.name.thumb}", class: "hundred-percent-width" %>
-      <% else %>
-        <%= image_tag "/favicon-152.png", class: "hundred-percent-width" %>
-      <% end %>
 
-      <div class="thumbnail-content-padding">
+    <%= link_to posting, class: "non-blue" do %>
+      <div class="posting-thumbnail">
+        <% if posting.uploads.last %>        
+          <%= image_tag "#{posting.uploads.last.name.thumb}", class: "hundred-percent-width" %>
+        <% else %>
+          <%= image_tag "/favicon-152.png", class: "hundred-percent-width" %>
+        <% end %>
 
-        <div class="thumbnail-truncated-description">
-          <%= posting.description %>
+        <div class="thumbnail-content-padding">
+
+          <div class="truncated-text-line">
+            <%= posting.description %>
+          </div>
+
+          <div class="right-of-truncated-text">
+            <strong><%= number_to_currency(posting.price) %></strong>        
+          </div>
+
+          <div class="truncated-text-line producer-name-font">
+            <%= posting.user.farm_name %>
+          </div>
+
         </div>
-
-        <div class="thumbnail-price">
-          <strong><%= number_to_currency(posting.price) %></strong>        
-        </div>
-
-        <div class="thumbnail-truncated-producer-name">
-          <%= posting.user.farm_name %>
-        </div>
-
       </div>
-    </div>
+    <% end %>
+
+
   </div>
 <% end %>

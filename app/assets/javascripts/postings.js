@@ -1,6 +1,27 @@
 $(function()
 { 
 
+  function toggleImportantNotesTruncation(e) {    
+    $('#importantNotes').toggleClass('truncated-text-line');
+  }
+
+  $('#importantNotesBody').on('show.bs.collapse', toggleImportantNotesTruncation);
+  $('#importantNotesBody').on('hide.bs.collapse', toggleImportantNotesTruncation);
+
+  function toggleProducerNameTruncation(e) {    
+    $('#producerName').toggleClass('truncated-text-line');
+  }
+
+  $('#producerDetails').on('show.bs.collapse', toggleProducerNameTruncation);
+  $('#producerDetails').on('hide.bs.collapse', toggleProducerNameTruncation);
+
+  function toggleDescriptionTruncation(e) {    
+    $('#productDescription').toggleClass('truncated-text-line');
+  }
+
+  $('#descriptionBody').on('show.bs.collapse', toggleDescriptionTruncation);
+  $('#descriptionBody').on('hide.bs.collapse', toggleDescriptionTruncation);
+
   $('#dtpDeliveryDate').datetimepicker({
     daysOfWeekDisabled: [0],
     format: "dddd, MMMM Do YYYY",
