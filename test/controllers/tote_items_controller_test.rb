@@ -16,26 +16,26 @@ class ToteItemsControllerTest < IntegrationHelper
 
     #first verify that when there are no important notes, nothing is displayed
     @posting_apples.update(important_notes: nil, important_notes_body: nil)
-    get new_tote_item_path(posting_id: @posting_apples.id)
+    get posting_path(@posting_apples)
     assert_response :success
-    assert_template 'tote_items/new'
+    assert_template 'postings/show'
     assert_select '#important-notes-info-glyph', {count: 0}
     assert_select '#important-notes-chevron-glyph', {count: 0}
 
     #next verify that when there are important notes they are displayed
     @posting_apples.update(important_notes: "important notes title", important_notes_body: nil)
-    get new_tote_item_path(posting_id: @posting_apples.id)
+    get posting_path(@posting_apples)
     assert_response :success
-    assert_template 'tote_items/new'
+    assert_template 'postings/show'
     assert_select '#important-notes-info-glyph', {count: 1}
     assert_select '#important-notes-chevron-glyph', {count: 0}
     assert_match @posting_apples.important_notes, response.body
 
     #now verify that when there are important notes_body they also are displayed
     @posting_apples.update(important_notes: "important notes title", important_notes_body: "important notes body")
-    get new_tote_item_path(posting_id: @posting_apples.id)
+    get posting_path(@posting_apples)
     assert_response :success
-    assert_template 'tote_items/new'
+    assert_template 'postings/show'
     assert_select '#important-notes-info-glyph', {count: 1}    
     assert_match @posting_apples.important_notes, response.body
     assert_match @posting_apples.important_notes_body, response.body
@@ -62,7 +62,7 @@ class ToteItemsControllerTest < IntegrationHelper
     log_in_as(@c1)
 
     tote_items_count = @c1.tote_items.count
-    post tote_items_path, params: {tote_item: {quantity: 1, posting_id: @posting_apples.id}}
+    post tote_items_path, params: {quantity: 1, posting_id: @posting_apples.id}
     @c1.reload
     assert_equal tote_items_count, @c1.tote_items.count
     assert_response :redirect
@@ -99,27 +99,29 @@ class ToteItemsControllerTest < IntegrationHelper
     
     #check that the 2 postings are in the proper states
     assert pr.reload.postings.first.state?(:CLOSED)
+    closed_posting = pr.postings.first
     closed_posting_id = pr.postings.first.id
 
     assert pr.postings.last.state?(:OPEN)
+    opened_posting = pr.postings.last
     opened_posting_id = pr.postings.last.id
 
     assert opened_posting_id != closed_posting_id
 
     #now log in and verify that the 2nd (i.e. OPENed) posting can be accessed
-    log_in_as(@c1)
-    get new_tote_item_path(posting_id: opened_posting_id)
+    log_in_as(@c1)    
+    get posting_path(opened_posting)
     assert_response :success
-    assert_template 'tote_items/new'
+    assert_template 'postings/show'
     posting = assigns(:posting)
     assert posting.valid?
     assert posting.state?(:OPEN)
     assert_equal opened_posting_id, posting.id
 
     #and now verify that if an attempt is made to view the 1st (i.e. CLOSEd) posting it will redirect to display the 2nd OPEN posting
-    get new_tote_item_path(posting_id: closed_posting_id)
+    get posting_path(closed_posting)
     assert_response :success
-    assert_template 'tote_items/new'
+    assert_template 'postings/show'
     posting = assigns(:posting)
     assert posting.valid?
     assert posting.state?(:OPEN)
@@ -230,7 +232,7 @@ class ToteItemsControllerTest < IntegrationHelper
   test "should get create" do
 
     log_in_as(@c1)
-    post tote_items_path, params: {tote_item: {quantity: 1, posting_id: @posting_apples.id}}
+    post tote_items_path, params: {quantity: 1, posting_id: @posting_apples.id}
 
     assert_equal "Tote item added", flash[:success]
     assert :redirected
@@ -244,7 +246,7 @@ class ToteItemsControllerTest < IntegrationHelper
     @posting_apples.update(live: false)
 
     log_in_as(@c1)
-    post tote_items_path, params: {tote_item: {quantity: 1, posting_id: @posting_apples.id}}
+    post tote_items_path, params: {quantity: 1, posting_id: @posting_apples.id}
 
     assert_equal "Oops, please try adding that again", flash[:danger]
     assert_redirected_to postings_path
@@ -256,14 +258,17 @@ class ToteItemsControllerTest < IntegrationHelper
     log_in_as(@c1)
 
     #zero quantity should fail
-    post tote_items_path, params: {tote_item: {quantity: 0, posting_id: @posting_apples.id}}
+    post tote_items_path, params: {quantity: 0, posting_id: @posting_apples.id}
 
-    assert_equal "Item not added to tote. See errors below.", flash.now[:danger]
-    assert_template 'tote_items/new'
+    assert_equal "Invalid quantity", flash.now[:danger]
+    assert_response :redirect
+    assert_redirected_to posting_path(@posting_apples)
+    follow_redirect!
+    assert_template 'postings/show'
 
   end
 
-  test "should redirect to subscription new" do
+  test "should render how often page" do
 
     log_in_as(@c1)    
     subscription_frequency = 1
@@ -271,16 +276,14 @@ class ToteItemsControllerTest < IntegrationHelper
     ti_count = c1_tote_items.count
     subscription_count = Subscription.where(user_id: @c1.id).count
 
-    post tote_items_path, params: {tote_item: {quantity: 2, posting_id: postings(:p_recurrence_on).id }}
+    post tote_items_path, params: {quantity: 2, posting_id: postings(:p_recurrence_on).id }
 
     c1_tote_items = ToteItem.where(user_id: @c1.id)
-    #verify there's exactly one additional tote item in the database after the post operation
-    assert_equal ti_count + 1 , c1_tote_items.count
-    new_ti = c1_tote_items.last
-    assert_equal ToteItem.states[:ADDED], new_ti.state
+    #verify there's exactly zero additional tote item in the database after the post operation
+    assert_equal ti_count , c1_tote_items.count
     
-    assert_response :redirect
-    assert_redirected_to new_subscription_path(tote_item_id: new_ti.id)
+    assert_response :success
+    assert_template "tote_items/how_often"
 
   end
   
@@ -291,7 +294,7 @@ class ToteItemsControllerTest < IntegrationHelper
     c1_tote_items = ToteItem.where(user_id: @c1.id)
     ti_count = c1_tote_items.count
     posting = postings(:p_recurrence_off)
-    post tote_items_path, params: {tote_item: {quantity: 2, posting_id: postings(:p_recurrence_off).id }}
+    post tote_items_path, params: {quantity: 2, posting_id: postings(:p_recurrence_off).id }
     
     c1_tote_items = ToteItem.where(user_id: @c1.id)
     #verify there's exactly one additional tote item in the database after the post operation
@@ -306,10 +309,10 @@ class ToteItemsControllerTest < IntegrationHelper
   test "should do hold behavior on create" do
 
     log_in_as(users(:c_account_on_hold))
-    post tote_items_path #TODO: COME BACK HERE AND PUT LEGIT PARAMETERS HERE
+    post tote_items_path, params: {posting_id: Posting.last.id, quantity: 1}
 
     assert :redirected
-    assert_equal flash[:danger], "Your account is on hold. Please contact Farmer's Cellar."
+    assert_equal "Your account is on hold. Please contact Farmer's Cellar.", flash[:danger]
     assert_not assigns(:tote_item)
     assert_not assigns(:subscription)  
 

@@ -147,12 +147,36 @@ class PostingsController < ApplicationController
   end
 
   def show
+
     @posting = Posting.find(params[:id])
     if @posting.product.food_category
       @posting_food_category = @posting.product.food_category
     else
       @posting_food_category = FoodCategory.where(parent: nil).first
     end
+
+    #we only want to show the user postings the are live and OPEN. if a producer has a one-time posting up, then if a customer tries to fetch the posting
+    #after it's either unlive or not OPEN, we want to show them an error. however, if a customer tries to fetch an unlive/unOPENed posting it might be
+    #due to them clicking on an older posting link from a postingrecurrence series. say, for example, i send someone a link to the current Pride & Joy
+    #posting. But they don't get their email until next week. When they click on the link i'd like for them to see the current posting. so this logic
+    #handles that as well.
+    if !@posting.live || !@posting.state?(:OPEN)
+      if @posting.posting_recurrence.nil?
+        flash[:danger] = "Oops, that posting is no longer active"
+        redirect_to food_category_path_helper(@posting_food_category)
+        return
+      else
+        pr = @posting.posting_recurrence
+        if pr.current_posting && pr.current_posting.live && pr.current_posting.state?(:OPEN)
+          @posting = pr.current_posting          
+        else
+          flash[:danger] = "Oops, that posting is no longer active"
+          redirect_to food_category_path_helper(@posting_food_category)
+          return
+        end
+      end
+    end
+
   end
 
   private

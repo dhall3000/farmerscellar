@@ -270,7 +270,7 @@ class SubscriptionTest < ActiveSupport::TestCase
 
 	test "should not generate new tote item when off" do
 		assert @subscription.on
-		assert @posting_recurrence.subscribable?
+		assert @posting_recurrence.on
 		@subscription.turn_off
 		assert_not @subscription.on
 		assert @subscription.valid?
@@ -282,9 +282,9 @@ class SubscriptionTest < ActiveSupport::TestCase
 
 	test "should not generate new tote item when posting recurrence is off" do
 		assert @subscription.on
-		assert @posting_recurrence.subscribable?
+		assert @posting_recurrence.on
 		@posting_recurrence.turn_off
-		assert_not @posting_recurrence.subscribable?
+		assert_not @posting_recurrence.on
 		@subscription.reload
 
 		#turning off the posting recurrence should have turned off the subscriptions

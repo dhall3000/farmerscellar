@@ -89,22 +89,14 @@ class ToteItemsController < ApplicationController
   end
 
   def create
-
-    #if user's account is on hold we don't want to allow them to add tote items    
-    if account_on_hold
-      flash[:danger] = "Your account is on hold. Please contact Farmer's Cellar."
-      redirect_to(root_url)
-      return
-    end
-
-    posting_id = params[:posting_id].to_i
-    @quantity = params[:quantity].to_i
+   
     if params[:frequency].blank?
       @frequency = nil
     else
       @frequency = params[:frequency].to_i
     end    
 
+    posting_id = params[:posting_id].to_i
     @posting = Posting.find_by(id: posting_id)
 
     if @posting.nil?
@@ -116,6 +108,20 @@ class ToteItemsController < ApplicationController
     if !@posting.live
       flash[:danger] = "Oops, please try adding that again"
       redirect_to food_category_path_helper(@posting.product.food_category)
+      return
+    end
+
+    #if user's account is on hold we don't want to allow them to add tote items    
+    if account_on_hold
+      flash[:danger] = "Your account is on hold. Please contact Farmer's Cellar."
+      redirect_to posting_path(@posting)
+      return
+    end
+
+    @quantity = params[:quantity].to_i
+    if @quantity < 1
+      flash[:danger] = "Invalid quantity"
+      redirect_to posting_path(@posting)
       return
     end
 
@@ -326,11 +332,11 @@ class ToteItemsController < ApplicationController
 
       if tote_item.save
         flash[:success] = "Tote item added"
+        redirect_to food_category_path_helper(posting.product.food_category)
       else
-        flash[:danger] = "Tote item not added. Please contact us so we can help you."
-      end
-      
-      redirect_to food_category_path_helper(posting.product.food_category)
+        flash[:danger] = "Tote item not added"
+        redirect_to posting_path(posting)
+      end      
 
       return tote_item
 

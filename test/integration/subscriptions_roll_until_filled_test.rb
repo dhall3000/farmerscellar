@@ -22,14 +22,9 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     log_in_as(bob)
     assert is_logged_in?
 
-    post tote_items_path, params: {tote_item: {quantity: 6, posting_id: posting.id}}    
-
-    assert :redirected
-    assert_response :redirect
-
-    follow_redirect!
-
-    assert_template 'subscriptions/new'
+    post tote_items_path, params: {posting_id: posting.id, quantity: 6}
+    assert_response :success
+    assert_template 'tote_items/how_often'
 
     #there are no constraints so both options should be present
     assert_select 'div div div form input[type=?][value=?]', "submit", "Just once", 1
@@ -56,15 +51,10 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     log_in_as(bob)
     assert is_logged_in?
 
-    post tote_items_path, params: {tote_item: {quantity: 2, posting_id: posting.id}}
+    post tote_items_path, params: {quantity: 2, posting_id: posting.id}
     tote_item = assigns(:tote_item)
-
-    assert :redirected
-    assert_response :redirect
-
-    follow_redirect!
-
-    assert_template 'subscriptions/new'
+    assert_response :success
+    assert_template 'tote_items/how_often'
 
     assert_select 'div div div form input[type=?][value=?]', "submit", "Just once", 0
     assert_select 'div div div form input[type=?][value=?]', "submit", "Just once (roll until filled)", 1
@@ -90,29 +80,19 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     log_in_as(bob)
     assert is_logged_in?
 
-    post tote_items_path, params: {tote_item: {quantity: 6, posting_id: posting.id}}    
-
-    assert :redirected
-    assert_response :redirect
-
-    follow_redirect!
-
-    assert_template 'subscriptions/new'
-
+    post tote_items_path, params: {quantity: 6, posting_id: posting.id}
+    assert_response :success
+    assert_template 'tote_items/how_often'
     assert_select 'div div div form input[type=?][value=?]', "submit", "Just once", 0
     assert_select 'div div div form input[type=?][value=?]', "submit", "Just once (roll until filled)", 1
+    post tote_items_path, params: {quantity: 6, posting_id: posting.id, frequency: 0}
 
     create_rt_authorization_for_customer(bob)
 
     #ok, now the vanilla Just Once option should show up since OM has now been met
-    post tote_items_path, params: {tote_item: {quantity: 6, posting_id: posting.id}}    
-
-    assert :redirected
-    assert_response :redirect
-
-    follow_redirect!
-
-    assert_template 'subscriptions/new'
+    post tote_items_path, params: {quantity: 6, posting_id: posting.id}    
+    assert_response :success
+    assert_template 'tote_items/how_often'
 
     assert_select 'div div div form input[type=?][value=?]', "submit", "Just once", 1
     assert_select 'div div div form input[type=?][value=?]', "submit", "Just once (roll until filled)", 1
@@ -137,15 +117,10 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     log_in_as(bob)
     assert is_logged_in?
 
-    post tote_items_path, params: {tote_item: {quantity: 2, posting_id: posting.id}}
+    post tote_items_path, params: {quantity: 2, posting_id: posting.id}
     tote_item = assigns(:tote_item)
-
-    assert :redirected
-    assert_response :redirect
-
-    follow_redirect!
-
-    assert_template 'subscriptions/new'
+    assert_response :success
+    assert_template 'tote_items/how_often'
 
     assert_select 'div div div form input[type=?][value=?]', "submit", "Just once", 0
     assert_select 'div div div form input[type=?][value=?]', "submit", "Just once (roll until filled)", 1
@@ -170,31 +145,21 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     log_in_as(bob)
     assert is_logged_in?
 
-    post tote_items_path, params: {tote_item: {quantity: 12, posting_id: posting.id}}
+    post tote_items_path, params: {quantity: 12, posting_id: posting.id}
     tote_item = assigns(:tote_item)
-
-    assert :redirected
-    assert_response :redirect
-
-    follow_redirect!
-
-    assert_template 'subscriptions/new'
-
+    assert_response :success
+    assert_template 'tote_items/how_often'
     assert_select 'div div div form input[type=?][value=?]', "submit", "Just once", 0
     assert_select 'div div div form input[type=?][value=?]', "submit", "Just once (roll until filled)", 1
+    post tote_items_path, params: {quantity: 12, posting_id: posting.id, frequency: 0}
 
     create_rt_authorization_for_customer(bob)
 
     #now vanilla just once option should be shown since the 1st case is full
-    post tote_items_path, params: {tote_item: {quantity: 12, posting_id: posting.id}}
+    post tote_items_path, params: {quantity: 12, posting_id: posting.id}
     tote_item = assigns(:tote_item)
-
-    assert :redirected
-    assert_response :redirect
-
-    follow_redirect!
-
-    assert_template 'subscriptions/new'
+    assert_response :success
+    assert_template 'tote_items/how_often'
 
     assert_select 'div div div form input[type=?][value=?]', "submit", "Just once", 1
     assert_select 'div div div form input[type=?][value=?]', "submit", "Just once (roll until filled)", 1
@@ -219,44 +184,29 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     log_in_as(bob)
     assert is_logged_in?
 
-    post tote_items_path, params: {tote_item: {quantity: 2, posting_id: posting.id}}
+    post tote_items_path, params: {quantity: 2, posting_id: posting.id}
     tote_item = assigns(:tote_item)
-
-    assert :redirected
-    assert_response :redirect
-
-    follow_redirect!
-
-    assert_template 'subscriptions/new'
-
+    assert_response :success
+    assert_template "tote_items/how_often"
     assert_select 'div div div form input[type=?][value=?]', "submit", "Just once", 0
     assert_select 'div div div form input[type=?][value=?]', "submit", "Just once (roll until filled)", 1
+    post tote_items_path, params: {quantity: 2, posting_id: posting.id, frequency: 0}
     
     #now make case and OM constraints met and vanilla just once option should show up
-    post tote_items_path, params: {tote_item: {quantity: 12, posting_id: posting.id}}
+    post tote_items_path, params: {quantity: 12, posting_id: posting.id}
     tote_item = assigns(:tote_item)
-
-    assert :redirected
-    assert_response :redirect
-
-    follow_redirect!
-
-    assert_template 'subscriptions/new'
-
+    assert_response :success
+    assert_template 'tote_items/how_often'
     assert_select 'div div div form input[type=?][value=?]', "submit", "Just once", 0
     assert_select 'div div div form input[type=?][value=?]', "submit", "Just once (roll until filled)", 1
+    post tote_items_path, params: {quantity: 12, posting_id: posting.id, frequency: 0}
 
     create_rt_authorization_for_customer(bob)
 
-    post tote_items_path, params: {tote_item: {quantity: 1, posting_id: posting.id}}
+    post tote_items_path, params: {quantity: 1, posting_id: posting.id}
     tote_item = assigns(:tote_item)
-
-    assert :redirected
-    assert_response :redirect
-
-    follow_redirect!
-
-    assert_template 'subscriptions/new'
+    assert_response :success
+    assert_template 'tote_items/how_often'
 
     assert_select 'div div div form input[type=?][value=?]', "submit", "Just once", 1
     assert_select 'div div div form input[type=?][value=?]', "submit", "Just once (roll until filled)", 1    

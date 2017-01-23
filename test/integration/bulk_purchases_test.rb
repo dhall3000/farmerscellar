@@ -285,18 +285,19 @@ class BulkPurchasesTest < BulkBuyer
     log_in_as(customer)   
 
     #try to pull up the buy form for a particular posting
-    get new_tote_item_path(posting_id: Posting.last.id)
+    post tote_items_path, params: {posting_id: Posting.last.id, quantity: 1}
 
     #check for the existence of nasty-gram related to account state
     if account_ok
-      assert_select 'p', count: 0, text: "Your account is on hold, most likely due to a positive balance on your account. Please contact Farmer's Cellar to pay your balance before continuing to shop."      
-      #this is a spot check of what should be healthy functioning row of quantity-add buttons that say "+1", "+2", "+3" and "+4". check to make sure the "+2" button exists and that no buttons are disabled
-      assert_select "table.table tbody tr td form.tote_addition_one_button_form input[value=?]", "+2"      
-      assert_select "table.table tbody tr td form.tote_addition_one_button_form input[disabled=?]", "disabled", 0
+      assert_response :redirect
+      assert_redirected_to postings_path
+      assert_not flash.empty?      
+      assert_equal "Tote item added", flash[:success]
     else
-      assert_select 'p', "Your account is on hold, most likely due to a positive balance on your account. Please contact Farmer's Cellar to pay your balance before continuing to shop."
-      #verify the existence of disabled buttons. these are the buttons user pokes to add quantity
-      assert_select "table.table tbody tr td form.tote_addition_one_button_form input[disabled=?]", "disabled"
+      assert_not flash.empty?
+      assert_equal "Your account is on hold. Please contact Farmer's Cellar.", flash[:danger]
+      assert_response :redirect
+      assert_redirected_to posting_path(Posting.last)
     end    
 
     #TODO: verify can't add new tote items

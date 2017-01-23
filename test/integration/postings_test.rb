@@ -169,7 +169,7 @@ class PostingsTest < IntegrationHelper
     c2 = users(:c2)
     log_in_as(c2)
     #add tote item with quantity 10
-    post tote_items_path, params: {tote_item: {quantity: c2_quantity, posting_id: posting.id}}
+    post tote_items_path, params: {quantity: c2_quantity, posting_id: posting.id}
     tote_item = assigns(:tote_item)
 
     #the case size is 10. c1 added 5 units and c2 just added 10. this is a total of 15 which means the 
@@ -215,7 +215,7 @@ class PostingsTest < IntegrationHelper
     c2 = users(:c2)
     log_in_as(c2)
     #add tote item with quantity 4
-    post tote_items_path, params: {tote_item: {quantity: 4, posting_id: posting.id}}
+    post tote_items_path, params: {quantity: 4, posting_id: posting.id}
     tote_item = assigns(:tote_item)
 
     #c2 should now be looking at the pout page
@@ -279,7 +279,7 @@ class PostingsTest < IntegrationHelper
     posting = come_up_3_short
     #user got sent to the pout page telling them they were three units short of a full case
     #so now they just added 3 more. it should not send them to pout page but back to shopping page
-    post tote_items_path, params: {tote_item: {quantity: 3, posting_id: posting.id}}
+    post tote_items_path, params: {quantity: 3, posting_id: posting.id}
     tote_item = assigns(:tote_item)
 
     #the case size is 10. c1 just found out the case was 3 units shy so they added 3 more so
@@ -306,7 +306,7 @@ class PostingsTest < IntegrationHelper
     c2 = users(:c2)
     log_in_as(c2)
     #add tote item with quantity 4
-    post tote_items_path, params: {tote_item: {quantity: 4, posting_id: posting.id}}
+    post tote_items_path, params: {quantity: 4, posting_id: posting.id}
     tote_item = assigns(:tote_item)
 
     #the case size is 10. c1 added 3 units and c2 just added 4. this is a total of 7 which means the 

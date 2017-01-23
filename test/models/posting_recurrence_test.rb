@@ -118,28 +118,28 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     #this should not only turn off the recurrence itself but also ripple through to turn off
     #all subscriptions based off it
 
-    assert @posting_recurrence.subscribable?
+    assert @posting_recurrence.on
 
     assert @posting_recurrence.on
     assert_equal 1, @posting_recurrence.subscriptions.count
     assert @posting_recurrence.subscriptions.first.on
 
     @posting_recurrence.turn_off    
-    assert_not @posting_recurrence.subscribable?
+    assert_not @posting_recurrence.on
     assert_not @posting_recurrence.on    
     assert_not @posting_recurrence.subscriptions.first.on
 
     pr = @posting_recurrence.reload
     s = @posting_recurrence.subscriptions.first.reload
 
-    assert_not pr.subscribable?
+    assert_not pr.on
     assert_not pr.on
     assert_not s.on
 
   end
 
   test "should be subscribable" do
-    assert @posting_recurrence.subscribable?
+    assert @posting_recurrence.on
   end
 
   test "should have legit subscription options" do
@@ -186,7 +186,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
 
   test "should not be subscribable" do
     @posting_recurrence.turn_off
-    assert_not @posting_recurrence.subscribable?
+    assert_not @posting_recurrence.on
     @posting_recurrence.reload
   end
 

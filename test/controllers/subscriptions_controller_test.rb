@@ -15,15 +15,14 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
     assert ti.valid?
     assert ti.save        
     subscription_count = @c1.subscriptions.count
-    post subscriptions_path, params: {tote_item_id: ti.id, frequency: 0, roll_until_filled: true}
+    post subscriptions_path, params: {posting_id: posting.id, quantity: 1, frequency: 0, roll_until_filled: true}
     assert_response :redirect
     assert_redirected_to postings_path
     assert_not flash.empty?
-    assert_equal "Tote item added", flash[:success]
+    assert_equal "Roll until filled item added", flash[:success]
     @c1.reload
-    assert_equal subscription_count + 1, @c1.subscriptions.count
-    ti.reload
-    assert ti.subscription.kind?(:ROLLUNTILFILLED)
+    assert_equal subscription_count + 1, @c1.subscriptions.count    
+    assert @c1.subscriptions.last.kind?(:ROLLUNTILFILLED)
   end
 
   test "should create" do
@@ -33,7 +32,7 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
     assert ti.valid?
     assert ti.save        
     subscription_count = @c1.subscriptions.count
-    post subscriptions_path, params: {tote_item_id: ti.id, frequency: 1}
+    post subscriptions_path, params: {posting_id: posting.id, quantity: 1, frequency: 1}
     assert_response :redirect    
     assert_redirected_to postings_path    
     @c1.reload
@@ -52,11 +51,12 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
     assert ti.valid?
     assert ti.save        
     subscription_count = @c1.subscriptions.count
-    post subscriptions_path, params: {tote_item_id: ti.id, frequency: 0}
-    assert_response :redirect    
+    post subscriptions_path, params: {posting_id: posting.id, quantity: 1, frequency: 0}
+    assert_response :redirect
+    assert posting.product.food_category.nil?
     assert_redirected_to postings_path
     assert_not flash.empty?
-    assert_equal "Tote item added", flash[:success]
+    assert_equal "Subscription not added. Please try again.", flash[:danger]
     @c1.reload
     assert_equal subscription_count, @c1.subscriptions.count
   end
@@ -132,50 +132,52 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
     assert ti.valid?
     assert ti.save        
     get new_subscription_path, params: {tote_item_id: ti.id}
-    assert_response :success
-    assert_template 'subscriptions/new'
+    assert_response :redirect
+    assert_redirected_to root_path
   end
 
-  test "should not get new when posting recurrence is off" do
+  test "should not see how often page when posting recurrence is off" do
     log_in_as(@c1)
     posting = postings(:p_recurrence_off)
     ti = ToteItem.new(quantity: 1, price: posting.price, posting_id: posting.id, user_id: @c1.id)
     assert ti.valid?
     assert ti.save        
-    get new_subscription_path, params: {tote_item_id: ti.id}
-    assert_response :redirect    
-    assert_redirected_to postings_path
+    num_tote_items = ToteItem.count
+    post tote_items_path params: {posting_id: posting.id, quantity: 1}    
+    assert_response :redirect
+    assert_redirected_to postings_path    
+    assert_equal num_tote_items + 1, ToteItem.count
   end
 
-  test "should not get new when posting does not recur" do
+  test "should not see how often page when posting does not recur" do
     log_in_as(@c1)
     c1apple = tote_items(:c1apple)
     assert c1apple.valid?
-    get new_subscription_path, params: {tote_item_id: c1apple.id}
-    assert_response :redirect    
-    assert_redirected_to postings_path
+    num_tote_items = ToteItem.count
+    post tote_items_path params: {posting_id: c1apple.posting.id, quantity: 1}    
+    assert_response :redirect
+    assert_redirected_to postings_path    
+    assert_equal num_tote_items + 1, ToteItem.count
   end
 
-  test "should not get new when tote item id does not belong to current user" do
-    log_in_as(@c1)
-    t18 = tote_items(:t18)
-    assert t18.valid?
-    get new_subscription_path, params: {tote_item_id: t18.id}
-    assert_response :redirect    
-    assert_redirected_to postings_path
-  end
-
-  test "should not get new when not logged in" do
+  test "should not see how often page when not logged in" do
     get new_subscription_path
+    posting = postings(:p_recurrence_on)
+    num_tote_items = ToteItem.count
+    post tote_items_path params: {posting_id: posting.id, quantity: 1}
     assert_response :redirect    
     assert_redirected_to login_path
+    assert_equal num_tote_items, ToteItem.count
   end
 
-  test "should not get new when tote item id not in params" do
+  test "should not see how often page with incorrect params" do
     log_in_as(@c1)
-    get new_subscription_path
+    posting = postings(:p_recurrence_on)
+    post tote_items_path params: {posting_id: posting.id}
     assert_response :redirect    
-    assert_redirected_to postings_path    
+    assert_redirected_to posting_path(posting)
+    assert_not flash.empty?
+    assert_equal "Invalid quantity", flash[:danger]
   end  
 
   test "should get index when user logged in" do

@@ -4,6 +4,9 @@ class SubscriptionsController < ApplicationController
 
   def new
 
+    redirect_to root_path
+    return
+
     if !new_conditions_met?
       return
     end
@@ -75,7 +78,7 @@ class SubscriptionsController < ApplicationController
       return
     end
 
-    if @frequency < 1 || !frequency_is_legit?(posting, @frequency) || posting.posting_recurrence.nil? || !posting.posting_recurrence.on
+    if @frequency.nil? || @frequency < 1 || !frequency_is_legit?(posting, @frequency) || posting.posting_recurrence.nil? || !posting.posting_recurrence.on
       flash[:danger] = "Subscription not added. Please try again."
       redirect_to food_category_path_helper(posting.product.food_category)
       return

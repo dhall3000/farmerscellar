@@ -1257,7 +1257,7 @@ class SubscriptionsTest < IntegrationHelper
     post user_dropsites_path, params: {user_dropsite: {dropsite_id: dropsites(:dropsite1).id}}
     post tote_items_path, params: {tote_item: {quantity: quantity, posting_id: posting.id}}
     tote_item = assigns(:tote_item)
-    post subscriptions_path, params: {tote_item_id: tote_item.id, frequency: frequency}
+    post subscriptions_path, params: {posting_id: posting.id, quantity: quantity, frequency: frequency}
 
     subscription = assigns(:subscription)
     assert_not subscription.nil?

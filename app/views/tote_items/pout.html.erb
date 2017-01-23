@@ -136,7 +136,7 @@
               <h4 class="panel-title">Order more <%= User.find_by(id: @posting.user_id).farm_name %> <%= Product.find_by(id: @posting.product_id).name %></h4>
             </div>
             <div id="quantityBody" class="panel-body" role="tabpanel">
-            	<%= render partial: "add_quantity", locals: { tote_item: ToteItem.new, posting: @posting, account_on_hold: @account_on_hold } %>                        
+            	<%= render partial: "postings/add_quantity", locals: {posting: @posting} %>
             </div>
           </div>
         <% end %>
