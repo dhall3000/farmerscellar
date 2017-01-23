@@ -479,6 +479,10 @@ class Posting < ApplicationRecord
 
   end
 
+  def subscribable?    
+    return posting_recurrence && posting_recurrence.on
+  end
+
   private
 
     def get_first_committed_tote_item

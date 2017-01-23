@@ -104,8 +104,7 @@ class ToteItemsTest < IntegrationHelper
     assert_response :success
     assert_template 'tote_items/how_often'
     assert_not tote_item
-
-    posting_id = assigns(:posting_id)
+    posting_id = assigns(:posting).id
     assert_equal posting.id, posting_id
 
     quantity_save = quantity

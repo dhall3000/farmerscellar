@@ -94,7 +94,12 @@
     <div id="deliveryBody" class="collapse" data-chevron="#deliveryBodyChevron">
       <div>
         <%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff") %>: <%= @posting.order_cutoff.strftime("%a, %b %-d, %l:%M %p") %>      
-      </div>      
+      </div>    
+      <% if @posting.subscribable? %>
+        <div>
+          Deliveries scheduled <%= @posting.posting_recurrence.friendly_frequency %>
+        </div>
+      <% end %>  
       <div>        
         <small>
           <span class="alert-info glyphicon glyphicon-asterisk"></span>
@@ -139,3 +144,5 @@
     <% end %>
   </div>
 </div>
+
+<%= render partial: "add_quantity", locals: { posting: @posting } %>

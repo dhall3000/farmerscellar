@@ -1,0 +1,46 @@
+<table id="quantityTable" class="table">
+  <thead></thead>                
+  <tbody>
+    <tr>
+      <td>
+        <%= form_tag tote_items_path do %>                                
+          <%= hidden_field_tag :quantity, 1 %>
+          <%= hidden_field_tag :posting_id, posting.id %>          
+          <%= submit_tag "+1", class: "btn btn-primary btn-lg btn-lg" %>
+        <% end %>
+      </td>
+
+      <td>
+        <%= form_tag tote_items_path do %>                                
+          <%= hidden_field_tag :quantity, 2 %>
+          <%= hidden_field_tag :posting_id, posting.id %>
+          <%= submit_tag "+2", class: "btn btn-primary btn-lg" %>
+        <% end %>
+      </td>
+
+      <td>
+        <%= form_tag tote_items_path do %>                                
+          <%= hidden_field_tag :quantity, 3 %>
+          <%= hidden_field_tag :posting_id, posting.id %>
+          <%= submit_tag "+3", class: "btn btn-primary btn-lg" %>
+        <% end %>
+      </td>
+
+      <td>
+        <%= form_tag tote_items_path do %>                                
+          <%= hidden_field_tag :quantity, 4 %>
+          <%= hidden_field_tag :posting_id, posting.id %>
+          <%= submit_tag "+4", class: "btn btn-primary btn-lg" %>
+        <% end %>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div id="customQuantityFormDiv">
+  <%= form_tag tote_items_path do %>        
+    <%= hidden_field_tag :quantity, class: "form-control fat-finger-spacing", placeholder: "Enter custom quantity" %>
+    <%= hidden_field_tag :posting_id, posting.id %>                
+    <%= submit_tag "Add to Tote", class: "btn btn-primary btn-lg" %>
+  <% end %>
+</div>

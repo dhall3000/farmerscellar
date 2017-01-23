@@ -34,6 +34,10 @@ class PostingRecurrence < ApplicationRecord
 
   validates_presence_of :postings
 
+  def friendly_frequency
+    return PostingRecurrence.frequency[frequency][0]
+  end
+
   #constraints:
   #can't be sunday or monday
   #must be in the future relative to current_posting
@@ -97,10 +101,6 @@ class PostingRecurrence < ApplicationRecord
     subscriptions.each do |subscription|
       subscription.turn_off
     end    
-  end
-
-  def subscribable?
-    return on == true
   end
 
   def subscription_description(subscription_frequency)
