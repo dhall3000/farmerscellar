@@ -97,6 +97,56 @@ class ToteItemsController < ApplicationController
       return
     end
 
+    @posting_id = params[:posting_id].to_i
+    @quantity = params[:quantity].to_i
+    if params[:frequency].blank?
+      @frequency = nil
+    else
+      @frequency = params[:frequency].to_i
+    end    
+
+    posting = Posting.find_by(id: @posting_id)
+
+    if posting.nil?
+      flash[:danger] = "Oops, please try that again"
+      redirect_to postings_path
+      return
+    end
+    
+    if !posting.live
+      flash[:danger] = "Oops, please try adding that again"
+      redirect_to food_category_path_helper(posting.product.food_category)
+      return
+    end
+
+    if posting.posting_recurrence.nil? || !posting.posting_recurrence.on
+      #one and done. no recurrence so just create a single tote item and carry on
+      @tote_item = create_tote_item(posting, @quantity)
+      return
+    end
+
+    if @frequency
+      if @frequency > 0
+      else        
+        @tote_item = create_tote_item(posting, @quantity)
+        return
+      end
+    else
+      #try to upsell a subscription
+      render 'how_often'
+    end    
+
+  end
+
+  def create_old
+
+    #if user's account is on hold we don't want to allow them to add tote items    
+    if account_on_hold
+      flash[:danger] = "Your account is on hold. Please contact Farmer's Cellar."
+      redirect_to(root_url)
+      return
+    end
+
     @tote_item = ToteItem.new(tote_item_params)
     @tote_item.user_id = current_user.id
     @posting = Posting.find(@tote_item.posting_id)
@@ -117,7 +167,11 @@ class ToteItemsController < ApplicationController
         return
       else
         flash[:success] = "Tote item added"
-        redirect_to postings_path
+        if @posting.product.food_category
+          redirect_to postings_path(food_category: @posting.product.food_category.name)
+        else
+          redirect_to postings_path
+        end        
         return        
       end
     else
@@ -242,6 +296,24 @@ class ToteItemsController < ApplicationController
   private
     def tote_item_params
       params.require(:tote_item).permit(:quantity, :posting_id)
+    end
+
+    def create_tote_item(posting, quantity)
+      
+      tote_item = ToteItem.new(posting: posting, quantity: quantity)
+      tote_item.price = posting.price
+      tote_item.user = current_user
+
+      if tote_item.save
+        flash[:success] = "Tote item added"
+      else
+        flash[:danger] = "Tote item not added. Please contact us so we can help you."
+      end
+      
+      redirect_to food_category_path_helper(posting.product.food_category)
+
+      return tote_item
+
     end
 
     def account_on_hold

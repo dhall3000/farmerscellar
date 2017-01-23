@@ -1,5 +1,13 @@
 module ToteItemsHelper
 
+  def food_category_path_helper(food_category)
+    if food_category
+      postings_path(food_category: food_category.name)
+    else
+      postings_path
+    end
+  end
+
   def start_of_next_week(start_time = nil)
 
     if start_time.nil?

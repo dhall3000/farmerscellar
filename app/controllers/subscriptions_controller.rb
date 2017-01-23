@@ -37,6 +37,67 @@ class SubscriptionsController < ApplicationController
 
   def create
 
+    @posting_id = params[:posting_id].to_i
+    @quantity = params[:quantity].to_i
+    if params[:frequency].blank?
+      @frequency = nil
+    else
+      @frequency = params[:frequency].to_i
+    end    
+
+    posting = Posting.find_by(id: @posting_id)
+
+    if posting.nil?
+      flash[:danger] = "Oops, please try that again"
+      redirect_to postings_path
+      return
+    end
+    
+    if !posting.live
+      flash[:danger] = "Oops, please try adding that again"
+      redirect_to food_category_path_helper(posting.product.food_category)
+      return
+    end
+
+    if params[:roll_until_filled]
+      @subscription = Subscription.new(kind: Subscription.kinds[:ROLLUNTILFILLED], frequency: 1, on: true, user_id: current_user.id, posting_recurrence_id: posting.posting_recurrence.id, quantity: @quantity, paused: false)
+      if @subscription.save
+        @subscription.generate_next_tote_item
+        flash[:success] = "Roll until filled item added"
+        redirect_to food_category_path_helper(posting.product.food_category)
+        return
+      else
+        AdminNotificationMailer.general_message("Roll until filled failed to create", @subscription.to_yaml).deliver_now
+        flash[:danger] = "Roll until filled item not added"
+        redirect_to food_category_path_helper(posting.product.food_category)
+        return
+      end    
+      return
+    end
+
+    if @frequency < 1 || !frequency_is_legit?(posting, @frequency) || posting.posting_recurrence.nil? || !posting.posting_recurrence.on
+      flash[:danger] = "Subscription not added. Please try again."
+      redirect_to food_category_path_helper(posting.product.food_category)
+      return
+    end
+
+    @subscription = Subscription.new(frequency: @frequency, on: true, user: current_user, posting_recurrence_id: posting.posting_recurrence.id, quantity: @quantity, paused: false)
+    if @subscription.save
+      @subscription.generate_next_tote_item
+      flash[:success] = "Subscription added"
+      redirect_to food_category_path_helper(posting.product.food_category)
+      return
+    else
+      AdminNotificationMailer.general_message("Subscription failed to create", @subscription.to_yaml).deliver_now
+      flash[:danger] = "Subscription not added"
+      redirect_to food_category_path_helper(posting.product.food_category)
+      return
+    end    
+
+  end
+
+  def create_old
+
     if !new_conditions_met?
       return
     end
@@ -47,7 +108,7 @@ class SubscriptionsController < ApplicationController
     end
 
     frequency = params[:frequency].to_i
-    frequency_is_legit = frequency_is_legit?(@tote_item, frequency)
+    frequency_is_legit = frequency_is_legit?(@tote_item.posting, frequency)
 
     if !frequency_is_legit
       redirect_to postings_path
@@ -452,11 +513,11 @@ class SubscriptionsController < ApplicationController
 
     #find the posting recurrence associted with the given tote item and determine if the frequency parameter
     #is actually an option for that posting recurrence
-    def frequency_is_legit?(tote_item, frequency)
+    def frequency_is_legit?(posting, frequency)
 
       frequency_is_legit = false
 
-      @posting_recurrence = tote_item.posting.posting_recurrence
+      @posting_recurrence = posting.posting_recurrence
 
       subscription_create_options = @posting_recurrence.subscription_create_options
       subscription_create_options.each do |subscription_create_option|
