@@ -125,15 +125,14 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to postings_path
   end
 
-  test "should get new" do
-    log_in_as(@c1)
+  test "should see how often page" do
     posting = postings(:p_recurrence_on)
-    ti = ToteItem.new(quantity: 1, price: posting.price, posting_id: posting.id, user_id: @c1.id)
-    assert ti.valid?
-    assert ti.save        
-    get new_subscription_path, params: {tote_item_id: ti.id}
-    assert_response :redirect
-    assert_redirected_to root_path
+    log_in_as(@c1)    
+    num_tote_items = ToteItem.count
+    post tote_items_path, params: {posting_id: posting.id, quantity: 1}
+    assert_response :success
+    assert_template 'tote_items/how_often'
+    assert_equal num_tote_items, ToteItem.count
   end
 
   test "should not see how often page when posting recurrence is off" do
@@ -161,10 +160,9 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should not see how often page when not logged in" do
-    get new_subscription_path
     posting = postings(:p_recurrence_on)
     num_tote_items = ToteItem.count
-    post tote_items_path params: {posting_id: posting.id, quantity: 1}
+    post tote_items_path, params: {posting_id: posting.id, quantity: 1}    
     assert_response :redirect    
     assert_redirected_to login_path
     assert_equal num_tote_items, ToteItem.count

@@ -2,42 +2,6 @@ class SubscriptionsController < ApplicationController
   before_action :logged_in_user
   before_action :correct_user, only: [:show, :edit, :update]
 
-  def new
-
-    redirect_to root_path
-    return
-
-    if !new_conditions_met?
-      return
-    end
-
-    posting = @tote_item.posting
-
-    #############business bootstrapping code#############
-    #this functionality is intended for FC's bootstrap launching phase. that is, right now it's 12/16/16 and we have products with $1000 OM
-    #and very few customers. we want to accrue customers over a long period of time to hit that OM so we want to steer people away from
-    #the vanilla Just Once option because almost certainly they won't get filled and won't come back. instead, for now, we'll remove that
-    #option so the only option they have left is Just Once (Roll Until Filled). hopefully more people will select this so that we can
-    #hit the OM. so, if we ever succeed, yank this functionality cause it won't matter once fc sales are $10M USD / month. for example.
-    biggest_order_minimum_producer_net_outstanding = posting.biggest_order_minimum_producer_net_outstanding
-
-    if biggest_order_minimum_producer_net_outstanding.nil?
-      biggest_order_minimum_producer_net_outstanding = 0
-    end
-
-    case_constraints_met = true    
-
-    if posting.units_per_case.to_i > 1 && posting.total_quantity_ordered < posting.units_per_case.to_i
-      case_constraints_met = false
-    end
-    
-    @display_vanilla_just_once_option = biggest_order_minimum_producer_net_outstanding == 0 && case_constraints_met
-    #############business bootstrapping code#############
-
-    @subscription_create_options = posting.posting_recurrence.subscription_create_options
-    
-  end
-
   def create
 
     @posting_id = params[:posting_id].to_i
@@ -96,60 +60,6 @@ class SubscriptionsController < ApplicationController
       redirect_to food_category_path_helper(posting.product.food_category)
       return
     end    
-
-  end
-
-  def create_old
-
-    if !new_conditions_met?
-      return
-    end
-
-    if params[:frequency].nil?
-      redirect_to postings_path
-      return
-    end
-
-    frequency = params[:frequency].to_i
-    frequency_is_legit = frequency_is_legit?(@tote_item.posting, frequency)
-
-    if !frequency_is_legit
-      redirect_to postings_path
-      return
-    end
-
-    if frequency == 0
-
-      if params[:roll_until_filled]
-
-        @subscription = Subscription.new(kind: Subscription.kinds[:ROLLUNTILFILLED], frequency: 1, on: true, user_id: current_user.id, posting_recurrence_id: @posting_recurrence.id, quantity: @tote_item.quantity, paused: false)
-        if @subscription.save
-          @subscription.tote_items << @tote_item
-          @subscription.save
-        end
-
-      end
-
-      flash[:success] = "Tote item added"
-      redirect_to postings_path
-
-      return
-      
-    end
-
-    @subscription = Subscription.new(frequency: frequency, on: true, user_id: current_user.id, posting_recurrence_id: @posting_recurrence.id, quantity: @tote_item.quantity, paused: false)
-    if @subscription.save
-      @subscription.tote_items << @tote_item
-      @subscription.save
-      flash[:success] = "Subscription added"
-      redirect_to postings_path
-      return
-    else
-      AdminNotificationMailer.general_message("Subscription failed to create", @subscription.to_yaml).deliver_now
-      flash[:danger] = "Subscription not added"
-      redirect_to postings_path
-      return
-    end
 
   end
 

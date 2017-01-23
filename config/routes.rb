@@ -42,7 +42,7 @@ Rails.application.routes.draw do
   resources :payments, only: [:index, :new, :create]
   resources :payment_payables, only: [:index]
   resources :creditor_orders  
-  resources :subscriptions, only: [:new, :create, :index, :show, :edit, :update]
+  resources :subscriptions, only: [:create, :index, :show, :edit, :update]
   resources :producer_product_unit_commissions
   resources :products
   resources :website_settings, only: [:edit, :update]
@@ -50,7 +50,7 @@ Rails.application.routes.draw do
   resources :account_activations, only: [:new, :create, :edit]
   resources :password_resets,     only: [:new, :create, :edit, :update]
   resources :postings
-  resources :tote_items, only: [:index, :new, :create, :destroy]
+  resources :tote_items, only: [:index, :create, :destroy]
   resources :authorizations, only: [:new, :create]
   resources :checkouts, only: [:create]
   resources :access_codes, only: [:new, :create, :update]

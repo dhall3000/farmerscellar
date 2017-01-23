@@ -77,8 +77,8 @@ class ToteItemsControllerTest < IntegrationHelper
     @posting_apples.reload
     assert_not @posting_apples.live
 
-    log_in_as(@c1)
-    get new_tote_item_path(posting_id: @posting_apples.id)
+    log_in_as(@c1)    
+    get posting_path(@posting_apples)
     assert_response :redirect
     assert_redirected_to postings_path
 

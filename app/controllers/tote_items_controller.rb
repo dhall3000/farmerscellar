@@ -45,51 +45,8 @@ class ToteItemsController < ApplicationController
 
   end
 
-  def new
-
-    @posting = Posting.find(params[:posting_id])
-
-    if !@posting
-      flash[:danger] = "Oops, no such posting"
-      redirect_to postings_path
-      return
-    end
-
-    #we only want to show the user postings the are live and OPEN. if a producer has a one-time posting up, then if a customer tries to fetch the posting
-    #after it's either unlive or not OPEN, we want to show them an error. however, if a customer tries to fetch an unlive/unOPENed posting it might be
-    #due to them clicking on an older posting link from a postingrecurrence series. say, for example, i send someone a link to the current Pride & Joy
-    #posting. But they don't get their email until next week. When they click on the link i'd like for them to see the current posting. so this logic
-    #handles that as well.
-    if !@posting.live || !@posting.state?(:OPEN)
-      if @posting.posting_recurrence.nil?
-        flash[:danger] = "Oops, that posting is no longer active"
-        redirect_to postings_path
-        return
-      else
-        pr = @posting.posting_recurrence
-        if pr.current_posting && pr.current_posting.live && pr.current_posting.state?(:OPEN)
-          @posting = pr.current_posting          
-        else
-          flash[:danger] = "Oops, that posting is no longer active"
-          redirect_to postings_path
-          return
-        end
-      end
-    end
-
-    @sanitized_producer_url = @posting.user.website
-    if @sanitized_producer_url != nil
-      @sanitized_producer_url = url_with_protocol(@sanitized_producer_url)
-    end
-
-    @account_on_hold = account_on_hold
-    @tote_item = ToteItem.new
-    @biggest_order_minimum_producer_net_outstanding = @posting.biggest_order_minimum_producer_net_outstanding
-
-  end
-
   def create
-   
+
     if params[:frequency].blank?
       @frequency = nil
     else
@@ -164,55 +121,6 @@ class ToteItemsController < ApplicationController
 
   end
 
-  def create_old
-
-    #if user's account is on hold we don't want to allow them to add tote items    
-    if account_on_hold
-      flash[:danger] = "Your account is on hold. Please contact Farmer's Cellar."
-      redirect_to(root_url)
-      return
-    end
-
-    @tote_item = ToteItem.new(tote_item_params)
-    @tote_item.user_id = current_user.id
-    @posting = Posting.find(@tote_item.posting_id)
-    @tote_item.price = @posting.price
-
-    if !correct_user_create(@tote_item)
-      redirect_to(root_url)
-      return
-    end
-
-    if !@tote_item.posting.live
-      flash[:danger] = "Oops, please try adding that again"
-      redirect_to postings_path
-    elsif @tote_item.save
-      if @tote_item.posting.posting_recurrence && @tote_item.posting.posting_recurrence.on
-        #this posting is subscribable. attempt subscription upsell.
-        redirect_to new_subscription_path(tote_item_id: @tote_item.id)
-        return
-      else
-        flash[:success] = "Tote item added"
-        if @posting.product.food_category
-          redirect_to postings_path(food_category: @posting.product.food_category.name)
-        else
-          redirect_to postings_path
-        end        
-        return        
-      end
-    else
-      flash.now[:danger] = "Item not added to tote. See errors below."
-      @sanitized_producer_url = @posting.user.website
-      if @sanitized_producer_url != nil
-        @sanitized_producer_url = url_with_protocol(@sanitized_producer_url)
-      end
-
-      @account_on_hold = account_on_hold
-      @biggest_order_minimum_producer_net_outstanding = @posting.biggest_order_minimum_producer_net_outstanding
-      render 'new'
-    end
-  end
-
   def pout
 
     @tote_item = ToteItem.find_by(id: params[:id])
@@ -249,8 +157,8 @@ class ToteItemsController < ApplicationController
     @back_link = request.referer
 
     case request.referer
-    when new_tote_item_url(posting_id: @tote_item.posting.id.to_s)
-      @back_link = postings_path
+    when posting_url(@tote_item.posting)
+      @back_link = posting_path(@tote_item.posting)
       @back_link_text = "continue shopping"
     when tote_items_url
       @back_link_text = "shopping tote"
