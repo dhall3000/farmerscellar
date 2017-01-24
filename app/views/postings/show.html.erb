@@ -3,7 +3,7 @@
 
 <% if @posting_food_category %>
   <div class="row gutter-10">
-    <div class="col-xs-12">
+    <div class="col-xs-12 col-sm-offset-3 col-sm-6">
       <%= link_to postings_path(food_category: @posting_food_category.name), class: "food-category-link non-blue" do %>
         <span class="glyphicon glyphicon-arrow-left"></span>
         <%= @posting_food_category.name %>
@@ -14,7 +14,7 @@
 <% end %>
 
 <div class="row gutter-10">
-  <div class="col-xs-11">
+  <div class="col-xs-11 col-sm-offset-3 col-sm-5">
     <div id="productDescription" class="truncated-text-line" data-toggle="collapse" data-target="#descriptionBody">
       <%= @posting.description %>
     </div>      
@@ -24,7 +24,7 @@
       <hr>
     </div>
   </div>
-  <div class="col-xs-1">
+  <div class="col-xs-1 col-sm-1">
     <div style="padding-top: 3px;" data-toggle="collapse" data-target="#descriptionBody">
       <span id="descriptionChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>            
     </div>
@@ -32,7 +32,7 @@
 </div>
 
 <div class="row gutter-10">
-  <div class="col-xs-11">
+  <div class="col-xs-11 col-sm-offset-3 col-sm-5">
     <div id="producerName" class="truncated-text-line producer-name-font" data-toggle="collapse" data-target="#producerDetails">
       <%= @posting.user.farm_name %>
     </div>      
@@ -43,7 +43,7 @@
       <%= @posting.user.description %>
     </div>
   </div>
-  <div class="col-xs-1">
+  <div class="col-xs-1 col-sm-1">
     <div style="padding-top: 3px;" data-toggle="collapse" data-target="#producerDetails">
       <span id="producerDetailsChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>            
     </div>
@@ -51,13 +51,13 @@
 </div>
 
 <div class="row gutter-10">
-  <div class="col-xs-12">
+  <div class="col-xs-12 col-sm-offset-3 col-sm-6">
     <strong><%= "#{@posting.user.city}, #{@posting.user.state}" %></strong>
   </div>
 </div>
 
 <div class="row gutter-10">
-  <div class="col-xs-12">
+  <div class="col-xs-12 col-sm-offset-3 col-sm-6">
     <% if @posting.uploads.last %>
       <%= image_tag "#{@posting.uploads.last.name.large}", class: "hundred-percent-width" %>
     <% end %>
@@ -66,10 +66,10 @@
 
 <% if !@posting.important_notes.blank? %>
   <div class="row gutter-10">
-    <div class="col-xs-1">
-      <span id="important-notes-info-glyph" class="alert-info glyphicon glyphicon-info-sign spin-continuously"></span>
+    <div class="col-xs-1 col-sm-offset-3 col-sm-1">
+      <span id="important-notes-info-glyph" class="alert-info glyphicon glyphicon-info-sign spin-continuously pull-right"></span>
     </div>
-    <div class="col-xs-10">
+    <div class="col-xs-10 col-sm-4">
       <div id="importantNotes" class="truncated-text-line" data-toggle="collapse" data-target="#importantNotesBody">
         <%= @posting.important_notes %>
       </div>      
@@ -79,9 +79,9 @@
         <hr>
       </div>
     </div>
-    <div class="col-xs-1">
+    <div class="col-xs-1 col-sm-1">
       <div style="padding-top: 3px;" data-toggle="collapse" data-target="#importantNotesBody">
-        <span id="importantNotesChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>                    
+        <span id="importantNotesChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>
       </div>
     </div>
   </div>
@@ -90,10 +90,10 @@
 
 <% if @biggest_order_minimum_producer_net_outstanding && @biggest_order_minimum_producer_net_outstanding > 0 %>
   <div class="row gutter-10">
-    <div class="col-xs-1">
-      <span class="alert-danger glyphicon glyphicon-exclamation-sign spin-continuously"></span>
+    <div class="col-xs-1 col-sm-offset-3 col-sm-1">
+      <span class="alert-danger glyphicon glyphicon-exclamation-sign spin-continuously pull-right"></span>
     </div>
-    <div class="col-xs-10">
+    <div class="col-xs-10 col-sm-4">
       <div class="truncated-text-line" data-toggle="collapse" data-target="#orderMinimumBody">
         Unmet Group Order Minimum
       </div>      
@@ -102,7 +102,7 @@
         <hr>
       </div>
     </div>
-    <div class="col-xs-1">
+    <div class="col-xs-1 col-sm-1">
       <div style="padding-top: 3px;" data-toggle="collapse" data-target="#orderMinimumBody">
         <span id="orderMinimumChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>                    
       </div>
@@ -112,12 +112,12 @@
 
 <% if @posting.important_notes.blank? && @biggest_order_minimum_producer_net_outstanding <= 0 %>
   <div class="row gutter-10">
-    <div class="col-xs-11">
+    <div class="col-xs-11 col-sm-offset-3 col-sm-5">
       <div data-toggle="collapse" data-target="#productDetailsBody">
         Delivery details
       </div>
     </div>
-    <div class="col-xs-1">
+    <div class="col-xs-1 col-sm-1">
       <div style="padding-top: 3px;" data-toggle="collapse" data-target="#productDetailsBody">
         <span id="productDetailsChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>            
       </div>
@@ -125,14 +125,14 @@
   </div>
 <% else %>
   <div class="row gutter-10">
-    <div class="col-xs-1">
+    <div class="col-xs-1 col-sm-offset-3 col-sm-1">
     </div>
-    <div class="col-xs-10">
+    <div class="col-xs-10 col-sm-4">
       <div data-toggle="collapse" data-target="#productDetailsBody">
         Delivery details
       </div>
     </div>
-    <div class="col-xs-1">
+    <div class="col-xs-1 col-sm-1">
       <div style="padding-top: 3px;" data-toggle="collapse" data-target="#productDetailsBody">
         <span id="productDetailsChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>            
       </div>
@@ -141,10 +141,7 @@
 <% end %>
 
 <div class="row gutter-10">
-  <div class="col-xs-12">
-
-
-
+  <div class="col-xs-12 col-sm-offset-4 col-sm-4">
     <div id="productDetailsBody" class="collapse" data-chevron="#productDetailsChevron">
       <ul class="list-group">
         <% if @posting.subscribable? %>
@@ -164,14 +161,16 @@
       </div>
       <hr>
     </div>
-
-
-
   </div>  
 </div>
 
 <div style="padding-top: 20px;" class="row gutter-10">
-  <div class="col-xs-12">
+  <% if @posting.important_notes.blank? && @biggest_order_minimum_producer_net_outstanding <= 0 %>
+    <div class="col-xs-12 col-sm-offset-3 col-sm-6">
+  <% else %>
+    <div class="col-xs-12 col-sm-offset-4 col-sm-5">
+  <% end %>
+  
     <div>
       <strong><%= "#{number_to_currency(@posting.price)} / #{@posting.unit.name}" %></strong>
     </div>      
