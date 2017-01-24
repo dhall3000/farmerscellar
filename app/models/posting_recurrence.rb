@@ -250,6 +250,13 @@ class PostingRecurrence < ApplicationRecord
     reload
     if postings.where(delivery_date: new_post.delivery_date).count == 0
       if new_post.save
+
+        #associate the photos from the old posting with this new posting
+        old_post.uploads.each do |upload|
+          new_post.uploads << upload
+        end
+
+        new_post.save
         
         #add to posting_recurrence.postings
         postings << new_post

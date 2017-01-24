@@ -2,6 +2,39 @@ require 'integration_helper'
 
 class UploadsTest < IntegrationHelper
 
+  test "photo associated with posting should associate with subsequent postings in the recurrence series" do
+
+    nuke_all_postings
+    nuke_all_users
+    producer = create_producer
+    get_access_for(producer)
+    posting = create_posting(producer, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1)
+
+    verify_producer_can_see_post_edit_option(producer, posting)
+    get_edit_posting(producer, posting)
+
+    #this original posting shoudl now contain zero photos
+    assert_equal 0, posting.uploads.count
+    #now upload a photo to this posting
+    upload_photo_to_posting(producer, posting)
+    #this original posting shoudl now contain one photo
+    assert_equal 1, posting.uploads.count
+    #there should only be a single posting in the db right now
+    assert_equal 1, Posting.count
+    #and this single posting should be open
+    assert posting.state?(:OPEN)
+    #now go to the order cutoff and process, so this posting should become closed and a new, OPEN'ed posting shoudl be generated
+    travel_to posting.order_cutoff
+    RakeHelper.do_hourly_tasks
+    assert posting.reload.state?(:CLOSED)
+    assert_equal 2, Posting.count
+    #this new posting should have the photos attached to it from the original posting
+    assert_equal 1, Posting.last.uploads.count
+
+    travel_back
+    
+  end
+
   test "producer should be able to delete a file associated with a posting" do
 
     #create a photo
