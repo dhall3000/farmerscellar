@@ -488,14 +488,15 @@ class PostingsControllerTest < IntegrationHelper
 #INDEX TESTS
   test "should get index for users" do
     log_in_as(@customer)
+    upload_file("noimage.jpg", "NoProductImage")
     successfully_get_index
-
     log_in_as(@farmer)
     successfully_get_index
   end
 
   test "should get index for admin" do
     log_in_as(@admin)
+    upload_file("noimage.jpg", "NoProductImage")
     successfully_get_index
   end
 
