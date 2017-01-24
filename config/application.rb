@@ -27,6 +27,7 @@ module SampleApp
 
     config.after_initialize do
       AccountState.auto_populate_database        
+      ::NOPRODUCTIMAGETITLE = "NoProductImage"
     end
 
   end

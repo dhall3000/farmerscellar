@@ -8,9 +8,9 @@
     <%= link_to posting, class: "non-blue" do %>
       <div class="posting-thumbnail">
         <% if posting.uploads.last %>        
-          <%= image_tag "#{posting.uploads.last.file_name.thumb}", class: "hundred-percent-width" %>
-        <% else %>
-          <%= image_tag "/favicon-152.png", class: "hundred-percent-width" %>
+          <%= image_tag "#{posting.uploads.last.file_name.square}", class: "hundred-percent-width" %>
+        <% elsif (upload = Upload.find_by(title: NOPRODUCTIMAGETITLE)) %>
+          <%= image_tag upload.file_name.square, class: "hundred-percent-width" %>
         <% end %>
 
         <div class="thumbnail-content-padding">
