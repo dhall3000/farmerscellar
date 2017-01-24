@@ -25,7 +25,7 @@
                 <li>Producer Description: <%= posting.user.description %></li>
                 <li>Product Description: <%= posting.description_body %></li>               
                 <% if !posting.user.website.nil? %>
-                  <li>More info:  <%= link_to posting.user.website, url_with_protocol(posting.user.website), target: "_blank" %></li>
+                  <li>More info:  <%= link_to posting.user.website, posting.user.full_website, target: "_blank" %></li>
                 <% end %>
               </ul>
 

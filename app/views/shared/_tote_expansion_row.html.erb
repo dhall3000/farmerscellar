@@ -86,7 +86,7 @@
         <ul class="list-group">
           <li class="list-group-item">Producer: <%= tote_item.posting.user.farm_name %></li>
           <% if !tote_item.posting.user.website.nil? %>
-            <li class="list-group-item">Producer Website:  <%= link_to tote_item.posting.user.website, url_with_protocol(tote_item.posting.user.website), target: "_blank" %></li>
+            <li class="list-group-item">Producer Website:  <%= link_to tote_item.posting.user.website, tote_item.posting.user.full_website, target: "_blank" %></li>
           <% end %>
           <% if tote_item.posting.description %>
             <li class="list-group-item">Product Attributes: <%= tote_item.posting.description %></li>          

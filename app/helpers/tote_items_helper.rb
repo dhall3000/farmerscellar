@@ -183,10 +183,6 @@ module ToteItemsHelper
     
   end
 
-  def url_with_protocol(url)
-    /^http/i.match(url) ? url : "http://#{url}"
-  end  
-
 	def tote_has_items(tote_items)
 	  tote_items != nil && tote_items.any?
 	end

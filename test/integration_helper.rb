@@ -541,6 +541,9 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     get posting_path(posting)
     assert_response :success
     assert_template 'postings/show'
+    if posting.biggest_order_minimum_producer_net_outstanding > 0      
+      assert_select 'div.row.gutter-10 div.col-xs-10 div.truncated-text-line', {text: "Unmet Group Order Minimum", count: 1}
+    end
 
     post tote_items_path, params: {posting_id: posting.id, quantity: quantity}
     tote_item = assigns(:tote_item)

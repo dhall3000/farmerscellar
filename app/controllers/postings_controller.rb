@@ -177,6 +177,8 @@ class PostingsController < ApplicationController
       end
     end
 
+    @biggest_order_minimum_producer_net_outstanding = @posting.biggest_order_minimum_producer_net_outstanding
+
   end
 
   private
