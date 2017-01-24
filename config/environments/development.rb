@@ -73,6 +73,7 @@ Rails.application.configure do
   ENV['S3_BUCKET_NAME'] = ""
   
   config.after_initialize do
+    ::NOPRODUCTIMAGETITLE = "NoProductImage"
     ::PAYPALCREDENTIALS = eval(ENV['PAYPALCREDENTIALS'])
     ::FOODCLEAROUTDAYTIME = eval(ENV['FOODCLEAROUTDAYTIME'])
     ::FOODCLEAROUTWARNINGDAYTIME = eval(ENV['FOODCLEAROUTWARNINGDAYTIME'])

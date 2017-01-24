@@ -26,8 +26,7 @@ module SampleApp
     # config.i18n.default_locale = :de
 
     config.after_initialize do
-      AccountState.auto_populate_database        
-      ::NOPRODUCTIMAGETITLE = "NoProductImage"
+      AccountState.auto_populate_database      
     end
 
   end
