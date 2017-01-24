@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170119194001) do
+ActiveRecord::Schema.define(version: 20170124182204) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -595,9 +595,11 @@ ActiveRecord::Schema.define(version: 20170119194001) do
   end
 
   create_table "uploads", force: :cascade do |t|
-    t.string   "name"
+    t.string   "file_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string   "title"
+    t.index ["title"], name: "index_uploads_on_title", unique: true
   end
 
   create_table "user_account_states", id: false, force: :cascade do |t|

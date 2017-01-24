@@ -803,7 +803,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
       #that's why all i'm verifying is just the span and the img
 
       #posting.uploads.each do |upload|        
-        #assert_select 'span img[src=?]', upload.name.thumb.store_path
+        #assert_select 'span img[src=?]', upload.file_name.thumb.store_path
       #end      
 
     end

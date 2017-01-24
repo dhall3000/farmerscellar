@@ -75,7 +75,7 @@
           <div class="panel-body">
             <% @posting.uploads.each do |upload| %>            
               <span>
-                <img src=<%= "#{upload.name.thumb}" %>>
+                <img src=<%= "#{upload.file_name.thumb}" %>>
                 <%= link_to "", upload_path(upload, posting_id: @posting.id), class: "non-blue glyphicon glyphicon-remove", method: :delete, data: { confirm: 'Delete photo?' } %>
               </span>
             <% end %>
@@ -92,7 +92,7 @@
         <div class="panel-body">
           <%= form_for(@upload) do |f| %>
             <div>
-              <%= f.file_field :name, class: 'form-control' %>
+              <%= f.file_field :file_name, class: 'form-control' %>
               <%= hidden_field_tag :posting_id, @posting.id %>
             </div>
             <div>
