@@ -1,13 +1,20 @@
 <h1>New Upload</h1>
- 
+
+<%= link_to uploads_path, class: "non-blue" do %>
+  <span class="glyphicon glyphicon-arrow-left"></span>
+  <span> Uploads</span>
+<% end %>
+<br><br>
+
 <%= form_for(@upload) do |f| %>
   <div>
+    <%= render partial: 'shared/error_messages_general', locals: { active_record_object: @upload } %>
     <%= f.label :file_name %><br>
-    <%= f.file_field :file_name %>
+    <%= f.file_field :file_name, class: 'form-control' %>
+    <%= f.label :title %><br>
+    <%= f.text_field :title, class: 'form-control' %>
   </div>
   <div>
-    <%= f.submit %>
+    <%= f.submit class: "btn btn-lg btn-primary" %>
   </div>
 <% end %>
- 
-<%= link_to 'Back', uploads_path %>

@@ -4,7 +4,7 @@ class UploadsController < ApplicationController
   before_action :redirect_to_root_if_not_producer, only: [:show, :new, :create, :destroy]
  
   def index
-    @uploads = Upload.all
+    @uploads = Upload.where.not(title: nil)
   end
  
   def show
@@ -26,6 +26,12 @@ class UploadsController < ApplicationController
     end
 
     @upload = Upload.new(post_upload_params)
+
+    if !@upload.valid?
+      flash.now[:danger] = "Invalid upload"
+      render 'uploads/new'
+      return
+    end
     
     if @upload.save
 
@@ -38,7 +44,7 @@ class UploadsController < ApplicationController
         redirect_to edit_posting_path(posting)
         return
       else
-        redirect_to user_path(current_user)
+        redirect_to @upload
         return
       end
 

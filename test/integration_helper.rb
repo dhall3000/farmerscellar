@@ -813,12 +813,41 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     assert_select 'input.form-control[type=file]'
   end
 
+  def upload_file(filename = nil, title = nil)
+    
+    orig_upload_count = Upload.count
+
+    if filename.nil?
+      filename = "filename.jpg"
+    end
+    
+    log_in_as(get_admin)
+    post uploads_path, params: {upload: {file_name: filename, title: title}}
+    upload = assigns(:upload)
+
+    if upload.valid?
+      assert_response :redirect
+      assert_redirected_to upload
+      follow_redirect!    
+      assert_equal orig_upload_count + 1, Upload.count
+    else
+      assert_response :success
+      assert_template 'uploads/new'
+      assert_not flash.empty?
+      assert_equal "Invalid upload", flash.now[:danger]
+      assert_equal orig_upload_count, Upload.count
+    end
+
+    return upload
+
+  end
+
   def upload_photo_to_posting(producer, posting)
     orig_upload_count = Upload.count
     orig_posting_photo_count = posting.uploads.count
 
     log_in_as(producer)    
-    post uploads_path, params: {upload: {name: "filename.jpg"}, posting_id: posting.id}
+    post uploads_path, params: {upload: {file_name: "filename.jpg"}, posting_id: posting.id}
     assert_response :redirect
     assert_redirected_to edit_posting_path(posting)
     follow_redirect!

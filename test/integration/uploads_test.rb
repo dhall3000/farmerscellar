@@ -2,6 +2,26 @@ require 'integration_helper'
 
 class UploadsTest < IntegrationHelper
 
+  test "should not be able to upload two files with the same title" do
+    
+    upload1 = upload_file("awesome.jpg", "mytitle")
+    upload2 = upload_file("cool.jpg", "mytitle")
+
+    assert upload1.valid?
+    assert_not upload2.valid?
+
+  end
+
+  test "should be able to upload two files without titles" do
+    
+    upload1 = upload_file("awesome.jpg")
+    upload2 = upload_file("cool.jpg")
+
+    assert upload1.valid?
+    assert upload2.valid?
+
+  end
+
   test "photo associated with posting should associate with subsequent postings in the recurrence series" do
 
     nuke_all_postings
@@ -91,11 +111,11 @@ class UploadsTest < IntegrationHelper
     get_access_for(producer)
 
     assert_equal 0, Upload.count
-    post uploads_path, params: {upload: {name: "filename.jpg"}}
+    post uploads_path, params: {upload: {file_name: "filename.jpg"}}
     assert_response :redirect
-    assert_redirected_to producer
+    assert_redirected_to assigns(:upload)
     follow_redirect!
-    assert_template 'users/show'
+    assert_template 'uploads/show'
     assert_equal 1, Upload.count
     
   end

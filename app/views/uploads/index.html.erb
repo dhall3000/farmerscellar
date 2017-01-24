@@ -1,9 +1,11 @@
+<div>
+  <%= link_to 'New upload', new_upload_path %>
+</div>
+
 <% @uploads.each do |upload| %>
   <%= link_to upload do %>
-  <img src="<%= upload.file_name.square %>">
+    <img src=<%= "#{upload.file_name.thumb}"%>>
+    <p><%= upload.title %></p>
+    <hr>
   <% end %>
 <% end %>
- 
-<br>
- 
-<%= link_to 'New upload', new_upload_path %>
