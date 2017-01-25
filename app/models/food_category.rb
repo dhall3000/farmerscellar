@@ -3,7 +3,20 @@ class FoodCategory < ApplicationRecord
   has_many :children, class_name: "FoodCategory", foreign_key: "parent_id"
   has_many :products
 
-  validate :max_one_root_object
+  validate :max_one_root_object, on: :create
+
+  #this is a recursive method that returns a single relation containing all the products associated with
+  #all children categories + products associated with self
+  def products_under
+    
+    pu = products
+    children.each do |child|
+      pu = pu.or(child.products_under)      
+    end
+
+    return pu
+
+  end
 
   private
 

@@ -37,7 +37,7 @@ class PostingsController < ApplicationController
     end
 
     if @food_category
-      products = @food_category.products
+      products = @food_category.products_under
     else
       products = Product.all
     end

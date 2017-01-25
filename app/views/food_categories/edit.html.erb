@@ -15,7 +15,7 @@
   <% if @food_category.parent %>
     <%= select_tag :parent, options_from_collection_for_select(@food_categories, "id", "name", @food_category.parent.id), class: 'form-control' %>
   <% else %>
-    <%= select_tag :parent, options_from_collection_for_select(@food_categories, "id", "name"), class: 'form-control' %>
+    <%= select_tag :parent, options_from_collection_for_select(@food_categories, "id", "name", nil), class: 'form-control', include_blank: "No Parent" %>
   <% end %>
   
   <%= f.submit "Update", class: "btn btn-lg btn-primary" %>

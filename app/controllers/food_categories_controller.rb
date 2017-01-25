@@ -44,14 +44,15 @@ class FoodCategoriesController < ApplicationController
   def update    
 
     @food_category = FoodCategory.find(params[:id])
+    old_name = @food_category.name
     @food_category.name = params[:food_category][:name]
-    @parent_food_category = FoodCategory.find(params[:parent])
+    @parent_food_category = FoodCategory.find_by(id: params[:parent])
     @food_category.parent = @parent_food_category
 
     if @food_category.save
-      flash[:success] = "FoodCategory created"
+      flash[:success] = "#{old_name} FoodCategory updated"
     else
-      flash[:danger] = "FoodCategory not created"
+      flash[:danger] = "#{old_name} FoodCategory not updated"
     end
 
     redirect_to food_category_path(@food_category)
