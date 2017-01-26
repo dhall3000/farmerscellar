@@ -53,6 +53,8 @@ Rails.application.configure do
   ENV['FOODCLEAROUTWARNINGDAYTIME'] = "{wday: 1, hour: 6}"    
 
   config.after_initialize do
+    ::HEADERICONTITLE = "FCIconBare32"
+    ::LANDINGSPLASHTITLE = "LandingSplash"
     ::NOPRODUCTIMAGETITLE = "NoProductImage"
     ::FOODCLEAROUTDAYTIME = eval(ENV['FOODCLEAROUTDAYTIME'])
     ::FOODCLEAROUTWARNINGDAYTIME = eval(ENV['FOODCLEAROUTWARNINGDAYTIME'])

@@ -8,14 +8,16 @@
         <span class="icon-bar"></span>
       </button>
       <%= link_to root_path, id: "logo" do %>
+        <% upload = Upload.find_by(title: HEADERICONTITLE) %>
+        <% if upload %>        
+          <%= image_tag upload.file_name.url %>
+        <% end %>
         <span>Farmer's Cellar</span>
-        <%= image_tag "/favicon-32.png", id: "headerIcon" %>
       <% end %>
     </div>
 
     <div class="collapse navbar-collapse" id="collapsible-navbar">    
       <ul class="nav navbar-nav navbar-right">        
-        <li><%= link_to "Shop", postings_path %></li>
         <% if logged_in? %>          
           <% if user_has_access?  %>            
             <li>

@@ -1,18 +1,25 @@
-<div class="center jumbotron">
-  <h1>Farmer's Cellar</h1>
-  <h3 class="fat-finger-spacing">local. clean. easy.</h3>
-
-  <% if !logged_in? %>
-    <div class="row row_spacing">
-      <div class="col-xs-8 col-xs-offset-2 col-md-4 col-md-offset-4">
-        <%= link_to "Log in or sign up", login_path, class: "btn btn-lg btn-primary btn-block" %>
-      </div>
+<div class="row">
+  <div class="col-sm-offset-3 col-sm-6">
+    <div class="center">
+      <% 
+        upload = Upload.find_by(title: LANDINGSPLASHTITLE)
+        if upload
+      %>
+        <%= image_tag upload.file_name.medium, class: "hundred-percent-width" %>
+      <% end %>
     </div>
-  <% end %>
+  </div>
+</div>
+<div class="row">
+  <div class="col-xs-offset-3 col-xs-6 col-sm-offset-5 col-sm-2">
+    <div>
+      <%= link_to "Shop", postings_path, class: "btn btn-lg btn-primary btn-block" %>
+    </div>
+  </div>
 </div>
 
-<% if spoofing? %>
 
+<% if spoofing? %>
   <div class="row">
     <div class="col-sm-offset-3 col-sm-6">
 
@@ -29,9 +36,7 @@
       </div>
 
     </div>
-  </div>
-
-  
+  </div>  
 <% end %>
 
 <% if admin_logged_in? %>
