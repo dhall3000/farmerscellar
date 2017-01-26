@@ -121,3 +121,7 @@
 <% end %>
 
 <%= render partial: "shared/access_code_submission" %>
+
+<% if @preview_postings.any? %>
+  <%= render partial: 'postings/postings', locals: { heading: "", postings: @preview_postings } %>
+<% end %>

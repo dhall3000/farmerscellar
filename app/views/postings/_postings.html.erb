@@ -23,13 +23,13 @@
           item_index = row_num * items_per_row
         %>
           <div id="postingIndexRow" class="row gutter-10">
-            <%= render partial: 'posting_thumbnail', locals: { posting: postings[item_index] } %>
+            <%= render partial: 'postings/posting_thumbnail', locals: { posting: postings[item_index] } %>
 
             <% 
             item_index += 1
             if postings.count > item_index
             %>
-              <%= render partial: 'posting_thumbnail', locals: { posting: postings[item_index] } %>
+              <%= render partial: 'postings/posting_thumbnail', locals: { posting: postings[item_index] } %>
             <% end %>
 
           </div>
