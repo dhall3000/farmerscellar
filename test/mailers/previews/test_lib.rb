@@ -329,7 +329,7 @@ module TestLib
     user = User.find_by(email: email)
 
     if user
-      user.destroy
+      return user
     end
 
     user = User.create!(
