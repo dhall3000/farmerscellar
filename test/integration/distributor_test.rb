@@ -255,7 +255,8 @@ class DistributorTest < BulkBuyer
     #creditors accept paypal
     assert_equal 0, Payment.count
 
-#there's a note in the development file with section title "6.5  Tests to Fix" about why short-circuited here and when to come back and fix
+#The deal with this one is the test is set up to have two creditors, one accepting COD, the other plastic. I need to finish up the payment methods for those and
+#then fix this test to its original intent. Short-circuiting for now while I finish up the new payment method features.
 travel_back
 next
 

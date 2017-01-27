@@ -2,7 +2,7 @@
   posting = local_assigns[:posting]
 %>
 
-<% if posting %>
+<% if posting && posting.valid? %>
   <div class="col-xs-6">
 
     <%= link_to posting, class: "non-blue" do %>

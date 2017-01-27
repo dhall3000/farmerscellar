@@ -36,7 +36,8 @@ class Posting < ApplicationRecord
   validates :units_per_case, numericality: { greater_than: 0, only_integer: true }, allow_nil: true
   validates :order_minimum_producer_net, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true    
 
-  validate :important_notes_body_not_present_without_important_notes, :delivery_date_not_sunday, :order_cutoff_must_be_before_delivery_date, :commission_is_set
+  validate :important_notes_body_not_present_without_important_notes, :delivery_date_not_sunday, :order_cutoff_must_be_before_delivery_date
+  validate :commission_is_set, on: :create
   before_create :delivery_date_must_be_after_today  
 
   def self.close(postings_closeable)
