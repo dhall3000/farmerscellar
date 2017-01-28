@@ -15,16 +15,20 @@
 
         <div class="thumbnail-content-padding">
 
+          <div class="truncated-text-line producer-name-font">
+            <%= posting.user.farm_name %>
+          </div>
+
+          <div class="truncated-text-line">
+            <%= posting.product.name %>
+          </div>
+
           <div class="truncated-text-line">
             <%= posting.description %>
           </div>
 
-          <div class="right-of-truncated-text">
-            <strong><%= number_to_currency(posting.price) %></strong>        
-          </div>
-
-          <div class="truncated-text-line producer-name-font">
-            <%= posting.user.farm_name %>
+          <div class="truncated-text-line">
+            <strong><%= "#{number_to_currency(posting.price)} / #{posting.unit.name}" %></strong>        
           </div>
 
         </div>
