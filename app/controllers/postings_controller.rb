@@ -77,20 +77,6 @@ class PostingsController < ApplicationController
 
   end
 
-  def get_postings(products, start_time, end_time, limit = nil)    
-
-    return_postings = Posting.joins(:product).where(product: products).where("delivery_date >= ? and delivery_date < ? and live = ? and state = ?", start_time, end_time, true, Posting.states[:OPEN]).order(:price)
-
-    if limit
-      #if we're going to limit the postings it's because we think we have too many. if we have too many
-      #then let's only show the postings that have pics, hence the .joins(:uploads)
-      return_postings = return_postings.joins(:uploads).limit(limit)
-    end    
-    
-    return return_postings
-
-  end
-
   def create
 
   	@posting = Posting.new(posting_params)
@@ -222,6 +208,20 @@ class PostingsController < ApplicationController
   end
 
   private
+
+    def get_postings(products, start_time, end_time, limit = nil)    
+
+      return_postings = Posting.joins(:product).where(product: products).where("delivery_date >= ? and delivery_date < ? and live = ? and state = ?", start_time, end_time, true, Posting.states[:OPEN]).order(:price)
+
+      if limit
+        #if we're going to limit the postings it's because we think we have too many. if we have too many
+        #then let's only show the postings that have pics, hence the .joins(:uploads)
+        return_postings = return_postings.joins(:uploads).distinct.limit(limit)
+      end    
+      
+      return return_postings
+
+    end
 
     def load_posting_choices
       @products = Product.all.order(:name)
