@@ -5,17 +5,32 @@ class FoodCategory < ApplicationRecord
 
   validate :max_one_root_object, on: :create
 
-  #this is a recursive method that returns a single relation containing all the products associated with
-  #all children categories + products associated with self
   def products_under
-    
-    pu = products
+
+    pu = nil
+
     children.each do |child|
-      pu = pu.or(child.products_under)      
+      if pu
+        pu = pu.or(child.products_at_or_under)
+      else
+        pu = child.products_at_or_under
+      end
     end
 
     return pu
 
+  end
+
+  #this is a recursive method that returns a single relation containing all the products associated with
+  #all children categories + products associated with self
+  def products_at_or_under
+    
+    pu = products
+    children.each do |child|
+      pu = pu.or(child.products_at_or_under)
+    end
+
+    return pu
   end
 
   private

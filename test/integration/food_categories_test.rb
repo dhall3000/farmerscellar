@@ -26,12 +26,12 @@ class FoodCategoriesTest < IntegrationHelper
     beef = products(:beef)
     beef.update(food_category: meat)
 
-    products_under = shop.products_under
-    assert_equal 1, products_under.where(name: "Carrots").count
-    assert_equal 1, products_under.where(name: "Fuji Apples").count
-    assert_equal 1, products_under.where(name: "Milk").count
-    assert_equal 1, products_under.where(name: "Beef").count
-    assert_equal 4, products_under.count
+    products_at_or_under = shop.products_at_or_under
+    assert_equal 1, products_at_or_under.where(name: "Carrots").count
+    assert_equal 1, products_at_or_under.where(name: "Fuji Apples").count
+    assert_equal 1, products_at_or_under.where(name: "Milk").count
+    assert_equal 1, products_at_or_under.where(name: "Beef").count
+    assert_equal 4, products_at_or_under.count
 
   end
 

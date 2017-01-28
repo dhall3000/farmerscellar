@@ -526,7 +526,8 @@ class PostingsControllerTest < IntegrationHelper
   end
 
   test "newly created posting is posted when created properly with live set" do
- 
+
+    nuke_all_postings 
     postings_count_prior = get_postings_count
     successfully_create_posting
     posting = assigns(:posting)
@@ -557,6 +558,7 @@ class PostingsControllerTest < IntegrationHelper
 
 #LIVE FEATURE TESTS  
   test "posted posting becomes unposted after unsetting live" do
+    nuke_all_postings
     posting = successfully_create_posting
     postings_count_prior = get_postings_count
     live_prior = posting.live

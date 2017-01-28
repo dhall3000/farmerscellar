@@ -36,18 +36,56 @@ class PostingsController < ApplicationController
       @food_category = FoodCategory.where(parent: nil).first
     end
 
+    #this is the upcoming sunday at midnight
+    next_week_start = start_of_next_week    
+    next_week_end = next_week_start + 7.days
+    limit = 10
+
+    products_under = Product.none
+    products_at = Product.none
+
     if @food_category
-      products = @food_category.products_under
-    else
-      products = Product.all
+
+      products_under = @food_category.products_under
+      products_at = @food_category.products
+      if products_under        
+        products = products_at.or(products_under)        
+      else
+        products = products_at
+      end
+
+      @this_weeks_postings = get_postings(products_at, Time.zone.now.midnight, next_week_start)
+      if !@this_weeks_postings.any?
+        @this_weeks_postings = get_postings(products_under, Time.zone.now.midnight, next_week_start, limit)
+      end
+
+      @next_weeks_postings = get_postings(products_at, next_week_start, next_week_end)
+      if !@next_weeks_postings.any?
+        @next_weeks_postings = get_postings(products_under, next_week_start, next_week_end, limit)
+      end
+
+      @future_postings = get_postings(products_at, next_week_end, next_week_end + 10.years)
+      if !@future_postings.any?
+        @future_postings = get_postings(products_under, next_week_end, next_week_end + 10.years, limit)
+      end
+
+    else      
+      @this_weeks_postings = get_postings(Product.all, Time.zone.now.midnight, next_week_start, limit)
+      @next_weeks_postings = get_postings(Product.all, next_week_start, next_week_end, limit)
+      @future_postings = get_postings(Product.all, next_week_end, next_week_end + 10.years, limit)
     end
 
-    #this is the upcoming sunday at midnight
-    next_week_start = start_of_next_week
+  end
 
-    @this_weeks_postings = Posting.joins(:product).where(product: products).where("delivery_date >= ? and delivery_date < ? and live = ? and state = ?", Time.zone.now.midnight, next_week_start, true, Posting.states[:OPEN])
-    @next_weeks_postings = Posting.joins(:product).where(product: products).where("delivery_date >= ? and delivery_date < ? and live = ? and state = ?", next_week_start, next_week_start + 7.days, true, Posting.states[:OPEN])
-    @future_postings = Posting.joins(:product).where(product: products).where("delivery_date >= ? and live = ? and state = ?", next_week_start + 7.days, true, Posting.states[:OPEN])
+  def get_postings(products, start_time, end_time, limit = nil)    
+
+    return_postings = Posting.joins(:product).where(product: products).where("delivery_date >= ? and delivery_date < ? and live = ? and state = ?", start_time, end_time, true, Posting.states[:OPEN]).order(:price)
+
+    if limit
+      return_postings = return_postings.limit(limit)
+    end    
+    
+    return return_postings
 
   end
 

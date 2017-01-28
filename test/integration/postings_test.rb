@@ -536,7 +536,7 @@ class PostingsTest < IntegrationHelper
 
     posting_params = {
       description: "describe description",
-      price: 5.25,
+      price: 0.83,
       user_id: @farmer.id,
       product_id: @product.id,
       unit_id: @unit.id,
@@ -573,7 +573,7 @@ class PostingsTest < IntegrationHelper
       delivery_date += 1.day
     end
 
-    price = 14.49
+    price = 1.09
 
     post postings_path, params: {posting: {
       description: "hi",

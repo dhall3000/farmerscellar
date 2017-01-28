@@ -265,8 +265,12 @@ input {
   margin-bottom: 50px;
 }
 
+.standard-element-vertical-spacing {
+  margin-top: 20px;
+}
+
 .fat-finger-spacing {
-  margin-bottom: 25px;
+  margin-bottom: 20px;
 }
 
 .borderless {
@@ -364,8 +368,8 @@ a.non-blue { color: inherit; }
   padding-bottom: 2px;
 }
 
-#postingIndexRow {
-  padding-bottom: 10px;
+.posting-rows-spacing {
+  padding-top: 10px;
 }
 
 //this came from http://arnique.net/web-design/58/a-quick-guide-to-changing-bootstraps-gutter-width/

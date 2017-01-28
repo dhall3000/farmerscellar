@@ -3,41 +3,40 @@
   postings = local_assigns[:postings]
 %>
 
-<% if postings.any? %>
+<% if postings && postings.any? %>
 
   <div class="row">
-    <div class="col-xs-12 col-sm-offset-3 col-sm-6">
-
-      <hr class="section-divider" />
-      <h2 class="section-heading"><%= heading %></h2>
-
-      <% if postings && postings.any? %>
-        <%  
-        items_per_row = 2
-        num_rows_needed = postings.count / items_per_row
-        if postings.count % items_per_row > 0
-          num_rows_needed += 1
-        end
-        row_num = 0
-        while row_num < num_rows_needed
-          item_index = row_num * items_per_row
-        %>
-          <div id="postingIndexRow" class="row gutter-10">
-            <%= render partial: 'postings/posting_thumbnail', locals: { posting: postings[item_index] } %>
-
-            <% 
-            item_index += 1
-            if postings.count > item_index
-            %>
-              <%= render partial: 'postings/posting_thumbnail', locals: { posting: postings[item_index] } %>
-            <% end %>
-
-          </div>
-        <%
-          row_num += 1
-        end
-        %>
+    <div class="col-xs-12 col-sm-offset-3 col-sm-6">    
+      <hr class="section-divider" />      
+      <% if !heading.blank? %>
+        <h2 class="section-heading"><%= heading %></h2>
       <% end %>
+      <%  
+      items_per_row = 2
+      num_rows_needed = postings.count / items_per_row
+      if postings.count % items_per_row > 0
+        num_rows_needed += 1
+      end
+      row_num = 0
+      while row_num < num_rows_needed
+        item_index = row_num * items_per_row
+      %>
+        <div class="row gutter-10 posting-rows-spacing">
+          <%= render partial: 'postings/posting_thumbnail', locals: { posting: postings[item_index] } %>
+
+          <% 
+          item_index += 1
+          if postings.count > item_index
+          %>
+            <%= render partial: 'postings/posting_thumbnail', locals: { posting: postings[item_index] } %>
+          <% end %>
+
+        </div>
+      <%
+        row_num += 1
+      end
+      %>
+      
 
     </div>
   </div>
