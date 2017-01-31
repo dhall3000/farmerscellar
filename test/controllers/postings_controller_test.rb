@@ -808,6 +808,10 @@ class PostingsControllerTest < IntegrationHelper
       units_per_case: 5
     }
 
+    product = Product.find @posting.product_id
+    assert product
+    create_food_category_for_product_if_product_has_none(product)
+    
     return posting
 
   end
@@ -936,6 +940,11 @@ class PostingsControllerTest < IntegrationHelper
   end
 
   def successfully_get_index
+
+    Product.all.each do |product|
+      create_food_category_for_product_if_product_has_none(product)
+    end
+
     get postings_path
     assert :success
     assert_template 'postings/index'

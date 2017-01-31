@@ -3,12 +3,36 @@ require 'utility/rake_helper'
 
 class IntegrationHelper < ActionDispatch::IntegrationTest
 
-  def verify_price_on_postings_page(price, count = nil)
+  def create_food_category_for_product_if_product_has_none(product)
 
-    if count
-      assert_select "div.right-of-truncated-text strong", {text: ActiveSupport::NumberHelper.number_to_currency(price), count: count}
+    assert product
+
+    if product.food_category
+      return
+    end
+
+    fc = FoodCategory.where(parent: nil).first
+
+    if fc.nil?
+      fc = FoodCategory.new(name: "Market", parent: nil)
+      assert fc.valid?
+      assert fc.save
+    end    
+    
+    product.food_category = fc
+    assert product.save
+    assert product.reload.food_category
+
+    return 
+
+  end
+
+  def verify_price_on_postings_page(price, unit, count = nil)
+
+    if count && count > 0
+      assert_select "div.truncated-text-line strong", {text: "#{ActiveSupport::NumberHelper.number_to_currency(price)} / #{unit.name}", minimum: 1}
     else
-      assert_select "div.right-of-truncated-text strong", ActiveSupport::NumberHelper.number_to_currency(price)
+      assert_select "div.truncated-text-line strong", {text: "#{ActiveSupport::NumberHelper.number_to_currency(price)} / #{unit.name}", count: 0}
     end
     
   end
@@ -410,6 +434,13 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     assert_redirected_to postings_path
     follow_redirect!
 
+    #need a product photo for this to display properly
+    upload = upload_file("productpic.jpg")
+    posting.uploads << upload
+    posting.save
+    assert_equal 1, posting.uploads.count
+
+    get postings_path
     verify_post(posting.price, posting.unit, exists = true, posting.id)
 
     if frequency == 0
@@ -871,9 +902,9 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     assert :success
 
     if exists
-      assert_select "div.right-of-truncated-text strong", {text: ActiveSupport::NumberHelper.number_to_currency(price), minimum: 1}
+      assert_select "div.truncated-text-line strong", {text: "#{ActiveSupport::NumberHelper.number_to_currency(price)} / #{unit.name}", minimum: 1}
     else
-      assert_select "div.right-of-truncated-text strong", {text: ActiveSupport::NumberHelper.number_to_currency(price), count: 0}
+      assert_select "div.truncated-text-line strong", {text: "#{ActiveSupport::NumberHelper.number_to_currency(price)} / #{unit.name}", count: 0}
     end
     
   end

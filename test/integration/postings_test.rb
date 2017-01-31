@@ -10,6 +10,12 @@ class PostingsTest < IntegrationHelper
     @unit = units(:pound)    
     @posting = postings(:postingf1apples)
 
+    Product.all.each do |product|
+      create_food_category_for_product_if_product_has_none(product)
+    end
+
+    create_food_category_for_product_if_product_has_none(@product)
+
     delivery_date = Time.zone.today + 3.days
 
     if delivery_date.sunday?
@@ -438,7 +444,7 @@ class PostingsTest < IntegrationHelper
   def verify_post_visibility(price, unit, count)
     get postings_path
     assert :success
-    verify_price_on_postings_page(price, count)
+    verify_price_on_postings_page(price, unit, count)
   end
 
   def verify_post_existence(price, count, posting_id = nil)
@@ -481,8 +487,9 @@ class PostingsTest < IntegrationHelper
     assert :success
 
     price = 2.75
+    unit = units(:pound)
 
-    verify_price_on_postings_page(price, count = 1)
+    verify_price_on_postings_page(price, unit, count = 1)
     
     #turn off the existing posting
     patch posting_path(@posting), params: {posting: {
@@ -513,7 +520,7 @@ class PostingsTest < IntegrationHelper
 
     get postings_path
     assert :success        
-    verify_price_on_postings_page(price, count = 1)
+    verify_price_on_postings_page(price, posting.unit, count = 1)
 
   end
 
@@ -591,7 +598,7 @@ class PostingsTest < IntegrationHelper
     assert_redirected_to postings_path
     follow_redirect!
     assert_template 'postings/index'    
-    verify_price_on_postings_page(price, 1)
+    verify_price_on_postings_page(price, posting.unit, 1)
     
     return posting
 
