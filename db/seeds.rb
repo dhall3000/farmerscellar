@@ -8,6 +8,9 @@
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
+Upload.create(file_name: File.open(File.join("/home/david/fc/website/assets", "noimageavailable.png")), title: "NoProductImage")
+Upload.create(file_name: File.open(File.join("/home/david/fc/website/assets", "FCLogo.jpg")), title: "LandingSplash")
+
 dropsite_user_one = User.create!(name:  "dropsite one user",
              email: "da@d.com",
              password:              "dogdog",

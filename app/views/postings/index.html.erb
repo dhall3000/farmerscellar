@@ -63,13 +63,13 @@
 <% end %>
 
 <% if @this_weeks_postings.any? %>
-  <%= render partial: 'postings', locals: { heading: "This Week's Delivery", postings: @this_weeks_postings } %>
+  <%= render partial: 'postings', locals: { heading: "This Week's Delivery", postings: @this_weeks_postings, collapse: false } %>
 <% end %>
 
 <% if @next_weeks_postings.any? %>
-  <%= render partial: 'postings', locals: { heading: "Next Week's Delivery", postings: @next_weeks_postings } %>
+  <%= render partial: 'postings', locals: { heading: "Next Week's Delivery", postings: @next_weeks_postings, collapse: @this_weeks_postings.any? } %>
 <% end %>
 
 <% if @future_postings.any? %>
-  <%= render partial: 'postings', locals: { heading: "Far Future Delivery", postings: @future_postings } %>
+  <%= render partial: 'postings', locals: { heading: "Distant Future Delivery", postings: @future_postings, collapse: @this_weeks_postings.any? || @next_weeks_postings.any? } %>
 <% end %>
