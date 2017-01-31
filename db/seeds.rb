@@ -41,7 +41,8 @@ f1 = User.create!(name:  "f1",
              phone: "206-588-6579",
              website: "www.f1.com",
              farm_name: "F1 FARM",
-             beta: false
+             beta: false,
+             order_minimum_producer_net: 200
              )
 
 AccessCode.create(user: f1, notes: "code for user 1")
@@ -255,7 +256,19 @@ f4.producer_product_unit_commissions.create(product: product_basil, commission: 
 standard_order_cutoff = next_friday - 2.days
 
 #Apples
-posting_apples = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_apples.id, price: 2.75, user_id: f1.id, unit_id: 8, description: "product attribute x, y & z", description_body: "these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
+posting_apples = Posting.create(
+  live: true,
+  delivery_date: next_friday,
+  order_cutoff: standard_order_cutoff,
+  product_id: product_apples.id,
+  price: 2.75,
+  user_id: f1.id,
+  unit_id: 8,
+  description: "product attribute x, y & z",
+  description_body: "these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.",
+  important_notes: "These are 2nds",
+  important_notes_body: "These are 2nds so they have some cosmetic blemishes but they are just as tasty and crunchy and possibly even more nutritious"
+  )
 #Asparagus
 posting_asparagus = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_asparagus.id, price: 3.25, user_id: f1.id, unit_id: 8, description: "product attribute x, y & z", description_body: "these Asparagus are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
 #Milk
