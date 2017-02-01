@@ -31,10 +31,10 @@
     <%= render 'layouts/shim' %>
   </head>
   <body>
-    <% if !@is_dropsite_user %>
-      <%= render 'layouts/header' %>
-    <% end %>
     <div class="container">
+      <% if !@is_dropsite_user %>
+        <%= render 'layouts/header' %>
+      <% end %>
       <% if spoofing? %>
         <div id="spoofBanner" class="spoof-banner alert alert-danger">Spoofing user <%= current_user.email %></div>
       <% end %>

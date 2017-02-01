@@ -13,7 +13,7 @@
       <% if !heading.blank? %>
         <hr class="section-divider" />
         <h2 data-toggle="collapse" data-target="<%= "##{partial_id.to_s}CollapseRows" %>" class="section-heading"><%= heading %>
-        <span id="<%= "#{partial_id.to_s}CollapseRowsChevron" %>" class="glyphicon <%= collapse ? "glyphicon-chevron-down" : "glyphicon-chevron-up" %> pull-right"></span></h2>
+        <span id="<%= "#{partial_id.to_s}CollapseRowsChevron" %>" class="glyphicon <%= collapse ? "glyphicon-chevron-down" : "glyphicon-chevron-up" %>"></span></h2>
       <% end %>
       <div id="<%= "#{partial_id.to_s}CollapseRows" %>" class="<%= collapse ? "collapse" : "collapse in" %>" data-chevron="<%= "##{partial_id.to_s}CollapseRowsChevron" %>">
         <%        
