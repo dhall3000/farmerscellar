@@ -4,6 +4,7 @@
 /* mixins, variables, etc. */
 
 $gray-medium-light: #eaeaea;
+$fc-primary-color: #AACB4F;
 
 @mixin box_sizing {
   -moz-box-sizing:    border-box;
@@ -14,10 +15,6 @@ $gray-medium-light: #eaeaea;
 /* universal */
 
 .anchor:target {
-  padding-top: 60px;
-}
-
-body {
   padding-top: 60px;
 }
 
@@ -75,22 +72,35 @@ p {
 }
 
 #logo {
-  float: left;
   margin-left: 5px;
   margin-right: 5px;
+  color: $fc-primary-color;
   font-size: 1.8em;
-  color: white;  
   font-family: Times New Roman, Times, Serif;  
   padding-top: 7px;
   font-weight: bold;
-  &:hover {
-    color: white;
-    text-decoration: none;
-  }
 }
 
 #headerIcon {
   padding-bottom: 5px;
+}
+
+.header-margin {
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.header-section-divider {
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  height:1px;
+  border:none;
+  color: $gray-medium-light;
+  background-color: $gray-medium-light;
 }
 
 /* footer */
@@ -339,8 +349,8 @@ a.non-blue { color: inherit; }
   margin-bottom: 0px;
   height:1px;
   border:none;
-  color:#333;
-  background-color:#333;
+  color: gray;
+  background-color: gray;
 }
 
 .section-heading {

@@ -1,93 +1,104 @@
-<nav class="navbar navbar-fixed-top navbar-inverse">
-  <div class="container">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#collapsible-navbar" aria-expanded="false">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <%= link_to root_path, id: "logo" do %>
-        <% upload = Upload.find_by(title: HEADERICONTITLE) %>
-        <% if upload %>        
-          <%= image_tag upload.file_name.url %>
-        <% end %>
-        <span>Farmer's Cellar</span>
+<div  data-toggle="collapse" data-target="#headerContent">
+  <span id="logo">Farmer's Cellar</span> <span id="headerContentChevron" class="glyphicon glyphicon-chevron-down"></span>
+</div>
+
+
+<div id="headerContent" class="collapse" data-chevron="#headerContentChevron">        
+  <div class="header-margin">
+    <%= link_to "Home", root_path, class: "non-blue" %>
+  </div>
+
+  <% if logged_in? %>
+    
+    <hr class="header-section-divider" />
+
+    <div class="header-margin">
+      <%= link_to tote_items_path, class: "non-blue" do %>      
+        <%
+          unauthorized_items = unauthorized_items_for(current_user)
+          if unauthorized_items.nil? || (num_tote_items = unauthorized_items.count) == 0
+            num_items_string = ""
+          else
+            num_items_string = "#{num_tote_items.to_s}"
+          end
+        %>
+        <span class="glyphicon glyphicon-shopping-cart"></span><span class="header-object-count"><%= num_items_string %></span>
+
+        <%
+          unauthorized_subscriptions = get_active_subscriptions_by_authorization_state(current_user, include_paused_subscriptions = true, kind = Subscription.kinds[:NORMAL])[:unauthorized]
+          if unauthorized_subscriptions && (num_unauthorized_subscriptions = unauthorized_subscriptions.count) > 0
+        %>
+            <span> <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span><span class="header-object-count"><%= num_unauthorized_subscriptions.to_s %></span></span>
+          <% end %>
+
+        <span> Tote</span>                    
       <% end %>
     </div>
 
-    <div class="collapse navbar-collapse" id="collapsible-navbar">    
-      <ul class="nav navbar-nav navbar-right">        
-        <% if logged_in? %>          
-          <% if user_has_access?  %>            
-            <li>
-              <%= link_to tote_items_path do %>
-                
-                <%
-                  unauthorized_items = unauthorized_items_for(current_user)
-                  if unauthorized_items.nil? || (num_tote_items = unauthorized_items.count) == 0
-                    num_items_string = ""
-                  else
-                    num_items_string = "#{num_tote_items.to_s}"
-                  end
-                %>
-                <span class="glyphicon glyphicon-shopping-cart"></span><span class="header-object-count"><%= num_items_string %></span>
 
-                <%
-                  unauthorized_subscriptions = get_active_subscriptions_by_authorization_state(current_user, include_paused_subscriptions = true, kind = Subscription.kinds[:NORMAL])[:unauthorized]
-                  if unauthorized_subscriptions && (num_unauthorized_subscriptions = unauthorized_subscriptions.count) > 0
-                %>
-                    <span> <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span><span class="header-object-count"><%= num_unauthorized_subscriptions.to_s %></span></span>
-                  <% end %>
+    <div class="header-margin">
+      <%= link_to tote_items_path(orders: true), class: "non-blue" do %>                
 
-                <span> Tote</span>
-                              
-              <% end %>
-            </li>
-            <li>
+        <%
+          num_order_objects = num_order_objects(current_user)
+          if num_order_objects.nil? || num_order_objects == 0
+            num_order_objects = ""
+          else
+            num_order_objects= "#{num_order_objects.to_s}"
+          end
+        %>
 
-              <%= link_to tote_items_path(orders: true) do %>                
+        <span class="glyphicon glyphicon glyphicon-list-alt"></span><span class="header-object-count"> <%= num_order_objects %></span>
+        <span> Orders</span>
 
-                <%
-                  num_order_objects = num_order_objects(current_user)
-                  if num_order_objects.nil? || num_order_objects == 0
-                    num_order_objects = ""
-                  else
-                    num_order_objects= "#{num_order_objects.to_s}"
-                  end
-                %>
-
-                <span class="glyphicon glyphicon glyphicon-list-alt"></span><span class="header-object-count"> <%= num_order_objects %></span>
-                <span> Orders</span>
-
-              <% end %>
-            </li>
-          <% end %>
-          <li class="dropdown">
-
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Account <span class="glyphicon glyphicon-menu-down"></span></a>
-            
-            <ul class="dropdown-menu">
-              <li><%= link_to "Subscriptions", subscriptions_path %></li>              
-              <% if user_has_access?  %>
-                <li><%= link_to "Settings", edit_user_path(current_user) %></li>                
-                <li><%= link_to "Info", user_path(current_user) %></li>
-                <% if current_user.account_type_is?(:PRODUCER) %>
-                  <li><%= link_to "Create new posting", new_posting_path %></li>
-                <% end %>
-              <% end %>
-              <li class="divider"></li>
-              <li>
-                <%= link_to "Log out", logout_path, method: "delete" %>
-              </li>
-            </ul>
-          </li>
-        <% else %>
-          <li><%= link_to "Log in or sign up", login_path %></li>
-        <% end %>
-      </ul>    
-
+      <% end %>
     </div>
 
-  </div>
-</nav>
+    <div class="header-margin">
+      <%= link_to "Subscriptions", subscriptions_path, class: "non-blue" %>
+    </div>
+
+    <hr class="header-section-divider" />
+
+    <div class="header-margin">
+      <%= link_to "Settings", edit_user_path(current_user), class: "non-blue" %>
+    </div>
+
+    <div class="header-margin">
+      <%= link_to "Info", user_path(current_user), class: "non-blue" %>
+    </div>
+    
+    <% if current_user.account_type_is?(:PRODUCER) %>
+      <div class="header-margin">
+        <%= link_to "Create new posting", new_posting_path, class: "non-blue" %>
+      </div>
+    <% end %>    
+
+    <hr class="header-section-divider" />
+
+    <div class="header-margin">
+      <%= link_to "Log out", logout_path, class: "non-blue", method: "delete" %>
+    </div>
+
+  <% else %>
+    <div class="header-margin">
+      <%= link_to "Log in", login_path, class: "non-blue" %>
+    </div>
+    <div class="header-margin">
+      <%= link_to "Sign up", login_path, class: "non-blue" %>
+    </div>
+  <% end %>
+  
+  
+
+  
+
+
+
+  
+
+
+  
+
+
+</div>
