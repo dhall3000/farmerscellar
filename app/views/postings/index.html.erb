@@ -1,7 +1,51 @@
 <% provide(:title, 'Shop') %>
 
 <% if @food_category %>
-  <h1><%= @food_category.name %></h1>
+
+  <% if @food_category_ancestors.any? %>
+    <div class="row">
+      <div class="col-xs-12">
+
+        <%= link_to "Home", root_path, class: "non-blue" %>
+        <%
+          index = 1
+          while index < @food_category_ancestors.count
+        %>
+            <%= "> " %>
+            <%= link_to @food_category_ancestors[index].name, postings_path(food_category: @food_category_ancestors[index].name), class: "non-blue" %>
+        <%
+            index += 1
+          end
+        %>
+
+      </div>
+    </div>
+
+  <% end %>
+
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="food-category-name"><%= @food_category.name %></div>
+    </div>
+  </div>
+
+  <% if @food_category.children.any? %>
+    <div class="row">
+      <% @food_category.children.each do |food_category| %>
+        <div class="col-xs-6 col-sm-3">
+          <%= link_to postings_path(food_category: food_category.name), class: "thumbnail" do %>
+            <%= image_tag "#{food_category.uploads.last.file_name.square}", class: "img-responsive" %>
+            <div class="caption">
+              <h3><%= food_category.name %></h3>
+            </div>
+          <% end %>        
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+
+
 
 <% if @food_category.parent || @food_category.children.any? %>
   <div class="row">

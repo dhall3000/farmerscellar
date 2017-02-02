@@ -44,7 +44,17 @@ class PostingsController < ApplicationController
     products_under = Product.none
     products_at = Product.none
 
+    @food_category_ancestors = []
+
     if @food_category
+
+      ancestor = @food_category.parent
+      while ancestor
+        @food_category_ancestors << ancestor
+        ancestor = ancestor.parent
+      end
+
+      @food_category_ancestors.reverse!
 
       products_under = @food_category.products_under
       products_at = @food_category.products

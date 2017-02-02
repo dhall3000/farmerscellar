@@ -93,8 +93,7 @@ p {
   font-size: 0.70em;
 }
 
-#logo {
-  margin-left: 5px;
+#logo {  
   margin-right: 5px;
   color: $fc-primary-color;
   font-size: 2.2em;
@@ -111,6 +110,13 @@ p {
 
 #local-food-connection {
   font-size: 1.3em;
+}
+
+.food-category-name {
+  font-size: 1.9em;  
+  color: $gray-light;
+  padding-top: 15px;
+  padding-bottom: 15px;
 }
 
 #headerIcon {
