@@ -199,11 +199,36 @@ a1 = c
 AccessCode.create(user: c, notes: "code for user 9")
 
 shop = FoodCategory.create(name: "Shop")
+
 produce = FoodCategory.create(name: "Produce", parent: shop)
+upload = Upload.create(file_name: File.open(File.join("/home/david/fc/website/assets", "produce.jpg")))
+produce.uploads << upload
+produce.save
+
 fruit = FoodCategory.create(name: "Fruit", parent: produce)
+upload = Upload.create(file_name: File.open(File.join("/home/david/fc/website/assets", "fruit.jpg")))
+fruit.uploads << upload
+fruit.save
+
 veggies = FoodCategory.create(name: "Vegetables", parent: produce)
+upload = Upload.create(file_name: File.open(File.join("/home/david/fc/website/assets", "vegetables.jpg")))
+veggies.uploads << upload
+veggies.save
+
 dairy = FoodCategory.create(name: "Dairy", parent: shop)
+upload = Upload.create(file_name: File.open(File.join("/home/david/fc/website/assets", "dairy.jpg")))
+dairy.uploads << upload
+dairy.save
+
 meat = FoodCategory.create(name: "Meat", parent: shop)
+upload = Upload.create(file_name: File.open(File.join("/home/david/fc/website/assets", "meat.jpg")))
+meat.uploads << upload
+meat.save
+
+bakery = FoodCategory.create(name: "Bakery", parent: shop)
+upload = Upload.create(file_name: File.open(File.join("/home/david/fc/website/assets", "bakery.jpeg")))
+bakery.uploads << upload
+bakery.save
 
 product_apples = Product.create(name: "Fuji Apples", food_category: fruit)
 product_carrots = Product.create(name: "Carrots", food_category: veggies)

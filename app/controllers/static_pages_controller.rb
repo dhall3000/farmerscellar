@@ -7,9 +7,13 @@ class StaticPagesController < ApplicationController
   
   def home
     @website_settings = WebsiteSetting.order("website_settings.id").last
-    #this selection is meant to entice first time landing page viewers to shop. we're pulling up the top 14 (so that they
-    #can still easily find footer links) postings that have a product pic, sorting them by price and putting cheapest at top
-    @preview_postings = Posting.where(live: true, state: Posting.states[:OPEN]).joins(:uploads).distinct.order(:price).limit(14)
+
+    @food_categories = nil    
+    root_food_category = FoodCategory.get_root_category
+    if root_food_category
+      @food_categories = root_food_category.children.joins(:uploads).distinct
+    end
+    
   end
 
   def about

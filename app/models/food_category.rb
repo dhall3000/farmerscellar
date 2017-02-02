@@ -8,6 +8,10 @@ class FoodCategory < ApplicationRecord
 
   validate :max_one_root_object, on: :create
 
+  def self.get_root_category
+    return FoodCategory.where(parent: nil).first
+  end
+
   def products_under
 
     pu = nil
