@@ -97,10 +97,20 @@ p {
   margin-left: 5px;
   margin-right: 5px;
   color: $fc-primary-color;
-  font-size: 1.8em;
+  font-size: 2.2em;
   font-family: Times New Roman, Times, Serif;  
   padding-top: 7px;
   font-weight: bold;
+}
+
+#easy {
+  font-size: 1.9em;
+  color: $fc-primary-color;
+  font-family: 'Pacifico', cursive;
+}
+
+#local-food-connection {
+  font-size: 1.3em;
 }
 
 #headerIcon {
