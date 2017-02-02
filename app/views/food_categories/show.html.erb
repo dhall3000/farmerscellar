@@ -26,7 +26,24 @@
 
     <% end %>
 
-<h2><%= @food_category.name %></h2>
+    <h2><%= @food_category.name %></h2>
+
+    <% if @food_category.uploads.count > 0 %>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="panel-title">
+            Photos
+          </div>
+        </div>
+        <div class="panel-body">
+          <% @food_category.uploads.each do |upload| %>            
+            <span>
+              <img src=<%= "#{upload.file_name.thumb}" %>>              
+            </span>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
 
     <% if @food_category.children.any? %>
       <div class="panel panel-default">

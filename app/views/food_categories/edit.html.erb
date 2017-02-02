@@ -4,20 +4,68 @@
   <span class="glyphicon glyphicon-arrow-left"></span>
   <%= link_to "Show #{@food_category.name}", food_category_path(@food_category) %>
 </p>
-<%= form_for @food_category do |f| %>
-  
-  <%= render partial: 'shared/error_messages_general', locals: { active_record_object: @food_category } %>
 
-  <%= f.label :name %>
-  <%= f.text_field :name, class: 'form-control' %>
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <div class="panel-title">
+      Edit Basics
+    </div>
+  </div>
+  <div class="panel-body">
+    <%= form_for @food_category do |f| %>
+      
+      <%= render partial: 'shared/error_messages_general', locals: { active_record_object: @food_category } %>
 
-  <%= f.label :parent %>
-  <% if @food_category.parent %>
-    <%= select_tag :parent, options_from_collection_for_select(@food_categories, "id", "name", @food_category.parent.id), class: 'form-control' %>
-  <% else %>
-    <%= select_tag :parent, options_from_collection_for_select(@food_categories, "id", "name", nil), class: 'form-control', include_blank: "No Parent" %>
-  <% end %>
-  
-  <%= f.submit "Update", class: "btn btn-lg btn-primary outline" %>
+      <%= f.label :name %>
+      <%= f.text_field :name, class: 'form-control' %>
 
+      <%= f.label :parent %>
+      <% if @food_category.parent %>
+        <%= select_tag :parent, options_from_collection_for_select(@food_categories, "id", "name", @food_category.parent.id), class: 'form-control' %>
+      <% else %>
+        <%= select_tag :parent, options_from_collection_for_select(@food_categories, "id", "name", nil), class: 'form-control', include_blank: "No Parent" %>
+      <% end %>
+      
+      <%= f.submit "Update", class: "btn btn-lg btn-primary outline" %>
+
+    <% end %>
+  </div>
+</div>
+
+<% if @food_category.uploads.count > 0 %>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <div class="panel-title">
+        Current Photos
+      </div>
+    </div>
+    <div class="panel-body">
+      <% @food_category.uploads.each do |upload| %>            
+        <span>
+          <img src=<%= "#{upload.file_name.thumb}" %>>
+          <%= link_to "", upload_path(upload, food_category_id: @food_category.id), class: "non-blue glyphicon glyphicon-remove", method: :delete, data: { confirm: 'Delete photo?' } %>
+        </span>
+      <% end %>
+    </div>
+  </div>
 <% end %>
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <div class="panel-title">
+      Add new photo
+    </div>
+  </div>
+  <div class="panel-body">
+    <%= form_for(@upload) do |f| %>
+      <div>
+        <%= f.file_field :file_name, class: 'form-control' %>
+        <%= hidden_field_tag :food_category_id, @food_category.id %>
+      </div>
+      <div>
+        <%= f.submit "Upload new photo", class: 'btn btn-lg btn-primary outline' %>
+      </div>
+    <% end %>
+
+  </div>
+</div>

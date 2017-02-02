@@ -43,6 +43,12 @@ class UploadsController < ApplicationController
         posting.save
         redirect_to edit_posting_path(posting)
         return
+      elsif params[:food_category_id]
+        food_category = FoodCategory.find(params[:food_category_id])
+        food_category.uploads << @upload
+        food_category.save
+        redirect_to edit_food_category_path(food_category)
+        return
       else
         redirect_to @upload
         return
@@ -73,6 +79,10 @@ class UploadsController < ApplicationController
       @upload.postings.delete(posting)
     end
 
+    @upload.food_categories.each do |food_category|
+      @upload.food_categories.delete(food_category)
+    end
+
     posting = nil
 
     #if we've gotten here with an associated posting, nuke the association
@@ -80,6 +90,13 @@ class UploadsController < ApplicationController
       #make sure this posting is not pointing at this upload
       posting = Posting.find(params[:posting_id])
       posting.uploads.delete(@upload)
+    end
+
+    #if we've gotten here with an associated food_category, nuke the association
+    if params[:food_category_id]
+      #make sure this food_category is not pointing at this upload
+      food_category = FoodCategory.find(params[:food_category_id])
+      food_category.uploads.delete(@upload)
     end
 
     if @upload.destroy
@@ -90,6 +107,8 @@ class UploadsController < ApplicationController
 
     if posting
       redirect_to edit_posting_path(posting)
+    elsif food_category
+      redirect_to edit_food_category_path(food_category)        
     else
       redirect_to uploads_path
     end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170124182204) do
+ActiveRecord::Schema.define(version: 20170202184606) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -259,6 +259,15 @@ ActiveRecord::Schema.define(version: 20170124182204) do
     t.integer  "parent_id"
     t.index ["name"], name: "index_food_categories_on_name"
     t.index ["parent_id"], name: "index_food_categories_on_parent_id"
+  end
+
+  create_table "food_category_uploads", force: :cascade do |t|
+    t.integer  "food_category_id"
+    t.integer  "upload_id"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+    t.index ["food_category_id"], name: "index_food_category_uploads_on_food_category_id"
+    t.index ["upload_id"], name: "index_food_category_uploads_on_upload_id"
   end
 
   create_table "nightly_task_runs", force: :cascade do |t|

@@ -3,6 +3,9 @@ class FoodCategory < ApplicationRecord
   has_many :children, class_name: "FoodCategory", foreign_key: "parent_id"
   has_many :products
 
+  has_many :food_category_uploads
+  has_many :uploads, through: :food_category_uploads
+
   validate :max_one_root_object, on: :create
 
   def products_under
