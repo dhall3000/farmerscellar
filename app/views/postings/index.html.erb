@@ -44,58 +44,6 @@
     </div>
   <% end %>
 
-
-
-
-<% if @food_category.parent || @food_category.children.any? %>
-  <div class="row">
-    <div class="col-xs-12 col-sm-offset-3 col-sm-6">
-
-      <% if @food_category.parent %>      
-      
-        <%= link_to postings_path(food_category: @food_category.parent.name), class: "food-category-link non-blue" do %>
-          <span class="glyphicon glyphicon-arrow-left"></span>
-          <%= @food_category.parent.name %>
-        <% end %>
-
-      <% end %>
-
-      <% if @food_category.children.any? %>        
-        
-          <%= link_to postings_path(food_category: @food_category.children.first.name), class: "food-category-link pull-right non-blue" do %>            
-            <%= @food_category.children.first.name %>
-            <span class="glyphicon glyphicon-arrow-right"></span>
-          <% end %>        
-
-      <% end %>
-
-    </div>
-  </div>
-<% end %>
-
-<% if @food_category.children.count > 1 %>
-  <% @food_category.children.each do |sub_category| %>
-
-    <% 
-      if sub_category == @food_category.children.first 
-        next
-      end
-    %>
-
-    <div class="row">
-      <div class="col-xs-12 col-sm-offset-3 col-sm-6">
-
-      <%= link_to postings_path(food_category: sub_category.name), class: "food-category-link pull-right non-blue" do %>
-        <%= sub_category.name %>
-        <span class="glyphicon glyphicon-arrow-right"></span>      
-      <% end %>
-
-      </div>
-    </div>
-
-  <% end %>
-<% end %>
-
 <% else %>
   <h1>Shop</h1>
 <% end %>

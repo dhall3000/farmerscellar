@@ -11,18 +11,6 @@
         <%= link_to "Home", root_path, class: "non-blue" %>
       </div>
 
-      <div class="header-margin">
-        <%
-          market_name = FoodCategory.where(parent: nil).last
-          if market_name.nil?
-            market_name = "Shop"
-          else
-            market_name = market_name.name
-          end
-        %>
-        <%= link_to market_name, postings_path, class: "non-blue" %>
-      </div>
-
       <% if logged_in? %>
         
         <hr class="header-section-divider" />
