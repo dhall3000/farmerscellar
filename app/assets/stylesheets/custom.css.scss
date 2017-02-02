@@ -12,6 +12,28 @@ $fc-primary-color: #AACB4F;
   box-sizing:         border-box;
 }
 
+.btn.outline {
+  background: none;
+  padding: 12px 22px;
+}
+
+.btn-primary.outline {
+  border: 2px solid $fc-primary-color;
+  color: $fc-primary-color;
+}
+
+.btn-primary.outline:hover, .btn-primary.outline:focus {
+  color: white;
+  background-color: $fc-primary-color;
+  border-color: $fc-primary-color;
+  opacity: 0.6;  
+  box-shadow: none;
+}
+
+.btn-primary.outline:active, .btn-primary.outline.active, .btn-primary.outline:active:focus {
+  opacity: 0.8;
+}
+
 /* universal */
 
 .anchor:target {

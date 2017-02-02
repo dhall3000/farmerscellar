@@ -7,7 +7,7 @@
 		    <p>Garage Door Test</p>
 		  </div>
 	    <div class="panel-body">
-				<%= link_to "Go garage", test_garage_door_path, class: "btn btn-primary" %>
+				<%= link_to "Go garage", test_garage_door_path, class: "btn btn-primary outline" %>
 	    </div>
     </div>
   </div>
@@ -39,7 +39,7 @@
 				<%= form_tag test_checkout_path, method: :post do %>				  
 				  <%= label_tag :amount %>
 				  <%= number_field_tag :amount, nil, class: 'form-control' %>
-				  <%= submit_tag "Checkout", class: 'btn btn-primary form-control' %>
+				  <%= submit_tag "Checkout", class: 'btn btn-primary outline form-control' %>
 				<% end %>
 	    </div>
     </div>
@@ -61,7 +61,7 @@
 			  <%= label_tag :amount %>
 			  <%= number_field_tag :amount, nil, class: 'form-control' %>
 
-			  <%= submit_tag "test masspay", class: 'btn btn-primary form-control' %>
+			  <%= submit_tag "test masspay", class: 'btn btn-primary outline form-control' %>
 
 			<% end %>
 	    </div>
@@ -76,18 +76,18 @@
 		    <p>Reference Transactions Test</p>
 		  </div>
 	    <div class="panel-body">
-	    	<%= link_to "Create billing agreement", reference_transactions_new_ba_path, class: "btn btn-primary" %>
+	    	<%= link_to "Create billing agreement", reference_transactions_new_ba_path, class: "btn btn-primary outline" %>
 	    	
 				<%= form_tag reference_transactions_create_capture_path, method: :post do %>
 				  
 				  <%= label_tag :amount %>
 				  <%= number_field_tag :amount, nil, class: 'form-control' %>
 
-				  <%= submit_tag "Make purchase", class: 'btn btn-primary form-control' %>
+				  <%= submit_tag "Make purchase", class: 'btn btn-primary outline form-control' %>
 
 				<% end %>
-				<%= link_to "Do Rtpurchase", reference_transactions_do_rtpurchase_path, class: "btn btn-primary" %>
-				<%= link_to "Do bulk_purchase", reference_transactions_do_bulk_purchase_path, class: "btn btn-primary" %>
+				<%= link_to "Do Rtpurchase", reference_transactions_do_rtpurchase_path, class: "btn btn-primary outline" %>
+				<%= link_to "Do bulk_purchase", reference_transactions_do_bulk_purchase_path, class: "btn btn-primary outline" %>
 	    </div>
     </div>
   </div>
@@ -100,7 +100,7 @@
 		    <p>Exception Test</p>
 		  </div>
 	    <div class="panel-body">
-	    	<%= link_to "Trigger exception", test_exception_path, class: "btn btn-primary" %>				
+	    	<%= link_to "Trigger exception", test_exception_path, class: "btn btn-primary outline" %>				
 	    </div>
     </div>
   </div>

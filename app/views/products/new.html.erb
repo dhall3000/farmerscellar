@@ -11,7 +11,7 @@
       <%= f.text_field :name, class: "form-control" %>
       <%= f.label :food_category %>
       <%= f.select :food_category_id, options_from_collection_for_select(@food_categories, "id", "name"), {}, class: 'form-control' %>
-      <%= f.submit "Create new product", class: "btn btn-lg btn-primary" %>
+      <%= f.submit "Create new product", class: "btn btn-lg btn-primary outline" %>
     <% end %>
   </div>
 </div>

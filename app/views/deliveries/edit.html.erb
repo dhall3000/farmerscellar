@@ -17,7 +17,7 @@
             <td class="text-center"><%= dropsite.name %></td>
             <td class="text-center"><%= dropsite.address + " " + dropsite.city + " " + dropsite.state + " " + dropsite.zip.to_s %></td>
             <% if @delivery.dropsites.find_by(id: dropsite.id).nil? %>
-              <td class="text-center"><%= link_to "Deliver!", delivery_path(id: @delivery, dropsite_id: dropsite.id), method: "patch", class: "btn btn-primary", data: { confirm: "Please confirm delivery for " + dropsite.name + ". Note: DELIVERY NOTIFICATIONS WILL BE SENT IMMEDIATELY!!" } %></td>
+              <td class="text-center"><%= link_to "Deliver!", delivery_path(id: @delivery, dropsite_id: dropsite.id), method: "patch", class: "btn btn-primary outline", data: { confirm: "Please confirm delivery for " + dropsite.name + ". Note: DELIVERY NOTIFICATIONS WILL BE SENT IMMEDIATELY!!" } %></td>
             <% else %>
               <td class="text-center">-</td>
             <% end %>            

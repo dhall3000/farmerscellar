@@ -97,10 +97,10 @@
 							<%= hidden_field_tag :pickup_code, @pickup_code.code %>
 						<% end %>										
 
-						<%= submit_tag "Open/Close garage door", class: 'btn btn-lg btn-primary fat-finger-spacing', data: { disable_with: "Please wait...sometimes slow! :(" } %>			
+						<%= submit_tag "Open/Close garage door", class: 'btn btn-lg btn-primary outline fat-finger-spacing', data: { disable_with: "Please wait...sometimes slow! :(" } %>			
 					<% end %>
 
-					<%= link_to "Log out", new_pickup_path, class: 'btn btn-lg btn-primary btn-block', data: { disable_with: "Please wait..." } %>
+					<%= link_to "Log out", new_pickup_path, class: 'btn btn-lg btn-primary outline btn-block', data: { disable_with: "Please wait..." } %>
 					
         </div>        
       </div>

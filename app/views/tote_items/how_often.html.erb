@@ -8,7 +8,7 @@
           <%= hidden_field_tag :frequency, @subscription_create_options[0][:subscription_frequency] %>
           <%= hidden_field_tag :quantity, @quantity %>
           <%= hidden_field_tag :posting_id, @posting.id %>
-          <%= submit_tag @subscription_create_options[0][:text], class: "btn btn-primary btn-lg" %>
+          <%= submit_tag @subscription_create_options[0][:text], class: "btn btn-primary outline btn-lg" %>
         <% end %>
       </div>
     </div>
@@ -43,7 +43,7 @@
         <%= hidden_field_tag :quantity, @quantity %>
         <%= hidden_field_tag :posting_id, @posting.id %>
         <%= hidden_field_tag :roll_until_filled, true %>
-        <%= submit_tag @subscription_create_options[0][:text] + " (roll until filled)", class: "btn btn-primary btn-lg" %>
+        <%= submit_tag @subscription_create_options[0][:text] + " (roll until filled)", class: "btn btn-primary outline btn-lg" %>
       <% end %>
     </div>
   </div>
@@ -79,7 +79,7 @@
         <%= hidden_field_tag :frequency, subscription_create_option[:subscription_frequency] %>
         <%= hidden_field_tag :quantity, @quantity %>
         <%= hidden_field_tag :posting_id, @posting.id %>        
-        <%= submit_tag subscription_create_option[:text], class: "btn btn-primary btn-lg" %>
+        <%= submit_tag subscription_create_option[:text], class: "btn btn-primary outline btn-lg" %>
       <% end %>                  
     </div>
   </div>

@@ -11,7 +11,7 @@
       <div>
         <%= form_tag rtauthorizations_create_path do %>
           <%= hidden_field_tag(:token, @rtba.token) %>
-          <%= submit_tag one_click, class: 'btn btn-lg btn-primary', id: "paypal-button", disabled: @dropsite.nil?, data: { disable_with: "Please wait..." } %>
+          <%= submit_tag one_click, class: 'btn btn-lg btn-primary outline', id: "paypal-button", disabled: @dropsite.nil?, data: { disable_with: "Please wait..." } %>
         <% end %>
       </div>
 
@@ -21,7 +21,7 @@
         <%= form_tag(checkouts_path) do %>
           <%= hidden_field_tag(:amount, @items_total_gross) %>                        
           <%= hidden_field_tag(:use_reference_transaction, "1") %>
-          <%= submit_tag one_click, class: 'btn btn-lg btn-primary', id: "paypal-button", disabled: @dropsite.nil?, data: { disable_with: "Please wait..." } %>                        
+          <%= submit_tag one_click, class: 'btn btn-lg btn-primary outline', id: "paypal-button", disabled: @dropsite.nil?, data: { disable_with: "Please wait..." } %>                        
         <% end %>
       </div>
 
@@ -31,7 +31,7 @@
           <%= form_tag(checkouts_path) do %>
             <%= hidden_field_tag(:amount, @items_total_gross) %>                        
             <%= hidden_field_tag(:use_reference_transaction, "0") %>
-            <%= submit_tag "Guest checkout", class: 'btn btn-lg btn-primary', id: "paypal-button", disabled: @dropsite.nil?, data: { disable_with: "Please wait..." } %>                        
+            <%= submit_tag "Guest checkout", class: 'btn btn-lg btn-primary outline', id: "paypal-button", disabled: @dropsite.nil?, data: { disable_with: "Please wait..." } %>                        
           <% end %>                            
         </div>
 

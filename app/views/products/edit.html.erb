@@ -15,5 +15,5 @@
   <% else %>
     <%= f.select :food_category_id, options_from_collection_for_select(@food_categories, "id", "name"), {}, class: 'form-control' %>
   <% end %>
-  <%= f.submit "Update", class: "btn btn-lg btn-primary" %>
+  <%= f.submit "Update", class: "btn btn-lg btn-primary outline" %>
 <% end %>

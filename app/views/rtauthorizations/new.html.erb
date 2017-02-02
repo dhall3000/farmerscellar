@@ -8,7 +8,7 @@
     <span class="small">I agree to use Paypal for this and all future purchases with Farmer's Cellar. I understand this lets me check out faster by not having to log in to PayPal to finish my purchase. I can change my preferred payment method or cancel this authorization at any time in my Account Profile at PayPal.com.</span>
     <%= form_tag rtauthorizations_create_path do %>
       <%= hidden_field_tag :token, @token %>
-      <%= submit_tag "I agree", class: "btn btn-primary btn-lg", data: { disable_with: "Please wait..." } %>        
+      <%= submit_tag "I agree", class: "btn btn-primary outline btn-lg", data: { disable_with: "Please wait..." } %>        
     <% end %>
   <% end %>
 

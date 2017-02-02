@@ -50,7 +50,7 @@
 	              <%= form_for @subscription do |f| %>
 	              	<%= f.hidden_field :paused, value: paused_button_value %>
 	              	<%= f.hidden_field :on, value: 1 %>
-	              	<%= f.submit paused_button_text, class: "btn btn-primary btn-lg" %>
+	              	<%= f.submit paused_button_text, class: "btn btn-primary outline btn-lg" %>
 	              <% end %>
 					    </div>
 
@@ -58,7 +58,7 @@
 	              <%= form_for @subscription do |f| %>
 	              	<%= f.hidden_field :paused %>
 	              	<%= f.hidden_field :on, value: 0 %>
-	              	<%= f.submit "Cancel", class: "btn btn-primary btn-lg" %>
+	              	<%= f.submit "Cancel", class: "btn btn-primary outline btn-lg" %>
 	              <% end %>				             
 					    </div>
 					    
@@ -143,7 +143,7 @@
 
 	              <%= hidden_field_tag :end_date, @end_date %>
 
-	              <%= submit_tag "Update skips", class: "btn btn-primary btn-lg form-control fat-finger-spacing" %>
+	              <%= submit_tag "Update skips", class: "btn btn-primary outline btn-lg form-control fat-finger-spacing" %>
 	              <%= link_to "Show more skip dates", edit_subscription_path(@subscription, end_date: @end_date + (4 * 7).days) %>
 	              
 	            <% end %>

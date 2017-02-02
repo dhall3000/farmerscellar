@@ -40,7 +40,7 @@
     <%= form_for @user_dropsite do |f| %>
       <%= f.number_field :user_id, value: @user_dropsite.user_id, hidden: true %> 
       <%= f.number_field :dropsite_id, value: @user_dropsite.dropsite_id, hidden: true %> 
-      <%= f.submit "Use this dropsite", class: "btn btn-primary" %>
+      <%= f.submit "Use this dropsite", class: "btn btn-primary outline" %>
     <% end %>
   </div>
 </div>

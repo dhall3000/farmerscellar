@@ -8,7 +8,7 @@
             <h2 class="panel-title">User Spoof</h2>
           </div>
           <div class="panel-body">
-            <%= link_to "Unspoof", sessions_unspoof_path, class: "btn btn-lg btn-primary" %>          
+            <%= link_to "Unspoof", sessions_unspoof_path, class: "btn btn-lg btn-primary outline" %>          
           </div>
 
         </div>
@@ -34,24 +34,24 @@
           </div>
 
           <div class="panel-body">
-            <%= link_to "Creditor Orders", creditor_orders_path, class: "btn btn-lg btn-primary btn-block" %>
-            <%= link_to "Deliver products", deliveries_path, class: "btn btn-lg btn-primary btn-block" %>
-            <%= link_to "Payment Payables", payment_payables_path, class: "btn btn-lg btn-primary btn-block" %>
-            <%= link_to "Create new access code", new_access_code_path, class: "btn btn-lg btn-primary btn-block" %>    
-            <%= link_to "Food Categories", food_categories_path, class: "btn btn-lg btn-primary btn-block" %>
-            <%= link_to "Products", products_path, class: "btn btn-lg btn-primary btn-block" %>
-            <%= link_to "Producer Product Commissions", new_producer_product_unit_commission_path, class: "btn btn-lg btn-primary btn-block" %>
-            <%= link_to "Add new dropsite", new_dropsite_path, class: "btn btn-lg btn-primary btn-block" %>
-            <%= link_to "List dropsites", dropsites_path, class: "btn btn-lg btn-primary btn-block" %>        
+            <%= link_to "Creditor Orders", creditor_orders_path, class: "btn btn-lg btn-primary outline btn-block" %>
+            <%= link_to "Deliver products", deliveries_path, class: "btn btn-lg btn-primary outline btn-block" %>
+            <%= link_to "Payment Payables", payment_payables_path, class: "btn btn-lg btn-primary outline btn-block" %>
+            <%= link_to "Create new access code", new_access_code_path, class: "btn btn-lg btn-primary outline btn-block" %>    
+            <%= link_to "Food Categories", food_categories_path, class: "btn btn-lg btn-primary outline btn-block" %>
+            <%= link_to "Products", products_path, class: "btn btn-lg btn-primary outline btn-block" %>
+            <%= link_to "Producer Product Commissions", new_producer_product_unit_commission_path, class: "btn btn-lg btn-primary outline btn-block" %>
+            <%= link_to "Add new dropsite", new_dropsite_path, class: "btn btn-lg btn-primary outline btn-block" %>
+            <%= link_to "List dropsites", dropsites_path, class: "btn btn-lg btn-primary outline btn-block" %>        
             <% if @website_settings %>
-              <%= link_to "Website Settings", edit_website_setting_path(@website_settings), class: "btn btn-lg btn-primary btn-block" %>
+              <%= link_to "Website Settings", edit_website_setting_path(@website_settings), class: "btn btn-lg btn-primary outline btn-block" %>
             <% end %>
-            <%= link_to "List Users", users_path, class: "btn btn-lg btn-primary btn-block" %>
-            <%= link_to "Go to test page", test_page_path, class: "btn btn-lg btn-primary btn-block" %>
-            <%= link_to "Uploads", uploads_path, class: "btn btn-lg btn-primary btn-block" %>
-            <%= link_to "Partner Users", partner_users_index_path, class: "btn btn-lg btn-primary btn-block" %>
-            <%= link_to "Toggle garage door", toggle_garage_door_path, class: "btn btn-lg btn-primary btn-block" %>
-            <%= link_to "Recent pickups", pickups_path, class: "btn btn-lg btn-primary btn-block" %>
+            <%= link_to "List Users", users_path, class: "btn btn-lg btn-primary outline btn-block" %>
+            <%= link_to "Go to test page", test_page_path, class: "btn btn-lg btn-primary outline btn-block" %>
+            <%= link_to "Uploads", uploads_path, class: "btn btn-lg btn-primary outline btn-block" %>
+            <%= link_to "Partner Users", partner_users_index_path, class: "btn btn-lg btn-primary outline btn-block" %>
+            <%= link_to "Toggle garage door", toggle_garage_door_path, class: "btn btn-lg btn-primary outline btn-block" %>
+            <%= link_to "Recent pickups", pickups_path, class: "btn btn-lg btn-primary outline btn-block" %>
           </div>
 
         </div>
@@ -66,7 +66,7 @@
             <%= form_tag sessions_spoof_path do %>      
               <%= label_tag :email %>
               <%= text_field_tag :email, nil, class: "form-control" %>                        
-              <%= submit_tag "Spoof user", class: "btn btn-lg btn-primary btn-block" %>
+              <%= submit_tag "Spoof user", class: "btn btn-lg btn-primary outline btn-block" %>
             <% end %>
           </div>
 
@@ -83,7 +83,7 @@
               <%= text_field_tag :to, nil, class: "form-control" %>
               <%= label_tag :body %>
               <%= text_field_tag :body, nil, class: "form-control" %>
-              <%= submit_tag "Send test email", class: "btn btn-lg btn-primary btn-block" %>
+              <%= submit_tag "Send test email", class: "btn btn-lg btn-primary outline btn-block" %>
             <% end %>
           </div>
 
@@ -106,9 +106,9 @@
   <%= render partial: 'postings/postings', locals: { heading: "", postings: @preview_postings } %>
 
   <div class="row">
-    <div class="col-xs-offset-1 col-xs-10 col-sm-offset-4 col-sm-4">
+    <div class="col-xs-offset-2 col-xs-8 col-sm-offset-5 col-sm-2">
       <div class="standard-element-vertical-spacing">
-        <%= link_to "Shop more", postings_path, class: "btn btn-lg btn-primary btn-block" %>
+        <%= link_to "Shop more", postings_path, class: "btn btn-lg btn-primary outline btn-block" %>
       </div>
     </div>
   </div>

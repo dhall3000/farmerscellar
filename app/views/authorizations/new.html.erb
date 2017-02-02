@@ -9,7 +9,7 @@
       <%= f.hidden_field :token %>
       <%= f.hidden_field :payer_id %>
       <%= f.hidden_field :amount %>
-      <%= f.submit "Confirm", class: "btn btn-primary btn-lg", data: { disable_with: "Please wait..." } %>      
+      <%= f.submit "Confirm", class: "btn btn-primary outline btn-lg", data: { disable_with: "Please wait..." } %>      
     <% end %>
     <span class="small">(By clicking 'Confirm' you authorize and agree to payment for the above items in accordance with our policies and operational procedures detailed on our <%= link_to "How Things Work", how_things_work_path %> page)</span>
   <% end %>

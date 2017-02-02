@@ -24,7 +24,7 @@
             <%= number_field_tag :producer_net, nil, {min: 0.0, step: 0.01, class: 'form-control'} %>
             <%= label_tag :commission %>
             <%= number_field_tag :commission, nil, {min: 0.0, step: :any, class: 'form-control'} %>
-            <%= submit_tag "Get retail price", class: "btn btn-lg btn-primary" %>
+            <%= submit_tag "Get retail price", class: "btn btn-lg btn-primary outline" %>
           <% end %>
 
         </div>
@@ -54,7 +54,7 @@
             <%= f.label :commission %>
             <%= f.text_field :commission, class: "form-control" %>
 
-            <%= f.submit class: "btn btn-primary btn-lg" %>
+            <%= f.submit class: "btn btn-primary outline btn-lg" %>
 
           <% end %>
 
@@ -85,7 +85,7 @@
             <%= label_tag :producer_net %>
             <%= text_field_tag :producer_net, @ppc.producer_net, class: "form-control" %>
 
-            <%= f.submit class: "btn btn-primary btn-lg" %>
+            <%= f.submit class: "btn btn-primary outline btn-lg" %>
 
           <% end %>
 
