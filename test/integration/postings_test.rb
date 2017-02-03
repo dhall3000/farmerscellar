@@ -108,6 +108,7 @@ class PostingsTest < IntegrationHelper
   test "should not send order email if first case does not get filled" do
     nuke_all_postings
     posting = create_standard_posting
+
     posting.units_per_case = 10
     assert posting.save
     assert_equal 0, posting.tote_items.count
@@ -367,6 +368,7 @@ class PostingsTest < IntegrationHelper
     price = 12.31
     #verify the post doesn't exist
     verify_post_presence(price, @unit, exists = false)
+
     #create the post, with recurrence
     login_for(@farmer)
     
@@ -376,19 +378,10 @@ class PostingsTest < IntegrationHelper
     end
 
     order_cutoff = delivery_date - 2.days
-    post postings_path, params: {posting: {
-      description: "my recurring posting",
-      price: price,
-      user_id: @farmer.id,
-      product_id: @product.id,      
-      unit_id: @unit.id,
-      live: true,
-      delivery_date: delivery_date,
-      order_cutoff: order_cutoff,
-      posting_recurrence: {frequency: 1, on: true}
-    }}
+    posting = create_posting(@farmer, price, @product, @unit, delivery_date, order_cutoff, units_per_case = nil, frequency = 1, order_minimum_producer_net = 0, product_id_code = nil)
+
     #verify exactly one post exists
-    verify_post_presence(price, @unit, exists = true)
+    verify_post_presence(price, @unit, exists = true, posting.id)
     #wind the clock forward to between the commitment zone start and delivery date
     posting = Posting.where(price: price).last
 
@@ -421,6 +414,8 @@ class PostingsTest < IntegrationHelper
     #posting_recurrence.postings list but only one is visible in the postings page    
     assert_equal false, posting.posting_recurrence.postings.first.live
     assert_equal 2, posting.posting_recurrence.postings.count
+
+   
     #verify the new post is visible
     verify_post_visibility(price, @unit, 1)
         
@@ -432,6 +427,14 @@ class PostingsTest < IntegrationHelper
 
     if exists == true
       count = 1
+
+      if posting_id.nil?
+        posting = Posting.where(price: price)
+      else
+        posting = Posting.find posting_id
+      end
+
+      get postings_path(food_category: posting.product.food_category.name)
     else
       count = 0
     end
@@ -442,9 +445,16 @@ class PostingsTest < IntegrationHelper
   end
 
   def verify_post_visibility(price, unit, count)
-    get postings_path
+    if count > 0
+      posting = Posting.where(price: price).first
+      get postings_path(food_category: posting.product.food_category.name)
+    else
+      get postings_path
+    end    
+    
     assert :success
     verify_price_on_postings_page(price, unit, count)
+
   end
 
   def verify_post_existence(price, count, posting_id = nil)
@@ -483,14 +493,14 @@ class PostingsTest < IntegrationHelper
   test "should copy new posting" do
     login_for(@farmer)
 
-    get postings_path
-    assert :success
-
     price = 2.75
-    unit = units(:pound)
+    unit = units(:pound)    
+    assert @posting.product.food_category
 
+    get postings_path(food_category: @posting.product.food_category.name)
+    assert :success
     verify_price_on_postings_page(price, unit, count = 1)
-    
+
     #turn off the existing posting
     patch posting_path(@posting), params: {posting: {
       description: "edited description",
@@ -500,7 +510,7 @@ class PostingsTest < IntegrationHelper
 
     assert :success  
     assert_redirected_to @farmer
-    get postings_path
+    get postings_path(food_category: @posting.product.food_category.name)
     assert :success
     assert_select '.price', {text: "$2.75 / Pound", count: 0}
 
@@ -518,7 +528,7 @@ class PostingsTest < IntegrationHelper
       order_cutoff: posting.order_cutoff
     }}
 
-    get postings_path
+    get postings_path(food_category: posting.product.food_category.name)
     assert :success        
     verify_price_on_postings_page(price, posting.unit, count = 1)
 
@@ -528,7 +538,7 @@ class PostingsTest < IntegrationHelper
     get_access_for(user)
     get login_path
     post login_path, params: {session: { email: @farmer.email, password: 'dogdog' }}
-    assert_redirected_to postings_path
+    assert_redirected_to root_path
     follow_redirect!
   end
 
@@ -541,35 +551,17 @@ class PostingsTest < IntegrationHelper
 
     order_cutoff = delivery_date - 2.days
 
-    posting_params = {
-      description: "describe description",
-      price: 0.83,
-      user_id: @farmer.id,
-      product_id: @product.id,
-      unit_id: @unit.id,
-      live: true,
-      delivery_date: delivery_date,
-      order_cutoff: order_cutoff,
-      units_per_case: 10
-    }
-
-    posting = create_posting(@farmer, posting_params)
+    posting = create_posting(@farmer, price = 0.83, product = @product, unit = @unit, delivery_date, order_cutoff, units_per_case = 10, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil)
 
     return posting
 
-  end
-
-  def create_posting(producer, params)
-    log_in_as(producer)
-    post postings_path, params: {posting: params}
-    posting = assigns(:posting)
-    verify_post_presence(posting.price, posting.unit, exists = true, posting.id)
-    return posting
   end
 
   def create_new_posting
+
     login_for(@farmer)
-    assert_template 'postings/index'
+    assert_response :success
+    assert_template 'static_pages/home'
     assert_select "a[href=?]", login_path, count: 0
     assert_select "a[href=?]", logout_path
     assert_select "a[href=?]", subscriptions_path
@@ -580,25 +572,8 @@ class PostingsTest < IntegrationHelper
       delivery_date += 1.day
     end
 
-    price = 1.09
-
-    post postings_path, params: {posting: {
-      description: "hi",
-      price: price,
-      user_id: @farmer.id,
-      product_id: @product.id,      
-      unit_id: @unit.id,
-      live: true,
-      delivery_date: delivery_date,
-      order_cutoff: delivery_date - 2.days
-      }}
-
-    assert :success
-    posting = assigns(:posting)
-    assert_redirected_to postings_path
-    follow_redirect!
-    assert_template 'postings/index'    
-    verify_price_on_postings_page(price, posting.unit, 1)
+    price = 1.09    
+    posting = create_posting(@farmer, price, @product, @unit, delivery_date, order_cutoff = delivery_date - 2.days, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil)
     
     return posting
 

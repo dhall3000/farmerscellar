@@ -32,10 +32,7 @@ class PostingsController < ApplicationController
   def index
 
     @food_category = FoodCategory.where(name: params[:food_category]).first
-    if @food_category.nil?
-      @food_category = FoodCategory.where(parent: nil).first
-    end
-
+ 
     #this is the upcoming sunday at midnight
     next_week_start = start_of_next_week    
     next_week_end = next_week_start + 7.days
@@ -70,9 +67,7 @@ class PostingsController < ApplicationController
       end
 
     else      
-      @this_weeks_postings = get_postings(Product.all, Time.zone.now.midnight, next_week_start, limit)
-      @next_weeks_postings = get_postings(Product.all, next_week_start, next_week_end, limit)
-      @future_postings = get_postings(Product.all, next_week_end, next_week_end + 10.years, limit)
+      redirect_to root_path
     end
 
   end

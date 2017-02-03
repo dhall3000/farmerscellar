@@ -3,30 +3,6 @@ require 'utility/rake_helper'
 
 class IntegrationHelper < ActionDispatch::IntegrationTest
 
-  def create_food_category_for_product_if_product_has_none(product)
-
-    assert product
-
-    if product.food_category
-      return
-    end
-
-    fc = FoodCategory.where(parent: nil).first
-
-    if fc.nil?
-      fc = FoodCategory.new(name: "Market", parent: nil)
-      assert fc.valid?
-      assert fc.save
-    end    
-    
-    product.food_category = fc
-    assert product.save
-    assert product.reload.food_category
-
-    return 
-
-  end
-
   def verify_price_on_postings_page(price, unit, count = nil)
 
     if count && count > 0
@@ -386,6 +362,8 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
       product = products(:apples)
     end
 
+    create_food_category_for_product_if_product_has_none(product)
+
     if unit.nil?
       unit = units(:pound)
     end
@@ -566,7 +544,11 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     log_in_as(customer)
     assert is_logged_in?
 
-    get postings_path
+    assert posting.valid?
+    assert posting.product.food_category
+    food_category = posting.product.food_category
+
+    get postings_path(food_category: food_category.name)
     assert_response :success
     assert_template 'postings/index'
     get posting_path(posting)

@@ -501,9 +501,21 @@ class PostingsControllerTest < IntegrationHelper
   end
 
   test "should get index for non users" do
+
     get postings_path
+    assert :redirect
+    assert_redirected_to root_path
+    follow_redirect!
+    assert_template 'static_pages/home'
+
+    create_food_category_for_all_products_that_have_none
+    root_category = FoodCategory.get_root_category
+    assert root_category
+
+    get postings_path(food_category: root_category.name)
     assert :success
     assert_template 'postings/index'
+
   end
 
 #CREATE TESTS
@@ -778,7 +790,12 @@ class PostingsControllerTest < IntegrationHelper
   def get_postings_count
     
     log_in_as(@farmer)
-    get postings_path
+
+    create_food_category_for_all_products_that_have_none
+
+    root_category = FoodCategory.get_root_category
+
+    get postings_path(food_category: root_category.name)
     this_weeks_postings = assigns(:this_weeks_postings)
     next_weeks_postings = assigns(:next_weeks_postings)
     future_postings = assigns(:future_postings)    
@@ -941,11 +958,12 @@ class PostingsControllerTest < IntegrationHelper
 
   def successfully_get_index
 
-    Product.all.each do |product|
-      create_food_category_for_product_if_product_has_none(product)
-    end
+    create_food_category_for_all_products_that_have_none
 
-    get postings_path
+    root_category = FoodCategory.get_root_category
+    assert root_category
+
+    get postings_path(food_category: root_category.name)
     assert :success
     assert_template 'postings/index'
 

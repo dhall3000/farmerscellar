@@ -1,5 +1,35 @@
 module TestLib
 
+  def create_food_category_for_all_products_that_have_none
+    Product.all.each do |product|
+      create_food_category_for_product_if_product_has_none(product)
+    end
+  end
+
+  def create_food_category_for_product_if_product_has_none(product)
+
+    assert product
+
+    if product.food_category
+      return
+    end
+
+    fc = FoodCategory.where(parent: nil).first
+
+    if fc.nil?
+      fc = FoodCategory.new(name: "Market", parent: nil)
+      assert fc.valid?
+      assert fc.save
+    end    
+    
+    product.food_category = fc
+    assert product.save
+    assert product.reload.food_category
+
+    return 
+
+  end
+
   def create_food_category(name, parent)
 
     fc = FoodCategory.new(name: name, parent: parent)

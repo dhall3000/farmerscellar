@@ -64,7 +64,7 @@ class SessionsController < ApplicationController
         if @user.account_type_is?(:DROPSITE)
           redirect_to new_pickup_path
         else
-          redirect_back_or postings_path
+          redirect_back_or root_path
         end
 
         return              

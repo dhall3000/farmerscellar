@@ -24,9 +24,9 @@ class UsersLoginTest < IntegrationHelper
     get_access_for(@user)
     get login_path
     post login_path, params: {session: { email: @user.email, password: 'dogdog' }}
-    assert_redirected_to postings_path
+    assert_redirected_to root_path
     follow_redirect!
-    assert_template 'postings/index'
+    assert_template 'static_pages/home'
     assert_select "a[href=?]", login_path, count: 0
     assert_select "a[href=?]", logout_path
     assert_select "a[href=?]", subscriptions_path
@@ -37,9 +37,9 @@ class UsersLoginTest < IntegrationHelper
     get login_path
     post login_path, params: {session: { email: @user.email, password: 'dogdog' }}
     assert is_logged_in?
-    assert_redirected_to postings_path
+    assert_redirected_to root_path
     follow_redirect!
-    assert_template 'postings/index'
+    assert_template 'static_pages/home'
     assert_select "a[href=?]", login_path, count: 0
     assert_select "a[href=?]", logout_path
     assert_select "a[href=?]", subscriptions_path

@@ -8,6 +8,7 @@ class BulkPurchasesTest < BulkBuyer
     #this test is for beta / launch mode when we're charging flat processor fees and 0% commission service fee
     #in this scenario we can/will end up with transactions we're upside down on...paying more to the producer
     #than we're collecting from Paypal. fun.
+    create_food_category_for_all_products_that_have_none
 
     assert_equal 0, PaymentPayable.where("amount <> amount_paid").count
 
@@ -37,6 +38,7 @@ class BulkPurchasesTest < BulkBuyer
     assert_equal 0, BulkPurchase.count
 
     posting = @c1.tote_items.first.posting    
+    create_food_category_for_all_products_that_have_none
     travel_to posting.order_cutoff
     RakeHelper.do_hourly_tasks
     travel_to posting.delivery_date + 22.hours
@@ -290,7 +292,7 @@ class BulkPurchasesTest < BulkBuyer
     #check for the existence of nasty-gram related to account state
     if account_ok
       assert_response :redirect
-      assert_redirected_to postings_path
+      assert_redirected_to postings_path(food_category: Posting.last.product.food_category.name)
       assert_not flash.empty?      
       assert_equal "Tote item added", flash[:success]
     else
