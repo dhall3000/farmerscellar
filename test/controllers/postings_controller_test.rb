@@ -951,7 +951,7 @@ class PostingsControllerTest < IntegrationHelper
 
     #assert that there are at least several postings (this should be the case as long as there
     #are "at least several" postings in the posting.yml file)    
-    assert_select "a.non-blue div.posting-thumbnail img.hundred-percent-width", minimum: 3
+    assert_select "a.thumbnail img.img-responsive", minimum: 3
 
   end
 

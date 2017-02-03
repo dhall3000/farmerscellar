@@ -9,18 +9,22 @@
       <div class="selected-food">
         <%= @food_category.name %>        
       </div>
-      <div class="thumbnail">
-        <%= image_tag "#{@food_category.uploads.last.file_name.square}", class: "img-responsive" %>
-      </div>
+      <% if @food_category.uploads.last %>
+        <div class="thumbnail">        
+          <%= image_tag "#{@food_category.uploads.last.file_name.square}", class: "img-responsive" %>        
+        </div>
+      <% end %>
     </div>
   </div>
 
   <% if @food_category.children.any? %>
     <div class="row">
-      <% @food_category.children.each do |food_category| %>
+      <% @food_category.children.each do |food_category| %>      
         <div class="col-xs-6 col-sm-3">
           <%= link_to postings_path(food_category: food_category.name), class: "thumbnail" do %>
-            <%= image_tag "#{food_category.uploads.last.file_name.square}", class: "img-responsive" %>
+            <% if food_category.uploads.last %>
+              <%= image_tag "#{food_category.uploads.last.file_name.square}", class: "img-responsive" %>
+            <% end %>        
             <div class="caption">
               <h3><%= food_category.name %></h3>
             </div>
