@@ -1,186 +1,213 @@
 <% provide(:title, @posting.product.name) %>
-<h1><%= @posting.product.name %></h1>
-
 <% if @posting_food_category %>
-  <div class="row gutter-10">
-    <div class="col-xs-12 col-sm-offset-3 col-sm-6">
-      <%= link_to postings_path(food_category: @posting_food_category.name), class: "food-category-link non-blue" do %>
-        <span class="glyphicon glyphicon-arrow-left"></span>
-        <%= @posting_food_category.name %>
+  <%= render partial: 'nav_trinket', locals: { food_category: @posting_food_category, include_self: true } %>
+<% end %>
+
+<div class="row gutter-10">
+  <div class="col-xs-12">
+    <div class="selected-food">
+      <%= @posting.product.name %>
+    </div>
+    <div class="thumbnail">
+      <% if @posting.uploads.last %>
+        <%= image_tag "#{@posting.uploads.last.file_name.large}", class: "img-responsive" %>
       <% end %>
-      <hr class="section-divider" />
-    </div>
-  </div>
-<% end %>
+      <div class="caption">
 
-<div class="row gutter-10">
-  <div class="col-xs-11 col-sm-offset-3 col-sm-5">
-    <div id="productDescription" class="truncated-text-line" data-toggle="collapse" data-target="#descriptionBody">
-      <%= @posting.description %>
-    </div>      
-    <div id="descriptionBody" class="collapse" data-chevron="#descriptionChevron">
-      <br>
-      <%= @posting.description_body %>
-      <hr>
-    </div>
-  </div>
-  <div class="col-xs-1 col-sm-1">
-    <div style="padding-top: 3px;" data-toggle="collapse" data-target="#descriptionBody">
-      <span id="descriptionChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>            
-    </div>
-  </div>
-</div>
+        <div class="row gutter-10" data-toggle="collapse" data-target="#producerDetails">
+          <div class="col-xs-11">
+            <div id="producerName" class="truncated-text-line producer-name-font">
+              <%= "#{@posting.user.farm_name}, #{@posting.user.city}, #{@posting.user.state}" %>
+            </div>
+          </div>
+          <div class="col-xs-1">
+            <span id="producerDetailsChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>
+          </div>
+        </div>
+        <div class="row gutter-10">
+          <div class="col-xs-12">
+            <div id="producerDetails" class="collapse" data-chevron="#producerDetailsChevron">          
+              <br style="padding-top: 20px;">
+              <%= link_to @posting.user.full_website, @posting.user.full_website, target: "_blank" %>
+              <br>
+              <%= @posting.user.description %>
+            </div>
+          </div>
+        </div>
 
-<div class="row gutter-10">
-  <div class="col-xs-11 col-sm-offset-3 col-sm-5">
-    <div id="producerName" class="truncated-text-line producer-name-font" data-toggle="collapse" data-target="#producerDetails">
-      <%= @posting.user.farm_name %>
-    </div>      
-    <div id="producerDetails" class="collapse" data-chevron="#producerDetailsChevron">
 
-      <%= link_to @posting.user.full_website, @posting.user.full_website, target: "_blank" %>
-      <br>
-      <%= @posting.user.description %>
-    </div>
-  </div>
-  <div class="col-xs-1 col-sm-1">
-    <div style="padding-top: 3px;" data-toggle="collapse" data-target="#producerDetails">
-      <span id="producerDetailsChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>            
-    </div>
-  </div>
-</div>
-
-<div class="row gutter-10">
-  <div class="col-xs-12 col-sm-offset-3 col-sm-6">
-    <strong><%= "#{@posting.user.city}, #{@posting.user.state}" %></strong>
-  </div>
-</div>
-
-<div class="row gutter-10">
-  <div class="col-xs-12 col-sm-offset-3 col-sm-6">
-    <% if @posting.uploads.last %>
-      <%= image_tag "#{@posting.uploads.last.file_name.large}", class: "hundred-percent-width" %>
-      <div class="standard-element-vertical-spacing"></div>      
-    <% end %>
-  </div>
-</div>
+        <div class="row gutter-10" data-toggle="collapse" data-target="#descriptionBody">
+          <div class="col-xs-11">
+            <div id="productDescription" class="truncated-text-line">
+              <%= @posting.description %>        
+            </div>            
+          </div>
+          <div class="col-xs-1">
+            <span id="descriptionChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>
+          </div>
+        </div>
+        <div class="row gutter-10">
+          <div class="col-xs-12">
+            <div id="descriptionBody" class="collapse" data-chevron="#descriptionChevron">
+              <br>
+              <%= @posting.description_body %>
+              <hr>
+            </div>
+          </div>
+        </div>
 
 
 
 
-<% if !@posting.important_notes.blank? %>
-  <div class="row gutter-10">
-    <div class="col-xs-10 col-sm-offset-3 col-sm-5">
-      <div id="importantNotes" class="truncated-text-line" data-toggle="collapse" data-target="#importantNotesBody">      
-        <%= @posting.important_notes %>
-      </div>
-    </div>
-    <div class="col-xs-2 col-sm-1">
-      <div data-toggle="collapse" data-target="#importantNotesBody">
-        <span id="importantNotesChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>
-        <span id="important-notes-info-glyph" class="alert-info glyphicon glyphicon-info-sign spin-continuously pull-right"></span>
-      </div>
-    </div>
-  </div>
-  <div class="row gutter-10">
-    <div class="col-xs-10 col-sm-offset-3 col-sm-5">
-      <div id="importantNotesBody" class="collapse" data-chevron="#importantNotesChevron">        
-        <br>
-        <%= @posting.important_notes_body %>        
-        <hr>
-      </div>      
-    </div>
-  </div>
-<% end %>
 
 
-<% if @biggest_order_minimum_producer_net_outstanding && @biggest_order_minimum_producer_net_outstanding > 0 %>
-  <div class="row gutter-10">
 
-    <div class="col-xs-10 col-sm-offset-3 col-sm-5">    
-      <div class="truncated-text-line" data-toggle="collapse" data-target="#orderMinimumBody">
-        Unmet Group Order Minimum
-      </div>
-    </div>
-
-
-    <div class="col-xs-2 col-sm-1">      
-      <div data-toggle="collapse" data-target="#orderMinimumBody">
-        <span id="orderMinimumChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>
-        <span class="alert-danger glyphicon glyphicon-exclamation-sign spin-continuously pull-right"></span>      
-      </div>
-    </div>
-
-  </div>
-
-
-  <div class="row gutter-10">
-    <div class="col-xs-10 col-sm-offset-3 col-sm-5">
-      <div id="orderMinimumBody" class="collapse" data-chevron="#orderMinimumChevron">
-        This product is subject to a <%= link_to "Group Order Minimum", how_things_work_path(anchor: "order_minimums") %>. To meet the minimum, the customer community must collectively order an additional <%= number_to_currency(@biggest_order_minimum_producer_net_outstanding) %>.
-        <hr>
-      </div>
-    </div>
-  </div>
-
-
-<% end %>
-
-<div class="row gutter-10">
-  <div class="col-xs-11 col-sm-offset-3 col-sm-5">
-    <div data-toggle="collapse" data-target="#productDetailsBody">
-      Delivery details
-    </div>
-  </div>
-  <div class="col-xs-1">
-    <div style="padding-top: 3px;" data-toggle="collapse" data-target="#productDetailsBody">
-      <span id="productDetailsChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>            
-    </div>
-  </div>
-</div>
-
-<div class="row gutter-10">
-  <div class="col-xs-12 col-sm-offset-4 col-sm-4">
-    <div id="productDetailsBody" class="collapse" data-chevron="#productDetailsChevron">
-      <ul class="list-group">
-        <% if @posting.subscribable? %>
-          <li class="list-group-item">Deliveries scheduled <%= @posting.posting_recurrence.friendly_frequency.downcase %><span class="alert-info glyphicon glyphicon-asterisk"></span></li>
-          <li class="list-group-item">Next <%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff") %> <%= @posting.order_cutoff.strftime("%a, %b %-d, %l:%M %p") %>      </li>
-          <li class="list-group-item">Next Scheduled Delivery <%= @posting.delivery_date.strftime("%a, %b %-d") %></li>
-        <% else %>
-          <li class="list-group-item"><%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff") %>: <%= @posting.order_cutoff.strftime("%a, %b %-d, %l:%M %p") %>      </li>
-          <li class="list-group-item">Scheduled Delivery <%= @posting.delivery_date.strftime("%a, %b %-d") %><span class="alert-info glyphicon glyphicon-asterisk"></span></li>
+        <% if !@posting.important_notes.blank? %>
+          <div class="row gutter-10" data-toggle="collapse" data-target="#importantNotesBody">
+            <div class="col-xs-10">
+              <div id="importantNotes" class="truncated-text-line">      
+                <%= @posting.important_notes %>
+              </div>
+            </div>
+            <div class="col-xs-2">
+              <span id="importantNotesChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>
+              <span id="important-notes-info-glyph" class="alert-info glyphicon glyphicon-info-sign spin-continuously pull-right"></span>
+            </div>
+          </div>
+          <div class="row gutter-10">
+            <div class="col-xs-12">
+              <div id="importantNotesBody" class="collapse" data-chevron="#importantNotesChevron">        
+                <br>
+                <%= @posting.important_notes_body %>        
+              </div>      
+            </div>
+          </div>
         <% end %>
-      </ul>
-      <div>
-        <small>
-          <span class="alert-info glyphicon glyphicon-asterisk"></span>
-          Deliveries occur on schedule subject to several constraints. Please be aware of our <%= link_to "Delivery Not Guaranteed", how_things_work_path(anchor: "delivery_not_guaranteed") %> policy.
-        </small>
-      </div>
-      <hr>
-    </div>
-  </div>  
-</div>
 
-<div style="padding-top: 20px;" class="row gutter-10">  
-  <div class="col-xs-12 col-sm-offset-3 col-sm-6">      
-    <div>
-      <strong><%= "#{number_to_currency(@posting.price)} / #{@posting.unit.name}" %></strong>
-    </div>      
-    <% if !@posting.unit_body.blank? || !@posting.price_body.blank? %>
-      <div>
-        <ul>
-          <% if !@posting.unit_body.blank? %>
-            <li><%= @posting.unit_body %></li>
-          <% end %>
-          <% if !@posting.price_body.blank? %>
-            <li><%= @posting.price_body %></li>
-          <% end %>
-        </ul>        
+
+
+
+
+
+
+
+
       </div>
-    <% end %>
+    </div>
   </div>
 </div>
 
-<%= render partial: "add_quantity", locals: { posting: @posting } %>
+<div class="row gutter-10">
+  <div class="col-xs-12">
+    <div class="thumbnail">      
+      <div class="caption">
+
+
+
+
+        <div class="row gutter-10">
+          <div class="col-xs-12">
+
+            <div>
+              <strong><%= "#{number_to_currency(@posting.price)} / #{@posting.unit.name}" %></strong>
+            </div>      
+            <% if !@posting.unit_body.blank? || !@posting.price_body.blank? %>
+              <div>
+                <ul>
+                  <% if !@posting.unit_body.blank? %>
+                    <li><%= @posting.unit_body %></li>
+                  <% end %>
+                  <% if !@posting.price_body.blank? %>
+                    <li><%= @posting.price_body %></li>
+                  <% end %>
+                </ul>        
+              </div>
+            <% end %>
+
+          </div>
+        </div>
+
+
+
+
+
+        <div class="row gutter-10" data-toggle="collapse" data-target="#productDetailsBody">
+          <div class="col-xs-11">
+            Delivery details
+          </div>
+          <div class="col-xs-1">
+            <div style="padding-top: 3px;">
+              <span id="productDetailsChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>            
+            </div>
+          </div>
+        </div>
+        
+        <div class="row gutter-10">
+          <div class="col-xs-12">
+            <div id="productDetailsBody" class="collapse" data-chevron="#productDetailsChevron">
+              <ul class="list-group">
+                <% if @posting.subscribable? %>
+                  <li class="list-group-item">Deliveries scheduled <%= @posting.posting_recurrence.friendly_frequency.downcase %><span class="alert-info glyphicon glyphicon-asterisk"></span></li>
+                  <li class="list-group-item">Next <%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff") %> <%= @posting.order_cutoff.strftime("%a, %b %-d, %l:%M %p") %>      </li>
+                  <li class="list-group-item">Next Scheduled Delivery <%= @posting.delivery_date.strftime("%a, %b %-d") %></li>
+                <% else %>
+                  <li class="list-group-item"><%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff") %>: <%= @posting.order_cutoff.strftime("%a, %b %-d, %l:%M %p") %>      </li>
+                  <li class="list-group-item">Scheduled Delivery <%= @posting.delivery_date.strftime("%a, %b %-d") %><span class="alert-info glyphicon glyphicon-asterisk"></span></li>
+                <% end %>
+              </ul>
+              <div>
+                <small>
+                  <span class="alert-info glyphicon glyphicon-asterisk"></span>
+                  Deliveries occur on schedule subject to several constraints. Please be aware of our <%= link_to "Delivery Not Guaranteed", how_things_work_path(anchor: "delivery_not_guaranteed") %> policy.
+                </small>
+              </div>
+              <hr>
+            </div>
+          </div>  
+        </div>
+
+
+
+
+
+        <% if @biggest_order_minimum_producer_net_outstanding && @biggest_order_minimum_producer_net_outstanding > 0 %>
+          <div class="row gutter-10" data-toggle="collapse" data-target="#orderMinimumBody">
+
+            <div class="col-xs-10">
+              <div class="truncated-text-line">
+                Unmet Group Order Minimum
+              </div>
+            </div>
+
+            <div class="col-xs-2">      
+              <span id="orderMinimumChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>
+              <span class="alert-danger glyphicon glyphicon-exclamation-sign spin-continuously pull-right"></span>      
+            </div>
+
+          </div>
+
+          <div class="row gutter-10">
+            <div class="col-xs-10">
+              <div id="orderMinimumBody" class="collapse" data-chevron="#orderMinimumChevron">
+                This product is subject to a <%= link_to "Group Order Minimum", how_things_work_path(anchor: "order_minimums") %>. To meet the minimum, the customer community must collectively order an additional <%= number_to_currency(@biggest_order_minimum_producer_net_outstanding) %>.        
+              </div>
+            </div>
+          </div>
+        <% end %>
+
+
+
+
+
+        <%= render partial: "add_quantity", locals: { posting: @posting } %>
+
+
+
+
+
+
+
+      </div>
+    </div>
+  </div>
+</div>

@@ -12,6 +12,12 @@ $fc-primary-color: #AACB4F;
   box-sizing:         border-box;
 }
 
+.selected-food {
+  font-size: 1.9em;
+  padding-top: 25px;
+  text-align: center;
+}
+
 .btn.outline {
   background: none;
   padding: 12px 22px;
