@@ -20,7 +20,18 @@
             <%= image_tag upload.file_name.square, class: "img-responsive" %>
           <% end %>          
           <div class="caption">
-            <h3><%= posting.product.name %></h3>
+            <div class="truncated-text-line producer-name-font">
+              <%= posting.user.farm_name %>
+            </div>
+            <div class="truncated-text-line">
+              <%= posting.product.name %>
+            </div>
+            <div class="truncated-text-line">
+              <%= posting.description %>
+            </div>
+            <div class="truncated-text-line">
+              <strong><%= "#{number_to_currency(posting.price)} / #{posting.unit.name}" %></strong>        
+            </div>
           </div>
         <% end %>
       </div>
