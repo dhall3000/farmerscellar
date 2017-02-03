@@ -1,6 +1,61 @@
 $(function()
 { 
 
+  $('#this-week').change(function(){
+
+    if ($('.next-week').is(':visible')) {      
+      $('.next-week').fadeOut('fast', function() {
+        $('.this-week').fadeIn('fast', function() {
+        });
+      });
+    }
+
+    if ($('.future').is(':visible')) {
+      $('.future').fadeOut('fast', function() {
+        $('.this-week').fadeIn('fast', function() {
+        });
+      });
+    }    
+
+  });
+
+  $('#next-week').change(function(){
+
+    if ($('.this-week').is(':visible')) {
+      $('.this-week').fadeOut('fast', function() {
+        $('.next-week').fadeIn('fast', function() {
+        });
+      });
+    }
+
+
+    if ($('.future').is(':visible')) {
+      $('.future').fadeOut('fast', function() {
+        $('.next-week').fadeIn('fast', function() {
+        });
+      });
+    }
+
+  });
+
+  $('#future').change(function(){
+
+    if ($('.this-week').is(':visible')) {
+      $('.this-week').fadeOut('fast', function() {
+        $('.future').fadeIn('fast', function() {
+        });
+      });
+    }
+
+    if ($('.next-week').is(':visible')) {
+      $('.next-week').fadeOut('fast', function() {
+        $('.future').fadeIn('fast', function() {
+        });
+      });
+    }
+
+  });
+
   function toggleImportantNotesTruncation(e) {    
     $('#importantNotes').toggleClass('truncated-text-line');
   }

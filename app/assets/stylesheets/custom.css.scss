@@ -23,15 +23,19 @@ $fc-primary-color: #AACB4F;
 }
 
 .btn-primary.outline:hover, .btn-primary.outline:focus {
+  opacity: 0.6;
   color: white;
   background-color: $fc-primary-color;
-  border-color: $fc-primary-color;
-  opacity: 0.6;  
+  border-color: $fc-primary-color;  
   box-shadow: none;
 }
 
 .btn-primary.outline:active, .btn-primary.outline.active, .btn-primary.outline:active:focus {
   opacity: 0.8;
+  color: white;
+  background-color: $fc-primary-color;
+  border-color: $fc-primary-color;
+  box-shadow: none;
 }
 
 /* universal */
@@ -122,6 +126,10 @@ p {
   color: $gray-light;
   padding-top: 15px;
   padding-bottom: 15px;
+}
+
+.display-none {
+  display: none;
 }
 
 #headerIcon {

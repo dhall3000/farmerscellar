@@ -308,10 +308,19 @@ posting_chicken = Posting.create(live: true, delivery_date: next_friday, order_c
 posting_oranges = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_oranges.id, price: 1.25, user_id: f4.id, unit_id: 8, description: "product attribute x, y & z", description_body: "best oranges ever!")
 #Celery
 posting_celery = Posting.create(product_id_code: "ZXB-9F", units_per_case: 10, live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_celery.id, price: 1.00, user_id: f4.id, unit_id: 8, description: "product attribute x, y & z", description_body: "best celery ever!")
+upload = Upload.create(file_name: File.open(File.join("/home/david/fc/website/assets", "celery.jpg")))
+posting_celery.uploads << upload
+posting_celery.save
 #Avocado
 posting_avocado = Posting.create(live: true, delivery_date: next_friday + 7.days, order_cutoff: Time.zone.today - 2.days, product_id: product_avocado.id, price: 2.29, user_id: f4.id, unit_id: whole.id, description: "product attribute x, y & z", description_body: "best avocado ever!")
+upload = Upload.create(file_name: File.open(File.join("/home/david/fc/website/assets", "avocado.png")))
+posting_avocado.uploads << upload
+posting_avocado.save
 #Basil
 posting_basil = Posting.create(live: true, delivery_date: next_friday + 14.days, order_cutoff: Time.zone.today - 2.days, product_id: product_basil.id, price: 2.97, user_id: f4.id, unit_id: bunch.id, unit_body: "A 'bunch' is about as much as you can grab with one handful", description: "product attribute x, y & z", description_body: "best basil ever!")
+upload = Upload.create(file_name: File.open(File.join("/home/david/fc/website/assets", "basil.jpg")))
+posting_basil.uploads << upload
+posting_basil.save
 
 develop_creditor_orders_controller = false
 

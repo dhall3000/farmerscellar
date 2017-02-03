@@ -54,14 +54,42 @@
   <% end %>
 <% end %>
 
+<div id="delivery-time-buttons" class="btn-group btn-group-justified" data-toggle="buttons">
+  
+  <% if @this_weeks_postings.any? %>
+    <label class="btn btn-primary outline active">
+      <input type="radio" name="options" id="this-week" autocomplete="off" checked> This Week
+    </label>
+  <% end %>
+
+  <% if @next_weeks_postings.any? %>
+    <label class="btn btn-primary outline">
+      <input type="radio" name="options" id="next-week" autocomplete="off"> Next Week
+    </label>
+  <% end %>
+
+  <% if @future_postings.any? %>
+    <label class="btn btn-primary outline">
+      <input type="radio" name="options" id="future" autocomplete="off"> Future
+    </label>
+  <% end %>
+
+</div>
+
 <% if @this_weeks_postings.any? %>
-  <%= render partial: 'postings', locals: { heading: "This Week", postings: @this_weeks_postings, collapse: false } %>
+  <div class="row this-week">
+    <%= render partial: 'posting_thumbnails', locals: { postings: @this_weeks_postings } %>
+  </div>  
 <% end %>
 
 <% if @next_weeks_postings.any? %>
-  <%= render partial: 'postings', locals: { heading: "Next Week", postings: @next_weeks_postings, collapse: @this_weeks_postings.any? } %>
+  <div class="row next-week <%= 'display-none' if @this_weeks_postings.any? %>">
+    <%= render partial: 'posting_thumbnails', locals: { postings: @next_weeks_postings } %>
+  </div>  
 <% end %>
 
 <% if @future_postings.any? %>
-  <%= render partial: 'postings', locals: { heading: "Distant Future", postings: @future_postings, collapse: @this_weeks_postings.any? || @next_weeks_postings.any? } %>
+  <div class="row future <%= 'display-none' if @this_weeks_postings.any? || @next_weeks_postings.any? %>">
+    <%= render partial: 'posting_thumbnails', locals: { postings: @future_postings } %>
+  </div>  
 <% end %>
