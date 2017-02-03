@@ -54,27 +54,29 @@
   <% end %>
 <% end %>
 
-<div id="delivery-time-buttons" class="btn-group btn-group-justified" data-toggle="buttons">
-  
-  <% if @this_weeks_postings.any? %>
-    <label class="btn btn-primary outline active">
-      <input type="radio" name="options" id="this-week" autocomplete="off" checked> This Week
-    </label>
-  <% end %>
+<% if display_delivery_range_buttons?(@this_weeks_postings, @next_weeks_postings, @future_postings) %>
+  <div id="delivery-time-buttons" class="btn-group btn-group-justified" data-toggle="buttons">
+    
+    <% if @this_weeks_postings.any? %>
+      <label class="btn btn-primary outline active">
+        <input type="radio" name="options" id="this-week" autocomplete="off" checked> This Week
+      </label>
+    <% end %>
 
-  <% if @next_weeks_postings.any? %>
-    <label class="btn btn-primary outline">
-      <input type="radio" name="options" id="next-week" autocomplete="off"> Next Week
-    </label>
-  <% end %>
+    <% if @next_weeks_postings.any? %>
+      <label class="btn btn-primary outline <%= 'active' if !@this_weeks_postings.any? %>">
+        <input type="radio" name="options" id="next-week" autocomplete="off"> Next Week
+      </label>
+    <% end %>
 
-  <% if @future_postings.any? %>
-    <label class="btn btn-primary outline">
-      <input type="radio" name="options" id="future" autocomplete="off"> Future
-    </label>
-  <% end %>
+    <% if @future_postings.any? && (@this_weeks_postings.any? || @next_weeks_postings.any?) %>
+      <label class="btn btn-primary outline">
+        <input type="radio" name="options" id="future" autocomplete="off"> Future
+      </label>
+    <% end %>
 
-</div>
+  </div>
+<% end %>
 
 <% if @this_weeks_postings.any? %>
   <div class="this-week">

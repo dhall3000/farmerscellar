@@ -1,5 +1,25 @@
 module PostingsHelper
 
+  def display_delivery_range_buttons?(this_weeks_postings, next_weeks_postings, future_postings)
+
+    count = 0
+
+    if this_weeks_postings.any?
+      count += 1
+    end
+
+    if next_weeks_postings.any?
+      count += 1
+    end
+
+    if future_postings.any?
+      count += 1
+    end
+
+    return count > 1
+
+  end
+
   def get_delivery_range_schedule_text(postings)
 
     if postings.nil? || !postings.any?
