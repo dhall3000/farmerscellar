@@ -1,5 +1,30 @@
 module PostingsHelper
 
+  def get_top_down_ancestors(food_category, include_self)
+
+    food_category_ancestors = []
+
+    if food_category.nil?
+      return food_category_ancestors
+    end
+
+    if include_self
+      ancestor = food_category
+    else
+      ancestor = food_category.parent
+    end    
+
+    while ancestor
+      food_category_ancestors << ancestor
+      ancestor = ancestor.parent
+    end
+
+    food_category_ancestors.reverse!
+
+    return food_category_ancestors
+
+  end
+
   def display_delivery_range_buttons?(this_weeks_postings, next_weeks_postings, future_postings)
 
     count = 0

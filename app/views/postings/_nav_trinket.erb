@@ -1,0 +1,27 @@
+<% #grab params from local_assigns
+  food_category = local_assigns[:food_category]
+  include_self = local_assigns[:include_self]
+%>
+
+<% 
+food_category_ancestors = get_top_down_ancestors(food_category, include_self)
+if food_category_ancestors.any?
+%>
+  <div class="row">
+    <div class="col-xs-12">
+
+      <%= link_to "Home", root_path, class: "food-category-nav non-blue" %>
+      <%
+        index = 1
+        while index < food_category_ancestors.count
+      %>            
+          <span class="food-category-nav"><%= "/ " %></span>
+          <%= link_to food_category_ancestors[index].name, postings_path(food_category: food_category_ancestors[index].name), class: "food-category-nav non-blue" %>
+      <%
+          index += 1
+        end
+      %>
+
+    </div>
+  </div>
+<% end %>
