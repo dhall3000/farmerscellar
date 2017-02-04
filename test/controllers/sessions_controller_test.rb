@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'integration_helper'
 
-class SessionsControllerTest < ActionDispatch::IntegrationTest
+class SessionsControllerTest < IntegrationHelper
 
   test "should spoof user if admin logged in" do
     spoof_user
@@ -31,8 +31,10 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
     spoof_user
     get sessions_unspoof_path
+    assert_response :redirect
+    assert_redirected_to users_path
     follow_redirect!
-    assert_template 'static_pages/home'
+    assert_template 'users/index'
     assert_not flash.empty?
     assert_equal "All done spoofing", flash[:success]
     current_user = assigns(:current_user)
@@ -61,15 +63,20 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
   def spoof_user
 
+    c1 = users(:c1)
+    get_access_for(c1)
+
     #log in as admin
     admin = users(:a1)
+    get_access_for(admin)
     assert admin
     log_in_as(admin)
     #spoof user
-    c1 = users(:c1)
     post sessions_spoof_path, params: {email: c1.email}
+    assert_response :redirect
+    assert_redirected_to c1
     follow_redirect!
-    assert_template 'static_pages/home'
+    assert_template 'users/show'
 
     assert_select 'div#spoofBanner', "Spoofing user #{c1.email}"
     current_user = assigns(:current_user)

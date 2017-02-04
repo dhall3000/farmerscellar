@@ -125,7 +125,8 @@ class PostingsControllerTest < IntegrationHelper
     log_in_as(users(:a1))
     post sessions_spoof_path, params: {email: "f1@f.com"}
     assert_equal "Now spoofing user f1@f.com", flash[:success]
-    assert_redirected_to root_url
+    f1 = User.find_by(email: "f1@f.com")
+    assert_redirected_to f1
 
     get new_posting_path
     assert_response :success
@@ -167,7 +168,8 @@ class PostingsControllerTest < IntegrationHelper
     log_in_as(users(:a1))
     post sessions_spoof_path, params: {email: "f1@f.com"}
     assert_equal "Now spoofing user f1@f.com", flash[:success]
-    assert_redirected_to root_url
+    f1 = User.find_by(email: "f1@f.com")
+    assert_redirected_to f1
 
     get new_posting_path
     assert_response :success
