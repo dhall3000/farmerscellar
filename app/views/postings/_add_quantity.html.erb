@@ -1,91 +1,41 @@
-  <div class="row gutter-10" style="padding-top: 20px;">
-    <div class="col-sm-3">      
-    </div>
-    
-    <%
-    quantities = [1,2,3]
-    quantities.each do |quantity |
-    %>  
-      <div class="col-xs-4 col-sm-2">
+<div class="row gutter-10">
+  <%
+  quantities = [1,2,3]
+  quantities.each do |quantity |
+  %>  
+    <div class="col-xs-4">
+      <div class="add-quantity-button-row-spacing">
         <%= form_tag tote_items_path do %>                                          
           <%= hidden_field_tag :quantity, quantity %>
           <%= hidden_field_tag :posting_id, posting.id %>          
           <%= submit_tag "+#{quantity.to_s}", class: "btn btn-primary outline btn-lg" %>
         <% end %>
-      </div>
-    <% end %>    
-  </div>
+      </div>      
+    </div>
+  <% end %>    
+</div>
 
-<div style="padding-top: 15px;" data-toggle="collapse" data-target="#moreQuantitiesBody">
-  <p class="text-center">More quantities <span id="moreQuantitiesChevron" class="glyphicon glyphicon-chevron-down"></span></p>  
+<div class="row gutter-10" data-toggle="collapse" data-target="#moreQuantitiesBody">
+  <div class="col-xs-12">
+    <div class="text-center add-quantity-button-row-spacing">More quantities <span id="moreQuantitiesChevron" class="glyphicon glyphicon-chevron-down"></span></div>  
+  </div>
 </div>
 
 <div id="moreQuantitiesBody" class="collapse" data-chevron="#moreQuantitiesChevron">
 
-  <div class="row gutter-10" style="padding-bottom: 20px;">
-    <div class="col-sm-3">      
-    </div>
+  <div class="row gutter-10">
     <%
-    quantities = [4,5,6]
+    quantities = [4,5,6,7,8,9,10,15,20,30,40,50]
     quantities.each do |quantity |
     %>  
-      <div class="col-xs-4 col-sm-2">
-        <%= form_tag tote_items_path do %>                                          
-          <%= hidden_field_tag :quantity, quantity %>
-          <%= hidden_field_tag :posting_id, posting.id %>          
-          <%= submit_tag "+#{quantity.to_s}", class: "btn btn-primary outline btn-lg" %>
-        <% end %>
-      </div>
-    <% end %>
-  </div>
-  
-  <div class="row gutter-10" style="padding-bottom: 20px;">
-    <div class="col-sm-3">      
-    </div>
-    <%
-    quantities = [7,8,9]
-    quantities.each do |quantity |
-    %>  
-      <div class="col-xs-4 col-sm-2">
-        <%= form_tag tote_items_path do %>                                          
-          <%= hidden_field_tag :quantity, quantity %>
-          <%= hidden_field_tag :posting_id, posting.id %>          
-          <%= submit_tag "+#{quantity.to_s}", class: "btn btn-primary outline btn-lg" %>
-        <% end %>
-      </div>
-    <% end %>
-  </div>
-
-  <div class="row gutter-10" style="padding-bottom: 20px;">
-    <div class="col-sm-3">      
-    </div>
-    <%
-    quantities = [10,15,20]
-    quantities.each do |quantity |
-    %>  
-      <div class="col-xs-4 col-sm-2">
-        <%= form_tag tote_items_path do %>                                          
-          <%= hidden_field_tag :quantity, quantity %>
-          <%= hidden_field_tag :posting_id, posting.id %>          
-          <%= submit_tag "+#{quantity.to_s}", class: "btn btn-primary outline btn-lg" %>
-        <% end %>
-      </div>
-    <% end %>
-  </div>
-
-  <div class="row gutter-10" style="padding-bottom: 20px;">
-    <div class="col-sm-3">      
-    </div>
-    <%
-    quantities = [30,40,50]
-    quantities.each do |quantity |
-    %>  
-      <div class="col-xs-4 col-sm-2">
-        <%= form_tag tote_items_path do %>                                          
-          <%= hidden_field_tag :quantity, quantity %>
-          <%= hidden_field_tag :posting_id, posting.id %>          
-          <%= submit_tag "+#{quantity.to_s}", class: "btn btn-primary outline btn-lg" %>
-        <% end %>
+      <div class="col-xs-4">
+        <div class="add-quantity-button-row-spacing">
+          <%= form_tag tote_items_path do %>                                          
+            <%= hidden_field_tag :quantity, quantity %>
+            <%= hidden_field_tag :posting_id, posting.id %>          
+            <%= submit_tag "+#{quantity.to_s}", class: "btn btn-primary outline btn-lg" %>
+          <% end %>
+        </div>        
       </div>
     <% end %>
   </div>

@@ -1,6 +1,8 @@
 @import "bootstrap-sprockets";
 @import "bootstrap";
 
+html {overflow-y: scroll;}
+
 /* mixins, variables, etc. */
 
 $gray-medium-light: #eaeaea;
@@ -12,10 +14,8 @@ $fc-primary-color: #AACB4F;
   box-sizing:         border-box;
 }
 
-.selected-food {
-  font-size: 1.9em;
+.add-quantity-button-row-spacing {
   padding-top: 25px;
-  text-align: center;
 }
 
 .btn.outline {

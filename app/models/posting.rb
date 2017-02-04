@@ -40,6 +40,10 @@ class Posting < ApplicationRecord
   validate :commission_is_set, on: :create
   before_create :delivery_date_must_be_after_today  
 
+  def food_category
+    return product.food_category
+  end
+
   def self.close(postings_closeable)
 
     if postings_closeable && postings_closeable.any?

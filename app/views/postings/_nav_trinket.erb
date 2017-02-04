@@ -1,6 +1,7 @@
 <% #grab params from local_assigns
   food_category = local_assigns[:food_category]
   include_self = local_assigns[:include_self]
+  posting = local_assigns[:posting]
 %>
 
 <% 
@@ -20,7 +21,12 @@ if food_category_ancestors.any?
       <%
           index += 1
         end
+
+        if include_self && posting
       %>
+          <span class="food-category-nav"><%= "/ " %></span>
+          <%= link_to posting.product.name, posting, class: "food-category-nav non-blue" %>
+      <% end %>
 
     </div>
   </div>

@@ -1,8 +1,12 @@
+<% if @posting.food_category %>
+  <%= render partial: 'postings/nav_trinket', locals: { food_category: @posting.food_category, include_self: true, posting: @posting } %>
+<% end %>
+
 <h1>How Often?</h1>
 
 <% if @display_vanilla_just_once_option %>
   <div class="row">
-    <div class="col-xs-10 col-sm-offset-4 col-sm-3">
+    <div class="col-xs-10 col-sm-offset-4 col-sm-5">
       <div>
         <%= form_tag tote_items_path do %>
           <%= hidden_field_tag :frequency, @subscription_create_options[0][:subscription_frequency] %>
@@ -24,7 +28,7 @@
     </div>
   </div>
   <div id="justOnceInfo" class="row collapse" data-chevron="#justOnceInfoChevron">
-    <div class="col-xs-10 col-sm-offset-4 col-sm-3">    
+    <div class="col-xs-10 col-sm-offset-4 col-sm-5">    
       <span>This places an order for delivery on <%= @posting.delivery_date.strftime("%A %b %d") %>. If it does not fill on that date this order will automatically be canceled.</span>    
     </div>
   </div>
@@ -36,7 +40,7 @@
 
 
 <div class="row">
-  <div class="col-xs-10 col-sm-offset-4 col-sm-3">
+  <div class="col-xs-10 col-sm-offset-4 col-sm-5">
     <div>
       <%= form_tag subscriptions_path do %>
         <%= hidden_field_tag :frequency, @subscription_create_options[0][:subscription_frequency] %>
@@ -59,7 +63,7 @@
   </div>
 </div>
 <div id="justOnceRTFInfo" class="row collapse" data-chevron="#justOnceRTFInfoChevron">
-  <div class="col-xs-10 col-sm-offset-4 col-sm-3">    
+  <div class="col-xs-10 col-sm-offset-4 col-sm-5">    
     <span>This places an order for delivery on <%= @posting.delivery_date.strftime("%A %b %d") %>. If it does not fill on that date we will keep rolling the order to the next delivery date until it fills.</span>
   </div>
 </div>
@@ -74,7 +78,7 @@
 %>
 
   <div class="row">
-    <div class="col-xs-10 col-sm-offset-4 col-sm-3 fat-finger-spacing">
+    <div class="col-xs-10 col-sm-offset-4 col-sm-5 fat-finger-spacing">
       <%= form_tag subscriptions_path do %>
         <%= hidden_field_tag :frequency, subscription_create_option[:subscription_frequency] %>
         <%= hidden_field_tag :quantity, @quantity %>

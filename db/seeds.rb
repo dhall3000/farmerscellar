@@ -215,6 +215,16 @@ upload = Upload.create(file_name: File.open(File.join("/home/david/fc/website/as
 veggies.uploads << upload
 veggies.save
 
+nuts = FoodCategory.create(name: "Nuts", parent: produce)
+upload = Upload.create(file_name: File.open(File.join("/home/david/fc/website/assets", "nuts.jpg")))
+nuts.uploads << upload
+nuts.save
+
+seeds = FoodCategory.create(name: "Seeds", parent: produce)
+upload = Upload.create(file_name: File.open(File.join("/home/david/fc/website/assets", "seeds.jpg")))
+seeds.uploads << upload
+seeds.save
+
 dairy = FoodCategory.create(name: "Dairy", parent: shop)
 upload = Upload.create(file_name: File.open(File.join("/home/david/fc/website/assets", "dairy.jpg")))
 dairy.uploads << upload

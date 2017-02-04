@@ -5,15 +5,8 @@
   <%= render partial: 'nav_trinket', locals: { food_category: @food_category, include_self: false } %>
 
   <div class="row">
-    <div class="col-xs-12">
-      <div class="selected-food">
-        <%= @food_category.name %>        
-      </div>
-      <% if @food_category.uploads.last %>
-        <div class="thumbnail">        
-          <%= image_tag "#{@food_category.uploads.last.file_name.square}", class: "img-responsive" %>        
-        </div>
-      <% end %>
+    <div class="col-xs-12 col-sm-offset-3 col-sm-6">
+      <h1><%= @food_category.name %></h1>
     </div>
   </div>
 
