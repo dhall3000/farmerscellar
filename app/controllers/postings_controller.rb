@@ -36,35 +36,14 @@ class PostingsController < ApplicationController
     #this is the upcoming sunday at midnight
     next_week_start = start_of_next_week    
     next_week_end = next_week_start + 7.days
-    limit = 10
-
-    products_under = Product.none
-    products_at = Product.none
-    
+            
     if @food_category
+      
+      products = @food_category.products
 
-      products_under = @food_category.products_under
-      products_at = @food_category.products
-      if products_under        
-        products = products_at.or(products_under)        
-      else
-        products = products_at
-      end
-
-      @this_weeks_postings = get_postings(products_at, Time.zone.now.midnight, next_week_start)
-      if !@this_weeks_postings.any?
-        @this_weeks_postings = get_postings(products_under, Time.zone.now.midnight, next_week_start, limit)
-      end
-
-      @next_weeks_postings = get_postings(products_at, next_week_start, next_week_end)
-      if !@next_weeks_postings.any?
-        @next_weeks_postings = get_postings(products_under, next_week_start, next_week_end, limit)
-      end
-
-      @future_postings = get_postings(products_at, next_week_end, next_week_end + 10.years)
-      if !@future_postings.any?
-        @future_postings = get_postings(products_under, next_week_end, next_week_end + 10.years, limit)
-      end
+      @this_weeks_postings = get_postings(products, Time.zone.now.midnight, next_week_start)
+      @next_weeks_postings = get_postings(products, next_week_start, next_week_end)
+      @future_postings = get_postings(products, next_week_end, next_week_end + 10.years)
 
     else      
       redirect_to root_path
