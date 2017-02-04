@@ -13,28 +13,22 @@
 </div>
 
 <div class="row">
-	<div class="col-xs-8 col-xs-offset-2 col-sm-4 col-sm-offset-4">
-
-		<div class="dropsite_question_mark">
-		  <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#helpBody" aria-expanded="false" aria-controls="helpBody">
-		    ?
-		  </a>
-		</div>
-
+	<div class="col-xs-8 col-xs-offset-2 col-sm-4 col-sm-offset-4" data-toggle="collapse" data-target="#helpBody">
+    <div class="text-center">
+      <span class="dropsite_question_mark">?</span>
+      <span id="helpBodyChevron" class="glyphicon glyphicon-chevron-down"></span>          
+    </div>    
 	</div>
 </div>
 
-
 <div class="row">
-	<div class="col-xs-8 col-xs-offset-2 col-sm-4 col-sm-offset-4">
-		<div id="accordion" role="tablist" aria-multiselectable="true">
-			<div id="helpBody" class="panel-collapse collapse" role="tabpanel">
-				<ul class="list-group">
-					<li class="list-group-item">
-						<p>Hint: fetch your pickup code from any delivery notification email</p>
-					</li>
-				</ul>		      
-			</div>
-		</div>
+	<div class="col-xs-8 col-xs-offset-2 col-sm-4 col-sm-offset-4">		
+		<div id="helpBody" class="collapse" data-chevron="#helpBodyChevron">
+			<ul class="list-group">
+				<li class="list-group-item">
+					<p>Hint: fetch your pickup code from any delivery notification email</p>
+				</li>
+			</ul>		      
+		</div>		
 	</div>
 </div>
