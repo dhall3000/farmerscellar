@@ -51,8 +51,8 @@ module PostingsHelper
       return nil
     end
 
-    first = postings.order(delivery_date: :asc).first.delivery_date
-    last = postings.order(delivery_date: :asc).last.delivery_date
+    first = postings.order(delivery_date: :desc).first.delivery_date
+    last = postings.order(delivery_date: :desc).last.delivery_date
 
     if first == last
       return "Delivery scheduled #{friendly_date(first)}"
