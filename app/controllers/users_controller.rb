@@ -14,6 +14,7 @@ class UsersController < ApplicationController
 
   def index
     @users = User.paginate(page: params[:page])
+    @producers = User.where(account_type: User.types[:PRODUCER]).order(:farm_name)
   end
 
   def new

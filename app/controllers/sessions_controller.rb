@@ -23,7 +23,7 @@ class SessionsController < ApplicationController
     log_in user
 
     flash[:success] = "Now spoofing user #{user.email}"
-    redirect_to root_url
+    redirect_to user
 
   end
 
@@ -38,7 +38,7 @@ class SessionsController < ApplicationController
     log_in User.find(session[:spoofing_admin_id])
     session[:spoofing_admin_id] = nil
     flash[:success] = "All done spoofing"
-    redirect_to root_url
+    redirect_to users_path
 
   end
 
