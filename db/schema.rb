@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170206235847) do
+ActiveRecord::Schema.define(version: 20170207205513) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -252,6 +252,13 @@ ActiveRecord::Schema.define(version: 20170206235847) do
     t.string   "ip_address"
   end
 
+  create_table "emails", force: :cascade do |t|
+    t.string   "subject",    null: false
+    t.text     "body",       null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "food_categories", force: :cascade do |t|
     t.string   "name",       null: false
     t.datetime "created_at", null: false
@@ -348,6 +355,15 @@ ActiveRecord::Schema.define(version: 20170206235847) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_pickups_on_user_id"
+  end
+
+  create_table "posting_emails", force: :cascade do |t|
+    t.integer  "posting_id"
+    t.integer  "email_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email_id"], name: "index_posting_emails_on_email_id"
+    t.index ["posting_id"], name: "index_posting_emails_on_posting_id"
   end
 
   create_table "posting_recurrences", force: :cascade do |t|

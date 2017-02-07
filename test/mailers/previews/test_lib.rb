@@ -217,6 +217,28 @@ module TestLib
 
   end
 
+  def create_email(subject = nil, body = nil, postings = nil)
+
+    if subject.nil?
+      subject = "hello subject"
+    end
+
+    if body.nil?
+      body = "hello body"
+    end
+
+    if postings.nil?
+      postings = [create_posting]
+    end
+
+    email = Email.new(subject: subject, body: body, postings: postings)
+
+    assert email.save
+
+    return email
+
+  end
+
   def create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
 
     if order_cutoff && delivery_date

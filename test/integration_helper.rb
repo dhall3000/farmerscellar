@@ -231,6 +231,10 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     follow_redirect!
   end
 
+  def log_out
+    delete logout_path
+  end
+
   def go_to_delivery_day_and_fill_posting(posting, quantity = nil)
     
     travel_to posting.delivery_date + 12.hours

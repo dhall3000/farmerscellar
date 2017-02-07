@@ -1015,10 +1015,11 @@ class SubscriptionsTest < IntegrationHelper
       assert_equal distance_of_time_in_words((7 * posting_frequency * subscription_frequency).days), distance_of_time_in_words(actual_tote_items_gap)      
       assert actual_tote_item_postings_gap > 7.days
     elsif posting_frequency == 5
-      expected_tote_items_gap_lo = (28 * subscription_frequency).days
+      expected_tote_items_gap_lo = (28 * subscription_frequency).days      
       expected_tote_items_gap_hi = (37 * subscription_frequency).days
 
-      assert actual_tote_items_gap >= expected_tote_items_gap_lo
+      #put in a '- 3600.seconds' to account for daylight savings math. ugh.
+      assert actual_tote_items_gap >= (expected_tote_items_gap_lo - 3600.seconds)
       assert actual_tote_items_gap <= expected_tote_items_gap_hi
     else
       assert false, "incorrect posting_frequency"

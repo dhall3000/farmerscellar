@@ -1,0 +1,43 @@
+<%
+  check_box_column_header_text = local_assigns[:check_box_column_header_text]
+  show_producer = local_assigns[:show_producer]
+  if show_producer.nil?
+    show_producer = true
+  end
+  postings = local_assigns[:postings]
+  default_checked_state = local_assigns[:default_checked_state]
+%>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th class="text-center"><%= check_box_column_header_text %></th>
+      <% if show_producer %>
+        <th class="text-center">Producer</th>
+      <% end %>
+      <th class="text-center">Product</th>
+      <th class="text-center">Units</th>
+      <th class="text-center">Posted Delivery Date</th>
+    </tr>
+  </thead>
+  <tbody>
+
+    <% postings.each do |posting| %>
+      <tr>
+        <td>
+          <% if default_checked_state %>
+            <%= check_box_tag "posting_ids[]", posting.id, checked: default_checked_state %>
+          <% else %>
+            <%= check_box_tag "posting_ids[]", posting.id %>
+          <% end %>
+        </td>
+        <% if show_producer %>
+          <td class="text-center"><%= User.find_by(id: posting.user_id).farm_name %></td>
+        <% end %>
+        <td class="text-center"><%= Product.find_by(id: posting.product_id).name %></td>
+        <td class="text-center"><%= posting.unit.name %></td>          
+        <td class="text-center"><%= posting.delivery_date.strftime("%a %b %d") %></td>                    
+      </tr>
+    <% end %>
+  </tbody>
+</table>  

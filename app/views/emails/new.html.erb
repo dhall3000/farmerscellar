@@ -1,0 +1,29 @@
+<% provide(:title, 'New email') %>
+
+<h1>New Email</h1>
+
+<div class="row">
+  <div class="col-xs-12 col-sm-offset-3 col-sm-6">
+
+    <%= form_for @email do |f| %>
+      <%= render partial: 'shared/error_messages_general', locals: { active_record_object: @email } %>
+      <%= f.label :subject %>
+      <%= f.text_field :subject, class: 'form-control' %>
+      <%= f.label :body %>
+      <%= f.text_area :body, class: 'form-control' %>
+
+      <% if @open_postings && @open_postings.any? %>
+        <h2>Open postings</h2>
+        <%= render partial: 'shared/postings_checkbox_table', locals: { check_box_column_header_text: "Send message to", show_producer: current_user.distributor?, postings: @open_postings } %>
+      <% end %>
+
+      <% if @committed_postings && @committed_postings.any? %>
+        <h2>Committed postings</h2>
+        <%= render partial: 'shared/postings_checkbox_table', locals: { check_box_column_header_text: "Send message to", show_producer: current_user.distributor?, postings: @committed_postings } %>
+      <% end %>
+
+      <%= f.submit "Send", class: "btn btn-primary outline" %>
+    <% end %>
+
+  </div>
+</div>
