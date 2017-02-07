@@ -354,13 +354,19 @@ input {
 
 a.non-blue { color: inherit; }
 
-#delivery-date-range-selection-got-it {
-  color: $fc-primary-color;
-  font-size: 1.5em;
-  animation: mytest 5s 1 forwards;
+.show-border-for-dev {
+  border-style: solid;
+  border-width: 1px;
 }
 
-@keyframes mytest {
+#delivery-date-range-selection-got-it {
+  padding-top: 5px;
+  color: $fc-primary-color;
+  font-size: 1.5em;
+  animation: got-it-spin-and-bounce 5s 1 forwards;
+}
+
+@keyframes got-it-spin-and-bounce {
   30% {    
     transform: rotate(1080deg);
   }

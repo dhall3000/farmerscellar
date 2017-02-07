@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170202184606) do
+ActiveRecord::Schema.define(version: 20170206235847) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -268,6 +268,14 @@ ActiveRecord::Schema.define(version: 20170202184606) do
     t.datetime "updated_at",       null: false
     t.index ["food_category_id"], name: "index_food_category_uploads_on_food_category_id"
     t.index ["upload_id"], name: "index_food_category_uploads_on_upload_id"
+  end
+
+  create_table "got_its", force: :cascade do |t|
+    t.integer  "user_id"
+    t.boolean  "delivery_date_range_selection"
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+    t.index ["user_id"], name: "index_got_its_on_user_id"
   end
 
   create_table "nightly_task_runs", force: :cascade do |t|

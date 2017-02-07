@@ -36,6 +36,7 @@ Rails.application.routes.draw do
   get 'partner_users/index'
   post 'partner_users/create'
   post 'partner_users/send_delivery_notification'
+  get 'postings/delivery_date_range_selection_got_it'
 
   resources :uploads
   resources :food_categories
@@ -49,7 +50,7 @@ Rails.application.routes.draw do
   resources :users
   resources :account_activations, only: [:new, :create, :edit]
   resources :password_resets,     only: [:new, :create, :edit, :update]
-  resources :postings
+  resources :postings    
   resources :tote_items, only: [:index, :create, :destroy]
   resources :authorizations, only: [:new, :create]
   resources :checkouts, only: [:create]

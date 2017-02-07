@@ -33,6 +33,7 @@ class User < ApplicationRecord
   has_one :access_code
   has_one :pickup_code
   has_one :setting
+  has_one :got_it
 
   #how do the producer/distributor stuff work: it used to be the distributors were 100% not producers and vice versa. but
   #that got changed. now a producer can be by itself or it can have a parent producer. this also is a bit of a hack.

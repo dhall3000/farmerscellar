@@ -1,5 +1,5 @@
 class PostingsController < ApplicationController
-  before_action :logged_in_user, only: [:new, :create, :edit, :update]
+  before_action :logged_in_user, only: [:new, :create, :edit, :update, :delivery_date_range_selection_got_it]
   before_action :redirect_to_root_if_not_producer, only: [:new, :create, :edit, :update]
   
   def new  	
@@ -48,6 +48,19 @@ class PostingsController < ApplicationController
     else      
       redirect_to root_path
     end
+
+  end
+
+  def delivery_date_range_selection_got_it
+
+    if current_user
+      if current_user.got_it.nil?
+        current_user.create_got_it
+      end
+      current_user.got_it.update(delivery_date_range_selection: true)
+    end
+
+    redirect_to request.referer
 
   end
 
