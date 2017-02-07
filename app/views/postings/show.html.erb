@@ -25,7 +25,17 @@
           <div class="carousel-inner" role="listbox">
             <% @posting.uploads.each do |upload| %>
               <div class="item <%= 'active' if upload == @posting.uploads.first %>">
-                <%= image_tag "#{upload.file_name.large}", class: "img-responsive" %>
+                <%
+                  #sometimes all we can find by way of product image is a tiny thumb. in that case it appears that the 'large' ImageUploader process
+                  #doesn't modify the size. so when you're here if you just unconditionally use .large you'll sometimes see a carousel with huge
+                  #whitespace and a tiny thumb. looks really bad. so we're here saying to get whichever is larger, .large or .square.
+                  if upload.file_name.large.size > upload.file_name.square.size
+                    image = upload.file_name.large
+                  else
+                    image = upload.file_name.square
+                  end
+                %>
+                <%= image_tag "#{image}", class: "img-responsive" %>
               </div>
             <% end %>    
           </div>
