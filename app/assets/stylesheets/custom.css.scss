@@ -18,6 +18,19 @@ $fc-primary-color: #AACB4F;
   padding-top: 25px;
 }
 
+.btn-primary.got-it,
+.btn-primary.got-it:hover,
+.btn-primary.got-it:focus,
+.btn-primary.got-it:active,
+.btn-primary.got-it.active,
+.btn-primary.got-it:active:focus
+{  
+  color: white;
+  background-color: $fc-primary-color;
+  border-color: $fc-primary-color;  
+  opacity: 0.7;
+}
+
 .btn.outline {
   background: none;
   padding: 12px 22px;
@@ -360,37 +373,55 @@ a.non-blue { color: inherit; }
 }
 
 #delivery-date-range-selection-got-it {
+  margin-right: 5px;
+  margin-bottom: 25px;
   padding-top: 5px;
   color: $fc-primary-color;
   font-size: 1.5em;
-  animation: got-it-spin-and-bounce 5s 1 forwards;
+  animation: got-it-spin-and-bounce 8s infinite forwards;
 }
 
 @keyframes got-it-spin-and-bounce {
-  30% {    
-    transform: rotate(1080deg);
+  0% {  
+  transform: rotate(0deg);  
+  }
+  20% {
+  transform: rotate(1080deg);
+  }
+  25% {
+  transform: translateY(20px);  
+  }
+  30% {
+  transform: translateY(0px);
+  }
+  35% {
+  transform: translateY(20px);
   }
   40% {
-   transform: translateY(-20px);
+  transform: translateY(0px);
+  }
+  45% {
+  transform: translateY(20px);
   }
   50% {
-   transform: translateY(0px);
+  transform: translateY(0px);
+  opacity: 1;
   }
   60% {
-   transform: translateY(-20px);
+  opacity: 0.5;  
   }
   70% {
-   transform: translateY(0px);   
+  opacity: 1;  
   }
   80% {
-   transform: translateY(-20px);   
-   opacity: 1;
+  opacity: 0.5;  
   }
-  95% {
-  
+  90% {
+  opacity: 1;
   }
   100% {
-   opacity: 0;
+  transform: rotate(1080deg);
+  opacity: 0.5;
   }
 }
 

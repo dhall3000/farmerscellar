@@ -39,22 +39,21 @@
 
 <% if display_delivery_range_buttons?(@this_weeks_postings, @next_weeks_postings, @future_postings) %>
 
-  <% if current_user.nil? || current_user.got_it.nil? || !current_user.got_it.delivery_date_range_selection %>
+  <% if current_user.nil? || current_user.got_it.nil? || current_user.got_it.delivery_date_range_selection.nil? || current_user.got_it.delivery_date_range_selection == false %>
     <div class="row">
-      <div class="col-xs-offset-8 col-xs-4">
-        <div class="row">
-          <div class="col-xs-offset-3 col-xs-3">
-            <div class="text-center" id="delivery-date-range-selection-got-it" style="padding-top: 5px;">
+      <div class="col-xs-offset-7 col-xs-5">
+        <div class="row">        
+          <div class="col-xs-12">
+            <span class="text-center pull-left" id="delivery-date-range-selection-got-it">
               <span class="glyphicon glyphicon glyphicon-hand-down"></span>
-            </div>
-          </div>
-          <div class="col-xs-6">
+            </span>
             <% if current_user %>
-              <div>
-                <%= link_to "Got it", postings_delivery_date_range_selection_got_it_path, class: "btn btn-primary outline" %>
-              </div>
+              <span>
+                <%= link_to "Got it!", postings_delivery_date_range_selection_got_it_path, class: "btn btn-primary got-it" %>
+              </span>
             <% end %>
           </div>
+
         </div>
       </div>
     </div>
