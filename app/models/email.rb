@@ -2,18 +2,18 @@ class Email < ApplicationRecord
   has_many :posting_emails
   has_many :postings, through: :posting_emails
 
+  has_many :email_recipients
+  has_many :recipients, through: :email_recipients, source: :user
+
   validates :subject, :body, presence: true
   validates_presence_of :postings
 
-  def get_to_list(tote_item_states = nil)
+  def get_recipients(tote_item_states = nil)
     #{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLED: 4, NOTFILLED: 5, REMOVED: 6}
-    #NOTE: as of now, ADDED and REMOVED are the only states that don't get an email. the reason for the ADDED
-    #is because i'm thinking if we have some snafu folks need to be aware of, for now what we'll do is send
-    #out an email, then put a .important_notes on the posting so that anybody adding will see the spinning
-    #blue info glyph. on the other hand, now that i'm thinking of it, the ADDED's might not see it because i
-    #don't think the tote displays the important_notes icon. anyway....
-    #TODO: the plan now is that tomorrow gets implemented a feature where checkboxes are added for the states so
-    #that user can state specifically who to contact
+    
+    if recipients.count > 0
+      return recipients
+    end
 
     if tote_item_states.nil?
       tote_item_states = [
@@ -25,10 +25,17 @@ class Email < ApplicationRecord
     end
 
     if ToteItem.valid_state_values?(tote_item_states)
-      return User.joins(tote_items: :posting).where(tote_items: {state: tote_item_states}).where(postings: {id: postings}).distinct    
-    else
-      return User.none
+      
+      to_users = User.joins(tote_items: :posting).where(tote_items: {state: tote_item_states}).where(postings: {id: postings}).distinct    
+      to_users.each do |user|
+        recipients << user
+      end
+
+      save
+    
     end
+
+    return recipients
 
   end
 

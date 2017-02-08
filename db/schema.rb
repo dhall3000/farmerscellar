@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170208215759) do
+ActiveRecord::Schema.define(version: 20170208231854) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -250,6 +250,15 @@ ActiveRecord::Schema.define(version: 20170208215759) do
     t.string   "state"
     t.integer  "zip"
     t.string   "ip_address"
+  end
+
+  create_table "email_recipients", force: :cascade do |t|
+    t.integer  "email_id"
+    t.integer  "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email_id"], name: "index_email_recipients_on_email_id"
+    t.index ["user_id"], name: "index_email_recipients_on_user_id"
   end
 
   create_table "emails", force: :cascade do |t|

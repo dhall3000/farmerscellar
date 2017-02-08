@@ -53,7 +53,7 @@ class EmailTest < ActiveSupport::TestCase
     assert email.valid?
     assert email.save
 
-    to_list = email.get_to_list
+    to_list = email.get_recipients
 
     assert_equal 3, to_list.count
     assert_equal 1, to_list.where(email: c1.email).count
@@ -96,7 +96,7 @@ class EmailTest < ActiveSupport::TestCase
     assert email.valid?
     assert email.save
 
-    to_list = email.get_to_list
+    to_list = email.get_recipients
 
     assert_equal 3, to_list.count
     assert_equal 1, to_list.where(email: c1.email).count
@@ -107,50 +107,6 @@ class EmailTest < ActiveSupport::TestCase
     assert_equal 1, posting1.emails.count
     assert_equal 1, posting2.emails.count
     assert_equal 0, posting3.emails.count    
-
-    #now verify that tote items in various states properly get in/excluded
-    #{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLED: 4, NOTFILLED: 5, REMOVED: 6}
-    ti = create_tote_item(c5, posting1, 1)
-    assert ti.state?(:ADDED)
-    ti.transition(:customer_removed)
-    assert ti.reload.state?(:REMOVED)
-
-    to_list = email.reload.get_to_list
-
-    assert_equal 3, to_list.count
-    assert_equal 1, to_list.where(email: c1.email).count
-    assert_equal 1, to_list.where(email: c2.email).count
-    assert_equal 1, to_list.where(email: c3.email).count
-    assert_equal 0, to_list.where(email: c4.email).count
-    assert_equal 0, to_list.where(email: c5.email).count
-
-    assert_equal 1, posting1.emails.count
-    assert_equal 1, posting2.emails.count
-    assert_equal 0, posting3.emails.count
-
-    ti.update(state: ToteItem.states[:ADDED])  
-    to_list = email.reload.get_to_list
-    assert_equal 0, to_list.where(email: c5.email).count
-
-    ti.update(state: ToteItem.states[:REMOVED])
-    to_list = email.reload.get_to_list
-    assert_equal 0, to_list.where(email: c5.email).count
-
-    ti.update(state: ToteItem.states[:AUTHORIZED])  
-    to_list = email.reload.get_to_list
-    assert_equal 1, to_list.where(email: c5.email).count
-
-    ti.update(state: ToteItem.states[:COMMITTED])  
-    to_list = email.reload.get_to_list
-    assert_equal 1, to_list.where(email: c5.email).count
-
-    ti.update(state: ToteItem.states[:FILLED])  
-    to_list = email.reload.get_to_list
-    assert_equal 1, to_list.where(email: c5.email).count
-
-    ti.update(state: ToteItem.states[:NOTFILLED])  
-    to_list = email.reload.get_to_list
-    assert_equal 1, to_list.where(email: c5.email).count
 
   end
 

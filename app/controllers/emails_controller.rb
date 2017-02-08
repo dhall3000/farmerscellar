@@ -61,7 +61,7 @@ class EmailsController < ApplicationController
 
     if @email.save
 
-      to_users_list = @email.get_to_list(tote_item_states)
+      to_users_list = @email.get_recipients(tote_item_states)
       to_users_list.each do |to_user|
         UserMailer.posting_alert(to_user, @email.subject, @email.body).deliver_now        
       end
