@@ -4,6 +4,9 @@ class Posting < ApplicationRecord
   belongs_to :unit
   belongs_to :posting_recurrence
 
+  has_many :posting_emails
+  has_many :emails, through: :posting_emails
+
   has_many :tote_items
   has_many :users, through: :tote_items
 

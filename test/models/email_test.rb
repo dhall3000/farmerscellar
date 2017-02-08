@@ -96,6 +96,10 @@ class EmailTest < ActiveSupport::TestCase
     assert_equal 1, to_list.where(email: c3.email).count
     assert_equal 0, to_list.where(email: c4.email).count
 
+    assert_equal 1, posting1.emails.count
+    assert_equal 1, posting2.emails.count
+    assert_equal 0, posting3.emails.count    
+
   end
 
 end
