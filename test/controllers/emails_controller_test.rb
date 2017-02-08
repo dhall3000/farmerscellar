@@ -99,7 +99,7 @@ class EmailsControllerTest < IntegrationHelper
     assert_response :success
     assert_template 'emails/new'
 
-    post emails_path, params: {email: {body: "mybody"}, posting_ids: [posting.id]}
+    post emails_path, params: {email: {body: "mybody"}, posting_ids: [posting.id], tote_item_states: [ToteItem.states[:ADDED]]}
     email = assigns(:email)
     assert_not email.valid?
     assert_not flash.empty?
@@ -122,7 +122,7 @@ class EmailsControllerTest < IntegrationHelper
     assert_response :success
     assert_template 'emails/new'
 
-    post emails_path, params: {email: {subject: "mysubject"}, posting_ids: [posting.id]}
+    post emails_path, params: {email: {subject: "mysubject"}, posting_ids: [posting.id], tote_item_states: [ToteItem.states[:ADDED]]}
     email = assigns(:email)
     assert_not email.valid?
     assert_not flash.empty?
@@ -144,7 +144,7 @@ class EmailsControllerTest < IntegrationHelper
     email = assigns(:email)
     assert_not email.valid?
     assert_not flash.empty?
-    assert_equal "You must specify at least one posting to send email to", flash[:danger]
+    assert_equal "Invalid tote item states selected", flash[:danger]
     assert_response :redirect
     assert_redirected_to producer
   end
@@ -169,7 +169,7 @@ class EmailsControllerTest < IntegrationHelper
     assert_response :success
     assert_template 'users/show'
 
-    post emails_path, params: {email: {subject: "mysubject", body: "mybody"}, posting_ids: [posting.id]}
+    post emails_path, params: {email: {subject: "mysubject", body: "mybody"}, posting_ids: [posting.id], tote_item_states: [ToteItem.states[:ADDED]]}
     email = assigns(:email)
     assert_not email.valid?
     assert_not flash.empty?
@@ -196,14 +196,14 @@ class EmailsControllerTest < IntegrationHelper
     assert_template 'users/show'
 
     ActionMailer::Base.deliveries.clear    
-    post emails_path, params: {email: {subject: "mysubject", body: "mybody"}, posting_ids: [posting.id]}
+    post emails_path, params: {email: {subject: "mysubject", body: "mybody"}, posting_ids: [posting.id], tote_item_states: [ToteItem.states[:AUTHORIZED]]}
     assert_equal 1, ActionMailer::Base.deliveries.count
     email = assigns(:email)
     assert email.valid?
     assert_not flash.empty?
     assert_equal "Email successfully sent", flash[:success]
     assert_response :redirect
-    assert_redirected_to emails_path
+    assert_redirected_to email
 
   end
 

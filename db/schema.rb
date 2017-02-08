@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170207205513) do
+ActiveRecord::Schema.define(version: 20170208215759) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -606,7 +606,7 @@ ActiveRecord::Schema.define(version: 20170207205513) do
   create_table "tote_items", force: :cascade do |t|
     t.integer  "quantity"
     t.float    "price"
-    t.integer  "state",           default: 0
+    t.integer  "state",           default: 9, null: false
     t.integer  "posting_id"
     t.datetime "created_at",                  null: false
     t.datetime "updated_at",                  null: false

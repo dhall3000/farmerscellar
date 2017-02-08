@@ -5,7 +5,7 @@ class Email < ApplicationRecord
   validates :subject, :body, presence: true
   validates_presence_of :postings
 
-  def get_to_list
+  def get_to_list(tote_item_states = nil)
     #{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLED: 4, NOTFILLED: 5, REMOVED: 6}
     #NOTE: as of now, ADDED and REMOVED are the only states that don't get an email. the reason for the ADDED
     #is because i'm thinking if we have some snafu folks need to be aware of, for now what we'll do is send
@@ -14,12 +14,22 @@ class Email < ApplicationRecord
     #don't think the tote displays the important_notes icon. anyway....
     #TODO: the plan now is that tomorrow gets implemented a feature where checkboxes are added for the states so
     #that user can state specifically who to contact
-    return User.joins(tote_items: :posting).where(tote_items: {state: [
-      ToteItem.states[:AUTHORIZED],
-      ToteItem.states[:COMMITTED],
-      ToteItem.states[:FILLED],
-      ToteItem.states[:NOTFILLED]
-      ]}).where(postings: {id: postings}).distinct    
+
+    if tote_item_states.nil?
+      tote_item_states = [
+        ToteItem.states[:AUTHORIZED],
+        ToteItem.states[:COMMITTED],
+        ToteItem.states[:FILLED],
+        ToteItem.states[:NOTFILLED]
+      ]
+    end
+
+    if ToteItem.valid_state_values?(tote_item_states)
+      return User.joins(tote_items: :posting).where(tote_items: {state: tote_item_states}).where(postings: {id: postings}).distinct    
+    else
+      return User.none
+    end
+
   end
 
 end

@@ -27,7 +27,21 @@ class ToteItem < ApplicationRecord
   validates :quantity, numericality: { greater_than: 0, only_integer: true }
 
   def self.states
-  	{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLED: 4, NOTFILLED: 5, REMOVED: 6}
+  	{ADDED: 9, AUTHORIZED: 1, COMMITTED: 2, FILLED: 4, NOTFILLED: 5, REMOVED: 6}
+  end
+
+  def self.valid_state_values?(state_values)
+
+    if state_values.nil?
+      return false
+    end
+
+    if !state_values.kind_of?(Array)
+      return false
+    end
+
+    return (state_values - states.values).empty?
+
   end
 
   validates :state, inclusion: { in: ToteItem.states.values }

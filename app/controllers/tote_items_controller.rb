@@ -234,7 +234,7 @@ class ToteItemsController < ApplicationController
 
     def create_tote_item(posting, quantity)
       
-      tote_item = ToteItem.new(posting: posting, quantity: quantity)
+      tote_item = ToteItem.new(posting: posting, quantity: quantity, state: ToteItem.states[:ADDED])
       tote_item.price = posting.price
       tote_item.user = current_user
 

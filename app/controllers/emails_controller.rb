@@ -27,6 +27,18 @@ class EmailsController < ApplicationController
     #verify existence of subject, body
     @email = Email.new(email_params)
 
+    #verify the selected tote item states are legitimate values
+    tote_item_states = nil
+    if params[:tote_item_states] && params[:tote_item_states].any?
+      tote_item_states = params[:tote_item_states].map(&:to_i)
+    end
+    
+    if !ToteItem.valid_state_values?(tote_item_states)
+      flash[:danger] = "Invalid tote item states selected"
+      redirect_to current_user
+      return            
+    end
+
     #verify correct_user
     postings = Posting.where(id: params[:posting_ids])
     postings.each do |posting|
@@ -49,7 +61,7 @@ class EmailsController < ApplicationController
 
     if @email.save
 
-      to_users_list = @email.get_to_list
+      to_users_list = @email.get_to_list(tote_item_states)
       to_users_list.each do |to_user|
         UserMailer.posting_alert(to_user, @email.subject, @email.body).deliver_now        
       end
@@ -60,7 +72,7 @@ class EmailsController < ApplicationController
         flash[:info] = "Email object saved but recipient list empty so no emails sent"
       end
       
-      redirect_to emails_path
+      redirect_to @email
       return
       
     else

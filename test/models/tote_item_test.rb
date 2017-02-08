@@ -27,6 +27,18 @@ class ToteItemTest < ActiveSupport::TestCase
 
   end
 
+  test "should return correct answers when querying for legit state values" do
+
+    ToteItem.states.values.each do |state_value|
+      assert ToteItem.valid_state_values?([state_value])
+    end    
+
+    assert ToteItem.valid_state_values?(ToteItem.states.values)
+    assert_not ToteItem.valid_state_values?([-1, ToteItem.states[:ADDED]])
+    assert_not ToteItem.valid_state_values?(["hello", "goodbye"])
+
+  end
+
   test "should report producer order minimum deficiency when posting and distributor order min met" do
 
     #get outstanding of posting
@@ -551,7 +563,7 @@ class ToteItemTest < ActiveSupport::TestCase
   end
 
   test "state should be within range" do
-  	@tote_item.state = 0
+  	@tote_item.state = 9
   	assert @tote_item.valid?
   	@tote_item.state = 1
   	assert @tote_item.valid?
@@ -581,11 +593,7 @@ class ToteItemTest < ActiveSupport::TestCase
     #was once upon a time used, there will be 8's in the production database so if you (Mr. Dev, whoever you are),
     #in the future use 8 again, your logic will work great in dev but break in production    
   	assert_not @tote_item.valid?
-    @tote_item.state = 9
-    #NOTE: this assert_not is accidentally brilliant. leaving this here will ensure that down the road no dev
-    #wanting to add a new state to ToteItem class will use the value '9'. Using 9 would be bad because, since it
-    #was once upon a time used, there will be 9's in the production database so if you (Mr. Dev, whoever you are),
-    #in the future use 9 again, your logic will work great in dev but break in production    
+    @tote_item.state = 10
     assert_not @tote_item.valid?
 
   	@tote_item.state = -1

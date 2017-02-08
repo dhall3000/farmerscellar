@@ -80,7 +80,7 @@ class ReferenceTransactionsController < ApplicationController
     else
       #validates_presence_of :rtba, :tote_items
       rtauthorization = Rtauthorization.new(rtba: rtba)                
-      ti = ToteItem.new(quantity: 1, price: 1, state: 2, posting: Posting.first, user: current_user)
+      ti = ToteItem.new(quantity: 1, price: 1, state: ToteItem.states[:COMMITTED], posting: Posting.first, user: current_user)
       ti.save
       rtauthorization.tote_items << ti
       rtauthorization.save
@@ -120,7 +120,7 @@ class ReferenceTransactionsController < ApplicationController
       
       pr = PurchaseReceivable.new(amount: amount, amount_purchased: 0, kind: PurchaseReceivable.kind[:NORMAL], state: PurchaseReceivable.states[:READY])
       pr.users << current_user
-      ti = ToteItem.new(quantity: 1, price: 1, state: 2, posting: Posting.first, user: current_user)
+      ti = ToteItem.new(quantity: 1, price: 1, state: ToteItem.states[:COMMITTED], posting: Posting.first, user: current_user)
       ti.save
       pr.tote_items << ti
 
