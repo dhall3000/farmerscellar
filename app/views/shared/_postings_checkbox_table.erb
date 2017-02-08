@@ -6,12 +6,18 @@
   end
   postings = local_assigns[:postings]
   default_checked_state = local_assigns[:default_checked_state]
+  show_check_boxes = local_assigns[:show_check_boxes]
+  if show_check_boxes.nil?
+    show_check_boxes = true
+  end
 %>
 
 <table class="table">
   <thead>
     <tr>
-      <th class="text-center"><%= check_box_column_header_text %></th>
+      <% if show_check_boxes %>
+        <th class="text-center"><%= check_box_column_header_text %></th>
+      <% end %>
       <% if show_producer %>
         <th class="text-center">Producer</th>
       <% end %>
@@ -24,13 +30,15 @@
 
     <% postings.each do |posting| %>
       <tr>
-        <td>
-          <% if default_checked_state %>
-            <%= check_box_tag "posting_ids[]", posting.id, checked: default_checked_state %>
-          <% else %>
-            <%= check_box_tag "posting_ids[]", posting.id %>
-          <% end %>
-        </td>
+        <% if show_check_boxes %>
+          <td>          
+            <% if default_checked_state %>
+              <%= check_box_tag "posting_ids[]", posting.id, checked: default_checked_state %>
+            <% else %>
+              <%= check_box_tag "posting_ids[]", posting.id %>
+            <% end %>          
+          </td>
+        <% end %>
         <% if show_producer %>
           <td class="text-center"><%= User.find_by(id: posting.user_id).farm_name %></td>
         <% end %>

@@ -62,7 +62,26 @@ class EmailsControllerTest < IntegrationHelper
     assert_redirected_to login_path
   end
 
+  test "should not get show if incorrect user" do
+    email = create_email
+    producer = create_producer("producer bob", "bob@b.com")
+    log_in_as(producer)
+    assert_not_equal email.postings.first.user.id, producer.id
+    get email_path(email)
+    assert_response :redirect
+    assert_redirected_to root_path
+    assert_not flash.empty?
+    assert_equal "You do not have access to view this email", flash[:danger]
+  end
+
   test "should get show as conditions warrant" do        
+    email = create_email
+    producer = email.postings.first.user
+    log_in_as(producer)    
+    get email_path(email)
+    assert_response :success
+    assert_template 'emails/show'
+    assert flash.empty?    
   end
 
   test "should not create email without a subject" do
@@ -167,12 +186,18 @@ class EmailsControllerTest < IntegrationHelper
     assert_response :redirect
     assert_redirected_to root_path    
     posting = create_posting(producer)
+    bob = create_new_customer("bob", "bob@b.com")
+    ti = create_tote_item(bob, posting, quantity = 1)
+    assert ti.valid?
+    ti.update(state: ToteItem.states[:AUTHORIZED])
     log_in_as(producer)
     get user_path(producer)
     assert_response :success
     assert_template 'users/show'
 
+    ActionMailer::Base.deliveries.clear    
     post emails_path, params: {email: {subject: "mysubject", body: "mybody"}, posting_ids: [posting.id]}
+    assert_equal 1, ActionMailer::Base.deliveries.count
     email = assigns(:email)
     assert email.valid?
     assert_not flash.empty?

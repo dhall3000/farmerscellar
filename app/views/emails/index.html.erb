@@ -1,2 +1,22 @@
-<h1>Emails#index</h1>
-<p>Find me in app/views/emails/index.html.erb</p>
+<h1>Emails</h1>
+
+<% if @emails && @emails.any? %>
+  <table class="table">
+    <thead>
+      <tr>
+        <th class="text-center">Subject</th>      
+        <th class="text-center">Sent at</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @emails.each do |email| %>
+        <tr>
+          <td class="text-center"><%= link_to email.subject, email_path(email) %></td>
+          <td class="text-center"><%= "#{email.created_at.strftime("%a, %b")} #{email.created_at.day.ordinalize}, #{email.created_at.strftime("%l:%M %p")}" %></td>          
+        </tr>
+      <% end %>
+    </tbody>
+  </table>  
+<% else %>
+  <p>Sorry, no emails to display</p>
+<% end %>

@@ -10,7 +10,7 @@
       <%= f.label :subject %>
       <%= f.text_field :subject, class: 'form-control' %>
       <%= f.label :body %>
-      <%= f.text_area :body, class: 'form-control' %>
+      <%= f.text_area :body, rows: 20, class: 'form-control' %>
 
       <% if @open_postings && @open_postings.any? %>
         <h2>Open postings</h2>

@@ -5,6 +5,7 @@ class EmailsController < ApplicationController
   before_action :redirect_to_root_if_not_producer
 
   def index
+    @emails = Email.joins(:postings).where(postings: {user_id: current_user.id}).distinct
   end
 
   def new
@@ -53,7 +54,12 @@ class EmailsController < ApplicationController
         UserMailer.posting_alert(to_user, @email.subject, @email.body).deliver_now        
       end
 
-      flash[:success] = "Email successfully sent"
+      if to_users_list.count > 0
+        flash[:success] = "Email successfully sent"
+      else
+        flash[:info] = "Email object saved but recipient list empty so no emails sent"
+      end
+      
       redirect_to emails_path
       return
       
@@ -68,7 +74,16 @@ class EmailsController < ApplicationController
   end
 
   def show
-    email = Email.find_by(id: params[:id])
+    
+    @email = Email.find_by(id: params[:id])
+
+    if @email && @email.postings.any?
+      if @email.postings.first.user_id != current_user.id
+        flash[:danger] = "You do not have access to view this email"
+        redirect_to root_path
+        return
+      end
+    end
 
   end
 
