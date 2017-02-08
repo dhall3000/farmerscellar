@@ -37,11 +37,14 @@ class EmailTest < ActiveSupport::TestCase
     c3 = create_user("c3", email = "customer3@c.com")
     #customer 1 is of only one posting
     create_tote_item(c1, posting1, 1)
+    create_one_time_authorization_for_customer(c1)
     #customer 2 is of only the other posting
     create_tote_item(c2, posting2, 1)
+    create_one_time_authorization_for_customer(c2)
     #customer 3 is of both postings
     create_tote_item(c3, posting1, 1)
     create_tote_item(c3, posting2, 1)
+    create_one_time_authorization_for_customer(c3)
 
     email = Email.new(subject: "mysubject", body: "mybody")
     email.postings << posting1
@@ -66,20 +69,25 @@ class EmailTest < ActiveSupport::TestCase
     posting1 = create_posting(producer, price = 10)
     posting2 = create_posting(producer, price = 20)
     posting3 = create_posting(producer, price = 20)
-    #make four customers
+    #make five customers
     c1 = create_user("c1", email = "customer1@c.com")
     c2 = create_user("c2", email = "customer2@c.com")
     c3 = create_user("c3", email = "customer3@c.com")
     c4 = create_user("c4", email = "customer4@c.com")
+    c5 = create_user("c5", email = "customer5@c.com")
     #customer 1 is of only one posting
     create_tote_item(c1, posting1, 1)
+    create_one_time_authorization_for_customer(c1)
     #customer 2 is of only the other posting
     create_tote_item(c2, posting2, 1)
+    create_one_time_authorization_for_customer(c2)
     #customer 3 is of both postings
     create_tote_item(c3, posting1, 1)
     create_tote_item(c3, posting2, 1)
+    create_one_time_authorization_for_customer(c3)
     #customer 4 is only of posting 3
     create_tote_item(c4, posting3, 1)
+    create_one_time_authorization_for_customer(c4)
 
     email = Email.new(subject: "mysubject", body: "mybody")
     email.postings << posting1
@@ -99,6 +107,50 @@ class EmailTest < ActiveSupport::TestCase
     assert_equal 1, posting1.emails.count
     assert_equal 1, posting2.emails.count
     assert_equal 0, posting3.emails.count    
+
+    #now verify that tote items in various states properly get in/excluded
+    #{ADDED: 0, AUTHORIZED: 1, COMMITTED: 2, FILLED: 4, NOTFILLED: 5, REMOVED: 6}
+    ti = create_tote_item(c5, posting1, 1)
+    assert ti.state?(:ADDED)
+    ti.transition(:customer_removed)
+    assert ti.reload.state?(:REMOVED)
+
+    to_list = email.reload.get_to_list
+
+    assert_equal 3, to_list.count
+    assert_equal 1, to_list.where(email: c1.email).count
+    assert_equal 1, to_list.where(email: c2.email).count
+    assert_equal 1, to_list.where(email: c3.email).count
+    assert_equal 0, to_list.where(email: c4.email).count
+    assert_equal 0, to_list.where(email: c5.email).count
+
+    assert_equal 1, posting1.emails.count
+    assert_equal 1, posting2.emails.count
+    assert_equal 0, posting3.emails.count
+
+    ti.update(state: ToteItem.states[:ADDED])  
+    to_list = email.reload.get_to_list
+    assert_equal 0, to_list.where(email: c5.email).count
+
+    ti.update(state: ToteItem.states[:REMOVED])
+    to_list = email.reload.get_to_list
+    assert_equal 0, to_list.where(email: c5.email).count
+
+    ti.update(state: ToteItem.states[:AUTHORIZED])  
+    to_list = email.reload.get_to_list
+    assert_equal 1, to_list.where(email: c5.email).count
+
+    ti.update(state: ToteItem.states[:COMMITTED])  
+    to_list = email.reload.get_to_list
+    assert_equal 1, to_list.where(email: c5.email).count
+
+    ti.update(state: ToteItem.states[:FILLED])  
+    to_list = email.reload.get_to_list
+    assert_equal 1, to_list.where(email: c5.email).count
+
+    ti.update(state: ToteItem.states[:NOTFILLED])  
+    to_list = email.reload.get_to_list
+    assert_equal 1, to_list.where(email: c5.email).count
 
   end
 
