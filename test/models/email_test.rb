@@ -25,4 +25,77 @@ class EmailTest < ActiveSupport::TestCase
     assert email.save
   end
 
+  test "should make proper to list" do
+    
+    #make two postings by same producer
+    producer = create_producer
+    posting1 = create_posting(producer, price = 10)
+    posting2 = create_posting(producer, price = 20)
+    #make three customers
+    c1 = create_user("c1", email = "customer1@c.com")
+    c2 = create_user("c2", email = "customer2@c.com")
+    c3 = create_user("c3", email = "customer3@c.com")
+    #customer 1 is of only one posting
+    create_tote_item(c1, posting1, 1)
+    #customer 2 is of only the other posting
+    create_tote_item(c2, posting2, 1)
+    #customer 3 is of both postings
+    create_tote_item(c3, posting1, 1)
+    create_tote_item(c3, posting2, 1)
+
+    email = Email.new(subject: "mysubject", body: "mybody")
+    email.postings << posting1
+    email.postings << posting2
+
+    assert email.valid?
+    assert email.save
+
+    to_list = email.get_to_list
+
+    assert_equal 3, to_list.count
+    assert_equal 1, to_list.where(email: c1.email).count
+    assert_equal 1, to_list.where(email: c2.email).count
+    assert_equal 1, to_list.where(email: c3.email).count
+
+  end
+
+  test "should make proper to list when producers wants to mail not all his postings" do
+    
+    #make 3 postings by same producer
+    producer = create_producer
+    posting1 = create_posting(producer, price = 10)
+    posting2 = create_posting(producer, price = 20)
+    posting3 = create_posting(producer, price = 20)
+    #make four customers
+    c1 = create_user("c1", email = "customer1@c.com")
+    c2 = create_user("c2", email = "customer2@c.com")
+    c3 = create_user("c3", email = "customer3@c.com")
+    c4 = create_user("c4", email = "customer4@c.com")
+    #customer 1 is of only one posting
+    create_tote_item(c1, posting1, 1)
+    #customer 2 is of only the other posting
+    create_tote_item(c2, posting2, 1)
+    #customer 3 is of both postings
+    create_tote_item(c3, posting1, 1)
+    create_tote_item(c3, posting2, 1)
+    #customer 4 is only of posting 3
+    create_tote_item(c4, posting3, 1)
+
+    email = Email.new(subject: "mysubject", body: "mybody")
+    email.postings << posting1
+    email.postings << posting2
+
+    assert email.valid?
+    assert email.save
+
+    to_list = email.get_to_list
+
+    assert_equal 3, to_list.count
+    assert_equal 1, to_list.where(email: c1.email).count
+    assert_equal 1, to_list.where(email: c2.email).count
+    assert_equal 1, to_list.where(email: c3.email).count
+    assert_equal 0, to_list.where(email: c4.email).count
+
+  end
+
 end

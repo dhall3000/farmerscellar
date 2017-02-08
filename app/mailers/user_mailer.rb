@@ -2,6 +2,12 @@ class UserMailer < ApplicationMailer
   include ToteItemsHelper
   helper :tote_items
 
+  def posting_alert(user, subject, body)
+    @user = user
+    @body = body
+    mail to: user.email, subject: subject
+  end
+
   # Subject can be set in your I18n file at config/locales/en.yml
   # with the following lookup:
   #

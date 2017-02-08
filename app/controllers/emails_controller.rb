@@ -47,10 +47,16 @@ class EmailsController < ApplicationController
     end
 
     if @email.save
-      #TODO: send the email
+
+      to_users_list = @email.get_to_list
+      to_users_list.each do |to_user|
+        UserMailer.posting_alert(to_user, @email.subject, @email.body).deliver_now        
+      end
+
       flash[:success] = "Email successfully sent"
       redirect_to emails_path
       return
+      
     else
       flash.now[:danger] = "Email failed to send"
       @open_postings = Posting.where(user: current_user, state: Posting.states[:OPEN])

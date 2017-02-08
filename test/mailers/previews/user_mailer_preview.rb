@@ -2,6 +2,12 @@
 class UserMailerPreview < ActionMailer::Preview
   include ToteItemsHelper
 
+  #http://localhost:3000/rails/mailers/user_mailer/posting_alert
+  def posting_alert
+    user = User.find_by(email: "c1@c.com")    
+    UserMailer.posting_alert(user, "this is my subject", "this is my body.")
+  end
+
   #http://localhost:3000/rails/mailers/user_mailer/pickup_deadline_reminder_fc_products_only
   def pickup_deadline_reminder_fc_products_only
 
