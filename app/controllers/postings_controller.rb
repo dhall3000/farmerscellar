@@ -1,6 +1,7 @@
 class PostingsController < ApplicationController
   before_action :logged_in_user, only: [:new, :create, :edit, :update, :delivery_date_range_selection_got_it]
   before_action :redirect_to_root_if_not_producer, only: [:new, :create, :edit, :update]
+  before_action :correct_producer, only: [:edit, :update]
   
   def new  	
 
@@ -196,6 +197,21 @@ class PostingsController < ApplicationController
   end
 
   private
+
+    def correct_producer
+
+      @posting = Posting.find_by(id: params[:id])
+
+      if @posting.nil?
+        return
+      end
+
+      if current_user.id != @posting.user.id
+        flash[:danger] = "That posting doesn't belong to you"
+        redirect_to root_path
+      end
+      
+    end  
 
     def get_postings(products, start_time, end_time, limit = nil)    
 

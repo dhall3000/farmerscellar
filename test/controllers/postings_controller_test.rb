@@ -627,7 +627,14 @@ class PostingsControllerTest < IntegrationHelper
     assert_redirected_to root_url    
   end
 
-  test "should get edit when logged in as farmer" do
+  test "should get edit when logged in as incorrect farmer" do
+    log_in_as(users(:f2))
+    get edit_posting_path(@posting)
+    assert_redirected_to root_path
+    assert_equal "That posting doesn't belong to you", flash[:danger]
+  end
+
+  test "should get edit when logged in as correct farmer" do
     log_in_as(@farmer)
     get edit_posting_path(@posting)
     posting = assigns(:posting)
@@ -661,6 +668,18 @@ class PostingsControllerTest < IntegrationHelper
     })
 
     assert_redirected_to root_url
+
+    #now try updating while logged in as incorrect farmer
+    f2 = users(:f2)
+    log_in_as(f2)
+    patch posting_path(@posting, posting: {
+      description: @posting.description + "new text"
+    })
+
+    assert_response :redirect
+    assert_redirected_to root_path
+    assert_not flash.empty?
+    assert_equal "That posting doesn't belong to you", flash[:danger]
 
   end
 

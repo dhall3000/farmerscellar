@@ -15,7 +15,7 @@ module FoodCategoriesHelper
       ancestor = food_category.parent
     end    
 
-    while ancestor.parent
+    while ancestor && ancestor.parent
       link = {text: ancestor.name, path: Rails.application.routes.url_helpers.postings_path(food_category: ancestor.name)}
       food_category_ancestors << link
       ancestor = ancestor.parent
