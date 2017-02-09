@@ -1,5 +1,7 @@
 <% if @posting.food_category %>
-  <%= render partial: 'postings/nav_trinket', locals: { links: @links } %>
+  <% content_for :nav_trinket do %>
+    <%= render partial: 'shared/nav_trinket', locals: { links: @links } %>
+  <% end %>
 <% end %>
 
 <h1>How Often?</h1>

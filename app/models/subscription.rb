@@ -21,6 +21,10 @@ class Subscription < ApplicationRecord
 
   validates :kind, inclusion: { in: Subscription.kinds.values }
 
+  def current_posting
+    return posting_recurrence.current_posting
+  end
+
   def kind?(kind_token)
     return self.kind == Subscription.kinds[kind_token]
   end

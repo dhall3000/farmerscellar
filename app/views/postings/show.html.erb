@@ -1,6 +1,8 @@
 <% provide(:title, @posting.product.name) %>
-<% if @posting_food_category %>
-  <%= render partial: 'nav_trinket', locals: { links: @links } %>
+<% if @posting_food_category %>  
+  <% content_for :nav_trinket do %>
+    <%= render partial: 'shared/nav_trinket', locals: { links: @links } %>
+  <% end %>
 <% end %>
 
 <div class="row gutter-10">

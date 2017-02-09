@@ -2,7 +2,9 @@
 
 <% if @food_category %>
 
-  <%= render partial: 'nav_trinket', locals: { links: FoodCategoriesController.helpers.get_top_down_ancestors(@food_category, include_self = false) } %>
+  <% content_for :nav_trinket do %>
+    <%= render partial: 'shared/nav_trinket', locals: { links: FoodCategoriesController.helpers.get_top_down_ancestors(@food_category, include_self = false) } %>
+  <% end %>  
 
   <div class="row">
     <div class="col-xs-12 col-sm-offset-3 col-sm-6">

@@ -6,18 +6,20 @@
   </div>
 </div>
 
+<% if (yield :nav_trinket).blank? %>
+  <% if request.path != root_path %>
+    <%= render partial: 'shared/nav_trinket', locals: { links: nil } %>
+  <% end %>
+<% else %>
+  <%= yield :nav_trinket %>
+<% end %>
+
 <div class="row">
   <div class="col-xs-12 col-sm-3">
     <div id="headerContent" class="collapse" data-chevron="#headerContentChevron">        
-      <div class="header-margin">
-        <%= link_to "Home", root_path, class: "non-blue" %>
-      </div>
-
       <% if logged_in? %>
         
-        <hr class="header-section-divider" />
-
-        <div class="header-margin">
+        <div class="left-most-header-link header-link">
           <%= link_to tote_items_path, class: "non-blue" do %>      
             <%
               unauthorized_items = unauthorized_items_for(current_user)
@@ -41,7 +43,7 @@
         </div>
 
 
-        <div class="header-margin">
+        <div class="left-most-header-link header-link">
           <%= link_to tote_items_path(orders: true), class: "non-blue" do %>                
 
             <%
@@ -59,38 +61,37 @@
           <% end %>
         </div>
 
-        <div class="header-margin">
+        <div class="left-most-header-link header-link">
           <%= link_to "Subscriptions", subscriptions_path, class: "non-blue" %>
         </div>
 
         <hr class="header-section-divider" />
 
-        <div class="header-margin">
+        <div class="left-most-header-link header-link">
           <%= link_to "Settings", edit_user_path(current_user), class: "non-blue" %>
         </div>
 
-        <div class="header-margin">
+        <div class="left-most-header-link header-link">
           <%= link_to "Info", user_path(current_user), class: "non-blue" %>
         </div>
         
         <% if current_user.account_type_is?(:PRODUCER) %>
-          <div class="header-margin">
+          <div class="left-most-header-link header-link">
             <%= link_to "Create new posting", new_posting_path, class: "non-blue" %>
           </div>
         <% end %>    
 
         <hr class="header-section-divider" />
 
-        <div class="header-margin">
+        <div class="left-most-header-link header-link">
           <%= link_to "Log out", logout_path, class: "non-blue", method: "delete" %>
         </div>
 
       <% else %>
-        <hr class="header-section-divider" />
-        <div class="header-margin">
+        <div class="left-most-header-link header-link">
           <%= link_to "Log in", login_path, class: "non-blue" %>
         </div>
-        <div class="header-margin">
+        <div class="left-most-header-link header-link">
           <%= link_to "Sign up", login_path, class: "non-blue" %>
         </div>
       <% end %>

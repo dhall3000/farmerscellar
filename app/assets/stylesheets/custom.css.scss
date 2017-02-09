@@ -135,10 +135,17 @@ p {
   font-size: 1.3em;
 }
 
-.nav-trinket {
+.header-link {
+  margin-top: 10px;  
+  margin-bottom: 10px;
+  margin-right: 3px;
   font-size: 0.85em;  
-  color: $gray-light;  
+  color: $gray-light;    
 }
+
+.left-most-header-link {
+    margin-left: 10px;
+  }
 
 .display-none {
   display: none;
@@ -146,13 +153,6 @@ p {
 
 #headerIcon {
   padding-bottom: 5px;
-}
-
-.header-margin {
-  margin-left: 10px;
-  margin-right: 10px;
-  margin-top: 10px;
-  margin-bottom: 10px;
 }
 
 .header-section-divider {

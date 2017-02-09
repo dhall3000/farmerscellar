@@ -139,7 +139,8 @@ class SubscriptionsController < ApplicationController
         end
       end        
 
-      @skip_dates = actual_skip_dates        
+      @skip_dates = actual_skip_dates      
+      @links = [{text: "Subscriptions", path: subscriptions_path}]  
 
     end
 
@@ -147,6 +148,10 @@ class SubscriptionsController < ApplicationController
 
   def edit
     get_show_or_edit_data
+    @links = [
+      {text: "Subscriptions", path: subscriptions_path},
+      {text: "#{@subscription.current_posting.product.name} subscription", path: subscription_path(@subscription)}
+    ]
   end
 
   def update
