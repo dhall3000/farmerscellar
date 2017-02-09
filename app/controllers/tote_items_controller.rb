@@ -115,6 +115,8 @@ class ToteItemsController < ApplicationController
     #############business bootstrapping code#############
 
     @subscription_create_options = @posting.posting_recurrence.subscription_create_options
+    @links = FoodCategoriesController.helpers.get_top_down_ancestors(@posting.food_category, include_self = true)
+    @links << {text: @posting.product.name, path: posting_path(@posting)}
 
     #try to upsell a subscription
     render 'how_often'

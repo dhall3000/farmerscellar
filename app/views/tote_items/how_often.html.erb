@@ -1,5 +1,5 @@
 <% if @posting.food_category %>
-  <%= render partial: 'postings/nav_trinket', locals: { food_category: @posting.food_category, include_self: true, posting: @posting } %>
+  <%= render partial: 'postings/nav_trinket', locals: { links: @links } %>
 <% end %>
 
 <h1>How Often?</h1>

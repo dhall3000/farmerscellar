@@ -190,6 +190,7 @@ class PostingsController < ApplicationController
       end
     end
 
+    @links = FoodCategoriesController.helpers.get_top_down_ancestors(@posting_food_category, include_self = true)    
     @biggest_order_minimum_producer_net_outstanding = @posting.biggest_order_minimum_producer_net_outstanding
 
   end

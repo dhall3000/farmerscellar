@@ -1,0 +1,21 @@
+<%
+  links = local_assigns[:links]
+%>
+
+<div class="row">
+  <div class="col-xs-12">
+
+    <%= link_to "Home", root_path, class: "nav-trinket non-blue" %>
+    <%
+      index = 0
+      while (links && index < links.count)
+    %>            
+        <span class="nav-trinket"><%= "/ " %></span>
+        <%= link_to links[index][:text], links[index][:path], class: "nav-trinket non-blue" %>
+    <%
+        index += 1
+      end
+    %>        
+
+  </div>
+</div>
