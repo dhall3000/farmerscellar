@@ -120,6 +120,9 @@ class ToteItemsControllerTest < IntegrationHelper
 
     #and now verify that if an attempt is made to view the 1st (i.e. CLOSEd) posting it will redirect to display the 2nd OPEN posting
     get posting_path(closed_posting)
+    assert_response :redirect
+    assert_redirected_to posting_path(opened_posting)
+    follow_redirect!
     assert_response :success
     assert_template 'postings/show'
     posting = assigns(:posting)
