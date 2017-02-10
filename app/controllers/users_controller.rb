@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
 
   before_action :logged_in_user, only: [:index, :edit, :update, :destroy, :show]
-  before_action :correct_user,   only: [:edit, :update]
+  before_action :correct_user,   only: [:show, :edit, :update]
   before_action :redirect_to_root_if_user_not_admin,     only: [:destroy, :index]
   before_action :redirect_to_root_if_user_lacks_access, only: [:destroy, :index, :show, :edit]
   before_action :correct_user_or_admin, only: [:show]
@@ -22,8 +22,6 @@ class UsersController < ApplicationController
   end
 
   def show
-
-  	@user = User.find(params[:id])
 
     #we want farmer to be able to see all his past postings
     if @user.account_type > 0
@@ -46,12 +44,10 @@ class UsersController < ApplicationController
     		
   end
 
-  def edit
-    @user = User.find(params[:id])
+  def edit    
   end
 
   def update    
-    @user = User.find(params[:id])
 
     if params.has_key?(:user)
       if params[:user].has_key?(:access_code)
@@ -102,17 +98,31 @@ class UsersController < ApplicationController
 
     # Confirms the correct user.
     def correct_user
-      @user = User.find(params[:id])
+
+      @user = User.find_by(id: params[:id])
+      if @user.nil?
+        redirect_to root_path
+        return
+      end
+      
       if !current_user?(@user)
         redirect_to(root_url)
       end
+      
     end
 
     def correct_user_or_admin
-      @user = User.find(params[:id])
+      
+      @user = User.find_by(id: params[:id])
+      if @user.nil?
+        redirect_to root_path
+        return
+      end
+
       if !current_user?(@user) && !current_user.account_type_is?(:ADMIN)
         redirect_to(root_url)
       end
+
     end
 
 end

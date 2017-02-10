@@ -1,5 +1,6 @@
 class CreditorOrdersController < ApplicationController
   before_action :redirect_to_root_if_user_not_admin
+  before_action :get_creditor_order, only: [:show, :edit]
 
   def index
     @open_orders = CreditorOrder.where(state: CreditorOrder.state(:OPEN)).order(delivery_date: :asc)
@@ -7,8 +8,6 @@ class CreditorOrdersController < ApplicationController
   end
 
   def show
-    
-    @creditor_order = CreditorOrder.find(params[:id])
 
     @payment_payables_sum = 0
     @payments_sum = 0
@@ -21,7 +20,6 @@ class CreditorOrdersController < ApplicationController
   end
 
   def edit
-    @creditor_order = CreditorOrder.find(params[:id])
   end
 
   def update
@@ -76,5 +74,14 @@ class CreditorOrdersController < ApplicationController
 
   def destroy
   end
+
+  private
+    def get_creditor_order
+      @creditor_order = CreditorOrder.find_by(id: params[:id])
+
+      if @creditor_order.nil?
+        redirect_to root_path
+      end      
+    end
 
 end

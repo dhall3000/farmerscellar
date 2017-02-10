@@ -1,5 +1,6 @@
 class DeliveriesController < ApplicationController
   before_action :redirect_to_root_if_user_not_admin
+  before_action :get_delivery, only: [:update, :show, :edit]
 
   def new
 
@@ -37,13 +38,11 @@ class DeliveriesController < ApplicationController
 
   end
 
-  def edit
-    @delivery = Delivery.find(params[:id])
+  def edit    
     @dropsites_deliverable = get_dropsites_from_postings(@delivery.postings)
   end
 
-  def update
-    @delivery = Delivery.find(params[:id])
+  def update    
     @dropsite = Dropsite.find(params[:dropsite_id])
     @delivery.dropsites << @dropsite
 
@@ -58,8 +57,7 @@ class DeliveriesController < ApplicationController
     @deliveries = Delivery.all.order(created_at: :desc)
   end
 
-  def show
-    @delivery = Delivery.find(params[:id])
+  def show    
     @dropsites_deliverable = get_dropsites_from_postings(@delivery.postings)
   end
 
@@ -67,6 +65,10 @@ class DeliveriesController < ApplicationController
   end
 
   private
+
+    def get_delivery
+      @delivery = Delivery.find_by(id: params[:id])
+    end
     
     def delivery_params
       params.require(:posting_ids)

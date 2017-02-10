@@ -22,15 +22,6 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_url
   end
 
-  test "should get show for farmer when logged in as admin" do
-    log_in_as(@admin)
-    other_user = users(:f1)
-    WebsiteSetting.create(new_customer_access_code_required: false, recurring_postings_enabled: true)
-    get user_path(other_user)
-    assert :success
-    assert_template 'users/show'
-  end
-
   test "should redirect edit when not logged in" do
     get edit_user_path(@user)
     assert_not flash.empty?

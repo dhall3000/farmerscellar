@@ -2,6 +2,7 @@ class PostingsController < ApplicationController
   before_action :logged_in_user, only: [:new, :create, :edit, :update, :delivery_date_range_selection_got_it]
   before_action :redirect_to_root_if_not_producer, only: [:new, :create, :edit, :update]
   before_action :correct_producer, only: [:edit, :update]
+  before_action :get_posting, only: [:edit, :update, :show]
   
   def new  	
 
@@ -125,8 +126,7 @@ class PostingsController < ApplicationController
   def edit
     #if an admin is doing this we want him to be able to edit it but if it's a farmer we want to put
     #contraints on. however, for now all we're implementing is the ability for farmer to switch between making the 
-    #posting live or not live
-    @posting = Posting.find(params[:id])        
+    #posting live or not live    
     @posting_recurrence = @posting.posting_recurrence
 
     @upload = Upload.new
@@ -134,8 +134,7 @@ class PostingsController < ApplicationController
   end
 
   def update    
-
-    @posting = Posting.find(params[:id])
+    
     @posting_recurrence = @posting.posting_recurrence
 
     if @posting_recurrence && @posting_recurrence.on
@@ -161,8 +160,7 @@ class PostingsController < ApplicationController
   end
 
   def show
-
-    @posting = Posting.find(params[:id])
+    
     if @posting.product.food_category
       @posting_food_category = @posting.product.food_category
     else
@@ -198,6 +196,15 @@ class PostingsController < ApplicationController
   end
 
   private
+
+    def get_posting
+      @posting = Posting.find_by(id: params[:id])
+
+      if @posting.nil?
+        flash[:danger] = "Oops, that posting doesn't exist"
+        redirect_to postings_path
+      end
+    end  
 
     def correct_producer
 
