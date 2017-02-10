@@ -182,7 +182,8 @@ class PostingsController < ApplicationController
       else
         pr = @posting.posting_recurrence
         if pr.current_posting && pr.current_posting.live && pr.current_posting.state?(:OPEN)
-          @posting = pr.current_posting          
+          redirect_to pr.current_posting
+          return
         else
           flash[:danger] = "Oops, that posting is no longer active"
           redirect_to food_category_path_helper(@posting_food_category)

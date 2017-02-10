@@ -75,7 +75,11 @@
           <h2 class="panel-title">Account Info</h2>
         </div>          
         <div class="panel-body">
-          <p>Email: <%= @user.email %></p>
+          <% if @user.producer? && @user.get_business_interface && !@user.get_business_interface.name.blank? %>
+            <p>Producer: <%= @user.get_business_interface.name %></p>
+          <% else %>
+            <p>Email: <%= @user.email %></p>
+          <% end %>
           <% if @previous_pickup_time %>
             <p>Last pickup: <%= @previous_pickup_time.strftime("%A %B %d, %Y at %l:%M %p") %></p>
           <% end %>         
