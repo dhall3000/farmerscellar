@@ -199,8 +199,8 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
     assert_template 'subscriptions/index'
     assert_select 'p', "You do not have any subscriptions."
     assert_equal false, assigns(:subscriptions).any?
-    assert_equal nil, assigns(:end_date)
-    assert_equal nil, assigns(:skip_dates)
+    assert_nil assigns(:end_date)
+    assert_nil assigns(:skip_dates)
   end
 
   test "index should show info when user has subscription" do

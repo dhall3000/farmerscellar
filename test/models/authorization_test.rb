@@ -26,7 +26,7 @@ class AuthorizationTest < ActiveSupport::TestCase
 
   test "should return all authorized tote items" do
     assert_not @authorization.checkouts.any?
-    assert_equal nil, @authorization.tote_items
+    assert_nil @authorization.tote_items
     @authorization.checkouts << @checkout
     assert @authorization.save
     tote_items = @authorization.tote_items

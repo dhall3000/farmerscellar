@@ -48,14 +48,14 @@ class DistributorTest < BulkBuyer
     bi.update(order_email: nil, order_instructions: "go to www.bigtimedistributor.com and manually submit order there. be sure to use a 1 when placing order.")
     bi.reload
     assert_not bi.order_email
-    assert_equal nil, bi.order_email
+    assert_nil bi.order_email
     assert_not bi.order_instructions.nil?
 
     bi = business_interfaces(:two)
     bi.update(order_email: nil, order_instructions: "go to www.f8farm.com and manually submit order there. do this before noon!")
     bi.reload
     assert_not bi.order_email
-    assert_equal nil, bi.order_email
+    assert_nil bi.order_email
     assert_not bi.order_instructions.nil?
 
     customer = users(:c18)
@@ -204,14 +204,14 @@ class DistributorTest < BulkBuyer
     bi.update(payment_method: BusinessInterface.payment_methods[:CASH], paypal_email: nil, payment_instructions: "COD")
     bi.reload
     assert_not bi.payment_method?(:PAYPAL)
-    assert_equal nil, bi.paypal_email    
+    assert_nil bi.paypal_email    
     assert_not bi.payment_instructions.nil?
 
     bi = business_interfaces(:two)
     bi.update(payment_method: BusinessInterface.payment_methods[:CASH], paypal_email: nil, payment_instructions: "Credit card on pickup")
     bi.reload
     assert_not bi.payment_method?(:PAYPAL)
-    assert_equal nil, bi.paypal_email    
+    assert_nil bi.paypal_email    
     assert_not bi.payment_instructions.nil?
 
     customer = users(:c18)

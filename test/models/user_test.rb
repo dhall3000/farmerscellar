@@ -1141,7 +1141,7 @@ class UserTest < ActiveSupport::TestCase
 
   test "should change dropsites" do
     assert @user.valid?
-    assert_equal nil, @user.dropsite
+    assert_nil @user.dropsite
     dropsite = dropsites(:dropsite1)
     @user.set_dropsite(dropsite)
     @user.reload
@@ -1156,7 +1156,7 @@ class UserTest < ActiveSupport::TestCase
 
   test "should change pickup code when switching dropsites" do
     assert @user.valid?
-    assert_equal nil, @user.dropsite
+    assert_nil @user.dropsite
     dropsite = dropsites(:dropsite1)
     @user.set_dropsite(dropsite)
     @user.reload

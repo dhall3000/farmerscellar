@@ -464,7 +464,7 @@ class PostingTest < ActiveSupport::TestCase
     @posting.update(units_per_case: 10)
     assert_equal 10, @posting.units_per_case
     #posting has no OM
-    assert_equal nil, @posting.order_minimum_producer_net
+    assert_nil @posting.order_minimum_producer_net
     #posting has no items
     assert_equal 0, @posting.tote_items.count
     #u1 orders 9
@@ -595,7 +595,7 @@ class PostingTest < ActiveSupport::TestCase
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state    
     assert_equal unit_count, @posting.inbound_num_units_ordered
-    assert_equal nil, @posting.inbound_num_cases_ordered
+    assert_nil @posting.inbound_num_cases_ordered
   end
 
   test "should not submit order when quantity authorized or committed is less than a case size" do

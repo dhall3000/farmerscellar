@@ -46,7 +46,7 @@ class RtauthorizationssTest < BulkBuyer
     #do billing agreement checkout (do not authorize)    
     checkouts_count = Checkout.count
     post checkouts_path, params: {amount: gross_tote_item_value, use_reference_transaction: "1"}
-    assert_equal nil, flash[:danger]
+    assert_nil flash[:danger]
     assert_equal checkouts_count + 1, Checkout.count
     assert_equal true, Checkout.last.is_rt
 

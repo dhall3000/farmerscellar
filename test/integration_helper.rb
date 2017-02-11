@@ -526,7 +526,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
       checkouts_count = Checkout.count
       post checkouts_path, params: {amount: items_total_gross, use_reference_transaction: "1"}
-      assert_equal nil, flash[:danger]
+      assert_nil flash[:danger]
       assert_equal checkouts_count + 1, Checkout.count
       assert_equal true, Checkout.last.is_rt
       checkout = assigns(:checkout)

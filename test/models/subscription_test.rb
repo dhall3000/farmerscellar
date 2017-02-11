@@ -310,7 +310,7 @@ class SubscriptionTest < ActiveSupport::TestCase
 	test "should not generate new tote item on immediateley successive calls" do
 		generate_new_tote_item
 		assert_equal 1, @subscription.tote_items.count
-		assert_equal nil, @subscription.generate_next_tote_item
+		assert_nil @subscription.generate_next_tote_item
 		assert_equal 1, @subscription.tote_items.count
 	end
 

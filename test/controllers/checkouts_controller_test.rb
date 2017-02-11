@@ -10,7 +10,7 @@ class CheckoutsControllerTest < ActionDispatch::IntegrationTest
   	log_in_as(@c1)
   	checkouts_count = Checkout.count
   	post checkouts_path, params: {use_reference_transaction: 0}
-  	assert_equal nil, flash[:danger]
+  	assert_nil flash[:danger]
   	assert_equal checkouts_count + 1, Checkout.count
   	assert_equal false, Checkout.last.is_rt
   end
@@ -19,7 +19,7 @@ class CheckoutsControllerTest < ActionDispatch::IntegrationTest
   	log_in_as(@c1)
   	checkouts_count = Checkout.count
   	post checkouts_path, params: {use_reference_transaction: 1}
-  	assert_equal nil, flash[:danger]
+  	assert_nil flash[:danger]
   	assert_equal checkouts_count + 1, Checkout.count
   	assert_equal true, Checkout.last.is_rt
   end
