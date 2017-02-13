@@ -140,13 +140,37 @@ class Posting < ApplicationRecord
 
   end
 
+  def effective_order_minimum_producer_net_by_case_constraint
+    
+    effective_om_by_case_constraint = 0
+
+    if units_per_case && units_per_case > 1
+      effective_om_by_case_constraint = get_producer_net_case
+    end
+
+    return effective_om_by_case_constraint
+
+  end
+
   def order_minimum_producer_net_outstanding
 
-    if order_minimum_producer_net.nil? || order_minimum_producer_net == 0
+    #the ugly gobbldy gook code here is to account for the fact that if this product ships in a case it creates
+    #an effective order minimum. we also want to handle wonky situations where the explicit OM is < than this
+    #implicit "effective" OM.
+
+    if order_minimum_producer_net.nil?
+      om = 0
+    else
+      om = order_minimum_producer_net
+    end
+
+    om = [om, effective_order_minimum_producer_net_by_case_constraint].max
+
+    if om == 0
       return 0
     end
 
-    return [(order_minimum_producer_net - inbound_order_value_producer_net).round(2), 0].max
+    return [(om - inbound_order_value_producer_net).round(2), 0].max
 
   end
 

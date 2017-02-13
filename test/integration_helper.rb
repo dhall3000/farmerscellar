@@ -1,7 +1,31 @@
 require 'test_helper'
 require 'utility/rake_helper'
 
+#def create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil)
+#def create_new_customer(name, email)
+#def create_tote_item(customer, posting, quantity, frequency = nil, roll_until_filled = nil)
+#def create_one_time_authorization_for_customer(customer)
+#def create_rt_authorization_for_customer(customer)
+#def create_payment(amount, amount_applied = 0, notes = nil, creditor_order = nil)
+#def create_payment_full_balance(creditor_order)
+
 class IntegrationHelper < ActionDispatch::IntegrationTest
+
+  def remove_tote_item(tote_item)
+    
+    assert tote_item
+    assert tote_item.valid?
+    assert [ToteItem.states[:ADDED], ToteItem.states[:AUTHORIZED]].include?(tote_item.state)
+
+    log_in_as(tote_item.user)
+    delete tote_item_path(tote_item)
+    assert_response :redirect
+
+    assert tote_item.reload.state?(:REMOVED)
+
+    return tote_item
+
+  end
 
   def verify_price_on_postings_page(price, unit, count = nil)
 

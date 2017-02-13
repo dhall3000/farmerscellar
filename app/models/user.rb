@@ -70,12 +70,12 @@ class User < ApplicationRecord
 
   def postings_by_delivery_date(delivery_date)
 
-    pdd = postings.where(delivery_date: delivery_date)
+    pdd = postings.where(delivery_date: delivery_date).distinct
     producers.each do |producer|
-      pdd = pdd.merge(producer.postings_by_delivery_date(delivery_date))
+      pdd = pdd.or(producer.postings_by_delivery_date(delivery_date))
     end
 
-    return pdd
+    return pdd.distinct
 
   end
 

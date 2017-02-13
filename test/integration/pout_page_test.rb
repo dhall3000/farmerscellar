@@ -406,9 +406,14 @@ class PoutPageTest < IntegrationHelper
     assert_equal ti_bob.posting.units_per_case - total_quantity_ordered, ti_bob.additional_units_required_to_fill_my_case
     #the OM for bob's item's posting should be fully satisfied theoretically because $60 was ordered and OM = $50.
     #however, since the 1st case wasn't filled the actual quantity set to be ordered from producer is 0 units
-    #so the fully OM is outstanding
-    order_min = ti_bob.posting.user.order_minimum_producer_net
-    assert_equal order_min, ti_bob.posting.biggest_order_minimum_producer_net_outstanding
+    #so the full OM is outstanding. however, if we display to the user the full OM as outstanding this might be confusing because
+    #although they've ordered product they see the outstanding om value unchanged.
+
+    case_constraint_effective_om_oustanding = (ti_bob.posting.get_producer_net_case - ti_bob.posting.inbound_order_value_producer_net).round(2)
+    theo_om_outstanding = ti_bob.posting.user.order_minimum_producer_net - ti_bob.posting.inbound_order_value_producer_net
+    om_oustanding = [case_constraint_effective_om_oustanding, theo_om_outstanding].max
+    assert_equal om_oustanding, ti_bob.posting.biggest_order_minimum_producer_net_outstanding    
+
 
     #bob's user experience should reflect that the case his item is in isn't yet filled. it should say nothing about the unmet OM.
     log_in_as(get_bob)
@@ -437,7 +442,7 @@ class PoutPageTest < IntegrationHelper
     biggest_order_minimum_producer_net_outstanding = assigns(:biggest_order_minimum_producer_net_outstanding)
 
     assert_equal ti_bob.posting.units_per_case - total_quantity_ordered, additional_units_required_to_fill_my_case
-    assert_equal 50, biggest_order_minimum_producer_net_outstanding
+    assert_equal om_oustanding, biggest_order_minimum_producer_net_outstanding
 
     #since there's a problem with both case and OM we only want to display case issues
     assert_select 'p span', {count: 1, text: "Currently this item will not ship"}    

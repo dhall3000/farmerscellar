@@ -1,5 +1,23 @@
 module TestLib
 
+#def create_admin(name = "Mr. Admin", email = "admin@a.com")
+#def create_distributor(name = "distributor name", email = "distributor@d.com", order_min = 0)
+#def create_producer(name = "producer name", email = "producer@p.com", distributor = nil, order_min = 0)
+#def create_business_interface(creditor, order_instructions = "order instructions", payment_method = BusinessInterface.payment_methods[:PAYPAL], payment_instructions = "payment instructions", payment_time = BusinessInterface.payment_times[:AFTERDELIVERY])
+#def create_user(name = "customer name", email = "customer@c.com")
+#def create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
+#def create_tote_item(customer, posting, quantity)
+#def create_subscription(user, posting, quantity, frequency)
+#def create_one_time_authorization_for_customer(customer)
+#def create_db_objects
+#def create_food_category_for_all_products_that_have_none
+#def create_food_category_for_product_if_product_has_none(product)
+#def create_food_category(name, parent)
+#def create_creditor_order(creditor = nil, postings = nil, customer = nil)
+#def create_commission(farmer, product, unit, commission)
+#def create_email(subject = nil, body = nil, postings = nil)
+#def create_creditor_with(payment_method_key, payment_time_key, creditor = nil)
+
   def create_food_category_for_all_products_that_have_none
     Product.all.each do |product|
       create_food_category_for_product_if_product_has_none(product)
