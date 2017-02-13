@@ -99,6 +99,7 @@ class ToteItem < ApplicationRecord
       case input
       when :customer_authorized
         new_state = ToteItem.states[:AUTHORIZED]
+        posting.add_inbound_order_value_producer_net(quantity)
       when :subscription_authorized
         new_state = ToteItem.states[:AUTHORIZED]
       when :customer_removed
@@ -112,10 +113,13 @@ class ToteItem < ApplicationRecord
       case input
       when :billing_agreement_inactive
         new_state = ToteItem.states[:ADDED]
+        posting.add_inbound_order_value_producer_net(-quantity)
       when :customer_removed
         new_state = ToteItem.states[:REMOVED]
+        posting.add_inbound_order_value_producer_net(-quantity)
       when :system_removed
         new_state = ToteItem.states[:REMOVED]
+        posting.add_inbound_order_value_producer_net(-quantity)
       when :order_cutoffed
         new_state = ToteItem.states[:COMMITTED]      
       end
@@ -173,8 +177,10 @@ class ToteItem < ApplicationRecord
       
       update(state: new_state)
 
-      if new_state == ToteItem.states[:AUTHORIZED]
-        update(authorized_at: Time.zone.now)
+      case new_state
+      when ToteItem.states[:AUTHORIZED]
+        update(authorized_at: Time.zone.now)        
+      when ToteItem.states[:REMOVED]
       end
 
     end

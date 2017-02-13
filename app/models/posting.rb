@@ -38,6 +38,7 @@ class Posting < ApplicationRecord
 
   validates :units_per_case, numericality: { greater_than: 0, only_integer: true }, allow_nil: true
   validates :order_minimum_producer_net, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true    
+  validates :inbound_order_value_producer_net, numericality: { greater_than_or_equal_to: 0 }, allow_nil: false
 
   validate :important_notes_body_not_present_without_important_notes, :delivery_date_not_sunday, :order_cutoff_must_be_before_delivery_date
   validate :commission_is_set, on: :create
@@ -174,15 +175,22 @@ class Posting < ApplicationRecord
 
   end
 
-  def inbound_order_value_producer_net
+  #quantity can be positive or negative an is a number of posting's units
+  #if quantity takes inbound_order_value_producer_net < 0 no state changes
+  def add_inbound_order_value_producer_net(quantity)
 
-    if state?(:CLOSED)
-      num_units = num_units_filled
-    else
-      num_units = inbound_num_units_ordered
+    if quantity == 0
+      return
     end
-    
-    return (num_units * get_producer_net_unit).round(2)
+
+    delta = (quantity * get_producer_net_unit).round(2)
+    proposed_inbound_order_value_producer_net = (inbound_order_value_producer_net + delta).round(2)
+
+    if proposed_inbound_order_value_producer_net < 0
+      return
+    end
+
+    update(inbound_order_value_producer_net: proposed_inbound_order_value_producer_net)
 
   end
 
@@ -190,11 +198,17 @@ class Posting < ApplicationRecord
 
     inbound = inbound_order_value_producer_net
 
+    effective_om = effective_order_minimum_producer_net_by_case_constraint    
+
     if order_minimum_producer_net.nil?
-      return inbound
+      om = 0
+    else
+      om = order_minimum_producer_net
     end
 
-    if inbound > order_minimum_producer_net
+    om = [om, effective_om].max
+
+    if inbound >= om
       return inbound
     else
       return 0

@@ -4,6 +4,8 @@ class OrderMinimumAmountOutstandingTest < IntegrationHelper
 
   def setup
 
+    nuke_all_postings
+
     @distributor = create_distributor(name = "distributor name", email = "distributor@d.com", order_min = 200)
 
     @producer1 = create_producer(name = "producer1", email = "producer1@p.com", distributor = @distributor, order_min = 50)
@@ -45,7 +47,7 @@ class OrderMinimumAmountOutstandingTest < IntegrationHelper
     20.times do
       ti = create_tote_item(user, @posting6, 10)
       create_rt_authorization_for_customer(user)
-      p6_order_value = @posting6.outbound_order_value_producer_net
+      p6_order_value = @posting6.reload.outbound_order_value_producer_net
       assert_equal [@distributor.order_minimum_producer_net - p6_order_value, 0].max, @posting5.biggest_order_minimum_producer_net_outstanding
     end
 
@@ -82,7 +84,7 @@ class OrderMinimumAmountOutstandingTest < IntegrationHelper
     ti = create_tote_item(user, @posting1, 1)
     create_rt_authorization_for_customer(user)
     assert_equal 10, @posting1.inbound_num_units_ordered
-    assert @posting1.outbound_order_value_producer_net > 0
+    assert @posting1.reload.outbound_order_value_producer_net > 0
     #this should make it so that producer1 and distributor's oms are met. verify by checkign that posting5.bomp is zero.
     assert_equal 0, @posting5.biggest_order_minimum_producer_net_outstanding
     #and that distributor is set to ship product
@@ -91,7 +93,7 @@ class OrderMinimumAmountOutstandingTest < IntegrationHelper
     remove_tote_item(ti)
     assert ti.reload.state?(:REMOVED)
     #this should cause the entire case to not ship which should move producer1
-    assert_equal 0, @posting1.outbound_order_value_producer_net
+    assert_equal 0, @posting1.reload.outbound_order_value_producer_net
     #below his om so all $50 should drop off
     assert_equal 0, @producer1.outbound_order_value_producer_net(@order_cutoff)
     #which would put distributor below his om so posting5.bomp should spike > 0 to around $50
@@ -101,7 +103,7 @@ class OrderMinimumAmountOutstandingTest < IntegrationHelper
   test "a case 1 shy of full should cause entire order to roll till next cycle when another unit addition triggers all to ship" do
     #what we're testing here is that order value tracking persists as roll till filled orders roll into the next week's cycle due to unmet order mins.
     #we're going to use most of the setup from this situation: test "removing one unit from posting1 should cause posting 5 bomp to increase by producer1 om" do
-    #but we're going to make it so that in cycle on there's a any unit insuficciency on @posting1's sheet so that causes all the distributors orders to roll till next cycle
+    #but we're going to make it so that in cycle on there's a any unit insuficciency on @posting1's sheet so that causes all the distributors orders to roll till next cycle    
     user = create_user
     posting6_quantity = 17
 
@@ -110,10 +112,13 @@ class OrderMinimumAmountOutstandingTest < IntegrationHelper
     ti = create_tote_item(user, @posting6, posting6_quantity, frequency = nil, roll_until_filled = true)
 
     create_rt_authorization_for_customer(user)
+    @posting1.reload
+    @posting3.reload
+    @posting6.reload
+
     assert_equal 9, @posting1.total_quantity_authorized_or_committed
     assert_equal 5, @posting3.inbound_num_units_ordered
     assert_equal posting6_quantity, @posting6.inbound_num_units_ordered
-
     assert_equal 0, @posting1.outbound_order_value_producer_net
     assert @posting3.outbound_order_value_producer_net > 0
     assert @posting6.outbound_order_value_producer_net > 0
@@ -135,7 +140,6 @@ class OrderMinimumAmountOutstandingTest < IntegrationHelper
     assert_equal 9, p1_current.total_quantity_authorized_or_committed
     assert_equal 5, p3_current.inbound_num_units_ordered
     assert_equal posting6_quantity, p6_current.inbound_num_units_ordered        
-
     assert_equal 0, p1_current.outbound_order_value_producer_net
     assert p3_current.outbound_order_value_producer_net > 0
     assert p6_current.outbound_order_value_producer_net > 0
@@ -150,10 +154,9 @@ class OrderMinimumAmountOutstandingTest < IntegrationHelper
     assert_equal 10, p1_current.inbound_num_units_ordered
     assert_equal 5, p3_current.inbound_num_units_ordered
     assert_equal posting6_quantity, p6_current.inbound_num_units_ordered        
-
-    assert p1_current.outbound_order_value_producer_net > 0
-    assert p3_current.outbound_order_value_producer_net > 0
-    assert p6_current.outbound_order_value_producer_net > 0
+    assert p1_current.reload.outbound_order_value_producer_net > 0
+    assert p3_current.reload.outbound_order_value_producer_net > 0
+    assert p6_current.reload.outbound_order_value_producer_net > 0
     assert @producer1.reload.outbound_order_value_producer_net(p1_current.order_cutoff) > 0
     assert @distributor.reload.outbound_order_value_producer_net(p1_current.order_cutoff) > 0
 
@@ -164,7 +167,7 @@ class OrderMinimumAmountOutstandingTest < IntegrationHelper
     assert_equal 5, p3_current.inbound_num_units_ordered
     assert_equal posting6_quantity, p6_current.inbound_num_units_ordered        
 
-    assert_equal 0, p1_current.outbound_order_value_producer_net
+    assert_equal 0, p1_current.reload.outbound_order_value_producer_net
     assert p3_current.outbound_order_value_producer_net > 0
     assert p6_current.outbound_order_value_producer_net > 0
     assert_equal 0, @producer1.reload.outbound_order_value_producer_net(@order_cutoff)
@@ -201,7 +204,7 @@ class OrderMinimumAmountOutstandingTest < IntegrationHelper
     #now order again from posting2, up over its bomp
     ti = create_tote_item(user, @posting2, 4)
     create_rt_authorization_for_customer(user)
-    assert_equal 0, @posting2.biggest_order_minimum_producer_net_outstanding
+    assert_equal 0, @posting2.reload.biggest_order_minimum_producer_net_outstanding
     #and verify posting1.bomp is now the case constraint
     assert_equal @posting1.get_producer_net_case, @posting1.biggest_order_minimum_producer_net_outstanding
 
