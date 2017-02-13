@@ -96,8 +96,17 @@ class Posting < ApplicationRecord
   end
 
   def get_producer_net_unit
-    producer_net_unit = price - commission_per_unit - ToteItemsController.helpers.get_payment_processor_fee_unit(price)
-    return producer_net_unit.round(2)
+
+    if producer_net_unit > 0
+      return producer_net_unit
+    end
+
+    pnu = price - commission_per_unit - ToteItemsController.helpers.get_payment_processor_fee_unit(price)
+    pnu = pnu.round(2)
+    update(producer_net_unit: pnu)
+    
+    return pnu
+
   end
 
   def get_producer_net_case

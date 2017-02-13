@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170213193716) do
+ActiveRecord::Schema.define(version: 20170213212138) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -413,6 +413,7 @@ ActiveRecord::Schema.define(version: 20170213193716) do
     t.string   "important_notes"
     t.string   "important_notes_body"
     t.float    "inbound_order_value_producer_net", default: 0.0,   null: false
+    t.float    "producer_net_unit",                default: 0.0,   null: false
     t.index ["delivery_date"], name: "index_postings_on_delivery_date"
     t.index ["live"], name: "index_postings_on_live"
     t.index ["order_cutoff"], name: "index_postings_on_order_cutoff"
