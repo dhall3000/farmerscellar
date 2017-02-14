@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170213212138) do
+ActiveRecord::Schema.define(version: 20170213215204) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -299,6 +299,16 @@ ActiveRecord::Schema.define(version: 20170213212138) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "order_values", force: :cascade do |t|
+    t.float    "inbound_producer_net", default: 0.0, null: false
+    t.datetime "order_cutoff",                       null: false
+    t.integer  "user_id"
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+    t.index ["order_cutoff"], name: "index_order_values_on_order_cutoff"
+    t.index ["user_id"], name: "index_order_values_on_user_id"
+  end
+
   create_table "page_updates", force: :cascade do |t|
     t.string   "name"
     t.datetime "update_time"
@@ -412,7 +422,7 @@ ActiveRecord::Schema.define(version: 20170213212138) do
     t.float    "order_minimum_producer_net"
     t.string   "important_notes"
     t.string   "important_notes_body"
-    t.float    "inbound_order_value_producer_net", default: 0.0,   null: false
+    t.float    "inbound_order_value_producer_net", default: -1.0,  null: false
     t.float    "producer_net_unit",                default: 0.0,   null: false
     t.index ["delivery_date"], name: "index_postings_on_delivery_date"
     t.index ["live"], name: "index_postings_on_live"

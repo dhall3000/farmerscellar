@@ -63,7 +63,7 @@ class ToteItemTest < ActiveSupport::TestCase
     ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting_f1, user: customer)
     assert ti.save
     assert ti.state?(:AUTHORIZED)
-    assert_equal (quantity * price * 0.915).round(2), posting_f1.inbound_order_value_producer_net
+    assert_equal (quantity * price * 0.915).round(2), posting_f1.get_inbound_order_value_producer_net
     assert_equal 0, posting_f1.outbound_order_value_producer_net
 
     farm2 = create_producer("farmer2", "f2@f.com")
@@ -195,7 +195,7 @@ class ToteItemTest < ActiveSupport::TestCase
     assert ti.save
     assert ti.state?(:AUTHORIZED)
 
-    expected_order_min_outstanding = (posting.order_minimum_producer_net - posting.inbound_order_value_producer_net).round(2)
+    expected_order_min_outstanding = (posting.order_minimum_producer_net - posting.get_inbound_order_value_producer_net).round(2)
     assert expected_order_min_outstanding > 0
     assert expected_order_min_outstanding < posting.order_minimum_producer_net
     assert_equal 0, posting.outbound_order_value_producer_net
@@ -238,7 +238,7 @@ class ToteItemTest < ActiveSupport::TestCase
     assert ti.save
     assert ti.state?(:AUTHORIZED)
 
-    expected_order_min_outstanding = [0, (posting.order_minimum_producer_net - posting.inbound_order_value_producer_net).round(2)].max
+    expected_order_min_outstanding = [0, (posting.order_minimum_producer_net - posting.get_inbound_order_value_producer_net).round(2)].max
     assert_equal 0, expected_order_min_outstanding
     assert posting.outbound_order_value_producer_net > order_minimum_producer_net
     assert_equal expected_order_min_outstanding, posting.order_minimum_producer_net_outstanding

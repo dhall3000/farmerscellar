@@ -38,7 +38,7 @@ class Posting < ApplicationRecord
 
   validates :units_per_case, numericality: { greater_than: 0, only_integer: true }, allow_nil: true
   validates :order_minimum_producer_net, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true    
-  validates :inbound_order_value_producer_net, numericality: { greater_than_or_equal_to: 0 }, allow_nil: false
+  validates :inbound_order_value_producer_net, numericality: { greater_than_or_equal_to: -1 }, allow_nil: false
 
   validate :important_notes_body_not_present_without_important_notes, :delivery_date_not_sunday, :order_cutoff_must_be_before_delivery_date
   validate :commission_is_set, on: :create
@@ -180,7 +180,25 @@ class Posting < ApplicationRecord
       return 0
     end
 
-    return [(om - inbound_order_value_producer_net).round(2), 0].max
+    return [(om - get_inbound_order_value_producer_net).round(2), 0].max
+
+  end
+
+  def get_inbound_order_value_producer_net
+
+    if inbound_order_value_producer_net >= 0
+      inbound = inbound_order_value_producer_net
+      if units_per_case && units_per_case > 1
+        case_value = get_producer_net_case
+        inbound = (case_value * (inbound / case_value).to_i).round(2)
+      end
+      return inbound
+    end
+
+   ov = (inbound_num_units_ordered * get_producer_net_unit).round(2)
+   update(inbound_order_value_producer_net: ov)
+
+   return ov
 
   end
 
@@ -193,19 +211,41 @@ class Posting < ApplicationRecord
     end
 
     delta = (quantity * get_producer_net_unit).round(2)
-    proposed_inbound_order_value_producer_net = (inbound_order_value_producer_net + delta).round(2)
+
+    if inbound_order_value_producer_net < 0
+      inbound = 0
+    else
+      inbound = inbound_order_value_producer_net
+    end
+
+    proposed_inbound_order_value_producer_net = (inbound + delta).round(2)
 
     if proposed_inbound_order_value_producer_net < 0
       return
     end
 
+    old_outbound_order_value_producer_net = outbound_order_value_producer_net
     update(inbound_order_value_producer_net: proposed_inbound_order_value_producer_net)
+    new_outbound_order_value_producer_net = outbound_order_value_producer_net
+
+    output_delta = (new_outbound_order_value_producer_net - old_outbound_order_value_producer_net).round(2)
+
+    if output_delta == 0
+      return
+    end
+
+    user.add_inbound_order_value_producer_net(order_cutoff, output_delta)
 
   end
 
   def outbound_order_value_producer_net
 
-    inbound = inbound_order_value_producer_net
+    inbound = get_inbound_order_value_producer_net
+
+    if units_per_case && units_per_case > 1
+      case_value = get_producer_net_case
+      inbound = (case_value * (inbound / case_value).to_i).round(2)
+    end
 
     effective_om = effective_order_minimum_producer_net_by_case_constraint    
 
@@ -383,7 +423,7 @@ class Posting < ApplicationRecord
       return true
     end
 
-    return inbound_order_value_producer_net >= order_minimum_producer_net
+    return get_inbound_order_value_producer_net >= order_minimum_producer_net
 
   end
 

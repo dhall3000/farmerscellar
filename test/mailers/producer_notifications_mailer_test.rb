@@ -17,7 +17,9 @@ class ProducerNotificationsMailerTest < ActionMailer::TestCase
       count += 1
     end
 
+    ActionMailer::Base.deliveries.clear
     CreditorOrder.submit(ps_keep)
+    assert_equal 1, ActionMailer::Base.deliveries.count
     mail = ActionMailer::Base.deliveries.last    
 
     assert_equal "Current orders for upcoming deliveries", mail.subject

@@ -17,6 +17,7 @@ class User < ApplicationRecord
   has_many :partner_deliveries
   has_many :tote_items
   has_many :creditor_orders, foreign_key: :creditor_id
+  has_many :order_values
 
   has_many :user_account_states
   has_many :account_states, through: :user_account_states
@@ -49,24 +50,6 @@ class User < ApplicationRecord
   belongs_to :distributor, class_name: "User", foreign_key: "distributor_id"
   #if this object is a distributor it might have many PRODUCERs
   has_many :producers, class_name: "User", foreign_key: "distributor_id"
-
-  def postings_receivable(delivery_date)
-    #this plucks all postings for this delivery date (regardless of order cutoff) for this creditor
-    #and subjects them to all shipping criteria (e.g. case tech, order minimums etc.) and returns
-    #all postings that FC should be receiving on the given delivery date
-
-    postings = []
-
-    #get list of unique order_cutoffs with the given delivery date
-    order_cutoffs = postings_by_delivery_date(delivery_date).select(:order_cutoff).distinct        
-    #call outbound order report on each unique order cutoff
-    order_cutoffs.each do |order_cutoff|
-      postings += outbound_order_report(order_cutoff.order_cutoff)[:postings_order_requirements_met]            
-    end    
-    
-    return postings
-
-  end
 
   def postings_by_delivery_date(delivery_date)
 
@@ -132,12 +115,84 @@ class User < ApplicationRecord
 
   end
 
+  #can be positive or negative. if the new total is < 0 no state is changed
+  def add_inbound_order_value_producer_net(order_cutoff, amount)
+
+    if amount == 0
+      return
+    end
+
+    order_value = get_order_value(order_cutoff)
+
+    if order_value.nil?
+      #something's up
+      return
+    end
+
+    #write the new value    
+    cred = get_creditor
+    if self.id != cred.id
+      #this producer has a creditor so we need to report any changes to out outbound producer net value
+      old_outbound_producer_net = outbound_order_value_producer_net(order_cutoff)      
+    end
+
+    new_inbound_producer_net = (order_value.inbound_producer_net + amount).round(2)
+    order_value.update(inbound_producer_net: new_inbound_producer_net)
+
+    if self.id == cred.id
+      #this producer is his own creditor so no need to report any change
+      return
+    end
+
+    #if our output changed as a result of this inbound change and we have a creditor, we need to report the change to the creditor    
+    new_outbound_producer_net = outbound_order_value_producer_net(order_cutoff)
+
+    if new_outbound_producer_net == old_outbound_producer_net
+      return      
+    end
+
+    outbound_delta = (new_outbound_producer_net - old_outbound_producer_net).round(2)
+    cred.add_inbound_order_value_producer_net(order_cutoff, outbound_delta)
+
+  end
+
   def inbound_order_value_producer_net(order_cutoff)
-    return inbound_order_report(order_cutoff)[:order_value_producer_net]
+
+    order_value = get_order_value(order_cutoff)
+
+    if order_value.nil?
+      #something's up
+      return 0
+    end
+
+    return order_value.inbound_producer_net
+
+  end
+
+  def get_order_value(order_cutoff)
+    
+    order_value = order_values.where(order_cutoff: order_cutoff).last
+
+    if order_value.nil?
+      #create the ov and populate it with data the slow way
+      order_values.create(inbound_producer_net: inbound_order_report(order_cutoff)[:order_value_producer_net], order_cutoff: order_cutoff)
+      order_value = order_values.where(order_cutoff: order_cutoff).last
+    end
+
+    return order_value
+
   end
 
   def outbound_order_value_producer_net(order_cutoff)
-    return outbound_order_report(order_cutoff)[:order_value_producer_net]
+    
+    inbound = inbound_order_value_producer_net(order_cutoff)
+
+    if inbound >= order_minimum_producer_net
+      return inbound
+    end
+
+    return 0
+
   end
 
   def order_minimum_producer_net_outstanding(order_cutoff)

@@ -270,9 +270,11 @@ class PostingTest < ActiveSupport::TestCase
     u1_ti1 = ToteItem.new(quantity: 29, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: u1)    
     u1_ti1.save
     u1_ti1.transition(:customer_authorized)
+
+
     #verify minimums not met
-    assert_not @posting.requirements_met_to_send_order?
-    assert @posting.outbound_order_value_producer_net == 0
+    assert_not @posting.reload.requirements_met_to_send_order?
+    assert @posting.reload.outbound_order_value_producer_net == 0
     #new users orders 2. total will now be 31 .
     u2 = create_user("u2", "u2@u.com")
     assert u2.valid?
@@ -280,14 +282,15 @@ class PostingTest < ActiveSupport::TestCase
     u2_ti1.save
     u2_ti1.transition(:customer_authorized)
     #verify order gets submitted now
-    assert @posting.requirements_met_to_send_order?
-    assert @posting.outbound_order_value_producer_net > 0
-    assert @posting.outbound_order_value_producer_net > @posting.order_minimum_producer_net
+
+    assert @posting.reload.requirements_met_to_send_order?
+    assert @posting.reload.outbound_order_value_producer_net > 0
+    assert @posting.reload.outbound_order_value_producer_net > @posting.order_minimum_producer_net
     #u2 changes thier mind and cancels order
     u2_ti1.transition(:customer_removed)
     #verify order won't get submitted
-    assert_not @posting.requirements_met_to_send_order?
-    assert @posting.outbound_order_value_producer_net == 0
+    assert_not @posting.reload.requirements_met_to_send_order?
+    assert @posting.reload.outbound_order_value_producer_net == 0
 
   end
 
@@ -309,8 +312,8 @@ class PostingTest < ActiveSupport::TestCase
     u1_ti1.save
     u1_ti1.transition(:customer_authorized)
     #verify minimums not met
-    assert_not @posting.requirements_met_to_send_order?
-    assert @posting.outbound_order_value_producer_net == 0
+    assert_not @posting.reload.requirements_met_to_send_order?
+    assert @posting.reload.outbound_order_value_producer_net == 0
     #new users orders 2. total will now be 31 .
     u2 = create_user("u2", "u2@u.com")
     assert u2.valid?
@@ -318,9 +321,9 @@ class PostingTest < ActiveSupport::TestCase
     u2_ti1.save
     u2_ti1.transition(:customer_authorized)
     #verify order gets submitted now
-    assert @posting.requirements_met_to_send_order?
-    assert @posting.outbound_order_value_producer_net > 0
-    assert @posting.outbound_order_value_producer_net > @posting.order_minimum_producer_net
+    assert @posting.reload.requirements_met_to_send_order?
+    assert @posting.reload.outbound_order_value_producer_net > 0
+    assert @posting.reload.outbound_order_value_producer_net > @posting.order_minimum_producer_net
 
   end
 
@@ -390,7 +393,7 @@ class PostingTest < ActiveSupport::TestCase
     u1_ti1.save
     u1_ti1.transition(:customer_authorized)
     #verify minimums not met
-    assert_not @posting.requirements_met_to_send_order?
+    assert_not @posting.reload.requirements_met_to_send_order?
     assert @posting.outbound_order_value_producer_net == 0
     #u2 orders 2
     u2 = create_user("u2", "u2@u.com")
@@ -399,16 +402,17 @@ class PostingTest < ActiveSupport::TestCase
     u2_ti1.save
     u2_ti1.transition(:customer_authorized)
     #verify order is submittable
-    assert @posting.requirements_met_to_send_order?
+    assert @posting.reload.requirements_met_to_send_order?
     #verify outbound_order_value_producer_net > 0
     assert @posting.outbound_order_value_producer_net > 0
     #verify that the outbound order amount equals 1 case, even though there were inbound orders totaling slightly more than one case
-    assert_equal @posting.get_producer_net_case, @posting.outbound_order_value_producer_net
+    @posting.outbound_order_value_producer_net
+    assert_equal @posting.reload.get_producer_net_case, @posting.outbound_order_value_producer_net
     #u2 cancels their order
     u2_ti1.transition(:customer_removed)    
     #verify outbound_order_value_producer_net == 0
     assert_not @posting.requirements_met_to_send_order?
-    assert @posting.outbound_order_value_producer_net == 0
+    assert @posting.reload.outbound_order_value_producer_net == 0
 
   end
 
@@ -431,8 +435,8 @@ class PostingTest < ActiveSupport::TestCase
     u1_ti1.transition(:customer_authorized)
     #verify minimums not met
     assert_not @posting.requirements_met_to_send_order?
-    assert @posting.inbound_order_value_producer_net < 10
-    assert @posting.inbound_order_value_producer_net > 0
+    assert @posting.get_inbound_order_value_producer_net < 10
+    assert @posting.get_inbound_order_value_producer_net > 0
     assert @posting.outbound_order_value_producer_net == 0
     #u2 orders 2
     u2 = create_user("u2", "u2@u.com")
@@ -441,17 +445,17 @@ class PostingTest < ActiveSupport::TestCase
     u2_ti1.save
     u2_ti1.transition(:customer_authorized)
     #verify order is submittable
-    assert @posting.requirements_met_to_send_order?
-    assert @posting.inbound_order_value_producer_net > 10
-    assert @posting.outbound_order_value_producer_net >= 10
+    assert @posting.reload.requirements_met_to_send_order?
+    assert @posting.reload.get_inbound_order_value_producer_net > 10
+    assert @posting.reload.outbound_order_value_producer_net >= 10
 
     #u2 cancels their order
     u2_ti1.transition(:customer_removed)    
     #verify outbound order conditions unmet
-    assert_not @posting.requirements_met_to_send_order?
-    assert @posting.inbound_order_value_producer_net < 10
-    assert @posting.inbound_order_value_producer_net > 0
-    assert @posting.outbound_order_value_producer_net == 0
+    assert_not @posting.reload.requirements_met_to_send_order?
+    assert @posting.reload.get_inbound_order_value_producer_net < 10
+    assert @posting.reload.get_inbound_order_value_producer_net > 0
+    assert @posting.reload.outbound_order_value_producer_net == 0
 
   end
 
@@ -474,8 +478,8 @@ class PostingTest < ActiveSupport::TestCase
     u1_ti1.save
     u1_ti1.transition(:customer_authorized)
     #verify minimums not met
-    assert_not @posting.requirements_met_to_send_order?
-    assert @posting.outbound_order_value_producer_net == 0
+    assert_not @posting.reload.requirements_met_to_send_order?
+    assert @posting.reload.outbound_order_value_producer_net == 0
     #u2 orders 2
     u2 = create_user("u2", "u2@u.com")
     assert u2.valid?
@@ -483,16 +487,16 @@ class PostingTest < ActiveSupport::TestCase
     u2_ti1.save
     u2_ti1.transition(:customer_authorized)
     #verify order is submittable
-    assert @posting.requirements_met_to_send_order?
+    assert @posting.reload.requirements_met_to_send_order?
     #verify outbound_order_value_producer_net > 0
-    assert @posting.outbound_order_value_producer_net > 0
+    assert @posting.reload.outbound_order_value_producer_net > 0
     #verify that the outbound order amount equals 1 case, even though there were inbound orders totaling slightly more than one case
-    assert_equal @posting.get_producer_net_case, @posting.outbound_order_value_producer_net
+    assert_equal @posting.reload.get_producer_net_case, @posting.reload.outbound_order_value_producer_net
     #u2 cancels their order
     u2_ti1.transition(:customer_removed)    
     #verify outbound_order_value_producer_net == 0
-    assert_not @posting.requirements_met_to_send_order?
-    assert @posting.outbound_order_value_producer_net == 0
+    assert_not @posting.reload.requirements_met_to_send_order?
+    assert @posting.reload.outbound_order_value_producer_net == 0
 
   end
 
