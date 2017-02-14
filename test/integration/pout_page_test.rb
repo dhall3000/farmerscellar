@@ -409,8 +409,8 @@ class PoutPageTest < IntegrationHelper
     #so the full OM is outstanding. however, if we display to the user the full OM as outstanding this might be confusing because
     #although they've ordered product they see the outstanding om value unchanged.
 
-    case_constraint_effective_om_oustanding = (ti_bob.posting.get_producer_net_case - ti_bob.posting.get_inbound_order_value_producer_net).round(2)
-    theo_om_outstanding = ti_bob.posting.user.order_minimum_producer_net - ti_bob.posting.get_inbound_order_value_producer_net
+    case_constraint_effective_om_oustanding = (ti_bob.posting.get_producer_net_case - ti_bob.posting.inbound_order_value_producer_net).round(2)
+    theo_om_outstanding = ti_bob.posting.user.order_minimum_producer_net - ti_bob.posting.inbound_order_value_producer_net
     om_oustanding = [case_constraint_effective_om_oustanding, theo_om_outstanding].max
     assert_equal om_oustanding, ti_bob.posting.biggest_order_minimum_producer_net_outstanding    
 

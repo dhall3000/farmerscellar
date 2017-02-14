@@ -68,7 +68,7 @@ class PostingsTest < IntegrationHelper
 
     assert_equal 1, posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], posting.tote_items.first.state
-    assert posting.requirements_met_to_send_order?
+    assert posting.shippable?
     assert_equal posting.units_per_case + 1, posting.total_quantity_authorized_or_committed
     assert_equal posting.units_per_case, posting.inbound_num_units_ordered
     assert_equal 1, posting.inbound_num_cases_ordered
@@ -128,7 +128,7 @@ class PostingsTest < IntegrationHelper
     posting.reload
     assert_equal 1, posting.tote_items.count
     assert_equal ToteItem.states[:NOTFILLED], posting.tote_items.first.state
-    assert_not posting.requirements_met_to_send_order?
+    assert_not posting.shippable?
     assert_equal 0, posting.total_quantity_authorized_or_committed
     assert_equal 0, posting.inbound_num_units_ordered
     assert_equal 0, posting.inbound_num_cases_ordered

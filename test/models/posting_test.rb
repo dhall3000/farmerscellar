@@ -273,7 +273,7 @@ class PostingTest < ActiveSupport::TestCase
 
 
     #verify minimums not met
-    assert_not @posting.reload.requirements_met_to_send_order?
+    assert_not @posting.reload.shippable?
     assert @posting.reload.outbound_order_value_producer_net == 0
     #new users orders 2. total will now be 31 .
     u2 = create_user("u2", "u2@u.com")
@@ -283,13 +283,13 @@ class PostingTest < ActiveSupport::TestCase
     u2_ti1.transition(:customer_authorized)
     #verify order gets submitted now
 
-    assert @posting.reload.requirements_met_to_send_order?
+    assert @posting.reload.shippable?
     assert @posting.reload.outbound_order_value_producer_net > 0
     assert @posting.reload.outbound_order_value_producer_net > @posting.order_minimum_producer_net
     #u2 changes thier mind and cancels order
     u2_ti1.transition(:customer_removed)
     #verify order won't get submitted
-    assert_not @posting.reload.requirements_met_to_send_order?
+    assert_not @posting.reload.shippable?
     assert @posting.reload.outbound_order_value_producer_net == 0
 
   end
@@ -312,7 +312,7 @@ class PostingTest < ActiveSupport::TestCase
     u1_ti1.save
     u1_ti1.transition(:customer_authorized)
     #verify minimums not met
-    assert_not @posting.reload.requirements_met_to_send_order?
+    assert_not @posting.reload.shippable?
     assert @posting.reload.outbound_order_value_producer_net == 0
     #new users orders 2. total will now be 31 .
     u2 = create_user("u2", "u2@u.com")
@@ -321,7 +321,7 @@ class PostingTest < ActiveSupport::TestCase
     u2_ti1.save
     u2_ti1.transition(:customer_authorized)
     #verify order gets submitted now
-    assert @posting.reload.requirements_met_to_send_order?
+    assert @posting.reload.shippable?
     assert @posting.reload.outbound_order_value_producer_net > 0
     assert @posting.reload.outbound_order_value_producer_net > @posting.order_minimum_producer_net
 
@@ -345,7 +345,7 @@ class PostingTest < ActiveSupport::TestCase
     u1_ti1.save
     u1_ti1.transition(:customer_authorized)
     #verify minimums not met
-    assert_not @posting.requirements_met_to_send_order?
+    assert_not @posting.shippable?
     assert @posting.outbound_order_value_producer_net == 0
     
   end
@@ -368,7 +368,7 @@ class PostingTest < ActiveSupport::TestCase
     u1_ti1.save
     u1_ti1.transition(:customer_authorized)
     #verify minimums not met
-    assert_not @posting.requirements_met_to_send_order?
+    assert_not @posting.shippable?
     assert @posting.outbound_order_value_producer_net == 0
     
   end
@@ -393,7 +393,7 @@ class PostingTest < ActiveSupport::TestCase
     u1_ti1.save
     u1_ti1.transition(:customer_authorized)
     #verify minimums not met
-    assert_not @posting.reload.requirements_met_to_send_order?
+    assert_not @posting.reload.shippable?
     assert @posting.outbound_order_value_producer_net == 0
     #u2 orders 2
     u2 = create_user("u2", "u2@u.com")
@@ -402,7 +402,7 @@ class PostingTest < ActiveSupport::TestCase
     u2_ti1.save
     u2_ti1.transition(:customer_authorized)
     #verify order is submittable
-    assert @posting.reload.requirements_met_to_send_order?
+    assert @posting.reload.shippable?
     #verify outbound_order_value_producer_net > 0
     assert @posting.outbound_order_value_producer_net > 0
     #verify that the outbound order amount equals 1 case, even though there were inbound orders totaling slightly more than one case
@@ -411,7 +411,7 @@ class PostingTest < ActiveSupport::TestCase
     #u2 cancels their order
     u2_ti1.transition(:customer_removed)    
     #verify outbound_order_value_producer_net == 0
-    assert_not @posting.requirements_met_to_send_order?
+    assert_not @posting.shippable?
     assert @posting.reload.outbound_order_value_producer_net == 0
 
   end
@@ -434,9 +434,9 @@ class PostingTest < ActiveSupport::TestCase
     u1_ti1.save
     u1_ti1.transition(:customer_authorized)
     #verify minimums not met
-    assert_not @posting.requirements_met_to_send_order?
-    assert @posting.get_inbound_order_value_producer_net < 10
-    assert @posting.get_inbound_order_value_producer_net > 0
+    assert_not @posting.shippable?
+    assert @posting.inbound_order_value_producer_net < 10
+    assert @posting.inbound_order_value_producer_net > 0
     assert @posting.outbound_order_value_producer_net == 0
     #u2 orders 2
     u2 = create_user("u2", "u2@u.com")
@@ -445,16 +445,16 @@ class PostingTest < ActiveSupport::TestCase
     u2_ti1.save
     u2_ti1.transition(:customer_authorized)
     #verify order is submittable
-    assert @posting.reload.requirements_met_to_send_order?
-    assert @posting.reload.get_inbound_order_value_producer_net > 10
+    assert @posting.reload.shippable?
+    assert @posting.reload.inbound_order_value_producer_net > 10
     assert @posting.reload.outbound_order_value_producer_net >= 10
 
     #u2 cancels their order
     u2_ti1.transition(:customer_removed)    
     #verify outbound order conditions unmet
-    assert_not @posting.reload.requirements_met_to_send_order?
-    assert @posting.reload.get_inbound_order_value_producer_net < 10
-    assert @posting.reload.get_inbound_order_value_producer_net > 0
+    assert_not @posting.reload.shippable?
+    assert @posting.reload.inbound_order_value_producer_net < 10
+    assert @posting.reload.inbound_order_value_producer_net > 0
     assert @posting.reload.outbound_order_value_producer_net == 0
 
   end
@@ -478,7 +478,7 @@ class PostingTest < ActiveSupport::TestCase
     u1_ti1.save
     u1_ti1.transition(:customer_authorized)
     #verify minimums not met
-    assert_not @posting.reload.requirements_met_to_send_order?
+    assert_not @posting.reload.shippable?
     assert @posting.reload.outbound_order_value_producer_net == 0
     #u2 orders 2
     u2 = create_user("u2", "u2@u.com")
@@ -487,7 +487,7 @@ class PostingTest < ActiveSupport::TestCase
     u2_ti1.save
     u2_ti1.transition(:customer_authorized)
     #verify order is submittable
-    assert @posting.reload.requirements_met_to_send_order?
+    assert @posting.reload.shippable?
     #verify outbound_order_value_producer_net > 0
     assert @posting.reload.outbound_order_value_producer_net > 0
     #verify that the outbound order amount equals 1 case, even though there were inbound orders totaling slightly more than one case
@@ -495,7 +495,7 @@ class PostingTest < ActiveSupport::TestCase
     #u2 cancels their order
     u2_ti1.transition(:customer_removed)    
     #verify outbound_order_value_producer_net == 0
-    assert_not @posting.reload.requirements_met_to_send_order?
+    assert_not @posting.reload.shippable?
     assert @posting.reload.outbound_order_value_producer_net == 0
 
   end
@@ -508,7 +508,7 @@ class PostingTest < ActiveSupport::TestCase
     ti.transition(:order_cutoffed)
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
-    assert @posting.requirements_met_to_send_order?    
+    assert @posting.shippable?    
   end
   
   test "should not submit order when posting value below order minimum" do
@@ -519,7 +519,7 @@ class PostingTest < ActiveSupport::TestCase
     ti.transition(:order_cutoffed)
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
-    assert_not @posting.requirements_met_to_send_order?    
+    assert_not @posting.shippable?    
   end
 
   test "posting should properly report remaining order amount necessary" do
@@ -532,7 +532,7 @@ class PostingTest < ActiveSupport::TestCase
     ti.transition(:order_cutoffed)
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
-    assert_not @posting.requirements_met_to_send_order?    
+    assert_not @posting.shippable?    
     # $100 producer net order minimum equals ~$109 gross order min. a single unit worth gross $1.25 was ordered. so the amount it
     #sould report as needed additional is ~ $109 - $1.25
     assert_equal @posting.order_minimum_retail - @posting.price, @posting.additional_retail_amount_necessary_to_send_order
@@ -544,7 +544,7 @@ class PostingTest < ActiveSupport::TestCase
     assert ti.save    
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:ADDED], @posting.tote_items.first.state
-    assert_not @posting.requirements_met_to_send_order?
+    assert_not @posting.shippable?
   end
 
   test "should submit order when quantity is above zero and cases arent in use" do
@@ -555,7 +555,7 @@ class PostingTest < ActiveSupport::TestCase
     ti.transition(:order_cutoffed)
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
-    assert @posting.requirements_met_to_send_order?
+    assert @posting.shippable?
   end
 
   test "should submit order when quantity is at least the size of a case" do
@@ -569,7 +569,7 @@ class PostingTest < ActiveSupport::TestCase
     ti.transition(:order_cutoffed)
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
-    assert @posting.requirements_met_to_send_order?
+    assert @posting.shippable?
   end
 
   test "should only submit order in round case lots when applicable" do    
@@ -613,7 +613,7 @@ class PostingTest < ActiveSupport::TestCase
     ti.transition(:order_cutoffed)
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
-    assert_not @posting.requirements_met_to_send_order?
+    assert_not @posting.shippable?
   end
 
   test "should fill all items" do

@@ -38,7 +38,7 @@ class Posting < ApplicationRecord
 
   validates :units_per_case, numericality: { greater_than: 0, only_integer: true }, allow_nil: true
   validates :order_minimum_producer_net, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true    
-  validates :inbound_order_value_producer_net, numericality: { greater_than_or_equal_to: -1 }, allow_nil: false
+  validates :inbound_order_value_producer_net, numericality: { greater_than_or_equal_to: 0 }, allow_nil: false
 
   validate :important_notes_body_not_present_without_important_notes, :delivery_date_not_sunday, :order_cutoff_must_be_before_delivery_date
   validate :commission_is_set, on: :create
@@ -95,20 +95,6 @@ class Posting < ApplicationRecord
     return user.get_creditor
   end
 
-  def get_producer_net_unit
-
-    if producer_net_unit > 0
-      return producer_net_unit
-    end
-
-    pnu = price - commission_per_unit - ToteItemsController.helpers.get_payment_processor_fee_unit(price)
-    pnu = pnu.round(2)
-    update(producer_net_unit: pnu)
-    
-    return pnu
-
-  end
-
   def get_producer_net_case
     
     if units_per_case.nil? || units_per_case < 2
@@ -121,147 +107,17 @@ class Posting < ApplicationRecord
 
   end
 
-  def biggest_order_minimum_producer_net_outstanding
-    #this posting has a producer and that producer might have a distributor. among those possible three entities, each could
-    #have an order minimum. we here want to return the greatest deficiency of those three
+  def get_producer_net_unit
 
-    biggest_outstanding = 0
-
-    temp = order_minimum_producer_net_outstanding
-
-    if temp > biggest_outstanding
-      biggest_outstanding = temp
+    if producer_net_unit > 0
+      return producer_net_unit
     end
 
-    temp = user.order_minimum_producer_net_outstanding(order_cutoff)
-
-    if temp > biggest_outstanding
-      biggest_outstanding = temp
-    end
-
-    if user.distributor
-      temp = user.distributor.order_minimum_producer_net_outstanding(order_cutoff)
-      if temp > biggest_outstanding
-        biggest_outstanding = temp
-      end
-    end
-
-    return biggest_outstanding
-
-  end
-
-  def effective_order_minimum_producer_net_by_case_constraint
+    pnu = price - commission_per_unit - ToteItemsController.helpers.get_payment_processor_fee_unit(price)
+    pnu = pnu.round(2)
+    update(producer_net_unit: pnu)
     
-    effective_om_by_case_constraint = 0
-
-    if units_per_case && units_per_case > 1
-      effective_om_by_case_constraint = get_producer_net_case
-    end
-
-    return effective_om_by_case_constraint
-
-  end
-
-  def order_minimum_producer_net_outstanding
-
-    #the ugly gobbldy gook code here is to account for the fact that if this product ships in a case it creates
-    #an effective order minimum. we also want to handle wonky situations where the explicit OM is < than this
-    #implicit "effective" OM.
-
-    if order_minimum_producer_net.nil?
-      om = 0
-    else
-      om = order_minimum_producer_net
-    end
-
-    om = [om, effective_order_minimum_producer_net_by_case_constraint].max
-
-    if om == 0
-      return 0
-    end
-
-    return [(om - get_inbound_order_value_producer_net).round(2), 0].max
-
-  end
-
-  def get_inbound_order_value_producer_net
-
-    if inbound_order_value_producer_net >= 0
-      inbound = inbound_order_value_producer_net
-      if units_per_case && units_per_case > 1
-        case_value = get_producer_net_case
-        inbound = (case_value * (inbound / case_value).to_i).round(2)
-      end
-      return inbound
-    end
-
-   ov = (inbound_num_units_ordered * get_producer_net_unit).round(2)
-   update(inbound_order_value_producer_net: ov)
-
-   return ov
-
-  end
-
-  #quantity can be positive or negative an is a number of posting's units
-  #if quantity takes inbound_order_value_producer_net < 0 no state changes
-  def add_inbound_order_value_producer_net(quantity)
-
-    if quantity == 0
-      return
-    end
-
-    delta = (quantity * get_producer_net_unit).round(2)
-
-    if inbound_order_value_producer_net < 0
-      inbound = 0
-    else
-      inbound = inbound_order_value_producer_net
-    end
-
-    proposed_inbound_order_value_producer_net = (inbound + delta).round(2)
-
-    if proposed_inbound_order_value_producer_net < 0
-      return
-    end
-
-    old_outbound_order_value_producer_net = outbound_order_value_producer_net
-    update(inbound_order_value_producer_net: proposed_inbound_order_value_producer_net)
-    new_outbound_order_value_producer_net = outbound_order_value_producer_net
-
-    output_delta = (new_outbound_order_value_producer_net - old_outbound_order_value_producer_net).round(2)
-
-    if output_delta == 0
-      return
-    end
-
-    user.add_inbound_order_value_producer_net(order_cutoff, output_delta)
-
-  end
-
-  def outbound_order_value_producer_net
-
-    inbound = get_inbound_order_value_producer_net
-
-    if units_per_case && units_per_case > 1
-      case_value = get_producer_net_case
-      inbound = (case_value * (inbound / case_value).to_i).round(2)
-    end
-
-    effective_om = effective_order_minimum_producer_net_by_case_constraint    
-
-    if order_minimum_producer_net.nil?
-      om = 0
-    else
-      om = order_minimum_producer_net
-    end
-
-    om = [om, effective_om].max
-
-    if inbound >= om
-      return inbound
-    else
-      return 0
-    end
+    return pnu
 
   end
 
@@ -299,140 +155,115 @@ class Posting < ApplicationRecord
     
     return (num_units * price).round(2)
 
+  end  
+
+  def biggest_order_minimum_producer_net_outstanding
+    #this posting has a producer and that producer might have a distributor. among those possible three entities, each could
+    #have an order minimum. we here want to return the greatest deficiency of those three
+
+    biggest_outstanding = 0
+
+    temp = order_minimum_producer_net_outstanding
+
+    if temp > biggest_outstanding
+      biggest_outstanding = temp
+    end
+
+    temp = user.order_minimum_producer_net_outstanding(order_cutoff)
+
+    if temp > biggest_outstanding
+      biggest_outstanding = temp
+    end
+
+    if user.distributor
+      temp = user.distributor.order_minimum_producer_net_outstanding(order_cutoff)
+      if temp > biggest_outstanding
+        biggest_outstanding = temp
+      end
+    end
+
+    return biggest_outstanding
+
   end
 
-  def state?(state_key)
-    return state == Posting.states[state_key]
-  end
-
-  def transition(input)
+  #an implicit order minimum is in effect if there's a case constraint
+  def implicit_order_minimum_producer_net
     
-    new_state = state
+    om = 0
 
-    case state
-
-
-    when Posting.states[:OPEN]
-      case input
-      when :order_cutoffed
-
-        if Time.zone.now >= order_cutoff
-          new_state = Posting.states[:COMMITMENTZONE]
-
-          update(live: false)
-          
-          tote_items.where(state: ToteItem.states[:ADDED]).each do |tote_item|
-            tote_item.transition(:system_removed)
-          end            
-
-          tote_items.where(state: ToteItem.states[:AUTHORIZED]).each do |tote_item|
-            tote_item.transition(:order_cutoffed)
-          end
-
-          if !posting_recurrence.nil? && posting_recurrence.on
-            posting_recurrence.recur
-          end
-
-        end        
-      
-      end
-
-
-    when Posting.states[:COMMITMENTZONE]      
-      case input
-      when :filled
-        new_state = Posting.states[:CLOSED]        
-      end
-
-
-    when Posting.states[:CLOSED]
-
+    if units_per_case && units_per_case > 1
+      om = get_producer_net_case
     end
 
-    if new_state != state
-      update(state: new_state)
-    end
+    return om
 
   end
 
-  def fill(quantity)
-
-    quantity_remaining = quantity
-    quantity_filled = 0
-    quantity_not_filled = 0
-    tote_items_filled = []
-    tote_items_not_filled = []
-    partially_filled_tote_items = []
-
-    #fill in FIFO order. partially fill if need be.
-    first_committed_tote_item = get_first_committed_tote_item
-    while first_committed_tote_item
-      if quantity_remaining > 0
-        quantity_to_fill = [first_committed_tote_item.quantity, quantity_remaining].min
-        quantity_remaining = quantity_remaining - quantity_to_fill
-        quantity_filled = quantity_filled + quantity_to_fill
-        first_committed_tote_item.transition(:tote_item_filled, {quantity_filled: quantity_to_fill})
-        tote_items_filled << first_committed_tote_item
-
-        if first_committed_tote_item.partially_filled?
-          partially_filled_tote_items << first_committed_tote_item
-          first_committed_tote_item.reload          
-        end
-
-      else        
-        first_committed_tote_item.transition(:tote_item_not_filled)                
-        tote_items_not_filled << first_committed_tote_item
-      end
-
-      quantity_not_filled += first_committed_tote_item.quantity_not_filled      
-      first_committed_tote_item = get_first_committed_tote_item
-
-    end
-
-    transition(:filled)
-
-    return {
-      quantity_filled: quantity_filled,
-      quantity_not_filled: quantity_not_filled,
-      quantity_remaining: quantity_remaining,
-      tote_items_filled: tote_items_filled,
-      tote_items_not_filled: tote_items_not_filled,
-      partially_filled_tote_items: partially_filled_tote_items
-    }
-
-  end
-
-  def requirements_met_to_send_order?
-
-    #packing minimum met?(at least one unit (or 1 case if cases are in effect))
-    if !packing_minimum_met?
-      return false
-    end
-
-    if !order_minimum_met?
-      return false
-    end
-
-    return true
-    
-  end
-
-  def order_minimum_met?
+  def effective_order_minimum_producer_net
 
     if order_minimum_producer_net.nil?
-      return true
+      om = 0
+    else
+      om = order_minimum_producer_net
     end
 
-    return get_inbound_order_value_producer_net >= order_minimum_producer_net
+    om = [om, implicit_order_minimum_producer_net].max
+
+    return om
 
   end
 
-  def packing_minimum_met?
-    if units_per_case.nil? || units_per_case < 2
-      return total_quantity_authorized_or_committed > 0
-    else
-      return total_quantity_authorized_or_committed >= units_per_case
+  def shippable?
+    return order_minimum_producer_net_outstanding == 0
+  end
+
+  def order_minimum_producer_net_outstanding
+
+    #the ugly gobbldy gook code here is to account for the fact that if this product ships in a case it creates
+    #an effective order minimum. we also want to handle wonky situations where the explicit OM is < than this
+    #implicit "effective" OM.
+
+    om = effective_order_minimum_producer_net
+
+    if om == 0
+      return 0
     end
+
+    return [(om - inbound_order_value_producer_net).round(2), 0].max
+
+  end
+
+  #quantity can be positive or negative an is a number of posting's units
+  #if quantity takes inbound_order_value_producer_net < 0 no state changes
+  def add_inbound_order_value_producer_net(quantity)
+
+    if quantity == 0
+      return
+    end
+
+    delta = (quantity * get_producer_net_unit).round(2)
+    proposed_inbound_order_value_producer_net = (inbound_order_value_producer_net + delta).round(2)
+
+    if proposed_inbound_order_value_producer_net < 0
+      return
+    end
+
+    old_outbound_order_value_producer_net = outbound_order_value_producer_net
+    update(inbound_order_value_producer_net: proposed_inbound_order_value_producer_net)
+    new_outbound_order_value_producer_net = outbound_order_value_producer_net
+
+    output_delta = (new_outbound_order_value_producer_net - old_outbound_order_value_producer_net).round(2)
+
+    if output_delta == 0
+      return
+    end
+
+    user.add_inbound_order_value_producer_net(order_cutoff, output_delta)
+
+  end
+
+  def outbound_order_value_producer_net
+    inbound_order_value_producer_net >= effective_order_minimum_producer_net ? return inbound_order_value_producer_net : return 0
   end
 
   def inbound_num_units_ordered
@@ -576,6 +407,107 @@ class Posting < ApplicationRecord
 
   def subscribable?    
     return posting_recurrence && posting_recurrence.on
+  end
+
+  def state?(state_key)
+    return state == Posting.states[state_key]
+  end
+
+  def transition(input)
+    
+    new_state = state
+
+    case state
+
+
+    when Posting.states[:OPEN]
+      case input
+      when :order_cutoffed
+
+        if Time.zone.now >= order_cutoff
+          new_state = Posting.states[:COMMITMENTZONE]
+
+          update(live: false)
+          
+          tote_items.where(state: ToteItem.states[:ADDED]).each do |tote_item|
+            tote_item.transition(:system_removed)
+          end            
+
+          tote_items.where(state: ToteItem.states[:AUTHORIZED]).each do |tote_item|
+            tote_item.transition(:order_cutoffed)
+          end
+
+          if !posting_recurrence.nil? && posting_recurrence.on
+            posting_recurrence.recur
+          end
+
+        end        
+      
+      end
+
+
+    when Posting.states[:COMMITMENTZONE]      
+      case input
+      when :filled
+        new_state = Posting.states[:CLOSED]        
+      end
+
+
+    when Posting.states[:CLOSED]
+
+    end
+
+    if new_state != state
+      update(state: new_state)
+    end
+
+  end
+
+  def fill(quantity)
+
+    quantity_remaining = quantity
+    quantity_filled = 0
+    quantity_not_filled = 0
+    tote_items_filled = []
+    tote_items_not_filled = []
+    partially_filled_tote_items = []
+
+    #fill in FIFO order. partially fill if need be.
+    first_committed_tote_item = get_first_committed_tote_item
+    while first_committed_tote_item
+      if quantity_remaining > 0
+        quantity_to_fill = [first_committed_tote_item.quantity, quantity_remaining].min
+        quantity_remaining = quantity_remaining - quantity_to_fill
+        quantity_filled = quantity_filled + quantity_to_fill
+        first_committed_tote_item.transition(:tote_item_filled, {quantity_filled: quantity_to_fill})
+        tote_items_filled << first_committed_tote_item
+
+        if first_committed_tote_item.partially_filled?
+          partially_filled_tote_items << first_committed_tote_item
+          first_committed_tote_item.reload          
+        end
+
+      else        
+        first_committed_tote_item.transition(:tote_item_not_filled)                
+        tote_items_not_filled << first_committed_tote_item
+      end
+
+      quantity_not_filled += first_committed_tote_item.quantity_not_filled      
+      first_committed_tote_item = get_first_committed_tote_item
+
+    end
+
+    transition(:filled)
+
+    return {
+      quantity_filled: quantity_filled,
+      quantity_not_filled: quantity_not_filled,
+      quantity_remaining: quantity_remaining,
+      tote_items_filled: tote_items_filled,
+      tote_items_not_filled: tote_items_not_filled,
+      partially_filled_tote_items: partially_filled_tote_items
+    }
+
   end
 
   private
