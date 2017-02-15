@@ -37,6 +37,8 @@ class UploadsController < ApplicationController
 
       flash[:success] = "Uploaded successfully"
 
+      @upload.update(square_size: @upload.file_name.square.size, large_size: @upload.file_name.large.size)
+
       if params[:posting_id]
         posting = Posting.find(params[:posting_id])
         posting.uploads << @upload

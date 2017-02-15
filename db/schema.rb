@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170215221516) do
+ActiveRecord::Schema.define(version: 20170215233206) do
 
   create_table "access_codes", force: :cascade do |t|
     t.integer  "user_id"
@@ -650,9 +650,11 @@ ActiveRecord::Schema.define(version: 20170215221516) do
 
   create_table "uploads", force: :cascade do |t|
     t.string   "file_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
     t.string   "title"
+    t.integer  "square_size", default: 0
+    t.integer  "large_size",  default: 0
     t.index ["title"], name: "index_uploads_on_title", unique: true
   end
 
