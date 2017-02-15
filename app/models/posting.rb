@@ -160,21 +160,27 @@ class Posting < ApplicationRecord
   def biggest_order_minimum_producer_net_outstanding
     #this posting has a producer and that producer might have a distributor. among those possible three entities, each could
     #have an order minimum. we here want to return the greatest deficiency of those three
-    biggest_outstanding = order_minimum_producer_net_outstanding
+    posting_outstanding = order_minimum_producer_net_outstanding
     producer_outstanding = user.order_minimum_producer_net_outstanding(order_cutoff)
 
-    if producer_outstanding > biggest_outstanding
-      biggest_outstanding = producer_outstanding
+    if posting_outstanding > 0
+      producer_outstanding = [(producer_outstanding - inbound_order_value_producer_net).round(2), 0].max
     end
 
-    if user.distributor
-      distributor_outstanding = user.distributor.order_minimum_producer_net_outstanding(order_cutoff)
-      if distributor_outstanding > biggest_outstanding
-        biggest_outstanding = distributor_outstanding
+    distributor_outstanding = user.distributor ? user.distributor.order_minimum_producer_net_outstanding(order_cutoff) : 0
+
+    if distributor_outstanding > 0
+      if posting_outstanding > 0
+        distributor_outstanding = [(distributor_outstanding - inbound_order_value_producer_net).round(2), 0].max
+      end
+      if producer_outstanding > 0
+        distributor_outstanding = [(distributor_outstanding - user.inbound_order_value_producer_net(order_cutoff)).round(2), 0].max
       end
     end
 
-    return biggest_outstanding
+    biggest_outstanding = [posting_outstanding, producer_outstanding, distributor_outstanding, 0].max
+
+    return biggest_outstanding    
 
   end
 

@@ -86,8 +86,8 @@ class ToteItemTest < ActiveSupport::TestCase
     assert farm1.order_minimum_producer_net_outstanding(posting_f1.order_cutoff) > posting_f1.order_minimum_producer_net_outstanding
     #verify that the amount left for the producer is greater than the amount left for the distributor
     assert farm1.order_minimum_producer_net_outstanding(posting_f1.order_cutoff) > distributor.order_minimum_producer_net_outstanding(posting_f1.order_cutoff)
-    #verify the biggest amount outstanding reported by the posting is correct (hint: should be equal to the producer's amount outstanding since it's the biggest of the three)
-    assert_equal farm1.order_minimum_producer_net_outstanding(posting_f1.order_cutoff), posting_f1.biggest_order_minimum_producer_net_outstanding
+    #verify the biggest amount outstanding reported by the posting is correct (hint: should be equal to farm1's order min minus posting1's inbound order value)
+    assert_equal farm1.order_minimum_producer_net_outstanding(posting_f1.order_cutoff) - posting_f1.reload.inbound_order_value_producer_net, posting_f1.biggest_order_minimum_producer_net_outstanding
 
   end
 
