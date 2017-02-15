@@ -33,7 +33,7 @@ class PostingsController < ApplicationController
 
   def index
 
-    @food_category = FoodCategory.where(name: params[:food_category]).first
+    @food_category = FoodCategory.includes(:parent, children: :uploads).where(name: params[:food_category]).first
  
     #this is the upcoming sunday at midnight
     next_week_start = start_of_next_week    
@@ -198,7 +198,7 @@ class PostingsController < ApplicationController
   private
 
     def get_posting
-      @posting = Posting.find_by(id: params[:id])
+      @posting = Posting.includes(:unit, :user, :uploads, :posting_recurrence, product: :food_category).where(id: params[:id]).first
 
       if @posting.nil?
         flash[:danger] = "Oops, that posting doesn't exist"
@@ -223,7 +223,7 @@ class PostingsController < ApplicationController
 
     def get_postings(products, start_time, end_time, limit = nil)    
 
-      return_postings = Posting.joins(:product).where(product: products).where("delivery_date >= ? and delivery_date < ? and live = ? and state = ?", start_time, end_time, true, Posting.states[:OPEN]).order(:price)
+      return_postings = Posting.includes(:user, :product, :unit).where(product: products).where("delivery_date >= ? and delivery_date < ? and live = ? and state = ?", start_time, end_time, true, Posting.states[:OPEN])
 
       if limit
         #if we're going to limit the postings it's because we think we have too many. if we have too many

@@ -9,9 +9,10 @@ class StaticPagesController < ApplicationController
     @website_settings = WebsiteSetting.order("website_settings.id").last
 
     @food_categories = nil    
-    root_food_category = FoodCategory.get_root_category
+
+    root_food_category = FoodCategory.includes(children: :uploads).where(parent: nil).first
     if root_food_category
-      @food_categories = root_food_category.children.joins(:uploads).distinct
+      @food_categories = root_food_category.children
     end
     
   end

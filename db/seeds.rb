@@ -248,6 +248,7 @@ product_chicken = Product.create(name: "Chicken", food_category: meat)
 product_asparagus = Product.create(name: "Asparagus", food_category: veggies)
 product_oranges = Product.create(name: "Oranges", food_category: fruit)
 product_celery = Product.create(name: "Celery", food_category: produce)
+product_spinach = Product.create(name: "Spinach", food_category: produce)
 product_avocado = Product.create(name: "Avocado", food_category: produce)
 product_basil = Product.create(name: "Basil", food_category: produce)
 
@@ -285,6 +286,7 @@ f3.producer_product_unit_commissions.create(product: product_carrots, commission
 f3.producer_product_unit_commissions.create(product: product_chicken, commission: 0.07, unit: pound)
 f4.producer_product_unit_commissions.create(product: product_oranges, commission: 0.08, unit: pound)
 f4.producer_product_unit_commissions.create(product: product_celery, commission: 0.12, unit: pound)
+f3.producer_product_unit_commissions.create(product: product_spinach, commission: 0.03, unit: pound)
 f4.producer_product_unit_commissions.create(product: product_avocado, commission: 0.08, unit: whole)
 f4.producer_product_unit_commissions.create(product: product_basil, commission: 0.06, unit: bunch)
 
@@ -321,6 +323,11 @@ posting_celery = Posting.create(product_id_code: "ZXB-9F", units_per_case: 10, l
 upload = Upload.create(file_name: File.open(File.join("/home/david/fc/website/assets", "celery.jpg")))
 posting_celery.uploads << upload
 posting_celery.save
+#Spinach
+posting_spinach = Posting.create(product_id_code: "super9", units_per_case: 10, live: true, delivery_date: next_friday + 1.day, order_cutoff: standard_order_cutoff, product_id: product_spinach.id, price: 1.00, user_id: f3.id, unit_id: 8, description: "organic", description_body: "best organic spinach ever!")
+upload = Upload.create(file_name: File.open(File.join("/home/david/fc/website/assets", "spinach.jpg")))
+posting_spinach.uploads << upload
+posting_spinach.save
 #Avocado
 posting_avocado = Posting.create(live: true, delivery_date: next_friday + 7.days, order_cutoff: Time.zone.today - 2.days, product_id: product_avocado.id, price: 2.29, user_id: f4.id, unit_id: whole.id, description: "product attribute x, y & z", description_body: "best avocado ever!")
 upload = Upload.create(file_name: File.open(File.join("/home/david/fc/website/assets", "avocado.png")))
