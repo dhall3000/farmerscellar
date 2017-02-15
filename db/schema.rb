@@ -422,7 +422,7 @@ ActiveRecord::Schema.define(version: 20170213215204) do
     t.float    "order_minimum_producer_net"
     t.string   "important_notes"
     t.string   "important_notes_body"
-    t.float    "inbound_order_value_producer_net", default: -1.0,  null: false
+    t.float    "inbound_order_value_producer_net", default: 0.0,   null: false
     t.float    "producer_net_unit",                default: 0.0,   null: false
     t.index ["delivery_date"], name: "index_postings_on_delivery_date"
     t.index ["live"], name: "index_postings_on_live"

@@ -241,6 +241,7 @@ class PostingRecurrence < ApplicationRecord
     #NOTE: the + 10.weeks is kinda arbitrary. might need to be revisited later. just want to keep moving for now so don't
     #want to spend brain cycles doing anything 'smart' here.
     new_post.delivery_date = get_delivery_dates_for(old_post.delivery_date, old_post.delivery_date + (10 * 7).days)[0]
+    new_post.inbound_order_value_producer_net = 0
 
     #set new_post commitment zone start
     commitment_zone_window = old_post.delivery_date - old_post.order_cutoff

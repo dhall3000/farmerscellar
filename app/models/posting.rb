@@ -160,25 +160,17 @@ class Posting < ApplicationRecord
   def biggest_order_minimum_producer_net_outstanding
     #this posting has a producer and that producer might have a distributor. among those possible three entities, each could
     #have an order minimum. we here want to return the greatest deficiency of those three
+    biggest_outstanding = order_minimum_producer_net_outstanding
+    producer_outstanding = user.order_minimum_producer_net_outstanding(order_cutoff)
 
-    biggest_outstanding = 0
-
-    temp = order_minimum_producer_net_outstanding
-
-    if temp > biggest_outstanding
-      biggest_outstanding = temp
-    end
-
-    temp = user.order_minimum_producer_net_outstanding(order_cutoff)
-
-    if temp > biggest_outstanding
-      biggest_outstanding = temp
+    if producer_outstanding > biggest_outstanding
+      biggest_outstanding = producer_outstanding
     end
 
     if user.distributor
-      temp = user.distributor.order_minimum_producer_net_outstanding(order_cutoff)
-      if temp > biggest_outstanding
-        biggest_outstanding = temp
+      distributor_outstanding = user.distributor.order_minimum_producer_net_outstanding(order_cutoff)
+      if distributor_outstanding > biggest_outstanding
+        biggest_outstanding = distributor_outstanding
       end
     end
 
@@ -192,7 +184,10 @@ class Posting < ApplicationRecord
     om = 0
 
     if units_per_case && units_per_case > 1
-      om = get_producer_net_case
+      case_value = get_producer_net_case
+      om = order_minimum_producer_net || 0
+      min_num_cases = [(om / case_value.to_f).ceil, 1].max
+      om = (min_num_cases * case_value).round(2)
     end
 
     return om
@@ -214,7 +209,7 @@ class Posting < ApplicationRecord
   end
 
   def shippable?
-    return order_minimum_producer_net_outstanding == 0
+    return order_minimum_producer_net_outstanding == 0 && inbound_order_value_producer_net > 0
   end
 
   def order_minimum_producer_net_outstanding
@@ -263,7 +258,21 @@ class Posting < ApplicationRecord
   end
 
   def outbound_order_value_producer_net
-    inbound_order_value_producer_net >= effective_order_minimum_producer_net ? return inbound_order_value_producer_net : return 0
+
+    if inbound_order_value_producer_net < effective_order_minimum_producer_net
+      return 0
+    end
+
+    if units_per_case.nil? || units_per_case < 2
+      return inbound_order_value_producer_net
+    end
+
+    case_value = get_producer_net_case
+    num_cases_outbound = (inbound_order_value_producer_net / case_value).floor
+    ov = (num_cases_outbound * get_producer_net_case).round(2)
+
+    return ov
+
   end
 
   def inbound_num_units_ordered

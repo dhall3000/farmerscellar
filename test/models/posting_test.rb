@@ -309,7 +309,7 @@ class PostingTest < ActiveSupport::TestCase
     u1 = create_user("u1", "u1@u.com")
     assert u1.valid?
     u1_ti1 = ToteItem.new(quantity: 29, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: u1)    
-    u1_ti1.save
+    assert u1_ti1.save
     u1_ti1.transition(:customer_authorized)
     #verify minimums not met
     assert_not @posting.reload.shippable?
@@ -406,12 +406,11 @@ class PostingTest < ActiveSupport::TestCase
     #verify outbound_order_value_producer_net > 0
     assert @posting.outbound_order_value_producer_net > 0
     #verify that the outbound order amount equals 1 case, even though there were inbound orders totaling slightly more than one case
-    @posting.outbound_order_value_producer_net
     assert_equal @posting.reload.get_producer_net_case, @posting.outbound_order_value_producer_net
     #u2 cancels their order
     u2_ti1.transition(:customer_removed)    
     #verify outbound_order_value_producer_net == 0
-    assert_not @posting.shippable?
+    assert_not @posting.reload.shippable?
     assert @posting.reload.outbound_order_value_producer_net == 0
 
   end
@@ -431,9 +430,10 @@ class PostingTest < ActiveSupport::TestCase
     #we are using 10 but this will create a inbound order value retail of 10. not producer net. so it should still cause 
     #us to be below OM
     u1_ti1 = ToteItem.new(quantity: 10, posting_id: @posting.id, state: ToteItem.states[:ADDED], price: @posting.price, user: u1)    
-    u1_ti1.save
+    assert u1_ti1.save
     u1_ti1.transition(:customer_authorized)
     #verify minimums not met
+    @posting.reload
     assert_not @posting.shippable?
     assert @posting.inbound_order_value_producer_net < 10
     assert @posting.inbound_order_value_producer_net > 0
@@ -508,7 +508,7 @@ class PostingTest < ActiveSupport::TestCase
     ti.transition(:order_cutoffed)
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
-    assert @posting.shippable?    
+    assert @posting.reload.shippable?    
   end
   
   test "should not submit order when posting value below order minimum" do
@@ -544,7 +544,7 @@ class PostingTest < ActiveSupport::TestCase
     assert ti.save    
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:ADDED], @posting.tote_items.first.state
-    assert_not @posting.shippable?
+    assert_not @posting.reload.shippable?
   end
 
   test "should submit order when quantity is above zero and cases arent in use" do
@@ -555,7 +555,7 @@ class PostingTest < ActiveSupport::TestCase
     ti.transition(:order_cutoffed)
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
-    assert @posting.shippable?
+    assert @posting.reload.shippable?
   end
 
   test "should submit order when quantity is at least the size of a case" do
@@ -569,7 +569,7 @@ class PostingTest < ActiveSupport::TestCase
     ti.transition(:order_cutoffed)
     assert_equal 1, @posting.tote_items.count
     assert_equal ToteItem.states[:COMMITTED], @posting.tote_items.first.state
-    assert @posting.shippable?
+    assert @posting.reload.shippable?
   end
 
   test "should only submit order in round case lots when applicable" do    

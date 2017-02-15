@@ -175,8 +175,7 @@ class User < ApplicationRecord
 
     if order_value.nil?
       #create the ov and populate it with data the slow way
-      order_values.create(inbound_producer_net: inbound_order_report(order_cutoff)[:order_value_producer_net], order_cutoff: order_cutoff)
-      order_value = order_values.where(order_cutoff: order_cutoff).last
+      order_value = order_values.create(inbound_producer_net: 0, order_cutoff: order_cutoff)      
     end
 
     return order_value

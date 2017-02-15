@@ -48,15 +48,15 @@ class UserTest < ActiveSupport::TestCase
 
     #tote items producer1 1, price 3.00, order min: $20, contribution: $54
     ti_bob_carrots = create_tote_item(bob, posting_carrots, quantity = 6)
-    ti_bob_carrots.update(state: ToteItem.states[:COMMITTED])
     ti_chris_carrots = create_tote_item(chris, posting_carrots, quantity = 12)
-    ti_chris_carrots.update(state: ToteItem.states[:COMMITTED])
 
     #tote items producer1 2, price 4.00, order min: $20, contribution: $24
     ti_sam_milk = create_tote_item(sam, posting_milk, quantity = 3)
-    ti_sam_milk.update(state: ToteItem.states[:COMMITTED])
     ti_chris_milk = create_tote_item(chris, posting_milk, quantity = 3)
-    ti_chris_milk.update(state: ToteItem.states[:COMMITTED])
+
+    create_one_time_authorization_for_customer(bob)
+    create_one_time_authorization_for_customer(sam)
+    create_one_time_authorization_for_customer(chris)
     
     report = producer1.outbound_order_report(posting_carrots.order_cutoff)    
     producer1_net_value = 49.32    
@@ -128,41 +128,33 @@ class UserTest < ActiveSupport::TestCase
 
     #tote items oxbow 1, price 1.00, contribution = $5.00
     ti_bob_celery = create_tote_item(bob, posting_celery, quantity = 3)
-    ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
     ti_sam_celery = create_tote_item(sam, posting_celery, quantity = 2)
-    ti_sam_celery.update(state: ToteItem.states[:COMMITTED])
 
     #tote items producer1 1, price 3.00, order min: $20, contribution: $54
     ti_bob_carrots = create_tote_item(bob, posting_carrots, quantity = 6)
-    ti_bob_carrots.update(state: ToteItem.states[:COMMITTED])
     ti_chris_carrots = create_tote_item(chris, posting_carrots, quantity = 12)
-    ti_chris_carrots.update(state: ToteItem.states[:COMMITTED])
 
     #tote items producer2 1, price 5.00, units_per_case: 10, num_units: 12, num_cases: 1, contribution: $50
     ti_sam_beef = create_tote_item(sam, posting_beef, quantity = 6)
-    ti_sam_beef.update(state: ToteItem.states[:COMMITTED])
     ti_chris_beef = create_tote_item(chris, posting_beef, quantity = 6)
-    ti_chris_beef.update(state: ToteItem.states[:COMMITTED])
 
     #-----------------------------------------------------------------------------------------------
 
     #tote items oxbow 2, price 2.00, contribution = $10
     ti_bob_apples = create_tote_item(bob, posting_apples, quantity = 3)
-    ti_bob_apples.update(state: ToteItem.states[:COMMITTED])
     ti_sam_apples = create_tote_item(sam, posting_apples, quantity = 2)
-    ti_sam_apples.update(state: ToteItem.states[:COMMITTED])
 
     #tote items producer1 2, price 4.00, order min: $20, contribution: $24
     ti_sam_milk = create_tote_item(sam, posting_milk, quantity = 3)
-    ti_sam_milk.update(state: ToteItem.states[:COMMITTED])
     ti_chris_milk = create_tote_item(chris, posting_milk, quantity = 3)
-    ti_chris_milk.update(state: ToteItem.states[:COMMITTED])    
 
     #tote items producer2 2, price 6.00, contribution: $36
     ti_sam_milk = create_tote_item(sam, posting_milk, quantity = 3)
-    ti_sam_milk.update(state: ToteItem.states[:COMMITTED])
     ti_chris_milk = create_tote_item(chris, posting_milk, quantity = 3)
-    ti_chris_milk.update(state: ToteItem.states[:COMMITTED])
+
+    create_one_time_authorization_for_customer(bob)
+    create_one_time_authorization_for_customer(sam)
+    create_one_time_authorization_for_customer(chris)
 
     #get producer net by first commitment zone
     first_czs_oxbow_net = oxbow.outbound_order_value_producer_net(czs1)
@@ -202,7 +194,7 @@ class UserTest < ActiveSupport::TestCase
     end
 
     postings.each do |posting|
-      outbound_order_value_producer_net = (outbound_order_value_producer_net + posting.outbound_order_value_producer_net).round(2)
+      outbound_order_value_producer_net = (outbound_order_value_producer_net + posting.reload.outbound_order_value_producer_net).round(2)
     end
 
     return outbound_order_value_producer_net
@@ -272,48 +264,40 @@ class UserTest < ActiveSupport::TestCase
     sam = create_user("sam", "sam@s.com")
 
     #tote items oxbow 1, price 1.00, contribution = $5.00
-    ti_bob_celery = create_tote_item(bob, posting_celery, quantity = 3)
-    ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
+    ti_bob_celery = create_tote_item(bob, posting_celery, quantity = 3) #
     ti_sam_celery = create_tote_item(sam, posting_celery, quantity = 2)
-    ti_sam_celery.update(state: ToteItem.states[:COMMITTED])
 
     #tote items producer1 1, price 3.00, order min: $20, contribution: $54
     ti_bob_carrots = create_tote_item(bob, posting_carrots, quantity = 6)
-    ti_bob_carrots.update(state: ToteItem.states[:COMMITTED])
     ti_chris_carrots = create_tote_item(chris, posting_carrots, quantity = 12)
-    ti_chris_carrots.update(state: ToteItem.states[:COMMITTED])
 
     #tote items producer2 1, price 5.00, units_per_case: 10, num_units: 6, contribution: $0
     ti_sam_beef = create_tote_item(sam, posting_beef, quantity = 3)
-    ti_sam_beef.update(state: ToteItem.states[:COMMITTED])
     ti_chris_beef = create_tote_item(chris, posting_beef, quantity = 3)
-    ti_chris_beef.update(state: ToteItem.states[:COMMITTED])
 
     #-----------------------------------------------------------------------------------------------
-
     #tote items oxbow 2, price 2.00, contribution = $10
     ti_bob_apples = create_tote_item(bob, posting_apples, quantity = 3)
-    ti_bob_apples.update(state: ToteItem.states[:COMMITTED])
     ti_sam_apples = create_tote_item(sam, posting_apples, quantity = 2)
-    ti_sam_apples.update(state: ToteItem.states[:COMMITTED])
 
     #tote items producer1 2, price 4.00, order min: $20, contribution: $24
     ti_sam_milk = create_tote_item(sam, posting_milk, quantity = 3)
-    ti_sam_milk.update(state: ToteItem.states[:COMMITTED])
     ti_chris_milk = create_tote_item(chris, posting_milk, quantity = 3)
-    ti_chris_milk.update(state: ToteItem.states[:COMMITTED])    
 
     #tote items producer2 2, price 6.00, contribution: $36
     ti_sam_milk = create_tote_item(sam, posting_milk, quantity = 3)
-    ti_sam_milk.update(state: ToteItem.states[:COMMITTED])
     ti_chris_milk = create_tote_item(chris, posting_milk, quantity = 3)
-    ti_chris_milk.update(state: ToteItem.states[:COMMITTED])
+
+    create_one_time_authorization_for_customer(bob)
+    create_one_time_authorization_for_customer(sam)
+    create_one_time_authorization_for_customer(chris)
 
     #get producer net by first commitment zone
-    first_czs_oxbow_net = oxbow.outbound_order_value_producer_net(czs1)
+    first_czs_oxbow_net = oxbow.reload.outbound_order_value_producer_net(czs1)
     #get producer net by postings    
     first_postings_distributor_net = get_outbound_order_value_producer_net(delivery_date1_postings)
     #verify producer nets match
+
     assert_equal first_czs_oxbow_net, first_postings_distributor_net    
     #verify correct oxbow producer net value
     assert_equal 53.87, first_czs_oxbow_net
@@ -401,41 +385,33 @@ class UserTest < ActiveSupport::TestCase
 
     #tote items oxbow 1, price 1.00, contribution = $5.00
     ti_bob_celery = create_tote_item(bob, posting_celery, quantity = 3)
-    ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
     ti_sam_celery = create_tote_item(sam, posting_celery, quantity = 2)
-    ti_sam_celery.update(state: ToteItem.states[:COMMITTED])
 
     #tote items producer1 1, price 3.00, order min: $20, contribution: $15
     ti_bob_carrots = create_tote_item(bob, posting_carrots, quantity = 3)
-    ti_bob_carrots.update(state: ToteItem.states[:COMMITTED])
     ti_chris_carrots = create_tote_item(chris, posting_carrots, quantity = 2)
-    ti_chris_carrots.update(state: ToteItem.states[:COMMITTED])
 
     #tote items producer2 1, price 5.00, units_per_case: 10, num_units: 6, contribution: $0
     ti_sam_beef = create_tote_item(sam, posting_beef, quantity = 3)
-    ti_sam_beef.update(state: ToteItem.states[:COMMITTED])
     ti_chris_beef = create_tote_item(chris, posting_beef, quantity = 3)
-    ti_chris_beef.update(state: ToteItem.states[:COMMITTED])
 
     #-----------------------------------------------------------------------------------------------
 
     #tote items oxbow 2, price 2.00, contribution = $10
     ti_bob_apples = create_tote_item(bob, posting_apples, quantity = 3)
-    ti_bob_apples.update(state: ToteItem.states[:COMMITTED])
     ti_sam_apples = create_tote_item(sam, posting_apples, quantity = 2)
-    ti_sam_apples.update(state: ToteItem.states[:COMMITTED])
 
     #tote items producer1 2, price 4.00, order min: $20, contribution: $24
     ti_sam_milk = create_tote_item(sam, posting_milk, quantity = 3)
-    ti_sam_milk.update(state: ToteItem.states[:COMMITTED])
     ti_chris_milk = create_tote_item(chris, posting_milk, quantity = 3)
-    ti_chris_milk.update(state: ToteItem.states[:COMMITTED])    
 
     #tote items producer2 2, price 6.00, contribution: $36
     ti_sam_milk = create_tote_item(sam, posting_milk, quantity = 3)
-    ti_sam_milk.update(state: ToteItem.states[:COMMITTED])
     ti_chris_milk = create_tote_item(chris, posting_milk, quantity = 3)
-    ti_chris_milk.update(state: ToteItem.states[:COMMITTED])
+
+    create_one_time_authorization_for_customer(bob)
+    create_one_time_authorization_for_customer(sam)
+    create_one_time_authorization_for_customer(chris)
 
     #oxbow has om $50 and only has gross sales of $5. producer1 has om $20 and only has gross sales of $13.75
     #producer2 has no om but does have case size of 10 and only 6 units sold
@@ -491,33 +467,28 @@ class UserTest < ActiveSupport::TestCase
 
     #create tote items for all postings
     ti_bob_celery = create_tote_item(bob, posting_celery, quantity = 3)
-    ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
     ti_chris_celery = create_tote_item(chris, posting_celery, quantity = 6)
-    ti_chris_celery.update(state: ToteItem.states[:COMMITTED])
     ti_sam_celery = create_tote_item(sam, posting_celery, quantity = 9)
-    ti_sam_celery.update(state: ToteItem.states[:COMMITTED])
 
     ti_bob_apples = create_tote_item(bob, posting_apples, quantity = 2)
-    ti_bob_apples.update(state: ToteItem.states[:COMMITTED])    
     ti_chris_apples = create_tote_item(chris, posting_apples, quantity = 4)
-    ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
     ti_sam_apples = create_tote_item(sam, posting_apples, quantity = 6)
-    ti_sam_apples.update(state: ToteItem.states[:COMMITTED])
 
     ti_bob_milk = create_tote_item(bob, posting_milk, quantity = 1)
-    ti_bob_milk.update(state: ToteItem.states[:COMMITTED])    
     ti_chris_milk = create_tote_item(chris, posting_milk, quantity = 2)
-    ti_chris_milk.update(state: ToteItem.states[:COMMITTED])
     ti_sam_milk = create_tote_item(sam, posting_milk, quantity = 3)
-    ti_sam_milk.update(state: ToteItem.states[:COMMITTED])
+
+    create_one_time_authorization_for_customer(bob)
+    create_one_time_authorization_for_customer(sam)
+    create_one_time_authorization_for_customer(chris)
 
     expected_celery_posting_value = 41.04
     expected_apples_posting_value = 21.96
     expected_order_value = expected_celery_posting_value + expected_apples_posting_value
     assert_equal 63, expected_order_value
 
-    assert_equal expected_celery_posting_value, posting_celery.inbound_order_value_producer_net
-    assert_equal expected_apples_posting_value, posting_apples.inbound_order_value_producer_net
+    assert_equal expected_celery_posting_value, posting_celery.reload.inbound_order_value_producer_net
+    assert_equal expected_apples_posting_value, posting_apples.reload.inbound_order_value_producer_net
 
     czs = posting_celery.order_cutoff
     producer_net = producer.outbound_order_value_producer_net(czs)
@@ -542,14 +513,13 @@ class UserTest < ActiveSupport::TestCase
     chris = create_user("chris", "chris@c.com")
 
     ti_bob_celery = create_tote_item(bob, posting_celery, quantity = 3)
-    ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
     ti_chris_celery = create_tote_item(chris, posting_celery, quantity = 6)
-    ti_chris_celery.update(state: ToteItem.states[:COMMITTED])
 
     ti_bob_apples = create_tote_item(bob, posting_apples, quantity = 2)
-    ti_bob_apples.update(state: ToteItem.states[:COMMITTED])    
     ti_chris_apples = create_tote_item(chris, posting_apples, quantity = 4)
-    ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
+
+    create_one_time_authorization_for_customer(bob)
+    create_one_time_authorization_for_customer(chris)
 
     #verify inbound_order_value_producer_net value
     gross_celery = 22.50
@@ -557,7 +527,7 @@ class UserTest < ActiveSupport::TestCase
     payment_processor_fee_unit_celery = 0.09
     producer_net_unit_celery = (price_celery - commission_per_unit_celery - payment_processor_fee_unit_celery).round(2)
     assert_equal 2.28, producer_net_unit_celery
-    assert_equal producer_net_unit_celery, posting_celery.get_producer_net_unit
+    assert_equal producer_net_unit_celery, posting_celery.reload.get_producer_net_unit
     expected_producer_net_celery = 20.52
     assert_equal expected_producer_net_celery, posting_celery.inbound_order_value_producer_net
 
@@ -566,7 +536,7 @@ class UserTest < ActiveSupport::TestCase
     payment_processor_fee_unit_apples = 0.07
     producer_net_unit_apples = (price_apples - commission_per_unit_apples - payment_processor_fee_unit_apples).round(2)
     assert_equal 1.83, producer_net_unit_apples
-    assert_equal producer_net_unit_apples, posting_apples.get_producer_net_unit
+    assert_equal producer_net_unit_apples, posting_apples.reload.get_producer_net_unit
     expected_producer_net_apples = 10.98
     assert_equal expected_producer_net_apples, posting_apples.inbound_order_value_producer_net
 
@@ -604,14 +574,13 @@ class UserTest < ActiveSupport::TestCase
     chris = create_user("chris", "chris@c.com")
 
     ti_bob_celery = create_tote_item(bob, posting_celery, quantity = 3)
-    ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
     ti_chris_celery = create_tote_item(chris, posting_celery, quantity = 6)
-    ti_chris_celery.update(state: ToteItem.states[:COMMITTED])
 
     ti_bob_apples = create_tote_item(bob, posting_apples, quantity = 2)
-    ti_bob_apples.update(state: ToteItem.states[:COMMITTED])    
     ti_chris_apples = create_tote_item(chris, posting_apples, quantity = 4)
-    ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
+
+    create_one_time_authorization_for_customer(bob)
+    create_one_time_authorization_for_customer(chris)
 
     #verify inbound_order_value_producer_net value
     gross_celery = 22.50
@@ -619,7 +588,7 @@ class UserTest < ActiveSupport::TestCase
     payment_processor_fee_unit_celery = 0.09
     producer_net_unit_celery = (price_celery - commission_per_unit_celery - payment_processor_fee_unit_celery).round(2)
     assert_equal 2.28, producer_net_unit_celery
-    assert_equal producer_net_unit_celery, posting_celery.get_producer_net_unit
+    assert_equal producer_net_unit_celery, posting_celery.reload.get_producer_net_unit
     expected_producer_net_celery = 20.52
     assert_equal expected_producer_net_celery, posting_celery.inbound_order_value_producer_net
 
@@ -628,7 +597,7 @@ class UserTest < ActiveSupport::TestCase
     payment_processor_fee_unit_apples = 0.07
     producer_net_unit_apples = (price_apples - commission_per_unit_apples - payment_processor_fee_unit_apples).round(2)
     assert_equal 1.83, producer_net_unit_apples
-    assert_equal producer_net_unit_apples, posting_apples.get_producer_net_unit
+    assert_equal producer_net_unit_apples, posting_apples.reload.get_producer_net_unit
     expected_producer_net_apples = 10.98
     assert_equal expected_producer_net_apples, posting_apples.inbound_order_value_producer_net
 
@@ -665,14 +634,13 @@ class UserTest < ActiveSupport::TestCase
     chris = create_user("chris", "chris@c.com")
 
     ti_bob_celery = create_tote_item(bob, posting_celery, quantity = 3)
-    ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
     ti_chris_celery = create_tote_item(chris, posting_celery, quantity = 6)
-    ti_chris_celery.update(state: ToteItem.states[:COMMITTED])
 
     ti_bob_apples = create_tote_item(bob, posting_apples, quantity = 2)
-    ti_bob_apples.update(state: ToteItem.states[:COMMITTED])    
     ti_chris_apples = create_tote_item(chris, posting_apples, quantity = 4)
-    ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
+
+    create_one_time_authorization_for_customer(bob)
+    create_one_time_authorization_for_customer(chris)
 
     #verify inbound_order_value_producer_net value
     gross_celery = 22.50
@@ -680,7 +648,7 @@ class UserTest < ActiveSupport::TestCase
     payment_processor_fee_unit_celery = 0.09
     producer_net_unit_celery = (price_celery - commission_per_unit_celery - payment_processor_fee_unit_celery).round(2)
     assert_equal 2.28, producer_net_unit_celery
-    assert_equal producer_net_unit_celery, posting_celery.get_producer_net_unit
+    assert_equal producer_net_unit_celery, posting_celery.reload.get_producer_net_unit
     expected_producer_net_celery = 20.52
     assert_equal expected_producer_net_celery, posting_celery.inbound_order_value_producer_net
 
@@ -689,7 +657,7 @@ class UserTest < ActiveSupport::TestCase
     payment_processor_fee_unit_apples = 0.07
     producer_net_unit_apples = (price_apples - commission_per_unit_apples - payment_processor_fee_unit_apples).round(2)
     assert_equal 1.83, producer_net_unit_apples
-    assert_equal producer_net_unit_apples, posting_apples.get_producer_net_unit
+    assert_equal producer_net_unit_apples, posting_apples.reload.get_producer_net_unit
     expected_producer_net_apples = 10.98
     assert_equal expected_producer_net_apples, posting_apples.inbound_order_value_producer_net
 
@@ -728,14 +696,12 @@ class UserTest < ActiveSupport::TestCase
     chris = create_user("chris", "chris@c.com")
 
     ti_bob_celery = create_tote_item(bob, posting_celery, quantity = 3)
-    ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
     ti_chris_celery = create_tote_item(chris, posting_celery, quantity = 6)
-    ti_chris_celery.update(state: ToteItem.states[:COMMITTED])
-
     ti_bob_apples = create_tote_item(bob, posting_apples, quantity = 2)
-    ti_bob_apples.update(state: ToteItem.states[:COMMITTED])    
     ti_chris_apples = create_tote_item(chris, posting_apples, quantity = 4)
-    ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
+
+    create_one_time_authorization_for_customer(bob)
+    create_one_time_authorization_for_customer(chris)
 
     #verify inbound_order_value_producer_net value
     gross_celery = 22.50
@@ -745,7 +711,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 2.28, producer_net_unit_celery
     assert_equal producer_net_unit_celery, posting_celery.get_producer_net_unit
     expected_producer_net_celery = 20.52
-    assert_equal expected_producer_net_celery, posting_celery.inbound_order_value_producer_net
+    assert_equal expected_producer_net_celery, posting_celery.reload.inbound_order_value_producer_net
 
     gross_apples = 12
     commission_per_unit_apples = 0.10
@@ -754,7 +720,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 1.83, producer_net_unit_apples
     assert_equal producer_net_unit_apples, posting_apples.get_producer_net_unit
     expected_producer_net_apples = 10.98
-    assert_equal expected_producer_net_apples, posting_apples.inbound_order_value_producer_net
+    assert_equal expected_producer_net_apples, posting_apples.reload.inbound_order_value_producer_net
 
     producer_net = posting_apples.inbound_order_value_producer_net + posting_celery.inbound_order_value_producer_net
     expected_producer_net = 31.50
@@ -794,14 +760,13 @@ class UserTest < ActiveSupport::TestCase
     chris = create_user("chris", "chris@c.com")
 
     ti_bob_celery = create_tote_item(bob, posting_celery, quantity = 3)
-    ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
     ti_chris_celery = create_tote_item(chris, posting_celery, quantity = 6)
-    ti_chris_celery.update(state: ToteItem.states[:COMMITTED])
 
     ti_bob_apples = create_tote_item(bob, posting_apples, quantity = 2)
-    ti_bob_apples.update(state: ToteItem.states[:COMMITTED])    
     ti_chris_apples = create_tote_item(chris, posting_apples, quantity = 4)
-    ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
+    
+    create_one_time_authorization_for_customer(bob)
+    create_one_time_authorization_for_customer(chris)
 
     #verify inbound_order_value_producer_net value
     gross_celery = 22.50
@@ -811,7 +776,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 2.28, producer_net_unit_celery
     assert_equal producer_net_unit_celery, posting_celery.get_producer_net_unit
     expected_producer_net_celery = 20.52
-    assert_equal expected_producer_net_celery, posting_celery.inbound_order_value_producer_net
+    assert_equal expected_producer_net_celery, posting_celery.reload.inbound_order_value_producer_net
 
     gross_apples = 12
     commission_per_unit_apples = 0.10
@@ -820,7 +785,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 1.83, producer_net_unit_apples
     assert_equal producer_net_unit_apples, posting_apples.get_producer_net_unit
     expected_producer_net_apples = 10.98
-    assert_equal expected_producer_net_apples, posting_apples.inbound_order_value_producer_net
+    assert_equal expected_producer_net_apples, posting_apples.reload.inbound_order_value_producer_net
 
     producer_net = posting_apples.inbound_order_value_producer_net + posting_celery.inbound_order_value_producer_net
     expected_producer_net = 31.50
@@ -860,14 +825,13 @@ class UserTest < ActiveSupport::TestCase
     chris = create_user("chris", "chris@c.com")
 
     ti_bob_celery = create_tote_item(bob, posting_celery, quantity = 3)
-    ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
     ti_chris_celery = create_tote_item(chris, posting_celery, quantity = 6)
-    ti_chris_celery.update(state: ToteItem.states[:COMMITTED])
 
     ti_bob_apples = create_tote_item(bob, posting_apples, quantity = 2)
-    ti_bob_apples.update(state: ToteItem.states[:COMMITTED])    
     ti_chris_apples = create_tote_item(chris, posting_apples, quantity = 4)
-    ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
+
+    create_one_time_authorization_for_customer(bob)
+    create_one_time_authorization_for_customer(chris)
 
     #verify inbound_order_value_producer_net value
     gross_celery = 22.50
@@ -875,7 +839,7 @@ class UserTest < ActiveSupport::TestCase
     payment_processor_fee_unit_celery = 0.09
     producer_net_unit_celery = (price_celery - commission_per_unit_celery - payment_processor_fee_unit_celery).round(2)
     assert_equal 2.28, producer_net_unit_celery
-    assert_equal producer_net_unit_celery, posting_celery.get_producer_net_unit
+    assert_equal producer_net_unit_celery, posting_celery.reload.get_producer_net_unit
     expected_producer_net_celery = 20.52
     assert_equal expected_producer_net_celery, posting_celery.inbound_order_value_producer_net
 
@@ -884,7 +848,7 @@ class UserTest < ActiveSupport::TestCase
     payment_processor_fee_unit_apples = 0.07
     producer_net_unit_apples = (price_apples - commission_per_unit_apples - payment_processor_fee_unit_apples).round(2)
     assert_equal 1.83, producer_net_unit_apples
-    assert_equal producer_net_unit_apples, posting_apples.get_producer_net_unit
+    assert_equal producer_net_unit_apples, posting_apples.reload.get_producer_net_unit
     expected_producer_net_apples = 10.98
     assert_equal expected_producer_net_apples, posting_apples.inbound_order_value_producer_net
 
@@ -932,14 +896,13 @@ class UserTest < ActiveSupport::TestCase
     chris = create_user("chris", "chris@c.com")
 
     ti_bob_celery = create_tote_item(bob, posting_celery, quantity = 3)
-    ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
     ti_chris_celery = create_tote_item(chris, posting_celery, quantity = 6)
-    ti_chris_celery.update(state: ToteItem.states[:COMMITTED])
 
     ti_bob_apples = create_tote_item(bob, posting_apples, quantity = 2)
-    ti_bob_apples.update(state: ToteItem.states[:COMMITTED])    
     ti_chris_apples = create_tote_item(chris, posting_apples, quantity = 4)
-    ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
+
+    create_one_time_authorization_for_customer(bob)
+    create_one_time_authorization_for_customer(chris)
 
     #verify inbound_order_value_producer_net value
     gross_celery = 22.50
@@ -947,7 +910,7 @@ class UserTest < ActiveSupport::TestCase
     payment_processor_fee_unit_celery = 0.09
     producer_net_unit_celery = (price_celery - commission_per_unit_celery - payment_processor_fee_unit_celery).round(2)
     assert_equal 2.28, producer_net_unit_celery
-    assert_equal producer_net_unit_celery, posting_celery.get_producer_net_unit
+    assert_equal producer_net_unit_celery, posting_celery.reload.get_producer_net_unit
     expected_producer_net_celery = 20.52
     assert_equal expected_producer_net_celery, posting_celery.inbound_order_value_producer_net
 
@@ -956,7 +919,7 @@ class UserTest < ActiveSupport::TestCase
     payment_processor_fee_unit_apples = 0.07
     producer_net_unit_apples = (price_apples - commission_per_unit_apples - payment_processor_fee_unit_apples).round(2)
     assert_equal 1.83, producer_net_unit_apples
-    assert_equal producer_net_unit_apples, posting_apples.get_producer_net_unit
+    assert_equal producer_net_unit_apples, posting_apples.reload.get_producer_net_unit
     expected_producer_net_apples = 10.98
     assert_equal expected_producer_net_apples, posting_apples.inbound_order_value_producer_net
 
@@ -1001,17 +964,15 @@ class UserTest < ActiveSupport::TestCase
     chris = create_user("chris", "chris@c.com")
 
     ti_bob_milk = create_tote_item(bob, posting_milk, quantity = 1)
-    ti_bob_milk.update(state: ToteItem.states[:COMMITTED])
 
     ti_bob_celery = create_tote_item(bob, posting_celery, quantity = 3)
-    ti_bob_celery.update(state: ToteItem.states[:COMMITTED])
     ti_chris_celery = create_tote_item(chris, posting_celery, quantity = 6)
-    ti_chris_celery.update(state: ToteItem.states[:COMMITTED])
 
     ti_bob_apples = create_tote_item(bob, posting_apples, quantity = 2)
-    ti_bob_apples.update(state: ToteItem.states[:COMMITTED])    
     ti_chris_apples = create_tote_item(chris, posting_apples, quantity = 4)
-    ti_chris_apples.update(state: ToteItem.states[:COMMITTED])
+
+    create_one_time_authorization_for_customer(bob)
+    create_one_time_authorization_for_customer(chris)
 
     #verify inbound_order_value_producer_net value
     gross_milk = price_milk
@@ -1019,7 +980,7 @@ class UserTest < ActiveSupport::TestCase
     payment_processor_fee_unit_milk = 0.35
     producer_net_unit_milk = (price_milk - commission_per_unit_milk - payment_processor_fee_unit_milk).round(2)
     assert_equal 9.15, producer_net_unit_milk
-    assert_equal producer_net_unit_milk, posting_milk.get_producer_net_unit
+    assert_equal producer_net_unit_milk, posting_milk.reload.get_producer_net_unit
     expected_producer_net_milk = 9.15
     assert_equal expected_producer_net_milk, posting_milk.inbound_order_value_producer_net    
 
@@ -1028,7 +989,7 @@ class UserTest < ActiveSupport::TestCase
     payment_processor_fee_unit_celery = 0.09
     producer_net_unit_celery = (price_celery - commission_per_unit_celery - payment_processor_fee_unit_celery).round(2)
     assert_equal 2.28, producer_net_unit_celery
-    assert_equal producer_net_unit_celery, posting_celery.get_producer_net_unit
+    assert_equal producer_net_unit_celery, posting_celery.reload.get_producer_net_unit
     expected_producer_net_celery = 20.52
     assert_equal expected_producer_net_celery, posting_celery.inbound_order_value_producer_net
 
@@ -1037,7 +998,7 @@ class UserTest < ActiveSupport::TestCase
     payment_processor_fee_unit_apples = 0.07
     producer_net_unit_apples = (price_apples - commission_per_unit_apples - payment_processor_fee_unit_apples).round(2)
     assert_equal 1.83, producer_net_unit_apples
-    assert_equal producer_net_unit_apples, posting_apples.get_producer_net_unit
+    assert_equal producer_net_unit_apples, posting_apples.reload.get_producer_net_unit
     expected_producer_net_apples = 10.98
     assert_equal expected_producer_net_apples, posting_apples.inbound_order_value_producer_net
 

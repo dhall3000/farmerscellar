@@ -60,10 +60,11 @@ class ToteItemTest < ActiveSupport::TestCase
     posting_f1 = create_posting(farm1, price, products(:apples))
     posting_f1.update(order_minimum_producer_net: 10)
     quantity = 4
-    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting_f1, user: customer)
+    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:ADDED], posting: posting_f1, user: customer)
     assert ti.save
+    ti.transition(:customer_authorized)
     assert ti.state?(:AUTHORIZED)
-    assert_equal (quantity * price * 0.915).round(2), posting_f1.inbound_order_value_producer_net
+    assert_equal (quantity * price * 0.915).round(2), posting_f1.reload.inbound_order_value_producer_net
     assert_equal 0, posting_f1.outbound_order_value_producer_net
 
     farm2 = create_producer("farmer2", "f2@f.com")
@@ -71,8 +72,9 @@ class ToteItemTest < ActiveSupport::TestCase
     price = 2
     posting_f2 = create_posting(farm2, price, products(:milk))
     quantity = 45
-    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting_f2, user: customer)
+    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:ADDED], posting: posting_f2, user: customer)
     assert ti.save
+    ti.transition(:customer_authorized)
     assert ti.state?(:AUTHORIZED)
 
     #verify that the amount left for the posting is > 0
@@ -84,7 +86,6 @@ class ToteItemTest < ActiveSupport::TestCase
     assert farm1.order_minimum_producer_net_outstanding(posting_f1.order_cutoff) > posting_f1.order_minimum_producer_net_outstanding
     #verify that the amount left for the producer is greater than the amount left for the distributor
     assert farm1.order_minimum_producer_net_outstanding(posting_f1.order_cutoff) > distributor.order_minimum_producer_net_outstanding(posting_f1.order_cutoff)
-
     #verify the biggest amount outstanding reported by the posting is correct (hint: should be equal to the producer's amount outstanding since it's the biggest of the three)
     assert_equal farm1.order_minimum_producer_net_outstanding(posting_f1.order_cutoff), posting_f1.biggest_order_minimum_producer_net_outstanding
 
@@ -116,7 +117,7 @@ class ToteItemTest < ActiveSupport::TestCase
     #OM for the distributor is 100. distributor has 3 producers, each of which has 3 postings. the distributor himself also has 3 postings. the customer buys quantity of 4 from each of
     #the 12 postings. that's quantity of 48. the retail price is $2 so the retail producer net for the distributor is $96. multiply this by 0.915 to account for paypal fees
     #and FC commission and you have 87.84 for the distributor inbound order value
-    assert_equal 87.84, distributor.inbound_order_value_producer_net(order_cutoff)
+    assert_equal 87.84, distributor.reload.inbound_order_value_producer_net(order_cutoff)
     assert_equal (100 - 87.84).round(2), distributor.order_minimum_producer_net_outstanding(order_cutoff)
     
   end
@@ -129,16 +130,19 @@ class ToteItemTest < ActiveSupport::TestCase
     posting_c = create_posting(producer, price, products(:celery))
 
     quantity = 4
-    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting_a, user: customer)
+    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:ADDED], posting: posting_a, user: customer)
     assert ti.save
+    ti.transition(:customer_authorized)
     assert ti.state?(:AUTHORIZED)
 
-    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting_b, user: customer)
+    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:ADDED], posting: posting_b, user: customer)
     assert ti.save
+    ti.transition(:customer_authorized)
     assert ti.state?(:AUTHORIZED)
 
-    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting_c, user: customer)
+    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:ADDED], posting: posting_c, user: customer)
     assert ti.save
+    ti.transition(:customer_authorized)
     assert ti.state?(:AUTHORIZED)
     
   end
@@ -156,16 +160,19 @@ class ToteItemTest < ActiveSupport::TestCase
     customer = create_user("bob", "bob@b.com")
 
     quantity = 5
-    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting_a, user: customer)
+    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:ADDED], posting: posting_a, user: customer)
     assert ti.save
+    ti.transition(:customer_authorized)
     assert ti.state?(:AUTHORIZED)
 
-    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting_b, user: customer)
+    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:ADDED], posting: posting_b, user: customer)
     assert ti.save
+    ti.transition(:customer_authorized)
     assert ti.state?(:AUTHORIZED)
 
-    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting_c, user: customer)
+    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:ADDED], posting: posting_c, user: customer)
     assert ti.save
+    ti.transition(:customer_authorized)
     assert ti.state?(:AUTHORIZED)
 
     retail = quantity * 3 * price
@@ -191,8 +198,9 @@ class ToteItemTest < ActiveSupport::TestCase
     posting = create_posting(producer, price, product = nil, unit = nil, delivery_date, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net)
     customer = create_user("bob", "bob@b.com")
     quantity = 10
-    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting, user: customer)
+    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:ADDED], posting: posting, user: customer)
     assert ti.save
+    ti.transition(:customer_authorized)
     assert ti.state?(:AUTHORIZED)
 
     expected_order_min_outstanding = (posting.order_minimum_producer_net - posting.inbound_order_value_producer_net).round(2)
@@ -212,8 +220,9 @@ class ToteItemTest < ActiveSupport::TestCase
     posting = create_posting(producer, price, products(:apples), units(:pound), delivery_date, delivery_date - 2.days, commission = 0.05)    
     customer = create_user("bob", "bob@b.com")
     quantity = 10
-    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting, user: customer)
+    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:ADDED], posting: posting, user: customer)
     assert ti.save
+    ti.transition(:customer_authorized)
     assert ti.state?(:AUTHORIZED)
 
     expected_order_min_outstanding = 0
@@ -234,9 +243,10 @@ class ToteItemTest < ActiveSupport::TestCase
     posting = create_posting(producer, price, product = nil, unit = nil, delivery_date, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net)
     customer = create_user("bob", "bob@b.com")
     quantity = 25
-    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:AUTHORIZED], posting: posting, user: customer)
+    ti = ToteItem.new(quantity: quantity, price: price, state: ToteItem.states[:ADDED], posting: posting, user: customer)
     assert ti.save
-    assert ti.state?(:AUTHORIZED)
+    ti.transition(:customer_authorized)
+    assert ti.reload.state?(:AUTHORIZED)
 
     expected_order_min_outstanding = [0, (posting.order_minimum_producer_net - posting.inbound_order_value_producer_net).round(2)].max
     assert_equal 0, expected_order_min_outstanding

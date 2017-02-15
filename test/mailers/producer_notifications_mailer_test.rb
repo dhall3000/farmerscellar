@@ -2,9 +2,11 @@ require 'test_helper'
 
 class ProducerNotificationsMailerTest < ActionMailer::TestCase
   test "current_orders" do  	
-  	tote_items = ToteItem.all
-  	tote_items.update_all(state: ToteItem.states[:COMMITTED])
+  	tote_items = ToteItem.all  	
     ps = Posting.all.where(user: users(:f1))
+    customer = ps.first.tote_items.first.user
+    create_one_time_authorization_for_customer(customer)
+    ToteItem.all.update_all(state: ToteItem.states[:COMMITTED])
 
     #ugh, there's some dumb invalid posting in this lot so strip it out
     ps_keep = []

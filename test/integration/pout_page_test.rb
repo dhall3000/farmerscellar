@@ -128,7 +128,7 @@ class PoutPageTest < IntegrationHelper
     #bob's item spans a case so he should get partially filled
     assert_equal 7, ti_bob.additional_units_required_to_fill_my_case
     #OM should be met
-    assert_equal 0, posting.biggest_order_minimum_producer_net_outstanding
+    assert_equal 0, posting.reload.biggest_order_minimum_producer_net_outstanding
     
     #bob should see an exclamation in his tote
     log_in_as(get_bob)
@@ -325,7 +325,7 @@ class PoutPageTest < IntegrationHelper
     assert_equal 0, additional_units_required_to_fill_my_case
     assert biggest_order_minimum_producer_net_outstanding > 0    
     assert biggest_order_minimum_producer_net_outstanding < posting.user.order_minimum_producer_net
-    assert_equal posting.biggest_order_minimum_producer_net_outstanding, biggest_order_minimum_producer_net_outstanding
+    assert_equal posting.reload.biggest_order_minimum_producer_net_outstanding, biggest_order_minimum_producer_net_outstanding
 
     #there's a problem with OM but not with case so we don't want to show any text related to case technology
     assert_select 'p span', {count: 1, text: "Currently this item will not ship"}
@@ -403,17 +403,16 @@ class PoutPageTest < IntegrationHelper
     #the case bob's item is in should not be fully filled now
     assert ti_bob.additional_units_required_to_fill_my_case > 0
     total_quantity_ordered = ti_bob.quantity + ti_sam.quantity
-    assert_equal ti_bob.posting.units_per_case - total_quantity_ordered, ti_bob.additional_units_required_to_fill_my_case
+    assert_equal ti_bob.posting.reload.units_per_case - total_quantity_ordered, ti_bob.additional_units_required_to_fill_my_case
     #the OM for bob's item's posting should be fully satisfied theoretically because $60 was ordered and OM = $50.
     #however, since the 1st case wasn't filled the actual quantity set to be ordered from producer is 0 units
     #so the full OM is outstanding. however, if we display to the user the full OM as outstanding this might be confusing because
     #although they've ordered product they see the outstanding om value unchanged.
 
-    case_constraint_effective_om_oustanding = (ti_bob.posting.get_producer_net_case - ti_bob.posting.inbound_order_value_producer_net).round(2)
+    case_constraint_effective_om_outstanding = (ti_bob.posting.get_producer_net_case - ti_bob.posting.inbound_order_value_producer_net).round(2)
     theo_om_outstanding = ti_bob.posting.user.order_minimum_producer_net - ti_bob.posting.inbound_order_value_producer_net
-    om_oustanding = [case_constraint_effective_om_oustanding, theo_om_outstanding].max
-    assert_equal om_oustanding, ti_bob.posting.biggest_order_minimum_producer_net_outstanding    
-
+    om_outstanding = [case_constraint_effective_om_outstanding, theo_om_outstanding].max
+    assert_equal om_outstanding, ti_bob.posting.biggest_order_minimum_producer_net_outstanding    
 
     #bob's user experience should reflect that the case his item is in isn't yet filled. it should say nothing about the unmet OM.
     log_in_as(get_bob)
@@ -442,7 +441,7 @@ class PoutPageTest < IntegrationHelper
     biggest_order_minimum_producer_net_outstanding = assigns(:biggest_order_minimum_producer_net_outstanding)
 
     assert_equal ti_bob.posting.units_per_case - total_quantity_ordered, additional_units_required_to_fill_my_case
-    assert_equal om_oustanding, biggest_order_minimum_producer_net_outstanding
+    assert_equal om_outstanding, biggest_order_minimum_producer_net_outstanding
 
     #since there's a problem with both case and OM we only want to display case issues
     assert_select 'p span', {count: 1, text: "Currently this item will not ship"}    

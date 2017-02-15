@@ -102,6 +102,7 @@ class ToteItem < ApplicationRecord
         posting.add_inbound_order_value_producer_net(quantity)
       when :subscription_authorized
         new_state = ToteItem.states[:AUTHORIZED]
+        posting.add_inbound_order_value_producer_net(quantity)
       when :customer_removed
         new_state = ToteItem.states[:REMOVED]
       when :system_removed
