@@ -26,14 +26,14 @@
               <div class="well">
                 <p>How can I tell if a Group Order Minimum has been met before I place my order?</p>
                 <p>
-                  Click ‘Shop’, then find the product of interest. Click ‘Order’. If there is a <%= link_to "Group Order Minimum", how_things_work_path(anchor: "order_minimums") %> and it hasn’t been achieved you’ll see <span class="spin-continuously alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>. Whenever you see that spinning icon, click it and you’ll see how much remains to achieve the minimum.
+                  First browse to the product of interest and click on it. Then look for 'Unmet Group Order Minimum' with one of these icons <span class="spin-continuously alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>. Click that icon to see how much remains to achieve the minimum. And if you don't see that icon then there's either no order minimum for that product or the order minimum has been met.
                 </p>
               </div>
 
               <div class="well">
                 <p>How can I tell if a Group Order Minimum has been met after I place my order?</p>
                 <p>
-                  If you’ve already ordered and later want to see if a <%= link_to "Group Order Minimum", how_things_work_path(anchor: "order_minimums") %> has been achieved, log in to your Farmer’s Cellar account and go to the black header at the top of the page. Click either ‘Tote’ or ‘Orders’ depending on if you’ve authorized payment or not. If any of the products you’ve selected still have unmet Group Order Minimums you’ll see <span class="spin-continuously alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>. Whenever you see that spinning icon click it to find out more information.
+                  If you’ve already ordered and later want to see if a <%= link_to "Group Order Minimum", how_things_work_path(anchor: "order_minimums") %> has been achieved, log in to your Farmer’s Cellar account and click the green company name at the top of any page. Then click either ‘Tote’ or ‘Orders’ to display the products you've selected. If any of the products you’ve selected still have unmet Group Order Minimums you’ll see one of these icons next to it <span class="spin-continuously alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>. Whenever you see that icon click it to find out more information.
                 </p>
               </div>
               
@@ -45,7 +45,7 @@
               <div class="well">
                 <p>How can I view Order Cutoff?</p>
                 <p>
-                  <%= link_to "Order Cutoff", how_things_work_path(anchor: "order_cutoff") %> is the latest you can place or cancel an order. To find this date/time from your Tote or Orders page, click the <span class="glyphicon glyphicon-chevron-down"></span> to the left of any of the item rows. To find this information while shopping click the 'Order' button, then click the Scheduled Delivery date to reveal the Order Cutoff.
+                  <%= link_to "Order Cutoff", how_things_work_path(anchor: "order_cutoff") %> is the latest you can place or cancel an order. To find this date/time from your Tote or Orders page, click the <span class="glyphicon glyphicon-chevron-down"></span> to the left of any of the item rows. To find this information while shopping first click the product of interest, then click 'Delivery details'.
                 </p>
               </div>
               
@@ -70,7 +70,7 @@
             <div class="anchor" id="where_is_currently_scheduled_delivery_date">              
               <h3>How Can I Tell What my Order's Currently Scheduled Delivery Date is?</h3>
               <p>
-                If you did not receive delivery on the date you were expecting it's possible your <%= link_to "delivery was skipped", how_things_work_path(anchor: "skipped_deliveries") %>. To find the currently <%= link_to "Scheduled Delivery Date", how_things_work_path(anchor: "scheduled_delivery_date") %> log in to your Farmer's Cellar account and click 'Orders' in the black header at the top of the page.
+                To find out your products' currently scheduled delivery date log in to your Farmer's Cellar account and click the green company name at the top of any page. Then click 'Orders' and look under the 'Scheduled Delivery' column. If you did not receive delivery on the date you were expecting it's possible your <%= link_to "delivery was skipped", how_things_work_path(anchor: "skipped_deliveries") %>.
               </p>
             </div>
                        
@@ -123,23 +123,7 @@
 
 
 
-
-
-      <div class="panel panel-default">
-        <div class="anchor panel-heading" id="detailed_posting_info">
-          <div class="panel-title" data-toggle="collapse" data-parent="#accordion" data-target="#detailed_posting_infoBody">
-            Detailed Posting Info<span id="detailed_posting_infoBodyChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>            
-          </div>
-        </div>
-        <div id="detailed_posting_infoBody" class="panel-collapse collapse" data-chevron="#detailed_posting_infoBodyChevron">
-          <div class="panel-body">
-            <p>
-              To find out detailed information about each posting, first click on 'Shop' to get to the postings page, then find the posting you're interested in. Each 'posting' is laid out with producer name first, then under that is product name. Each of those names has a little icon to the left...if you click that icon it expands to show more information. Expand these little icons and you should find what you're looking for.
-            </p>            
-          </div>
-        </div>
-      </div>
-
+      
 
       <div class="panel panel-default">
         <div class="anchor panel-heading" id="password_reset_not_working">
