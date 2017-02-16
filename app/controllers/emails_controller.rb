@@ -5,7 +5,7 @@ class EmailsController < ApplicationController
   before_action :redirect_to_root_if_not_producer
 
   def index
-    @emails = Email.joins(:postings).where(postings: {user_id: current_user.id}).distinct
+    @emails = Email.joins(:postings).where(postings: {user_id: current_user.id}).order(:send_time).distinct
   end
 
   def new
