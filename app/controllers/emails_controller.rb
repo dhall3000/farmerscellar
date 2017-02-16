@@ -61,15 +61,12 @@ class EmailsController < ApplicationController
 
     if @email.save
 
-      to_users_list = @email.get_recipients(tote_item_states)
-      to_users_list.each do |to_user|
-        UserMailer.posting_alert(to_user, @email.subject, @email.body).deliver_now        
-      end
+      @email.send_email(tote_item_states)
 
-      if to_users_list.count > 0
+      if @email.reload.send_time
         flash[:success] = "Email successfully sent"
       else
-        flash[:info] = "Email object saved but recipient list empty so no emails sent"
+        flash[:info] = "Email not sent"
       end
       
       redirect_to @email

@@ -52,8 +52,11 @@ class EmailTest < ActiveSupport::TestCase
 
     assert email.valid?
     assert email.save
+    assert_not email.send_time
+    email.send_email
+    assert email.send_time
 
-    to_list = email.get_recipients
+    to_list = email.recipients
 
     assert_equal 3, to_list.count
     assert_equal 1, to_list.where(email: c1.email).count
@@ -95,8 +98,11 @@ class EmailTest < ActiveSupport::TestCase
 
     assert email.valid?
     assert email.save
+    assert_not email.send_time
+    email.send_email
+    assert email.send_time
 
-    to_list = email.get_recipients
+    to_list = email.recipients
 
     assert_equal 3, to_list.count
     assert_equal 1, to_list.where(email: c1.email).count

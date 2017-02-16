@@ -95,7 +95,7 @@ class ProducerAlertEmailsTest < IntegrationHelper
     email = assigns(:email)
     assert email.valid?
     assert_not flash.empty?
-    assert_equal "Email object saved but recipient list empty so no emails sent", flash[:info]
+    assert_equal "Email not sent", flash[:info]
     
     assert_response :redirect
     assert_redirected_to email

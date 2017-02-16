@@ -2,7 +2,7 @@
 
 <h2>Info</h2>
 <div>
-  <p><%= "#{@email.get_recipients.count.to_s} recipients" %></p>
+  <p><%= "#{@email.recipients.count.to_s} recipients" %></p>
 </div>
 <div>
   <p><%= "Sent #{@email.created_at.strftime("%a, %b")} #{@email.created_at.day.ordinalize}, #{@email.created_at.strftime("%l:%M %p")}" %></p>
@@ -28,7 +28,7 @@
 
 <h2>Distribution List</h2>
 <div>
-  <% @email.get_recipients.order(:email).each do |user| %>
+  <% @email.recipients.order(:email).each do |user| %>
     <p><%= user.email %></p>
   <% end %>
 </div>
