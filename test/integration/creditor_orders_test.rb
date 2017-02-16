@@ -3,6 +3,23 @@ require 'integration_helper'
 
 class CreditorOrdersTest < IntegrationHelper
 
+  test "open co should close when producer fails to deliver anything and admin enters zero for fill quantities" do
+    nuke_all_postings
+    posting = create_posting
+    bob = create_new_customer("bob", "bob@b.com")
+    create_tote_item(bob, posting, 1)
+    create_one_time_authorization_for_customer(bob)
+    travel_to posting.order_cutoff
+    assert_equal 0, CreditorOrder.count
+    RakeHelper.do_hourly_tasks
+    assert_equal 1, CreditorOrder.count
+    co = CreditorOrder.first
+    assert co.state?(:OPEN)
+    travel_to posting.delivery_date + 12.hours
+    fill_posting(posting, 0)
+    assert co.reload.state?(:CLOSED)
+  end  
+
   test "state should transition properly" do
 
     setup_basic_subscription_through_delivery

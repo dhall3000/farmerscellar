@@ -58,7 +58,15 @@ class CreditorOrdersController < ApplicationController
     @creditor_order = CreditorOrder.find_by(id: params[:id])
 
     if @creditor_order
+
+      if @creditor_order.balanced? && @creditor_order.state?(:OPEN)
+        #this condition was added in the case that a producer entirely skips delivering on an order. in this situation, as things currently are
+        #the creditororder.transition method will never get called so the co stays in the OPEN state. fix that.
+        @creditor_order.transition(:skipped_delivery)
+      end
+
       redirect_to creditor_order_path(@creditor_order)
+
     else
       flash[:danger] = "Couldn't find CreditorOrder id: #{params[:id].to_s}"
       redirect_to creditor_orders_path

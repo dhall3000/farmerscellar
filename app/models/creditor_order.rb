@@ -141,6 +141,10 @@ class CreditorOrder < ApplicationRecord
               update(state: CreditorOrder.state(:CLOSED))              
             end
             return
+          when :skipped_delivery
+            if balanced?
+              update(state: CreditorOrder.state(:CLOSED))
+            end
         end
         return
 
