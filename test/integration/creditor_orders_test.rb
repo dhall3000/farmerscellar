@@ -18,6 +18,7 @@ class CreditorOrdersTest < IntegrationHelper
     travel_to posting.delivery_date + 12.hours
     fill_posting(posting, 0)
     assert co.reload.state?(:CLOSED)
+    travel_back
   end  
 
   test "state should transition properly" do
