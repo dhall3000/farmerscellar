@@ -112,8 +112,13 @@
 <% if @food_categories && @food_categories.any? %>
   <div class="row">
     <% @food_categories.each do |food_category| %>
+      <%
+      if !food_category.uploads.any?
+        next
+      end
+      %>
       <div class="col-xs-6 col-sm-3">
-        <%= link_to postings_path(food_category: food_category.name), class: "thumbnail" do %>
+        <%= link_to postings_path(food_category: food_category.name), class: "thumbnail" do %>          
           <%= image_tag "#{food_category.uploads.last.file_name.square}", class: "img-responsive" %>
           <div class="caption">
             <h3><%= food_category.name %></h3>
