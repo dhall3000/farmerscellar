@@ -29,7 +29,7 @@
           <!-- Wrapper for slides -->
           <div class="carousel-inner" role="listbox">
             <% @posting.uploads.order(created_at: :asc).each do |upload| %>
-              <div class="item <%= 'active' if upload == @posting.uploads.first %>">
+              <div class="item <%= 'active' if upload == first_upload %>">
                 <%
                 
                   #sometimes all we can find by way of product image is a tiny thumb. in that case it appears that the 'large' ImageUploader process
