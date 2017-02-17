@@ -1,0 +1,17 @@
+<h1>Units</h1>
+
+<div class="row">
+  <div class="col-xs-12 col-sm-offset-3 col-sm-6">
+    <% @units.each do |unit| %>
+      <div>
+        <%= link_to unit.name, unit_path(unit) %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-xs-12 col-sm-offset-3 col-sm-6">
+    <%= link_to "New unit", new_unit_path, class: "btn btn-primary btn-lg outline" %>
+  </div>
+</div>
