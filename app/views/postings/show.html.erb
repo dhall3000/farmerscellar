@@ -16,7 +16,7 @@
           <% if @posting.uploads.count > 1 %>
             <ol class="carousel-indicators">
               <% index = 0 %>
-              <% @posting.uploads.each do |upload| %>
+              <% @posting.uploads.order(created_at: :asc).each do |upload| %>
                 <li data-target="#product-photos-carousel" data-slide-to="<%= index.to_s %>" class="<%= 'active' if upload == @posting.uploads.first %>"></li>
                 <% index += 1 %>
               <% end %>
@@ -25,7 +25,7 @@
 
           <!-- Wrapper for slides -->
           <div class="carousel-inner" role="listbox">
-            <% @posting.uploads.each do |upload| %>
+            <% @posting.uploads.order(created_at: :asc).each do |upload| %>
               <div class="item <%= 'active' if upload == @posting.uploads.first %>">
                 <%
                 
