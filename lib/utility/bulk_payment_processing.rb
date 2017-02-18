@@ -171,18 +171,8 @@ class BulkPaymentProcessing
 
     end
 
-    def self.deliveries_remaining_this_week
-
-      last_day_of_this_week = Time.zone.today
-
-      while last_day_of_this_week.wday != ENDOFWEEK
-        last_day_of_this_week = last_day_of_this_week + 1.day
-      end
-
-      outstanding_deliveries_this_week = Posting.where("delivery_date > ? and delivery_date <= ?", Time.zone.today.midnight, last_day_of_this_week.midnight)
-      
-      return outstanding_deliveries_this_week.count > 0
-
+    def self.deliveries_remaining_this_week      
+      return Posting.where("delivery_date > ? and delivery_date <= ?", Time.zone.today.midnight, end_of_week.midnight).any?
     end
 
     #sample success response.body = "TIMESTAMP=2015%2d08%2d22T00%3a59%3a05Z&CORRELATIONID=4ab512d716828&ACK=Success&VERSION=124%2e0&BUILD=000000"

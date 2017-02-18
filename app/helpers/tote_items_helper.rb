@@ -8,6 +8,10 @@ module ToteItemsHelper
     end
   end
 
+  def end_of_week(relative_to = nil)
+    return start_of_next_week(relative_to) - 1.day    
+  end
+
   def start_of_next_week(start_time = nil)
 
     if start_time.nil?
