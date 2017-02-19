@@ -13,7 +13,7 @@ class ProducerNotificationsMailerPreview < ActionMailer::Preview
     #make a fresh posting
     farmer = User.find_by(email: "f1@f.com")
     delivery_date = Time.zone.now.midnight + 2.days
-    if delivery_date.sunday?
+    if delivery_date.wday == STARTOFWEEK
       delivery_date = delivery_date + 1.day
     end
 
@@ -37,7 +37,7 @@ class ProducerNotificationsMailerPreview < ActionMailer::Preview
     #make a fresh posting
     farmer = User.find_by(email: "f1@f.com")
     delivery_date = Time.zone.now.midnight + 2.days
-    if delivery_date.sunday?
+    if delivery_date.wday == STARTOFWEEK
       delivery_date = delivery_date + 1.day
     end
 
@@ -71,7 +71,7 @@ class ProducerNotificationsMailerPreview < ActionMailer::Preview
     #make a fresh posting
     farmer = User.find_by(email: "f1@f.com")
     delivery_date = Time.zone.now.midnight + 2.days
-    if delivery_date.sunday?
+    if delivery_date.wday == STARTOFWEEK
       delivery_date = delivery_date + 1.day
     end
 

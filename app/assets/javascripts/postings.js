@@ -78,7 +78,7 @@ $(function()
   $('#descriptionBody').on('hide.bs.collapse', toggleDescriptionTruncation);
 
   $('#dtpDeliveryDate').datetimepicker({
-    daysOfWeekDisabled: [0],
+    daysOfWeekDisabled: [1],
     format: "dddd, MMMM Do YYYY",
     ignoreReadonly: true
   }); 

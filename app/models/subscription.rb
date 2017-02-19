@@ -200,7 +200,7 @@ class Subscription < ApplicationRecord
         end
 
         if posting_recurrence.frequency < 5
-          if num_sundays_between_dates(reference_date, producer_delivery_date) >= frequency * posting_recurrence.frequency
+          if num_week_start_days_between_dates(reference_date, producer_delivery_date) >= frequency * posting_recurrence.frequency
             subscriber_delivery_dates << producer_delivery_date
           end
         elsif posting_recurrence.frequency == 5        
@@ -268,25 +268,25 @@ class Subscription < ApplicationRecord
 
   private
 
-    def num_sundays_between_dates(date1, date2)
+    def num_week_start_days_between_dates(date1, date2)
 
       start_date = [date1, date2].min
       end_date = [date1, date2].max
 
-      num_sundays = 0
+      num_week_start_days = 0
 
-      if start_date.wday == 0
+      if start_date.wday == STARTOFWEEK
         start_date += 1.day
       end
 
       while start_date <= end_date
-        if start_date.wday == 0
-          num_sundays += 1
+        if start_date.wday == STARTOFWEEK
+          num_week_start_days += 1
         end
         start_date += 1.day
       end
 
-      return num_sundays
+      return num_week_start_days
 
     end
 

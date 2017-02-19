@@ -477,7 +477,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
   def create_post
 
     delivery_date = Time.zone.now.midnight + 4.days
-    if delivery_date.sunday?
+    if delivery_date.wday == STARTOFWEEK
       delivery_date += 1.day
     end
     order_cutoff = delivery_date - 2.days

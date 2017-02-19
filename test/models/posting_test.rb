@@ -13,7 +13,7 @@ class PostingTest < ActiveSupport::TestCase
 
     delivery_date = Time.zone.today + 3.days
 
-    if delivery_date.sunday?
+    if delivery_date.wday == STARTOFWEEK
       delivery_date = Time.zone.today + 4.days
     end
 
@@ -75,7 +75,11 @@ class PostingTest < ActiveSupport::TestCase
     tester.delivery_date = 78
     assert_not tester.valid?
 
-    #TODO: there should be a test that delivery date is not on Sunday. too lazy...
+    #we don't do deliveries on STARTOFWEEK day    
+    tester = @posting.dup
+    assert tester.valid?
+    tester.delivery_date = start_of_next_week(tester.delivery_date)
+    assert_not tester.valid?
 
     #order_cutoff
     tester = @posting.dup    
@@ -868,8 +872,8 @@ class PostingTest < ActiveSupport::TestCase
     assert_not @posting.valid?, get_error_messages(@posting)
   end
 
-  test "delivery_date must not be sunday" do
-    while !@posting.delivery_date.sunday?
+  test "delivery_date must not be start of week" do
+    while @posting.delivery_date.wday != STARTOFWEEK
       @posting.delivery_date += 1.day
     end
     assert_not @posting.valid?, get_error_messages(@posting)
@@ -878,7 +882,7 @@ class PostingTest < ActiveSupport::TestCase
   test "posting should not be created with past delivery date" do
     
     delivery_date = Time.zone.tomorrow.midnight
-    if delivery_date.sunday?
+    if delivery_date.wday == STARTOFWEEK
       delivery_date += 3.days
     end
 
@@ -899,7 +903,7 @@ class PostingTest < ActiveSupport::TestCase
     #but now let's make and assign an invalid delivery date...a date in the past
 
     new_delivery_date = Time.zone.now.midnight - 1.day
-    if new_delivery_date.sunday?
+    if new_delivery_date.wday == STARTOFWEEK
       new_delivery_date -= 1.days
     end
 
@@ -914,7 +918,7 @@ class PostingTest < ActiveSupport::TestCase
   test "posting should be updatable with past delivery date" do
 
     delivery_date = Time.zone.tomorrow.midnight
-    if delivery_date.sunday?
+    if delivery_date.wday == STARTOFWEEK
       delivery_date += 3.days
     end
 

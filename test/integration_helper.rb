@@ -670,7 +670,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     nuke_all_postings
 
     delivery_date = get_delivery_date(days_from_now = 10)
-    if (delivery_date - 1.day).sunday?
+    if (delivery_date - 1.day).wday == STARTOFWEEK
       delivery_date += 1.day
     end
     order_cutoff = delivery_date - 2.days
@@ -753,7 +753,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     nuke_all_postings
 
     delivery_date = get_delivery_date(days_from_now = 10)
-    if (delivery_date - 1.day).sunday?
+    if (delivery_date - 1.day).wday == STARTOFWEEK
       delivery_date += 1.day
     end
     order_cutoff = delivery_date - 2.days

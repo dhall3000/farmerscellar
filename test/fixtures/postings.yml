@@ -8,23 +8,22 @@
 <% delivery_date_next = delivery_date + 7.days %>
 
 <% days_out_to_start = 14 %>
-<% base_monday = Time.zone.today.midnight + days_out_to_start.days %>
+<% base_first_delivery_day_of_week = Time.zone.today.midnight + days_out_to_start.days %>
 <% i = 1 %>
-<% while !(base_monday + i.days).monday? %>
+<% while (base_first_delivery_day_of_week + i.days).wday != STARTOFWEEK %>
   <% i += 1 %>
 <% end %>
-<% base_monday = Time.zone.today.midnight + days_out_to_start.days + i.days %>
-<% wednesday_after_base_monday = base_monday + 2.days %>
-<% friday_after_base_monday = wednesday_after_base_monday + 2.days %>
-<% monday_after_base_monday = base_monday + 7.days %>
+<% base_first_delivery_day_of_week = Time.zone.today.midnight + days_out_to_start.days + (i + 1).days %>
+<% wednesday_after_base_first_delivery_day_of_week = base_first_delivery_day_of_week + 2.days %>
+<% friday_after_base_first_delivery_day_of_week = wednesday_after_base_first_delivery_day_of_week + 2.days %>
+<% first_delivery_day_of_week_after_base_first_delivery_day_of_week = base_first_delivery_day_of_week + 7.days %>
 
-<% next_non_sunday_or_monday = Time.zone.now.midnight %>
-<% if next_non_sunday_or_monday.sunday? %>
-  <% next_non_sunday_or_monday = next_non_sunday_or_monday + 2.days %>
-<% end %>
-<% if next_non_sunday_or_monday.monday? %>
-  <% next_non_sunday_or_monday = next_non_sunday_or_monday + 1.day %>
-<% end %>
+<% next_non_start_of_week_day = Time.zone.now.midnight %>
+<%
+if next_non_start_of_week_day.wday == STARTOFWEEK
+  next_non_start_of_week_day = next_non_start_of_week_day + 2.days 
+end
+%>
 
 f9posting:
   delivery_date: <%= delivery_date %>
@@ -91,8 +90,8 @@ postingf5apples:
   live: true
 
 p_recurrence_off:
-  delivery_date: <%= monday_after_base_monday + 7.days %>
-  order_cutoff: <%= monday_after_base_monday + 5.days %>
+  delivery_date: <%= first_delivery_day_of_week_after_base_first_delivery_day_of_week + 7.days %>
+  order_cutoff: <%= first_delivery_day_of_week_after_base_first_delivery_day_of_week + 5.days %>
   product: beef
   price: 5.21
   user: f2
@@ -102,8 +101,8 @@ p_recurrence_off:
   posting_recurrence: two
 
 p_recurrence_on:
-  delivery_date: <%= monday_after_base_monday + 7.days %>
-  order_cutoff: <%= monday_after_base_monday + 5.days %>
+  delivery_date: <%= first_delivery_day_of_week_after_base_first_delivery_day_of_week + 7.days %>
+  order_cutoff: <%= first_delivery_day_of_week_after_base_first_delivery_day_of_week + 5.days %>
   product: beef
   price: 5.21
   user: f2
@@ -136,8 +135,8 @@ p5:
 #--------------------------------------------------------------
 
 p1:
-  delivery_date: <%= base_monday %>
-  order_cutoff: <%= base_monday - 2.days %>
+  delivery_date: <%= base_first_delivery_day_of_week %>
+  order_cutoff: <%= base_first_delivery_day_of_week - 2.days %>
   product: apples
   price: 2.89
   user: f1
@@ -146,8 +145,8 @@ p1:
   live: true  
 
 p2:
-  delivery_date: <%= wednesday_after_base_monday %>
-  order_cutoff: <%= wednesday_after_base_monday - 2.days %>
+  delivery_date: <%= wednesday_after_base_first_delivery_day_of_week %>
+  order_cutoff: <%= wednesday_after_base_first_delivery_day_of_week - 2.days %>
   product: asparagus
   price: 2.74
   user: f1
@@ -156,8 +155,8 @@ p2:
   live: true  
 
 p3:
-  delivery_date: <%= friday_after_base_monday %>
-  order_cutoff: <%= friday_after_base_monday - 2.days %>
+  delivery_date: <%= friday_after_base_first_delivery_day_of_week %>
+  order_cutoff: <%= friday_after_base_first_delivery_day_of_week - 2.days %>
   product: milk
   price: 5.00
   user: f2
@@ -166,8 +165,8 @@ p3:
   live: true  
 
 p4:
-  delivery_date: <%= monday_after_base_monday %>
-  order_cutoff: <%= monday_after_base_monday - 2.days %>
+  delivery_date: <%= first_delivery_day_of_week_after_base_first_delivery_day_of_week %>
+  order_cutoff: <%= first_delivery_day_of_week_after_base_first_delivery_day_of_week - 2.days %>
   product: beef
   price: 5.21
   user: f2
@@ -287,8 +286,8 @@ postingf4celery:
 
 #Avocado
 postingf4avocado:
-  delivery_date: <%= next_non_sunday_or_monday %>
-  order_cutoff: <%= next_non_sunday_or_monday - 2.days %>
+  delivery_date: <%= next_non_start_of_week_day %>
+  order_cutoff: <%= next_non_start_of_week_day - 2.days %>
   product: avocado
   price: 2.97
   user: f4
@@ -298,8 +297,8 @@ postingf4avocado:
 
 #Basil
 postingf4basil:
-  delivery_date: <%= next_non_sunday_or_monday %>
-  order_cutoff: <%= next_non_sunday_or_monday - 2.days %>
+  delivery_date: <%= next_non_start_of_week_day %>
+  order_cutoff: <%= next_non_start_of_week_day - 2.days %>
   product: basil
   price: 2.27
   user: f4

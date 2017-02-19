@@ -39,7 +39,7 @@ class PostingRecurrence < ApplicationRecord
   end
 
   #constraints:
-  #can't be sunday or monday
+  #can't be FOODCLEAROUTDAY
   #must be in the future relative to current_posting
   #order_cutoff must be modified independantly
   #
@@ -60,8 +60,8 @@ class PostingRecurrence < ApplicationRecord
       return false
     end
 
-    #we don't take deliveries on sunday or monday
-    if new_wday == 0 || new_wday == 1
+    #we don't take deliveries on FOODCLEAROUTDAY
+    if new_wday == FOODCLEAROUTDAYTIME[:wday]
       return false
     end
 

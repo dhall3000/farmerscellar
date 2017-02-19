@@ -8,24 +8,34 @@ module ToteItemsHelper
     end
   end
 
+  def time_span(start_date, end_date)
+
+    span = end_date - start_date
+
+    minutes, seconds = span.divmod(60)            #=> e.g. [4515, 21]
+    hours, minutes = minutes.divmod(60)           #=> e.g. [75, 15]
+    days, hours = hours.divmod(24)
+
+    return [days, hours, minutes, seconds]
+
+  end
+
   def end_of_week(relative_to = nil)
     return start_of_next_week(relative_to) - 1.day    
   end
 
-  def start_of_next_week(start_time = nil)
+  def start_of_next_week(relative_to = nil)
 
-    if start_time.nil?
-      start_time = Time.zone.now
+    if relative_to.nil?
+      relative_to = Time.zone.now
     end
 
-    start_time = start_time.midnight    
+    next_week_start = relative_to.midnight    
 
-    while start_time.wday != ENDOFWEEK
-      start_time += 1.day
+    while next_week_start.wday != STARTOFWEEK
+      next_week_start += 1.day
     end
-
-    next_week_start = start_time + 1.day
-
+    
     return next_week_start
     
   end

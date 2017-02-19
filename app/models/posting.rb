@@ -40,7 +40,7 @@ class Posting < ApplicationRecord
   validates :order_minimum_producer_net, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true    
   validates :inbound_order_value_producer_net, numericality: { greater_than_or_equal_to: 0 }, allow_nil: false
 
-  validate :important_notes_body_not_present_without_important_notes, :delivery_date_not_sunday, :order_cutoff_must_be_before_delivery_date
+  validate :important_notes_body_not_present_without_important_notes, :delivery_date_not_food_clearout_day, :order_cutoff_must_be_before_delivery_date
   validate :commission_is_set, on: :create
   before_create :delivery_date_must_be_after_today  
 
@@ -544,9 +544,9 @@ class Posting < ApplicationRecord
 
     end
     
-    def delivery_date_not_sunday
-      if delivery_date != nil && delivery_date.sunday?
-        errors.add(:delivery_date, "delivery date can not be Sunday")
+    def delivery_date_not_food_clearout_day
+      if delivery_date && (delivery_date.wday == FOODCLEAROUTDAYTIME[:wday])
+        errors.add(:delivery_date, "delivery date can not be food clearout day")
       end
     end
 

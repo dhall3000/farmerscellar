@@ -830,7 +830,7 @@ class PostingsControllerTest < IntegrationHelper
   def get_posting_params_hash
 
     delivery_date = Time.zone.today + 5.days
-    if delivery_date.sunday?
+    if delivery_date.wday == STARTOFWEEK
       delivery_date += 1.day
     end
 
@@ -861,7 +861,7 @@ class PostingsControllerTest < IntegrationHelper
     #specify values, submit form
 
     delivery_date = Time.zone.today + 5.days
-    if delivery_date.sunday?
+    if delivery_date.wday == STARTOFWEEK
       delivery_date += 1.day
     end
 
@@ -898,7 +898,7 @@ class PostingsControllerTest < IntegrationHelper
     #specify values, submit form
 
     delivery_date = Time.zone.today + 5.days
-    if delivery_date.sunday?
+    if delivery_date.wday == STARTOFWEEK
       delivery_date += 1.day
     end
 
@@ -926,7 +926,7 @@ class PostingsControllerTest < IntegrationHelper
     #specify values, submit form
 
     delivery_date = Time.zone.today + 5.days
-    if delivery_date.sunday?
+    if delivery_date.wday == STARTOFWEEK
       delivery_date += 1.day
     end
 

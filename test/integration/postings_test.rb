@@ -18,7 +18,7 @@ class PostingsTest < IntegrationHelper
 
     delivery_date = Time.zone.today + 3.days
 
-    if delivery_date.sunday?
+    if delivery_date.wday == STARTOFWEEK
       delivery_date = Time.zone.today + 4.days
     end
 
@@ -373,7 +373,7 @@ class PostingsTest < IntegrationHelper
     login_for(@farmer)
     
     delivery_date = Time.zone.today.midnight + 14.days
-    if delivery_date.sunday?
+    if delivery_date.wday == STARTOFWEEK
       delivery_date += 1.day
     end
 
@@ -545,7 +545,7 @@ class PostingsTest < IntegrationHelper
   def create_standard_posting
 
     delivery_date = Time.zone.now.midnight + 7.days
-    if delivery_date.sunday?
+    if delivery_date.wday == STARTOFWEEK
       delivery_date += 1.day
     end
 
@@ -568,7 +568,7 @@ class PostingsTest < IntegrationHelper
     get new_posting_path
 
     delivery_date = Time.zone.today + 5.days
-    if delivery_date.sunday?
+    if delivery_date.wday == STARTOFWEEK
       delivery_date += 1.day
     end
 

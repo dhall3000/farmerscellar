@@ -480,7 +480,7 @@ module TestLib
     today = Time.zone.now.midnight
     delivery_date = today + days_from_now.days
 
-    if delivery_date.sunday?
+    if delivery_date.wday == STARTOFWEEK
       delivery_date += 1.day
     end
 

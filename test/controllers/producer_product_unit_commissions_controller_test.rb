@@ -23,7 +23,7 @@ class ProducerProductUnitCommissionsControllerTest < ActionDispatch::Integration
     post producer_product_unit_commissions_path, params: {producer_product_unit_commission: {product_id: @product.id, unit_id: units(:pound).id, user_id: @farmer.id, commission: 0.10}}
 
     delivery_date = Time.zone.now.midnight + 3.days
-    if delivery_date.sunday?
+    if delivery_date.wday == STARTOFWEEK
       delivery_date += 1.day
     end
 

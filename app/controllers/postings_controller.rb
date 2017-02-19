@@ -35,7 +35,7 @@ class PostingsController < ApplicationController
 
     @food_category = FoodCategory.includes(:parent, children: :uploads).where(name: params[:food_category]).first
  
-    #this is the upcoming sunday at midnight
+    #this is midnight the first day of the new week's cycle
     next_week_start = start_of_next_week    
     next_week_end = next_week_start + 7.days
             
@@ -237,8 +237,7 @@ class PostingsController < ApplicationController
 
     def load_posting_choices
       @products = Product.all.order(:name)
-      @units = Unit.all.order(:name)
-      @delivery_dates = next_delivery_dates
+      @units = Unit.all.order(:name)      
       @producers = User.where(account_type: User.types[:PRODUCER]).order(:farm_name)
     end
 
@@ -320,24 +319,6 @@ class PostingsController < ApplicationController
         )
 
       return posting
-
-    end
-
-    def next_delivery_dates
-
-      i = 3      
-      dates = []
-
-      while i < 30
-        d = Time.zone.today + i
-        if !d.sunday?
-          dates << d
-        end
-
-        i +=1
-      end      
-
-      dates
 
     end
 

@@ -14,7 +14,7 @@ class ToteItemTest < ActiveSupport::TestCase
 
     delivery_date = Time.zone.today + 3.days
 
-    if delivery_date.sunday?
+    if delivery_date.wday == STARTOFWEEK
       delivery_date = Time.zone.today + 4.days
     end
 

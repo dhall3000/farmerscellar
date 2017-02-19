@@ -79,6 +79,8 @@ Rails.application.configure do
     ::PAYPALCREDENTIALS = eval(ENV['PAYPALCREDENTIALS'])
     ::FOODCLEAROUTDAYTIME = eval(ENV['FOODCLEAROUTDAYTIME'])
     ::FOODCLEAROUTWARNINGDAYTIME = eval(ENV['FOODCLEAROUTWARNINGDAYTIME'])
+    #so query against this like so: if Time.zone.today.wday == STARTOFWEEK
+    ::STARTOFWEEK = FOODCLEAROUTDAYTIME[:wday]
 
     ActiveMerchant::Billing::Base.mode = :test    
     ::GATEWAY = ActiveMerchant::Billing::PaypalExpressGateway.new(

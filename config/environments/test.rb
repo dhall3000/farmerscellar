@@ -58,6 +58,8 @@ Rails.application.configure do
     ::NOPRODUCTIMAGETITLE = "NoProductImage"
     ::FOODCLEAROUTDAYTIME = eval(ENV['FOODCLEAROUTDAYTIME'])
     ::FOODCLEAROUTWARNINGDAYTIME = eval(ENV['FOODCLEAROUTWARNINGDAYTIME'])
+    #so query against this like so: if Time.zone.today.wday == STARTOFWEEK
+    ::STARTOFWEEK = FOODCLEAROUTDAYTIME[:wday]
 
     ::PAYPALCREDENTIALS =
     {

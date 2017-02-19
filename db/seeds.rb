@@ -359,7 +359,7 @@ posting_recurrence.save
 
 delivery_date = Time.zone.tomorrow
 
-if delivery_date.sunday?
+if delivery_date.wday == STARTOFWEEK
   delivery_date = delivery_date + 1.day
 end
 
