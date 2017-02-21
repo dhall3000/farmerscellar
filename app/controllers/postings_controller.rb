@@ -223,7 +223,7 @@ class PostingsController < ApplicationController
 
     def get_postings(products, start_time, end_time, limit = nil)    
 
-      return_postings = Posting.includes(:user, :product, :unit).where(product: products).where("delivery_date >= ? and delivery_date < ? and live = ? and state = ?", start_time, end_time, true, Posting.states[:OPEN])
+      return_postings = Posting.includes(:user, :product, :unit).where(product: products).where("delivery_date >= ? and delivery_date < ? and live = ? and postings.state = ?", start_time, end_time, true, Posting.states[:OPEN])
 
       if limit
         #if we're going to limit the postings it's because we think we have too many. if we have too many

@@ -11,7 +11,7 @@
     </div>
   </div>
   <div class="row">
-    <% postings.each do |posting| %>
+    <% postings.order("users.farm_name").order("products.name").each do |posting| %>
       <div class="col-xs-6 col-sm-3">
         <%= link_to posting, class: "thumbnail" do %>
           <% if posting.uploads.count > 0 %>        
