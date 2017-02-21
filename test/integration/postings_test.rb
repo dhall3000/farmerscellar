@@ -27,6 +27,140 @@ class PostingsTest < IntegrationHelper
 
   end
 
+  test "should properly divide postings into this next and future on first day of week" do
+
+    assert STARTOFWEEK >= 0
+    assert STARTOFWEEK <= 6
+
+    nuke_all_postings
+
+    while Time.zone.now.wday != STARTOFWEEK
+      travel 1.day
+    end
+
+    assert_equal STARTOFWEEK, Time.zone.now.wday
+
+    producer = create_producer("farmer john", "farmerjohn@jjohn.com")
+    base_delivery_date = get_delivery_date(5)
+    this_weeks_posting = create_posting(producer, price = nil, product = nil, unit = nil, base_delivery_date)
+    next_weeks_posting = create_posting(producer, price = nil, product = nil, unit = nil, base_delivery_date + 7.days)
+    future_posting = create_posting(producer, price = nil, product = nil, unit = nil, base_delivery_date + 14.days)
+
+    get postings_path(food_category: FoodCategory.get_root_category.name)
+    assert_response :success
+    assert_template 'index'
+
+    this_weeks_postings = assigns(:this_weeks_postings)
+    assert_not this_weeks_postings.nil?
+    assert_equal 1, this_weeks_postings.count
+    assert_equal this_weeks_posting, this_weeks_postings.first
+
+    next_weeks_postings = assigns(:next_weeks_postings)
+    assert_not next_weeks_postings.nil?
+    assert_equal 1, next_weeks_postings.count
+    assert_equal next_weeks_posting, next_weeks_postings.first
+
+    future_postings = assigns(:future_postings)
+    assert_not future_postings.nil?
+    assert_equal 1, future_postings.count
+    assert_equal future_posting, future_postings.first
+
+    travel_back
+
+  end
+
+  test "should properly divide postings into this next and future in middle of week" do
+
+    assert STARTOFWEEK >= 0
+    assert STARTOFWEEK <= 6
+
+    nuke_all_postings
+
+    while Time.zone.now.wday != STARTOFWEEK
+      travel 1.day
+    end
+
+    assert_equal STARTOFWEEK, Time.zone.now.wday
+
+    travel 1.day    
+
+    producer = create_producer("farmer john", "farmerjohn@jjohn.com")
+    base_delivery_date = get_delivery_date(5)
+    this_weeks_posting = create_posting(producer, price = nil, product = nil, unit = nil, base_delivery_date)
+    next_weeks_posting = create_posting(producer, price = nil, product = nil, unit = nil, base_delivery_date + 7.days)
+    future_posting = create_posting(producer, price = nil, product = nil, unit = nil, base_delivery_date + 14.days)
+
+    get postings_path(food_category: FoodCategory.get_root_category.name)
+    assert_response :success
+    assert_template 'index'
+
+    this_weeks_postings = assigns(:this_weeks_postings)
+    assert_not this_weeks_postings.nil?
+    assert_equal 1, this_weeks_postings.count
+    assert_equal this_weeks_posting, this_weeks_postings.first
+
+    next_weeks_postings = assigns(:next_weeks_postings)
+    assert_not next_weeks_postings.nil?
+    assert_equal 1, next_weeks_postings.count
+    assert_equal next_weeks_posting, next_weeks_postings.first
+
+    future_postings = assigns(:future_postings)
+    assert_not future_postings.nil?
+    assert_equal 1, future_postings.count
+    assert_equal future_posting, future_postings.first
+
+    travel_back
+
+  end
+
+  test "should properly divide postings into this next and future on last day of week" do
+
+    assert STARTOFWEEK >= 0
+    assert STARTOFWEEK <= 6
+
+    nuke_all_postings
+
+    while Time.zone.now.wday != STARTOFWEEK
+      travel 1.day
+    end
+
+    assert_equal STARTOFWEEK, Time.zone.now.wday    
+    travel -1.day
+    current_wday_should_be = STARTOFWEEK - 1
+    if current_wday_should_be < 0
+      current_wday_should_be += 7
+    end
+    assert_equal current_wday_should_be, Time.zone.now.wday
+
+    producer = create_producer("farmer john", "farmerjohn@jjohn.com")
+    base_delivery_date = get_delivery_date(5)
+    first_posting = create_posting(producer, price = nil, product = nil, unit = nil, base_delivery_date)
+    second_posting = create_posting(producer, price = nil, product = nil, unit = nil, base_delivery_date + 7.days)
+    third_posting = create_posting(producer, price = nil, product = nil, unit = nil, base_delivery_date + 14.days)
+
+    get postings_path(food_category: FoodCategory.get_root_category.name)
+    assert_response :success
+    assert_template 'index'
+
+    this_weeks_postings = assigns(:this_weeks_postings)
+    assert_not this_weeks_postings.nil?
+    assert_equal 0, this_weeks_postings.count
+    
+    next_weeks_postings = assigns(:next_weeks_postings)
+    assert_not next_weeks_postings.nil?
+    assert_equal 1, next_weeks_postings.count
+    assert_equal first_posting, next_weeks_postings.first
+
+    future_postings = assigns(:future_postings)
+    assert_not future_postings.nil?
+    assert_equal 2, future_postings.count
+    assert_equal second_posting, future_postings.first
+    assert_equal third_posting, future_postings.last
+
+    travel_back
+
+  end
+
   test "dont send order email if unit count zero" do
 
     posting = create_standard_posting    

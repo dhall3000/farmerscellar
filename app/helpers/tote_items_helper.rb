@@ -30,6 +30,10 @@ module ToteItemsHelper
       relative_to = Time.zone.now
     end
 
+    if relative_to.wday == STARTOFWEEK
+      relative_to += 1.day
+    end
+
     next_week_start = relative_to.midnight    
 
     while next_week_start.wday != STARTOFWEEK
