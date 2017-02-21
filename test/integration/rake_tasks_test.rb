@@ -104,25 +104,29 @@ class RakeTasksTest < BulkBuyer
         if Time.zone.now == @p1.order_cutoff
           assert_equal 3, committed_tote_item_count          
           assert_equal 1, email_count          
-          assert_appropriate_email(current_order_mail, @p1.user.email, "Current orders for upcoming deliveries", "Below are orders for your upcoming delivery")
+          subject = "Farmer's Cellar order for #{@p1.delivery_date.strftime("%A, %B")} #{@p1.delivery_date.day.ordinalize} delivery"
+          assert_appropriate_email(current_order_mail, @p1.user.email, subject, "Below are orders for your upcoming delivery")
         elsif Time.zone.now == @p2.order_cutoff         
           #at the time we enter the commitment zone for posting p2 we won't have delivered the items for p1 yet
           #so the total committed tote item count should be all the items for postings p1 and p2        
           assert_equal 4, committed_tote_item_count
           assert_equal 1, email_count
-          assert_appropriate_email(current_order_mail, @p2.user.email, "Current orders for upcoming deliveries", "Below are orders for your upcoming delivery")
+          subject = "Farmer's Cellar order for #{@p2.delivery_date.strftime("%A, %B")} #{@p2.delivery_date.day.ordinalize} delivery"
+          assert_appropriate_email(current_order_mail, @p2.user.email, subject, "Below are orders for your upcoming delivery")
         elsif Time.zone.now == @p3.order_cutoff         
           #by the time we get to p3's commitment zone, p1's items should have been tranitioned out of the COMMITTED state
           #so they no longer contribute to the total committed tote item count. it's only p2 and p3 that contribute.        
           assert_equal 3, committed_tote_item_count
           assert_equal 1, email_count
-          assert_appropriate_email(current_order_mail, @p3.user.email, "Current orders for upcoming deliveries", "Below are orders for your upcoming delivery")
+          subject = "Farmer's Cellar order for #{@p3.delivery_date.strftime("%A, %B")} #{@p3.delivery_date.day.ordinalize} delivery"
+          assert_appropriate_email(current_order_mail, @p3.user.email, subject, "Below are orders for your upcoming delivery")
         elsif Time.zone.now == @p4.order_cutoff        
           #the weekend has elapsed since p3's delivery, so by the time we get to this monday - p4's delivery - all other
           #tote items should have transitioned out of the committed state        
           assert_equal 1, committed_tote_item_count
           assert_equal 1, email_count
-          assert_appropriate_email(current_order_mail, @p4.user.email, "Current orders for upcoming deliveries", "Below are orders for your upcoming delivery")
+          subject = "Farmer's Cellar order for #{@p4.delivery_date.strftime("%A, %B")} #{@p4.delivery_date.day.ordinalize} delivery"
+          assert_appropriate_email(current_order_mail, @p4.user.email, subject, "Below are orders for your upcoming delivery")
         else
 
           #if it's 10pm...

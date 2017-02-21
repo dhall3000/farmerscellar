@@ -24,7 +24,8 @@ class ProducerNotificationsMailerTest < ActionMailer::TestCase
     assert_equal 1, ActionMailer::Base.deliveries.count
     mail = ActionMailer::Base.deliveries.last    
 
-    assert_equal "Current orders for upcoming deliveries", mail.subject
+    subject = "Farmer's Cellar order for #{ps_keep.first.delivery_date.strftime("%A, %B")} #{ps_keep.first.delivery_date.day.ordinalize} delivery"
+    assert_equal subject, mail.subject
     assert_equal [ps.first.user.email], mail.to
     assert_equal ["david@farmerscellar.com"], mail.from
     assert_match "Below are orders for your upcoming delivery", mail.body.encoded

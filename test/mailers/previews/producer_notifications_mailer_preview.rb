@@ -1,3 +1,5 @@
+require 'utility/rake_helper'
+
 # Preview all emails at http://localhost:3000/rails/mailers/producer_notifications_mailer
 class ProducerNotificationsMailerPreview < ActionMailer::Preview
 
@@ -11,6 +13,7 @@ class ProducerNotificationsMailerPreview < ActionMailer::Preview
   #http://localhost:3000/rails/mailers/producer_notifications_mailer/current_orders_plain
   def current_orders_plain
     #make a fresh posting
+
     farmer = User.find_by(email: "f1@f.com")
     delivery_date = Time.zone.now.midnight + 2.days
     if delivery_date.wday == STARTOFWEEK
@@ -18,15 +21,18 @@ class ProducerNotificationsMailerPreview < ActionMailer::Preview
     end
 
     ProducerProductUnitCommission.create(user: farmer, product: Product.first, unit: Unit.first, commission: 0.05)
-    posting = Posting.new(unit: Unit.first, product: Product.first, user: farmer, description_body: "descrip", price: 1.25, live: true, order_cutoff: Time.zone.now - 1.second, delivery_date: delivery_date)
+    posting = Posting.new(unit: Unit.first, product: Product.first, user: farmer, description: "organic, tasty", description_body: "descrip", price: 1.25, live: true, order_cutoff: Time.zone.now - 1.second, delivery_date: delivery_date)
     posting.save
     #make some tote items for that posting
     user = User.find_by(email: "c1@c.com")    
-    ti1 = ToteItem.new(quantity: 2, posting: posting, user: user, price: posting.price, state: ToteItem.states[:COMMITTED])
+    ti1 = ToteItem.new(quantity: 300, posting: posting, user: user, price: posting.price, state: ToteItem.states[:ADDED])
     ti1.save
-    ti2 = ToteItem.new(quantity: 3, posting: posting, user: user, price: posting.price, state: ToteItem.states[:COMMITTED])
+    ti1.transition(:customer_authorized)
+    ti2 = ToteItem.new(quantity: 3, posting: posting, user: user, price: posting.price, state: ToteItem.states[:ADDED])
     ti2.save
-
+    ti2.transition(:customer_authorized)
+    RakeHelper.do_hourly_tasks
+    
     CreditorOrder.submit([posting])
   end
 

@@ -27,7 +27,7 @@ class ProducerNotificationsMailer < ApplicationMailer
       return
     end
 
-    subject = "Current orders for upcoming deliveries"
+    subject = "Farmer's Cellar order for #{creditor_order.delivery_date.strftime("%A, %B")} #{creditor_order.delivery_date.day.ordinalize} delivery"
 
     if @business_interface.order_email
       @email = @business_interface.order_email      

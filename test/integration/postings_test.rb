@@ -76,8 +76,11 @@ class PostingsTest < IntegrationHelper
     #there should be a single email that went out; the order submission email to the producer
     assert_equal 1, ActionMailer::Base.deliveries.count
     #'verify' that the number '10' shows up which is that 10 units were ordered rather than the 11 that were committed
-    assert_appropriate_email(ActionMailer::Base.deliveries[0], posting.user.get_business_interface.order_email, "Current orders for upcoming deliveries", "10")
-    assert_appropriate_email(ActionMailer::Base.deliveries[0], posting.user.get_business_interface.order_email, "Current orders for upcoming deliveries", "1")
+    
+    subject = "Farmer's Cellar order for #{posting.delivery_date.strftime("%A, %B")} #{posting.delivery_date.day.ordinalize} delivery"
+
+    assert_appropriate_email(ActionMailer::Base.deliveries[0], posting.user.get_business_interface.order_email, subject, "10")
+    assert_appropriate_email(ActionMailer::Base.deliveries[0], posting.user.get_business_interface.order_email, subject, "1")
 
     #now once farmer delivers we want to verify we partially filled
     fill_report = fill_posting(posting, posting.inbound_num_units_ordered)

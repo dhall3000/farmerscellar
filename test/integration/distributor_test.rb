@@ -22,14 +22,17 @@ class DistributorTest < BulkBuyer
     clear_mailer
     RakeHelper.do_hourly_tasks    
     assert_equal 2, ActionMailer::Base.deliveries.count
-    
-    assert_appropriate_email_exists("d1order_email@d.com", "Current orders for upcoming deliveries", "Hi Bigtime Distributor Business Interface,")
-    assert_appropriate_email_exists("d1order_email@d.com", "Current orders for upcoming deliveries", "Below are orders for your upcoming delivery.")
-    assert_appropriate_email_exists("d1order_email@d.com", "Current orders for upcoming deliveries", "F6 FARM")
-    assert_appropriate_email_exists("d1order_email@d.com", "Current orders for upcoming deliveries", "F7 FARM")
 
-    assert_appropriate_email_exists("f8order_email@f.com", "Current orders for upcoming deliveries", "Hi F8 FARM Business Interface,")
-    assert_appropriate_email_exists("f8order_email@f.com", "Current orders for upcoming deliveries", "Below are orders for your upcoming delivery.")
+    delivery_date = customer.tote_items.first.posting.delivery_date
+    subject = "Farmer's Cellar order for #{delivery_date.strftime("%A, %B")} #{delivery_date.day.ordinalize} delivery"
+    
+    assert_appropriate_email_exists("d1order_email@d.com", subject, "Hi Bigtime Distributor Business Interface,")
+    assert_appropriate_email_exists("d1order_email@d.com", subject, "Below are orders for your upcoming delivery.")
+    assert_appropriate_email_exists("d1order_email@d.com", subject, "F6 FARM")
+    assert_appropriate_email_exists("d1order_email@d.com", subject, "F7 FARM")
+
+    assert_appropriate_email_exists("f8order_email@f.com", subject, "Hi F8 FARM Business Interface,")
+    assert_appropriate_email_exists("f8order_email@f.com", subject, "Below are orders for your upcoming delivery.")
 
     #assert that neither the distributor nor producer got emailed
     customer.tote_items.each do |tote_item|
@@ -69,15 +72,17 @@ class DistributorTest < BulkBuyer
     RakeHelper.do_hourly_tasks    
     assert_equal 2, ActionMailer::Base.deliveries.count
 
-    assert_appropriate_email_exists("david@farmerscellar.com", "admin action required: Current orders for upcoming deliveries", "Hi david@farmerscellar.com,")
-    assert_appropriate_email_exists("david@farmerscellar.com", "admin action required: Current orders for upcoming deliveries", "Below are orders for your upcoming delivery.")    
-    assert_appropriate_email_exists("david@farmerscellar.com", "admin action required: Current orders for upcoming deliveries", "F6 FARM")
-    assert_appropriate_email_exists("david@farmerscellar.com", "admin action required: Current orders for upcoming deliveries", "F7 FARM")
-    assert_appropriate_email_exists("david@farmerscellar.com", "admin action required: Current orders for upcoming deliveries", "Order Instructions: go to www.bigtimedistributor.com and manually submit order there. be sure to use a 1 when placing order.")
+    subject = "Farmer's Cellar order for #{posting.delivery_date.strftime("%A, %B")} #{posting.delivery_date.day.ordinalize} delivery"
 
-    assert_appropriate_email_exists("david@farmerscellar.com", "admin action required: Current orders for upcoming deliveries", "Hi david@farmerscellar.com,")
-    assert_appropriate_email_exists("david@farmerscellar.com", "admin action required: Current orders for upcoming deliveries", "Below are orders for your upcoming delivery.")    
-    assert_appropriate_email_exists("david@farmerscellar.com", "admin action required: Current orders for upcoming deliveries", "Order Instructions: go to www.f8farm.com and manually submit order there. do this before noon!")
+    assert_appropriate_email_exists("david@farmerscellar.com", "admin action required: #{subject}", "Hi david@farmerscellar.com,")
+    assert_appropriate_email_exists("david@farmerscellar.com", "admin action required: #{subject}", "Below are orders for your upcoming delivery.")    
+    assert_appropriate_email_exists("david@farmerscellar.com", "admin action required: #{subject}", "F6 FARM")
+    assert_appropriate_email_exists("david@farmerscellar.com", "admin action required: #{subject}", "F7 FARM")
+    assert_appropriate_email_exists("david@farmerscellar.com", "admin action required: #{subject}", "Order Instructions: go to www.bigtimedistributor.com and manually submit order there. be sure to use a 1 when placing order.")
+
+    assert_appropriate_email_exists("david@farmerscellar.com", "admin action required: #{subject}", "Hi david@farmerscellar.com,")
+    assert_appropriate_email_exists("david@farmerscellar.com", "admin action required: #{subject}", "Below are orders for your upcoming delivery.")    
+    assert_appropriate_email_exists("david@farmerscellar.com", "admin action required: #{subject}", "Order Instructions: go to www.f8farm.com and manually submit order there. do this before noon!")
 
     #assert that neither the distributor nor producer got emailed
     customer.tote_items.each do |tote_item|
@@ -101,14 +106,16 @@ class DistributorTest < BulkBuyer
     clear_mailer
     RakeHelper.do_hourly_tasks    
     assert_equal 2, ActionMailer::Base.deliveries.count
-    
-    assert_appropriate_email_exists("d1order_email@d.com", "Current orders for upcoming deliveries", "Hi Bigtime Distributor Business Interface,")
-    assert_appropriate_email_exists("d1order_email@d.com", "Current orders for upcoming deliveries", "Below are orders for your upcoming delivery.")    
-    assert_appropriate_email_exists("d1order_email@d.com", "Current orders for upcoming deliveries", "F6 FARM")
-    assert_appropriate_email_exists("d1order_email@d.com", "Current orders for upcoming deliveries", "F7 FARM")
 
-    assert_appropriate_email_exists("f8order_email@f.com", "Current orders for upcoming deliveries", "Hi F8 FARM Business Interface,")
-    assert_appropriate_email_exists("f8order_email@f.com", "Current orders for upcoming deliveries", "Below are orders for your upcoming delivery.")    
+    subject = "Farmer's Cellar order for #{posting.delivery_date.strftime("%A, %B")} #{posting.delivery_date.day.ordinalize} delivery"
+    
+    assert_appropriate_email_exists("d1order_email@d.com", subject, "Hi Bigtime Distributor Business Interface,")
+    assert_appropriate_email_exists("d1order_email@d.com", subject, "Below are orders for your upcoming delivery.")    
+    assert_appropriate_email_exists("d1order_email@d.com", subject, "F6 FARM")
+    assert_appropriate_email_exists("d1order_email@d.com", subject, "F7 FARM")
+
+    assert_appropriate_email_exists("f8order_email@f.com", subject, "Hi F8 FARM Business Interface,")
+    assert_appropriate_email_exists("f8order_email@f.com", subject, "Below are orders for your upcoming delivery.")    
     
     clear_mailer
 
@@ -224,14 +231,16 @@ class DistributorTest < BulkBuyer
     clear_mailer
     RakeHelper.do_hourly_tasks    
     assert_equal 2, ActionMailer::Base.deliveries.count
-    
-    assert_appropriate_email_exists("d1order_email@d.com", "Current orders for upcoming deliveries", "Hi Bigtime Distributor Business Interface,")
-    assert_appropriate_email_exists("d1order_email@d.com", "Current orders for upcoming deliveries", "Below are orders for your upcoming delivery.")    
-    assert_appropriate_email_exists("d1order_email@d.com", "Current orders for upcoming deliveries", "F6 FARM")
-    assert_appropriate_email_exists("d1order_email@d.com", "Current orders for upcoming deliveries", "F7 FARM")
 
-    assert_appropriate_email_exists("f8order_email@f.com", "Current orders for upcoming deliveries", "Hi F8 FARM Business Interface,")
-    assert_appropriate_email_exists("f8order_email@f.com", "Current orders for upcoming deliveries", "Below are orders for your upcoming delivery.")    
+    subject = "Farmer's Cellar order for #{posting.delivery_date.strftime("%A, %B")} #{posting.delivery_date.day.ordinalize} delivery"
+    
+    assert_appropriate_email_exists("d1order_email@d.com", subject, "Hi Bigtime Distributor Business Interface,")
+    assert_appropriate_email_exists("d1order_email@d.com", subject, "Below are orders for your upcoming delivery.")    
+    assert_appropriate_email_exists("d1order_email@d.com", subject, "F6 FARM")
+    assert_appropriate_email_exists("d1order_email@d.com", subject, "F7 FARM")
+
+    assert_appropriate_email_exists("f8order_email@f.com", subject, "Hi F8 FARM Business Interface,")
+    assert_appropriate_email_exists("f8order_email@f.com", subject, "Below are orders for your upcoming delivery.")    
     
     clear_mailer
 
