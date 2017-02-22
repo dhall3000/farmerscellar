@@ -29,14 +29,10 @@ class Subscription < ApplicationRecord
     return self.kind == Subscription.kinds[kind_token]
   end
 
-  def fill(quantity, tote_item = nil)
+  def fill(quantity)
 
     if quantity < 1
       return
-    end
-
-    if tote_item.nil?
-      tote_item = tote_items.last
     end
 
     if kind?(:ROLLUNTILFILLED)

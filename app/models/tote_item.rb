@@ -147,7 +147,7 @@ class ToteItem < ApplicationRecord
           create_funds_flow_objects
 
           if subscription
-            subscription.fill(params[:quantity_filled], self)
+            subscription.fill(params[:quantity_filled])
           end
 
         end
