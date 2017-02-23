@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby "2.3.1"
+ruby "2.4.0"
 gem 'activemerchant'
 gem 'rails', '>= 5.0.1'
 gem 'bcrypt',				'3.1.7'
