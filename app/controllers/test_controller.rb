@@ -10,9 +10,15 @@ class TestController < ApplicationController
       flash[:success] = "MemoryProfiler started"
       MemoryProfiler.start
     elsif params[:stop]
+
       @report = MemoryProfiler.stop
-      @report.pretty_print
-      flash[:success] = "MemoryProfiler stopped"
+      if @report
+        flash[:success] = "MemoryProfiler stopped"
+        @report.pretty_print
+      else
+        flash[:danger] = "MemoryProfiler report was nil"
+      end
+      
     end
 
     redirect_to root_path
