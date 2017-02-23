@@ -12,7 +12,6 @@ CarrierWave.configure do |config|
     config.enable_processing = true
   elsif Rails.env.production?
     config.storage = :fog
-    config.cache_dir        = "#{Rails.root}/public/tmp"
   end
   
   config.fog_directory    = ENV['S3_BUCKET_NAME']
