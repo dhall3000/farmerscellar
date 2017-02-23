@@ -90,7 +90,7 @@
           </div>
         </div>
         <div class="panel-body">
-          <%= form_for(@upload) do |f| %>
+          <%= form_for(@upload, html: { multipart: true }) do |f| %>
             <div>
               <%= f.file_field :file_name, class: 'form-control' %>
               <%= hidden_field_tag :posting_id, @posting.id %>
