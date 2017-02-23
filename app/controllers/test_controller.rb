@@ -1,6 +1,23 @@
+require 'memory_profiler'
+
 class TestController < ApplicationController
 	
 	before_action :redirect_to_root_if_user_not_admin
+
+  def memory_profiler
+
+    if params[:start]
+      flash[:success] = "MemoryProfiler started"
+      MemoryProfiler.start
+    elsif params[:stop]
+      @report = MemoryProfiler.stop
+      @report.pretty_print
+      flash[:success] = "MemoryProfiler stopped"
+    end
+
+    redirect_to root_path
+
+  end
 
   def send_email
 

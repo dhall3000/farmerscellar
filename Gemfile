@@ -20,6 +20,7 @@ gem 'carrierwave'
 gem 'mini_magick'
 gem 'fog'
 gem 'mimemagic'
+gem 'memory_profiler', git: 'https://github.com/SamSaffron/memory_profiler.git'
 
 group :development do
   gem 'web-console', '>= 3.3.0'

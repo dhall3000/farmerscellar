@@ -1,3 +1,9 @@
+GIT
+  remote: https://github.com/SamSaffron/memory_profiler.git
+  revision: 3f8c607a41a08d0a4cee114d7c7888e05ac888e5
+  specs:
+    memory_profiler (0.9.7)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -354,6 +360,7 @@ DEPENDENCIES
   guard-minitest (= 2.4.6)
   jbuilder
   jquery-rails
+  memory_profiler!
   mimemagic
   mini_backtrace (= 0.1.3)
   mini_magick

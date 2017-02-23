@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   post 'test/checkout'
   get 'test/authorize'
   post 'test/capture'
+  get 'test/memory_profiler'
   get 'news' => 'static_pages#news'
   get 'test_page' => 'static_pages#test_page'
   get 'test_exception' => 'static_pages#test_exception'
