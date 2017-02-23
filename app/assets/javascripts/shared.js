@@ -3,7 +3,7 @@ $(function()
 
   //this is here for iOS. divs don't listen to click events so can't toggle collapse without this code.
   //see here: http://stackoverflow.com/questions/33074160/bootstrap-collapse-half-working-on-iphone  
-  $('div[data-toggle="collapse"]').on('click', function() {});
+  $('div[data-toggle="collapse"], span[data-toggle="collapse"]').on('click', function() {});
 
   //////////////////////////////////////////////////////////////////////////
   //https://github.com/twbs/bootstrap/issues/16360
