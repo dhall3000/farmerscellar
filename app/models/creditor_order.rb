@@ -163,22 +163,6 @@ class CreditorOrder < ApplicationRecord
 
   def state?(key)
     return state == CreditorOrder.state(key)
-  end
-
-  def all_postings_closed?
-
-    if postings.nil? || !postings.any?
-      return true
-    end
-
-    postings.each do |posting|
-      if !posting.state?(:CLOSED)
-        return false
-      end
-    end
-
-    return true
-
-  end
+  end  
 
 end
