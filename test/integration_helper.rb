@@ -987,7 +987,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
     business_interface = creditor.get_business_interface
 
-    subject = "Farmer's Cellar order for #{posting.delivery_date.strftime("%A, %B")} #{posting.delivery_date.day.ordinalize} delivery"
+    subject = "Order for #{posting.delivery_date.strftime("%A, %B")} #{posting.delivery_date.day.ordinalize} delivery"
 
     if business_interface.order_email
       email = business_interface.order_email

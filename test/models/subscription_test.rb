@@ -352,14 +352,16 @@ class SubscriptionTest < ActiveSupport::TestCase
 	end
 
 	test "should not save without posting_recurrence" do		
-		@subscription.posting_recurrence.destroy
+    pr = @subscription.posting_recurrence
+    nuke_posting_recurrence(pr)
 		@subscription.posting_recurrence = nil
 		assert_not @subscription.save
 		assert_not @subscription.valid?		
 	end
 
 	test "should not save without user" do		
-		@subscription.user.destroy
+		#@subscription.user.destroy
+    nuke_user(@subscription.user)
 		@subscription.user = nil
 		assert_not @subscription.save
 		assert_not @subscription.valid?		

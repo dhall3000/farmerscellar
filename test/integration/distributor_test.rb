@@ -24,7 +24,7 @@ class DistributorTest < BulkBuyer
     assert_equal 2, ActionMailer::Base.deliveries.count
 
     delivery_date = customer.tote_items.first.posting.delivery_date
-    subject = "Farmer's Cellar order for #{delivery_date.strftime("%A, %B")} #{delivery_date.day.ordinalize} delivery"
+    subject = "Order for #{delivery_date.strftime("%A, %B")} #{delivery_date.day.ordinalize} delivery"
     
     assert_appropriate_email_exists("d1order_email@d.com", subject, "Hi Bigtime Distributor Business Interface,")
     assert_appropriate_email_exists("d1order_email@d.com", subject, "Below are orders for your upcoming delivery.")
@@ -72,7 +72,7 @@ class DistributorTest < BulkBuyer
     RakeHelper.do_hourly_tasks    
     assert_equal 2, ActionMailer::Base.deliveries.count
 
-    subject = "Farmer's Cellar order for #{posting.delivery_date.strftime("%A, %B")} #{posting.delivery_date.day.ordinalize} delivery"
+    subject = "Order for #{posting.delivery_date.strftime("%A, %B")} #{posting.delivery_date.day.ordinalize} delivery"
 
     assert_appropriate_email_exists("david@farmerscellar.com", "admin action required: #{subject}", "Hi david@farmerscellar.com,")
     assert_appropriate_email_exists("david@farmerscellar.com", "admin action required: #{subject}", "Below are orders for your upcoming delivery.")    
@@ -107,7 +107,7 @@ class DistributorTest < BulkBuyer
     RakeHelper.do_hourly_tasks    
     assert_equal 2, ActionMailer::Base.deliveries.count
 
-    subject = "Farmer's Cellar order for #{posting.delivery_date.strftime("%A, %B")} #{posting.delivery_date.day.ordinalize} delivery"
+    subject = "Order for #{posting.delivery_date.strftime("%A, %B")} #{posting.delivery_date.day.ordinalize} delivery"
     
     assert_appropriate_email_exists("d1order_email@d.com", subject, "Hi Bigtime Distributor Business Interface,")
     assert_appropriate_email_exists("d1order_email@d.com", subject, "Below are orders for your upcoming delivery.")    
@@ -232,7 +232,7 @@ class DistributorTest < BulkBuyer
     RakeHelper.do_hourly_tasks    
     assert_equal 2, ActionMailer::Base.deliveries.count
 
-    subject = "Farmer's Cellar order for #{posting.delivery_date.strftime("%A, %B")} #{posting.delivery_date.day.ordinalize} delivery"
+    subject = "Order for #{posting.delivery_date.strftime("%A, %B")} #{posting.delivery_date.day.ordinalize} delivery"
     
     assert_appropriate_email_exists("d1order_email@d.com", subject, "Hi Bigtime Distributor Business Interface,")
     assert_appropriate_email_exists("d1order_email@d.com", subject, "Below are orders for your upcoming delivery.")    

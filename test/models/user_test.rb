@@ -4,6 +4,7 @@ require 'utility/rake_helper'
 class UserTest < ActiveSupport::TestCase
 
   def setup
+    puts "Test method: #{self.method_name}"
     @user = User.new(name: "Example User", email: "user@example.com", password: "foobar", password_confirmation: "foobar", zip: 98033, account_type: 0)
     @f6 = users(:f6)
     @f7 = users(:f7)
@@ -729,8 +730,9 @@ class UserTest < ActiveSupport::TestCase
     #outbound_order_report(postings_presently_transitioning_to_commitment_zone) should return postings
     report = distributor.outbound_order_report(posting_celery.order_cutoff)
     #verify all postings returned
-    assert_equal report[:postings_order_requirements_met].first, posting_celery
-    assert_equal report[:postings_order_requirements_met].last, posting_apples
+    assert report[:postings_order_requirements_met].include?(posting_celery)
+    assert report[:postings_order_requirements_met].include?(posting_apples)
+
     assert_equal 0, report[:postings_order_requirements_unmet].count
     #verify total order amount    
     assert_equal expected_producer_net, report[:order_value_producer_net]
@@ -794,8 +796,8 @@ class UserTest < ActiveSupport::TestCase
     #outbound_order_report(postings_presently_transitioning_to_commitment_zone) should return postings
     report = distributor.outbound_order_report(posting_celery.order_cutoff)
     #verify all postings returned
-    assert_equal report[:postings_order_requirements_met].first, posting_celery
-    assert_equal report[:postings_order_requirements_met].last, posting_apples
+    assert report[:postings_order_requirements_met].include?(posting_celery)
+    assert report[:postings_order_requirements_met].include?(posting_apples)
     assert_equal 0, report[:postings_order_requirements_unmet].count
     #verify total order amount    
     assert_equal expected_producer_net, report[:order_value_producer_net]
@@ -861,8 +863,9 @@ class UserTest < ActiveSupport::TestCase
     #verify all postings returned
     assert_equal 0, report[:postings_order_requirements_met].count
 
-    assert_equal report[:postings_order_requirements_unmet].first, posting_celery
-    assert_equal report[:postings_order_requirements_unmet].last, posting_apples    
+    assert report[:postings_order_requirements_unmet].include?(posting_celery)
+    assert report[:postings_order_requirements_unmet].include?(posting_apples)
+
     #verify total order amount    
     assert_equal 0, report[:order_value_producer_net]
   end
@@ -1012,9 +1015,14 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 0, report[:postings_order_requirements_unmet].count
     assert_equal 3, report[:postings_order_requirements_met].count
         
-    assert_equal posting_milk.product.name, report[:postings_order_requirements_met].first.product.name
-    assert_equal posting_celery.product.name, report[:postings_order_requirements_met].second.product.name
-    assert_equal posting_apples.product.name, report[:postings_order_requirements_met].last.product.name
+    products_included = []
+    report[:postings_order_requirements_met].each do |posting|
+      products_included << posting.product.name
+    end
+
+    assert products_included.include?(posting_milk.product.name)
+    assert products_included.include?(posting_celery.product.name)
+    assert products_included.include?(posting_apples.product.name)
 
     #verify total order amount    
     assert_equal expected_producer_net, report[:order_value_producer_net]

@@ -6,7 +6,7 @@ f9:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 1
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   description: producers of dog food
   address: 9876 Yipsam Rd
   city: Gnarly
@@ -22,7 +22,7 @@ c18:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 0
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   address: 4415 21st St. SW
   city: Redmond
   state: Washington
@@ -35,7 +35,7 @@ d1:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 1
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   description: the biggest, the baddest, distributor all over town
   address: 1234 main st
   city: Kirkland
@@ -51,7 +51,7 @@ f6:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 1
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   description: producers of dog food
   address: 9876 Yipsam Rd
   city: Gnarly
@@ -68,7 +68,7 @@ f7:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 1
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   description: producers of dog food
   address: 9876 Yipsam Rd
   city: Gnarly
@@ -85,7 +85,7 @@ f8:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 1
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   description: producers of dog food
   address: 9876 Yipsam Rd
   city: Gnarly
@@ -101,7 +101,7 @@ c17:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 0
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   address: 4415 21st St. SW
   city: Redmond
   state: Washington
@@ -114,7 +114,7 @@ f_subscriptions:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 1
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   description: producers of dog food
   address: 9206 Yaksak Rd
   city: Gnarlston
@@ -130,7 +130,7 @@ c_subscription:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 0
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   address: 229178 21st St. SW
   city: Redmond
   state: Washington
@@ -143,7 +143,7 @@ c_subscription_1:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 0
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   address: 229178 21st St. SW
   city: Redmond
   state: Washington
@@ -156,7 +156,7 @@ c_subscription_2:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 0
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   address: 229178 21st St. SW
   city: Redmond
   state: Washington
@@ -169,7 +169,7 @@ f5:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 1
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   description: producers of dog food
   address: 9876 Yipsam Rd
   city: Gnarly
@@ -185,7 +185,7 @@ c9:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 0
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   address: 4215 21st St. SW
   city: Redmond
   state: Washington
@@ -198,7 +198,7 @@ c10:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 0
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   address: 4215 21st St. SW
   city: Redmond
   state: Washington
@@ -211,7 +211,7 @@ c11:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 0
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   address: 4215 21st St. SW
   city: Redmond
   state: Washington
@@ -224,7 +224,7 @@ c12:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 0
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   address: 4215 21st St. SW
   city: Redmond
   state: Washington
@@ -237,7 +237,7 @@ c13:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 0
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   address: 4215 21st St. SW
   city: Redmond
   state: Washington
@@ -250,7 +250,7 @@ c14:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 0
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   address: 4215 21st St. SW
   city: Redmond
   state: Washington
@@ -263,7 +263,7 @@ c15:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 0
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   address: 4215 21st St. SW
   city: Redmond
   state: Washington
@@ -276,7 +276,7 @@ c16:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 0
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   address: 4215 21st St. SW
   city: Redmond
   state: Washington
@@ -289,7 +289,7 @@ dropsite1:
   password_digest: <%= User.digest('dogdog') %>
   account_type: <%= User.types[:DROPSITE] %>
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   address: 8971 23st St. SW
   city: Redmond
   state: Washington
@@ -302,7 +302,7 @@ c5:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 0
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   address: 4215 21st St. SW
   city: Redmond
   state: Washington
@@ -315,7 +315,7 @@ c6:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 0
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   address: 4215 21st St. SW
   city: Redmond
   state: Washington
@@ -328,7 +328,7 @@ c7:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 0
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   address: 4215 21st St. SW
   city: Redmond
   state: Washington
@@ -341,7 +341,7 @@ c8:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 0
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   address: 4215 21st St. SW
   city: Redmond
   state: Washington
@@ -354,7 +354,7 @@ f1:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 1
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   description: producer of fine apples
   address: 1234 main st
   city: Kirkland
@@ -370,7 +370,7 @@ f2:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 1
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   description: we make grass fed beef
   address: 9876 Focker St
   city: Bellevue
@@ -386,7 +386,7 @@ f3:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 1
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   description: producers of fine food
   address: 9876 Blaster St
   city: Bellevue
@@ -402,7 +402,7 @@ f4:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 1
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   description: producers of sea food
   address: 9876 Yollimer Rd
   city: Republic
@@ -418,7 +418,7 @@ baron_farms:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 1
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   description: pastured eggs
   address: 9876 Yollimer Rd
   city: Wapato
@@ -434,7 +434,7 @@ pride_and_joy:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 1
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   description: pastured organic milk
   address: 9876 Yatzhee Rd
   city: Wapato
@@ -450,7 +450,7 @@ c1:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 0
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   address: 4215 21st St. SW
   city: Redmond
   state: Washington
@@ -463,7 +463,7 @@ c2:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 0
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   address: 1964 29st St. NE
   city: Renton
   state: Washington
@@ -476,7 +476,7 @@ c3:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 0
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   address: 1946 31st St. SE
   city: Covington
   state: Washington
@@ -489,7 +489,7 @@ c4:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 0
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   address: 1974 33st St. South
   city: Ravensdale
   state: Washington
@@ -502,7 +502,7 @@ c_no_tote_items:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 0
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   address: 3195 27st St. South
   city: Ramsdale
   state: Washington
@@ -515,7 +515,7 @@ c_one_tote_item:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 0
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   address: 3195 27st St. South
   city: Ramsdale
   state: Washington
@@ -528,7 +528,7 @@ c_account_on_hold:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 0
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   address: 32195 27st St. South
   city: Quaylesdale
   state: Washington
@@ -541,7 +541,7 @@ a1:
   password_digest: <%= User.digest('dogdog') %>
   account_type: 2
   activated: true
-  activated_at: Time.zone.now
+  activated_at: <%= Time.zone.now %>
   address: 1234 Admin Road NE
   city: Bothell
   state: Washington

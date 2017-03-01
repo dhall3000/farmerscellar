@@ -136,9 +136,9 @@ class ToteItemsControllerTest < IntegrationHelper
   test "should auto assign dropsite if only one dropsite exists and user has not specified a dropsite" do        
     #verify only one dropsite exists
     dropsite = dropsites(:dropsite2)
-    dropsite.destroy
+    nuke_dropsite(dropsite)
     dropsite = dropsites(:dropsite3)
-    dropsite.destroy
+    nuke_dropsite(dropsite)
     assert_equal 1, Dropsite.count
     #verify user does not have dropsite specified
     c5 = users(:c5)

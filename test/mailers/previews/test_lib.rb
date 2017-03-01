@@ -493,14 +493,76 @@ module TestLib
     assert_equal 0, ToteItem.count
   end
 
+  def nuke_user(user)
+    if user.business_interface
+      user.business_interface.delete
+    end
+    if user.setting
+      user.setting.delete
+    end
+    if user.pickup_code
+      user.pickup_code.delete
+    end
+    if user.distributor
+      user.distributor.delete
+    end
+
+    user.products.delete_all
+    user.subscriptions.delete_all
+    user.creditor_orders.delete_all
+    user.dropsites.delete_all
+    user.account_states.delete_all
+    user.tote_items.delete_all
+    user.producers.delete_all
+
+    user.rtbas.each do |rtba|
+      rtba.delete
+    end
+
+    user.delete
+
+  end
+
   def nuke_all_users
+
+    User.all.each do |user|
+      nuke_user(user)
+    end
+
     User.delete_all
     assert_equal 0, User.count
   end
 
   def nuke_all_postings
+    nuke_all_tote_items
+
+    Posting.all.each do |posting|
+      posting.creditor_orders.delete_all
+      posting.deliveries.delete_all
+      nuke_posting_recurrence(posting.posting_recurrence)
+    end
+
     Posting.delete_all
     assert_equal 0, Posting.count
+  end
+
+  def nuke_posting_recurrence(pr)
+
+    if pr.nil?
+      return
+    end
+    pr.postings.delete_all
+    pr.subscriptions.delete_all
+    pr.destroy
+    pr.delete
+  end
+
+  def nuke_dropsite(dropsite)
+    if dropsite.nil?
+      return
+    end
+    dropsite.users.delete_all
+    dropsite.delete
   end
 
 end

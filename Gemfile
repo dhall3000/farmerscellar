@@ -19,29 +19,28 @@ gem 'bootstrap3-datetimepicker-rails',  '4.17.43'
 gem 'carrierwave',                      '0.11.2'
 gem 'mini_magick',                      '4.5.1'
 gem 'fog',                              '1.38.0'
-gem 'mimemagic'
-gem 'memory_profiler',                  git: 'https://github.com/SamSaffron/memory_profiler.git'
-
-group :development do
-  gem 'web-console', '3.1.1'
-end
+gem 'memory_profiler',                  '0.9.8'
+gem 'pg',                               '0.18.4'
 
 group :test do
-  gem 'minitest-reporters', '1.1.9'
-  gem 'mini_backtrace',     '0.1.3'
-  gem 'guard',              '2.13.0'
-  gem 'guard-minitest',     '2.4.4'
+  gem 'minitest-reporters',       '1.1.9'
+  gem 'mini_backtrace',           '0.1.3'
+  gem 'guard',                    '2.13.0'
+  gem 'guard-minitest',           '2.4.4'
   gem 'rails-controller-testing', '0.1.1'
 end
 
-group :development, :test do
-  gem 'sqlite3',     '1.3.12'
+group :development do
+  gem 'web-console',              '3.1.1'
+end
+
+group :production do  
+  gem 'rails_12factor',           '0.0.2'
+  gem 'puma',                     '3.4.0'
+end
+
+group :development, :test do  
   gem 'byebug',      '9.0.0', platform: :mri
   gem 'spring',      '1.1.3'
 end
 
-group :production do
-  gem 'pg',             '0.18.4'
-  gem 'rails_12factor', '0.0.2'
-  gem 'puma',			      '3.4.0'
-end

@@ -411,7 +411,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     old_post.transition(:order_cutoffed)
     assert_equal 2, posting_recurrence.postings.count
     assert_equal false, old_post.live
-    assert_equal true, posting_recurrence.postings.last.live
+    assert_equal true, posting_recurrence.reload.postings.last.live
     posting = posting_recurrence.postings.last
 
     between_posting_span_days = posting_recurrence.postings.last.delivery_date - posting_recurrence.postings.first.delivery_date

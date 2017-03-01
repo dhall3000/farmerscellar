@@ -23,7 +23,7 @@
 if next_non_start_of_week_day.wday == STARTOFWEEK
   next_non_start_of_week_day = next_non_start_of_week_day + 2.days 
 end
-%>
+ %>
 
 f9posting:
   delivery_date: <%= delivery_date %>
@@ -110,17 +110,6 @@ p_recurrence_on:
   description: beef description_body
   live: true  
   posting_recurrence: one
-
-p_recurrence_three:
-  delivery_date: <%= Time.zone.local(2016, 4, 26, 0, 0) %>
-  order_cutoff: <%= Time.zone.local(2016, 4, 26, 0, 0) - 15.hours %>
-  product: beef
-  price: 5.21
-  user: f2
-  unit: pound
-  description: beef description_body
-  live: true  
-  posting_recurrence: three
 
 #--------------------------------------------------------------
 p5:

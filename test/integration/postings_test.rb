@@ -211,7 +211,7 @@ class PostingsTest < IntegrationHelper
     assert_equal 1, ActionMailer::Base.deliveries.count
     #'verify' that the number '10' shows up which is that 10 units were ordered rather than the 11 that were committed
     
-    subject = "Farmer's Cellar order for #{posting.delivery_date.strftime("%A, %B")} #{posting.delivery_date.day.ordinalize} delivery"
+    subject = "Order for #{posting.delivery_date.strftime("%A, %B")} #{posting.delivery_date.day.ordinalize} delivery"
 
     assert_appropriate_email(ActionMailer::Base.deliveries[0], posting.user.get_business_interface.order_email, subject, "10")
     assert_appropriate_email(ActionMailer::Base.deliveries[0], posting.user.get_business_interface.order_email, subject, "1")

@@ -81,7 +81,7 @@ class RtauthorizationTest < ActiveSupport::TestCase
     assert num_added_items - 1, user.tote_items.where(state: ToteItem.states[:ADDED]).count
 
     #verify subscription is not authorized
-    subscriptions = get_active_subscriptions_for(user)
+    subscriptions = ToteItemsController.helpers.get_active_subscriptions_for(user)
     assert_equal 1, subscriptions.count
 
     assert_not subscriptions.last.authorized?
@@ -92,7 +92,7 @@ class RtauthorizationTest < ActiveSupport::TestCase
     assert rtauthorization.save
 
     assert subscriptions.last.authorized?
-    assert_equal ToteItem.states[:COMMITTED], user.tote_items.first.state
+    assert_equal ToteItem.states[:COMMITTED], user.reload.tote_items.first.state
     assert_equal ToteItem.states[:AUTHORIZED], user.tote_items.last.state
 		
 	end
@@ -116,7 +116,7 @@ class RtauthorizationTest < ActiveSupport::TestCase
     assert num_added_items - 1, user.tote_items.where(state: ToteItem.states[:ADDED]).count
 
     #verify subscription is not authorized    
-    subscriptions = get_active_subscriptions_for(user)
+    subscriptions = ToteItemsController.helpers.get_active_subscriptions_for(user)
     assert_equal 1, subscriptions.count
 
     assert_not subscriptions.last.authorized?
