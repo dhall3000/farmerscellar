@@ -50,12 +50,17 @@ class BulkPurchasesTest < BulkBuyer
 
     bulk_purchase = BulkPurchase.last
     bulk_payment = BulkPayment.last
-    
-    pj_ti_index = 8
-    ti = @c1.tote_items[pj_ti_index]
-    c1_charge_amount = (ti.quantity * ti.price).round(2)
+
+    assert_equal 1, @c1.tote_items.joins(posting: :user).where("postings.user_id = ?", users(:pride_and_joy).id).count
+    pj_ti = @c1.tote_items.joins(posting: :user).where("postings.user_id = ?", users(:pride_and_joy).id).first        
+    c1_charge_amount = (pj_ti.quantity * pj_ti.price).round(2)
     ricky_proceeds = (c1_charge_amount * (0.965)).round(2)
-    assert_equal ricky_proceeds, bulk_payment.payment_payables[pj_ti_index].payments.first.amount
+    assert_equal 1, pj_ti.payment_payables.count
+    pj_pp = pj_ti.payment_payables.first
+    assert_equal 1, pj_pp.payments.count
+    pj_payment = pj_pp.payments.first
+    assert_equal ricky_proceeds, pj_payment.amount
+    assert_equal 1, bulk_payment.payment_payables.where(id: pj_pp.id).count
 
     travel_back
 

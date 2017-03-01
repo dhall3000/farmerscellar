@@ -343,7 +343,15 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     ActionMailer::Base.deliveries.clear
     do_delivery
     assert_equal 2, ActionMailer::Base.deliveries.count
-    verify_proper_delivery_notification_email(ActionMailer::Base.deliveries.last, ti_sam)
+
+    mail_one = ActionMailer::Base.deliveries.first
+    mail_two = ActionMailer::Base.deliveries.last
+
+    if mail_one.to[0] == ti_sam.user.email
+      verify_proper_delivery_notification_email(mail_one, ti_sam.reload)
+    else
+      verify_proper_delivery_notification_email(mail_two, ti_sam.reload)
+    end
     
     #verify no more items get generated
     travel_to first_posting.posting_recurrence.current_posting.order_cutoff    
@@ -433,7 +441,15 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     ActionMailer::Base.deliveries.clear
     do_delivery
     assert_equal 2, ActionMailer::Base.deliveries.count
-    verify_proper_delivery_notification_email(ActionMailer::Base.deliveries.last, ti_sam)
+    
+    mail_one = ActionMailer::Base.deliveries.first
+    mail_two = ActionMailer::Base.deliveries.last
+
+    if mail_one.to[0] == ti_sam.user.email
+      verify_proper_delivery_notification_email(mail_one, ti_sam.reload)
+    else
+      verify_proper_delivery_notification_email(mail_two, ti_sam.reload)
+    end
     
     #verify no more items get generated
     travel_to first_posting.posting_recurrence.current_posting.order_cutoff    
@@ -706,8 +722,17 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     do_delivery
     #two delivery notifications should have gone out
     assert_equal 2, ActionMailer::Base.deliveries.count
-    verify_proper_delivery_notification_email(ActionMailer::Base.deliveries.first, ti_bob.reload)
-    verify_proper_delivery_notification_email(ActionMailer::Base.deliveries.last, ti_sam.reload)
+
+    mail_one = ActionMailer::Base.deliveries.first
+    mail_two = ActionMailer::Base.deliveries.last
+
+    if mail_one.to[0] == ti_bob.user.email
+      verify_proper_delivery_notification_email(mail_one, ti_bob.reload)
+      verify_proper_delivery_notification_email(mail_two, ti_sam.reload)
+    else
+      verify_proper_delivery_notification_email(mail_two, ti_bob.reload)
+      verify_proper_delivery_notification_email(mail_one, ti_sam.reload)
+    end
 
     #bob's last tote item should be authorized
     assert bob.tote_items.last.state?(:AUTHORIZED)

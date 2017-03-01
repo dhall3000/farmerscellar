@@ -216,7 +216,7 @@ class RakeTasksTest < BulkBuyer
         assert_equal 3, PurchaseReceivable.count, "There should be exactly 3 PurchaseReceivables because one was created for each of the three tote items that was filled & delivered on Monday even though the other two customers still have tote items to be delivered later on this week"
         assert_equal 2, ActionMailer::Base.deliveries.count
         assert_appropriate_email(emails[0], "c5@c.com", "Purchase receipt", "Here is your Farmer's Cellar purchase receipt.")        
-        assert_appropriate_email(emails[1], "david@farmerscellar.com", "bulk purchase report", "BulkPurchase id: 1")
+        assert_appropriate_email(emails[1], "david@farmerscellar.com", "bulk purchase report", "BulkPurchase id: ")
       end
 
       #this is after the nightly tasks on the Wednesday delivery
@@ -243,7 +243,7 @@ class RakeTasksTest < BulkBuyer
         assert_equal 7, ActionMailer::Base.deliveries.count
         assert_appropriate_email(emails[0], "c7@c.com", "Purchase receipt", "Here is your Farmer's Cellar purchase receipt.")
         assert_appropriate_email(emails[1], "c6@c.com", "Purchase receipt", "Here is your Farmer's Cellar purchase receipt.")          
-        assert_appropriate_email(emails[2], "david@farmerscellar.com", "bulk purchase report", "BulkPurchase id: 2")
+        assert_appropriate_email(emails[2], "david@farmerscellar.com", "bulk purchase report", "BulkPurchase id: ")
         assert_appropriate_email(emails[3], "f1@f.com", "Payment receipt", "Here's a 'paper' trail for the")
         #yep, there should be two to f1. reason is because F1 had a delivery on Monday and another on Wednesday. they have different order cutoffs so they got submitted to
         #producer on different orders so they get different payments even though payment went through on the same day. we want it this way because a 1-1 ration of
@@ -263,7 +263,7 @@ class RakeTasksTest < BulkBuyer
         assert_equal 7, PurchaseReceivable.count, "There should be a 7th PurchaseReceivable because we're in the next week now which is where c5's 2nd tote item is delivered" 
         assert_equal 4, ActionMailer::Base.deliveries.count
         assert_appropriate_email(emails[0], "c5@c.com", "Purchase receipt", "Here is your Farmer's Cellar purchase receipt.")
-        assert_appropriate_email(emails[1], "david@farmerscellar.com", "bulk purchase report", "BulkPurchase id: 3")
+        assert_appropriate_email(emails[1], "david@farmerscellar.com", "bulk purchase report", "BulkPurchase id: ")
         assert_appropriate_email(emails[2], "f2@f.com", "Payment receipt", "Here's a 'paper' trail for the")
         assert_appropriate_email(emails[3], "david@farmerscellar.com", "BulkPayment report", "The sum of paypal payments is")
       end
@@ -397,9 +397,9 @@ class RakeTasksTest < BulkBuyer
 
         #verify the proper emails were sent
         assert_equal 2, ActionMailer::Base.deliveries.count        
-        assert_equal "f2@f.com", ActionMailer::Base.deliveries[1].to[0]
+        assert_equal "f2@f.com", ActionMailer::Base.deliveries[0].to[0]
         assert_equal "david@farmerscellar.com", ActionMailer::Base.deliveries[1].bcc[0]
-        assert_equal "f1@f.com", ActionMailer::Base.deliveries[0].to[0]
+        assert_equal "f1@f.com", ActionMailer::Base.deliveries[1].to[0]
         assert_equal "david@farmerscellar.com", ActionMailer::Base.deliveries[1].bcc[0]
         ActionMailer::Base.deliveries.clear    
       else         

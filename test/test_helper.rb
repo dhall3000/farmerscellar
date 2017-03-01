@@ -15,7 +15,7 @@ class ActiveSupport::TestCase
 
   def do_posting_spacing(posting_recurrence)
 
-    postings = posting_recurrence.postings
+    postings = posting_recurrence.postings.order(delivery_date: :asc)
     assert postings.count > 1, "there aren't enough postings in this recurrence to test the spacing"
 
     seconds_per_hour = 60 * 60
@@ -31,16 +31,20 @@ class ActiveSupport::TestCase
 
     if posting_recurrence.frequency > 0 && posting_recurrence.frequency < 6
 
-      count = 1
-      while count < postings.count
+      prev_posting = postings.first
+      postings.each do |posting|
 
-        spacing = postings[count].delivery_date - postings[count - 1].delivery_date
+        if posting == postings.first
+          next
+        end      
 
-        if !postings[count].delivery_date.dst? && postings[count - 1].delivery_date.dst?
+        spacing = posting.delivery_date - prev_posting.delivery_date
+
+        if !posting.delivery_date.dst? && prev_posting.delivery_date.dst?
           spacing -= seconds_per_hour
         end
 
-        if postings[count].delivery_date.dst? && !postings[count - 1].delivery_date.dst?
+        if posting.delivery_date.dst? && !prev_posting.delivery_date.dst?
           spacing += seconds_per_hour
         end
 
@@ -51,7 +55,7 @@ class ActiveSupport::TestCase
           assert_equal num_seconds_per_week * posting_recurrence.frequency, spacing
         end
         
-        count += 1
+        prev_posting = posting
 
       end
 

@@ -493,6 +493,31 @@ module TestLib
     assert_equal 0, ToteItem.count
   end
 
+  def nuke_tote_item(tote_item)
+
+    if tote_item.nil?
+      return
+    end
+
+    tote_item.delete
+
+  end
+
+  def nuke_posting(posting)
+    
+    if posting.nil?
+      return
+    end
+
+    posting.tote_items.each do |tote_item|
+      nuke_tote_item(tote_item)
+    end
+
+    posting.deliveries.delete_all
+    posting.delete
+
+  end
+
   def nuke_user(user)
     if user.business_interface
       user.business_interface.delete
@@ -514,6 +539,12 @@ module TestLib
     user.account_states.delete_all
     user.tote_items.delete_all
     user.producers.delete_all
+
+    user.postings.each do |posting|
+      nuke_posting(posting)
+    end
+
+    user.postings.delete_all
 
     user.rtbas.each do |rtba|
       rtba.delete

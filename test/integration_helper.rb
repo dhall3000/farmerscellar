@@ -272,7 +272,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
   def fill_posting(posting, quantity = nil)
 
     assert posting, "posting param is nil"
-    assert posting.creditor_order, "This posting has no associated order. You can't fill a posting that doesn't have an associated CreditorOrder object."
+    assert posting.reload.creditor_order, "This posting has no associated order. You can't fill a posting that doesn't have an associated CreditorOrder object."
 
     if quantity.nil?
       quantity = posting.total_quantity_ordered_from_creditor

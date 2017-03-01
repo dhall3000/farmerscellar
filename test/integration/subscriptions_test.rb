@@ -928,13 +928,13 @@ class SubscriptionsTest < IntegrationHelper
     user.reload
     assert_equal user.tote_items.count, num_tote_items + subscription.tote_items.count - 1
     assert_equal subscription.tote_items.count, apples_posting.posting_recurrence.postings.count
-    gap = subscription.tote_items[1].posting.delivery_date - subscription.tote_items[0].posting.delivery_date
+    gap = subscription.tote_items.joins(:posting).order("postings.delivery_date")[1].posting.delivery_date - subscription.tote_items.joins(:posting).order("postings.delivery_date")[0].posting.delivery_date
     assert_equal distance_of_time_in_words(7.days), distance_of_time_in_words(gap)
 
-    assert_equal ToteItem.states[:COMMITTED], subscription.tote_items[0].state
-    assert_equal ToteItem.states[:REMOVED], subscription.tote_items[1].state
-    assert_equal ToteItem.states[:COMMITTED], subscription.tote_items[2].state
-    gap = subscription.tote_items[2].posting.delivery_date - subscription.tote_items[0].posting.delivery_date    
+    assert_equal ToteItem.states[:COMMITTED], subscription.tote_items.joins(:posting).order("postings.delivery_date")[0].state
+    assert_equal ToteItem.states[:REMOVED], subscription.tote_items.joins(:posting).order("postings.delivery_date")[1].state
+    assert_equal ToteItem.states[:COMMITTED], subscription.tote_items.joins(:posting).order("postings.delivery_date")[2].state
+    gap = subscription.tote_items.joins(:posting).order("postings.delivery_date")[2].posting.delivery_date - subscription.tote_items.joins(:posting).order("postings.delivery_date")[0].posting.delivery_date    
     assert_equal distance_of_time_in_words(14.days), distance_of_time_in_words(gap)
     
     gap = subscription.tote_items[3].posting.delivery_date - subscription.tote_items[2].posting.delivery_date
@@ -1008,7 +1008,7 @@ class SubscriptionsTest < IntegrationHelper
     #as of this writing only two items should have been generated in this series. they should be without gap (i.e. 7 day spacing)
     #right at the beginning of the posting recurrence series. then the turn_off method gets called so their shoudl be no further
     #tote items. but the pr should keep chugging so there should be a big gap between the last posting in the pr series vs the ti series
-    actual_tote_items_gap = subscription.tote_items[1].posting.delivery_date - subscription.tote_items[0].posting.delivery_date    
+    actual_tote_items_gap = subscription.tote_items.joins(:posting).order("postings.delivery_date").last.posting.delivery_date - subscription.tote_items.joins(:posting).order("postings.delivery_date").first.posting.delivery_date
     actual_tote_item_postings_gap = posting.posting_recurrence.postings.last.delivery_date - subscription.tote_items.last.posting.delivery_date
 
     if posting_frequency > 0 && posting_frequency < 5      

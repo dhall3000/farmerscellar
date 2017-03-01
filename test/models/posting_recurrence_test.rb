@@ -146,7 +146,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     monthly_posting_recurrence = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 5, order_minimum_producer_net = 0).posting_recurrence
     monthly_options = monthly_posting_recurrence.subscription_create_options
 
-    options = @posting_recurrence.subscription_create_options
+    options = @posting_recurrence.reload.subscription_create_options
 
     assert_not options.nil?
     assert_equal "Just once", options[0][:text]
@@ -169,9 +169,10 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     assert_equal 1, monthly_options[1][:subscription_frequency]
     assert_equal 2, monthly_options[2][:subscription_frequency]
 
-    delivery_date = @posting_recurrence.postings.last.delivery_date
+    delivery_date = @posting_recurrence.current_posting.delivery_date
 
     assert_equal delivery_date, options[0][:next_delivery_date]
+
     assert_equal delivery_date, options[1][:next_delivery_date]
     assert_equal delivery_date, options[2][:next_delivery_date]
     assert_equal delivery_date, options[3][:next_delivery_date]

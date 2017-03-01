@@ -665,14 +665,14 @@ class PostingTest < ActiveSupport::TestCase
     travel_to @posting.order_cutoff
     RakeHelper.do_hourly_tasks
 
-    @posting.fill(quantity_received_from_producer)
+    @posting.reload.fill(quantity_received_from_producer)
 
-    c1_items = c1.tote_items.joins(:posting).where("postings.id = ?", @posting.id)
+    c1_items = c1.reload.tote_items.joins(:posting).where("postings.id = ?", @posting.id)
 
     count = 0
     quantity_remaining = quantity_received_from_producer
 
-    c1_items.each do |tote_item|
+    c1_items.order(quantity_filled: :desc).each do |tote_item|
 
       if quantity_remaining >= tote_item.quantity
         assert tote_item.reload.fully_filled?

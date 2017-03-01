@@ -548,8 +548,9 @@ class UserTest < ActiveSupport::TestCase
     #outbound_order_report(postings_presently_transitioning_to_commitment_zone) should return postings
     report = producer.outbound_order_report(posting_celery.order_cutoff)
     #verify all postings returned
-    assert_equal report[:postings_order_requirements_met].first, posting_celery
-    assert_equal report[:postings_order_requirements_met].last, posting_apples
+    assert report[:postings_order_requirements_met].include?(posting_celery)
+    assert report[:postings_order_requirements_met].include?(posting_apples)
+
     assert_equal 0, report[:postings_order_requirements_unmet].count
     #verify total order amount    
     assert_equal expected_producer_net, report[:order_value_producer_net]
@@ -609,8 +610,8 @@ class UserTest < ActiveSupport::TestCase
     #outbound_order_report(postings_presently_transitioning_to_commitment_zone) should return postings
     report = producer.outbound_order_report(posting_celery.order_cutoff)
     #verify all postings returned
-    assert_equal report[:postings_order_requirements_met].first, posting_celery
-    assert_equal report[:postings_order_requirements_met].last, posting_apples
+    assert report[:postings_order_requirements_met].include?(posting_celery)
+    assert report[:postings_order_requirements_met].include?(posting_apples)
     assert_equal 0, report[:postings_order_requirements_unmet].count
     #verify total order amount    
     assert_equal expected_producer_net, report[:order_value_producer_net]
@@ -670,8 +671,9 @@ class UserTest < ActiveSupport::TestCase
     report = producer.outbound_order_report(posting_celery.order_cutoff)
     #verify all postings returned
     assert_equal 0, report[:postings_order_requirements_met].count
-    assert_equal report[:postings_order_requirements_unmet].first, posting_celery
-    assert_equal report[:postings_order_requirements_unmet].last, posting_apples
+    assert report[:postings_order_requirements_unmet].include?(posting_celery)
+    assert report[:postings_order_requirements_unmet].include?(posting_apples)
+
     #verify total order amount    
     assert_equal 0, report[:order_value_producer_net]
   end
