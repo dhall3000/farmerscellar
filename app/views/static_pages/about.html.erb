@@ -1,37 +1,51 @@
 <% provide(:title, "About") %>
   <h1>About</h1>
 
-  <h2>The Operation</h2>
-  <p>
-    Our goal at Farmer's Cellar is to provide as direct and transparent a connection as possible between you and your farmer short of you actually driving to the farm yourself. Big convenience, small footprint. That's our aim.
-  </p>
-  <p>
-    The reason is so that you can know not only where your food comes from but also exactly how it got to you. Afterall, you are putting this stuff in your body so these things are important to know!
-  </p>
-  <p>
-  When you order you'll always know exactly who you're buying from. Each product posting clearly says the farm, a bit about them and their practices and whenever possible we display their website so you can find out even more or contact them directly if you want.
-  </p>
-  <p>
+<div class="row">
+  <div class="col-xs-12 col-sm-offset-2 col-sm-8">
+
+    <div>
+        <%
+        upload = Upload.find_by(title: "FAMILY")
+        if upload
+        %>
+          <%= image_tag upload.file_name.large, class: "img-responsive" %>
+        <% end %>
+    </div>
+
+    <h2>The Family</h2>
+    <p>
+      We are a family operation...David and Kellye Hall, two young boys (Boaz and Jethro), a baby on the way and a Golden Retriever (Leo).
+    </p>
+    <p>
+      We've always been in to health and nutrition but really got active in sourcing direct from farmer around 2010. We chose to source as much as possible directly so that we could know more not only about the source of the food but also how it got from that source to us.
+    </p>
+
+    <h2>The Motivation</h2>
+    <p>
+      However, we found direct access to farmers very challenging and noticed others had similar challenges. So in 2014 we decided to try some ideas to see if we could make it easier for farmers and their customers to connect as directly as possible.
+    </p>
+    <p>
+      We offered our garage as a dropsite free to the community for 2 years. After a lot of fun and great feedback we decided to make an official business out of it so that we could expand our offering.
+    </p>
+
+    <h2>The Operation</h2>
+    <p>
+      Our goal at Farmer's Cellar is to provide as direct and transparent a connection as possible between you and your farmer short of you actually driving to the farm yourself. Big convenience, small footprint. That's our aim.
+    </p>
+    <p>
+      The reason is so that you can know not only where your food comes from but also exactly how it got to you. Afterall, you are putting this stuff in your body so these things are important to know!
+    </p>
+    <p>
+    When you order you'll always know exactly who you're buying from. Each product posting clearly says the farm, a bit about them and their practices and whenever possible we display their website so you can find out even more or contact them directly if you want.
+    </p>
+    <p>
+
+    <h2>The Mission</h2>
+    <p>
+      Our mission is to glorify Jesus Christ through our service. We strive to achieve this by actually doing what we say we believe in, the Holy Bible. The main passage we hope you see in our dealings is “the golden rule”, Matthew 7:12 “in everything, do to others what you would have them do to you”.
+    </p>
 
 
-  <h2>The Family</h2>
-  <p>
-    We are a family operation...David and Kellye Hall, two young boys (Boaz and Jethro), a baby on the way and a Golden Retriever (Leo).
-  </p>
-  <p>
-    We've always been in to health and nutrition but really got active in sourcing direct from farmer around 2010. We chose to source as much as possible directly so that we could know more not only about the source of the food but also how it got from that source to us.
-  </p>
-
-
-  <h2>The Motivation</h2>
-  <p>
-    However, we found direct access to farmers very challenging and noticed others had similar challenges. So in 2014 we decided to try some ideas to see if we could make it easier for farmers and their customers to connect as directly as possible.
-  </p>
-  <p>
-    We offered our garage as a dropsite free to the community for 2 years. After a lot of fun and great feedback we decided to make an official business out of it so that we could expand our offering.
-  </p>
-
-  <h2>The Mission</h2>
-  <p>
-    Our mission is to glorify Jesus Christ through our service. We strive to achieve this by actually doing what we say we believe in, the Holy Bible. The main passage we hope you see in our dealings is “the golden rule”, Matthew 7:12 “in everything, do to others what you would have them do to you”.
-  </p>
+  </div>
+</div>
