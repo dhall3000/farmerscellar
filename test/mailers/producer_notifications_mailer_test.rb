@@ -13,7 +13,7 @@ class ProducerNotificationsMailerTest < ActionMailer::TestCase
 
     count = 0
     while count < ps.count
-      if ps[count].valid?
+      if ps[count].valid? && ps[count].inbound_order_value_producer_net > 0
         ps_keep << ps[count]
       end
       count += 1
@@ -24,7 +24,7 @@ class ProducerNotificationsMailerTest < ActionMailer::TestCase
     assert_equal 1, ActionMailer::Base.deliveries.count
     mail = ActionMailer::Base.deliveries.last    
 
-    subject = "Farmer's Cellar order for #{ps_keep.first.delivery_date.strftime("%A, %B")} #{ps_keep.first.delivery_date.day.ordinalize} delivery"
+    subject = "Order for #{ps_keep.first.delivery_date.strftime("%A, %B")} #{ps_keep.first.delivery_date.day.ordinalize} delivery"
     assert_equal subject, mail.subject
     assert_equal [ps.first.user.email], mail.to
     assert_equal ["david@farmerscellar.com"], mail.from
