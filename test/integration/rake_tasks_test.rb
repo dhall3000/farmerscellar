@@ -188,12 +188,17 @@ class RakeTasksTest < BulkBuyer
     #there should be a bp on the 2nd monday because that customer has no more deliveries that week
     assert_equal 3, BulkPurchase.count
 
-    #this bp represents only c5's 1st monday night's purchase
-    assert_equal 8.67, BulkPurchase.all[0].gross
-    #this bp represents all orders of c6 & c7 which occurred on friday night
-    assert_equal 81.97, BulkPurchase.all[1].gross
-    #this bp represents only c5's 2nd monday night's purchase
-    assert_equal 46.89, BulkPurchase.all[2].gross
+    #$8.67...this bp represents only c5's 1st monday night's purchase
+    #$81.97...this bp represents all orders of c6 & c7 which occurred on friday night
+    #$46.89...this bp represents only c5's 2nd monday night's purchase
+
+    assert (BulkPurchase.all[0].gross == 8.67) || (BulkPurchase.all[0].gross == 81.97) || (BulkPurchase.all[0].gross == 46.89)
+    assert (BulkPurchase.all[1].gross == 8.67) || (BulkPurchase.all[1].gross == 81.97) || (BulkPurchase.all[1].gross == 46.89)
+    assert (BulkPurchase.all[2].gross == 8.67) || (BulkPurchase.all[2].gross == 81.97) || (BulkPurchase.all[2].gross == 46.89)
+
+    assert_not_equal BulkPurchase.all[0].gross, BulkPurchase.all[1].gross
+    assert_not_equal BulkPurchase.all[0].gross, BulkPurchase.all[2].gross
+    assert_not_equal BulkPurchase.all[1].gross, BulkPurchase.all[2].gross
 
     #go back to regular time    
     travel_back    
