@@ -16,7 +16,8 @@ class RtauthorizationssTest < BulkBuyer
     assert_equal 0, Rtpurchase.count
     setup_basic_subscription_through_delivery
     assert_equal 2, Posting.count    
-    travel_to Posting.first.delivery_date + 22.hours    
+    dt = Posting.first.delivery_date
+    travel_to Time.zone.local(dt.year, dt.month, dt.day, 22, 0)
     RakeHelper.do_hourly_tasks
     assert_equal 1, BulkPurchase.count
     assert_equal 1, Rtpurchase.count

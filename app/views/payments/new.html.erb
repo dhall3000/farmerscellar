@@ -5,7 +5,7 @@
   <%= render partial: 'shared/error_messages_general', locals: { active_record_object: @payment } %>
 
   <%= f.label :amount %>
-  <%= f.number_field :amount, class: 'form-control' %>
+  <%= f.number_field :amount, step: 0.01, class: 'form-control' %>
   
   <%= f.label :notes %>  
   <%= f.text_area :notes, class: "form-control", rows: "8" %>

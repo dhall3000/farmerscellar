@@ -18,6 +18,27 @@ module TestLib
 #def create_email(subject = nil, body = nil, postings = nil)
 #def create_creditor_with(payment_method_key, payment_time_key, creditor = nil)
 
+
+  def get_emails_to(emails, to)
+    emails_to = []
+    emails.each do |mail|
+      if mail.to[0] == to
+        emails_to << mail
+      end      
+    end
+    return emails_to
+  end
+
+  def get_emails_by_subject(emails, subject)
+    emails_by_subject = []
+    emails.each do |mail|
+      if mail.subject == subject
+        emails_by_subject << mail
+      end
+    end
+    return emails_by_subject
+  end
+
   def create_food_category_for_all_products_that_have_none
     Product.all.each do |product|
       create_food_category_for_product_if_product_has_none(product)

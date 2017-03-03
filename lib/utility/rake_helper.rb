@@ -73,7 +73,7 @@ class RakeHelper
 			last_run = NightlyTaskRun.order("nightly_task_runs.id").last
 
 			if last_run.nil?
-				last_run = now - 1.day
+				last_run = now - 24.hours
 			else
 				last_run = last_run.created_at
 			end
@@ -215,7 +215,7 @@ class RakeHelper
 
       #if this isn't the correct time, exit
       now = Time.zone.now
-      if now.hour != 2
+      if now.hour != 3
         puts "send_postings_receivable_to_admin: it's not 2AM so quitting."
         puts "send_postings_receivable_to_admin: exit"
         return        

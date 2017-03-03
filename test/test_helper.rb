@@ -79,44 +79,54 @@ class ActiveSupport::TestCase
 
     postings = posting_recurrence.postings
     subscription = posting_recurrence.subscriptions.last
-    tote_items = subscription.tote_items
+    tote_items = subscription.tote_items.joins(:posting).order("postings.delivery_date")
 
     assert postings.count > 1, "there aren't enough postings in this recurrence to test the tote items spacing"
     assert tote_items.count > 1, "there aren't enough tote_items in this subscription to test the tote items spacing"
 
-    if posting_recurrence.frequency > 0 && posting_recurrence.frequency < 5
-      count = 1
-      while count < tote_items.count
+    tote_item_prev = tote_items.first
 
-        actual_spacing = tote_items[count].posting.delivery_date - tote_items[count - 1].posting.delivery_date
+    if posting_recurrence.frequency > 0 && posting_recurrence.frequency < 5
+      
+      tote_items.each do |tote_item|
+
+        if tote_item == tote_items.first
+          return
+        end
+
+        actual_spacing = tote_item.posting.delivery_date - tote_item_prev.posting.delivery_date
         expected_spacing = num_seconds_per_week * posting_recurrence.frequency * subscription.frequency
 
-        if !tote_items[count].posting.delivery_date.dst? && tote_items[count - 1].posting.delivery_date.dst?
+        if !tote_item.posting.delivery_date.dst? && tote_item_prev.posting.delivery_date.dst?
           expected_spacing += seconds_per_hour
         end
 
-        if tote_items[count].posting.delivery_date.dst? && !tote_items[count - 1].posting.delivery_date.dst?
+        if tote_item.posting.delivery_date.dst? && !tote_item_prev.posting.delivery_date.dst?
           expected_spacing -= seconds_per_hour
         end
 
         assert_equal expected_spacing, actual_spacing
-        count += 1
+        tote_item_prev = tote_item
       end
     elsif posting_recurrence.frequency == 5
-      count = 1
-      while count < tote_items.count
+      
+      tote_items.each do |tote_item|
 
-        actual_spacing = tote_items[count].posting.delivery_date - tote_items[count - 1].posting.delivery_date
+        if tote_item == tote_items.first
+          return
+        end
+
+        actual_spacing = tote_item.posting.delivery_date - tote_item_prev.posting.delivery_date
 
         expected_spacing_lo = num_seconds_per_month_lo * subscription.frequency
         expected_spacing_hi = num_seconds_per_month_hi * subscription.frequency
 
-        if !tote_items[count].posting.delivery_date.dst? && tote_items[count - 1].posting.delivery_date.dst?
+        if !tote_item.posting.delivery_date.dst? && tote_item_prev.posting.delivery_date.dst?
           expected_spacing_lo += seconds_per_hour
           expected_spacing_hi += seconds_per_hour
         end
 
-        if tote_items[count].posting.delivery_date.dst? && !tote_items[count - 1].posting.delivery_date.dst?
+        if tote_item.posting.delivery_date.dst? && !tote_item_prev.posting.delivery_date.dst?
           expected_spacing_lo -= seconds_per_hour
           expected_spacing_hi -= seconds_per_hour
         end
@@ -124,7 +134,7 @@ class ActiveSupport::TestCase
         assert actual_spacing.seconds >= expected_spacing_lo.seconds
         assert actual_spacing.seconds <= expected_spacing_hi.seconds
         
-        count += 1
+        tote_item_prev = tote_item
 
       end
     else

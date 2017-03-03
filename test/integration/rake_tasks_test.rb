@@ -132,7 +132,7 @@ class RakeTasksTest < BulkBuyer
           #if it's 10pm...
           if Time.zone.now.hour == 22
             do_nightly_task_assertions
-          elsif Time.zone.now.hour == 2
+          elsif Time.zone.now.hour == 3
             if ActionMailer::Base.deliveries.count > 0
               assert_equal 1, ActionMailer::Base.deliveries.count
               mail = ActionMailer::Base.deliveries.first
@@ -241,16 +241,37 @@ class RakeTasksTest < BulkBuyer
         assert_equal BulkPayment.last.total_payments_amount, (BulkPurchase.first.net + BulkPurchase.last.net).round(2), "The sum of the two BulkPurchases should equal the total BulkPayment masspayment payout"
 
         assert_equal 7, ActionMailer::Base.deliveries.count
-        assert_appropriate_email(emails[0], "c7@c.com", "Purchase receipt", "Here is your Farmer's Cellar purchase receipt.")
-        assert_appropriate_email(emails[1], "c6@c.com", "Purchase receipt", "Here is your Farmer's Cellar purchase receipt.")          
-        assert_appropriate_email(emails[2], "david@farmerscellar.com", "bulk purchase report", "BulkPurchase id: ")
-        assert_appropriate_email(emails[3], "f1@f.com", "Payment receipt", "Here's a 'paper' trail for the")
+        emails_to = get_emails_to(ActionMailer::Base.deliveries, "c7@c.com")
+        assert_equal 1, emails_to.count
+        assert_appropriate_email(emails_to[0], "c7@c.com", "Purchase receipt", "Here is your Farmer's Cellar purchase receipt.")
+        
+        emails_to = get_emails_to(ActionMailer::Base.deliveries, "c6@c.com")
+        assert_equal 1, emails_to.count
+        assert_appropriate_email(emails_to[0], "c6@c.com", "Purchase receipt", "Here is your Farmer's Cellar purchase receipt.")          
+
+        emails_to = get_emails_to(ActionMailer::Base.deliveries, "david@farmerscellar.com")
+        assert_equal 2, emails_to.count
+        emails_to = get_emails_by_subject(emails_to, "bulk purchase report")
+        assert_equal 1, emails_to.count
+        assert_appropriate_email(emails_to[0], "david@farmerscellar.com", "bulk purchase report", "BulkPurchase id: ")
+
+        emails_to = get_emails_to(ActionMailer::Base.deliveries, "f1@f.com")
+        assert_equal 2, emails_to.count
+        assert_appropriate_email(emails_to[0], "f1@f.com", "Payment receipt", "Here's a 'paper' trail for the")
         #yep, there should be two to f1. reason is because F1 had a delivery on Monday and another on Wednesday. they have different order cutoffs so they got submitted to
         #producer on different orders so they get different payments even though payment went through on the same day. we want it this way because a 1-1 ration of
         #orders and payments will make reconciliation easier. plus, it's unlikely we'll have same farmer delivering on different days in same week.
-        assert_appropriate_email(emails[4], "f1@f.com", "Payment receipt", "Here's a 'paper' trail for the")
-        assert_appropriate_email(emails[5], "f2@f.com", "Payment receipt", "Here's a 'paper' trail for the")
-        assert_appropriate_email(emails[6], "david@farmerscellar.com", "BulkPayment report", "The sum of paypal payments is")
+        assert_appropriate_email(emails_to[1], "f1@f.com", "Payment receipt", "Here's a 'paper' trail for the")
+
+        emails_to = get_emails_to(ActionMailer::Base.deliveries, "f2@f.com")
+        assert_equal 1, emails_to.count        
+        assert_appropriate_email(emails_to[0], "f2@f.com", "Payment receipt", "Here's a 'paper' trail for the")
+
+        emails_to = get_emails_to(ActionMailer::Base.deliveries, "david@farmerscellar.com")
+        assert_equal 2, emails_to.count
+        emails_to = get_emails_by_subject(emails_to, "BulkPayment report")
+        assert_equal 1, emails_to.count
+        assert_appropriate_email(emails_to[0], "david@farmerscellar.com", "BulkPayment report", "The sum of paypal payments is")
 
         assert_equal 0, CreditorObligation.where("balance > 0").count
         assert_equal 0, CreditorObligation.where("balance < 0").count
@@ -396,11 +417,14 @@ class RakeTasksTest < BulkBuyer
         assert_not_equal @committed_count, committed_count
 
         #verify the proper emails were sent
-        assert_equal 2, ActionMailer::Base.deliveries.count        
-        assert_equal "f2@f.com", ActionMailer::Base.deliveries[0].to[0]
-        assert_equal "david@farmerscellar.com", ActionMailer::Base.deliveries[1].bcc[0]
-        assert_equal "f1@f.com", ActionMailer::Base.deliveries[1].to[0]
-        assert_equal "david@farmerscellar.com", ActionMailer::Base.deliveries[1].bcc[0]
+        assert_equal 2, ActionMailer::Base.deliveries.count
+        emails_to = get_emails_to(ActionMailer::Base.deliveries, "f2@f.com")
+        assert_equal 1, emails_to.count        
+        assert_equal "david@farmerscellar.com", emails_to[0].bcc[0]
+        
+        emails_to = get_emails_to(ActionMailer::Base.deliveries, "f1@f.com")
+        assert_equal 1, emails_to.count        
+        assert_equal "david@farmerscellar.com", emails_to[0].bcc[0]
         ActionMailer::Base.deliveries.clear    
       else         
         #after transition

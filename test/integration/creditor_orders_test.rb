@@ -42,7 +42,8 @@ class CreditorOrdersTest < IntegrationHelper
     assert creditor_obligation.balance > 0
 
     #now let's make the payment happen and verify things get all squared up
-    travel_to posting.delivery_date + 22.hours
+    dt = posting.delivery_date
+    travel_to Time.zone.local(dt.year, dt.month, dt.day, 22, 0)
     RakeHelper.do_hourly_tasks
 
     #now there should be a payment
