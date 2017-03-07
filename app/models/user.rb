@@ -132,7 +132,7 @@ class User < ApplicationRecord
     #write the new value    
     cred = get_creditor
     if self.id != cred.id
-      #this producer has a creditor so we need to report any changes to out outbound producer net value
+      #this producer has a distributor so we need to report any changes to our outbound producer net value
       old_outbound_producer_net = outbound_order_value_producer_net(order_cutoff)      
     end
 
@@ -144,7 +144,7 @@ class User < ApplicationRecord
       return
     end
 
-    #if our output changed as a result of this inbound change and we have a creditor, we need to report the change to the creditor    
+    #if our output changed as a result of this inbound change and we have a distributor, we need to report the change to the distributor
     new_outbound_producer_net = outbound_order_value_producer_net(order_cutoff)
 
     if new_outbound_producer_net == old_outbound_producer_net

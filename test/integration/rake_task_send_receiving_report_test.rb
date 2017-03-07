@@ -25,7 +25,8 @@ class RakeTaskSendReceivingReportTest < IntegrationHelper
     ActionMailer::Base.deliveries.clear
     assert_equal 0, ActionMailer::Base.deliveries.count
 
-    travel_to ret[:delivery_date] + 2.hours
+    travel_to ret[:delivery_date] + 3.hours
+
     RakeHelper.do_hourly_tasks
     assert_equal 1, ActionMailer::Base.deliveries.count
     mail = ActionMailer::Base.deliveries.first

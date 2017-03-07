@@ -75,7 +75,125 @@ class OrderMinimumAmountOutstandingTest < IntegrationHelper
     #assert_equal 15, @posting1.biggest_order_minimum_producer_net_outstanding
   end
 
-  def setup2(distributor_om = 0, producer1_om = 0, posting1_om = 0, posting1_units_per_case = 1, posting1_quantity = 0, posting2_quantity = 0, posting3_quantity = 0)
+  test "biggest amount outstanding should be consistent with total stated in order email when a single unit bumps the order up over the order minimum" do
+
+    #here's the motivation for this test: we had a production situation where only $3.XX was 'outstanding' to push a Pete's order through ($100 OM). so i ordered one gallon of
+    #pure eire raw milk (retail $9.25 / gal) to push the order through. but then when the order email went out it said:
+    #"If all orders are filled total sales will be $118.04."
+    #so i'm making this test to see if i can duplicate this behavior because it seems to me that the order total should be something like $96.XX + $8 (producer net on 1 gal raw) = $104.XX
+
+    #set up: $100 distributor OM, posting with retail $11.40/unit retail, $11/unit producer net. initially 9 units are ordered so producer net should stand at $99 so 
+    #biggest_order_minimum_producer_net_outstanding should be $1
+    setup2(distributor_om = 100, producer1_om = 0, posting1_om = 0, posting1_units_per_case = 1, posting1_quantity = 9, posting2_quantity = 0, posting3_quantity = 0, price = 11.40)
+    ActionMailer::Base.deliveries.clear
+    assert_equal 1, @posting1.biggest_order_minimum_producer_net_outstanding
+    assert_equal 99, @posting1.inbound_order_value_producer_net
+    #user orders one more unit
+    ti = create_tote_item(@user, @posting1, 1)
+    assert ti.state?(:ADDED)
+    ti.transition(:customer_authorized)
+    assert ti.state?(:AUTHORIZED)
+    #now biggest_order_minimum_producer_net_outstanding should be $0
+    assert_equal 0, @posting1.biggest_order_minimum_producer_net_outstanding
+    #order total should be $110 now
+    assert_equal 110, @distributor.outbound_order_value_producer_net(@posting1.order_cutoff)
+    #user cancels order
+    ti.transition(:customer_removed)
+    assert ti.reload.state?(:REMOVED)
+    #amount outstanding should once again be $1
+    assert_equal 1, @posting1.biggest_order_minimum_producer_net_outstanding
+    assert_equal 99, @posting1.inbound_order_value_producer_net
+    #and order value should be $0
+    assert_equal 0, @distributor.outbound_order_value_producer_net(@posting1.order_cutoff)
+    #user orders one more unit again
+    ti = create_tote_item(@user, @posting1, 1)
+    assert ti.state?(:ADDED)
+    ti.transition(:customer_authorized)
+    assert ti.state?(:AUTHORIZED)
+
+    #trigger the order email to be submitted to the distributor
+    assert_equal 0, ActionMailer::Base.deliveries.count
+    travel_to @posting1.order_cutoff
+    RakeHelper.do_hourly_tasks
+    #verify order email was sent
+    assert_equal 1, ActionMailer::Base.deliveries.count
+    mail = ActionMailer::Base.deliveries.first
+    assert_equal @distributor.get_business_interface.order_email, mail.to[0]
+    assert_equal "Order for #{@posting1.delivery_date.strftime("%A, %B")} #{@posting1.delivery_date.day.ordinalize} delivery", mail.subject
+    assert_match "If all orders are filled total sales will be $110.00.", mail.body.encoded
+
+    travel_back    
+
+  end
+
+  test "biggest amount outstanding should be consistent with total stated in order email when a single unit bumps the order up over the order minimum after first order not submitted due to insufficient order value" do
+
+    #here's the motivation for this test: we had a production situation where only $3.XX was 'outstanding' to push a Pete's order through ($100 OM). so i ordered one gallon of
+    #pure eire raw milk (retail $9.25 / gal) to push the order through. but then when the order email went out it said:
+    #"If all orders are filled total sales will be $118.04."
+    #so i'm making this test to see if i can duplicate this behavior because it seems to me that the order total should be something like $96.XX + $8 (producer net on 1 gal raw) = $104.XX
+
+    #set up: $100 distributor OM, posting with retail $11.40/unit retail, $11/unit producer net. initially 9 units are ordered so producer net should stand at $99 so 
+    #biggest_order_minimum_producer_net_outstanding should be $1
+    setup2(distributor_om = 100, producer1_om = 0, posting1_om = 0, posting1_units_per_case = 1, posting1_quantity = 9, posting2_quantity = 0, posting3_quantity = 0, price = 11.40, posting1_frequency = -1)
+    assert_equal 1, @posting1.biggest_order_minimum_producer_net_outstanding
+    assert_equal 99, @posting1.inbound_order_value_producer_net
+    #trigger the order email to be submitted to the distributor
+    ActionMailer::Base.deliveries.clear
+    travel_to @posting1.order_cutoff
+    RakeHelper.do_hourly_tasks
+    #verify order email was sent
+    assert_equal 0, ActionMailer::Base.deliveries.count
+
+    #ok so things just rolled so now let's get the new order cutoff and do some analysis
+    new_posting1 = @posting1.reload.posting_recurrence.current_posting    
+    #first, verify the new posting's oc is out past old posting oc
+    assert new_posting1.order_cutoff > @posting1.order_cutoff
+
+    assert_equal 1, new_posting1.biggest_order_minimum_producer_net_outstanding
+    assert_equal 99, new_posting1.inbound_order_value_producer_net
+
+
+    #user orders one more unit
+    ti = create_tote_item(@user, new_posting1, 1)
+    assert ti.state?(:ADDED)
+    create_rt_authorization_for_customer(@user)
+    ActionMailer::Base.deliveries.clear
+    assert ti.reload.state?(:AUTHORIZED)
+    #now biggest_order_minimum_producer_net_outstanding should be $0
+    assert_equal 0, new_posting1.biggest_order_minimum_producer_net_outstanding
+    #order total should be $110 now
+    assert_equal 110, @distributor.outbound_order_value_producer_net(new_posting1.order_cutoff)
+    #user cancels order
+    ti.transition(:customer_removed)
+    assert ti.reload.state?(:REMOVED)
+    #amount outstanding should once again be $1
+    assert_equal 1, new_posting1.biggest_order_minimum_producer_net_outstanding
+    assert_equal 99, new_posting1.inbound_order_value_producer_net
+    #and order value should be $0
+    assert_equal 0, @distributor.outbound_order_value_producer_net(new_posting1.order_cutoff)
+    #user orders one more unit again
+    ti = create_tote_item(@user, new_posting1, 1)
+    assert ti.state?(:ADDED)
+    ti.transition(:customer_authorized)
+    assert ti.state?(:AUTHORIZED)
+
+    #trigger the order email to be submitted to the distributor
+    assert_equal 0, ActionMailer::Base.deliveries.count
+    travel_to new_posting1.order_cutoff
+    RakeHelper.do_hourly_tasks
+    #verify order email was sent
+    assert_equal 1, ActionMailer::Base.deliveries.count
+    mail = ActionMailer::Base.deliveries.first
+    assert_equal @distributor.get_business_interface.order_email, mail.to[0]
+    assert_equal "Order for #{new_posting1.delivery_date.strftime("%A, %B")} #{new_posting1.delivery_date.day.ordinalize} delivery", mail.subject
+    assert_match "If all orders are filled total sales will be $110.00.", mail.body.encoded
+
+    travel_back    
+
+  end
+
+  def setup2(distributor_om = 0, producer1_om = 0, posting1_om = 0, posting1_units_per_case = 1, posting1_quantity = 0, posting2_quantity = 0, posting3_quantity = 0, price = 1.04, posting1_frequency = 0)
     @distributor = create_distributor(name = "distributor name", email = "distributor@d.com", order_min = distributor_om)
 
     @producer1 = create_producer(name = "producer1", email = "producer1@p.com", distributor = @distributor, order_min = producer1_om)
@@ -84,17 +202,24 @@ class OrderMinimumAmountOutstandingTest < IntegrationHelper
     @delivery_date = get_delivery_date(7)
     @order_cutoff = @delivery_date - 2.days
 
-    @posting1 = create_posting(@producer1, price = 1.04, Product.create(name: "Product1"), unit = nil, @delivery_date, @order_cutoff, units_per_case = posting1_units_per_case, frequency = 1, order_minimum_producer_net = posting1_om, product_id_code = nil, commission = 0)
-    @posting2 = create_posting(@producer1, price = 1.04, Product.create(name: "Product2"), unit = nil, @delivery_date, @order_cutoff, units_per_case = nil, frequency = 1, order_minimum_producer_net = 0, product_id_code = nil, commission = 0)
-    @posting3 = create_posting(@producer2, price = 1.04, Product.create(name: "Product3"), unit = nil, @delivery_date, @order_cutoff, units_per_case = nil, frequency = 1, order_minimum_producer_net = 0, product_id_code = nil, commission = 0)
+    @posting1 = create_posting(@producer1, price, Product.create(name: "Product1"), unit = nil, @delivery_date, @order_cutoff, units_per_case = posting1_units_per_case, frequency = 1, order_minimum_producer_net = posting1_om, product_id_code = nil, commission = 0)
+    @posting2 = create_posting(@producer1, price, Product.create(name: "Product2"), unit = nil, @delivery_date, @order_cutoff, units_per_case = nil, frequency = 1, order_minimum_producer_net = 0, product_id_code = nil, commission = 0)
+    @posting3 = create_posting(@producer2, price, Product.create(name: "Product3"), unit = nil, @delivery_date, @order_cutoff, units_per_case = nil, frequency = 1, order_minimum_producer_net = 0, product_id_code = nil, commission = 0)
 
     @user = create_user
 
     if posting1_quantity > 0
-      ti = create_tote_item(@user, @posting1, posting1_quantity)
+      
+      if posting1_frequency == -1
+        #this is for roll until filled. i just didn't want to create another parameter so am encoding it in this one
+        ti = create_tote_item(@user, @posting1, posting1_quantity, frequency = posting1_frequency, roll_until_filled = true)
+      elsif posting1_frequency > -1
+        ti = create_tote_item(@user, @posting1, posting1_quantity, frequency = posting1_frequency)
+      end
+           
       assert ti.state?(:ADDED)
-      ti.transition(:customer_authorized)
-      assert ti.state?(:AUTHORIZED)
+      create_rt_authorization_for_customer(@user)
+      assert ti.reload.state?(:AUTHORIZED)
     end
 
     if posting2_quantity > 0
