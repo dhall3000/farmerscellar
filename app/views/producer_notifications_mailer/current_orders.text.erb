@@ -23,7 +23,7 @@ Below are orders for your upcoming delivery. If all orders are filled total sale
 <% else %>
 	<% product_id_code = "Product ID Code=#{posting.product_id_code}," %>
 <% end %>
-Id=<%= posting.id %>,Delivery Date=<%= posting.delivery_date.strftime("%A %b %d, %Y") %>,<%= producer %>Product=<%= posting.product.name %>,Units=<%= posting.unit.name %>,<%= product_id_code %><%= case_info %>Number of Units=<%= value[:unit_count] %>,Unit Price=<%= number_to_currency(posting.get_producer_net_unit) %>,Sub Total=<%= number_to_currency(value[:sub_total]) %>
+Id=<%= posting.id %>,Delivery Date=<%= posting.delivery_date.strftime("%A %b %d, %Y") %>,<%= producer %>Product=<%= posting.product.name %>,Units=<%= posting.unit.name %>,<%= product_id_code %><%= case_info %>Number of Units=<%= value[:unit_count] %>,Unit Price=<%= number_to_currency(posting.producer_net_unit) %>,Sub Total=<%= number_to_currency(value[:sub_total]) %>
 <% end %>
 
 Thanks!

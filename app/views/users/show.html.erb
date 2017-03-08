@@ -108,7 +108,7 @@
                     <td class="text-center"><%= posting.total_quantity_ordered %></td>            
                     <td class="text-center"><%= posting.delivery_date.strftime("%A %b %d, %Y") %></td>
 
-                    <td class="text-center"><%= number_to_currency(posting.get_producer_net_unit) %></td>
+                    <td class="text-center"><%= number_to_currency(posting.producer_net_unit) %></td>
                     <td class="text-center"><%= posting.get_commission_factor.round(4).to_s %></td>
 
                     <td class="text-center"><%= link_to "Copy", new_posting_path(posting_id: posting.id),  class: "glyphicon glyphicon-duplicate" %></td>

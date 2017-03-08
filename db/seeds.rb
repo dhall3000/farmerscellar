@@ -278,18 +278,6 @@ def next_friday
   return (Time.zone.now + i.days).midnight
 end
 
-f1.producer_product_unit_commissions.create(product: product_apples, commission: 0.05, unit: pound)
-f1.producer_product_unit_commissions.create(product: product_asparagus, commission: 0.15, unit: pound)
-f2.producer_product_unit_commissions.create(product: product_milk, commission: 0.10, unit: gallon)
-f2.producer_product_unit_commissions.create(product: product_beef, commission: 0.03, unit: pound)
-f3.producer_product_unit_commissions.create(product: product_carrots, commission: 0.04, unit: pound)
-f3.producer_product_unit_commissions.create(product: product_chicken, commission: 0.07, unit: pound)
-f4.producer_product_unit_commissions.create(product: product_oranges, commission: 0.08, unit: pound)
-f4.producer_product_unit_commissions.create(product: product_celery, commission: 0.12, unit: pound)
-f3.producer_product_unit_commissions.create(product: product_spinach, commission: 0.03, unit: pound)
-f4.producer_product_unit_commissions.create(product: product_avocado, commission: 0.08, unit: whole)
-f4.producer_product_unit_commissions.create(product: product_basil, commission: 0.06, unit: bunch)
-
 standard_order_cutoff = next_friday - 2.days
 
 #Apples
@@ -307,34 +295,34 @@ posting_apples = Posting.create(
   important_notes_body: "These are 2nds so they have some cosmetic blemishes but they are just as tasty and crunchy and possibly even more nutritious"
   )
 #Asparagus
-posting_asparagus = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_asparagus.id, price: 3.25, user_id: f1.id, unit_id: 8, description: "product attribute x, y & z", description_body: "these Asparagus are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
+posting_asparagus = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_asparagus.id, price: 3.25, producer_net_unit: 3.00, user_id: f1.id, unit_id: 8, description: "product attribute x, y & z", description_body: "these Asparagus are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
 #Milk
-posting_milk = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_milk.id, price: 2.00, user_id: f2.id, unit_id: 5, description: "product attribute x, y & z", description_body: "these milks are all organic grown with no pesticides. they are raw. no homogeneization. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
+posting_milk = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_milk.id, producer_net_unit: 1.75, price: 2.00, user_id: f2.id, unit_id: 5, description: "product attribute x, y & z", description_body: "these milks are all organic grown with no pesticides. they are raw. no homogeneization. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.")
 #Beef
-posting_beef = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_beef.id, price: 3.75, user_id: f2.id, unit_id: pound.id, description: "product attribute x, y & z", description_body: "these beefs are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
+posting_beef = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_beef.id, producer_net_unit: 3.25, price: 3.75, user_id: f2.id, unit_id: pound.id, description: "product attribute x, y & z", description_body: "these beefs are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.")
 #Carrots
-posting_carrots = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_carrots.id, price: 2.25, user_id: f3.id, unit_id: 8, description: "product attribute x, y & z", description_body: "yummy, crunchy carrots. tastiest ever!")
+posting_carrots = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_carrots.id, producer_net_unit: 1.95, price: 2.25, user_id: f3.id, unit_id: 8, description: "product attribute x, y & z", description_body: "yummy, crunchy carrots. tastiest ever!")
 #Chicken
-posting_chicken = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_chicken.id, price: 1.50, user_id: f3.id, unit_id: pound.id, description: "product attribute x, y & z", description_body: "best whole chickens around. all grass fed on clean, organic fields. no antibiotics. no supplements. just lots of grass and all the bugs they can eat! :)")
+posting_chicken = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_chicken.id, producer_net_unit: 1.00, price: 1.50, user_id: f3.id, unit_id: pound.id, description: "product attribute x, y & z", description_body: "best whole chickens around. all grass fed on clean, organic fields. no antibiotics. no supplements. just lots of grass and all the bugs they can eat! :)")
 #Oranges
-posting_oranges = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_oranges.id, price: 1.25, user_id: f4.id, unit_id: 8, description: "product attribute x, y & z", description_body: "best oranges ever!")
+posting_oranges = Posting.create(live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_oranges.id, producer_net_unit: 0.95, price: 1.25, user_id: f4.id, unit_id: 8, description: "product attribute x, y & z", description_body: "best oranges ever!")
 #Celery
-posting_celery = Posting.create(product_id_code: "ZXB-9F", units_per_case: 10, live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_celery.id, price: 1.00, user_id: f4.id, unit_id: 8, description: "product attribute x, y & z", description_body: "best celery ever!")
+posting_celery = Posting.create(product_id_code: "ZXB-9F", units_per_case: 10, live: true, delivery_date: next_friday, order_cutoff: standard_order_cutoff, product_id: product_celery.id, producer_net_unit: 0.75, price: 1.00, user_id: f4.id, unit_id: 8, description: "product attribute x, y & z", description_body: "best celery ever!")
 upload = Upload.create(file_name: File.open(File.join("/home/david/fc/website/assets", "celery.jpg")))
 posting_celery.uploads << upload
 posting_celery.save
 #Spinach
-posting_spinach = Posting.create(product_id_code: "super9", units_per_case: 10, live: true, delivery_date: next_friday + 1.day, order_cutoff: standard_order_cutoff, product_id: product_spinach.id, price: 1.00, user_id: f3.id, unit_id: 8, description: "organic", description_body: "best organic spinach ever!")
+posting_spinach = Posting.create(product_id_code: "super9", units_per_case: 10, live: true, delivery_date: next_friday + 1.day, order_cutoff: standard_order_cutoff, product_id: product_spinach.id, producer_net_unit: 0.75, price: 1.00, user_id: f3.id, unit_id: 8, description: "organic", description_body: "best organic spinach ever!")
 upload = Upload.create(file_name: File.open(File.join("/home/david/fc/website/assets", "spinach.jpg")))
 posting_spinach.uploads << upload
 posting_spinach.save
 #Avocado
-posting_avocado = Posting.create(live: true, delivery_date: next_friday + 7.days, order_cutoff: Time.zone.today - 2.days, product_id: product_avocado.id, price: 2.29, user_id: f4.id, unit_id: whole.id, description: "product attribute x, y & z", description_body: "best avocado ever!")
+posting_avocado = Posting.create(live: true, delivery_date: next_friday + 7.days, order_cutoff: Time.zone.today - 2.days, product_id: product_avocado.id, producer_net_unit: 2.00, price: 2.29, user_id: f4.id, unit_id: whole.id, description: "product attribute x, y & z", description_body: "best avocado ever!")
 upload = Upload.create(file_name: File.open(File.join("/home/david/fc/website/assets", "avocado.png")))
 posting_avocado.uploads << upload
 posting_avocado.save
 #Basil
-posting_basil = Posting.create(live: true, delivery_date: next_friday + 14.days, order_cutoff: Time.zone.today - 2.days, product_id: product_basil.id, price: 2.97, user_id: f4.id, unit_id: bunch.id, unit_body: "A 'bunch' is about as much as you can grab with one handful", description: "product attribute x, y & z", description_body: "best basil ever!")
+posting_basil = Posting.create(live: true, delivery_date: next_friday + 14.days, order_cutoff: Time.zone.today - 2.days, product_id: product_basil.id, producer_net_unit: 2.75, price: 2.97, user_id: f4.id, unit_id: bunch.id, unit_body: "A 'bunch' is about as much as you can grab with one handful", description: "product attribute x, y & z", description_body: "best basil ever!")
 upload = Upload.create(file_name: File.open(File.join("/home/david/fc/website/assets", "basil.jpg")))
 posting_basil.uploads << upload
 posting_basil.save
@@ -404,6 +392,9 @@ ToteItem.create(quantity: 3, price: posting_celery.price, state: ToteItem.states
 ToteItem.create(quantity: 1, price: posting_celery.price, state: ToteItem.states[:ADDED], user_id: c2.id, posting_id: posting_celery.id).transition(:customer_authorized)
 ToteItem.create(quantity: 5, price: posting_celery.price, state: ToteItem.states[:ADDED], user_id: c3.id, posting_id: posting_celery.id).transition(:customer_authorized)
 ToteItem.create(quantity: 2, price: posting_celery.price, state: ToteItem.states[:ADDED], user_id: c4.id, posting_id: posting_celery.id)
+
+#Asparagus
+ToteItem.create(quantity: 100, price: posting_asparagus.price, state: ToteItem.states[:ADDED], user_id: c4.id, posting_id: posting_asparagus.id).transition(:customer_authorized)
 
 Dropsite.create(name: "Farmer's Cellar", phone: "206-588-6579", hours: "8 - 8", address: "9827 128TH AVE NE", city: "Kirkland", state: "WA", zip: 98033, active: true, access_instructions: "punch in 123 and hit enter")
 WebsiteSetting.create(new_customer_access_code_required: false, recurring_postings_enabled: true)

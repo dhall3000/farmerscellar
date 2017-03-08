@@ -14,7 +14,7 @@ class PostingsController < ApplicationController
       @posting = posting_to_clone.dup
 
       if spoofing?
-        @producer_net = posting_to_clone.get_producer_net_unit
+        @producer_net = posting_to_clone.producer_net_unit
       end
     else
       @posting = current_user.postings.new(live: true, delivery_date: Time.zone.now.midnight + 2.days, order_cutoff: Time.zone.now.midnight + 1.day)
@@ -79,37 +79,17 @@ class PostingsController < ApplicationController
       posting_recurrence.postings << @posting            
     end
 
-    #if this is an admin making a new posting he has a feature where he can short-circuit manually creating the commission by just specifying the 
-    #producer_net right on the posting creation form. here we're checking for that and creating a new commission on the fly
-    if spoofing? && !params[:producer_net].blank?
-      producer_net = params[:producer_net].to_f
-      if producer_net > 0
-        commission_factor = make_commission_factor(@posting.price, producer_net)
-        ProducerProductUnitCommission.create(user_id: @posting.user.id, product_id: @posting.product.id, unit_id: @posting.unit.id, commission: commission_factor)
-      end
-    end
-
-    #first check to see if we have a commission set for this creation attempt
-    commission = ProducerProductUnitCommission.where(user_id: posting_params[:user_id], product_id: posting_params[:product_id], unit_id: posting_params[:unit_id])
-
-    if commission.count == 0
-      #there is no commission set for this user/product/unit. tell the user and fail.
-      if @posting.posting_recurrence.nil?
-        @posting.build_posting_recurrence(posting_recurrence_params)
-      end
-
-      load_posting_choices
-      flash.now[:danger] = "No commission is set for that product and unit. Please contact Farmer's Cellar to get a commission set."
-      render 'new'
-      return
-    end
-
   	if @posting.save
       if @posting.live
         flash[:success] = "Your new posting is now live!"
       else
         flash[:info] = "Your posting was created but is not live as you specified during creation."
-      end  	  
+      end
+
+      if !spoofing?
+        AdminNotificationMailer.general_message("producer just created his own posting", "producer has no way of specifying producer_net_unit. Make sure that value is set. Posting id is #{@posting.id.to_s}").deliver_now
+      end
+
       redirect_to postings_path
     else      
       #if no recurrence is set, give farmer another chance to set that
@@ -118,6 +98,7 @@ class PostingsController < ApplicationController
       end
 
       load_posting_choices
+      flash.now[:danger] = "Posting not saved"
       render 'new'
   	end
 
@@ -279,8 +260,13 @@ class PostingsController < ApplicationController
         :unit_body,
         :order_minimum_producer_net,
         :units_per_case,
-        :product_id_code
+        :product_id_code,
+        :producer_net_unit,
+        :refundable_amount_unit_producer_to_fc
         )      
+
+      posting[:price] = posting[:price].to_f.round(2)
+      posting[:producer_net_unit] = posting[:producer_net_unit].to_f.round(2)
 
       #this hocus pocus has to do with some strange gotchas. a check box sends in a "1" or "0", both of which evaluate to true for a boolean type,
       #which the live attribute is. so i'm just hackishly converting from one to the other to be ridiculously specific

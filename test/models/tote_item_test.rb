@@ -18,7 +18,7 @@ class ToteItemTest < ActiveSupport::TestCase
       delivery_date = Time.zone.today + 4.days
     end
 
-    @posting = Posting.new(units_per_case: 10, unit: @unit, product: @product, user: @farmer, description: "descrip", price: 1.25, live: true, order_cutoff: delivery_date - 2.days, delivery_date: delivery_date)
+    @posting = Posting.new(units_per_case: 10, unit: @unit, product: @product, user: @farmer, description: "descrip", price: 1.25, live: true, order_cutoff: delivery_date - 2.days, delivery_date: delivery_date, producer_net_unit: 1.15)
     @posting.save
 
     creditor_order = CreditorOrder.new(delivery_date: @posting.delivery_date, creditor: @posting.get_creditor, order_value_producer_net: 1.0)
@@ -266,7 +266,7 @@ class ToteItemTest < ActiveSupport::TestCase
     #test get_commission_item
     expected_price = 2.75
     expected_quantity = 3
-    expected_commission_factor = 0.05
+    expected_commission_factor = 0.048
     #if you use a calculator to multiply the above three numbers you get 0.4125.    
     #rounded to 2 places you'd get 0.41. so why 0.42 for 'expected'? because we compute
     #based off a single unit and then multiply from there. so in this example you'd compute

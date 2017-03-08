@@ -17,7 +17,16 @@ class PostingTest < ActiveSupport::TestCase
       delivery_date = Time.zone.today + 4.days
     end
 
-    @posting = Posting.new(unit: @unit, product: @product, user: @farmer, description: "descrip", price: 1.25, live: true, order_cutoff: delivery_date - 2.days, delivery_date: delivery_date)
+    @posting = Posting.new(
+      unit: @unit,
+      product: @product,
+      user: @farmer,
+      description: "descrip",
+      price: 1.25,
+      producer_net_unit: 1.00,
+      live: true,
+      order_cutoff: delivery_date - 2.days,
+      delivery_date: delivery_date)
     @posting.save
 
   end
@@ -425,7 +434,7 @@ class PostingTest < ActiveSupport::TestCase
     #to less than OM. verify the outbound order value is zero.
 
     #specify posting values    
-    @posting.update(order_minimum_producer_net: 10, units_per_case: 1, price: 1)    
+    @posting.update(order_minimum_producer_net: 10, units_per_case: 1, price: 1, producer_net_unit: 0.90)    
     #posting has no items
     assert_equal 0, @posting.tote_items.count
     #u1 orders 9
@@ -891,6 +900,7 @@ class PostingTest < ActiveSupport::TestCase
       order_cutoff: delivery_date - 1.day,
       product: @product,
       price: 10,
+      producer_net_unit: 9,
       user: @farmer,
       unit: @unit,
       description: "crisp, crunchy organic apples. you'll love them.",
@@ -927,6 +937,7 @@ class PostingTest < ActiveSupport::TestCase
       order_cutoff: delivery_date - 1.day,
       product: @product,
       price: 10,
+      producer_net_unit: 9,
       user: @farmer,
       unit: @unit,
       description: "crisp, crunchy organic apples. you'll love them.",

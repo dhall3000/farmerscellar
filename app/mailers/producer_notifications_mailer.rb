@@ -58,7 +58,7 @@ class ProducerNotificationsMailer < ApplicationMailer
       end
 
       sub_total = 0
-      producer_net_unit = posting.get_producer_net_unit
+      producer_net_unit = posting.producer_net_unit
       unit_count.times do
         sub_total = (sub_total + producer_net_unit).round(2)
       end

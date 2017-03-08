@@ -34,14 +34,14 @@ class Posting < ApplicationRecord
   validates :price, :description, :delivery_date, :order_cutoff, :state, presence: true
   validates :state, inclusion: Posting.states.values
   validates_presence_of :user, :product, :unit
-  validates :price, numericality: { greater_than: 0 }
+  validates :price, :producer_net_unit, numericality: { greater_than: 0 }
 
   validates :units_per_case, numericality: { greater_than: 0, only_integer: true }, allow_nil: true
   validates :order_minimum_producer_net, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true    
   validates :inbound_order_value_producer_net, numericality: { greater_than_or_equal_to: 0 }, allow_nil: false
 
   validate :important_notes_body_not_present_without_important_notes, :delivery_date_not_food_clearout_day, :order_cutoff_must_be_before_delivery_date
-  validate :commission_is_set, on: :create
+  
   before_create :delivery_date_must_be_after_today  
 
   def food_category
@@ -101,34 +101,20 @@ class Posting < ApplicationRecord
       return nil
     end
 
-    producer_net_case = (get_producer_net_unit * units_per_case).round(2)
+    producer_net_case = (producer_net_unit * units_per_case).round(2)
 
     return producer_net_case
 
   end
 
-  def get_producer_net_unit
-
-    if producer_net_unit > 0
-      return producer_net_unit
-    end
-
-    pnu = price - commission_per_unit - ToteItemsController.helpers.get_payment_processor_fee_unit(price)
-    pnu = pnu.round(2)
-    update(producer_net_unit: pnu)
-    
-    return pnu
-
-  end
-
   def commission_per_unit
-    commission_factor = get_commission_factor
+    commission_factor = ToteItemsController.helpers.make_commission_factor(price, producer_net_unit)
     commission_per_unit = (price * commission_factor).round(2)
     return commission_per_unit
   end
 
   def get_commission_factor
-    return ProducerProductUnitCommission.get_current_commission_factor(user, product, unit)
+    return ToteItemsController.helpers.make_commission_factor(price, producer_net_unit)
   end
 
   def order_minimum_retail
@@ -137,7 +123,7 @@ class Posting < ApplicationRecord
       return 0
     end
 
-    return (order_minimum_producer_net / (1.0 - (0.035 + get_commission_factor))).round(2)
+    return (order_minimum_producer_net / (1.0 - (0.035 + ToteItemsController.helpers.make_commission_factor(price, producer_net_unit)))).round(2)
 
   end
 
@@ -242,7 +228,7 @@ class Posting < ApplicationRecord
       return
     end
 
-    delta = (quantity * get_producer_net_unit).round(2)
+    delta = (quantity * producer_net_unit).round(2)
     proposed_inbound_order_value_producer_net = (inbound_order_value_producer_net + delta).round(2)
 
     if proposed_inbound_order_value_producer_net < 0
@@ -572,19 +558,6 @@ class Posting < ApplicationRecord
         errors.add(:order_cutoff, "commitment zone must start prior to delivery date")
       end
 
-    end
-
-    def commission_is_set
-
-      commission = ProducerProductUnitCommission.where(user: user, product: product, unit: unit)
-
-      if commission.count == 0
-        errors.add(:commission_is_set, "commission must be set for producer/product/unit")
-        return false
-      end
-
-      return true
-
-    end
+    end    
 
 end

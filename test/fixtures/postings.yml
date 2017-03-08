@@ -30,6 +30,7 @@ f9posting:
   order_cutoff: <%= delivery_date - 2.days %>  
   product: apples
   price: 4
+  producer_net_unit: 3
   user: f9
   unit: pound
   description: crispy apples
@@ -41,6 +42,7 @@ f6posting:
   order_cutoff: <%= delivery_date - 2.days %>  
   product: apples
   price: 1
+  producer_net_unit: 0.80
   user: f6
   unit: pound
   description: crisp, crunchy organic apples. you'll love them.
@@ -51,6 +53,7 @@ f7posting:
   order_cutoff: <%= delivery_date - 2.days %>  
   product: asparagus
   price: 2
+  producer_net_unit: 1.50
   user: f7
   unit: pound
   description: asparagus description_body...yum!
@@ -61,6 +64,7 @@ f8posting:
   order_cutoff: <%= delivery_date - 2.days %>  
   product: milk
   price: 4
+  producer_net_unit: 3.50
   user: f8
   unit: gallon
   description: raw milk description_body
@@ -72,6 +76,7 @@ posting_subscription_farmer:
   order_cutoff: <%= delivery_date - 2.days %>  
   product: apples
   price: 4.29
+  producer_net_unit: 3.50
   user: f_subscriptions
   unit: pound
   description: crisp, crunchy organic apples. you'll love them.
@@ -84,6 +89,7 @@ postingf5apples:
   order_cutoff: <%= delivery_date - 2.days %>  
   product: apples
   price: 4.29
+  producer_net_unit: 3.50
   user: f5
   unit: pound
   description: crisp, crunchy organic apples. you'll love them.
@@ -94,6 +100,7 @@ p_recurrence_off:
   order_cutoff: <%= first_delivery_day_of_week_after_base_first_delivery_day_of_week + 5.days %>
   product: beef
   price: 5.21
+  producer_net_unit: 4.75
   user: f2
   unit: pound
   description: beef description_body
@@ -105,6 +112,7 @@ p_recurrence_on:
   order_cutoff: <%= first_delivery_day_of_week_after_base_first_delivery_day_of_week + 5.days %>
   product: beef
   price: 5.21
+  producer_net_unit: 4.75
   user: f2
   unit: pound
   description: beef description_body
@@ -117,6 +125,7 @@ p5:
   order_cutoff: <%= delivery_date - 2.days %>
   product: beef
   price: 5.21
+  producer_net_unit: 4.75
   user: f2
   unit: pound
   description: beef description_body
@@ -128,6 +137,7 @@ p1:
   order_cutoff: <%= base_first_delivery_day_of_week - 2.days %>
   product: apples
   price: 2.89
+  producer_net_unit: 1.75
   user: f1
   unit: pound
   description: these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.
@@ -138,6 +148,7 @@ p2:
   order_cutoff: <%= wednesday_after_base_first_delivery_day_of_week - 2.days %>
   product: asparagus
   price: 2.74
+  producer_net_unit: 2.25
   user: f1
   unit: pound
   description: asparagus description_body
@@ -148,6 +159,7 @@ p3:
   order_cutoff: <%= friday_after_base_first_delivery_day_of_week - 2.days %>
   product: milk
   price: 5.00
+  producer_net_unit: 4.50
   user: f2
   unit: gallon
   description: milk description_body
@@ -158,6 +170,7 @@ p4:
   order_cutoff: <%= first_delivery_day_of_week_after_base_first_delivery_day_of_week - 2.days %>
   product: beef
   price: 5.21
+  producer_net_unit: 4.75
   user: f2
   unit: pound
   description: beef description_body
@@ -169,6 +182,7 @@ postingf1apples:
   order_cutoff: <%= delivery_date - 2.days %>
   product: apples
   price: 2.75
+  producer_net_unit: 2.51
   user: f1
   unit: pound
   description: these apples are all organic grown with no pesticides. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.
@@ -180,6 +194,7 @@ postingf1asparagus:
   order_cutoff: <%= delivery_date - 2.days %>  
   product: asparagus
   price: 3.25
+  producer_net_unit: 2.75
   user: f1
   unit: pound
   description: these Asparagus are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.
@@ -191,6 +206,7 @@ postingf1lettuce:
   order_cutoff: <%= delivery_date_next - 2.days %>  
   product: lettuce
   price: 4.25
+  producer_net_unit: 3.75
   user: f1
   unit: pound
   description: delicious lettuce
@@ -202,6 +218,7 @@ postingf2milk:
   order_cutoff: <%= delivery_date - 2.days %>  
   product: milk
   price: 2.00
+  producer_net_unit: 1.50
   user: f2
   unit: gallon
   description: these milks are all organic grown with no pesticides. they are raw. no homogeneization. they are 2nds so might have some spotting but they are just as tasty and possibly more nutritious too.
@@ -213,6 +230,7 @@ postingf2beef:
   order_cutoff: <%= delivery_date - 2.days %>  
   product: beef
   price: 3.75
+  producer_net_unit: 3.00
   user: f2
   unit: quarter
   description: these beefs are all organic grown with no pesticides. they are crispy and crunchy and tasty as ever.
@@ -224,6 +242,7 @@ postingf2tomato:
   order_cutoff: <%= delivery_date_next - 2.days %>  
   product: tomato
   price: 2.99
+  producer_net_unit: 2.50
   user: f2
   unit: whole
   description: delicious tomato description_body
@@ -235,6 +254,7 @@ postingf3carrots:
   order_cutoff: <%= delivery_date - 2.days %>  
   product: carrots
   price: 2.25
+  producer_net_unit: 1.75
   user: f3
   unit: pound
   description: yummy, crunchy carrots. tastiest ever!
@@ -246,6 +266,7 @@ postingf3chicken:
   order_cutoff: <%= delivery_date - 2.days %>  
   product: chicken
   price: 1.50
+  producer_net_unit: 1.00
   user: f3
   unit: whole
   description: best whole chickens around. all grass fed on clean, organic fields. no antibiotics. no supplements. just lots of grass and all the bugs they can eat! :)
@@ -257,6 +278,7 @@ postingf4oranges:
   order_cutoff: <%= delivery_date - 2.days %>  
   product: oranges
   price: 1.25
+  producer_net_unit: 0.75
   user: f4
   unit: pound
   description: best oranges ever!
@@ -268,6 +290,7 @@ postingf4celery:
   order_cutoff: <%= delivery_date - 2.days %>  
   product: celery
   price: 2.50
+  producer_net_unit: 2.00
   user: f4
   unit: pound
   description: best celery ever!
@@ -279,6 +302,7 @@ postingf4avocado:
   order_cutoff: <%= next_non_start_of_week_day - 2.days %>
   product: avocado
   price: 2.97
+  producer_net_unit: 2.50
   user: f4
   unit: whole
   description: best avocado ever!
@@ -290,6 +314,7 @@ postingf4basil:
   order_cutoff: <%= next_non_start_of_week_day - 2.days %>
   product: basil
   price: 2.27
+  producer_net_unit: 1.75
   user: f4
   unit: bunch
   description: best basil ever!
@@ -300,6 +325,7 @@ baron_farms_eggs:
   order_cutoff: <%= delivery_date - 2.days %>  
   product: eggs
   price: 6.25
+  producer_net_unit: 5.50
   user: baron_farms
   unit: whole
   description: pastured eggs
@@ -310,6 +336,7 @@ pride_and_joy_milk:
   order_cutoff: <%= delivery_date - 2.days %>  
   product: milk
   price: 10.50
+  producer_net_unit: 10
   user: pride_and_joy
   unit: gallon
   description: pastured organic raw milk

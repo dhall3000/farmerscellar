@@ -486,6 +486,7 @@ class PostingRecurrenceTest < ActiveSupport::TestCase
     post = Posting.new(
       description: "my descrip",
       price: 10,
+      producer_net_unit: 9,
       user_id: users(:f1).id,
       product_id: products(:apples).id,
       unit_id: units(:pound).id,

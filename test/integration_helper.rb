@@ -1,7 +1,7 @@
 require 'test_helper'
 require 'utility/rake_helper'
 
-#def create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, commission = 0.05)
+#def create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil)
 #def create_new_customer(name, email)
 #def create_tote_item(customer, posting, quantity, frequency = nil, roll_until_filled = nil)
 #def create_one_time_authorization_for_customer(customer)
@@ -374,7 +374,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     return [{posting_id: posting_id, quantity: quantity}]
   end
   
-  def create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, commission = nil)
+  def create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil)
 
     if farmer.nil?
       farmer = create_producer("john", "john@j.com")
@@ -412,17 +412,16 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
       frequency = 0
     end
 
-    if commission.nil?
-      commission = 0.05
-    end
-
-    if !ProducerProductUnitCommission.where(user: farmer, product: product, unit: unit).any?
-      create_commission(farmer, product, unit, commission)
+    if producer_net_unit.nil?
+      commission_per_unit = (price * 0.05).round(2)
+      payment_processor_fee_unit = ToteItemsController.helpers.get_payment_processor_fee_unit(price)
+      producer_net_unit = (price - commission_per_unit - payment_processor_fee_unit).round(2)
     end
 
     posting_params = {
       description: "describe description",
       price: price,
+      producer_net_unit: producer_net_unit,
       user_id: farmer.id,
       product_id: product.id,
       unit_id: unit.id,

@@ -56,7 +56,7 @@
           <td align="center"><%= number_to_currency(posting.get_producer_net_case) %></td>
         <% end %>
         <td align="center"><%= value[:unit_count] %></td>
-        <td align="center"><%= number_to_currency(posting.get_producer_net_unit) %></td>        
+        <td align="center"><%= number_to_currency(posting.producer_net_unit) %></td>        
         <td align="center"><%= number_to_currency(value[:sub_total]) %></td>
       </tr>
     <% end %>

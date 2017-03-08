@@ -42,28 +42,28 @@ class PostingsControllerTest < IntegrationHelper
     assert posting.valid?
     assert_equal pid_code, posting.product_id_code
 
-  end
+  end  
 
-  test "producer net field should not show up on new if farmer is making the posting" do
+  test "if producer posts admin should be notified so that admin can double check producer net value" do
 
     log_in_as(users(:f1))
     get new_posting_path
     assert_response :success
     assert_template 'postings/new'
 
-    assert_select 'form label', {count: 0, text: "Producer net"}
-    assert_select 'form input[type=number][name=producer_net]', 0
+    assert_select 'form label', {count: 0, text: "Producer net unit"}
+    assert_select 'form input[type=number][name=?]', "posting[producer_net]", 0
 
     producer = users(:f1)
     product = products(:apples)
     unit = units(:pound)
 
-    old_commission = ProducerProductUnitCommission.get_current_commission_factor(producer, product, unit)
+    assert_equal 0, ActionMailer::Base.deliveries.count
 
-    post postings_path, params: {
-      
+    post postings_path, params: {      
       posting: {
         price: 10,
+        producer_net_unit: 9,
         user_id: producer.id,
         product_id: product.id,
         unit_id: unit.id,
@@ -77,46 +77,11 @@ class PostingsControllerTest < IntegrationHelper
     posting = assigns(:posting)
     assert posting.valid?
 
-    new_commission = ProducerProductUnitCommission.get_current_commission_factor(producer, product, unit)
-    assert old_commission == new_commission
-
-  end
-
-  test "if producer somehow posts producer net during posting creation commission should not update" do
-
-    log_in_as(users(:f1))
-    get new_posting_path
-    assert_response :success
-    assert_template 'postings/new'
-
-    assert_select 'form label', {count: 0, text: "Producer net"}
-    assert_select 'form input[type=number][name=producer_net]', 0
-
-    producer = users(:f1)
-    product = products(:apples)
-    unit = units(:pound)
-
-    old_commission = ProducerProductUnitCommission.get_current_commission_factor(producer, product, unit)
-
-    post postings_path, params: {
-      producer_net: 9,      
-      posting: {
-        price: 10,
-        user_id: producer.id,
-        product_id: product.id,
-        unit_id: unit.id,
-        live: true,
-        delivery_date: get_delivery_date(5),
-        order_cutoff: get_delivery_date(3),
-        description: "my description"
-      }
-    }
-
-    posting = assigns(:posting)
-    assert posting.valid?
-
-    new_commission = ProducerProductUnitCommission.get_current_commission_factor(producer, product, unit)
-    assert old_commission == new_commission
+    assert_equal 1, ActionMailer::Base.deliveries.count
+    mail = ActionMailer::Base.deliveries[0]
+    assert_equal "david@farmerscellar.com", mail.to[0]
+    assert_equal "producer just created his own posting", mail.subject
+    assert_match "producer has no way of specifying producer_net_unit. Make sure that value is set. Posting id is #{posting.id.to_s}", mail.body.encoded    
 
   end
 
@@ -132,19 +97,17 @@ class PostingsControllerTest < IntegrationHelper
     assert_response :success
     assert_template 'postings/new'
 
-    assert_select 'form label', {count: 1, text: "Price per unit (producer net)"}
-    assert_select 'form input[type=number][name=producer_net]', 1
+    assert_select 'form label', {count: 1, text: "Producer net unit"}
+    assert_select 'form input[type=number][name=?]', "posting[producer_net_unit]", 1
 
     producer = users(:f1)
     product = products(:apples)
     unit = units(:pound)
 
-    old_commission = ProducerProductUnitCommission.get_current_commission_factor(producer, product, unit)
-
-    post postings_path, params: {
-      producer_net: 9,
+    post postings_path, params: {      
       posting: {
         price: 10,
+        producer_net_unit: 9,
         user_id: producer.id,
         product_id: product.id,
         unit_id: unit.id,
@@ -157,13 +120,11 @@ class PostingsControllerTest < IntegrationHelper
 
     posting = assigns(:posting)
     assert posting.valid?
-
-    new_commission = ProducerProductUnitCommission.get_current_commission_factor(producer, product, unit)
-    assert old_commission != new_commission
+    assert_equal 0.065, posting.get_commission_factor
 
   end
 
-  test "should leave old commission in place when spoofing admin creates posting without specifying producer net" do
+  test "producer net must be greater than zero" do
 
     log_in_as(users(:a1))
     post sessions_spoof_path, params: {email: "f1@f.com"}
@@ -175,18 +136,36 @@ class PostingsControllerTest < IntegrationHelper
     assert_response :success
     assert_template 'postings/new'
 
-    assert_select 'form label', {count: 1, text: "Price per unit (producer net)"}
-    assert_select 'form input[type=number][name=producer_net]', 1
+    assert_select 'form label', {count: 1, text: "Producer net unit"}
+    assert_select 'form input[type=number][name=?]', "posting[producer_net_unit]", 1
 
     producer = users(:f1)
     product = products(:apples)
     unit = units(:pound)
 
-    old_commission = ProducerProductUnitCommission.get_current_commission_factor(producer, product, unit)
+    posting_count = Posting.count
 
     post postings_path, params: {
-      producer_net: "", #if i just omit this var it evaluates to nil in the controller. but nil isn't what happens in the browser
-      #what happens in the browser is as above...""
+      posting: {
+        price: 10,
+        producer_net_unit: "", #if i just omit this var it evaluates to nil in the controller. but nil isn't what happens in the browser
+        #what happens in the browser is as above...""
+        user_id: producer.id,
+        product_id: product.id,
+        unit_id: unit.id,
+        live: true,
+        delivery_date: get_delivery_date(5),
+        order_cutoff: get_delivery_date(3),
+        description: "my description"
+      }
+    }
+
+    assert_response :success
+    assert_template 'postings/new'
+    assert_equal "Posting not saved", flash.now[:danger]
+    assert_equal posting_count, Posting.count
+
+    post postings_path, params: {
       posting: {
         price: 10,
         user_id: producer.id,
@@ -199,31 +178,53 @@ class PostingsControllerTest < IntegrationHelper
       }
     }
 
-    posting = assigns(:posting)
-    assert posting.valid?
+    assert_response :success
+    assert_template 'postings/new'
+    assert_equal "Posting not saved", flash.now[:danger]
+    assert_equal posting_count, Posting.count
 
-    new_commission = ProducerProductUnitCommission.get_current_commission_factor(producer, product, unit)
-    assert old_commission == new_commission
+    post postings_path, params: {
+      posting: {
+        price: 10,
+        producer_net_unit: "0", #if i just omit this var it evaluates to nil in the controller. but nil isn't what happens in the browser
+        #what happens in the browser is as above...""
+        user_id: producer.id,
+        product_id: product.id,
+        unit_id: unit.id,
+        live: true,
+        delivery_date: get_delivery_date(5),
+        order_cutoff: get_delivery_date(3),
+        description: "my description"
+      }
+    }
 
-  end
+    assert_response :success
+    assert_template 'postings/new'
+    assert_equal "Posting not saved", flash.now[:danger]
+    assert_equal posting_count, Posting.count
 
-  test "do not create if commission not set for producer product unit" do
+    post postings_path, params: {      
+      posting: {
+        price: 10,
+        producer_net_unit: "1",
+        user_id: producer.id,
+        product_id: product.id,
+        unit_id: unit.id,
+        live: true,
+        delivery_date: get_delivery_date(5),
+        order_cutoff: get_delivery_date(3),
+        description: "my description"
+      }
+    }
 
-    #this producer does not have a commission set for this product
-    product = products(:milk)
-
-    #log in
-    log_in_as(@farmer)
-    #make a posting that doesn't have price set
-    posting_params = get_posting_params_hash
-    posting_params[:product_id] = product.id
-    commission = ProducerProductUnitCommission.where(user: @farmer, product: product, unit_id: posting_params[:unit_id])
-    assert_equal 0, commission.count
-    post postings_path, params: {posting: posting_params}
-    posting = assigns(:posting)
-    assert_not posting.valid?
-    assert_not flash.empty?
-    assert_equal "No commission is set for that product and unit. Please contact Farmer's Cellar to get a commission set.", flash.now[:danger]
+    assert_equal posting_count + 1, Posting.count
+    assert_response :redirect
+    assert_redirected_to postings_path
+    follow_redirect!
+    assert_response :redirect
+    assert_redirected_to root_path
+    follow_redirect!
+    assert_template 'static_pages/home'
 
   end
 
@@ -837,7 +838,8 @@ class PostingsControllerTest < IntegrationHelper
     posting = {
       user_id: @farmer.id,
       description: "descrip",
-      price: 1,      
+      price: 1,
+      producer_net_unit: 0.85,
       live: true,
       delivery_date: delivery_date,
       product_id: @posting.product_id,

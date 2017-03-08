@@ -5,7 +5,7 @@ module TestLib
 #def create_producer(name = "producer name", email = "producer@p.com", distributor = nil, order_min = 0)
 #def create_business_interface(creditor, order_instructions = "order instructions", payment_method = BusinessInterface.payment_methods[:PAYPAL], payment_instructions = "payment instructions", payment_time = BusinessInterface.payment_times[:AFTERDELIVERY])
 #def create_user(name = "customer name", email = "customer@c.com")
-#def create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
+#def create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0, producer_net_unit = nil)
 #def create_tote_item(customer, posting, quantity)
 #def create_subscription(user, posting, quantity, frequency)
 #def create_one_time_authorization_for_customer(customer)
@@ -278,7 +278,7 @@ module TestLib
 
   end
 
-  def create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0)
+  def create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0, producer_net_unit = nil)
 
     if order_cutoff && delivery_date
       assert order_cutoff < delivery_date
@@ -292,6 +292,12 @@ module TestLib
 
     if price.nil?
       price = 1.0
+    end
+
+    if producer_net_unit.nil?
+      commission_per_unit = (price * 0.05).round(2)
+      payment_processor_fee_unit = ToteItemsController.helpers.get_payment_processor_fee_unit(price)
+      producer_net_unit = (price - commission_per_unit - payment_processor_fee_unit).round(2)
     end
 
     if product.nil?
@@ -318,16 +324,13 @@ module TestLib
       frequency = 0
     end
 
-    if !ProducerProductUnitCommission.where(user: farmer, product: product, unit: unit).any?
-      create_commission(farmer, product, unit, 0.05)
-    end
-
     posting = Posting.create(
       live: true,
       delivery_date: delivery_date,
       order_cutoff: order_cutoff,
       product_id: product.id,
       price: price,
+      producer_net_unit: producer_net_unit,
       user_id: farmer.id,
       unit_id: unit.id,
       description: "this is a description of the posting",
@@ -553,7 +556,6 @@ module TestLib
       user.distributor.delete
     end
 
-    user.products.delete_all
     user.subscriptions.delete_all
     user.creditor_orders.delete_all
     user.dropsites.delete_all

@@ -528,7 +528,7 @@ class UserTest < ActiveSupport::TestCase
     payment_processor_fee_unit_celery = 0.09
     producer_net_unit_celery = (price_celery - commission_per_unit_celery - payment_processor_fee_unit_celery).round(2)
     assert_equal 2.28, producer_net_unit_celery
-    assert_equal producer_net_unit_celery, posting_celery.reload.get_producer_net_unit
+    assert_equal producer_net_unit_celery, posting_celery.reload.producer_net_unit
     expected_producer_net_celery = 20.52
     assert_equal expected_producer_net_celery, posting_celery.inbound_order_value_producer_net
 
@@ -537,7 +537,7 @@ class UserTest < ActiveSupport::TestCase
     payment_processor_fee_unit_apples = 0.07
     producer_net_unit_apples = (price_apples - commission_per_unit_apples - payment_processor_fee_unit_apples).round(2)
     assert_equal 1.83, producer_net_unit_apples
-    assert_equal producer_net_unit_apples, posting_apples.reload.get_producer_net_unit
+    assert_equal producer_net_unit_apples, posting_apples.reload.producer_net_unit
     expected_producer_net_apples = 10.98
     assert_equal expected_producer_net_apples, posting_apples.inbound_order_value_producer_net
 
@@ -590,7 +590,7 @@ class UserTest < ActiveSupport::TestCase
     payment_processor_fee_unit_celery = 0.09
     producer_net_unit_celery = (price_celery - commission_per_unit_celery - payment_processor_fee_unit_celery).round(2)
     assert_equal 2.28, producer_net_unit_celery
-    assert_equal producer_net_unit_celery, posting_celery.reload.get_producer_net_unit
+    assert_equal producer_net_unit_celery, posting_celery.reload.producer_net_unit
     expected_producer_net_celery = 20.52
     assert_equal expected_producer_net_celery, posting_celery.inbound_order_value_producer_net
 
@@ -599,7 +599,7 @@ class UserTest < ActiveSupport::TestCase
     payment_processor_fee_unit_apples = 0.07
     producer_net_unit_apples = (price_apples - commission_per_unit_apples - payment_processor_fee_unit_apples).round(2)
     assert_equal 1.83, producer_net_unit_apples
-    assert_equal producer_net_unit_apples, posting_apples.reload.get_producer_net_unit
+    assert_equal producer_net_unit_apples, posting_apples.reload.producer_net_unit
     expected_producer_net_apples = 10.98
     assert_equal expected_producer_net_apples, posting_apples.inbound_order_value_producer_net
 
@@ -650,7 +650,7 @@ class UserTest < ActiveSupport::TestCase
     payment_processor_fee_unit_celery = 0.09
     producer_net_unit_celery = (price_celery - commission_per_unit_celery - payment_processor_fee_unit_celery).round(2)
     assert_equal 2.28, producer_net_unit_celery
-    assert_equal producer_net_unit_celery, posting_celery.reload.get_producer_net_unit
+    assert_equal producer_net_unit_celery, posting_celery.reload.producer_net_unit
     expected_producer_net_celery = 20.52
     assert_equal expected_producer_net_celery, posting_celery.inbound_order_value_producer_net
 
@@ -659,7 +659,7 @@ class UserTest < ActiveSupport::TestCase
     payment_processor_fee_unit_apples = 0.07
     producer_net_unit_apples = (price_apples - commission_per_unit_apples - payment_processor_fee_unit_apples).round(2)
     assert_equal 1.83, producer_net_unit_apples
-    assert_equal producer_net_unit_apples, posting_apples.reload.get_producer_net_unit
+    assert_equal producer_net_unit_apples, posting_apples.reload.producer_net_unit
     expected_producer_net_apples = 10.98
     assert_equal expected_producer_net_apples, posting_apples.inbound_order_value_producer_net
 
@@ -712,7 +712,7 @@ class UserTest < ActiveSupport::TestCase
     payment_processor_fee_unit_celery = 0.09
     producer_net_unit_celery = (price_celery - commission_per_unit_celery - payment_processor_fee_unit_celery).round(2)
     assert_equal 2.28, producer_net_unit_celery
-    assert_equal producer_net_unit_celery, posting_celery.get_producer_net_unit
+    assert_equal producer_net_unit_celery, posting_celery.producer_net_unit
     expected_producer_net_celery = 20.52
     assert_equal expected_producer_net_celery, posting_celery.reload.inbound_order_value_producer_net
 
@@ -721,7 +721,7 @@ class UserTest < ActiveSupport::TestCase
     payment_processor_fee_unit_apples = 0.07
     producer_net_unit_apples = (price_apples - commission_per_unit_apples - payment_processor_fee_unit_apples).round(2)
     assert_equal 1.83, producer_net_unit_apples
-    assert_equal producer_net_unit_apples, posting_apples.get_producer_net_unit
+    assert_equal producer_net_unit_apples, posting_apples.producer_net_unit
     expected_producer_net_apples = 10.98
     assert_equal expected_producer_net_apples, posting_apples.reload.inbound_order_value_producer_net
 
@@ -778,7 +778,7 @@ class UserTest < ActiveSupport::TestCase
     payment_processor_fee_unit_celery = 0.09
     producer_net_unit_celery = (price_celery - commission_per_unit_celery - payment_processor_fee_unit_celery).round(2)
     assert_equal 2.28, producer_net_unit_celery
-    assert_equal producer_net_unit_celery, posting_celery.get_producer_net_unit
+    assert_equal producer_net_unit_celery, posting_celery.producer_net_unit
     expected_producer_net_celery = 20.52
     assert_equal expected_producer_net_celery, posting_celery.reload.inbound_order_value_producer_net
 
@@ -787,7 +787,7 @@ class UserTest < ActiveSupport::TestCase
     payment_processor_fee_unit_apples = 0.07
     producer_net_unit_apples = (price_apples - commission_per_unit_apples - payment_processor_fee_unit_apples).round(2)
     assert_equal 1.83, producer_net_unit_apples
-    assert_equal producer_net_unit_apples, posting_apples.get_producer_net_unit
+    assert_equal producer_net_unit_apples, posting_apples.producer_net_unit
     expected_producer_net_apples = 10.98
     assert_equal expected_producer_net_apples, posting_apples.reload.inbound_order_value_producer_net
 
@@ -843,7 +843,7 @@ class UserTest < ActiveSupport::TestCase
     payment_processor_fee_unit_celery = 0.09
     producer_net_unit_celery = (price_celery - commission_per_unit_celery - payment_processor_fee_unit_celery).round(2)
     assert_equal 2.28, producer_net_unit_celery
-    assert_equal producer_net_unit_celery, posting_celery.reload.get_producer_net_unit
+    assert_equal producer_net_unit_celery, posting_celery.reload.producer_net_unit
     expected_producer_net_celery = 20.52
     assert_equal expected_producer_net_celery, posting_celery.inbound_order_value_producer_net
 
@@ -852,7 +852,7 @@ class UserTest < ActiveSupport::TestCase
     payment_processor_fee_unit_apples = 0.07
     producer_net_unit_apples = (price_apples - commission_per_unit_apples - payment_processor_fee_unit_apples).round(2)
     assert_equal 1.83, producer_net_unit_apples
-    assert_equal producer_net_unit_apples, posting_apples.reload.get_producer_net_unit
+    assert_equal producer_net_unit_apples, posting_apples.reload.producer_net_unit
     expected_producer_net_apples = 10.98
     assert_equal expected_producer_net_apples, posting_apples.inbound_order_value_producer_net
 
@@ -915,7 +915,7 @@ class UserTest < ActiveSupport::TestCase
     payment_processor_fee_unit_celery = 0.09
     producer_net_unit_celery = (price_celery - commission_per_unit_celery - payment_processor_fee_unit_celery).round(2)
     assert_equal 2.28, producer_net_unit_celery
-    assert_equal producer_net_unit_celery, posting_celery.reload.get_producer_net_unit
+    assert_equal producer_net_unit_celery, posting_celery.reload.producer_net_unit
     expected_producer_net_celery = 20.52
     assert_equal expected_producer_net_celery, posting_celery.inbound_order_value_producer_net
 
@@ -924,7 +924,7 @@ class UserTest < ActiveSupport::TestCase
     payment_processor_fee_unit_apples = 0.07
     producer_net_unit_apples = (price_apples - commission_per_unit_apples - payment_processor_fee_unit_apples).round(2)
     assert_equal 1.83, producer_net_unit_apples
-    assert_equal producer_net_unit_apples, posting_apples.reload.get_producer_net_unit
+    assert_equal producer_net_unit_apples, posting_apples.reload.producer_net_unit
     expected_producer_net_apples = 10.98
     assert_equal expected_producer_net_apples, posting_apples.inbound_order_value_producer_net
 
@@ -985,7 +985,7 @@ class UserTest < ActiveSupport::TestCase
     payment_processor_fee_unit_milk = 0.35
     producer_net_unit_milk = (price_milk - commission_per_unit_milk - payment_processor_fee_unit_milk).round(2)
     assert_equal 9.15, producer_net_unit_milk
-    assert_equal producer_net_unit_milk, posting_milk.reload.get_producer_net_unit
+    assert_equal producer_net_unit_milk, posting_milk.reload.producer_net_unit
     expected_producer_net_milk = 9.15
     assert_equal expected_producer_net_milk, posting_milk.inbound_order_value_producer_net    
 
@@ -994,7 +994,7 @@ class UserTest < ActiveSupport::TestCase
     payment_processor_fee_unit_celery = 0.09
     producer_net_unit_celery = (price_celery - commission_per_unit_celery - payment_processor_fee_unit_celery).round(2)
     assert_equal 2.28, producer_net_unit_celery
-    assert_equal producer_net_unit_celery, posting_celery.reload.get_producer_net_unit
+    assert_equal producer_net_unit_celery, posting_celery.reload.producer_net_unit
     expected_producer_net_celery = 20.52
     assert_equal expected_producer_net_celery, posting_celery.inbound_order_value_producer_net
 
@@ -1003,7 +1003,7 @@ class UserTest < ActiveSupport::TestCase
     payment_processor_fee_unit_apples = 0.07
     producer_net_unit_apples = (price_apples - commission_per_unit_apples - payment_processor_fee_unit_apples).round(2)
     assert_equal 1.83, producer_net_unit_apples
-    assert_equal producer_net_unit_apples, posting_apples.reload.get_producer_net_unit
+    assert_equal producer_net_unit_apples, posting_apples.reload.producer_net_unit
     expected_producer_net_apples = 10.98
     assert_equal expected_producer_net_apples, posting_apples.inbound_order_value_producer_net
 

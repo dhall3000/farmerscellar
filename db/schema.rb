@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170216232145) do
+ActiveRecord::Schema.define(version: 20170308172147) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -407,18 +407,18 @@ ActiveRecord::Schema.define(version: 20170216232145) do
 
   create_table "postings", force: :cascade do |t|
     t.text     "description_body"
-    t.float    "price",                            default: 0.0,   null: false
-    t.integer  "user_id",                                          null: false
-    t.integer  "product_id",                                       null: false
-    t.integer  "unit_id",                                          null: false
-    t.datetime "created_at",                                       null: false
-    t.datetime "updated_at",                                       null: false
-    t.boolean  "live",                             default: false, null: false
-    t.datetime "delivery_date",                                    null: false
-    t.datetime "order_cutoff",                                     null: false
+    t.float    "price",                                 default: 0.0,   null: false
+    t.integer  "user_id",                                               null: false
+    t.integer  "product_id",                                            null: false
+    t.integer  "unit_id",                                               null: false
+    t.datetime "created_at",                                            null: false
+    t.datetime "updated_at",                                            null: false
+    t.boolean  "live",                                  default: false, null: false
+    t.datetime "delivery_date",                                         null: false
+    t.datetime "order_cutoff",                                          null: false
     t.integer  "posting_recurrence_id"
-    t.integer  "state",                            default: 0,     null: false
-    t.string   "description",                                      null: false
+    t.integer  "state",                                 default: 0,     null: false
+    t.string   "description",                                           null: false
     t.string   "price_body"
     t.string   "unit_body"
     t.integer  "units_per_case"
@@ -426,8 +426,9 @@ ActiveRecord::Schema.define(version: 20170216232145) do
     t.float    "order_minimum_producer_net"
     t.string   "important_notes"
     t.string   "important_notes_body"
-    t.float    "inbound_order_value_producer_net", default: 0.0,   null: false
-    t.float    "producer_net_unit",                default: 0.0,   null: false
+    t.float    "inbound_order_value_producer_net",      default: 0.0,   null: false
+    t.float    "producer_net_unit",                     default: 0.0,   null: false
+    t.float    "refundable_amount_unit_producer_to_fc", default: 0.0,   null: false
     t.index ["delivery_date"], name: "index_postings_on_delivery_date", using: :btree
     t.index ["live"], name: "index_postings_on_live", using: :btree
     t.index ["order_cutoff"], name: "index_postings_on_order_cutoff", using: :btree
@@ -454,18 +455,6 @@ ActiveRecord::Schema.define(version: 20170216232145) do
     t.string   "value"
     t.datetime "created_at",     null: false
     t.datetime "updated_at",     null: false
-  end
-
-  create_table "producer_product_unit_commissions", force: :cascade do |t|
-    t.integer  "product_id", null: false
-    t.integer  "user_id",    null: false
-    t.float    "commission", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer  "unit_id",    null: false
-    t.index ["product_id"], name: "index_producer_product_unit_commissions_on_product_id", using: :btree
-    t.index ["unit_id"], name: "index_producer_product_unit_commissions_on_unit_id", using: :btree
-    t.index ["user_id"], name: "index_producer_product_unit_commissions_on_user_id", using: :btree
   end
 
   create_table "products", force: :cascade do |t|
@@ -788,9 +777,6 @@ ActiveRecord::Schema.define(version: 20170216232145) do
   add_foreign_key "postings", "products"
   add_foreign_key "postings", "units"
   add_foreign_key "postings", "users"
-  add_foreign_key "producer_product_unit_commissions", "products"
-  add_foreign_key "producer_product_unit_commissions", "units"
-  add_foreign_key "producer_product_unit_commissions", "users"
   add_foreign_key "products", "food_categories"
   add_foreign_key "purchase_bulk_buys", "bulk_buys"
   add_foreign_key "purchase_bulk_buys", "purchases"
