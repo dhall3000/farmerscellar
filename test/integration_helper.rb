@@ -685,9 +685,9 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     producer1 = create_producer("producer1", "producer1@p.com")
     producer1.distributor = distributor    
     producer1.save
-    
-    create_commission(producer1, products(:apples), units(:pound), 0.05)
-    posting1 = create_posting(producer1, 1.00, products(:apples), units(:pound), delivery_date, order_cutoff, units_per_case = 1, frequency = 1)
+        
+    price = 1.00
+    posting1 = create_posting(producer1, price, products(:apples), units(:pound), delivery_date, order_cutoff, units_per_case = 1, frequency = 1, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = get_producer_net_unit(0.05, price))
 
     bob = create_user("bob", "bob@b.com")
     
@@ -768,10 +768,10 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     producer1 = create_producer("producer1", "producer1@p.com")
     producer1.distributor = distributor    
     producer1.save
+        
+    price = 1.00
+    posting1 = create_posting(producer1, price, products(:apples), units(:pound), delivery_date, order_cutoff, units_per_case = 1, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = get_producer_net_unit(0.05, price))
     
-    create_commission(producer1, products(:apples), units(:pound), 0.05)
-    posting1 = create_posting(producer1, 1.00, products(:apples), units(:pound), delivery_date, order_cutoff, units_per_case = 1)
-
     bob = create_user("bob", "bob@b.com")
     
     ti1_bob = create_tote_item(bob, posting1, 2)

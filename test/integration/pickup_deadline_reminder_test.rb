@@ -252,8 +252,8 @@ class PickupDeadlineReminderTest < IntegrationHelper
     delivery_date = wednesday_posting.delivery_date + 2.days
     order_cutoff = delivery_date - 2.days
 
-    create_commission(wednesday_posting.user, products(:milk), units(:gallon), 0.05)
-    posting = create_posting(wednesday_posting.user, 2.00, products(:milk), units(:gallon), delivery_date, order_cutoff, units_per_case = 1)
+    price = 2.00
+    posting = create_posting(wednesday_posting.user, price, products(:milk), units(:gallon), delivery_date, order_cutoff, units_per_case = 1, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, get_producer_net_unit(0.05, price))
 
     return posting
 
@@ -272,8 +272,8 @@ class PickupDeadlineReminderTest < IntegrationHelper
     producer1.distributor = distributor
     producer1.save
 
-    create_commission(producer1, products(:apples), units(:pound), 0.05)
-    posting = create_posting(producer1, 1.00, products(:apples), units(:pound), delivery_date, order_cutoff, units_per_case = 1)
+    price = 1.00
+    posting = create_posting(producer1, price, products(:apples), units(:pound), delivery_date, order_cutoff, units_per_case = 1, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, get_producer_net_unit(0.05, price))
 
     return posting
 

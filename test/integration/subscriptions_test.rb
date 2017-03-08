@@ -1291,15 +1291,12 @@ class SubscriptionsTest < IntegrationHelper
     log_in_as(farmer)
 
     unit = units(:pound)
-
-    if ProducerProductUnitCommission.where(user: farmer, product: product, unit: unit).count < 1      
-      ppuc = ProducerProductUnitCommission.create(user: farmer, product: product, unit: unit, commission: 0.05)
-    end
     
     delivery_date = next_day_of_week_after(Time.zone.now, 5, 7)
     post postings_path, params: {posting: {
       description: "#{product.name} description",
       price: 2,
+      producer_net_unit: 1.80,
       user_id: farmer.id,
       product_id: product.id,
       unit_id: unit.id,

@@ -202,9 +202,9 @@ class OrderMinimumAmountOutstandingTest < IntegrationHelper
     @delivery_date = get_delivery_date(7)
     @order_cutoff = @delivery_date - 2.days
 
-    @posting1 = create_posting(@producer1, price, Product.create(name: "Product1"), unit = nil, @delivery_date, @order_cutoff, units_per_case = posting1_units_per_case, frequency = 1, order_minimum_producer_net = posting1_om, product_id_code = nil, commission = 0)
-    @posting2 = create_posting(@producer1, price, Product.create(name: "Product2"), unit = nil, @delivery_date, @order_cutoff, units_per_case = nil, frequency = 1, order_minimum_producer_net = 0, product_id_code = nil, commission = 0)
-    @posting3 = create_posting(@producer2, price, Product.create(name: "Product3"), unit = nil, @delivery_date, @order_cutoff, units_per_case = nil, frequency = 1, order_minimum_producer_net = 0, product_id_code = nil, commission = 0)
+    @posting1 = create_posting(@producer1, price, Product.create(name: "Product1"), unit = nil, @delivery_date, @order_cutoff, units_per_case = posting1_units_per_case, frequency = 1, order_minimum_producer_net = posting1_om, product_id_code = nil, get_producer_net_unit(0, price))
+    @posting2 = create_posting(@producer1, price, Product.create(name: "Product2"), unit = nil, @delivery_date, @order_cutoff, units_per_case = nil, frequency = 1, order_minimum_producer_net = 0, product_id_code = nil, get_producer_net_unit(0, price))
+    @posting3 = create_posting(@producer2, price, Product.create(name: "Product3"), unit = nil, @delivery_date, @order_cutoff, units_per_case = nil, frequency = 1, order_minimum_producer_net = 0, product_id_code = nil, get_producer_net_unit(0, price))
 
     @user = create_user
 

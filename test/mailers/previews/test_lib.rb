@@ -14,7 +14,6 @@ module TestLib
 #def create_food_category_for_product_if_product_has_none(product)
 #def create_food_category(name, parent)
 #def create_creditor_order(creditor = nil, postings = nil, customer = nil)
-#def create_commission(farmer, product, unit, commission)
 #def create_email(subject = nil, body = nil, postings = nil)
 #def create_creditor_with(payment_method_key, payment_time_key, creditor = nil)
 
@@ -238,21 +237,6 @@ module TestLib
     end
 
     return Unit.create(name: name)
-
-  end
-
-  def create_commission(farmer, product, unit, commission)    
-    
-    ppuc = ProducerProductUnitCommission.new(user: farmer, product: product, unit: unit, commission: commission)
-
-    if Rails.env.test?
-      assert ppuc.valid?
-      assert ppuc.save
-    else
-      ppuc.save
-    end
-
-    return ppuc
 
   end
 

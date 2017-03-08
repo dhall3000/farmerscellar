@@ -19,8 +19,8 @@ class CaseTechTest < IntegrationHelper
     producer1.distributor = distributor    
     producer1.save
     
-    create_commission(producer1, products(:apples), units(:pound), 0.05)
-    posting1 = create_posting(producer1, 1.00, products(:apples), units(:pound), delivery_date, order_cutoff, units_per_case = 10, frequency = 1)
+    price = 1.00
+    posting1 = create_posting(producer1, price, products(:apples), units(:pound), delivery_date, order_cutoff, units_per_case = 10, frequency = 1, order_minimum_producer_net = 0, product_id_code = nil, get_producer_net_unit(0.05, price))
 
     bob = create_user("bob", "bob@b.com")
     
@@ -59,9 +59,7 @@ class CaseTechTest < IntegrationHelper
     product = products(:apples)
     unit = units(:pound)
 
-    ppuc = create_commission(farmer, product, unit, commission)
-    
-    posting = create_posting(farmer, price, product, unit, delivery_date, order_cutoff, units_per_case)
+    posting = create_posting(farmer, price, product, unit, delivery_date, order_cutoff, units_per_case, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, get_producer_net_unit(commission, price))
     #create customer
     customer = create_new_customer("bob", "bob@fc.com")
     customer.set_dropsite(Dropsite.first)

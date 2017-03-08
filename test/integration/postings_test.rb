@@ -657,6 +657,7 @@ class PostingsTest < IntegrationHelper
     post postings_path, params: {posting: {
       description: posting.description,
       price: posting.price,
+      producer_net_unit: (posting.price * 0.90).round(2),
       user_id: posting.user_id,
       product_id: posting.product_id,      
       unit_id: posting.unit_id,

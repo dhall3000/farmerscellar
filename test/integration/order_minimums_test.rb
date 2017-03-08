@@ -32,14 +32,14 @@ class OrderMinimumsTest < IntegrationHelper
     producer_decoy = create_producer("producer_decoy", "producer_decoy@p.com")
     producer_decoy.create_business_interface(name: producer_decoy.farm_name, order_email: producer_decoy.email, payment_method: BusinessInterface.payment_methods[:PAYPAL], paypal_email: producer_decoy.email)
 
-    create_commission(producer1, products(:apples), units(:pound), 0.05)
-    posting1 = create_posting(producer1, 1.00, products(:apples), units(:pound), delivery_date, order_cutoff, units_per_case = 1)
+    price = 1.00
+    posting1 = create_posting(producer1, price, products(:apples), units(:pound), delivery_date, order_cutoff, units_per_case = 1, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, get_producer_net_unit(0.05, price))
 
-    create_commission(producer2, products(:celery), units(:bunch), 0.05)
-    posting2 = create_posting(producer2, 2.00, products(:celery), units(:bunch), delivery_date, order_cutoff, units_per_case = 1)
+    price = 2.00
+    posting2 = create_posting(producer2, price, products(:celery), units(:bunch), delivery_date, order_cutoff, units_per_case = 1, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, get_producer_net_unit(0.05, price))
 
-    create_commission(producer_decoy, products(:milk), units(:gallon), 0.05)
-    posting_decoy = create_posting(producer_decoy, 10.50, products(:milk), units(:gallon), delivery_date_decoy, order_cutoff_decoy, units_per_case = 1)
+    price = 10.50
+    posting_decoy = create_posting(producer_decoy, price, products(:milk), units(:gallon), delivery_date_decoy, order_cutoff_decoy, units_per_case = 1, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, get_producer_net_unit(0.05, price))
 
     bob = create_user("bob", "bob@b.com")
     sam = create_user("sam", "sam@s.com")

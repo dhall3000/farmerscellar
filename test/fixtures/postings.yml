@@ -325,7 +325,7 @@ baron_farms_eggs:
   order_cutoff: <%= delivery_date - 2.days %>  
   product: eggs
   price: 6.25
-  producer_net_unit: 5.50
+  producer_net_unit: 6.03
   user: baron_farms
   unit: whole
   description: pastured eggs
@@ -336,7 +336,7 @@ pride_and_joy_milk:
   order_cutoff: <%= delivery_date - 2.days %>  
   product: milk
   price: 10.50
-  producer_net_unit: 10
+  producer_net_unit: 10.13
   user: pride_and_joy
   unit: gallon
   description: pastured organic raw milk
