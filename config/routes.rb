@@ -30,7 +30,6 @@ Rails.application.routes.draw do
   get 'reference_transactions/do_rtpurchase'
   get 'reference_transactions/do_bulk_purchase'
   post 'tote_items/pout'  
-  post 'producer_product_unit_commissions/retail_helper'
   post 'subscriptions/skip_dates'
   post 'pickups/toggle_garage_door'  
   get 'pickups/log_out_dropsite_user'
@@ -47,7 +46,6 @@ Rails.application.routes.draw do
   resources :payment_payables, only: [:index]
   resources :creditor_orders  
   resources :subscriptions, only: [:create, :index, :show, :edit, :update]
-  resources :producer_product_unit_commissions
   resources :products
   resources :website_settings, only: [:edit, :update]
   resources :users
