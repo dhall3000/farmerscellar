@@ -342,7 +342,7 @@ module ToteItemsHelper
     
     pp_fee = get_payment_processor_fee_unit(retail_price)
     commission_per_unit = (retail_price * commission_factor).round(2)
-    producer_net_unit = retail_price - commission_per_unit - pp_fee
+    producer_net_unit = (retail_price - commission_per_unit - pp_fee).round(2)
 
     return producer_net_unit
 

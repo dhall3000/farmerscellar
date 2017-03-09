@@ -27,6 +27,60 @@ class PostingsTest < IntegrationHelper
 
   end
 
+  test "should properly process upside down posting" do
+    #description: an "upside down posting" is a posting where the producer_net_unit is > retail price. the first time this is being done is as a hack for glass bottles. the original scenario
+    #on 2017-03-08 is we're getting Pure Eire raw milk in half gallon glass bottle from Pete's delivery for $4.50 + $2.50 bottle deposit. But, of course, we don't want to do the bottle
+    #deposit / refund hassle with our customers so we're starting with an initial 'experimental' program to test a innovative idea. the idea is we're out a total of $7 / unit (plus paypal fees)
+    #and we're charging customers $6.50 retail. if they bring the bottles back to us we make a profit. if they don't, we get killed. so we're keeping some metrics to see. but this test is to
+    #verify it can work.
+
+    nuke_all_postings
+
+    price = 6.50
+    producer_net_unit = 7.00
+    posting = create_posting(farmer = nil, price, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit)
+    assert posting.valid?
+
+    bob = create_new_customer("bob", "bob@b.com")
+    ti = create_tote_item(bob, posting, 1)
+    assert ti.valid?
+    assert ti.state?(:ADDED)
+
+    create_one_time_authorization_for_customer(bob)
+    assert ti.reload.state?(:AUTHORIZED)
+
+    travel_to posting.order_cutoff
+    RakeHelper.do_hourly_tasks
+
+    assert ti.reload.state?(:COMMITTED)
+
+    travel_to posting.delivery_date + 12.hours
+    fully_fill_creditor_order(posting.creditor_order)
+
+    assert ti.reload.state?(:FILLED)
+
+    travel_to posting.delivery_date + 22.hours
+
+    assert_equal 0, Payment.count
+    assert_equal 0, Purchase.count
+    RakeHelper.do_hourly_tasks
+    assert_equal 1, Payment.count
+    assert_equal 1, Purchase.count
+
+    assert_equal price, Purchase.first.gross_amount
+    purchase_net = (price - 0.30 - (0.029 * price)).round(2)
+    assert_equal purchase_net, Purchase.first.net_amount
+    assert_equal producer_net_unit, Payment.first.amount
+
+    expected = (price - (0.30 + 0.029 * price) - producer_net_unit).round(2)
+    actual = (purchase_net - Payment.first.amount).round(2)
+
+    assert_equal expected, actual
+
+    travel_back
+
+  end
+
   test "should properly divide postings into this next and future on first day of week" do
 
     assert STARTOFWEEK >= 0

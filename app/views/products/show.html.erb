@@ -10,7 +10,7 @@
 </p>
 
 <h2><%= @product.name %></h2>
-
+<p>ID: <%= @product.id.to_s %>
 <% if @product.food_category %>
   <p>Food Category: <%= link_to @product.food_category.name, food_category_path(@product.food_category) %></p>
 <% else %>

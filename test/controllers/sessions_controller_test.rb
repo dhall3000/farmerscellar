@@ -32,9 +32,9 @@ class SessionsControllerTest < IntegrationHelper
     spoof_user
     get sessions_unspoof_path
     assert_response :redirect
-    assert_redirected_to users_path
+    assert_redirected_to root_path
     follow_redirect!
-    assert_template 'users/index'
+    assert_template 'static_pages/home'
     assert_not flash.empty?
     assert_equal "All done spoofing", flash[:success]
     current_user = assigns(:current_user)

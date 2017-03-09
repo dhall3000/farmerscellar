@@ -79,6 +79,12 @@ class PostingsController < ApplicationController
       posting_recurrence.postings << @posting            
     end
 
+    if !spoofing?
+      if posting_params[:producer_net_unit].to_f == 0
+        @posting.producer_net_unit = get_producer_net_unit(0.1, @posting.price)
+      end
+    end
+
   	if @posting.save
       if @posting.live
         flash[:success] = "Your new posting is now live!"
@@ -87,7 +93,7 @@ class PostingsController < ApplicationController
       end
 
       if !spoofing?
-        AdminNotificationMailer.general_message("producer just created his own posting", "producer has no way of specifying producer_net_unit. Make sure that value is set. Posting id is #{@posting.id.to_s}").deliver_now
+        AdminNotificationMailer.general_message("producer just created his own posting", "producer has no way of specifying producer_net_unit so we set it for them at our standard commission. Make sure that value is set. Posting id is #{@posting.id.to_s}").deliver_now
       end
 
       redirect_to postings_path

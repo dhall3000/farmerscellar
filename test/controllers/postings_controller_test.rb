@@ -35,6 +35,15 @@ class PostingsControllerTest < IntegrationHelper
 
   end
 
+  test "order min producer net should stick" do
+
+    order_minimum_producer_net = 100
+    posting = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net, product_id_code = nil)
+    assert posting.valid?
+    assert_equal order_minimum_producer_net, posting.order_minimum_producer_net
+
+  end
+
   test "product id code should stick on posting creation" do
     
     pid_code = "davidproductcode"
@@ -81,7 +90,7 @@ class PostingsControllerTest < IntegrationHelper
     mail = ActionMailer::Base.deliveries[0]
     assert_equal "david@farmerscellar.com", mail.to[0]
     assert_equal "producer just created his own posting", mail.subject
-    assert_match "producer has no way of specifying producer_net_unit. Make sure that value is set. Posting id is #{posting.id.to_s}", mail.body.encoded    
+    assert_match "producer has no way of specifying producer_net_unit so we set it for them at our standard commission. Make sure that value is set. Posting id is #{posting.id.to_s}", mail.body.encoded
 
   end
 

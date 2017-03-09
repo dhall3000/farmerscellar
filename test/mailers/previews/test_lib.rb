@@ -468,7 +468,11 @@ module TestLib
 
   end
 
-  def create_business_interface(creditor, order_instructions = "order instructions", payment_method = BusinessInterface.payment_methods[:PAYPAL], payment_instructions = "payment instructions", payment_time = BusinessInterface.payment_times[:AFTERDELIVERY])
+  def create_business_interface(creditor, order_instructions = "order instructions", payment_method = BusinessInterface.payment_methods[:PAYPAL], payment_instructions = "payment instructions", payment_time = BusinessInterface.payment_times[:AFTERDELIVERY], payment_receipt_email = nil)
+
+    if payment_receipt_email.nil?
+      payment_receipt_email = creditor.email
+    end
 
     creditor.create_business_interface(
       name: "#{creditor.name} #{creditor.name}, Inc.",
@@ -477,7 +481,8 @@ module TestLib
       payment_method: payment_method,
       paypal_email: creditor.email,
       payment_instructions: payment_instructions,
-      payment_time: payment_time
+      payment_time: payment_time,
+      payment_receipt_email: payment_receipt_email
       )
 
   end
