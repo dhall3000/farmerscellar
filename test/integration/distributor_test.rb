@@ -208,19 +208,17 @@ class DistributorTest < BulkBuyer
 
     #first modify the business interfaces properly
     bi = business_interfaces(:one)
-    bi.update(payment_method: BusinessInterface.payment_methods[:CASH], paypal_email: nil, payment_instructions: "COD")
+    bi.update(payment_method: BusinessInterface.payment_methods[:CASH], paypal_email: nil)
     bi.reload
     assert_not bi.payment_method?(:PAYPAL)
     assert_nil bi.paypal_email    
-    assert_not bi.payment_instructions.nil?
-
+    
     bi = business_interfaces(:two)
-    bi.update(payment_method: BusinessInterface.payment_methods[:CASH], paypal_email: nil, payment_instructions: "Credit card on pickup")
+    bi.update(payment_method: BusinessInterface.payment_methods[:CASH], paypal_email: nil)
     bi.reload
     assert_not bi.payment_method?(:PAYPAL)
     assert_nil bi.paypal_email    
-    assert_not bi.payment_instructions.nil?
-
+    
     customer = users(:c18)
     #do one time checkout and authorization
     create_authorization_for_customer(customer)

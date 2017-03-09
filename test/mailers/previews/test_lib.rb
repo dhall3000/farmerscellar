@@ -480,7 +480,6 @@ module TestLib
       order_instructions: order_instructions,
       payment_method: payment_method,
       paypal_email: creditor.email,
-      payment_instructions: payment_instructions,
       payment_time: payment_time,
       payment_receipt_email: payment_receipt_email
       )

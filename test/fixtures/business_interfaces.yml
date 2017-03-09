@@ -5,7 +5,6 @@ one:
   order_email: d1order_email@d.com
   order_instructions: nil
   paypal_email: d1paypal_email@d.com
-  payment_instructions: nil
   user: d1
 
 two:
@@ -13,7 +12,6 @@ two:
   order_email: f8order_email@f.com
   order_instructions: nil
   paypal_email: f8paypal_email@f.com
-  payment_instructions: nil
   user: f8
 
 f_subscriptions:
@@ -21,7 +19,6 @@ f_subscriptions:
   order_email: sf@f.com
   order_instructions: nil
   paypal_email: sf@f.com
-  payment_instructions: nil
   user: f_subscriptions
 
 f9:  
@@ -29,7 +26,6 @@ f9:
   order_email: f9@f.com
   order_instructions: nil
   paypal_email: f9@f.com
-  payment_instructions: nil
   user: f9
 
 f5:  
@@ -37,7 +33,6 @@ f5:
   order_email: f5@f.com
   order_instructions: nil
   paypal_email: f5@f.com
-  payment_instructions: nil
   user: f5
 
 f1:
@@ -45,7 +40,6 @@ f1:
   order_email: f1@f.com
   order_instructions: nil
   paypal_email: f1@f.com
-  payment_instructions: nil
   user: f1
 
 f2:
@@ -53,7 +47,6 @@ f2:
   order_email: f2@f.com
   order_instructions: nil
   paypal_email: f2@f.com
-  payment_instructions: nil
   user: f2
 
 f3:
@@ -61,7 +54,6 @@ f3:
   order_email: f3@f.com
   order_instructions: nil
   paypal_email: f3@f.com
-  payment_instructions: nil
   user: f3
 
 f4:
@@ -69,7 +61,6 @@ f4:
   order_email: f4@f.com
   order_instructions: nil
   paypal_email: f4@f.com
-  payment_instructions: nil
   user: f4
 
 baron_farms:
@@ -77,7 +68,6 @@ baron_farms:
   order_email: martydavis@gmail.com
   order_instructions: nil
   paypal_email: martydavis@gmail.com
-  payment_instructions: nil
   user: baron_farms
 
 pride_and_joy:
@@ -85,5 +75,4 @@ pride_and_joy:
   order_email: ricky@prideandjoydairy.com
   order_instructions: nil
   paypal_email: ricky@prideandjoydairy.com
-  payment_instructions: nil
   user: pride_and_joy

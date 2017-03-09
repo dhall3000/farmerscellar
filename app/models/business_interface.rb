@@ -79,6 +79,5 @@ class BusinessInterface < ApplicationRecord
 #  order_email: if order_email is non null specify the address you want order emails routed to here. else set to nil
 #  order_instructions: if order_email is non null specify any special manual order submission instructions here. these will be included in the order emailed to 'david@fc.com'. if !order_email, set to nil
 #  paypal_email: same concept as for order_email. paypal payment will get sent to this address. also, our payment invoice well get sent to this address.
-#  payment_instructions: same concept as for order_email
 
 end
