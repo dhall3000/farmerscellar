@@ -27,7 +27,9 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     assert_template 'tote_items/how_often'
 
     #there are no constraints so both options should be present
-    assert_select 'div div div form input[type=?][value=?]', "submit", "Just once", 1
+    #search for the comments and code at this string 'business bootstrapping code'. for the reasons in that comment i decided to 100% yank the vanilla 'Just Once'
+    #option until our sales are huge
+    #assert_select 'div div div form input[type=?][value=?]', "submit", "Just once", 1
     assert_select 'div div div form input[type=?][value=?]', "submit", "Just once (roll until filled)", 1
 
   end
@@ -94,7 +96,9 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     assert_response :success
     assert_template 'tote_items/how_often'
 
-    assert_select 'div div div form input[type=?][value=?]', "submit", "Just once", 1
+    #search for the comments and code at this string 'business bootstrapping code'. for the reasons in that comment i decided to 100% yank the vanilla 'Just Once'
+    #option until our sales are huge
+    #assert_select 'div div div form input[type=?][value=?]', "submit", "Just once", 1
     assert_select 'div div div form input[type=?][value=?]', "submit", "Just once (roll until filled)", 1
 
   end
@@ -161,7 +165,9 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     assert_response :success
     assert_template 'tote_items/how_often'
 
-    assert_select 'div div div form input[type=?][value=?]', "submit", "Just once", 1
+    #search for the comments and code at this string 'business bootstrapping code'. for the reasons in that comment i decided to 100% yank the vanilla 'Just Once'
+    #option until our sales are huge
+    #assert_select 'div div div form input[type=?][value=?]', "submit", "Just once", 1
     assert_select 'div div div form input[type=?][value=?]', "submit", "Just once (roll until filled)", 1
 
   end
@@ -208,7 +214,9 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     assert_response :success
     assert_template 'tote_items/how_often'
 
-    assert_select 'div div div form input[type=?][value=?]', "submit", "Just once", 1
+    #search for the comments and code at this string 'business bootstrapping code'. for the reasons in that comment i decided to 100% yank the vanilla 'Just Once'
+    #option until our sales are huge
+    #assert_select 'div div div form input[type=?][value=?]', "submit", "Just once", 1
     assert_select 'div div div form input[type=?][value=?]', "submit", "Just once (roll until filled)", 1    
 
   end

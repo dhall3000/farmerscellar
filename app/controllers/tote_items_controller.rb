@@ -110,8 +110,19 @@ class ToteItemsController < ApplicationController
     if @posting.units_per_case.to_i > 1 && @posting.total_quantity_ordered < @posting.units_per_case.to_i
       case_constraints_met = false
     end
+
+    #NOTE: Change of plans. the following line is what we used to use. it said to show the vanilla just once if order min and case constraint were met. but read below for how this
+    #caused an issue
+    #@display_vanilla_just_once_option = biggest_order_minimum_producer_net_outstanding == 0 && case_constraints_met
     
-    @display_vanilla_just_once_option = biggest_order_minimum_producer_net_outstanding == 0 && case_constraints_met
+    #make it so that vanilla Just Once never appears for now. there's very little positive value to leaving it there and there's significant adverse effect. here's why:
+    #say on week 1 we get beyond the order min by selling RTF orders. since the RTF is really a subscription it will generate a new tote item as soon as we hit the order
+    #cutoff for week 1. once all these RTFs generate their item for week 2 that also will triger the order min to be hit which will trigger the vanilla Just Once button to appear.
+    #so then if a bunch of people sign up for Just Once (vanilla) then once week 1 delivery happens all those week 1 RTF orders for week 2 will cancel sending us back down
+    #below the order min for week 2. so then the vanilla Just Once'ers won't get filled and they won't roll so we'll have lost sales.
+    @display_vanilla_just_once_option = false
+    #when yanking this code, fix the tests by uncommenting these test lines:
+    #assert_select 'div div div form input[type=?][value=?]', "submit", "Just once", 1
     #############business bootstrapping code#############
 
     @subscription_create_options = @posting.posting_recurrence.subscription_create_options
