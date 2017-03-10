@@ -1,7 +1,7 @@
 
 <% @creditor_order.postings.each do |posting| %>
 ---------------------------------------------
-Id=<%= posting.id %>,Product=<%= posting.product.name %>,Delivery Date=<%= posting.delivery_date.strftime("%A %b %d, %Y") %>,Units=<%= posting.unit.name %>,Quantity=<%= posting.num_units_filled %>,Unit Price=<%= number_to_currency(posting.producer_net_unit) %>,Sub Total=<%= number_to_currency(posting.inbound_order_value_producer_net) %>
+Id=<%= posting.id %>,Product=<%= posting.product.name %>,Delivery Date=<%= posting.delivery_date.strftime("%A %b %d, %Y") %>,Units=<%= posting.unit.name %>,Quantity=<%= posting.num_units_filled %>,Unit Price=<%= number_to_currency(posting.producer_net_unit) %>,Sub Total=<%= number_to_currency(posting.outbound_order_value_producer_net) %>
 <% end %>
 
 Thanks!

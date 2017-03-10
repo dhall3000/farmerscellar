@@ -3,6 +3,54 @@ require 'integration_helper'
 
 class CaseTechTest < IntegrationHelper
 
+  test "order email and payment receipt should show proper funds amounts if producer order quantity is less than customer order quantity due to case constraint" do
+
+    nuke_all_postings
+    units_per_case = 10
+    posting = create_posting(farmer = nil, price = 1.04, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = 1.00)
+    posting2 = create_posting(posting.user, price = 1.04, product = Product.create(name: "FakeProduct"), unit = nil, delivery_date = nil, order_cutoff = nil, nil, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = 1.00)    
+    bob = create_new_customer
+    ti = create_tote_item(bob, posting, 15, frequency = nil, roll_until_filled = true)
+    ti2 = create_tote_item(bob, posting2, 1, frequency = nil, roll_until_filled = true)
+    create_rt_authorization_for_customer(bob)
+
+    ActionMailer::Base.deliveries.clear
+    travel_to posting.order_cutoff
+    RakeHelper.do_hourly_tasks
+
+    #go to order cutoff and verify proper order email
+    #case size is 10, inbound order quantity was 15. so the producer order should only be for quantity 10
+    assert_equal 1, ActionMailer::Base.deliveries.count
+    mail = ActionMailer::Base.deliveries.first
+    assert_equal "Order for #{posting.delivery_date.strftime("%A, %B")} #{posting.delivery_date.day.ordinalize} delivery", mail.subject
+    assert_match "Below are orders for your upcoming delivery. If all orders are filled total sales will be $11.00", mail.body.encoded
+
+    #now go to delivery day, process fills
+    travel_to posting.delivery_date + 12.hours
+    fully_fill_creditor_order(posting.creditor_order)    
+    assert_equal units_per_case, ti.reload.quantity_filled
+    assert_equal 1, ti2.reload.quantity_filled
+
+    #now go to payment time and verify the payment receipt is accurate
+    travel_to posting.delivery_date + 22.hours
+    ActionMailer::Base.deliveries.clear
+    RakeHelper.do_hourly_tasks
+
+    #there should be payment receipt, purchase receipt, bulk purchase report, bulk payment report
+    assert_equal 4, ActionMailer::Base.deliveries.count
+    emails = get_emails_by_subject(ActionMailer::Base.deliveries, "Payment receipt")
+    assert_equal 1, emails.count
+    payment_receipt = emails.first
+    assert_match "Here's a 'paper' trail for the $11.00 payment we just made for the following products / quantities:", payment_receipt.body.encoded
+
+    #this assertion is the real kicker. there should be a 'sub total' column that has this value to represent the first posting's items. customers ordered a total of $15
+    #of product. however, a case constraint was in effect so only 10 units shipped so this sub total should reflect that.
+    assert_match "$10.00", payment_receipt.body.encoded
+
+    travel_back
+
+  end
+
   test "should show pout page if subscription first tote item will not fill" do
     nuke_all_postings
 

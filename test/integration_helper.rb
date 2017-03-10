@@ -465,7 +465,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
   end
 
-  def create_new_customer(name, email)
+  def create_new_customer(name = "bob", email = "bob@b.com")
 
     get signup_path
     ActionMailer::Base.deliveries.clear

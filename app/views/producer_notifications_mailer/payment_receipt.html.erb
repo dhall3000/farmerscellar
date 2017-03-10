@@ -28,7 +28,7 @@
         <td align="center"><%= posting.unit.name %></td>        
         <td align="center"><%= posting.num_units_filled %></td>
         <td align="center"><%= number_to_currency(posting.producer_net_unit) %></td>
-        <td align="center"><%= number_to_currency(posting.inbound_order_value_producer_net) %></td>
+        <td align="center"><%= number_to_currency(posting.outbound_order_value_producer_net) %></td>
       </tr>
     <% end %>
   </tbody>
