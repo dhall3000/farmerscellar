@@ -68,7 +68,7 @@ class UserMailer < ApplicationMailer
       if @all_items_fully_filled
         subject = "Delivery notification"
       else
-        subject = "Unfilled order(s) and delivery notification"
+        subject = "Important notice and delivery notification"
       end
     end
 

@@ -1063,7 +1063,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     if tote_item.fully_filled? && all_tote_items_fully_filled?(all_tote_items_in_this_delivery_notification)
       subject = "Delivery notification"
     else
-      subject = "Unfilled order(s) and delivery notification"
+      subject = "Important notice and delivery notification"
     end    
 
     email = tote_item.user.email

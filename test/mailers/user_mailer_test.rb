@@ -83,7 +83,7 @@ class UserMailerTest < ActionMailer::TestCase
 
     mail = UserMailer.delivery_notification(user, dropsite, tote_items)
 
-    assert_equal "Unfilled order(s) and delivery notification", mail.subject
+    assert_equal "Important notice and delivery notification", mail.subject
     assert_equal [user.email], mail.to
     assert_equal ["david@farmerscellar.com"], mail.from
 
