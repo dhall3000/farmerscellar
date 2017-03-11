@@ -1,116 +1,87 @@
-<div class="center jumbotron">
-  <h1>Farmer's Cellar</h1>
-  <h2>Pickup List</h2>
+<div class="row">
+  <div class="col-xs-12">
+    <div  data-toggle="collapse" data-target="#headerContent">
+      <div class="text-center" id="logo" style="font-size: 4.0em;padding-top: 20px;">Farmer's Cellar</div>
+    </div>
+  </div>
 </div>
 
 <div class="row">
 	<div class="col-sm-8 col-sm-offset-2">
 
-    <div class="panel-group">
+    <h2>Account</h2>
+    <% if @user.producer? && @user.get_business_interface && !@user.get_business_interface.name.blank? %>
+      <p>Hello <%= @user.get_business_interface.name %></p>
+    <% else %>
+      <p><%= @user.email %></p>
+      <% if @previous_pickup_time %>
+        <p>Last pickup was <%= @previous_pickup_time.strftime("%A %B %d, %Y at %l:%M %p") %></p>
+      <% end %>            
+    <% end %>
 
-
-    	<% if @closed %>
-
-	    	<div class="panel panel-default">
-	        <div class="panel-heading">
-	          <h2 class="panel-title alert alert-danger">Attention!</h2>
-	        </div>          
-	        <div class="panel-body">
-	        	<p>City of Kirkland's rule is that <span class="alert alert-danger">all pickups must be between 8AM - 8PM</span>.</p>
-	        	<p>Go ahead and get your products now but in the future please try to pickup within those hours.</p>
-	        	<p>Thanks!</p>
-	        </div>        
-	      </div>
-
-    	<% end %>
-      
-
-      <% if @tote_items.any? %>
-      
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h2 class="panel-title">Your recently delivered products</h2>
-          </div>          
-          <div class="panel-body">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th class="text-center"></th>
-                  <th class="text-center">Producer</th>
-                  <th class="text-center">Product</th>
-                  <th class="text-center">Quantity Delivered</th>
-                </tr>
-              </thead>
-              <tbody>
-
-                <% @tote_items.each do |tote_item| %>        
-                  <tr>                  
-                    <td><%= image_tag "/favicon-32.png" %></td>
-                    <td class="text-center"><%= tote_item.posting.user.farm_name %></td>
-                    <td class="text-center"><%= tote_item.posting.product.name %></td>
-
-                    <% if tote_item.quantity_filled < tote_item.quantity || tote_item.state?(:NOTFILLED) %>
-                      <td class="text-center">
-                        <div class="alert alert-danger">
-                          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> <%= pluralize(tote_item.quantity_filled, tote_item.posting.unit.name) %>. We couldn't fully fill this order.                          
-                        </div>
-                      </td>
-                    <% else %>
-                      <td class="text-center"><%= pluralize(tote_item.quantity_filled, tote_item.posting.unit.name) %></td>
-                    <% end %>
-                    
-                  </tr>        
-                <% end %>
-
-              </tbody>
-            </table>            
-          </div>
-        </div>
-      <% end %>
-
-
-
+    <% if @closed %>
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h2 class="panel-title">Account Info</h2>
+          <h2 class="panel-title alert alert-danger">Attention!</h2>
         </div>          
         <div class="panel-body">
-          <% if @user.producer? && @user.get_business_interface && !@user.get_business_interface.name.blank? %>
-            <p>Producer: <%= @user.get_business_interface.name %></p>
-          <% else %>
-            <p>Email: <%= @user.email %></p>
+          <p>City of Kirkland's rule is that <span class="alert alert-danger">all pickups must be between 8AM - 8PM</span>.</p>
+          <p>Go ahead and get your products now but in the future please try to pickup within those hours.</p>
+          <p>Thanks!</p>
+        </div>        
+      </div>
+    <% end %>
+
+    <h2>Your recently delivered products</h2>
+    <% if @tote_items.any? %>      
+      <table class="table">
+        <thead>
+          <tr>
+            <th class="text-center"></th>
+            <th class="text-center">Producer</th>
+            <th class="text-center">Product</th>
+            <th class="text-center">Quantity Delivered</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <% @tote_items.each do |tote_item| %>        
+            <tr>                  
+              <td><%= image_tag "/favicon-32.png" %></td>
+              <td class="text-center"><%= tote_item.posting.user.farm_name %></td>
+              <td class="text-center"><%= tote_item.posting.product.name %></td>
+
+              <% if tote_item.quantity_filled < tote_item.quantity || tote_item.state?(:NOTFILLED) %>
+                <td class="text-center">
+                  <div class="alert alert-danger">
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> <%= pluralize(tote_item.quantity_filled, tote_item.posting.unit.name) %>. We couldn't fully fill this order.                          
+                  </div>
+                </td>
+              <% else %>
+                <td class="text-center"><%= pluralize(tote_item.quantity_filled, tote_item.posting.unit.name) %></td>
+              <% end %>
+              
+            </tr>        
           <% end %>
-          <% if @previous_pickup_time %>
-            <p>Last pickup: <%= @previous_pickup_time.strftime("%A %B %d, %Y at %l:%M %p") %></p>
-          <% end %>         
-        </div>        
-      </div>
+
+        </tbody>
+      </table>            
+    <% end %>
 
 
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h2 class="panel-title">Action</h2>
-        </div>          
-        <div class="panel-body">
+    <h2 >Action</h2>
+    <%= form_tag pickups_toggle_garage_door_path do %>
+      
+      <% if @mockup_mode %>
+        <%= hidden_field_tag :pickup_code, "1111" %>
+      <% else %>
+        <%= hidden_field_tag :pickup_code, @pickup_code.code %>
+      <% end %>                   
 
-					<%= form_tag pickups_toggle_garage_door_path do %>
-						
-						<% if @mockup_mode %>
-							<%= hidden_field_tag :pickup_code, "1111" %>
-						<% else %>
-							<%= hidden_field_tag :pickup_code, @pickup_code.code %>
-						<% end %>										
+      <%= submit_tag "Open/Close garage door", class: 'btn btn-lg btn-primary outline fat-finger-spacing', data: { disable_with: "Please wait...sometimes slow! :(" } %>      
+    <% end %>
 
-						<%= submit_tag "Open/Close garage door", class: 'btn btn-lg btn-primary outline fat-finger-spacing', data: { disable_with: "Please wait...sometimes slow! :(" } %>			
-					<% end %>
+    <%= link_to "Log out", new_pickup_path, class: 'btn btn-lg btn-primary outline btn-block', data: { disable_with: "Please wait..." } %>
 
-					<%= link_to "Log out", new_pickup_path, class: 'btn btn-lg btn-primary outline btn-block', data: { disable_with: "Please wait..." } %>
-					
-        </div>        
-      </div>
-        
-
-
-    </div>
 	</div>
 </div>

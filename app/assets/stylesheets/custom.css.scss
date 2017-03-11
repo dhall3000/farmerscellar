@@ -38,11 +38,13 @@ $fc-primary-color: #AACB4F;
 
 .btn-primary.outline {
   border: 2px solid $fc-primary-color;
-  color: $fc-primary-color;
+  color: white;
+  background-color: $fc-primary-color;
+  opacity: 0.75;
 }
 
 .btn-primary.outline:hover, .btn-primary.outline:focus {
-  opacity: 0.6;
+  opacity: 0.95;
   color: white;
   background-color: $fc-primary-color;
   border-color: $fc-primary-color;  
@@ -50,7 +52,7 @@ $fc-primary-color: #AACB4F;
 }
 
 .btn-primary.outline:active, .btn-primary.outline.active, .btn-primary.outline:active:focus {
-  opacity: 0.8;
+  opacity: 1.0;
   color: white;
   background-color: $fc-primary-color;
   border-color: $fc-primary-color;
