@@ -174,7 +174,7 @@ class BulkPurchasesTest < BulkBuyer
     #verify a message is displayed notifying user of partially filled item
     assert_select 'div', count: 1, text: "3 Wholes. We couldn't fully fill this order."
     #verify a message is displayed notifying user of not filled item
-    assert_select 'div', count: 1, text: "0 Wholes. We couldn't fully fill this order."
+    assert_select 'div', count: 1, text: "0 Wholes. We couldn't fill this order."
 
 
     #the rest of this test is superfluous to the intent of this test. it's just an artifact of copy/pasting test "do pickups" do
