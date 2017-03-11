@@ -51,10 +51,16 @@
               <td class="text-center"><%= tote_item.posting.user.farm_name %></td>
               <td class="text-center"><%= tote_item.posting.product.name %></td>
 
-              <% if tote_item.quantity_filled < tote_item.quantity || tote_item.state?(:NOTFILLED) %>
+              <% if tote_item.quantity_filled > 0 && tote_item.quantity_filled < tote_item.quantity %>
                 <td class="text-center">
                   <div class="alert alert-danger">
-                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> <%= pluralize(tote_item.quantity_filled, tote_item.posting.unit.name) %>. We couldn't fully fill this order.                          
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> <%= pluralize(tote_item.quantity_filled, tote_item.posting.unit.name) %>. We couldn't fully fill this order.
+                  </div>
+                </td>
+              <% elsif tote_item.quantity_filled == 0 || tote_item.state?(:NOTFILLED) %>
+                <td class="text-center">
+                  <div class="alert alert-danger">
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> <%= pluralize(tote_item.quantity_filled, tote_item.posting.unit.name) %>. We couldn't fill this order.
                   </div>
                 </td>
               <% else %>
