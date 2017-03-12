@@ -13,34 +13,34 @@ class PickupsControllerTest < ActionDispatch::IntegrationTest
   	log_in_as(@dropsite_user)
     get new_pickup_path
     assert_response :success
-    assert_select 'input#pickup_code', count: 1
+    assert_select 'form#pinForm', count: 1
   end
 
   test "should not get new when not logged in" do
     get new_pickup_path
     assert_response :redirect
-    assert_select 'input#pickup_code', count: 0
+    assert_select 'form#pinForm', count: 0
   end
 
   test "should not get new when logged in as customer" do
     log_in_as(@customer)
     get new_pickup_path
     assert_response :redirect
-    assert_select 'input#pickup_code', count: 0
+    assert_select 'form#pinForm', count: 0
   end
 
   test "should not get new when logged in as farmer" do
   	log_in_as(@farmer)
     get new_pickup_path
     assert_response :redirect
-    assert_select 'input#pickup_code', count: 0
+    assert_select 'form#pinForm', count: 0
   end
 
   test "should not get new when logged in as admin" do
     log_in_as(@admin)
     get new_pickup_path
     assert_response :redirect
-    assert_select 'input#pickup_code', count: 0
+    assert_select 'form#pinForm', count: 0
   end
 
   test "should create" do

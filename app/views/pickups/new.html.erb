@@ -1,9 +1,52 @@
 <% provide(:title, "Pickup") %>
-<div class="row">
-  <div class="col-xs-12">
-    <div  data-toggle="collapse" data-target="#headerContent">
-      <div class="text-center" id="logo" style="font-size: 4.0em;padding-top: 50px;">Farmer's Cellar</div>
+
+<!-- Modal -->
+<div class="modal fade" id="finePolicyModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"></button>
+        <h2 class="modal-title alert alert-danger">Don't get fined!!!</h2>
+      </div>
+      <div class="modal-body">
+        <p>
+          Every product in this dropsite has already been paid for by other customers so it belongs to them, not Farmer's Cellar. If you take something that you did not order you just took product that belongs to someone else. They will discover their products missing only after arriving here at the dropsite to pick up. For this reason, we try to ease their pain by giving them $15 cash for their inconvenience. We then pass this $15 fee on to you. We'll additionally charge you for their product which you took.
+        </p>
+
+        <p>
+          For example, say you ordered 2 gallons of Bob's Farm milk at $5 / gallon. But when you arrive you accidentally take 2 gallons of John's Farm milk which costs $10 / gallon. Say these 2 gallons you take belonged to two different people. In addition to charging you for the Bob's Farm milk that you did order, we'd also charge you $20 for the John's Farm milk that you did not order plus two $15 fees for each of the two people you inconvenienced by taking their milk. In this example, you would be charged $50 for taking the wrong product. We, Farmer's Cellar, don't make a penny off of this fee. We're only covering our costs for the product you ordered and the product you took and compensating our good customers for the inconvenience you caused them.
+        </p>
+
+        <p>
+          We really don't want to charge you these fees but we will in order to keep our good customers happy. So please don't make us fine you. Please carefully pick up only the products you ordered. If you have any doubts whatsoever about something please knock on the front door and we'll gladly help you.
+        </p>
+
+        <p>
+          We do not accept returned food. As soon as you remove something from this dropsite it becomes yours and you'll be responsible for the fines.
+        </p>
+
+        <p>
+          If you do not agree to these terms, do not enter the dropsite. Contact us and we will get your products for you and close your Farmer's Cellar account. By clicking the 'I agree' button and entering the dropsite you agree to these terms.
+        </p>
+
+        <p>
+          Do you agree to these terms?
+        </p>
+
+      </div>
+      <div class="modal-footer">
+        <button id="disagree" type="button" class="btn btn-lg btn-default outline" data-dismiss="modal">I do not agree</button>
+        <button id="agree" type="button" class="btn btn-lg btn-primary outline">I agree</button>
+      </div>
     </div>
+  </div>
+</div>
+
+
+
+<div class="row">
+  <div class="col-xs-12">    
+    <div class="text-center" id="logo" style="font-size: 4.0em;padding-top: 50px;">Farmer's Cellar</div>    
   </div>
 </div>
 
@@ -17,9 +60,13 @@
 
 <div class="row" style="padding-top: 50px;">
 	<div class="col-xs-8 col-xs-offset-2 col-sm-4 col-sm-offset-4">
-		<%= form_tag pickups_path do %>
-			<%= number_field_tag :pickup_code, nil, class: 'input-lg fat-finger-spacing', placeholder: "Tap here to enter pickup code..." %>			
-			<%= submit_tag "Enter", class: 'btn btn-lg btn-primary outline form-control', data: { disable_with: "Please wait...sometimes slow! :(" } %>			
+		<%= form_tag pickups_path, id: "pinForm" do %>
+			<%= number_field_tag :pickup_code, nil, id: "pinField", class: 'input-lg fat-finger-spacing', placeholder: "Tap here to enter pickup code..." %>
 		<% end %>
+    <%= button_tag "Enter", class: 'btn btn-lg btn-primary outline btn-block', data: { 
+      disable_with: "Please wait...sometimes slow! :(",
+      toggle: "modal",
+      target: "#finePolicyModal"}
+    %>
 	</div>
 </div>

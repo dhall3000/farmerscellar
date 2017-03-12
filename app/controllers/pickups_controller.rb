@@ -116,7 +116,7 @@ class PickupsController < ApplicationController
             #we don't want to create a new pickup object every time someone logs in because we auto log folks out after 5 minutes of
             #inactivity so it's likely user will log in, open door, dink around inside dropsite for 10 minutes, then have
             #to log in to close the garage door. we don't want to create a pickup on this second log in.
-            if @user.pickups.where("created_at > ?", Time.zone.now - 60.minutes).order("pickups.id").last.nil?
+            if !@user.picked_up_within_last?(minutes = 60)
               #create a new pickup to represent the current pickup          
               @user.pickups.create
             end

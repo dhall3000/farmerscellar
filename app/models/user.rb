@@ -48,6 +48,10 @@ class User < ApplicationRecord
   #if this object is a distributor it might have many PRODUCERs
   has_many :producers, class_name: "User", foreign_key: "distributor_id"
 
+  def picked_up_within_last?(minutes)
+    return pickups.where("created_at > ?", Time.zone.now - minutes.minutes).order("pickups.id").last
+  end
+
   def postings_by_delivery_date(delivery_date)
 
     pdd = postings.where(delivery_date: delivery_date).distinct
