@@ -2,7 +2,7 @@ require 'test_helper'
 require 'utility/rake_helper'
 
 #def create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil)
-#def create_new_customer(name, email)
+#def create_new_customer(name = "bob", email = "bob@b.com")
 #def create_tote_item(customer, posting, quantity, frequency = nil, roll_until_filled = nil)
 #def create_one_time_authorization_for_customer(customer)
 #def create_rt_authorization_for_customer(customer)
