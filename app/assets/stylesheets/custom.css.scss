@@ -94,7 +94,7 @@ h1 {
 }
 
 h3 {
-  font-size: 1.2em;
+  font-size: 1.4em;
   letter-spacing: -1px;  
   font-weight: normal;
   color: $gray-light;
@@ -368,6 +368,7 @@ input {
 }
 
 a.non-blue { color: inherit; }
+non-blue { color: inherit; }
 
 .show-border-for-dev {
   border-style: solid;

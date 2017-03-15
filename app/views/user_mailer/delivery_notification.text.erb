@@ -1,36 +1,6 @@
-<% if !@all_items_fully_filled %>
-IMPORTANT MESSAGE!
-   -Not all of your orders were fully filled
-   -Please only pick up the quantity that was actually delivered for you
-   -You will only be charged for the quantity that was actually delivered
-----------------------------------------------------------------------------------------
-
-<% end %>
 Hello,
 
-This email is your Farmer's Cellar delivery notification.
-
-Here is the status of products you recently ordered that were set for delivery today:
 <% if @partner_name %>
-  <% products_delivered = true %>
-<% else %>
-  <% products_delivered = false %>
-<% end %>
-<% if @tote_items %>
-<% @tote_items.each do |tote_item| %>
-  <% status = "UNKNOWN" %>
-  <% if tote_item.state == ToteItem.states[:FILLED] %>
-    <% status = "DELIVERED" %>
-    <% products_delivered = true %>
-  <% elsif tote_item.state == ToteItem.states[:NOTFILLED] %>
-    <% status = "NOT DELIVERED" %>
-  <% end %>
-ID=<%= tote_item.id %>,Producer=<%= tote_item.posting.user.farm_name %>,Product=<%= tote_item.posting.product.name %>,Unit=<%= tote_item.posting.unit.name %>,Quantity Delivered=<%= tote_item.quantity_filled %>,Status=<%= status %>
----------------------------------------------------------------------------------
-<% end %>
-<% end %>
-
-<% if products_delivered == true %>
 Your products are available for you to pick up at your convenience. However, all products must be picked up by<%=@dropsite.next_food_clearout.strftime("%l%p on %A %B %d, %Y") %> according to our pickup deadline policy outlined here: <%= how_things_work_url(anchor: "pickup_deadline") %>
 
 First time user? Watch this to see what to expect at pickup: https://youtu.be/oE4D93bALnM
@@ -46,7 +16,7 @@ Your pickup code is: <%= @user.pickup_code.code %>
 <%= @dropsite.access_instructions %>
 <% end %>
 <% else %>
-Unfortunately we were unable to fill your order for today's delivery.
+Products have been delivered for you and are ready for pickup. See your products list here: <%= pickup_url %>
 <% end %>
 
 Thanks!

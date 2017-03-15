@@ -192,4 +192,43 @@ class PickupLoginTest < IntegrationHelper
 
   end
 
+  test "user should see clear messaging whenever not all items are fully filled" do
+
+    nuke_all_postings
+
+    producer = create_producer("producer", "producer@o.com")
+    posting_carrots = create_posting(producer, price = 1.50, product = products(:carrots))
+    posting_apples  = create_posting(producer, price = 2.50, product = products(:apples))
+
+    bob = create_user("bob", "bob@b.com")
+    bob.set_dropsite(Dropsite.first)    
+
+    ti_bob_carrots = create_tote_item(bob, posting_carrots, quantity = 6)    
+    ti_bob_apples  = create_tote_item(bob, posting_apples , quantity = 2)
+
+    create_one_time_authorization_for_customer(bob)
+
+    assert ti_bob_carrots.reload.state?(:AUTHORIZED)
+    assert ti_bob_apples.reload.state?(:AUTHORIZED)
+
+    travel_to posting_carrots.order_cutoff
+    RakeHelper.do_hourly_tasks
+
+    fully_fill_creditor_order(posting_carrots.creditor_order)
+
+    #both items should be fully filled as of now
+    assert_equal ti_bob_carrots.reload.quantity, ti_bob_carrots.quantity_filled
+    assert ti_bob_carrots.state?(:FILLED)
+    assert_equal ti_bob_apples.reload.quantity, ti_bob_apples.quantity_filled
+    assert ti_bob_apples.state?(:FILLED)
+
+    #now make the carrots not fully filled so we can proceed with our test
+    ti_bob_carrots.update(quantity_filled: 3)
+    assert_equal 3, ti_bob_carrots.quantity_filled
+    do_pickup_for(@dropsite_user, bob.reload)
+
+    travel_back
+
+  end
+
 end

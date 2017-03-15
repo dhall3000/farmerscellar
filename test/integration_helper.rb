@@ -234,6 +234,30 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
   def do_pickup_for(dropsite_user, pickup_user)
 
+    log_in_as(pickup_user)
+    get pickup_path
+    assert_response :success
+    assert_template 'tote_items/pickup'
+    tote_items = assigns(:tote_items)
+
+    if tote_items.any? && pickup_user.previous_pickup
+      assert_select 'p', "Last recorded pickup: #{pickup_user.previous_pickup.created_at.strftime("%A %B %d, %Y at %l:%M %p")}"
+    end
+
+    if all_items_fully_filled?(tote_items)
+      assert_select 'h2', {text: "Important Message!", count: 0}      
+    else
+      assert_select 'h2', "Important Message!"
+      #find an item that's not fully filled
+      not_fully_filled_item = tote_items.where("quantity_filled < quantity").first
+      assert_not not_fully_filled_item.nil?
+      assert_select 'strong.alert-danger', "Quantity Delivered: #{not_fully_filled_item.quantity_filled.to_s}"
+    end
+
+    if !tote_items.any?
+      assert_select 'p', "Currently there are zero products waiting for you at the dropsite for pickup."
+    end
+
     log_in_dropsite_user(dropsite_user)
     post pickups_path, params: {pickup_code: pickup_user.pickup_code.code}
     assert_response :success
@@ -1061,28 +1085,30 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
   def verify_proper_delivery_notification_email(mail, tote_item, all_tote_items_in_this_delivery_notification = nil)
 
     if tote_item.fully_filled? && all_tote_items_fully_filled?(all_tote_items_in_this_delivery_notification)
-      subject = "Delivery notification"
+      #subject = "Delivery notification"
     else
-      subject = "Important notice and delivery notification"
-    end    
+      #subject = "Important notice and delivery notification"
+    end 
+    #we implemented a 'ready for pickup' feature so no longer need this detail in delivery notification
+    subject = "Delivery notification"   
 
     email = tote_item.user.email
 
     assert_equal [email], mail.to
     assert_match subject, mail.subject
 
-    assert_match tote_item.quantity_filled.to_s, mail.body.encoded
+    #assert_match tote_item.quantity_filled.to_s, mail.body.encoded
 
     if (tote_item.fully_filled? || tote_item.partially_filled?) && tote_item.state?(:FILLED)
-      assert_match "DELIVERED", mail.body.encoded
+      #assert_match "DELIVERED", mail.body.encoded
     end
 
     if tote_item.zero_filled? && tote_item.state?(:NOTFILLED)
-      assert_match "NOT DELIVERED", mail.body.encoded
+      #assert_match "NOT DELIVERED", mail.body.encoded
     end
 
     if (tote_item.partially_filled? || tote_item.zero_filled?) && (tote_item.state?(:NOTFILLED) || tote_item.state?(:FILLED))
-      assert_match "Important Message!", mail.body.encoded      
+      #assert_match "Important Message!", mail.body.encoded      
     end
 
   end

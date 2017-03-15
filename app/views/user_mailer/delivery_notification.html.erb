@@ -1,70 +1,12 @@
-<% if !@all_items_fully_filled %>
-<h1>Important Message!</h1>
-<ol>
-  <li>Not all of your orders were fully filled</li>
-  <li><span style="background-color:yellow;"><u>Please only pick up the quantity that was actually delivered for you</u></span></li>
-  <li>You will only be charged for the quantity that was actually delivered</li>
-</ol>
-
-<p>----------------------------------------------------------------------------------------</p>
-<% end %>
 <p>
 Hello,
 </p>
 
-<p>
-This email is your Farmer's Cellar delivery notification.
-</p>
-
 <% if @partner_name %>
-  <% products_delivered = true %>
-<% else %>
-  <% products_delivered = false %>
-<% end %>
+  <p>
+  This email is your Farmer's Cellar delivery notification.
+  </p>
 
-<% if @tote_items %>
-  <table border="1">
-    <thead>
-      <tr>		    
-        <th align="left">ID</th>
-        <th align="left">Producer</th>
-        <th align="left">Product</th>
-        <th align="left">Unit</th>
-        <th align="center">Quantity Delivered</th>
-        <th align="center">Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @tote_items.each do |tote_item| %>
-        <tr>
-          <td align="left"><%= tote_item.id %></td>
-          <td align="left"><%= tote_item.posting.user.farm_name %></td>
-          <td align="left"><%= tote_item.posting.product.name %></td>
-          <td align="left"><%= tote_item.posting.unit.name %></td>
-
-          <% if tote_item.fully_filled? %>
-            <td align="center"><%= tote_item.quantity_filled %></td>
-          <% else %>
-            <td bgcolor="yellow" align="center"><%= tote_item.quantity_filled %></td>
-          <% end %>        
-
-          <td align="center">
-            <% if tote_item.state == ToteItem.states[:FILLED] %>
-              DELIVERED
-              <% products_delivered = true %>
-            <% elsif tote_item.state == ToteItem.states[:NOTFILLED] %>
-              NOT DELIVERED
-            <% else %>
-              UNKNOWN
-            <% end %>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-<% end %>
-
-<% if products_delivered == true %>
   <p>
     Your products are available for you to pick up at your convenience. However, all products must be picked up by <%= @dropsite.next_food_clearout.strftime("%l%p on %A %B %d, %Y") %> according to <%= link_to "our pickup deadline policy outlined here", how_things_work_url(anchor: "pickup_deadline") %>.
   </p>
@@ -83,8 +25,10 @@ This email is your Farmer's Cellar delivery notification.
     </p>
   <% end %>
 <% else %>
-<p>Unfortunately we were unable to fill your order for today's delivery.</p>
+  <!-- xunrfomunchfve this line needs to get changed if we ever go back to sending delivery notifications on a day when zero products were delivered -->
+  <p>Products have been delivered for you and are <%= link_to "ready for pickup", pickup_url %>.</p>
 <% end %>
+
 <p>
 Thanks!
 </p>

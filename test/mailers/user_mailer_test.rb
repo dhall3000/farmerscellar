@@ -52,11 +52,7 @@ class UserMailerTest < ActionMailer::TestCase
     assert_equal [user.email], mail.to
     assert_equal ["david@farmerscellar.com"], mail.from
 
-    assert_match basil.unit.name, mail.body.encoded
-    assert_match basil.user.farm_name, mail.body.encoded
-
-    assert_match avocado.unit.name, mail.body.encoded
-    assert_match avocado.user.farm_name, mail.body.encoded
+    assert_match "Products have been delivered for you and are", mail.body.encoded
     
   end
 
@@ -83,15 +79,21 @@ class UserMailerTest < ActionMailer::TestCase
 
     mail = UserMailer.delivery_notification(user, dropsite, tote_items)
 
-    assert_equal "Important notice and delivery notification", mail.subject
+    #assert_equal "Important notice and delivery notification", mail.subject
+    #the above line is what it used to be. but then we implemented the pickup list feature so we'll warn users there about 'important message'.
+    #also, even if they don't view the online pickup list they'll be confronted with it when they access the kiosk and hopefully see the 'alert-danger's 
+    #on the less-than-fully-filled items
+    assert_equal "Delivery notification", mail.subject
+
     assert_equal [user.email], mail.to
     assert_equal ["david@farmerscellar.com"], mail.from
 
-    assert_match basil.unit.name, mail.body.encoded
-    assert_match basil.user.farm_name, mail.body.encoded
-
-    assert_match avocado.unit.name, mail.body.encoded
-    assert_match avocado.user.farm_name, mail.body.encoded
+    #we now use an online pickup list so this is no longer relevant
+    #assert_match basil.unit.name, mail.body.encoded
+    #assert_match basil.user.farm_name, mail.body.encoded
+    #assert_match avocado.unit.name, mail.body.encoded
+    #assert_match avocado.user.farm_name, mail.body.encoded
+    assert_match "Products have been delivered for you and are", mail.body.encoded
     
   end
 

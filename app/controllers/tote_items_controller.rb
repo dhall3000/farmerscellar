@@ -1,7 +1,29 @@
 class ToteItemsController < ApplicationController
 
   before_action :correct_user,   only: [:destroy, :pout]
-  before_action :logged_in_user, only: [:index, :create, :destroy, :pout]
+  before_action :logged_in_user
+
+  def pickup
+
+    if Rails.env.development?
+      if current_user.tote_items.where(state: ToteItem.states[:FILLED]).count == 0
+        ToteItem.create(user: current_user, price: Posting.first.price, posting: Posting.first, quantity: 1, quantity_filled: 1, state: ToteItem.states[:FILLED])
+        ToteItem.create(user: current_user, price: Posting.second.price, posting: Posting.second, quantity: 2, quantity_filled: 1, state: ToteItem.states[:FILLED])
+        ToteItem.create(user: current_user, price: Posting.third.price, posting: Posting.third, quantity: 3, quantity_filled: 0, state: ToteItem.states[:NOTFILLED])
+        ToteItem.create(user: current_user, price: Posting.fourth.price, posting: Posting.fourth, quantity: 1, quantity_filled: 1, state: ToteItem.states[:FILLED])
+        ToteItem.create(user: current_user, price: Posting.fifth.price, posting: Posting.fifth, quantity: 1, quantity_filled: 1, state: ToteItem.states[:FILLED])
+      end
+
+      if !current_user.dropsites.any?        
+        current_user.set_dropsite(Dropsite.first)
+      end
+
+      @tote_items = current_user.tote_items.includes(:posting).last(5)
+    else
+      @tote_items = current_user.tote_items_to_pickup
+    end
+    
+  end
 
   def index
 

@@ -60,16 +60,11 @@ class UserMailer < ApplicationMailer
     @dropsite = dropsite
     @tote_items = tote_items
     @partner_name = partner_name
-    @all_items_fully_filled = all_items_fully_filled?(tote_items)
-
+    
     if partner_name
       subject = partner_name + " delivery notification"
     else
-      if @all_items_fully_filled
-        subject = "Delivery notification"
-      else
-        subject = "Important notice and delivery notification"
-      end
+      subject = "Delivery notification"
     end
 
     mail to: user.email, subject: subject

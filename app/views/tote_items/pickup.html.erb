@@ -1,0 +1,102 @@
+<h1>Ready for Pickup</h1>
+
+<% if @tote_items && @tote_items.any? %>
+  <div class="row">
+    <div class="col-xs-12 col-sm-offset-4 col-sm-4">
+      <% next_food_clearout = current_user.dropsite.next_food_clearout %>
+      <% if all_items_fully_filled?(@tote_items) %>
+        <div class="row">
+          <div class="col-xs-12 col-sm-offset-4 col-sm-4 fat-finger-spacing">
+            <h3>Pickup deadline</h3>            
+            <span><%= "#{next_food_clearout.strftime("%A %B")} #{next_food_clearout.day.ordinalize} at #{next_food_clearout.strftime("%l%p")}" %></span>
+          </div>
+        </div>
+      <% else %>
+        <h2>Important Message!</h2>
+        <ol>
+          <li>Not all of your orders were fully filled</li>
+          <li><span class="alert-danger">Only take the quantity delivered</span></li>
+          <li>Pickup deadline: <%= "#{next_food_clearout.strftime("%A %B")} #{next_food_clearout.day.ordinalize} at #{next_food_clearout.strftime("%l%p")}" %></li>
+        </ol>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-12 col-sm-offset-4 col-sm-4 fat-finger-spacing">
+      <% if current_user.dropsite %>
+        <div>
+          <button class="btn btn-lg btn-primary outline" data-toggle="collapse" data-target="#dropsiteAccessInfo">See dropsite access info</button>
+        </div>              
+        <div id="dropsiteAccessInfo" class="collapse">
+
+          <p>PIN code: <%= current_user.pickup_code.code %></p>
+
+          <% if current_user.previous_pickup %>            
+            <p>Last recorded pickup: <%= current_user.previous_pickup.created_at.strftime("%A %B %d, %Y at %l:%M %p") %></p>  
+          <% end %>
+
+          <p>
+          <span><%= current_user.dropsite.name %></span><br>            
+          <% address_link = "https://www.google.com/maps/place/" + (current_user.dropsite.address + " " + current_user.dropsite.city + " " + current_user.dropsite.state + " " + current_user.dropsite.zip.to_s).gsub(' ', '+') %>
+          <a target="blank" href="<%= address_link %>">
+              <%= current_user.dropsite.address %> <%= current_user.dropsite.city %>, <%= current_user.dropsite.state %> <%= current_user.dropsite.zip.to_s %>
+            </a><br>
+          </p>
+
+          <p>Hours: <%= current_user.dropsite.hours %></p>
+                      
+          <% if current_user.dropsite.access_instructions != nil %>
+            <p>
+              <%= current_user.dropsite.access_instructions %>
+            </p>
+          <% end %>
+          <p>First time user? Watch <%= link_to "this", "https://youtu.be/oE4D93bALnM", target: false %> to see what to expect at pickup.</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+  
+  <div class="row">
+    <% @tote_items.each do |tote_item| %>
+      <div class="col-xs-6 col-sm-3">
+        <%= link_to tote_item.posting, class: "thumbnail" do %>
+          <%
+          if tote_item.posting.delivery_date == Time.zone.now.midnight
+            delivery_date_text = "Today"
+          elsif tote_item.posting.delivery_date == Time.zone.now.midnight - 1.day
+            delivery_date_text = "Yesterday"
+          else
+            delivery_date_text = "#{tote_item.posting.delivery_date.strftime("%a %b")} #{tote_item.posting.delivery_date.day.ordinalize}"
+          end
+          %>
+          <div>
+            <span style="color: black;"><%= delivery_date_text %></span>
+          </div>
+          <div class="truncated-text-line producer-name-font">
+            <%= tote_item.posting.user.farm_name %>
+          </div>
+          <div class="truncated-text-line producer-name-font">
+            <%= tote_item.posting.product.name %>
+          </div>
+          <% if tote_item.posting.uploads.count > 0 %>        
+            <%= image_tag "#{tote_item.posting.uploads.first.file_name.square}", class: "img-responsive" %>
+          <% elsif (upload = Upload.find_by(title: NOPRODUCTIMAGETITLE)) %>
+            <%= image_tag upload.file_name.square, class: "img-responsive" %>
+          <% end %>          
+          <div class="caption">
+            <div>
+              <% if tote_item.quantity_filled == tote_item.quantity %>
+                <strong>Quantity Delivered: <%= "#{tote_item.quantity_filled}" %></strong>
+              <% else %>
+                <strong class="alert-danger">Quantity Delivered: <%= "#{tote_item.quantity_filled}" %></strong>
+              <% end %>              
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <p>Currently there are zero products waiting for you at the dropsite for pickup.</p>
+<% end %>
