@@ -5,12 +5,10 @@
     <div class="col-xs-12 col-sm-offset-4 col-sm-4">
       <% next_food_clearout = current_user.dropsite.next_food_clearout %>
       <% if all_items_fully_filled?(@tote_items) %>
-        <div class="row">
-          <div class="col-xs-12 col-sm-offset-4 col-sm-4 fat-finger-spacing">
+
             <h3>Pickup deadline</h3>            
             <span><%= "#{next_food_clearout.strftime("%A %B")} #{next_food_clearout.day.ordinalize} at #{next_food_clearout.strftime("%l%p")}" %></span>
-          </div>
-        </div>
+
       <% else %>
         <h2>Important Message!</h2>
         <ol>
@@ -51,7 +49,9 @@
               <%= current_user.dropsite.access_instructions %>
             </p>
           <% end %>
-          <p>First time user? Watch <%= link_to "this", "https://youtu.be/oE4D93bALnM", target: false %> to see what to expect at pickup.</p>
+          <% if current_user.pickups.count == 0 %>
+            <p>First time user? Watch <%= link_to "this", "https://youtu.be/oE4D93bALnM", target: false %> to see what to expect at pickup.</p>
+          <% end %>
         </div>
       <% end %>
     </div>
@@ -98,5 +98,5 @@
     <% end %>
   </div>
 <% else %>
-  <p>Currently there are zero products waiting for you at the dropsite for pickup.</p>
+  <p class="text-center">Currently there are zero products waiting for you at the dropsite for pickup.</p>
 <% end %>
