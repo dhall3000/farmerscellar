@@ -9,6 +9,14 @@
 <div class="row">
 	<div class="col-sm-8 col-sm-offset-2">
 
+    <% if !all_items_fully_filled?(@tote_items) %>
+      <h2>Important Message!</h2>
+      <ol>
+        <li>Not all of your orders were fully filled</li>
+        <li><span class="alert-danger">Only take the <strong>Quantity Delivered</strong></span></li>
+      </ol>
+    <% end %>
+
     <h2>Account</h2>
     <% if @user.producer? && @user.get_business_interface && !@user.get_business_interface.name.blank? %>
       <p>Hello <%= @user.get_business_interface.name %></p>
@@ -34,44 +42,7 @@
 
     <h2>Your recently delivered products</h2>
     <% if @tote_items.any? %>      
-      <table class="table">
-        <thead>
-          <tr>
-            <th class="text-center"></th>
-            <th class="text-center">Producer</th>
-            <th class="text-center">Product</th>
-            <th class="text-center">Quantity Delivered</th>
-          </tr>
-        </thead>
-        <tbody>
-
-          <% @tote_items.each do |tote_item| %>        
-            <tr>                  
-              <td><%= image_tag "/favicon-32.png" %></td>
-              <td class="text-center"><%= tote_item.posting.user.farm_name %></td>
-              <td class="text-center"><%= tote_item.posting.product.name %></td>
-
-              <% if tote_item.quantity_filled > 0 && tote_item.quantity_filled < tote_item.quantity %>
-                <td class="text-center">
-                  <div class="alert alert-danger">
-                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> <%= pluralize(tote_item.quantity_filled, tote_item.posting.unit.name) %>. We couldn't fully fill this order.
-                  </div>
-                </td>
-              <% elsif tote_item.quantity_filled == 0 || tote_item.state?(:NOTFILLED) %>
-                <td class="text-center">
-                  <div class="alert alert-danger">
-                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> <%= pluralize(tote_item.quantity_filled, tote_item.posting.unit.name) %>. We couldn't fill this order.
-                  </div>
-                </td>
-              <% else %>
-                <td class="text-center"><%= pluralize(tote_item.quantity_filled, tote_item.posting.unit.name) %></td>
-              <% end %>
-              
-            </tr>        
-          <% end %>
-
-        </tbody>
-      </table>            
+      <%= render partial: 'shared/pickup_list', locals: { link_to_posting: false, tote_items: @tote_items } %>
     <% end %>
 
 

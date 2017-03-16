@@ -1,0 +1,52 @@
+<%
+  link_to_posting = local_assigns[:link_to_posting]
+  tote_items = local_assigns[:tote_items]
+%>
+
+<div class="row">
+  <% tote_items.each do |tote_item| %>
+    <div class="col-xs-6 col-sm-3">
+      <% link = link_to_posting ? tote_item.posting : '#' %>
+      <%= link_to link, class: "thumbnail" do %>
+        <%
+        if tote_item.posting.delivery_date == Time.zone.now.midnight
+          delivery_date_text = "Today"
+        elsif tote_item.posting.delivery_date == Time.zone.now.midnight - 1.day
+          delivery_date_text = "Yesterday"
+        else
+          delivery_date_text = "#{tote_item.posting.delivery_date.strftime("%a %b")} #{tote_item.posting.delivery_date.day.ordinalize}"
+        end
+        %>
+        <div>
+          <span style="color: black;"><%= delivery_date_text %></span>
+        </div>
+        <div class="truncated-text-line producer-name-font">
+          <%= tote_item.posting.user.farm_name %>
+        </div>
+        <div class="truncated-text-line producer-name-font">
+          <%= tote_item.posting.product.name %>
+        </div>
+        <% if tote_item.posting.uploads.count > 0 %>        
+          <%= image_tag "#{tote_item.posting.uploads.first.file_name.square}", class: "img-responsive" %>
+        <% elsif (upload = Upload.find_by(title: NOPRODUCTIMAGETITLE)) %>
+          <%= image_tag upload.file_name.square, class: "img-responsive" %>
+        <% end %>          
+        <div class="caption">
+          <div>
+            <% quantity_delivered = "Quantity Delivered: #{pluralize(tote_item.quantity_filled, tote_item.posting.unit.name)}" %>
+
+            <% if tote_item.fully_filled? %>
+              <div style="padding: 10px;">
+                <strong><%= quantity_delivered %></strong>
+              </div>
+            <% else %>
+              <div style="padding: 10px;" class="alert-danger">
+                <strong><%= quantity_delivered %></strong>
+              </div>            
+            <% end %>              
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

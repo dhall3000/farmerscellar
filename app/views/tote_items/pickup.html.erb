@@ -3,18 +3,26 @@
 <% if @tote_items && @tote_items.any? %>
   <div class="row">
     <div class="col-xs-12 col-sm-offset-4 col-sm-4">
-      <% next_food_clearout = current_user.dropsite.next_food_clearout %>
+      <%
+      next_food_clearout = current_user.dropsite.next_food_clearout
+      next_food_clearout_midnight = next_food_clearout.midnight
+      if Time.zone.now.midnight == next_food_clearout_midnight
+        next_food_clearout = "Today at #{next_food_clearout.strftime("%l%p")}"
+      elsif Time.zone.now.midnight + 1.day == next_food_clearout_midnight
+        next_food_clearout = "Tomorrow at #{next_food_clearout.strftime("%l%p")}"
+      else
+        next_food_clearout = "#{next_food_clearout.strftime("%A %B")} #{next_food_clearout.day.ordinalize} at #{next_food_clearout.strftime("%l%p")}"
+      end
+      %>
       <% if all_items_fully_filled?(@tote_items) %>
-
-            <h3>Pickup deadline</h3>            
-            <span><%= "#{next_food_clearout.strftime("%A %B")} #{next_food_clearout.day.ordinalize} at #{next_food_clearout.strftime("%l%p")}" %></span>
-
+        <h3>Pickup deadline</h3>            
+        <span id="pickupDeadline"><%= next_food_clearout %></span>
       <% else %>
         <h2>Important Message!</h2>
         <ol>
           <li>Not all of your orders were fully filled</li>
-          <li><span class="alert-danger">Only take the quantity delivered</span></li>
-          <li>Pickup deadline: <%= "#{next_food_clearout.strftime("%A %B")} #{next_food_clearout.day.ordinalize} at #{next_food_clearout.strftime("%l%p")}" %></li>
+          <li><span class="alert-danger">Only take the <strong>Quantity Delivered</strong></span></li>
+          <li id="pickupDeadline">Pickup deadline: <%= next_food_clearout %></li>
         </ol>
       <% end %>
     </div>
@@ -57,46 +65,8 @@
     </div>
   </div>
   
-  <div class="row">
-    <% @tote_items.each do |tote_item| %>
-      <div class="col-xs-6 col-sm-3">
-        <%= link_to tote_item.posting, class: "thumbnail" do %>
-          <%
-          if tote_item.posting.delivery_date == Time.zone.now.midnight
-            delivery_date_text = "Today"
-          elsif tote_item.posting.delivery_date == Time.zone.now.midnight - 1.day
-            delivery_date_text = "Yesterday"
-          else
-            delivery_date_text = "#{tote_item.posting.delivery_date.strftime("%a %b")} #{tote_item.posting.delivery_date.day.ordinalize}"
-          end
-          %>
-          <div>
-            <span style="color: black;"><%= delivery_date_text %></span>
-          </div>
-          <div class="truncated-text-line producer-name-font">
-            <%= tote_item.posting.user.farm_name %>
-          </div>
-          <div class="truncated-text-line producer-name-font">
-            <%= tote_item.posting.product.name %>
-          </div>
-          <% if tote_item.posting.uploads.count > 0 %>        
-            <%= image_tag "#{tote_item.posting.uploads.first.file_name.square}", class: "img-responsive" %>
-          <% elsif (upload = Upload.find_by(title: NOPRODUCTIMAGETITLE)) %>
-            <%= image_tag upload.file_name.square, class: "img-responsive" %>
-          <% end %>          
-          <div class="caption">
-            <div>
-              <% if tote_item.quantity_filled == tote_item.quantity %>
-                <strong>Quantity Delivered: <%= "#{tote_item.quantity_filled}" %></strong>
-              <% else %>
-                <strong class="alert-danger">Quantity Delivered: <%= "#{tote_item.quantity_filled}" %></strong>
-              <% end %>              
-            </div>
-          </div>
-        <% end %>
-      </div>
-    <% end %>
-  </div>
+  <%= render partial: 'shared/pickup_list', locals: { link_to_posting: true, tote_items: @tote_items } %>
+
 <% else %>
   <p class="text-center">Currently there are zero products waiting for you at the dropsite for pickup.</p>
 <% end %>
