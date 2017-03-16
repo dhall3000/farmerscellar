@@ -3,79 +3,58 @@
 <% if (@open_orders.nil? || !@open_orders.any?) && (@closed_orders.nil? || !@closed_orders.any?)  %>
   <p class="text-center">There are no CreditorOrders to view</p>
 <% else %>
-  <div class="panel-group">
-
     <% if @open_orders && @open_orders.any? %>
 
-      <div class="panel panel-default">        
-        <div class="panel-heading">
-          <h2>Open Orders</h2>
+      <h2>Open Orders</h2>
+
+      <div class="row">
+        <div class="col-xs-12 col-sm-3">
+          <% @open_orders.each do |co| %>
+            <%= link_to creditor_order_path(co), class: "thumbnail" do %>
+              <div class="caption">
+                <h3>Creditor</h3>
+                <p><%= co.business_interface.name %></p>
+
+                <h3>Order Value (producer net)</h3>
+                <p><%= number_to_currency(co.order_value_producer_net) %></p>
+
+                <h3>Balance</h3>
+                <p><%= number_to_currency(co.balance.to_f) %></p>
+
+                <h3>Payment Type</h3>
+                <p><%= co.business_interface.friendly_payment_description %></p>
+
+                <h3>Delivery Date</h3>                
+                <p><%= co.delivery_date.strftime("%A %B %d, %Y") %></p>
+              </div>
+            <% end %>
+          <% end %>
         </div>
-        <div class="panel-body">
-          <table class="table">
-            <thead>
-              <tr>          
-                <th class="text-left">Creditor</th>          
-                <th class="text-center">Order Value (producer net)</th>
-                <th class="text-center">Payment Type</th>
-                <th class="text-center">Balance</th>
-                <th class="text-center">Delivery Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @open_orders.each do |co| %>
-                <tr>
-                  <td class="text-left">
-                    <%= link_to co.business_interface.name, creditor_order_path(co) %>
-                  </td>
-                  <td class="text-center"><%= number_to_currency(co.order_value_producer_net) %></td>
-                  <td class="text-center"><%= co.business_interface.friendly_payment_description %></td>
-                  <td class="text-center"><%= number_to_currency(co.balance.to_f) %></td>
-                  <td class="text-center">
-                    <%= co.delivery_date.strftime("%A %B %d, %Y") %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        </div>
-      </div>
+      </div>      
 
     <% end %>
 
     <% if @closed_orders && @closed_orders.any? %>
 
-      <div class="panel panel-default">        
-        <div class="panel-heading">
-          <h2>Closed Orders</h2>
-        </div>
-        <div class="panel-body">          
-          <table class="table">
-            <thead>
-              <tr>          
-                <th class="text-left">Creditor</th>
-                <th class="text-center">Order Value (producer net)</th>
-                <th class="text-center">Delivery Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @closed_orders.each do |co| %>
-                <tr>
-                  <td class="text-left">
-                    <%= link_to co.business_interface.name, creditor_order_path(co) %>
-                  </td>
-                  <td class="text-center"><%= number_to_currency(co.order_value_producer_net) %></td>
-                  <td class="text-center">                
-                    <%= co.delivery_date.strftime("%A %B %d, %Y") %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <h2>Closed Orders</h2>
+      <div class="row">
+        <div class="col-xs-12 col-sm-3">
+          <% @closed_orders.each do |co| %>
+            <%= link_to creditor_order_path(co), class: "thumbnail" do %>
+              <div class="caption">
+                <h3>Creditor</h3>
+                <p><%= co.business_interface.name %></p>
 
-    <% end %>
+                <h3>Order Value (producer net)</h3>
+                <p><%= number_to_currency(co.order_value_producer_net) %></p>                
 
-  </div>
+                <h3>Delivery Date</h3>                
+                <p><%= co.delivery_date.strftime("%A %B %d, %Y") %></p>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      </div>      
+
+    <% end %>  
 <% end %>
