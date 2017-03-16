@@ -24,8 +24,8 @@ class PaymentMethodsTest < IntegrationHelper
     get creditor_order_path(creditor_order)
     assert_response :success
     assert_template 'creditor_orders/show'
-    assert_select 'td.text-left', "OPEN"
-    assert_select 'td.text-left', number_to_currency(0)
+    assert_select 'p', "OPEN"
+    assert_select 'p', number_to_currency(0)
     #go to payment#new
     get new_payment_path
     assert_response :success
@@ -78,17 +78,17 @@ class PaymentMethodsTest < IntegrationHelper
     assert_template 'creditor_orders/index'    
     #verify this corder displays
     assert_select 'h2', "Open Orders"
-    assert_select 'td.text-center', "Cash on delivery"
+    assert_select 'p', "Cash on delivery"
     #verify the business name shows up
-    assert_select 'a[href=?]', creditor_order_path(creditor_order), creditor_order.business_interface.name
+    assert_select 'a[href=?].thumbnail', creditor_order_path(creditor_order)
     #verify this corder has positive balance
-    assert_select 'td.text-center', number_to_currency(creditor_order.balance)
+    assert_select 'p', number_to_currency(creditor_order.balance)
     #go to creditororder#show
     get creditor_order_path(creditor_order)
     assert_response :success
     assert_template 'creditor_orders/show'
-    assert_select 'td.text-left', "OPEN"
-    assert_select 'td.text-left', number_to_currency(creditor_order.balance)
+    assert_select 'p', "OPEN"
+    assert_select 'p', number_to_currency(creditor_order.balance)
     #go to payment#new
     get new_payment_path
     assert_response :success
@@ -109,7 +109,7 @@ class PaymentMethodsTest < IntegrationHelper
     assert_not pp.fully_paid
 
     #verify balance displays
-    assert_select 'td.text-left', number_to_currency(creditor_order.reload.balance)
+    assert_select 'p', number_to_currency(creditor_order.reload.balance)
     #verify balance is a third what it was but still positive
     assert creditor_order.balance > 0
     #the new balance should be 2/3 the old balance
@@ -121,9 +121,9 @@ class PaymentMethodsTest < IntegrationHelper
     assert_redirected_to creditor_order_path(creditor_order)
     follow_redirect!
     #verify balance displays zero
-    assert_select 'td.text-left', number_to_currency(0)
+    assert_select 'p', number_to_currency(0)
     #verify state displays CLOSED
-    assert_select 'td.text-left', "CLOSED"
+    assert_select 'p', "CLOSED"
 
     #verify that the previously partially paid pp is now fully paid
     assert pp.reload.amount > 0

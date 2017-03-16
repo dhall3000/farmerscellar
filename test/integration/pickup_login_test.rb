@@ -213,7 +213,6 @@ class PickupLoginTest < IntegrationHelper
 
     travel_to posting_carrots.order_cutoff
     RakeHelper.do_hourly_tasks
-
     fully_fill_creditor_order(posting_carrots.creditor_order)
 
     #both items should be fully filled as of now
@@ -225,6 +224,8 @@ class PickupLoginTest < IntegrationHelper
     #now make the carrots not fully filled so we can proceed with our test
     ti_bob_carrots.update(quantity_filled: 3)
     assert_equal 3, ti_bob_carrots.quantity_filled
+    assert ti_bob_carrots.partially_filled?
+
     do_pickup_for(@dropsite_user, bob.reload)
 
     travel_back

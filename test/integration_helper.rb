@@ -10,6 +10,7 @@ require 'utility/rake_helper'
 #def create_payment_full_balance(creditor_order)
 
 class IntegrationHelper < ActionDispatch::IntegrationTest
+  include ActionView::Helpers::TextHelper
 
   def remove_tote_item(tote_item)
     
@@ -65,12 +66,12 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     end
 
     assert_select 'h2', open_or_closed
-    assert_select 'td.text-center', creditor_order.business_interface.friendly_payment_description
+    assert_select 'p', creditor_order.business_interface.friendly_payment_description
 
     #verify the business name shows up
-    assert_select 'a[href=?]', creditor_order_path(creditor_order), creditor_order.business_interface.name
+    assert_select 'a[href=?].thumbnail', creditor_order_path(creditor_order)
     #verify the balance shows up
-    assert_select 'td.text-center', number_to_currency(creditor_order.balance)
+    assert_select 'p', number_to_currency(creditor_order.balance)
     
   end
 
@@ -128,9 +129,9 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
       assert_redirected_to creditor_order_path(creditor_order)
       follow_redirect!
       #verify balance displays
-      assert_select 'td.text-left', number_to_currency(creditor_order.balance)
+      assert_select 'p', number_to_currency(creditor_order.balance)
       #verify the state displays
-      assert_select 'td.text-left', creditor_order.state_key.to_s
+      assert_select 'p', creditor_order.state_key.to_s
       #verify balance reflects new payment
       assert_equal (prior_balance - amount).round(2), creditor_order.balance
       #verify creditor_order object now holds a reference to 1 more payment
@@ -251,7 +252,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
       #find an item that's not fully filled
       not_fully_filled_item = tote_items.where("quantity_filled < quantity").first
       assert_not not_fully_filled_item.nil?
-      assert_select 'strong.alert-danger', "Quantity Delivered: #{not_fully_filled_item.quantity_filled.to_s}"
+      assert_select 'div.alert-danger', "Quantity Delivered: #{pluralize(not_fully_filled_item.quantity_filled, not_fully_filled_item.posting.unit.name)}"      
     end
 
     if !tote_items.any?

@@ -1,136 +1,119 @@
 <h1>Creditor Order</h1>
 
-<%= link_to "Creditor Orders", creditor_orders_path %>
-<div class="panel-group">
+<div class="row">  
+  <div class="col-xs-12">
+    <%= link_to "Creditor Orders", creditor_orders_path %>
+  </div>
+</div>
 
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h2>Vitals</h2>
-    </div>
-    <div class="panel-body">            
-      <table class="table">
-        <tbody>
-          <tr>
-            <td class="text-left">Creditor</td>
-            <td class="text-left"><%= @creditor_order.business_interface.name %></td>
-          </tr>
-          <tr>
-            <td class="text-left">CreditorOrder ID</td>
-            <td class="text-left"><%= @creditor_order.id.to_s %></td>
-          </tr>
-          <tr>
-            <td class="text-left">CreditorOrder State</td>
-            <td class="text-left"><%= @creditor_order.state_key.to_s %></td>
-          </tr>
-          <tr>
-            <td class="text-left">Delivery date</td>
-            <td class="text-left"><%= @creditor_order.delivery_date.strftime("%A %B %d, %Y") %></td>
-          </tr>
-        </tbody>
-      </table>
+<div class="row">
+
+  <div class="col-xs-12 col-sm-3">    
+    <h2>Vitals</h2>
+    <div class="thumbnail">
+      <div class="caption">
+        <h3>Creditor</h3>
+        <p><%= @creditor_order.business_interface.name %></p>
+        <h3>CreditorOrder ID</h3>
+        <p><%= @creditor_order.id.to_s %></p>
+        <h3>CreditorOrder State</h3>
+        <p><%= @creditor_order.state_key.to_s %></p>
+        <h3>Delivery date</h3>
+        <p><%= @creditor_order.delivery_date.strftime("%A %B %d, %Y") %></p>
+      </div>
     </div>
   </div>
 
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h2>Funds</h2>
-    </div>
-    <div class="panel-body">
-
-      <table class="table">
-        <tbody>
-
-          <tr>
-            <td class="text-left">Order Value (producer net)</td>
-            <td class="text-left"><%= number_to_currency(@creditor_order.order_value_producer_net) %></td>
-          </tr>
-
-          <tr>
-            <td class="text-left">Payment Payables Sum</td>
-            <td class="text-left"><%= number_to_currency(@payment_payables_sum) %></td>
-          </tr>
-
-          <tr>
-            <td class="text-left">Payments Sum</td>
-            <td class="text-left"><%= number_to_currency(@payments_sum) %></td>
-          </tr>
-
-          <tr>
-            <td class="text-left">Balance</td>
-            <td class="text-left"><%= number_to_currency(@creditor_order.balance) %></td>
-          </tr>
-
-          <tr>
-            <td class="text-left">Payment Type</td>
-            <td class="text-left"><%= @creditor_order.business_interface.friendly_payment_description %></td>
-          </tr>
-
-        </tbody>
-      </table>
-
-
-
-      <%= link_to "New payment", new_payment_path(creditor_order_id: @creditor_order.id), class: "btn btn-primary outline btn-lg pull-right" %>
-
+  <div class="col-xs-12 col-sm-3">
+    <h2>Funds</h2>
+    <div class="thumbnail">
+      <div class="caption">
+        <h3>Order Value (producer net)</h3>
+        <p><%= number_to_currency(@creditor_order.order_value_producer_net) %></p>
+        <h3>Payment Payables Sum</h3>
+        <p><%= number_to_currency(@payment_payables_sum) %></p>
+        <h3>Payments Sum</h3>
+        <p><%= number_to_currency(@payments_sum) %></p>
+        <h3>Balance</h3>
+        <p><%= number_to_currency(@creditor_order.balance) %></p>
+        <h3>Payment Type</h3>
+        <p><%= @creditor_order.business_interface.friendly_payment_description %></p>    
+      </div>
     </div>
   </div>
 
+</div>
 
+<div class="row">  
+  <div class="col-xs-12">
+    <%= link_to "New payment", new_payment_path(creditor_order_id: @creditor_order.id), class: "btn btn-primary outline btn-lg" %>
+  </div>
+</div>
 
+<div class="row">  
+  <div class="col-xs-12">
+    <h2>Postings</h2>
+  </div>
+</div>
 
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h2>Postings</h2>      
-    </div>
-    <div class="panel-body">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <% if @creditor_order.creditor.distributor? %>
-              <th>Producer</th>
-            <% end %>
-            <th>Product</th>
-            <th class="text-center">Product ID Code</th>
-            <th>Unit</th>        
-            <th class="text-center">Units Ordered</th>            
-            <th>Case Size</th>
-            <th>Cases Ordered</th>        
-            <th class="text-center">Units Filled</th>
-          </tr>
-        </thead>
+<div class="row">  
+  <% @creditor_order.postings.joins(:user).order("users.farm_name").each do |posting| %>
+    <div class="col-xs-12 col-sm-3">
+      <div class="thumbnail">
+        <div class="caption">
+          <h3>ID</h3>
+          <p><%= posting.id.to_s %></p>
 
-        <tbody>
-          <% @creditor_order.postings.joins(:user).order("users.farm_name").each do |posting| %>
-            <tr>
-              <td><%= posting.id.to_s %></td>
-              <% if @creditor_order.creditor.distributor? %>
-                <td><%= posting.user.farm_name %></td>
-              <% end %>
-              <td><%= posting.product.name %></td>
-              <td class="text-center"><%= posting.product_id_code %></td>
-              <td><%= posting.unit.name %></td>
-              <td class="text-center"><%= posting.total_quantity_ordered_from_creditor %></td>              
-              <%
-              if posting.units_per_case.nil? || posting.units_per_case < 2
-                units_per_case = nil
-                num_cases_ordered = nil
-              else
-                units_per_case = posting.units_per_case.to_s
-                num_cases_ordered = posting.inbound_num_cases_ordered.to_s
-              end
-              %>
-              <td><%= units_per_case %></td>
-              <td><%= num_cases_ordered %></td>                    
-              <td class="text-center"><%= posting.num_units_filled %></td>
-            </tr>
+          <% if @creditor_order.creditor.distributor? %>            
+            <h3>Producer</h3>
+            <p><%= posting.user.farm_name %></p>
           <% end %>
-        </tbody>
-        
-      </table>
-      <%= link_to "Enter fills", edit_creditor_order_path(@creditor_order), class: "btn btn-primary outline btn-lg pull-right" %>
+
+          <h3>Product</h3>
+          <p><%= posting.product.name %></p>
+
+          <% if posting.product_id_code %>
+            <h3>Product ID Code</h3>
+            <p><%= posting.product_id_code %></p>
+          <% end %>
+
+          <h3>Unit</h3>
+          <p><%= posting.unit.name %></p>
+
+          <h3>Units Ordered</h3>
+          <p><%= posting.total_quantity_ordered_from_creditor %></p>
+
+          <%
+          if posting.units_per_case.nil? || posting.units_per_case < 2
+            units_per_case = nil
+            num_cases_ordered = nil
+          else
+            units_per_case = posting.units_per_case.to_s
+            num_cases_ordered = posting.inbound_num_cases_ordered.to_s
+          end
+          %>
+
+          <% if units_per_case %>
+            <h3>Case Size</h3>
+            <p><%= units_per_case %></p>
+          <% end %>
+
+          <% if num_cases_ordered %>
+            <h3>Cases Ordered</h3>
+            <p><%= num_cases_ordered %></p>
+          <% end %>
+
+          <h3>Units Filled</h3>
+          <p><%= posting.num_units_filled %></p>          
+
+        </div>
+      </div>      
     </div>
+  <% end %>
+</div>
+
+<div class="row">  
+  <div class="col-xs-12">
+    <%= link_to "Enter fills", edit_creditor_order_path(@creditor_order), class: "btn btn-primary outline btn-lg" %>
   </div>
-
-
 </div>

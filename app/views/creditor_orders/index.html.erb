@@ -7,9 +7,9 @@
 
       <h2>Open Orders</h2>
 
-      <div class="row">
-        <div class="col-xs-12 col-sm-3">
-          <% @open_orders.each do |co| %>
+      <div class="row">        
+        <% @open_orders.each do |co| %>
+          <div class="col-xs-12 col-sm-3">            
             <%= link_to creditor_order_path(co), class: "thumbnail" do %>
               <div class="caption">
                 <h3>Creditor</h3>
@@ -28,8 +28,9 @@
                 <p><%= co.delivery_date.strftime("%A %B %d, %Y") %></p>
               </div>
             <% end %>
-          <% end %>
-        </div>
+          </div>
+        <% end %>
+        
       </div>      
 
     <% end %>
@@ -37,9 +38,9 @@
     <% if @closed_orders && @closed_orders.any? %>
 
       <h2>Closed Orders</h2>
-      <div class="row">
-        <div class="col-xs-12 col-sm-3">
-          <% @closed_orders.each do |co| %>
+      <div class="row">        
+        <% @closed_orders.each do |co| %>
+          <div class="col-xs-12 col-sm-3">
             <%= link_to creditor_order_path(co), class: "thumbnail" do %>
               <div class="caption">
                 <h3>Creditor</h3>
@@ -52,8 +53,8 @@
                 <p><%= co.delivery_date.strftime("%A %B %d, %Y") %></p>
               </div>
             <% end %>
-          <% end %>
-        </div>
+          </div>
+        <% end %>        
       </div>      
 
     <% end %>  
