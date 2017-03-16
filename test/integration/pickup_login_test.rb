@@ -232,4 +232,7 @@ class PickupLoginTest < IntegrationHelper
 
   end
 
+  test "pickup list should say deadline is tomorrow or today appropriately" do
+  end
+
 end

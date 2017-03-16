@@ -1,0 +1,68 @@
+<%
+show_fills_input = local_assigns[:show_fills_input]
+creditor_order = local_assigns[:creditor_order]
+%>
+
+<div class="row">  
+  <% creditor_order.postings.joins(:user).order("users.farm_name").each do |posting| %>
+    <div class="col-xs-12 col-sm-3">
+      <div class="thumbnail">
+        <div class="caption">
+          <%
+          producer = creditor_order.creditor.distributor? ? "#{posting.user.farm_name} " : ""
+          %>
+          <h3><%= "#{producer}#{posting.product.name} #{posting.unit.name.pluralize}" %></h3>
+
+          <% if show_fills_input %>
+            <%= hidden_field_tag "fills[][posting_id]", posting.id.to_s %>
+            <%= number_field_tag "fills[][quantity]", posting.num_units_unfilled, class: "input-lg" %>            
+          <% else %>
+            <p><%= posting.num_units_unfilled.to_s %></p>
+          <% end %>
+          
+          <div data-toggle="collapse" data-target="#posting<%= posting.id.to_s %>Details">
+            <p>More details <span id="posting<%= posting.id.to_s %>DetailsChevron" class="glyphicon glyphicon-chevron-down pull-right"></span></p>
+          </div>
+
+          <div id="posting<%= posting.id.to_s %>Details" class="collapse" data-chevron="#posting<%= posting.id.to_s %>DetailsChevron">            
+
+            <span>Posting ID</span>
+            <p><%= posting.id.to_s %></p>
+
+            <% if posting.product_id_code %>
+              <span>Product ID Code</span>
+              <p><%= posting.product_id_code %></p>
+            <% end %>
+
+            <%
+            if posting.units_per_case.nil? || posting.units_per_case < 2
+              units_per_case = nil
+              num_cases_ordered = nil
+            else
+              units_per_case = posting.units_per_case.to_s
+              num_cases_ordered = posting.inbound_num_cases_ordered.to_s
+            end
+            %>
+
+            <% if units_per_case %>
+              <span>Case Size</span>
+              <p><%= units_per_case %></p>
+            <% end %>
+
+            <% if num_cases_ordered %>
+              <span>Cases Ordered</span>
+              <p><%= num_cases_ordered %></p>
+            <% end %>
+
+            <span>Units Ordered</span>
+            <p><%= posting.total_quantity_ordered_from_creditor %></p>
+
+            <span>Units Filled</span>
+            <p><%= posting.num_units_filled %></p>
+
+          </div>
+        </div>
+      </div>      
+    </div>
+  <% end %>
+</div>

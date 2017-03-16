@@ -241,8 +241,19 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     assert_template 'tote_items/pickup'
     tote_items = assigns(:tote_items)
 
-    if tote_items.any? && pickup_user.previous_pickup
-      assert_select 'p', "Last recorded pickup: #{pickup_user.previous_pickup.created_at.strftime("%A %B %d, %Y at %l:%M %p")}"
+    if tote_items.any?
+
+if false
+      if (Time.zone.now + 1.day).wday == STARTOFWEEK
+        assert_select '#pickupDeadline', "Pickup deadline: Tomorrow at "
+      elsif (Time.zone.now).wday == STARTOFWEEK
+      else
+      end
+end      
+
+      if pickup_user.previous_pickup
+        assert_select 'p', "Last recorded pickup: #{pickup_user.previous_pickup.created_at.strftime("%A %B %d, %Y at %l:%M %p")}"
+      end
     end
 
     if all_items_fully_filled?(tote_items)
@@ -251,8 +262,8 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
       assert_select 'h2', "Important Message!"
       #find an item that's not fully filled
       not_fully_filled_item = tote_items.where("quantity_filled < quantity").first
-      assert_not not_fully_filled_item.nil?
-      assert_select 'div.alert-danger', "Quantity Delivered: #{pluralize(not_fully_filled_item.quantity_filled, not_fully_filled_item.posting.unit.name)}"      
+      assert_not not_fully_filled_item.nil?      
+      assert_select 'div.alert-danger strong', "Quantity Delivered: #{pluralize(not_fully_filled_item.quantity_filled, not_fully_filled_item.posting.unit.name)}"      
     end
 
     if !tote_items.any?
