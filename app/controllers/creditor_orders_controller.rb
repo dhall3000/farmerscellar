@@ -3,7 +3,7 @@ class CreditorOrdersController < ApplicationController
   before_action :get_creditor_order, only: [:show, :edit]
 
   def index
-    @open_orders = CreditorOrder.joins(creditor: :business_interface).where(state: CreditorOrder.state(:OPEN)).order("business_interfaces.name").order(delivery_date: :asc)
+    @open_orders = CreditorOrder.joins(creditor: :business_interface).where(state: CreditorOrder.state(:OPEN)).order(delivery_date: :asc).order("business_interfaces.name")
     @closed_orders = CreditorOrder.joins(:postings).distinct.where(state: CreditorOrder.state(:CLOSED)).where("postings.delivery_date > ?", Time.zone.now.midnight - 8.weeks).order(delivery_date: :desc)
   end
 
