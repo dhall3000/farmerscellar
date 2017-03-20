@@ -1,52 +1,60 @@
 <div class="row">
-  <div class="col-xs-12">
-    <div  data-toggle="collapse" data-target="#headerContent">
-      <div class="text-center" id="logo" style="font-size: 4.0em;padding-top: 20px;">Farmer's Cellar</div>
-    </div>
+  <div class="col-xs-12">    
+    <div class="text-center" id="logo" style="font-size: 4.0em;padding-top: 20px;">Farmer's Cellar</div>    
   </div>
 </div>
 
+
+<h1>Ready for Pickup</h1>
+
+
 <div class="row">
-	<div class="col-sm-8 col-sm-offset-2">
+  <div class="col-sm-8 col-sm-offset-2">
+    <%
+    if @user.producer? && @user.get_business_interface && !@user.get_business_interface.name.blank?
+      identifier = @user.get_business_interface.name
+    else
+      identifier = @user.email
+    end
+    %>
 
-    <% if !all_items_fully_filled?(@tote_items) %>
-      <h2>Important Message!</h2>
-      <ol>
-        <li>Not all of your orders were fully filled</li>
-        <li><span class="alert-danger">Only take the <strong>Quantity Delivered</strong></span></li>
-      </ol>
-    <% end %>
+    <p>Hello <%= identifier %></p>
+  </div>
+</div>
 
-    <h2>Account</h2>
-    <% if @user.producer? && @user.get_business_interface && !@user.get_business_interface.name.blank? %>
-      <p>Hello <%= @user.get_business_interface.name %></p>
-    <% else %>
-      <p><%= @user.email %></p>
-      <% if @previous_pickup_time %>
-        <p>Last pickup was <%= @previous_pickup_time.strftime("%A %B %d, %Y at %l:%M %p") %></p>
-      <% end %>            
-    <% end %>
 
-    <% if @closed %>
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h2 class="panel-title alert alert-danger">Attention!</h2>
-        </div>          
-        <div class="panel-body">
-          <p>City of Kirkland's rule is that <span class="alert alert-danger">all pickups must be between 8AM - 8PM</span>.</p>
-          <p>Go ahead and get your products now but in the future please try to pickup within those hours.</p>
-          <p>Thanks!</p>
-        </div>        
+<div class="row">
+  <div class="col-sm-8 col-sm-offset-2">
+    <% if @closed %>      
+      <h2 class="alert alert-danger">Attention!</h2>             
+      <div>
+        <p>City of Kirkland's rule is that <span class="alert alert-danger">all pickups must be between 8AM - 8PM</span>.</p>
+        <p>Go ahead and get your products now but in the future please try to pickup within those hours.</p>
+        <p>Thanks!</p>
       </div>
     <% end %>
-
-    <h2>Your recently delivered products</h2>
-    <% if @tote_items.any? %>      
-      <%= render partial: 'shared/pickup_list', locals: { link_to_posting: false, tote_items: @tote_items } %>
-    <% end %>
+  </div>
+</div>
 
 
-    <h2 >Action</h2>
+<% if !all_items_fully_filled?(@tote_items) %>
+  <div class="row">
+    <div class="col-sm-8 col-sm-offset-2">    
+      <div class="quantity-delivered alert alert-danger">Only take <strong>Quantity Delivered</strong></div>          
+    </div>
+  </div>
+<% end %>
+
+
+<% if @tote_items.any? %>
+  <%= render partial: 'shared/pickup_list', locals: { link_to_posting: false, tote_items: @tote_items } %>
+<% else %>    
+  <h2>You don't have any products ready for pickup</h2>
+<% end %> 
+
+
+<div class="row">
+  <div class="col-sm-8 col-sm-offset-2">
     <%= form_tag pickups_toggle_garage_door_path do %>
       
       <% if @mockup_mode %>
@@ -59,6 +67,5 @@
     <% end %>
 
     <%= link_to "Log out", new_pickup_path, class: 'btn btn-lg btn-primary outline btn-block fat-finger-spacing', data: { disable_with: "Please wait..." } %>
-
-	</div>
+  </div>
 </div>
