@@ -368,7 +368,8 @@ input {
 }
 
 a.non-blue { color: inherit; }
-non-blue { color: inherit; }
+.non-blue { color: inherit; }
+.black {color: black;}
 
 .show-border-for-dev {
   border-style: solid;

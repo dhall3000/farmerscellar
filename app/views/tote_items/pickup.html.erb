@@ -1,40 +1,28 @@
 <h1>Ready for Pickup</h1>
 
 <% if @tote_items && @tote_items.any? %>
-  <div class="row">
-    <div class="col-xs-12 col-sm-offset-4 col-sm-4">
-      <%
-      next_food_clearout = current_user.dropsite.next_food_clearout
-      next_food_clearout_midnight = next_food_clearout.midnight
-      if Time.zone.now.midnight == next_food_clearout_midnight
-        next_food_clearout = "Today at #{next_food_clearout.strftime("%l%p")}"
-      elsif Time.zone.now.midnight + 1.day == next_food_clearout_midnight
-        next_food_clearout = "Tomorrow at #{next_food_clearout.strftime("%l%p")}"
-      else
-        next_food_clearout = "#{next_food_clearout.strftime("%A %B")} #{next_food_clearout.day.ordinalize} at #{next_food_clearout.strftime("%l%p")}"
-      end
-      %>
-      <% if all_items_fully_filled?(@tote_items) %>
-        <h3>Pickup deadline</h3>            
-        <span id="pickupDeadline"><%= next_food_clearout %></span>
-      <% else %>
-        <h2>Important Message!</h2>
-        <ol>
-          <li>Not all of your orders were fully filled</li>
-          <li><span class="alert-danger">Only take the <strong>Quantity Delivered</strong></span></li>
-          <li id="pickupDeadline">Pickup deadline: <%= next_food_clearout %></li>
-        </ol>
-      <% end %>
-    </div>
-  </div>
 
   <div class="row">
     <div class="col-xs-12 col-sm-offset-4 col-sm-4 fat-finger-spacing">
       <% if current_user.dropsite %>
         <div>
-          <button class="btn btn-lg btn-primary outline" data-toggle="collapse" data-target="#dropsiteAccessInfo">See dropsite access info</button>
-        </div>              
-        <div id="dropsiteAccessInfo" class="collapse">
+          <h3 data-toggle="collapse" data-target="#dropsiteAccessInfo">Dropsite Access Info<span id="dropsiteAccessInfoChevron" class="glyphicon glyphicon-chevron-down pull-right"></span></h3>
+        </div>
+        <div id="dropsiteAccessInfo" class="collapse" data-chevron="#dropsiteAccessInfoChevron">
+
+          <%
+          next_food_clearout = current_user.dropsite.next_food_clearout
+          next_food_clearout_midnight = next_food_clearout.midnight
+          if Time.zone.now.midnight == next_food_clearout_midnight
+            next_food_clearout = "Today at #{next_food_clearout.strftime("%l%p")}"
+          elsif Time.zone.now.midnight + 1.day == next_food_clearout_midnight
+            next_food_clearout = "Tomorrow at #{next_food_clearout.strftime("%l%p")}"
+          else
+            next_food_clearout = "#{next_food_clearout.strftime("%A %B")} #{next_food_clearout.day.ordinalize} at #{next_food_clearout.strftime("%l%p")}"
+          end
+          %>
+
+          <p>Pickup deadline: <%= next_food_clearout %></p>
 
           <p>PIN code: <%= current_user.pickup_code.code %></p>
 
@@ -61,6 +49,14 @@
             <p>First time user? Watch <%= link_to "this", "https://youtu.be/oE4D93bALnM", target: false %> to see what to expect at pickup.</p>
           <% end %>
         </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-12 col-sm-offset-4 col-sm-4">
+      <% if !all_items_fully_filled?(@tote_items) %>
+        <div class="text-center alert alert-danger">Only take <strong>Quantity Delivered</strong></div>      
       <% end %>
     </div>
   </div>
