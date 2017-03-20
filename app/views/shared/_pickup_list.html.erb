@@ -9,18 +9,8 @@
       <% link = link_to_posting ? tote_item.posting : '#' %>
       <%= link_to link, class: "thumbnail" do %>
 
-        <div>
-          <% quantity_delivered = "Quantity Delivered: #{pluralize(tote_item.quantity_filled, tote_item.posting.unit.name)}" %>
-
-          <% if tote_item.fully_filled? %>
-            <div style="padding: 5px; margin-bottom: 5px;" class="black">
-              <strong><%= quantity_delivered %></strong>
-            </div>
-          <% else %>
-            <div style="padding: 5px; margin-bottom: 5px;" class="alert alert-danger">
-              <strong><%= quantity_delivered %></strong>
-            </div>            
-          <% end %>              
+        <div class="quantity-delivered <%= tote_item.fully_filled? ? "black" : "alert alert-danger" %>">          
+          <%= "#{pluralize(tote_item.quantity_filled, tote_item.posting.unit.name)}" %>
         </div>
 
         <% if tote_item.posting.uploads.count > 0 %>        
