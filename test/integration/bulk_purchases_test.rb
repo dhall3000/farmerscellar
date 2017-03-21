@@ -138,7 +138,7 @@ class BulkPurchasesTest < BulkBuyer
 
   end
 
-  test "pickups should notify user of partially and zero filled items" do    
+  test "pickups should notify user of partially filled items" do    
     do_bulk_buy
     do_delivery
 
@@ -150,8 +150,10 @@ class BulkPurchasesTest < BulkBuyer
     log_in_as(users(:dropsite1))    
     #scab in some tote items that aren't fully filled
     posting = @c1.tote_items_to_pickup.first.posting
-    assert ToteItem.create(quantity: 5, quantity_filled: 3, price: posting.price, posting: posting, user: @c1, state: ToteItem.states[:FILLED])
-    assert ToteItem.create(quantity: 5, price: posting.price, posting: posting, user: @c1, state: ToteItem.states[:NOTFILLED])
+    ti_partial = ToteItem.create(quantity: 5, quantity_filled: 3, price: posting.price, posting: posting, user: @c1, state: ToteItem.states[:FILLED])
+    assert ti_partial
+    ti_zero = ToteItem.create(quantity: 5, price: posting.price, posting: posting, user: @c1, state: ToteItem.states[:NOTFILLED])
+    assert ti_zero
     #user enters their pickup code at kiosk
     post pickups_path, params: {pickup_code: @c1.pickup_code.code}
     assert_response :success
@@ -159,6 +161,7 @@ class BulkPurchasesTest < BulkBuyer
     assert_template 'pickups/create'    
     #verify that the un-fully filled items exist in the tote_items object
     tote_items = assigns(:tote_items)
+
     partially_filled_found = false
     not_filled_found = false
     tote_items.each do |ti|
@@ -170,13 +173,15 @@ class BulkPurchasesTest < BulkBuyer
       end
     end
     assert partially_filled_found
-    assert not_filled_found
+    assert_not not_filled_found
 
     #verify a message is displayed notifying user of partially filled item
-    assert_select 'div.quantity-delivered.alert.alert-danger', count: 1, text: "3 Wholes"
+    ti_partial.reload
+    assert_select 'div.quantity-delivered.alert.alert-danger', "#{pluralize(ti_partial.quantity_filled, ti_partial.posting.unit.name)}"
     #verify a message is displayed notifying user of not filled item
-    assert_select 'div.quantity-delivered.alert.alert-danger', text: "0 Wholes"
-
+    ti_zero.reload
+    assert_select 'div.quantity-delivered.alert.alert-danger', {count: 0, text: "#{pluralize(ti_zero.quantity_filled, ti_zero.posting.unit.name)}"}
+    
     #the rest of this test is superfluous to the intent of this test. it's just an artifact of copy/pasting test "do pickups" do
     #as a starting point for this test. leaving it in, whatever...
 
@@ -191,7 +196,7 @@ class BulkPurchasesTest < BulkBuyer
     num_items_second_pickup_count = @c1.tote_items_to_pickup.count
     assert num_items_second_pickup_count > 0
     #compare this remaining-to-pick-up number to the number already picked up to the total number of items
-    assert_equal @c1.tote_items.count, num_items_first_pickup_count + num_items_second_pickup_count
+    assert_equal @c1.tote_items.count, num_items_first_pickup_count + num_items_second_pickup_count + @c1.tote_items.where(state: ToteItem.states[:NOTFILLED]).count
     #jump forward 7 days from now
     travel_to Time.zone.now + 7.days
     #hit c1's model object for the number of items remaining to pick up

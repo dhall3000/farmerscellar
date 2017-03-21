@@ -232,6 +232,43 @@ class PickupLoginTest < IntegrationHelper
 
   end
 
+  test "zero filled items should not show up in the ready for pickup list or on the kiosk display" do
+
+    nuke_all_postings
+    posting1 = create_posting(farmer = nil, price = 1.04, product = Product.create(name: "Product1"), unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = 1)
+    posting2 = create_posting(farmer = posting1.user, price = 1.04, product = Product.create(name: "Product2"), unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 10, product_id_code = nil, producer_net_unit = 1)
+
+    assert_equal posting1.order_cutoff, posting2.order_cutoff
+    assert_equal posting1.delivery_date, posting2.delivery_date
+
+    bob = create_user("bob", "bob@b.com")
+    bob.set_dropsite(Dropsite.first)    
+
+    ti_posting1 = create_tote_item(bob, posting1, quantity = 2)    
+    ti_posting2 = create_tote_item(bob, posting2, quantity = 2)
+
+    create_one_time_authorization_for_customer(bob)
+
+    assert ti_posting1.reload.state?(:AUTHORIZED)
+    assert ti_posting2.reload.state?(:AUTHORIZED)
+
+    travel_to posting1.order_cutoff
+    RakeHelper.do_hourly_tasks
+
+    assert ti_posting1.reload.state?(:COMMITTED)
+    assert ti_posting2.reload.state?(:NOTFILLED)
+
+    fully_fill_creditor_order(posting1.creditor_order)
+
+    assert ti_posting1.reload.state?(:FILLED)
+
+    do_pickup_for(@dropsite_user, bob.reload)
+
+    travel_back
+
+
+  end
+
   test "pickup list should say deadline is tomorrow or today appropriately" do
   end
 

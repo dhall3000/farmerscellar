@@ -319,7 +319,7 @@ class User < ApplicationRecord
     #there is a private method called 'cutoff' and i don't want to get mixed up with that so just stick an 'x' on it and call it good    
     xcutoff = [previous_pickup_time, dropsite.last_food_clearout].max
 
-    return tote_items.joins(:posting).where("postings.delivery_date > ? and postings.delivery_date < ?", xcutoff, Time.zone.now).where(state: [ToteItem.states[:FILLED], ToteItem.states[:NOTFILLED]])
+    return tote_items.joins(:posting).where("postings.delivery_date > ? and postings.delivery_date < ?", xcutoff, Time.zone.now).where(state: ToteItem.states[:FILLED]).joins(:posting).order("postings.delivery_date desc")
 
   end
 
