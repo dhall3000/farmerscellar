@@ -260,7 +260,7 @@ end
       assert_select 'h2', {text: "Important Message!", count: 0}      
     else
 
-      assert_select 'div.quantity-delivered.alert.alert-danger', "Only take Quantity Delivered"
+      assert_select 'div.quantity-delivered.alert.alert-danger', "Only take quantity delivered"
       #find an item that's not fully filled
       not_fully_filled_item = tote_items.where("quantity_filled < quantity").first
       assert_not not_fully_filled_item.nil?      
