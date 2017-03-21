@@ -259,11 +259,13 @@ end
     if all_items_fully_filled?(tote_items)
       assert_select 'h2', {text: "Important Message!", count: 0}      
     else
-      assert_select 'h2', "Important Message!"
+
+      assert_select 'div.quantity-delivered.alert.alert-danger', "Only take Quantity Delivered"
       #find an item that's not fully filled
       not_fully_filled_item = tote_items.where("quantity_filled < quantity").first
       assert_not not_fully_filled_item.nil?      
-      assert_select 'div.alert-danger strong', "Quantity Delivered: #{pluralize(not_fully_filled_item.quantity_filled, not_fully_filled_item.posting.unit.name)}"      
+      assert_select 'div.quantity-delivered.alert.alert-danger', "#{pluralize(not_fully_filled_item.quantity_filled, not_fully_filled_item.posting.unit.name)}"
+      
     end
 
     if !tote_items.any?

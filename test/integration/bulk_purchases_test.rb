@@ -171,10 +171,11 @@ class BulkPurchasesTest < BulkBuyer
     end
     assert partially_filled_found
     assert not_filled_found
+
     #verify a message is displayed notifying user of partially filled item
-    assert_select 'div.alert-danger strong', count: 1, text: "Quantity Delivered: 3 Wholes"
+    assert_select 'div.quantity-delivered.alert.alert-danger', count: 1, text: "3 Wholes"
     #verify a message is displayed notifying user of not filled item
-    assert_select 'div.alert-danger strong', text: "Quantity Delivered: 0 Wholes"
+    assert_select 'div.quantity-delivered.alert.alert-danger', text: "0 Wholes"
 
     #the rest of this test is superfluous to the intent of this test. it's just an artifact of copy/pasting test "do pickups" do
     #as a starting point for this test. leaving it in, whatever...
