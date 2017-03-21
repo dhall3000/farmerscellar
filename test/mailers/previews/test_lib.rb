@@ -486,6 +486,20 @@ module TestLib
 
   end
 
+  def get_next_wday_after(wday, days_from_now)
+
+    dfn = days_from_now
+    count = 0
+    date = nil
+
+    while (date = get_delivery_date(dfn + count)).wday != wday
+      count += 1
+    end
+
+    return date    
+
+  end
+
   #days_from_now can be any integer, positive, zero or negative
   def get_delivery_date(days_from_now)
 

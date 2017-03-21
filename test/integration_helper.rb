@@ -258,6 +258,7 @@ end
 
     if all_items_fully_filled?(tote_items)
       assert_select 'div.quantity-delivered.alert.alert-danger', {text: "Only take quantity delivered", count: 0}
+      assert_select 'alert-danger', count: 0
     else
 
       assert_select 'div.quantity-delivered.alert.alert-danger', "Only take quantity delivered"
@@ -286,6 +287,8 @@ end
     else
       assert_template 'pickups/new'
     end    
+
+    log_out_dropsite_user
     
     return tote_items
 
@@ -358,7 +361,7 @@ end
     
     assert creditor_order
     assert creditor_order.postings
-    
+ 
     log_in_as_admin
     
     get creditor_order_path(creditor_order)
