@@ -72,13 +72,13 @@
         <hr class="header-section-divider" />
 
         <div class="left-most-header-link header-link">
-          <%= link_to "Settings", edit_user_path(current_user), class: "non-blue" %>
+          <%= link_to "Account", user_path(current_user), class: "non-blue" %>
         </div>
 
         <div class="left-most-header-link header-link">
-          <%= link_to "Info", user_path(current_user), class: "non-blue" %>
+          <%= link_to "Settings", edit_user_path(current_user), class: "non-blue" %>
         </div>
-        
+       
         <% if current_user.account_type_is?(:PRODUCER) %>
           <div class="left-most-header-link header-link">
             <%= link_to "Create new posting", new_posting_path, class: "non-blue" %>

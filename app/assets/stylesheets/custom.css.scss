@@ -14,6 +14,23 @@ $fc-primary-color: #AACB4F;
   box-sizing:         border-box;
 }
 
+.pagination > .pagination a {
+    color: $fc-primary-color;
+}
+
+.pagination > .pagination a:hover {
+    color: $fc-primary-color;
+}
+
+.pagination > .pagination > li.active > a {
+    color: white;
+}
+
+div.pagination > ul.pagination > li.active > a {
+    background-color: $fc-primary-color;
+    border-color: $fc-primary-color;
+}
+
 .quantity-delivered {
   font-weight: 900;
   font-size: 2em;

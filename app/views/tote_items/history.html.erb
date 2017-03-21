@@ -1,0 +1,45 @@
+<h1>Tote Items History</h1>
+
+<!-- producer, product, unit, unit price, quantity ordered, quantity filled, delivery date, item amount authorizated, item amount charged, photo -->
+
+<% if @tote_items && @tote_items.any? %>
+  <div class="row">
+    <div class="col-xs-12">
+      <%= will_paginate @tote_items, inner_window: 1, outer_window: 0 %>
+    </div>
+  </div>
+
+  <div class="row">
+    <% @tote_items.each do |tote_item| %>
+      <div class="col-xs-12 col-sm-4">
+        <div class="thumbnail">
+          <div class="caption"><%= "#{tote_item.posting.user.farm_name} #{tote_item.posting.product.name}, #{tote_item.posting.unit.name}" %></div>
+
+          <% if tote_item.posting.uploads.count > 0 %>        
+            <%= image_tag "#{tote_item.posting.uploads.first.file_name.square}", class: "img-responsive" %>
+          <% elsif (upload = Upload.find_by(title: NOPRODUCTIMAGETITLE)) %>
+            <%= image_tag upload.file_name.square, class: "img-responsive" %>
+          <% end %>
+
+          <div class="caption">
+            <div>Unit Price: <%= number_to_currency(tote_item.price) %></div>
+            <div>Quantity Ordered: <%= tote_item.quantity %></div>
+            <div>Quantity Filled: <%= tote_item.quantity_filled %></div>
+            <div>Delivery Date: <%= tote_item.posting.delivery_date.strftime("%B #{tote_item.posting.delivery_date.day.ordinalize}, %Y") %></div>
+            <div>Amount Ordered: <%= number_to_currency(get_gross_item(tote_item, filled = false)) %></div>
+            <div>Amount Charged: <%= number_to_currency(get_gross_item(tote_item, filled = true)) %></div>
+          </div>
+        </div>
+      </div>
+    <% end %>    
+  </div>
+
+  <div class="row">
+    <div class="col-xs-12">
+      <%= will_paginate @tote_items, inner_window: 1, outer_window: 0 %>
+    </div>
+  </div>
+
+<% else %>
+  <p class="text-center">You have zero past tote items.</p>
+<% end %>
