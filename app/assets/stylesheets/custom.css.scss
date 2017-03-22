@@ -14,6 +14,12 @@ $fc-primary-color: #AACB4F;
   box-sizing:         border-box;
 }
 
+.horizontal-scroller {
+  width: 150px;
+  height: 250px;
+  display: inline-block;  
+}
+
 .pagination > .pagination a {
     color: $fc-primary-color;
 }
@@ -399,6 +405,22 @@ a.non-blue { color: inherit; }
 .show-border-for-dev {
   border-style: solid;
   border-width: 1px;
+}
+
+.gentle-flash {
+  animation: gentle-flash-animation 2s infinite forwards;
+}
+
+@keyframes gentle-flash-animation {
+  0% {  
+  opacity: 1.0;
+  }
+  50% {  
+  opacity: 0.5;
+  }  
+  100% {
+  opacity: 1.0;
+  }
 }
 
 #delivery-date-range-selection-got-it {

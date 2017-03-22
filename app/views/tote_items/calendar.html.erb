@@ -1,0 +1,49 @@
+<h1>Orders Calendar</h1>
+
+<div class="row">
+  <div class="col-xs-12">
+
+
+    <div style="white-space: nowrap; overflow: auto;">
+      <% if @tote_items && @tote_items.any? %>
+
+        <%= link_to '#', class: "black" do %>
+          <div class="thumbnail horizontal-scroller">        
+            <div class="text-right" style="padding-bottom: 10px;">
+              <% date = @tote_items.first.posting.delivery_date %>
+              <%= "#{date.strftime("%A, %B")} #{date.day.ordinalize}" %>
+            </div>            
+            <ul>
+              <%
+              max_count = 8
+              count = 0
+              @tote_items.each do |tote_item|
+              %>
+                <%
+                if count > max_count
+                  next
+                end
+                %>
+                <li>
+                  <%= tote_item.posting.product.name %>
+                  <% if tote_item.additional_units_required_to_fill_my_case > 0 || tote_item.posting.biggest_order_minimum_producer_net_outstanding > 0 %>
+                    <span class="gentle-flash alert-danger glyphicon glyphicon-exclamation-sign"></span>
+                  <% end %>
+                </li>
+                <% if count == max_count %>
+                  <li><%= link_to "See more", '#' %></li>
+                <% end %>
+              <%
+                count += 1
+              end
+              %>              
+            </ul>            
+          </div>
+        <% end %>
+
+      <% end %>      
+    </div>
+
+
+  </div>
+</div>

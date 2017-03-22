@@ -41,6 +41,14 @@ class ToteItemsController < ApplicationController
       end
     end
 
+    if params[:calendar]
+      @tote_items = current_user.tote_items.joins(:posting).where("postings.delivery_date > ?", current_user.pickup_items_start).where("tote_items.state" => [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED], ToteItem.states[:FILLED]]).order("postings.delivery_date")
+      @calendar_state = @tote_items.first.posting.delivery_date
+      @calendar_end = @tote_items.last.posting.delivery_date
+      render 'tote_items/calendar'
+      return
+    end
+
     @rtba = current_user.get_active_rtba
     @items_total_gross = 0    
     template = ''

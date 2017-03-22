@@ -44,7 +44,7 @@
 
 
         <div class="left-most-header-link header-link">
-          <%= link_to tote_items_path(orders: true), class: "non-blue" do %>                
+          <%= link_to tote_items_path(calendar: 1), class: "non-blue" do %>                
 
             <%
               num_order_objects = num_order_objects(current_user)
@@ -55,8 +55,8 @@
               end
             %>
 
-            <span class="glyphicon glyphicon glyphicon-list-alt"></span><span class="header-object-count"> <%= num_order_objects %></span>
-            <span> Orders</span>
+            <span class="glyphicon glyphicon glyphicon-calendar"></span><span class="header-object-count"> <%= num_order_objects %></span>
+            <span> Orders calendar</span>
 
           <% end %>
         </div>
