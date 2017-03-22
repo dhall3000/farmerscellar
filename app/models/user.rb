@@ -248,11 +248,11 @@ class User < ApplicationRecord
   end
 
   def filled_items_at_dropsite
-    return tote_items.joins(:posting).where("postings.delivery_date > ? and tote_items.state = ?", cutoff, ToteItem.states[:FILLED]).order("postings.delivery_date")
+    return tote_items.joins(:posting).where("postings.delivery_date > ? and tote_items.state = ?", pickup_items_start, ToteItem.states[:FILLED]).order("postings.delivery_date")
   end
 
   def partner_deliveries_at_dropsite
-    return partner_deliveries.where("created_at > ?", cutoff)
+    return partner_deliveries.where("created_at > ?", pickup_items_start)
   end
 
   def producer?
@@ -315,11 +315,10 @@ class User < ApplicationRecord
     else
       previous_pickup_time = dropsite.last_food_clearout
     end
+    
+    cutoff = [previous_pickup_time, dropsite.last_food_clearout].max
 
-    #there is a private method called 'cutoff' and i don't want to get mixed up with that so just stick an 'x' on it and call it good    
-    xcutoff = [previous_pickup_time, dropsite.last_food_clearout].max
-
-    return tote_items.joins(:posting).where("postings.delivery_date > ? and postings.delivery_date < ?", xcutoff, Time.zone.now).where(state: ToteItem.states[:FILLED]).joins(:posting).order("postings.delivery_date desc")
+    return tote_items.joins(:posting).where("postings.delivery_date > ? and postings.delivery_date < ?", cutoff, Time.zone.now).where(state: ToteItem.states[:FILLED]).order("postings.delivery_date desc")
 
   end
 
@@ -503,20 +502,20 @@ class User < ApplicationRecord
     url = website
     return /^http/i.match(url) ? url : "http://#{url}"
   end
+
+  def pickup_items_start
+    
+    if pickups.any?
+      #we want what's most recent, user's last pickup or the last food clearout
+      return [pickups.last.created_at, dropsite.last_food_clearout].max
+    else
+      #user's never picked up before so just get the latest food clearout
+      return dropsite.last_food_clearout
+    end
+
+  end
   
   private
-
-    def cutoff
-      
-      if pickups.any?
-        #we want what's most recent, user's last pickup or the last food clearout
-        return [pickups.last.created_at, dropsite.last_food_clearout].max
-      else
-        #user's never picked up before so just get the latest food clearout
-        return dropsite.last_food_clearout
-      end
-
-    end
 
     # Converts email to all lower-case.
     def downcase_email
