@@ -1,5 +1,20 @@
 module ToteItemsHelper
 
+  def pickup_range_for(datetime)
+
+    start_time = start_of_next_week(datetime) - 6.days
+    end_time = start_of_next_week(datetime) - 6.days
+
+    while end_time.wday != FOODCLEAROUTDAYTIME[:wday].to_i
+      end_time += 1.day
+    end
+
+    end_time += FOODCLEAROUTDAYTIME[:hour].to_i.hours
+
+    return [start_time, end_time]
+
+  end
+
   def food_category_path_helper(food_category)
     if food_category
       postings_path(food_category: food_category.name)

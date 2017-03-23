@@ -430,6 +430,8 @@ module TestLib
       assert user.valid?
     end
 
+    user.set_dropsite(Dropsite.first)
+
     return user
 
   end

@@ -17,7 +17,8 @@ $fc-primary-color: #AACB4F;
 .horizontal-scroller {
   width: 150px;
   height: 250px;
-  display: inline-block;  
+  display: inline-block;
+  vertical-align: top;
 }
 
 .pagination > .pagination a {

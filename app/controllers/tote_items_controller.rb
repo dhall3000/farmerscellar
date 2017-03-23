@@ -42,9 +42,30 @@ class ToteItemsController < ApplicationController
     end
 
     if params[:calendar]
-      @tote_items = current_user.tote_items.joins(:posting).where("postings.delivery_date > ?", current_user.pickup_items_start).where("tote_items.state" => [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED], ToteItem.states[:FILLED]]).order("postings.delivery_date")
-      @calendar_state = @tote_items.first.posting.delivery_date
-      @calendar_end = @tote_items.last.posting.delivery_date
+
+      @tote_items_by_week = []
+      tote_items = current_user.tote_items.joins(:posting).where("postings.delivery_date > ?", current_user.pickup_items_start).where("tote_items.state" => [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED], ToteItem.states[:FILLED]]).order("postings.delivery_date asc")
+
+      if tote_items.any?
+        calendar_start = tote_items.first.posting.delivery_date
+        calendar_end = tote_items.last.posting.delivery_date
+
+        delivery_date = calendar_start        
+
+        while delivery_date <= calendar_end
+
+          pickup_range = pickup_range_for(delivery_date)
+          tote_items_for_range = tote_items.where("postings.delivery_date >= ? and postings.delivery_date <= ?", pickup_range[0], pickup_range[1])
+
+          if tote_items_for_range.any?
+            @tote_items_by_week << {start: pickup_range[0], end: pickup_range[1], tote_items: tote_items_for_range}
+          end
+
+          delivery_date += 7.days
+
+        end        
+
+      end
       render 'tote_items/calendar'
       return
     end

@@ -1,49 +1,77 @@
 <h1>Orders Calendar</h1>
 
-<div class="row">
-  <div class="col-xs-12">
+<% if @tote_items_by_week.any? %>
+  <%
+  @tote_items_by_week.each do |tote_items_by_week|
+    week_start = tote_items_by_week[:start]
+    week_end = tote_items_by_week[:end]
+    tote_items = tote_items_by_week[:tote_items]
+  %>
 
+    <div class="row">
+      <div class="col-xs-12">
 
-    <div style="white-space: nowrap; overflow: auto;">
-      <% if @tote_items && @tote_items.any? %>
+        <div style="white-space: nowrap; overflow: auto;">
 
-        <%= link_to '#', class: "black" do %>
-          <div class="thumbnail horizontal-scroller">        
-            <div class="text-right" style="padding-bottom: 10px;">
-              <% date = @tote_items.first.posting.delivery_date %>
-              <%= "#{date.strftime("%A, %B")} #{date.day.ordinalize}" %>
-            </div>            
-            <ul>
-              <%
-              max_count = 8
-              count = 0
-              @tote_items.each do |tote_item|
-              %>
-                <%
-                if count > max_count
-                  next
-                end
-                %>
-                <li>
-                  <%= tote_item.posting.product.name %>
-                  <% if tote_item.additional_units_required_to_fill_my_case > 0 || tote_item.posting.biggest_order_minimum_producer_net_outstanding > 0 %>
-                    <span class="gentle-flash alert-danger glyphicon glyphicon-exclamation-sign"></span>
-                  <% end %>
-                </li>
-                <% if count == max_count %>
-                  <li><%= link_to "See more", '#' %></li>
+          <%
+          delivery_date = week_start
+          while delivery_date <= week_end
+          %>
+
+            <%= link_to '#', class: "black" do %>
+              <div class="thumbnail horizontal-scroller" style="position: relative;">        
+                <div class="text-right" style="padding-bottom: 10px;">                    
+                  <%= "#{delivery_date.strftime("%a, %b")} #{delivery_date.day.ordinalize}" %>
+                </div>
+                <% tote_items_for_date = tote_items.where("postings.delivery_date = ?", delivery_date) %>
+                <% if tote_items_for_date.any? %>
+                  <ul>
+                    <%
+                    max_count = 8
+                    count = 0                  
+                    tote_items_for_date.each do |tote_item|
+                    %>
+                      <%
+                      if count > max_count
+                        next
+                      end
+                      %>
+                      <li>
+                        <%= tote_item.posting.product.name %>
+                        <% if tote_item.additional_units_required_to_fill_my_case > 0 || tote_item.posting.biggest_order_minimum_producer_net_outstanding > 0 %>
+                          <span class="gentle-flash alert-danger glyphicon glyphicon-exclamation-sign"></span>
+                        <% end %>
+                      </li>
+                      <% if count == max_count %>
+                        <li><%= link_to "See more", '#' %></li>
+                      <% end %>
+                    <%
+                      count += 1
+                    end
+                    %>              
+                  </ul>            
                 <% end %>
-              <%
-                count += 1
-              end
-              %>              
-            </ul>            
-          </div>
-        <% end %>
 
-      <% end %>      
+                <% if delivery_date == week_end.midnight %>
+                  <div class="text-center">
+                    <div class="alert alert-danger" style="position: absolute; bottom: 0;"><%= "Pickup by #{week_end.strftime("%l%p")}" %></div>
+                  </div>
+                <% end %>
+
+              </div>
+            <% end %>            
+
+            <% delivery_date += 1.day %>
+
+          <% end %>
+
+
+
+
+        </div>
+
+
+      </div>
     </div>
-
-
-  </div>
-</div>
+  <% end %>
+<% end %>
