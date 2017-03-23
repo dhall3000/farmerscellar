@@ -1,5 +1,10 @@
 $(function(){
 
+  var thumbnailWidth = $('.horizontal-scroller')[0].offsetWidth;  
+  var thumbnailIndex = $('#firstFutureItemThumbnailIndex').data('thumbnailindex');
+  var scrollAmount = thumbnailIndex * thumbnailWidth
+  $('#calendar').animate({scrollLeft: scrollAmount}, 'slow')
+
 	$('.popover_init').popover();
 
 	$(function () {

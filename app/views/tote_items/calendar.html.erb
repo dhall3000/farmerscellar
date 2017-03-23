@@ -3,13 +3,14 @@
 <% if @first_future_item %>
   <div class="row">
     <div class="col-xs-12">
-      <div style="white-space: nowrap; overflow: auto;">
+      <div id="calendar" style="white-space: nowrap; overflow: auto;">
         <%
         @tote_items_by_week.each do |tote_items_by_week|
           week_start = tote_items_by_week[:start]
           week_end = tote_items_by_week[:end]
           tote_items = tote_items_by_week[:tote_items]          
           delivery_date = week_start
+          thumbnail_index = 0
 
           while delivery_date <= week_end
         %>
@@ -32,6 +33,9 @@
                         next
                       end
                       %>
+                      <% if tote_item == @first_future_item %>
+                        <span id="firstFutureItemThumbnailIndex" data-thumbnailindex="<%= thumbnail_index %>"></span>
+                      <% end %>
                       <li>
                         <%= tote_item.posting.product.name %>
                         <% if tote_item.additional_units_required_to_fill_my_case > 0 || tote_item.posting.biggest_order_minimum_producer_net_outstanding > 0 %>
@@ -57,7 +61,10 @@
               </div>
             <% end %>            
 
-            <% delivery_date += 1.day %>
+            <%
+            thumbnail_index += 1
+            delivery_date = week_start + thumbnail_index.days
+            %>
 
           <% end %>
 
