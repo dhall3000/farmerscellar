@@ -17,7 +17,7 @@
 
             <%= link_to '#', class: "black" do %>
               <div class="thumbnail horizontal-scroller" style="position: relative;">        
-                <div class="text-right" style="padding-bottom: 10px;">                    
+                <div class="text-right" style="padding-bottom: 10px; padding-right: 2px;<%= delivery_date == Time.zone.now.midnight ? "background-color: lightgray;" : "" %>">
                   <%= "#{delivery_date.strftime("%a, %b")} #{delivery_date.day.ordinalize}" %>
                 </div>
                 <% tote_items_for_date = tote_items.where("postings.delivery_date = ?", delivery_date) %>
