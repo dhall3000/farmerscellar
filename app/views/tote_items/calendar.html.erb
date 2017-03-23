@@ -1,22 +1,18 @@
 <h1>Orders Calendar</h1>
 
 <% if @first_future_item %>
-  <%
-  @tote_items_by_week.each do |tote_items_by_week|
-    week_start = tote_items_by_week[:start]
-    week_end = tote_items_by_week[:end]
-    tote_items = tote_items_by_week[:tote_items]
-  %>
-
-    <div class="row">
-      <div class="col-xs-12">
-
-        <div style="white-space: nowrap; overflow: auto;">
-
-          <%
+  <div class="row">
+    <div class="col-xs-12">
+      <div style="white-space: nowrap; overflow: auto;">
+        <%
+        @tote_items_by_week.each do |tote_items_by_week|
+          week_start = tote_items_by_week[:start]
+          week_end = tote_items_by_week[:end]
+          tote_items = tote_items_by_week[:tote_items]          
           delivery_date = week_start
+
           while delivery_date <= week_end
-          %>
+        %>
 
             <%= link_to '#', class: "black" do %>
               <div class="thumbnail horizontal-scroller" style="position: relative;">        
@@ -65,15 +61,12 @@
 
           <% end %>
 
+          <br>              
 
-
-
-        </div>
-
-
+        <% end %>
       </div>
     </div>
-  <% end %>
+  </div>
 <% else %>
   
 <% end %>
