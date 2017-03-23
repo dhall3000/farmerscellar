@@ -1,6 +1,6 @@
 <h1>Orders Calendar</h1>
 
-<% if @tote_items_by_week.any? %>
+<% if @first_future_item %>
   <%
   @tote_items_by_week.each do |tote_items_by_week|
     week_start = tote_items_by_week[:start]
@@ -74,4 +74,6 @@
       </div>
     </div>
   <% end %>
+<% else %>
+  
 <% end %>
