@@ -2,7 +2,7 @@ require 'integration_helper'
 
 class OrdersCalendarTest < IntegrationHelper
 
-  test "awesome" do
+  test "dev driver" do
 
     nuke_all_postings
 
@@ -52,5 +52,50 @@ class OrdersCalendarTest < IntegrationHelper
     assert_equal posting22.delivery_date, tote_items_by_week[1][:tote_items][1].posting.delivery_date
 
   end
+
+  test "calendar should tell user they have no future deliveries" do
+
+    nuke_all_postings
+    bob = create_user
+    log_in_as(bob)
+    get tote_items_path(calendar: 1)
+    assert_response :success
+    assert_template 'tote_items/calendar'
+    assert_select 'div.text-center', "You have zero future deliveries scheduled."
+
+  end
+
+  test "calendar should tell user they have no future deliveries and invite them to view their ready for pickup page" do
+
+    nuke_all_postings
+
+    wednesday_next_week = get_next_wday_after(wday = 3, days_from_now = 7)
+    
+    producer1 = create_producer("producer1", "producer1@p.com")
+    posting1 = create_posting(producer1, price = nil, product = Product.create(name: "Product1"), unit = nil, delivery_date = wednesday_next_week, order_cutoff = wednesday_next_week - 1.day)
+    bob = create_user
+    create_tote_item(bob, posting1, quantity = 1)
+    create_one_time_authorization_for_customer(bob)
+    log_in_as(bob)
+    get tote_items_path(calendar: 1)
+    assert_response :success
+    assert_template 'tote_items/calendar'
+
+    travel_to posting1.order_cutoff
+    RakeHelper.do_hourly_tasks
+    fully_fill_creditor_order(posting1.creditor_order)
+
+    log_in_as bob
+    get tote_items_path(calendar: 1)
+    assert_response :success
+    assert_template 'tote_items/calendar'
+    assert_select 'div.text-center', "You have zero future deliveries scheduled."
+ 
+    assert_select 'a', "ready for pickup"
+
+    travel_back
+
+  end
+
 
 end

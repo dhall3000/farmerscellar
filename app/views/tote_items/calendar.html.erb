@@ -75,5 +75,20 @@
     </div>
   </div>
 <% else %>
-  
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="text-center">You have zero future deliveries scheduled.</div>
+    </div>
+  </div>
+
+  <!--if there are no future items but there are items, that means there are only past items. if there are past items that means there's viewable content in 'ready for pickup'-->
+  <% if @tote_items_by_week.any? %>
+  <div class="row">
+    <div class="col-xs-12 col-sm-offset-3 col-sm-6">
+      <div class="text-center">
+        But you do have items <%= link_to "ready for pickup", pickup_path %>.
+      </div>
+    </div>
+  </div>  
+  <% end %>
 <% end %>
