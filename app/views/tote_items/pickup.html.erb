@@ -3,52 +3,57 @@
 <% if @tote_items && @tote_items.any? %>
 
   <div class="row">
-    <div class="col-xs-12 col-sm-offset-4 col-sm-4 fat-finger-spacing">
+    <div class="col-xs-12 col-sm-offset-4 col-sm-4">
       <% if current_user.dropsite %>
-        <div>
-          <h3 data-toggle="collapse" data-target="#dropsiteAccessInfo">Dropsite Access Info<span id="dropsiteAccessInfoChevron" class="glyphicon glyphicon-chevron-down pull-right"></span></h3>
-        </div>
-        <div id="dropsiteAccessInfo" class="collapse" data-chevron="#dropsiteAccessInfoChevron">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <div class="panel-title" data-toggle="collapse" data-target="#dropsiteAccessInfo">
+              Dropsite Access Info <span id="dropsiteAccessInfoChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>            
+            </div>
+          </div>
+          <div id="dropsiteAccessInfo" class="panel-collapse collapse" data-chevron="#dropsiteAccessInfoChevron">
+            <div class="panel-body">
+              <%
+              next_food_clearout = current_user.dropsite.next_food_clearout
+              next_food_clearout_midnight = next_food_clearout.midnight
+              if Time.zone.now.midnight == next_food_clearout_midnight
+                next_food_clearout = "Today at #{next_food_clearout.strftime("%l%p")}"
+              elsif Time.zone.now.midnight + 1.day == next_food_clearout_midnight
+                next_food_clearout = "Tomorrow at #{next_food_clearout.strftime("%l%p")}"
+              else
+                next_food_clearout = "#{next_food_clearout.strftime("%A %B")} #{next_food_clearout.day.ordinalize} at #{next_food_clearout.strftime("%l%p")}"
+              end
+              %>
 
-          <%
-          next_food_clearout = current_user.dropsite.next_food_clearout
-          next_food_clearout_midnight = next_food_clearout.midnight
-          if Time.zone.now.midnight == next_food_clearout_midnight
-            next_food_clearout = "Today at #{next_food_clearout.strftime("%l%p")}"
-          elsif Time.zone.now.midnight + 1.day == next_food_clearout_midnight
-            next_food_clearout = "Tomorrow at #{next_food_clearout.strftime("%l%p")}"
-          else
-            next_food_clearout = "#{next_food_clearout.strftime("%A %B")} #{next_food_clearout.day.ordinalize} at #{next_food_clearout.strftime("%l%p")}"
-          end
-          %>
+              <p>Pickup deadline: <%= next_food_clearout %></p>
 
-          <p>Pickup deadline: <%= next_food_clearout %></p>
+              <p>PIN code: <%= current_user.pickup_code.code %></p>
 
-          <p>PIN code: <%= current_user.pickup_code.code %></p>
+              <% if current_user.previous_pickup %>            
+                <p>Last recorded pickup: <%= current_user.previous_pickup.created_at.strftime("%A %B %d, %Y at %l:%M %p") %></p>  
+              <% end %>
 
-          <% if current_user.previous_pickup %>            
-            <p>Last recorded pickup: <%= current_user.previous_pickup.created_at.strftime("%A %B %d, %Y at %l:%M %p") %></p>  
-          <% end %>
+              <p>
+              <span><%= current_user.dropsite.name %></span><br>            
+              <% address_link = "https://www.google.com/maps/place/" + (current_user.dropsite.address + " " + current_user.dropsite.city + " " + current_user.dropsite.state + " " + current_user.dropsite.zip.to_s).gsub(' ', '+') %>
+              <a target="blank" href="<%= address_link %>">
+                  <%= current_user.dropsite.address %> <%= current_user.dropsite.city %>, <%= current_user.dropsite.state %> <%= current_user.dropsite.zip.to_s %>
+                </a><br>
+              </p>
 
-          <p>
-          <span><%= current_user.dropsite.name %></span><br>            
-          <% address_link = "https://www.google.com/maps/place/" + (current_user.dropsite.address + " " + current_user.dropsite.city + " " + current_user.dropsite.state + " " + current_user.dropsite.zip.to_s).gsub(' ', '+') %>
-          <a target="blank" href="<%= address_link %>">
-              <%= current_user.dropsite.address %> <%= current_user.dropsite.city %>, <%= current_user.dropsite.state %> <%= current_user.dropsite.zip.to_s %>
-            </a><br>
-          </p>
-
-          <p>Hours: <%= current_user.dropsite.hours %></p>
-                      
-          <% if current_user.dropsite.access_instructions != nil %>
-            <p>
-              <%= current_user.dropsite.access_instructions %>
-            </p>
-          <% end %>
-          <% if current_user.pickups.count == 0 %>
-            <p>First time user? Watch <%= link_to "this", "https://youtu.be/oE4D93bALnM", target: false %> to see what to expect at pickup.</p>
-          <% end %>
-        </div>
+              <p>Hours: <%= current_user.dropsite.hours %></p>
+                          
+              <% if current_user.dropsite.access_instructions != nil %>
+                <p>
+                  <%= current_user.dropsite.access_instructions %>
+                </p>
+              <% end %>
+              <% if current_user.pickups.count == 0 %>
+                <p>First time user? Watch <%= link_to "this", "https://youtu.be/oE4D93bALnM", target: false %> to see what to expect at pickup.</p>
+              <% end %>
+            </div>
+          </div>
+        </div>        
       <% end %>
     </div>
   </div>
