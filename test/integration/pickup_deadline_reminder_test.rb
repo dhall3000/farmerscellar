@@ -64,7 +64,7 @@ class PickupDeadlineReminderTest < IntegrationHelper
     assert_equal expected_num_pickups, bob.pickups.count
     travel 1.day
     assert Time.zone.now.thursday?
-    do_pickup_for(users(:dropsite1), bob)
+    do_pickup_for(users(:dropsite1), bob.reload)
     log_out_dropsite_user
     assert_equal expected_num_pickups + 1, bob.reload.pickups.count
 
@@ -114,7 +114,7 @@ class PickupDeadlineReminderTest < IntegrationHelper
     travel 1.day
     #verify it's thursday
     assert Time.zone.now.thursday?
-    do_pickup_for(users(:dropsite1), bob)
+    do_pickup_for(users(:dropsite1), bob.reload)
     assert_equal expected_num_pickups + 1, bob.pickups.count
 
     #skip to pickup deadline warning time

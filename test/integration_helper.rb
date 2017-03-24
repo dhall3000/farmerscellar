@@ -233,7 +233,7 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     assert_template 'pickups/new'
   end
 
-  def do_pickup_for(dropsite_user, pickup_user)
+  def do_pickup_for(dropsite_user, pickup_user, logout_dropsite_user_after_pickup = false)
 
     log_in_as(pickup_user)
     get pickup_path
@@ -288,7 +288,9 @@ end
       assert_template 'pickups/new'
     end    
 
-    log_out_dropsite_user
+    if logout_dropsite_user_after_pickup
+      log_out_dropsite_user
+    end
     
     return tote_items
 

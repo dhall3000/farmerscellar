@@ -156,31 +156,31 @@ class PickupLoginTest < IntegrationHelper
     assert_equal 0, Pickup.count
     assert_equal 1, bob.reload.tote_items_to_pickup.count
     assert_equal "Carrots", bob.tote_items_to_pickup.first.posting.product.name
-    tote_items = do_pickup_for(@dropsite_user, bob.reload)
+    tote_items = do_pickup_for(@dropsite_user, bob.reload, true)
     assert_equal 1, Pickup.count
     assert_equal "Carrots", tote_items.first.posting.product.name
 
     travel 61.minutes
     #now bob should have zero tote items since it's > 1 hour since last pickup and no additional deliveries have been made.
-    tote_items = do_pickup_for(@dropsite_user, bob.reload)
+    tote_items = do_pickup_for(@dropsite_user, bob.reload, true)
     assert_not tote_items.any?
     assert_equal 2, Pickup.count
 
     fully_fill_creditor_order(posting_apples.creditor_order)
 
     travel 1.minute
-    tote_items = do_pickup_for(@dropsite_user, bob.reload)
+    tote_items = do_pickup_for(@dropsite_user, bob.reload, true)
     assert_equal 1, tote_items.count
     assert_equal "Fuji Apples", tote_items.first.posting.product.name
     assert_equal 3, Pickup.count
 
     travel 61.minutes
-    tote_items = do_pickup_for(@dropsite_user, bob.reload)
+    tote_items = do_pickup_for(@dropsite_user, bob.reload, true)
     assert_not tote_items.any?
     assert_equal 4, Pickup.count
 
     travel 7.days
-    tote_items = do_pickup_for(@dropsite_user, bob.reload)
+    tote_items = do_pickup_for(@dropsite_user, bob.reload, true)
     assert_nil tote_items
     
     travel_back
@@ -304,7 +304,7 @@ class PickupLoginTest < IntegrationHelper
 
     #user picks up on thursday which is between the W and F deliveries
     travel_to wednesday_next_week + 1.day + 12.hours
-    tote_items_picked_up = do_pickup_for(@dropsite_user, bob.reload)
+    tote_items_picked_up = do_pickup_for(@dropsite_user, bob.reload, true)
     assert tote_items_picked_up.count < bob.tote_items.count
     num_items_first_pickup_count = tote_items_picked_up.count
     assert num_items_first_pickup_count > 0
@@ -324,12 +324,12 @@ class PickupLoginTest < IntegrationHelper
 
     #jump back to one day after the last delivery date
     travel_to posting2.delivery_date + 1.day + 12.hours
-    tote_items_picked_up = do_pickup_for(@dropsite_user, bob.reload) 
+    tote_items_picked_up = do_pickup_for(@dropsite_user, bob.reload, true) 
     assert_equal num_items_second_pickup_count, tote_items_picked_up.count
     assert tote_items_picked_up.count > 0
 
     travel 61.minutes
-    tote_items_picked_up = do_pickup_for(@dropsite_user, bob.reload) 
+    tote_items_picked_up = do_pickup_for(@dropsite_user, bob.reload, true)
     #verify no more items picked up
     assert_equal 0, tote_items_picked_up.count
 

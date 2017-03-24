@@ -97,7 +97,7 @@ class ToteItemsController < ApplicationController
 
         @tote_items = current_user.tote_items.includes(:posting).paginate(:page => params[:page], :per_page => 2)
       else        
-        @tote_items = current_user.tote_items.joins(:posting).where(state: [ToteItem.states[:FILLED], ToteItem.states[:NOTFILLED]]).paginate(:page => params[:page], :per_page => 12).order("postings.delivery_date desc")
+        @tote_items = current_user.tote_items.joins(:posting).where(state: ToteItem.states[:FILLED]).paginate(:page => params[:page], :per_page => 12).order("postings.delivery_date desc")
       end
       template = 'tote_items/history'
     else
