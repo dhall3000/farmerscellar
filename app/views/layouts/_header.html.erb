@@ -30,14 +30,6 @@
               end
             %>
             <span class="glyphicon glyphicon-shopping-cart"></span><span class="header-object-count"><%= num_items_string %></span>
-
-            <%
-              unauthorized_subscriptions = get_active_subscriptions_by_authorization_state(current_user, include_paused_subscriptions = true, kind = Subscription.kinds[:NORMAL])[:unauthorized]
-              if unauthorized_subscriptions && (num_unauthorized_subscriptions = unauthorized_subscriptions.count) > 0
-            %>
-                <span> <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span><span class="header-object-count"><%= num_unauthorized_subscriptions.to_s %></span></span>
-              <% end %>
-
             <span> Tote</span>                    
           <% end %>
         </div>
@@ -62,7 +54,10 @@
         </div>
 
         <div class="left-most-header-link header-link">
-          <%= link_to "Subscriptions", subscriptions_path, class: "non-blue" %>
+          <%= link_to subscriptions_path, class: "non-blue" do %>          
+            <span class="glyphicon glyphicon glyphicon-repeat"></span><span class="header-object-count"> <%= @num_authorized_subscriptions > 0 ? @num_authorized_subscriptions.to_s : " " %></span>
+            <span> Subscriptions</span>
+          <% end %>
         </div>
 
         <div class="left-most-header-link header-link">

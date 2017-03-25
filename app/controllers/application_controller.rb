@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::Base  
   include SessionsHelper, ToteItemsHelper
 
-  before_action :redirect_dropsite_user
+  before_action :redirect_dropsite_user, :fetch_header_data
 
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
@@ -22,6 +22,14 @@ class ApplicationController < ActionController::Base
           redirect_to(new_pickup_url)
         end
       end
+    end
+
+    def fetch_header_data
+      
+      if !logged_in?
+        return
+      end      
+      @num_authorized_subscriptions = num_authorized_subscriptions_for(current_user)
     end
 
 end
