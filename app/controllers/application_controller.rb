@@ -30,6 +30,9 @@ class ApplicationController < ActionController::Base
         return
       end      
       @num_authorized_subscriptions = num_authorized_subscriptions_for(current_user)
+
+      num_ready_to_pickup = current_user.tote_items_to_pickup
+      @num_ready_to_pickup = num_ready_to_pickup.nil? ? 0 : num_ready_to_pickup.count
     end
 
 end

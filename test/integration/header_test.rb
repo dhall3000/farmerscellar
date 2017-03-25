@@ -60,4 +60,59 @@ class HeaderTest < IntegrationHelper
     assert_select 'span.glyphicon-repeat ~ span.header-object-count', ""
   end
 
+  test "ready for pickup link should display correct number" do
+    nuke_all_postings
+
+    wednesday_next_week = get_next_wday_after(3, days_from_now = 7)
+
+    posting1 = create_posting(producer = nil, price = 1.04, product = Product.create(name: "Product1"), unit = nil, delivery_date = wednesday_next_week, order_cutoff = wednesday_next_week - 1.day, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = 1)
+    posting2 = create_posting(posting1.user, price = 1.04,  product = Product.create(name: "Product2"), unit = nil, posting1.delivery_date, posting1.order_cutoff, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = 1)
+
+    assert_equal posting1.order_cutoff, posting2.order_cutoff
+    assert_equal posting1.delivery_date, posting2.delivery_date
+
+    bob = create_user("bob", "bob@b.com")
+    bob.set_dropsite(Dropsite.first)    
+
+    ti_posting1 = create_tote_item(bob, posting1, quantity = 2)    
+    ti_posting2 = create_tote_item(bob, posting2, quantity = 2)
+
+    create_one_time_authorization_for_customer(bob)
+
+    get root_path
+
+    #header should not display a number since there are zero items ready for pickup
+    assert_select 'span.glyphicon-ok ~ span.header-object-count', ""
+
+    assert ti_posting1.reload.state?(:AUTHORIZED)
+    assert ti_posting2.reload.state?(:AUTHORIZED)
+
+    travel_to posting1.order_cutoff
+    RakeHelper.do_hourly_tasks
+
+    assert ti_posting1.reload.state?(:COMMITTED)
+    assert ti_posting2.reload.state?(:COMMITTED)
+
+    fully_fill_creditor_order(posting1.creditor_order)
+    travel 1.minute
+
+    assert ti_posting1.reload.state?(:FILLED)
+    assert ti_posting2.reload.state?(:FILLED)
+
+    log_in_as bob
+    get root_path
+    #header should now display there are 2 items ready for pickup
+    assert_select 'span.glyphicon-ok ~ span.header-object-count', "2"
+    do_pickup_for(users(:dropsite1), bob.reload, true)
+
+    travel 61.minutes
+    log_in_as bob
+    get root_path
+    #header should not display a number since there are zero items ready for pickup
+    #since user just picked them up
+    assert_select 'span.glyphicon-ok ~ span.header-object-count', ""
+
+    travel_back    
+  end
+
 end
