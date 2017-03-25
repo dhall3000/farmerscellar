@@ -165,6 +165,15 @@ p {
   font-family: 'Pacifico', cursive;
 }
 
+.beta-feature {
+  font-size: 2em;
+  color: $fc-primary-color;
+  font-family: 'Pacifico', cursive;
+  padding-bottom: 25px;
+  transform: rotate(-5deg);
+  transition:transform 180ms ease-in;
+}
+
 #local-food-connection {
   font-size: 1.3em;
 }
