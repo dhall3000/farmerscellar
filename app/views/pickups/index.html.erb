@@ -19,7 +19,7 @@
 						<td><%= pickup.user.name %></td>
             <td>
               <%= form_tag sessions_spoof_path do %>      
-                <%= hidden_field_tag :email, producer.email, class: "form-control" %>
+                <%= hidden_field_tag :email, pickup.user.email %>
                 <%= submit_tag "Spoof", class: "btn btn-lg btn-primary outline" %>
               <% end %>
             </td>
