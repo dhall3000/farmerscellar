@@ -58,6 +58,14 @@ class HeaderTest < IntegrationHelper
     #should report 0
     assert_equal 0, num_authorized_subscriptions_for(bob.reload)
     assert_select 'span.glyphicon-repeat ~ span.header-object-count', ""
+
+    #now create a RTF order and verify this doesn't change the subscription count
+    create_tote_item(bob, posting, quantity = 1, frequency = nil, roll_until_filled = true)
+    create_rt_authorization_for_customer(bob)
+    get root_path
+    assert_equal 0, num_authorized_subscriptions_for(bob.reload)
+    assert_select 'span.glyphicon-repeat ~ span.header-object-count', ""
+
   end
 
   test "ready for pickup link should display correct number" do

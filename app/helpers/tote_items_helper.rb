@@ -175,7 +175,7 @@ module ToteItemsHelper
       return nil
     end
 
-    return Subscription.joins(rtauthorizations: :rtba).where(user: user, on: true, paused: false).where("rtauthorizations.rtba_id" => rtba.id).distinct
+    return Subscription.joins(rtauthorizations: :rtba).where(user: user, on: true, paused: false, kind: Subscription.kinds[:NORMAL]).where("rtauthorizations.rtba_id" => rtba.id).distinct
 
   end
 
