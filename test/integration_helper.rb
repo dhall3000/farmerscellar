@@ -488,7 +488,7 @@ end
     assert posting.valid?
 
     assert_response :redirect
-    assert_redirected_to postings_path
+    assert_redirected_to user_path farmer
     follow_redirect!
 
     #need a product photo for this to display properly

@@ -10,6 +10,20 @@
       <div class="panel panel-default">
         <div class="panel-heading">
           <div class="panel-title">
+            Non-editable
+          </div>
+        </div>
+        <div class="panel-body">
+          <h3>Product</h3>
+          <p><%= @posting.product.name %></p>
+          <h3>Unit</h3>
+          <p><%= @posting.unit.name %></p>
+        </div>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="panel-title">
             Basics
           </div>
         </div>
@@ -25,17 +39,34 @@
           <%= f.label :description_body %>
           <%= f.text_field :description_body, class: 'form-control' %>
 
-          <%= f.label :price_body %>
-          <%= f.text_field :price_body, class: 'form-control' %>
-
-          <%= f.label :unit_body %>
-          <%= f.text_field :unit_body, class: 'form-control' %>
-
           <%= f.label :important_notes %>
           <%= f.text_field :important_notes, class: 'form-control' %>
 
           <%= f.label :important_notes_body %>
           <%= f.text_field :important_notes_body, class: 'form-control' %>
+
+          <%= f.label :product_id_code %>
+          <%= f.text_field :product_id_code, class: 'form-control' %>
+
+          <%= f.label :units_per_case %>
+          <%= f.number_field :units_per_case, min: 1, step: 1, class: 'form-control' %>
+
+          <%= f.label :unit_body %>
+          <%= f.text_field :unit_body, class: 'form-control' %>
+
+          <% if spoofing? %>
+            <%= f.label :producer_net_unit %>
+            <%= f.number_field :producer_net_unit, min: 0.01, step: 0.01, class: 'form-control' %>
+          <% end %>
+
+          <%= f.label :price, "Price per unit (retail)" %>
+          <%= f.number_field :price, min: 0.01, step: 0.01, class: 'form-control' %>
+
+          <%= f.label :price_body %>
+          <%= f.text_field :price_body, class: 'form-control' %>
+
+          <%= f.label :order_minimum_producer_net %>
+          <%= f.number_field :order_minimum_producer_net, min: 0.01, step: 0.01, class: 'form-control' %>
 
           <%= f.label :live, class: "inline" do %>
             <%= f.check_box :live %>

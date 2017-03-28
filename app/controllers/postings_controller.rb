@@ -96,7 +96,7 @@ class PostingsController < ApplicationController
         AdminNotificationMailer.general_message("producer just created his own posting", "producer has no way of specifying producer_net_unit so we set it for them at our standard commission. Make sure that value is set. Posting id is #{@posting.id.to_s}").deliver_now
       end
 
-      redirect_to postings_path
+      redirect_to current_user
     else      
       #if no recurrence is set, give farmer another chance to set that
       if @posting.posting_recurrence.nil?
@@ -308,7 +308,12 @@ class PostingsController < ApplicationController
         :unit_body,
         :important_notes,
         :important_notes_body,
-        :live
+        :live,
+        :price,
+        :units_per_case,
+        :product_id_code,
+        :order_minimum_producer_net,
+        :producer_net_unit
         )
 
       return posting

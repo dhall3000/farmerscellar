@@ -56,6 +56,38 @@ class PostingsControllerTest < IntegrationHelper
     assert posting.valid?
     assert_equal important_notes, posting.important_notes
     assert_equal important_notes_body, posting.important_notes_body
+  end
+
+  test "update should take effect" do
+
+    posting = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil, important_notes = "Last season's harvest", important_notes_body = "Still a good apple")
+    assert posting.valid?
+    log_in_as posting.user
+    get edit_posting_path posting
+    assert_response :success
+    assert_template 'postings/edit'
+    assert_select 'input#posting_description'
+    assert_select 'input#posting_description_body'
+    assert_select 'input#posting_important_notes'
+    assert_select 'input#posting_important_notes_body'
+    
+    assert_select 'input#posting_product_id_code'
+    assert_select 'input#posting_units_per_case'
+    assert_select 'input#posting_price'
+    assert_select 'input#posting_price_body'
+    assert_select 'input#posting_order_minimum_producer_net'
+
+    assert posting.units_per_case.nil? || posting.units_per_case == 1
+
+    patch posting_path(posting), params: {posting: {units_per_case: 2, price: 7, product_id_code: "awesome code", order_minimum_producer_net: 22, producer_net_unit: 6}}
+    assert_response :redirect
+    assert_redirected_to user_path posting.user
+
+    assert_equal 2, posting.reload.units_per_case
+    assert_equal 7, posting.reload.price
+    assert_equal "awesome code", posting.reload.product_id_code
+    assert_equal 22, posting.reload.order_minimum_producer_net
+    assert_equal 6, posting.reload.producer_net_unit
 
   end
 
