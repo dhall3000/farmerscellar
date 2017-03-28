@@ -24,6 +24,12 @@
   		<%= f.label :description_body %>
   		<%= f.text_area :description_body, class: "form-control", rows: "8" %>
 
+      <%= f.label :important_notes %>
+      <%= f.text_area :important_notes, class: "form-control", rows: "2" %>
+
+      <%= f.label :important_notes_body %>
+      <%= f.text_area :important_notes_body, class: "form-control", rows: "8" %>
+
   		<%= f.label :unit_id %>
   		<%= f.collection_select(:unit_id, @units, :id, :name, {prompt: true}, {class: 'form-control'}) %>		
 

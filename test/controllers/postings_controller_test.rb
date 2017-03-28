@@ -35,6 +35,30 @@ class PostingsControllerTest < IntegrationHelper
 
   end
 
+  test "new should show important notes and body" do
+    log_in_as @farmer
+    get new_posting_path
+    assert_response :success
+    assert_template 'postings/new'
+    assert_select 'label', "Important notes"
+    assert_select 'label', "Important notes body"
+  end
+
+  test "create should save important notes and body" do
+    log_in_as @farmer
+    get new_posting_path
+    assert_response :success
+    assert_template 'postings/new'
+    assert_select 'label', "Important notes"
+    assert_select 'label', "Important notes body"
+
+    posting = create_posting(@farmer, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil, important_notes = "Last season's harvest", important_notes_body = "Still a good apple")
+    assert posting.valid?
+    assert_equal important_notes, posting.important_notes
+    assert_equal important_notes_body, posting.important_notes_body
+
+  end
+
   test "order min producer net should stick" do
 
     order_minimum_producer_net = 100

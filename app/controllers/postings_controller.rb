@@ -268,7 +268,8 @@ class PostingsController < ApplicationController
         :units_per_case,
         :product_id_code,
         :producer_net_unit,
-        :refundable_amount_unit_producer_to_fc
+        :important_notes,
+        :important_notes_body        
         )      
 
       posting[:price] = posting[:price].to_f.round(2)

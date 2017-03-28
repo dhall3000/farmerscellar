@@ -1,7 +1,7 @@
 require 'test_helper'
 require 'utility/rake_helper'
 
-#def create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil)
+#def create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil, important_notes = nil, important_notes_body = nil)
 #def create_new_customer(name = "bob", email = "bob@b.com")
 #def create_tote_item(customer, posting, quantity, frequency = nil, roll_until_filled = nil)
 #def create_one_time_authorization_for_customer(customer)
@@ -420,7 +420,7 @@ end
     return [{posting_id: posting_id, quantity: quantity}]
   end
   
-  def create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil)
+  def create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil, important_notes = nil, important_notes_body = nil)
 
     if farmer.nil?
       farmer = create_producer("john", "john@j.com")
@@ -477,7 +477,9 @@ end
       units_per_case: units_per_case,
       order_minimum_producer_net: order_minimum_producer_net,
       posting_recurrence: {frequency: frequency, on: true},
-      product_id_code: product_id_code
+      product_id_code: product_id_code,
+      important_notes: important_notes,
+      important_notes_body: important_notes_body
     }    
 
     log_in_as(farmer)
