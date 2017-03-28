@@ -19,6 +19,9 @@ creditor_order = local_assigns[:creditor_order]
           <% else %>
             <p><%= posting.num_units_unfilled.to_s %></p>
           <% end %>
+
+          <span>Producer Net Unit</span>
+          <p><%= number_to_currency(posting.producer_net_unit) %></p>
           
           <div data-toggle="collapse" data-target="#posting<%= posting.id.to_s %>Details">
             <p>More details <span id="posting<%= posting.id.to_s %>DetailsChevron" class="glyphicon glyphicon-chevron-down pull-right"></span></p>
@@ -60,8 +63,41 @@ creditor_order = local_assigns[:creditor_order]
             <span>Units Filled</span>
             <p><%= posting.num_units_filled %></p>
 
+            <span>Retail Price</span>
+            <p><%= number_to_currency(posting.price) %></p>
+
+            <% if posting.price_body %>
+              <span>Price Body</span>
+              <p><%= posting.price_body %></p>
+            <% end %>
+
+            <% if posting.unit_body %>
+              <span>Unit Body</span>
+              <p><%= posting.unit_body %></p>
+            <% end %>              
+
+            <span>Description</span>
+            <p><%= posting.description %></p>
+
+            <% if posting.order_minimum_producer_net %>
+              <span>Order Minimum Producer Net</span>
+              <p><%= posting.order_minimum_producer_net %></p>
+            <% end %>              
+
+            <% if posting.important_notes %>
+              <span>Important Notes</span>
+              <p><%= posting.important_notes %></p>
+            <% end %>              
+
           </div>
         </div>
+
+        <% if posting.uploads.any? %>
+          <%= image_tag "#{posting.uploads.first.file_name.square}", class: "img-responsive" %>
+        <% elsif (upload = Upload.find_by(title: NOPRODUCTIMAGETITLE)) %>
+          <%= image_tag upload.file_name.square, class: "img-responsive" %>
+        <% end %>
+
       </div>      
     </div>
   <% end %>
