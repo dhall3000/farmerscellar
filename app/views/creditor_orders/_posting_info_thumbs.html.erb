@@ -84,7 +84,7 @@ creditor_order = local_assigns[:creditor_order]
               <p><%= posting.order_minimum_producer_net %></p>
             <% end %>              
 
-            <% if posting.important_notes %>
+            <% if !posting.important_notes.blank? %>
               <span>Important Notes</span>
               <p><%= posting.important_notes %></p>
             <% end %>              
