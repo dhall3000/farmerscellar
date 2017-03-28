@@ -88,7 +88,11 @@
             <%= link_to "Create new posting", new_posting_path(current_user), class: "btn btn-lg btn-primary outline" %>
           </div>
           <% if !@postings.nil? && @postings.any? %>      
-            <h1>My Postings</h1>
+            <div class="row">
+              <div class="col-xs-12">
+                <%= will_paginate @postings, inner_window: 1, outer_window: 0 %>
+              </div>
+            </div>
             <table class="table">
               <thead>
                 <tr>        
@@ -102,16 +106,9 @@
                 </tr>
               </thead>
               <tbody>
-                <% @postings.each do |posting| %>
-                  <% farmInfo = "Producer has not provided info about their operation" %>
-                  <% if posting.user.description != nil %>
-                    <% farmInfo = "<u>Producer Description</u><p>" + posting.user.description %>
-                  <% end %>
-                  <% if !posting.user.website.blank? %>
-                    <% farmInfo = farmInfo + "<p>" + "<u>Producer Website</u><p><a href='" + posting.user.website + "' target='_blank'>" + posting.user.website + "</a>"%>
-                  <% end %>
+                <% @postings.each do |posting| %>                  
                   <tr>                      
-                    <td><a tabindex="0" class="btn btn-primary outline btn-block" role="button" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%= posting.description_body %>"><%= Product.find_by(id: posting.product_id).name %></a></td>
+                    <td class="text-center"><%= posting.product.name %></td>
                     <td class="text-center"><%= number_to_currency(posting.price) %></td>
                     <td class="text-center"><%= Unit.find_by(id: posting.unit_id).name %></td>
                     <td class="text-center"><%= posting.total_quantity_ordered %></td>            
@@ -126,6 +123,13 @@
                 <% end %>
               </tbody>
             </table>        
+
+            <div class="row">
+              <div class="col-xs-12">
+                <%= will_paginate @postings, inner_window: 1, outer_window: 0 %>
+              </div>
+            </div>
+
           <% end %>
         </div>
       </div>
