@@ -866,7 +866,7 @@ end
     get user_path(producer)
     assert_response :success
     assert_template 'users/show'
-    assert_select 'td a', posting.product.name
+    assert_select 'td.text-center', posting.product.name
     assert_select 'td.text-center a[href=?]', edit_posting_path(posting), {text: "Edit posting"}
   end
 
