@@ -47,6 +47,14 @@ class PostingRecurrenceIntegrationTest < IntegrationHelper
 
     last_delivery_date_before_pause = pr.current_posting.delivery_date
 
+    #ok, we've already turned off the recurrence. but now we're going to the order cutoff of the last posting in the series
+    #to do hourly tasks. this will transition the last posting's state away from OPEN which is important so that we can later
+    #verify when we unpause the recurrence that the fresh new posting's state is OPEN
+    travel_to pr.current_posting.order_cutoff
+    RakeHelper.do_hourly_tasks
+    pr.current_posting.reload
+    assert_not_equal Posting.states[:OPEN], pr.current_posting.state
+
     #now go to a time far out in the future that's right in the middle of what should be the committment zone
     #thursday
     travel_to pr.current_posting.order_cutoff + 1.day + 28.days
@@ -86,6 +94,8 @@ class PostingRecurrenceIntegrationTest < IntegrationHelper
     #delivery_dates should be spaced 35 days
     assert_equal last_delivery_date_before_pause + 35.days, cp.delivery_date    
     assert_equal last_delivery_date_before_pause - 2.days + 35.days, cp.order_cutoff
+
+    assert cp.state?(:OPEN)
 
     travel_back
     

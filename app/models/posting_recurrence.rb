@@ -268,6 +268,7 @@ class PostingRecurrence < ApplicationRecord
     #set new_post commitment zone start    
     new_post.order_cutoff = new_post.delivery_date - commitment_zone_window
     new_post.live = true
+    new_post.state = Posting.states[:OPEN]
     #if there doesn't already exist a post with these parameters
     reload
     if postings.where(delivery_date: new_post.delivery_date).count == 0
