@@ -43,8 +43,8 @@ class ToteItemsController < ApplicationController
 
     if params[:calendar]
 
-      @tote_items_by_week = []
-      tote_items = current_user.tote_items.joins(:posting).where("postings.delivery_date > ?", current_user.pickup_items_start).where("tote_items.state" => [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED], ToteItem.states[:FILLED]]).order("postings.delivery_date asc")
+      @tote_items_by_week = []      
+      tote_items = ToteItem.calendar_items_displayable(current_user)
       @first_future_item = tote_items.where("postings.delivery_date >= ?", Time.zone.now.midnight).where("tote_items.state" => [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED]]).order("postings.delivery_date asc").first
 
       if tote_items.any?

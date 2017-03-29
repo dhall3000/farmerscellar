@@ -123,4 +123,43 @@ class HeaderTest < IntegrationHelper
     travel_back    
   end
 
+  test "orders calendar superscript should be correct" do
+    nuke_all_postings
+    wednesday_next_week = get_next_wday_after(3, days_from_now = 7)
+
+    producer1 = create_producer(name = "producer1", email = "producer1@p.com")
+    producer2 = create_producer(name = "producer2", email = "producer2@p.com")
+
+    #recurring posting1 delivery on wednesday
+    posting1 = create_posting(producer1, price = 1.04, product = Product.create(name: "Product1"), unit = nil, delivery_date = wednesday_next_week, order_cutoff = wednesday_next_week - 1.day, units_per_case = nil, frequency = 1)
+    #recurring posting2 delivery on thursday
+    posting2 = create_posting(producer2, price = 1.04, product = Product.create(name: "Product2"), unit = nil, delivery_date = wednesday_next_week + 1.day, order_cutoff = wednesday_next_week - 1.day, units_per_case = nil, frequency = 1)
+    
+    bob = create_user
+    #user has every-other-week subscription for wednesday posting
+    ti1 = create_tote_item(bob, posting1, quantity = 1, frequency = 2)
+    #user has every week subscription for thursday posting
+    ti2 = create_tote_item(bob, posting2, quantity = 1, frequency = 1)
+
+    create_rt_authorization_for_customer(bob)
+
+    travel_to posting1.order_cutoff
+    RakeHelper.do_hourly_tasks
+
+    fully_fill_creditor_order(posting1.creditor_order)
+
+    travel 1.minute
+
+    log_in_as bob
+    get root_path
+
+    #here's why there should be 3: the every other week item just got filled. so that should show. but a new tote item won't get generated for the 2-weeks-out posting
+    #until the next order_cutoff hits. so for this series the calendar should only show 1 item. for the every-week subscription there should be one item for tomorrow's
+    #delivery and another item for the delivery after that
+    assert_select 'span.glyphicon-calendar ~ span.header-object-count', "3"
+
+    travel_back
+    
+  end
+
 end

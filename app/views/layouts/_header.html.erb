@@ -53,7 +53,15 @@
 
         <div class="left-most-header-link header-link">
           <%= link_to tote_items_path(calendar: 1), class: "non-blue" do %>                
-            <span class="glyphicon glyphicon glyphicon-calendar"></span><span class="header-object-count"> <%= num_order_objects %></span>
+            <%
+            calendar_items_displayable = ToteItem.calendar_items_displayable(current_user)
+            if calendar_items_displayable.nil? || calendar_items_displayable.count == 0
+              calendar_items_displayable_count = ""
+            else
+              calendar_items_displayable_count = calendar_items_displayable.count
+            end
+            %>
+            <span class="glyphicon glyphicon glyphicon-calendar"></span><span class="header-object-count"> <%= calendar_items_displayable_count %></span>
             <span> Orders calendar</span>
           <% end %>
         </div>

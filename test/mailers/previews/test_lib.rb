@@ -384,6 +384,9 @@ module TestLib
     admin = User.where(account_type: User.types[:ADMIN]).first
 
     if admin
+      if admin.dropsite.nil?
+        admin.set_dropsite(Dropsite.first)
+      end
       return admin
     end
 

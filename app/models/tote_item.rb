@@ -44,6 +44,16 @@ class ToteItem < ApplicationRecord
 
   end
 
+  def self.calendar_items_displayable(user)
+
+    if user.dropsite.nil?
+      return nil
+    end
+
+    return user.tote_items.joins(:posting).where("postings.delivery_date > ?", user.pickup_items_start).where("tote_items.state" => [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED], ToteItem.states[:FILLED]]).order("postings.delivery_date asc")
+
+  end
+
   validates :state, inclusion: { in: ToteItem.states.values }
   validates :state, numericality: {only_integer: true}
 
