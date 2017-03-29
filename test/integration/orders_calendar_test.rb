@@ -2,6 +2,63 @@ require 'integration_helper'
 
 class OrdersCalendarTest < IntegrationHelper
 
+  test "calendar display should include filled item" do
+
+    nuke_all_postings
+
+    wednesday_next_week = get_next_wday_after(wday = 3, days_from_now = 7)
+    friday_next_week = wednesday_next_week + 2.days
+
+    several_wednesdays_out = wednesday_next_week + 3.weeks
+    several_fridays_out = several_wednesdays_out + 2.days
+
+    producer1 = create_producer("producer1", "producer1@p.com")
+    producer2 = create_producer("producer2", "producer2@p.com")
+
+    posting1 = create_posting(producer1, price = nil, product = Product.create(name: "Product1"), unit = nil, delivery_date = wednesday_next_week, order_cutoff = wednesday_next_week - 1.day)
+    posting2 = create_posting(producer2, price = nil, product = Product.create(name: "Product2"), unit = nil, delivery_date = friday_next_week, order_cutoff = posting1.order_cutoff)
+
+    bob = create_user
+
+    ti1 = create_tote_item(bob, posting1, quantity = 1)    
+    ti2 = create_tote_item(bob, posting2, quantity = 1)
+    
+    create_one_time_authorization_for_customer(bob)
+
+    log_in_as(bob)
+    get tote_items_path(calendar: 1)
+    assert_response :success
+    assert_template 'tote_items/calendar'
+
+    tote_items_by_week = assigns(:tote_items_by_week)
+
+    #there should be data for pickups on one week
+    assert_equal 1, tote_items_by_week.count
+
+    #this week should have 2 tote items for pickup
+    assert_equal 2, tote_items_by_week[0][:tote_items].count
+    
+    #the delivery dates on these should match like this
+    assert_equal posting1.delivery_date, tote_items_by_week[0][:tote_items][0].posting.delivery_date
+    assert_equal posting2.delivery_date, tote_items_by_week[0][:tote_items][1].posting.delivery_date
+
+    travel_to posting1.order_cutoff
+    RakeHelper.do_hourly_tasks
+
+    assert_equal Posting.states[:COMMITMENTZONE], posting1.reload.state
+    assert_equal Posting.states[:COMMITMENTZONE], posting2.reload.state
+
+    fully_fill_creditor_order(posting1.creditor_order)
+
+    log_in_as(bob)
+    get tote_items_path(calendar: 1)
+    assert_response :success
+    assert_template 'tote_items/calendar'
+
+    travel_back
+
+  end
+
   test "dev driver" do
 
     nuke_all_postings

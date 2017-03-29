@@ -44,9 +44,11 @@
                       <% end %>
                       <li>
                         <%= tote_item.posting.product.name %>
-                        <% if tote_item.additional_units_required_to_fill_my_case > 0 || tote_item.posting.biggest_order_minimum_producer_net_outstanding > 0 %>
-                          <span class="gentle-flash alert-danger glyphicon glyphicon-exclamation-sign"></span>
-                        <% end %>
+                        <% if [ToteItem.states[:ADDED], ToteItem.states[:ADDED], ToteItem.states[:ADDED]].include? tote_item.state %>
+                          <% if tote_item.additional_units_required_to_fill_my_case > 0 || tote_item.posting.biggest_order_minimum_producer_net_outstanding > 0 %>
+                            <span class="gentle-flash alert-danger glyphicon glyphicon-exclamation-sign"></span>
+                          <% end %>
+                        <% end %>                          
                       </li>
                       <% if count == max_count %>
                         <li><%= link_to "See more", '#' %></li>

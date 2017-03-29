@@ -339,17 +339,21 @@ class Posting < ApplicationRecord
       return 0
     end
 
-    if tote_item.state?(:ADDED)
-      
+    if tote_item.state?(:ADDED)      
       queue_quantity_through_item = tote_items.where(state: [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED]]).sum(:quantity) +
         tote_items.where(user: tote_item.user, state: ToteItem.states[:ADDED]).where("created_at <= ?", tote_item.created_at).sum(:quantity)
       existing_quantity_after_item = tote_items.where(user: tote_item.user, state: ToteItem.states[:ADDED]).where("created_at > ?", tote_item.created_at).sum(:quantity)
-
     elsif tote_item.state?(:AUTHORIZED) || tote_item.state?(:COMMITTED)      
-
       queue_quantity_through_item = tote_items.where(state: [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED]]).where("authorized_at <= ?", tote_item.authorized_at).sum(:quantity)
       existing_quantity_after_item = tote_items.where(state: [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED]]).where("authorized_at > ?", tote_item.authorized_at).sum(:quantity)
-
+    else
+      #NOTE: these numbers are bogus, if you think about it. they were put here because a bug was exploited during implementation of the orders calendar feature. that feature, by design,
+      #displays filled items. so the below variables were nil which caused an exception before we got out of this method. the case that was exploiting this was when units_per_case = 1
+      #so i just stuck these values in here to get by. furthermore, this was only happening in logic trying to determine if an order min wasn't met in the view for purposes of displaying
+      #a graphical element to alert the user if an item was currently set to not ship. didn't matter in this cause since the item already was shipped so just sticking this code in to
+      #keep things moving along.
+      queue_quantity_through_item = 0
+      existing_quantity_after_item = 1
     end
 
     quantity_needed_after_to_fill_items_case = (units_per_case - (queue_quantity_through_item % units_per_case)) % units_per_case
