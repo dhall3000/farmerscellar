@@ -284,7 +284,7 @@ class PostingsControllerTest < IntegrationHelper
 
     assert_equal posting_count + 1, Posting.count
     assert_response :redirect
-    assert_redirected_to postings_path
+    assert_redirected_to producer
     follow_redirect!
     assert_response :redirect
     assert_redirected_to root_path
@@ -782,7 +782,10 @@ class PostingsControllerTest < IntegrationHelper
 
     #assert @posting.price != posting_old.price
     #CHANGE: price can't be changed through the controller now
-    assert_equal @posting.price, posting_old.price
+    #assert_equal @posting.price, posting_old.price
+    #CHANGING AGAIN: ideally you'd have some smart code so that if a posting price can't be changed if it's committed. and if it's not yet committed
+    #all customers get email notification so they can back out.
+    assert_equal posting_old.price + 1.0, @posting.price
 
     assert @posting.live != posting_old.live
 
@@ -837,16 +840,6 @@ class PostingsControllerTest < IntegrationHelper
       price: -1.0,
       live: !(@posting.live)
     })
-
-    #CHANGE: 2017-01-19
-    #i made it so price can't be updated in the private postingscontroller params method
-    #that makes it so that the change above passes just fine. you can pass a negative price in
-    #all day long from the browser and the controller will just ignore it (or any other price)
-    assert_response :redirect
-    assert_redirected_to @farmer
-    follow_redirect!
-    assert_template 'users/show'
-    return
 
     #now we should get sent back to the edit page with errors for user to see what went wrong
     assert :success
@@ -942,7 +935,7 @@ class PostingsControllerTest < IntegrationHelper
     #because we don't want to create a db object for postings that don't repeat
     assert_not posting.posting_recurrence
     assert posting.valid?, get_error_messages(posting)
-    assert_redirected_to postings_path
+    assert_redirected_to @farmer
     assert_not flash.empty?    
 
     return posting    
@@ -980,7 +973,7 @@ class PostingsControllerTest < IntegrationHelper
     assert posting.valid?, get_error_messages(posting)
     #there should be more posting recurrences in the database now than thre was before this posting
     assert PostingRecurrence.count > posting_recurrence_count
-    assert_redirected_to postings_path
+    assert_redirected_to @farmer
     assert_not flash.empty?    
 
     return posting        
@@ -1004,7 +997,7 @@ class PostingsControllerTest < IntegrationHelper
     #because we don't want to create a db object for postings that don't repeat
     assert_not posting.posting_recurrence
     assert posting.valid?, get_error_messages(posting)
-    assert_redirected_to postings_path
+    assert_redirected_to @farmer
     assert_not flash.empty?
 
     return posting
@@ -1026,7 +1019,7 @@ class PostingsControllerTest < IntegrationHelper
     posting = assigns(:posting)
     assert_not posting.nil?
     assert posting.valid?, get_error_messages(posting)
-    assert_redirected_to postings_path
+    assert_redirected_to @farmer
     assert_not flash.empty?
 
     #ok, now we have to update this posting if we really want live unset

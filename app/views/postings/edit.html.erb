@@ -73,11 +73,11 @@
             <span class="checkboxText">Live</span>
           <% end %>
 
-          <% if WebsiteSetting.order("website_settings.id").last.recurring_postings_enabled && @posting_recurrence != nil && @posting_recurrence.on %>      
+          <% if WebsiteSetting.order("website_settings.id").last.recurring_postings_enabled && !@posting_recurrence.nil? %>      
             <div>
               <%= f.fields_for @posting.posting_recurrence do |posting_recurrence_f| %>
                 <%= posting_recurrence_f.label :on, class: "inline" do %>
-                  <%= posting_recurrence_f.check_box :on %>
+                  <%= posting_recurrence_f.check_box :on, {}, 1, 0 %>
                   <span class="checkboxText">Recur</span>      
                 <% end %>                 
               <% end %>     

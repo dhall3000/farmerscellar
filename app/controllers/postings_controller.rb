@@ -124,15 +124,21 @@ class PostingsController < ApplicationController
     
     @posting_recurrence = @posting.posting_recurrence
 
-    if @posting_recurrence && @posting_recurrence.on
-      #check to see if the user just turned the recurrence off. if they did we need to persist that.
-
-      if params[:posting][:posting_recurrence][:on] == "0"
-        #user just turned off the recurrence so persist that to db
-        @posting_recurrence.turn_off
-        @posting_recurrence.save
+    if @posting_recurrence
+      if @posting_recurrence.on
+        #check to see if the user just turned the recurrence off. if they did we need to persist that.
+        if params[:posting][:posting_recurrence][:on] == "0"
+          #user just turned off the recurrence so persist that to db
+          @posting_recurrence.turn_off
+          @posting_recurrence.save
+        end
+      else
+        #check to see if the user just turned the recurrence on. if they did we need to persist that.
+        if params[:posting][:posting_recurrence][:on] == "1"
+          #user just turned on the recurrence so persist that to db
+          @posting_recurrence.turn_on  
+        end
       end
-
     end
 
     if @posting.update_attributes(posting_params_update)      

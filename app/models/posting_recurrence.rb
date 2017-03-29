@@ -96,6 +96,21 @@ class PostingRecurrence < ApplicationRecord
 
   end
 
+  def turn_on
+    
+    if on
+      return
+    end
+    
+    if frequency < 1
+      return
+    end
+
+    update(on: true)
+    recur
+
+  end
+
   def turn_off
     update(on: false)
     subscriptions.each do |subscription|
@@ -229,22 +244,28 @@ class PostingRecurrence < ApplicationRecord
 
     old_post = postings.order("postings.id").last
     now = Time.zone.now
-
-    #if we're not between the most recently posted post's commit zone and delivery date, just quit
-    if now < old_post.order_cutoff || now > old_post.delivery_date
+    
+    if now < old_post.order_cutoff
       return
+    end
+
+    time_since_last_posting = 0
+
+    if now > old_post.delivery_date
+      time_since_last_posting = Time.zone.now - old_post.delivery_date
     end
 
     #copy old_post
     new_post = old_post.dup       
+    commitment_zone_window = old_post.delivery_date - old_post.order_cutoff    
     #set new_post delivery_date
     #NOTE: the + 10.weeks is kinda arbitrary. might need to be revisited later. just want to keep moving for now so don't
     #want to spend brain cycles doing anything 'smart' here.
-    new_post.delivery_date = get_delivery_dates_for(old_post.delivery_date, old_post.delivery_date + (10 * 7).days)[0]
+    offset = time_since_last_posting + commitment_zone_window
+    new_post.delivery_date = get_delivery_dates_for(old_post.delivery_date + offset, old_post.delivery_date + (10 * 7).days + offset)[0]
     new_post.inbound_order_value_producer_net = 0
 
-    #set new_post commitment zone start
-    commitment_zone_window = old_post.delivery_date - old_post.order_cutoff
+    #set new_post commitment zone start    
     new_post.order_cutoff = new_post.delivery_date - commitment_zone_window
     new_post.live = true
     #if there doesn't already exist a post with these parameters
