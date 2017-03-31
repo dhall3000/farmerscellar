@@ -68,5 +68,5 @@
 <% if @tote_items.any? %>
   <%= render partial: 'shared/pickup_list', locals: { link_to_posting: false, tote_items: @tote_items } %>
 <% else %>    
-  <h2>You don't have any products ready for pickup</h2>
+  <!-- TODO: should put partner users list here? but what about scenario where folks have tote items and partner deliveries? -->
 <% end %>
