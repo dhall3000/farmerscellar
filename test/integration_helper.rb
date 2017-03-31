@@ -1,6 +1,7 @@
 require 'test_helper'
 require 'utility/rake_helper'
 
+#def create_business_interface(producer, name = "Producer's Business Interface Name", order_email = "orders@farmfactory.com", payment_method = BusinessInterface.payment_methods[:CASH], payment_time = BusinessInterface.payment_times[:ONDELIVERY])
 #def create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil, important_notes = nil, important_notes_body = nil)
 #def create_new_customer(name = "bob", email = "bob@b.com")
 #def create_tote_item(customer, posting, quantity, frequency = nil, roll_until_filled = nil)
@@ -11,6 +12,31 @@ require 'utility/rake_helper'
 
 class IntegrationHelper < ActionDispatch::IntegrationTest
   include ActionView::Helpers::TextHelper
+
+  def create_business_interface(producer, name = "Producer's Business Interface Name", order_email = "orders@farmfactory.com", payment_method = BusinessInterface.payment_methods[:CASH], payment_time = BusinessInterface.payment_times[:ONDELIVERY])
+    
+    log_in_as get_admin
+
+    bi_count = BusinessInterface.count
+    post business_interfaces_path, params: {
+      business_interface:
+      {
+        name: name,
+        order_email: order_email,
+        payment_method: payment_method,
+        payment_time: payment_time,
+        user_id: producer.id
+      }
+    }
+
+    assert_equal bi_count + 1, BusinessInterface.count
+    assert_equal "BusinessInterface created", flash[:success]
+    bi = assigns(:business_interface)
+    assert bi.valid?
+
+    return bi
+
+  end
 
   def remove_tote_item(tote_item)
     

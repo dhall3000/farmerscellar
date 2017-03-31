@@ -108,6 +108,26 @@ f4 = User.create!(name:  "f4",
 
 AccessCode.create(user: f4, notes: "code for user 4")
 
+f5 = User.create!(name:  "f5",
+             email: "f5@f.com",
+             password:              "dogdog",
+             password_confirmation: "dogdog",
+             account_type: '1',
+             activated: true,
+             activated_at: Time.zone.now,
+             description: "producers of sea food",
+             address: "9876 Yollimer Rd",
+             city: "Republic",
+             state: "Washington",
+             zip: "98114",
+             phone: "206-650-6579",
+             website: "www.f5.com",
+             farm_name: "f5 FARM",
+             beta: false,
+             order_minimum_producer_net: 20
+             )
+AccessCode.create(user: f5, notes: "code for user 4")
+
 c = User.create!(name:  "c1",
              email: "c1@c.com",
              password:              "dogdog",

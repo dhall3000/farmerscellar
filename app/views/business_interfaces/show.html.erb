@@ -1,0 +1,43 @@
+<h1>BusinessInterface</h1>
+
+<%= link_to "Edit", edit_business_interface_path(@business_interface), class: "btn btn-lg btn-primary outline" %>
+<div class="row">
+  <div class="col-sm-offset-4 col-sm-4">
+    <%= "Name: #{@business_interface.name}"%>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-offset-4 col-sm-4">
+    <%= "Order Email: #{@business_interface.order_email}"%>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-offset-4 col-sm-4">
+    <%= "Order Instructions: #{@business_interface.order_instructions}"%>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-offset-4 col-sm-4">
+    <%= "Paypal Email: #{@business_interface.paypal_email}"%>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-offset-4 col-sm-4">
+    <%= "Producer: #{@business_interface.user.farm_name}"%>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-offset-4 col-sm-4">
+    <%= "Payment Method: #{@business_interface.friendly_payment_method}"%>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-offset-4 col-sm-4">
+    <%= "Payment Time: #{@business_interface.friendly_payment_time}"%>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-offset-4 col-sm-4">
+    <%= "Payment Receipt Email: #{@business_interface.payment_receipt_email}"%>
+  </div>
+</div>

@@ -1,0 +1,11 @@
+<h1>BusinessInterfaces</h1>
+
+<%= link_to "New BusinessInterface", new_business_interface_path, class: "btn btn-lg btn-primary outline" %>
+
+<% @business_interfaces.each do |bi| %>
+  <div class="row">
+    <div class="col-sm-offset-4 col-sm-4">
+      <%= link_to bi.name, business_interface_path(bi) %>
+    </div>
+  </div>
+<% end %>

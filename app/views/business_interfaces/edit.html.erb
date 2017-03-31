@@ -1,0 +1,40 @@
+<h1>Edit BusinessInterface</h1>
+
+<div class="row">
+  <div class="col-md-4 col-md-offset-4">
+    <%= link_to "BusinessInterfaces", business_interfaces_path %>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-4 col-md-offset-4">
+    <%= form_for @business_interface do |f| %>
+      <%= render partial: 'shared/error_messages_general', locals: { active_record_object: @business_interface } %>
+
+      <%= f.label :name %>
+      <%= f.text_field :name, class: 'form-control' %>
+
+      <%= f.label :order_email %>
+      <%= f.text_field :order_email, class: 'form-control' %>
+
+      <%= f.label :order_instructions %>
+      <%= f.text_field :order_instructions, class: 'form-control' %>
+
+      <%= f.label :paypal_email %>
+      <%= f.text_field :paypal_email, class: 'form-control' %>
+
+      <%= f.label :payment_receipt_email %>
+      <%= f.text_field :payment_receipt_email, class: 'form-control' %>
+
+      <%= f.label :payment_method %>        
+      <%= f.select(:payment_method, options_for_select(BusinessInterface.payment_methods), {}, {class: 'form-control'}) %>
+
+      <%= f.label :payment_time %>        
+      <%= f.select(:payment_time, options_for_select(BusinessInterface.payment_times), {}, {class: 'form-control'}) %>
+
+      <%= f.label :user_id, "Producer" %>
+      <%= f.collection_select(:user_id, @producers, :id, :farm_name, {prompt: true, selected: @business_interface.user.id}, {class: 'form-control'}) %>   
+
+      <%= f.submit "Update BusinessInterface", class: "btn btn-lg btn-primary outline" %>
+    <% end %>
+  </div>
+</div>
