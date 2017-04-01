@@ -1,0 +1,38 @@
+<h1>Producers</h1>
+
+<div class="row">
+  <div class="col-sm-offset-4 col-sm-4">
+    <%= link_to "New Producer", new_producer_path, class: "btn btn-lg btn-primary outline" %>
+  </div>
+</div>
+
+<% if @distributors.any? %>
+  <div class="row">
+    <div class="col-sm-offset-4 col-sm-4">
+      <h2>Distributors</h2>
+    </div>
+  </div>
+  <% @distributors.each do |distributor| %>
+    <div class="row">
+      <div class="col-sm-offset-4 col-sm-4">
+        <%= link_to distributor.farm_name, producer_path(distributor) %>
+      </div>
+    </div>    
+  <% end %>
+<% end %>
+
+<% if @producers.any? %>
+  <div class="row">
+    <div class="col-sm-offset-4 col-sm-4">
+      <h2>Producers</h2>
+    </div>
+  </div>
+  <% @producers.each do |producer| %>
+    <div class="row">
+      <div class="col-sm-offset-4 col-sm-4">
+        <% link_class = "alert-danger" unless producer.get_business_interface %>
+        <%= link_to producer.farm_name, producer_path(producer), class: link_class %>
+      </div>
+    </div>    
+  <% end %>
+<% end %>

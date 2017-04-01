@@ -39,6 +39,7 @@ Rails.application.routes.draw do
   post 'partner_users/send_delivery_notification'
   get 'postings/delivery_date_range_selection_got_it'
 
+  resources :producers
   resources :business_interfaces
   resources :units
   resources :emails, only: [:index, :new, :create, :show]

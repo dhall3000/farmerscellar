@@ -50,6 +50,16 @@ class BusinessInterfacesController < ApplicationController
     @business_interfaces = BusinessInterface.all.order(:name)
   end
 
+  def destroy
+    @business_interface = BusinessInterface.find(params[:id])
+    if @business_interface && @business_interface.destroy
+      flash[:success] = "BusinessInterface destroyed"
+    else
+      flash[:danger] = "Error. BusinessInterface not destroyed"      
+    end
+    redirect_to business_interfaces_path
+  end
+
   private
     def business_interface_params
       params.require(:business_interface).permit(
