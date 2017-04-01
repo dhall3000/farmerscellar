@@ -4,7 +4,12 @@
 <%= link_to "Destroy", business_interface_path(@business_interface), method: :delete, class: "btn btn-lg btn-primary outline" %>
 <div class="row">
   <div class="col-sm-offset-4 col-sm-4">
-    <%= "Name: #{@business_interface.name}"%>
+    <span>Creditor Account: </span><%= link_to @business_interface.user.farm_name, producer_path(@business_interface.user) %>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-offset-4 col-sm-4">
+    <%= "BI Name: #{@business_interface.name}"%>
   </div>
 </div>
 <div class="row">
@@ -42,3 +47,17 @@
     <%= "Payment Receipt Email: #{@business_interface.payment_receipt_email}"%>
   </div>
 </div>
+
+<% if @business_interface.errors.any? %>
+  <div class="row">
+    <div class="col-sm-offset-4 col-sm-4">
+      <div class="alert-danger">
+        <ul>
+          <% @business_interface.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  </div>
+<% end %>

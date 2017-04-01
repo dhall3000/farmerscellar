@@ -5,7 +5,8 @@
 <% @business_interfaces.each do |bi| %>
   <div class="row">
     <div class="col-sm-offset-4 col-sm-4">
-      <%= link_to bi.name, business_interface_path(bi) %>
+      <% link_class = "alert-danger" unless bi.valid? %>
+      <%= link_to bi.name, business_interface_path(bi), class: link_class %>
     </div>
   </div>
 <% end %>
