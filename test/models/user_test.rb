@@ -12,6 +12,23 @@ class UserTest < ActiveSupport::TestCase
     @d1 = users(:d1)
   end
 
+  test "producer cannot source through distributor when business interface already exists" do
+    #create producer that has its own business_interface
+    producer = create_producer(name = "producer name", email = "producer@p.com", distributor = nil, order_min = 0, create_default_business_interface = true)
+    assert producer.valid?
+    assert producer.business_interface
+    #create distributor that has its own business_interface
+    distributor = create_distributor(name = "distributor name", email = "distributor@d.com", order_min = 0)
+    assert distributor.valid?
+    assert distributor.business_interface
+    #verify cannot source producer through distributor
+    producer.distributor = distributor
+    assert_not producer.save
+    assert_not producer.valid?
+    #destroy producer's bi
+    #verify can source producer through distributor
+  end
+
   #what if you have a producer that has no distributor. can you call producer.outbound_order_report(postings_at_order_cutoff) on it and have it do the right thing?
   test "should return proper orderable report when distributor postings reporter called on a producer with no distributor" do
 
@@ -73,14 +90,8 @@ class UserTest < ActiveSupport::TestCase
     oxbow = create_producer("oxbow", "oxbow@o.com")
     oxbow.update(order_minimum_producer_net: 50)
     #has many producers
-    producer1 = create_producer("producer1", "producer1@o.com")
-    producer1.distributor = oxbow    
-    producer1.save
-    producer1.update(order_minimum_producer_net: 20)
-
-    producer2 = create_producer("producer2", "producer2@o.com")
-    producer2.distributor = oxbow
-    producer2.save
+    producer1 = create_producer("producer1", "producer1@o.com", oxbow, order_min = 20, create_default_business_interface = false)
+    producer2 = create_producer("producer2", "producer2@o.com", oxbow, order_min = 0, create_default_business_interface = false)
 
     #has lots of order cutoffs
     delivery_date1 = get_delivery_date(days_from_now = 7)
@@ -210,14 +221,8 @@ class UserTest < ActiveSupport::TestCase
     oxbow = create_producer("oxbow", "oxbow@o.com")
     oxbow.update(order_minimum_producer_net: 50)
     #has many producers
-    producer1 = create_producer("producer1", "producer1@o.com")
-    producer1.distributor = oxbow    
-    producer1.save
-    producer1.update(order_minimum_producer_net: 20)
-
-    producer2 = create_producer("producer2", "producer2@o.com")
-    producer2.distributor = oxbow
-    producer2.save
+    producer1 = create_producer("producer1", "producer1@p.com", oxbow, order_min = 20, create_default_business_interface = false)
+    producer2 = create_producer("producer2", "producer2@p.com", oxbow, order_min = 0, create_default_business_interface = false)
 
     #has lots of order cutoffs
     delivery_date1 = get_delivery_date(days_from_now = 7)
@@ -680,12 +685,9 @@ class UserTest < ActiveSupport::TestCase
 
   test "should submit orders when distributor has no order minimum" do
     distributor = create_producer("distributor", "distributor@d.com")
-    producer1 = create_producer("producer1", "producer1@p.com")
-    producer1.distributor = distributor
-    producer1.save
-    producer2 = create_producer("producer2", "producer2@p.com")
-    producer2.distributor = distributor
-    producer2.save
+
+    producer1 = create_producer("producer1", "producer1@p.com", distributor, order_min = 0, create_default_business_interface = false)
+    producer2 = create_producer("producer2", "producer2@p.com", distributor, order_min = 0, create_default_business_interface = false)
 
     #create postings
     price_celery = 2.50
@@ -745,12 +747,8 @@ class UserTest < ActiveSupport::TestCase
     order_minimum = 30
     distributor.update(order_minimum_producer_net: order_minimum)
     assert_equal order_minimum, distributor.reload.order_minimum_producer_net
-    producer1 = create_producer("producer1", "producer1@p.com")
-    producer1.distributor = distributor
-    producer1.save
-    producer2 = create_producer("producer2", "producer2@p.com")
-    producer2.distributor = distributor
-    producer2.save
+    producer1 = create_producer("producer1", "producer1@p.com", distributor, order_min = 0, create_default_business_interface = false)
+    producer2 = create_producer("producer2", "producer2@p.com", distributor, order_min = 0, create_default_business_interface = false)
 
     #create postings
     price_celery = 2.50
@@ -810,12 +808,9 @@ class UserTest < ActiveSupport::TestCase
     order_minimum = 32
     distributor.update(order_minimum_producer_net: order_minimum)
     assert_equal order_minimum, distributor.reload.order_minimum_producer_net
-    producer1 = create_producer("producer1", "producer1@p.com")
-    producer1.distributor = distributor
-    producer1.save
-    producer2 = create_producer("producer2", "producer2@p.com")
-    producer2.distributor = distributor
-    producer2.save
+
+    producer1 = create_producer("producer1", "producer1@p.com", distributor, order_min = 0, create_default_business_interface = false)
+    producer2 = create_producer("producer2", "producer2@p.com", distributor, order_min = 0, create_default_business_interface = false)
 
     #create postings
     price_celery = 2.50
@@ -877,17 +872,12 @@ class UserTest < ActiveSupport::TestCase
     distributor_order_minimum = 10
     distributor.update(order_minimum_producer_net: distributor_order_minimum)
     assert_equal distributor_order_minimum, distributor.reload.order_minimum_producer_net
-
-    producer1 = create_producer("producer1", "producer1@p.com")
-    producer1.distributor = distributor
-    producer1.save
+    
     producer1_order_minimum = 25
-    producer1.update(order_minimum_producer_net: producer1_order_minimum)
+    producer1 = create_producer("producer1", "producer1@p.com", distributor, order_min = producer1_order_minimum, create_default_business_interface = false)
     assert_equal producer1_order_minimum, producer1.reload.order_minimum_producer_net
 
-    producer2 = create_producer("producer2", "producer2@p.com")
-    producer2.distributor = distributor
-    producer2.save
+    producer2 = create_producer("producer2", "producer2@p.com", distributor, order_min = 0, create_default_business_interface = false)
 
     #create postings
     price_celery = 2.50
@@ -947,12 +937,8 @@ class UserTest < ActiveSupport::TestCase
 
   test "should submit orders properly when distributor is itself a producer" do
     distributor = create_producer("distributor", "distributor@d.com")
-    producer1 = create_producer("producer1", "producer1@p.com")
-    producer1.distributor = distributor
-    producer1.save
-    producer2 = create_producer("producer2", "producer2@p.com")
-    producer2.distributor = distributor
-    producer2.save
+    producer1 = create_producer("producer1", "producer1@p.com", distributor, order_min = 0, create_default_business_interface = false)
+    producer2 = create_producer("producer2", "producer2@p.com", distributor, order_min = 0, create_default_business_interface = false)
 
     #create postings
     price_milk = 10

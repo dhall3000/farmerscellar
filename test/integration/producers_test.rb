@@ -66,7 +66,7 @@ class ProducersTest < IntegrationHelper
     p2 = create_producer(name = "producer2", email = "producer2@petes.com", distributor = petes, order_min = 0)
     p3 = create_producer(name = "producer3", email = "producer3@petes.com", distributor = nil, order_min = 0)
     p4 = create_producer(name = "producer4", email = "producer4@petes.com", distributor = nil, order_min = 0)
-debugger
+
     log_in_as get_admin
     get producers_path
     assert :success

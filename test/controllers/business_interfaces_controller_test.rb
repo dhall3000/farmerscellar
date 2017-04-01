@@ -6,12 +6,6 @@ class BusinessInterfacesControllerTest < IntegrationHelper
 
     #we have puget sound food hub
     psfh = create_producer(name = "Puget Sound Food Hub", email = "john@psfh.com", distributor = nil, order_min = 0)
-
-debugger
-    xxx = 1
-
-
-
     #psfh moves samish bay cheese
     #create_producer(name = "Puget Sound Food Hub", email = "john@psfh.com", distributor = nil, order_min = 0)
 
@@ -77,20 +71,11 @@ debugger
   end
 
   test "should get edit" do
-    producer = create_producer
+    producer = create_producer(name = "producer name", email = "producer@p.com", distributor = nil, order_min = 0, create_default_business_interface = false)
     bi = create_business_interface(producer, name = "Pete's Milk Delivery", order_email = "pete@petesmilkdelivery.com")
 
     log_in_as get_admin
     get edit_business_interface_path bi        
-  end
-
-  test "should get update" do
-  end
-
-  test "should get show" do
-  end
-
-  test "should get index" do
   end
 
 end

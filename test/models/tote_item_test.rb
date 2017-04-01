@@ -54,8 +54,7 @@ class ToteItemTest < ActiveSupport::TestCase
     distributor = create_producer("distributor", "distributor@d.com")
     distributor.update(order_minimum_producer_net: 100)
 
-    farm1 = create_producer("farmer1", "f1@f.com")
-    farm1.update(distributor: distributor, order_minimum_producer_net: 50)
+    farm1 = create_producer("farmer1", "f1@f.com", distributor, 50, create_default_business_interface = false)
     price = 2
     posting_f1 = create_posting(farm1, price, products(:apples))
     posting_f1.update(order_minimum_producer_net: 10)
@@ -67,8 +66,7 @@ class ToteItemTest < ActiveSupport::TestCase
     assert_equal (quantity * price * 0.915).round(2), posting_f1.reload.inbound_order_value_producer_net
     assert_equal 0, posting_f1.outbound_order_value_producer_net
 
-    farm2 = create_producer("farmer2", "f2@f.com")
-    farm2.update(distributor: distributor)
+    farm2 = create_producer("farmer2", "f2@f.com", distributor, 0, create_default_business_interface = false)
     price = 2
     posting_f2 = create_posting(farm2, price, products(:milk))
     quantity = 45
@@ -98,14 +96,11 @@ class ToteItemTest < ActiveSupport::TestCase
     
     distributor = create_producer("distributor", "distributor@d.com")
     distributor.update(order_minimum_producer_net: 100)
-
-    farm1 = create_producer("farmer1", "f1@f.com")
-    farm1.update(distributor: distributor)
-    farm2 = create_producer("farmer2", "f2@f.com")
-    farm2.update(distributor: distributor)
-    farm3 = create_producer("farmer3", "f3@f.com")
-    farm3.update(distributor: distributor)
-
+    
+    farm1 = create_producer("farmer1", "f1@f.com", distributor, order_min = 0, create_default_business_interface = false)
+    farm2 = create_producer("farmer2", "f2@f.com", distributor, order_min = 0, create_default_business_interface = false)    
+    farm3 = create_producer("farmer3", "f3@f.com", distributor, order_min = 0, create_default_business_interface = false)    
+    
     customer = create_user("bob", "bob@b.com")
     make_some_orders(distributor, customer)
     make_some_orders(farm1, customer)

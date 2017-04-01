@@ -21,15 +21,9 @@ class OrderMinimumsTest < IntegrationHelper
     distributor.create_business_interface(name: "Distributor Inc.", order_email: distributor.email, payment_method: BusinessInterface.payment_methods[:PAYPAL], paypal_email: distributor.email)
     distributor.update(order_minimum_producer_net: 20)
 
-    producer1 = create_producer("producer1", "producer1@p.com")
-    producer1.distributor = distributor
-    producer1.save
-
-    producer2 = create_producer("producer2", "producer2@p.com")
-    producer2.distributor = distributor
-    producer2.save
-
-    producer_decoy = create_producer("producer_decoy", "producer_decoy@p.com")
+    producer1 = create_producer("producer1", "producer1@p.com", distributor, order_min = 0, create_default_business_interface = false)
+    producer2 = create_producer("producer2", "producer2@p.com", distributor, order_min = 0, create_default_business_interface = false)    
+    producer_decoy = create_producer("producer_decoy", "producer_decoy@p.com", distributor = nil, order_min = 0, create_default_business_interface = false)
     producer_decoy.create_business_interface(name: producer_decoy.farm_name, order_email: producer_decoy.email, payment_method: BusinessInterface.payment_methods[:PAYPAL], paypal_email: producer_decoy.email)
 
     price = 1.00
