@@ -11,12 +11,32 @@ class RakeHelper
 		do_nightly_tasks
 		send_pickup_deadline_reminders
     send_postings_receivable_to_admin
+    do_db_integrity_checks
 
 	  puts "finished with hourly tasks."
 
 	end
 
 	private
+
+    def self.do_db_integrity_checks
+      producers = User.where(account_type: User.types[:PRODUCER])
+      no_interface_producers = []
+
+      producers.each do |producer|
+        if producer.get_business_interface.nil?
+          no_interface_producers << producer
+        end
+      end
+
+      if no_interface_producers.any?
+        body_lines = ["Here is a list of producers that have no associated business_interface"]
+        no_interface_producers.each do |nip|
+          body_lines << "ID: #{nip.id.to_s}, farm_name: #{nip.farm_name}"
+        end
+        AdminNotificationMailer.general_message("MAJOR PROBLEM: producer(s) without associated business_interface", "fake body", body_lines).deliver_now        
+      end
+    end
 
 		def self.roll_postings			
 		  transition_posting_ids = transition_open_postings

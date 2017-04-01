@@ -19,6 +19,43 @@ class RakeTasksTest < BulkBuyer
     @c7 = users(:c7)
   end
 
+  test "admin should get notified every hour if any producer accounts that have no associated business interface" do
+    nuke_all_users
+    nuke_all_postings
+
+    travel_to Time.zone.now.midnight
+    ActionMailer::Base.deliveries.clear
+    RakeHelper.do_hourly_tasks
+    assert_equal 0, ActionMailer::Base.deliveries.count
+
+    producer1 = create_producer("producer1", "producer1@p.com", distributor = nil, order_min = 0, create_default_business_interface = true)
+    assert producer1.valid?
+    assert producer1.business_interface
+    travel 1.hour
+    RakeHelper.do_hourly_tasks
+    #there should be no admin alerts cause this producer has a business interface
+    assert_equal 0, ActionMailer::Base.deliveries.count
+    producer2 = create_producer("producer2", "producer2@p.com", distributor = nil, order_min = 0, create_default_business_interface = false)
+    assert producer2.valid?
+    assert_not producer2.business_interface
+    travel 1.hour
+    RakeHelper.do_hourly_tasks
+    #there should be a admin alert cause this producer has no business interface
+    assert_equal 1, ActionMailer::Base.deliveries.count
+
+    #let's say another hour goes by and nobody fixes problem. we should see another email
+    travel 1.hour
+    RakeHelper.do_hourly_tasks
+    assert_equal 2, ActionMailer::Base.deliveries.count
+    ActionMailer::Base.deliveries.clear
+
+    #finally lazy admin drags himself out of bed and fixes the problem
+    create_business_interface(producer2)
+    travel 1.hour
+    RakeHelper.do_hourly_tasks
+    assert_equal 0, ActionMailer::Base.deliveries.count
+  end
+
   test "producer should not get order email if no product ordered from him" do
 
     assert_equal 0, ToteItem.where(state: ToteItem.states[:FILLED]).count, "This test requires there be no FILLED tote items as a pre-condition."    
