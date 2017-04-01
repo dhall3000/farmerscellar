@@ -1,7 +1,8 @@
 <h1>BusinessInterface</h1>
 
-<%= link_to "Edit", edit_business_interface_path(@business_interface), class: "btn btn-lg btn-primary outline" %>
-<%= link_to "Destroy", business_interface_path(@business_interface), method: :delete, class: "btn btn-lg btn-primary outline" %>
+<div><%= link_to "business interfaces", business_interfaces_path %></div>
+<div><%= link_to "Edit", edit_business_interface_path(@business_interface), class: "btn btn-lg btn-primary outline" %></div>
+<div><%= link_to "Destroy", business_interface_path(@business_interface), method: :delete, class: "btn btn-lg btn-primary outline" %></div>
 <div class="row">
   <div class="col-sm-offset-4 col-sm-4">
     <span>Creditor Account: </span><%= link_to @business_interface.user.farm_name, producer_path(@business_interface.user) %>

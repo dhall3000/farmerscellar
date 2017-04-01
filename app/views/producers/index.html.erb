@@ -15,7 +15,8 @@
   <% @distributors.each do |distributor| %>
     <div class="row">
       <div class="col-sm-offset-4 col-sm-4">
-        <%= link_to distributor.farm_name, producer_path(distributor) %>
+        <% link_class = "alert-danger" unless (distributor.get_business_interface && !distributor.invalid?) %>
+        <%= link_to distributor.farm_name, producer_path(distributor), class: link_class %>
       </div>
     </div>    
   <% end %>
@@ -30,7 +31,7 @@
   <% @producers.each do |producer| %>
     <div class="row">
       <div class="col-sm-offset-4 col-sm-4">
-        <% link_class = "alert-danger" unless producer.get_business_interface %>
+        <% link_class = "alert-danger" unless (producer.get_business_interface && !producer.invalid?) %>
         <%= link_to producer.farm_name, producer_path(producer), class: link_class %>
       </div>
     </div>    

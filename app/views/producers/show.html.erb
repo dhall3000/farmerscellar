@@ -1,2 +1,75 @@
-<h1>Producers#show</h1>
-<p>Find me in app/views/producers/show.html.erb</p>
+<h1><%= @producer.farm_name %></h1>
+
+<div><%= link_to "producers", producers_path, class: "fat-finger-spacing" %></div>
+<div><%= link_to "Edit", edit_producer_path(@producer), class: "btn btn-lg btn-primary outline fat-finger-spacing" %></div>
+
+<div class="panel-group">
+
+  <% if @producer.get_business_interface.nil? || !@producer.valid? %>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <div class="panel-title">
+          <span class="alert-danger">Problems</span>
+        </div>
+      </div>    
+      <div class="panel-body">
+        <% if @producer.get_business_interface.nil? %>
+          <p>This account has no associated business_interface</p>
+        <% end %>
+        <% if !@producer.valid? %>
+          <ul>
+            <% @producer.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        <% end %>        
+      </div>    
+    </div>
+  <% end %>
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <div class="panel-title">
+        Account Info
+      </div>
+    </div>    
+    <div class="panel-body">
+      <h3>Name</h3>
+      <%= @producer.name %>
+      <h3>Email</h3>
+      <%= @producer.email %>
+      <h3>Created at</h3>
+      <%= @producer.created_at.strftime("%B %d, %Y at %l:%M %p") %>
+      <h3>Description</h3>
+      <%= @producer.description %>
+      <h3>City</h3>
+      <%= @producer.city %>
+      <h3>State</h3>
+      <%= @producer.state %>
+      <h3>Website</h3>
+      <%= @producer.website %>
+      <h3>Order minimum producer net</h3>
+      <%= @producer.order_minimum_producer_net %>
+      <h3>Distributor</h3>
+      <%= @producer.get_creditor == @producer ? "Self" : (link_to @producer.get_creditor.farm_name, producers_path(@producer.get_creditor)) %>
+      <h3>Business Interface</h3>
+      <%= @producer.get_business_interface ? (link_to @producer.get_business_interface.name, business_interface_path(@producer.get_business_interface)) : "No interface" %>
+    </div>    
+  </div>
+
+  <% if @producer.distributor? %>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <div class="panel-title">
+          Producers
+        </div>
+      </div>    
+      <div class="panel-body">
+        <% @producer.producers.order(:farm_name).each do |producer| %>
+          <%= link_to producer.farm_name, producer_path(producer) %>
+        <% end %>        
+      </div>    
+    </div>
+  <% end %>
+
+</div>

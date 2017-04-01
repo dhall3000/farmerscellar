@@ -39,6 +39,7 @@ class ProducersController < ApplicationController
   end
 
   def show
+    @producer = User.find(params[:id])
   end
 
   def destroy
