@@ -4,6 +4,7 @@ class BusinessInterface < ApplicationRecord
   validates :name, presence: true
 
   validates :payment_method, :payment_time, presence: true
+  validates :user, uniqueness: true
 
   #'AUTOMATIC' means we leave payment info with the creditor and they tap it at the time they fill our order
   def self.payment_methods

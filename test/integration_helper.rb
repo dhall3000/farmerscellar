@@ -30,10 +30,15 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
       }
     }
 
-    assert_equal bi_count + 1, BusinessInterface.count
-    assert_equal "BusinessInterface created", flash[:success]
     bi = assigns(:business_interface)
-    assert bi.valid?
+    if bi.valid?
+      assert_equal bi_count + 1, BusinessInterface.count
+      assert_equal "BusinessInterface created", flash[:success]
+    else
+      assert_equal bi_count, BusinessInterface.count
+      assert_equal "BusinessInterface not created", flash.now[:danger]
+      assert_template 'business_interfaces/new'
+    end
 
     return bi
 
