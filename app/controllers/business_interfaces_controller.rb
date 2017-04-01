@@ -68,6 +68,6 @@ class BusinessInterfacesController < ApplicationController
     end
 
     def get_producers_for_new            
-      @producers = User.includes(:business_interface).where(account_type: User.types[:PRODUCER], business_interfaces: {id: [nil, @business_interface]})
+      @producers = User.includes(:business_interface).where(distributor_id: nil, account_type: User.types[:PRODUCER], business_interfaces: {id: [nil, @business_interface]})
     end
 end

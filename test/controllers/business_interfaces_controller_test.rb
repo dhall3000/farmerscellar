@@ -2,6 +2,44 @@ require 'integration_helper'
 
 class BusinessInterfacesControllerTest < IntegrationHelper
 
+  test "belong to producers should exclude patrons of a distributor" do
+
+    #explanation: a producer can't have a business_interface and a distributor. that is a foul. so when we are creating a new BI we have a dropdown
+    #list of the eligible producers. this list of eligibles should only include producers who have neither distributor nor BI
+
+    nuke_all_users
+
+    distributor = create_distributor("pete's", "pete@petesmilkdelivery.com")
+    assert distributor.valid?
+    assert distributor.business_interface
+    assert distributor.business_interface.valid?
+
+    grace = create_producer("grace harbor farms", "tim@ghf.com", distributor, order_min = 0, create_default_business_interface = false)
+    pureeire = create_producer("pure eire dairy", "richard@pe.com", distributor, order_min = 0, create_default_business_interface = false)
+
+    new_farm = create_producer("bob's turkey ranch", "bob@turkeyranch.com", nil, order_min = 0, create_default_business_interface = false)
+    assert new_farm.valid?
+    assert_not new_farm.business_interface
+    assert new_farm.get_business_interface.nil?
+
+    log_in_as get_admin
+    get new_business_interface_path
+    assert_response :success
+    assert_template 'business_interfaces/new'
+
+    producers = assigns(:producers)
+
+    assert_equal 1, producers.where(id: new_farm).count
+
+    #these belong to the distributor so shouldn't be visible in the 'eligibles' list
+    assert_not producers.where(id: grace).any?
+    assert_not producers.where(id: pureeire).any?
+
+    #there should only be one eligible producer to belong_to
+    assert_equal 1, producers.count
+
+  end
+
   test "producer should not be able to have distributor and business interface" do
 
     #we have puget sound food hub
@@ -47,7 +85,7 @@ class BusinessInterfacesControllerTest < IntegrationHelper
     create_business_interface(producer, name = "Pete's Milk Delivery", order_email = "pete@petesmilkdelivery.com")
   end
 
-  test "should get create if producer not specified" do
+  test "should not create if producer not specified" do
 
     producer = create_producer
     log_in_as get_admin
