@@ -5,6 +5,7 @@ class BusinessInterface < ApplicationRecord
 
   validates :payment_method, :payment_time, presence: true
   validates :user, uniqueness: true
+  validate :cannot_belong_to_producer_that_has_distributor
 
   #'AUTOMATIC' means we leave payment info with the creditor and they tap it at the time they fill our order
   def self.payment_methods
@@ -80,5 +81,13 @@ class BusinessInterface < ApplicationRecord
 #  order_email: if order_email is non null specify the address you want order emails routed to here. else set to nil
 #  order_instructions: if order_email is non null specify any special manual order submission instructions here. these will be included in the order emailed to 'david@fc.com'. if !order_email, set to nil
 #  paypal_email: same concept as for order_email. paypal payment will get sent to this address. also, our payment invoice well get sent to this address.
+  
+  private
+
+    def cannot_belong_to_producer_that_has_distributor
+      if user && user.distributor
+        errors.add(:user, "producer already has distributor")
+      end
+    end
 
 end

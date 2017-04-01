@@ -2,7 +2,7 @@ module TestLib
 
 #def create_admin(name = "Mr. Admin", email = "admin@a.com")
 #def create_distributor(name = "distributor name", email = "distributor@d.com", order_min = 0)
-#def create_producer(name = "producer name", email = "producer@p.com", distributor = nil, order_min = 0)
+#def create_producer(name = "producer name", email = "producer@p.com", distributor = nil, order_min = 0, create_default_business_interface = true)
 #def create_business_interface(creditor, order_instructions = "order instructions", payment_method = BusinessInterface.payment_methods[:PAYPAL], payment_instructions = "payment instructions", payment_time = BusinessInterface.payment_times[:AFTERDELIVERY])
 #def create_user(name = "customer name", email = "customer@c.com")
 #def create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0, producer_net_unit = nil)
@@ -439,7 +439,7 @@ module TestLib
 
   end
 
-  def create_producer(name = "producer name", email = "producer@p.com", distributor = nil, order_min = 0)
+  def create_producer(name = "producer name", email = "producer@p.com", distributor = nil, order_min = 0, create_default_business_interface = true)
     
     user = create_user(name, email)    
     user.update(
@@ -451,7 +451,9 @@ module TestLib
       farm_name: "#{name} Farms")
 
     producer = user.reload
-    create_business_interface(producer)
+    if create_default_business_interface
+      create_business_interface(producer)
+    end
 
     return producer
 
@@ -488,6 +490,8 @@ module TestLib
       payment_time: payment_time,
       payment_receipt_email: payment_receipt_email
       )
+
+    return creditor.business_interface
 
   end
 
