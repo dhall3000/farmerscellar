@@ -4,11 +4,11 @@ class ProducersController < ApplicationController
   def new
     @producer = User.new    
     #@producer = User.new(name: "Palouse Poultry", email: "palouse@poultry.com", description: "good chicken", city: "Rosario", state: "WA", website: "http://www.palousepasturedpoultry.com", farm_name: "PP Poultry")
-    @producers = User.where(account_type: User.types[:PRODUCER])    
+    get_producers_for_new
   end
 
   def create
-    
+
     @producer = User.new(producer_params)
     @producer.password = "854f7f938d52415c8d20a7ca4afa3040"
     @producer.password_confirmation = "854f7f938d52415c8d20a7ca4afa3040"
@@ -20,7 +20,7 @@ class ProducersController < ApplicationController
       flash[:success] = "Producer created"
       redirect_to producer_path(@producer)
     else
-      @producers = User.where(account_type: User.types[:PRODUCER])
+      get_producers_for_new
       flash.now[:danger] = "Producer not created"
       render 'producers/new'
     end
@@ -33,9 +33,20 @@ class ProducersController < ApplicationController
   end
 
   def edit
+    @producer = User.find(params[:id])
+    get_producers_for_new
   end
 
   def update
+    @producer = User.find(params[:id])
+    if @producer.update_attributes(producer_params)
+      flash[:success] = "Producer updated"
+      redirect_to producer_path(@producer)
+    else
+      get_producers_for_new
+      flash.now[:danger] = "Producer not updated"
+      render 'edit'
+    end
   end
 
   def show
@@ -48,5 +59,9 @@ class ProducersController < ApplicationController
   private
     def producer_params
       params.require(:producer).permit(:name, :email, :description, :city, :state, :website, :farm_name, :distributor_id, :order_minimum_producer_net)
+    end
+
+    def get_producers_for_new
+      @producers = User.where(account_type: User.types[:PRODUCER]).where.not(id: @producer).order(:farm_name)
     end
 end

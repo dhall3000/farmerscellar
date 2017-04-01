@@ -1,2 +1,43 @@
-<h1>Producers#edit</h1>
-<p>Find me in app/views/producers/edit.html.erb</p>
+<h1>Edit Producer</h1>
+
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <div><%= link_to "show", producer_path(@producer), class: "fat-finger-spacing" %></div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <%= form_for @producer, url: producer_path, as: :producer do |f| %>
+      <%= render partial: 'shared/error_messages_general', locals: { active_record_object: @producer } %>
+
+      <%= f.label :name %>
+      <%= f.text_field :name, class: 'form-control' %>
+
+      <%= f.label :email %>
+      <%= f.text_field :email, class: 'form-control' %>
+
+      <%= f.label :description %>
+      <%= f.text_area :description, class: "form-control", rows: "8" %>      
+
+      <%= f.label :city %>
+      <%= f.text_field :city, class: 'form-control' %>
+
+      <%= f.label :state %>
+      <%= f.text_field :state, class: 'form-control' %>
+
+      <%= f.label :website %>
+      <%= f.text_field :website, class: 'form-control' %>
+
+      <%= f.label :farm_name %>
+      <%= f.text_field :farm_name, class: 'form-control' %>
+
+      <%= f.label :order_minimum_producer_net %>
+      <%= f.number_field :order_minimum_producer_net, min: 0.00, step: 0.01, class: 'form-control' %>
+
+      <%= f.label :distributor_id, "Distributor" %>
+      <%= f.collection_select(:distributor_id, @producers, :id, :farm_name, {prompt: true, selected: @producer.distributor_id, include_blank: "Self"}, {class: 'form-control'}) %>   
+
+      <%= f.submit "Update producer", class: "btn btn-lg btn-primary outline" %>
+    <% end %>
+  </div>
+</div>

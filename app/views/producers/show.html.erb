@@ -47,13 +47,13 @@
       <h3>State</h3>
       <%= @producer.state %>
       <h3>Website</h3>
-      <%= @producer.website %>
+      <%= link_to @producer.website, @producer.website, target: "blank" %>
       <h3>Order minimum producer net</h3>
       <%= @producer.order_minimum_producer_net %>
       <h3>Distributor</h3>
       <%= @producer.get_creditor == @producer ? "Self" : (link_to @producer.get_creditor.farm_name, producers_path(@producer.get_creditor)) %>
       <h3>Business Interface</h3>
-      <%= @producer.get_business_interface ? (link_to @producer.get_business_interface.name, business_interface_path(@producer.get_business_interface)) : "No interface" %>
+      <%= @producer.get_business_interface ? (link_to @producer.get_business_interface.name, business_interface_path(@producer.get_business_interface)) : "No associated interface" %>
     </div>    
   </div>
 
