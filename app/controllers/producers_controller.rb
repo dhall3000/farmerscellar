@@ -10,8 +10,8 @@ class ProducersController < ApplicationController
   def create
 
     @producer = User.new(producer_params)
-    @producer.password = "854f7f938d52415c8d20a7ca4afa3040"
-    @producer.password_confirmation = "854f7f938d52415c8d20a7ca4afa3040"
+    @producer.password = PRODUCERDEFAULTPASSWORD
+    @producer.password_confirmation = PRODUCERDEFAULTPASSWORD
     @producer.account_type = User.types[:PRODUCER]
     @producer.activated = true
     @producer.activated_at = Time.zone.now

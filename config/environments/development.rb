@@ -81,6 +81,7 @@ Rails.application.configure do
     ::FOODCLEAROUTWARNINGDAYTIME = eval(ENV['FOODCLEAROUTWARNINGDAYTIME'])
     #so query against this like so: if Time.zone.today.wday == STARTOFWEEK
     ::STARTOFWEEK = FOODCLEAROUTDAYTIME[:wday]
+    ::PRODUCERDEFAULTPASSWORD = "defaultproducerpassword"
 
     ActiveMerchant::Billing::Base.mode = :test    
     ::GATEWAY = ActiveMerchant::Billing::PaypalExpressGateway.new(
