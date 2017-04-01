@@ -81,7 +81,7 @@ class CreditorObligation < ApplicationRecord
   end
 
   def self.get_positive_balanced
-    return CreditorObligation.joins(creditor_order: {creditor: :business_interface}).where("balance > 0.0").where("business_interfaces.payment_method = ?", BusinessInterface.payment_methods[:PAYPAL])
+    return CreditorObligation.joins(creditor_order: {creditor: :business_interface}).where("balance > 0.0").where("business_interfaces.payment_method = ?", BusinessInterface.payment_methods[:PAYPAL]).distinct
   end
 
   private

@@ -13,7 +13,7 @@ require 'utility/rake_helper'
 class IntegrationHelper < ActionDispatch::IntegrationTest
   include ActionView::Helpers::TextHelper
 
-  def create_business_interface(producer, name = "Producer's Business Interface Name", order_email = "orders@farmfactory.com", payment_method = BusinessInterface.payment_methods[:CASH], payment_time = BusinessInterface.payment_times[:ONDELIVERY])
+  def create_business_interface(producer, name = "Producer's Business Interface Name", order_email = "orders@farmfactory.com", payment_method = BusinessInterface.payment_methods[:PAYPAL], payment_time = BusinessInterface.payment_times[:AFTERDELIVERY], paypal_email = "paypalpayment@farmfactory.com")
     
     log_in_as get_admin
 
@@ -25,7 +25,8 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
         order_email: order_email,
         payment_method: payment_method,
         payment_time: payment_time,
-        user_id: producer.id
+        user_id: producer.id,
+        paypal_email: paypal_email
       }
     }
 

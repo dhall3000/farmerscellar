@@ -31,6 +31,72 @@ class PostingTest < ActiveSupport::TestCase
 
   end
 
+  test "should save when producer has an associated business interface" do
+    
+    producer = User.new(
+      name: "Farmer Bob",
+      farm_name: "Bob's Farm, Inc.",
+      email: "bob@bobsfarm.com",
+      password: "bobsfarm",
+      password_confirmation: "bobsfarm",
+      account_type: User.types[:PRODUCER],
+      activated: true,
+      description: "real good farm with real good practices",      
+      )
+    assert producer.valid?
+    assert producer.save
+
+    create_business_interface(producer, order_instructions = "order instructions", payment_method = BusinessInterface.payment_methods[:PAYPAL], payment_instructions = "payment instructions", payment_time = BusinessInterface.payment_times[:AFTERDELIVERY])
+
+    posting = Posting.new(
+      price: 10,
+      user: producer,
+      product: Product.create(name: "Myproduct"),
+      unit: Unit.create(name: "Myunit"),
+      live: true,
+      delivery_date: get_delivery_date(7),
+      order_cutoff: get_delivery_date(5),
+      description: "super yummy product",
+      producer_net_unit: 9
+      )
+
+    #this should not be valid cause producer has neither creditor nor business_interface
+    assert posting.valid?    
+
+  end
+
+  test "should not save when producer does not have business interface or creditor" do
+    
+    producer = User.new(
+      name: "Farmer Bob",
+      farm_name: "Bob's Farm, Inc.",
+      email: "bob@bobsfarm.com",
+      password: "bobsfarm",
+      password_confirmation: "bobsfarm",
+      account_type: User.types[:PRODUCER],
+      activated: true,
+      description: "real good farm with real good practices",      
+      )
+    assert producer.valid?
+    assert producer.save
+
+    posting = Posting.new(
+      price: 10,
+      user: producer,
+      product: Product.create(name: "Myproduct"),
+      unit: Unit.create(name: "Myunit"),
+      live: true,
+      delivery_date: get_delivery_date(7),
+      order_cutoff: get_delivery_date(5),
+      description: "super yummy product",
+      producer_net_unit: 9
+      )
+
+    #this should not be valid cause producer has neither creditor nor business_interface
+    assert_not posting.valid?    
+
+  end
+
   test "validate validations" do
 
     assert @posting.valid?

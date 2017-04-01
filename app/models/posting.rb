@@ -40,7 +40,7 @@ class Posting < ApplicationRecord
   validates :order_minimum_producer_net, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true    
   validates :inbound_order_value_producer_net, numericality: { greater_than_or_equal_to: 0 }, allow_nil: false
 
-  validate :important_notes_body_not_present_without_important_notes, :delivery_date_not_food_clearout_day, :order_cutoff_must_be_before_delivery_date
+  validate :producer_must_have_associated_business_interface, :important_notes_body_not_present_without_important_notes, :delivery_date_not_food_clearout_day, :order_cutoff_must_be_before_delivery_date
   
   before_create :delivery_date_must_be_after_today  
 
@@ -563,5 +563,13 @@ class Posting < ApplicationRecord
       end
 
     end    
+
+    def producer_must_have_associated_business_interface
+
+      if user.nil? || user.get_business_interface.nil?
+        errors.add(:user, "producer must have associated BusinessInterface")
+      end
+
+    end
 
 end
