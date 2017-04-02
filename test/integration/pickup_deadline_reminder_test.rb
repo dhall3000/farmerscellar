@@ -265,7 +265,7 @@ class PickupDeadlineReminderTest < IntegrationHelper
     delivery_date = get_next_wednesday
     order_cutoff = delivery_date - 2.days
 
-    distributor = create_producer("distributor", "distributor@d.com")
+    distributor = create_producer("distributor", "distributor@d.com", distributor = nil, order_min = 0, create_default_business_interface = false)    
     distributor.create_business_interface(name: "Distributor Inc.", order_email: distributor.email, payment_method: BusinessInterface.payment_methods[:PAYPAL], paypal_email: distributor.email)
 
     producer1 = create_producer("producer1", "producer1@p.com")

@@ -517,6 +517,7 @@ end
     log_in_as(farmer)
     post postings_path, params: {posting: posting_params}    
     posting = assigns(:posting)
+
     assert posting.valid?
 
     assert_response :redirect
@@ -754,7 +755,7 @@ end
     end
     order_cutoff = delivery_date - 2.days
 
-    distributor = create_producer("distributor", "distributor@d.com")
+    distributor = create_producer("distributor", "distributor@d.com", distributor, order_min = 0, create_default_business_interface = false)
     distributor.create_business_interface(name: "Distributor Inc.", order_email: distributor.email, payment_method: BusinessInterface.payment_methods[:PAYPAL], paypal_email: distributor.email)
 
     #maybe we can/will parameterize this later?
@@ -762,9 +763,7 @@ end
       distributor.update(order_minimum_producer_net: 20)
     end
 
-    producer1 = create_producer("producer1", "producer1@p.com")
-    producer1.distributor = distributor    
-    producer1.save
+    producer1 = create_producer("producer1", "producer1@p.com", distributor, order_min = 0, create_default_business_interface = false)
         
     price = 1.00
     posting1 = create_posting(producer1, price, products(:apples), units(:pound), delivery_date, order_cutoff, units_per_case = 1, frequency = 1, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = get_producer_net_unit(0.05, price))
@@ -837,7 +836,7 @@ end
     end
     order_cutoff = delivery_date - 2.days
 
-    distributor = create_producer("distributor", "distributor@d.com")
+    distributor = create_producer("distributor", "distributor@d.com", distributor = nil, order_min = 0, create_default_business_interface = false)
     distributor.create_business_interface(name: "Distributor Inc.", order_email: distributor.email, payment_method: BusinessInterface.payment_methods[:PAYPAL], paypal_email: distributor.email)
 
     #maybe we can/will parameterize this later?
@@ -845,9 +844,7 @@ end
       distributor.update(order_minimum_producer_net: 20)
     end
 
-    producer1 = create_producer("producer1", "producer1@p.com")
-    producer1.distributor = distributor    
-    producer1.save
+    producer1 = create_producer("producer1", "producer1@p.com", distributor, order_min = 0, create_default_business_interface = false)
         
     price = 1.00
     posting1 = create_posting(producer1, price, products(:apples), units(:pound), delivery_date, order_cutoff, units_per_case = 1, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = get_producer_net_unit(0.05, price))

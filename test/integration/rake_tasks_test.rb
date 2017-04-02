@@ -54,6 +54,8 @@ class RakeTasksTest < BulkBuyer
     travel 1.hour
     RakeHelper.do_hourly_tasks
     assert_equal 0, ActionMailer::Base.deliveries.count
+
+    travel_back    
   end
 
   test "producer should not get order email if no product ordered from him" do
