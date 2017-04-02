@@ -5,7 +5,11 @@
 <div><%= link_to "Destroy", business_interface_path(@business_interface), method: :delete, class: "btn btn-lg btn-primary outline" %></div>
 <div class="row">
   <div class="col-sm-offset-4 col-sm-4">
-    <span>Creditor Account: </span><%= link_to @business_interface.user.farm_name, producer_path(@business_interface.user) %>
+    <% if @business_interface.user %>
+      <span>Creditor Account: </span><%= link_to(@business_interface.user.farm_name, producer_path(@business_interface.user))  %>
+    <% else %>
+      <span class="alert-danger">Creditor Account: No associated producer account</span>      
+    <% end %>    
   </div>
 </div>
 <div class="row">
@@ -26,11 +30,6 @@
 <div class="row">
   <div class="col-sm-offset-4 col-sm-4">
     <%= "Paypal Email: #{@business_interface.paypal_email}"%>
-  </div>
-</div>
-<div class="row">
-  <div class="col-sm-offset-4 col-sm-4">
-    <%= "Producer: #{@business_interface.user.farm_name}"%>
   </div>
 </div>
 <div class="row">

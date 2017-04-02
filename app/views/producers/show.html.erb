@@ -66,7 +66,7 @@
       </div>    
       <div class="panel-body">
         <% @producer.producers.order(:farm_name).each do |producer| %>
-          <%= link_to producer.farm_name, producer_path(producer) %>
+          <div><%= link_to producer.farm_name, producer_path(producer) %></div>
         <% end %>        
       </div>    
     </div>
