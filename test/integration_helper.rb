@@ -13,6 +13,10 @@ require 'utility/rake_helper'
 class IntegrationHelper < ActionDispatch::IntegrationTest
   include ActionView::Helpers::TextHelper
 
+  def teardown
+    travel_back
+  end
+
   def create_business_interface(producer, name = "Producer's Business Interface Name", order_email = "orders@farmfactory.com", payment_method = BusinessInterface.payment_methods[:PAYPAL], payment_time = BusinessInterface.payment_times[:AFTERDELIVERY], paypal_email = "paypalpayment@farmfactory.com")
     
     log_in_as get_admin
