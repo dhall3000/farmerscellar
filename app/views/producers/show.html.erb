@@ -34,10 +34,12 @@
       </div>
     </div>    
     <div class="panel-body">
-      <h3>Name</h3>
-      <%= @producer.name %>
+      <h3>ID</h3>
+      <%= @producer.id.to_s %>
       <h3>Email</h3>
       <%= @producer.email %>
+      <h3>Name</h3>
+      <%= @producer.name %>
       <h3>Created at</h3>
       <%= @producer.created_at.strftime("%B %d, %Y at %l:%M %p") %>
       <h3>Description</h3>

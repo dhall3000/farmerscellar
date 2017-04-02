@@ -1,5 +1,8 @@
 <h1>New Payment</h1>
 
+<h2>Payment Receipt Email</h2>
+<div><%= @creditor_order.creditor.get_business_interface.payment_receipt_email %></div>
+
 <%= form_for @payment do |f| %>
   
   <%= render partial: 'shared/error_messages_general', locals: { active_record_object: @payment } %>
@@ -19,4 +22,3 @@
   <%= f.submit "Create payment", class: "btn btn-lg btn-primary outline" %>
 
 <% end %>
-
