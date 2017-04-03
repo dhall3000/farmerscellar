@@ -45,7 +45,7 @@ class ToteItemsController < ApplicationController
 
       @tote_items_by_week = []      
       tote_items = ToteItem.calendar_items_displayable(current_user)
-      @first_future_item = tote_items.where("postings.delivery_date >= ?", Time.zone.now.midnight).where("tote_items.state" => [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED]]).order("postings.delivery_date asc").first
+      @first_future_item = future_items(tote_items).first
 
       if tote_items.any?
         calendar_start = tote_items.first.posting.delivery_date
