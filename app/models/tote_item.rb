@@ -62,14 +62,12 @@ class ToteItem < ApplicationRecord
     
     authorized_subscription_objects = get_authorized_subscription_objects_for(user)
 
-    if authorized_subscription_objects.nil?
-      return nil
-    end
-
     subscription_items = ToteItem.none
-    authorized_subscription_objects.each do |subscription_object|
-      subscription_items = subscription_items.or(ToteItem.customer_visible_subscription_items(subscription_object))
-    end    
+    if !authorized_subscription_objects.nil?
+      authorized_subscription_objects.each do |subscription_object|
+        subscription_items = subscription_items.or(ToteItem.customer_visible_subscription_items(subscription_object))
+      end    
+    end
     
     individual_items = where(subscription: nil, state: [states[:AUTHORIZED], states[:COMMITTED]])    
     ready_for_pickup_items = user.tote_items.joins(:posting).where("postings.delivery_date > ?", user.pickup_items_start).where("tote_items.state" => ToteItem.states[:FILLED])

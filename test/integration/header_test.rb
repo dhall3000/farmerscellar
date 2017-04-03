@@ -153,10 +153,11 @@ class HeaderTest < IntegrationHelper
     log_in_as bob
     get root_path
 
-    #here's why there should be 3: the every other week item just got filled. so that should show. but a new tote item won't get generated for the 2-weeks-out posting
-    #until the next order_cutoff hits. so for this series the calendar should only show 1 item. for the every-week subscription there should be one item for tomorrow's
-    #delivery and another item for the delivery after that
-    assert_select 'span.glyphicon-calendar ~ span.header-object-count', "3"
+    #the every other week subscription won't have a future item generated until the next order cutoff hits. so the only item is the one that just got filled. however,
+    #the header only shows future items. we want it this way so that people use the ready to pickup feature for pickups rather than the calendar. the reason for this is
+    #using the ready for pickup feature on one's mobile device in the dropsite while picking up should drive down SNAFU rate. so calendar only shows future deliverables.
+    #so right now for the every-other-week series there are no future items yet. for the weekly subscription there should be tomorrow's item displayed.
+    assert_select 'span.glyphicon-calendar ~ span.header-object-count', "1"
 
     travel_back
     

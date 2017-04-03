@@ -10,6 +10,9 @@ class PaymentsController < ApplicationController
     balance = 0
     if @creditor_order
       balance = @creditor_order.balance
+      if @creditor_order.creditor
+        @business_interface = @creditor_order.creditor.get_business_interface
+      end      
     end
     @payment = Payment.new(amount: balance, amount_applied: 0)
   end

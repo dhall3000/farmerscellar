@@ -217,21 +217,28 @@ class OrdersCalendarTest < IntegrationHelper
 
     log_in_as bansal
     get root_path
+    assert_select 'span.glyphicon-shopping-cart + span.header-object-count', {text: "1", count: 1}
+    assert_select 'span.glyphicon-shopping-cart + span.header-object-count', {text: "", count: 0}
     assert_select 'span.glyphicon-calendar + span.header-object-count', {text: "", count: 1}
     assert_select 'span.glyphicon-calendar + span.header-object-count', {text: "1", count: 0}
     create_rt_authorization_for_customer(bansal)
     log_in_as bansal
     get root_path
+    assert_select 'span.glyphicon-shopping-cart + span.header-object-count', {text: "1", count: 0}
+    assert_select 'span.glyphicon-shopping-cart + span.header-object-count', {text: "", count: 1}
     assert_select 'span.glyphicon-calendar + span.header-object-count', {text: "1", count: 1}
     assert_select 'span.glyphicon-calendar + span.header-object-count', {text: "", count: 0}
 
     travel_to posting1.order_cutoff
     RakeHelper.do_hourly_tasks
 
-    #now the next item in the series has been generated so header should say '2' for calendar
+    #now the next item in the series has been generated so header should say '1' for calendar
     log_in_as bansal
     get root_path
-    assert_select 'span.glyphicon-calendar + span.header-object-count', {text: "2", count: 1}
+    assert_select 'span.glyphicon-shopping-cart + span.header-object-count', {text: "1", count: 0}
+    assert_select 'span.glyphicon-shopping-cart + span.header-object-count', {text: "", count: 1}
+    assert_select 'span.glyphicon-calendar + span.header-object-count', {text: "1", count: 1}
+    assert_select 'span.glyphicon-calendar + span.header-object-count', {text: "", count: 0}
 
     travel_to posting1.delivery_date + 12.hours
 
