@@ -2,6 +2,72 @@ require 'integration_helper'
 
 class ToteItemsTest < IntegrationHelper
 
+  test "customer visible subscription items scope dev driver" do
+
+    posting = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil, important_notes = nil, important_notes_body = nil)
+    bob = create_user
+    ti = create_tote_item(bob, posting, quantity = 1, frequency = 1)
+    create_rt_authorization_for_customer(bob)
+
+    ret = ToteItem.customer_visible_subscription_items(ti.subscription)
+    assert_equal 1, ret.count
+    assert ret.last.state?(:AUTHORIZED)
+
+    travel_to posting.order_cutoff
+    RakeHelper.do_hourly_tasks
+    travel 1.minute
+
+    ret = ToteItem.customer_visible_subscription_items(ti.subscription)
+    assert_equal 1, ret.count
+    assert ret.last.state?(:COMMITTED)
+
+  end
+
+  test "customer should not see multiple items in a subscription series" do
+
+    posting1 = create_posting(farmer = nil, price = nil, product = Product.create(name: "Product1"), unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil, important_notes = nil, important_notes_body = nil)
+    posting2 = create_posting(posting1.user, price = nil, product = Product.create(name: "Product2"), unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil, important_notes = nil, important_notes_body = nil)    
+    posting3 = create_posting(posting1.user, price = nil, product = Product.create(name: "Product3"), unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil, important_notes = nil, important_notes_body = nil)    
+    bob = create_user
+    ti1 = create_tote_item(bob, posting1, quantity = 1, frequency = 1)
+    ti2 = create_tote_item(bob, posting2, quantity = 1, frequency = 0)
+    ti3 = create_tote_item(bob, posting3, quantity = 1, frequency = 0, true)
+    create_rt_authorization_for_customer(bob)
+
+    #immediately after the authorization user should see 1 auth'd item for the subscription and one for the RTF order
+    ret = ToteItem.customer_visible_subscription_items(ti1.subscription)
+    assert_equal 1, ret.count
+    assert ret.last.state?(:AUTHORIZED)
+    ret = ToteItem.customer_visible_subscription_items(ti3.subscription)
+    assert_equal 1, ret.count
+    assert ret.last.state?(:AUTHORIZED)
+
+    travel_to posting1.order_cutoff
+    RakeHelper.do_hourly_tasks
+    travel 1.minute
+
+    #immediately after the order cutoff user should see 1 committed item for the subscription and one for the RTF order
+    ret = ToteItem.customer_visible_subscription_items(ti1.subscription)
+    assert_equal 1, ret.count
+    assert ret.last.state?(:COMMITTED)
+    ret = ToteItem.customer_visible_subscription_items(ti3.subscription)
+    assert_equal 1, ret.count
+    assert ret.last.state?(:COMMITTED)
+
+    fully_fill_creditor_order(posting1.creditor_order)
+    travel 1.minute
+
+    #immediately after delivery user should see one auth'd item for the next delivery cycle of the subscription and zero items related to the RTF order
+    ret = ToteItem.customer_visible_subscription_items(ti1.subscription)
+    assert_equal 1, ret.count
+    assert ret.last.state?(:AUTHORIZED)
+    ret = ToteItem.customer_visible_subscription_items(ti3.subscription)
+    assert_equal 0, ret.count
+
+    travel_back    
+
+  end
+
   test "tote items history should display" do
 
     #brand new user should see nothing in his history

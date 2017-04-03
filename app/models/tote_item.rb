@@ -1,6 +1,16 @@
 class ToteItem < ApplicationRecord
   include ToteItemsHelper
 
+  #this just allows you to hand a subscription and tote item state and it will return the set of tote items in the subscription series that match the given state
+  scope :subscription_items_by_state, -> (subscription, state) { joins(posting: {posting_recurrence: :subscriptions}).where(subscription: subscription).where("tote_items.state = ?", state) }
+  #when a customer has a subscription where Time.zone.now is between order cutoff and delivery their subscription object will have at least two tote items in its series, one of
+  #which will be AUTHORIZED and one of which will be COMMITTED. the auth'd one will be for the next delivery cycle out. but we don't want to show this next-out item to the customer.
+  #it clutters up their view (best case) and in the scenaro of a RTF order (Roll Till Filled) it's extra bad because the customer will see two items (one for the upcoming delivery
+  #and the other for the one after that) and think FC is playing tricks by signing them up for multiple deliveries, not knowing the system will auto-cancel if the upcoming delivery
+  #doesn't get filled. best bet is to just hide the future-most item from customer's view...what they don't know won't hurt them. so this method intends to help with that.
+  #logic: if a subscription's tote items series has a COMMITTED item, we only want to return that. if it does not have any COMMITTED items then we want to show them any AUTH'd items
+  scope :customer_visible_subscription_items, -> (subscription) { (committed = subscription_items_by_state(subscription, ToteItem.states[:COMMITTED])).any? ? committed : subscription_items_by_state(subscription, ToteItem.states[:AUTHORIZED]) }
+
   has_many :tote_item_rtauthorizations
   has_many :rtauthorizations, through: :tote_item_rtauthorizations
 
