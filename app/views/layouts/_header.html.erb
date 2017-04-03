@@ -55,10 +55,11 @@
           <%= link_to tote_items_path(calendar: 1), class: "non-blue" do %>                
             <%
             calendar_items_displayable = ToteItem.calendar_items_displayable(current_user)
-            if calendar_items_displayable.nil? || calendar_items_displayable.count == 0
+            future_calendar_items_displayable = future_items(calendar_items_displayable)
+            if future_calendar_items_displayable.nil? || future_calendar_items_displayable.count == 0
               calendar_items_displayable_count = ""
             else
-              calendar_items_displayable_count = calendar_items_displayable.count
+              calendar_items_displayable_count = future_calendar_items_displayable.count
             end
             %>
             <span class="glyphicon glyphicon glyphicon-calendar"></span><span class="header-object-count"> <%= calendar_items_displayable_count %></span>

@@ -2,6 +2,47 @@ require 'integration_helper'
 
 class OrdersCalendarTest < IntegrationHelper
 
+  test "fix erics bug" do
+    #scenario: eric orders.e@kapfhammer.info RTF'd a bunch of stuff that all was delivered on the same day. once the order was filled
+    #his orders calendar header superscript said '3' but the calendar itself said "you have zero future deliveries". this is weird.
+
+    nuke_all_postings
+    nuke_all_users
+    producer = create_producer
+    posting1 = create_posting(producer, price = 1, product = Product.create(name: "Product1"), unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = 0.75, important_notes = nil, important_notes_body = nil)
+    posting2 = create_posting(producer, price = 2, product = Product.create(name: "Product2"), unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = 1.75, important_notes = nil, important_notes_body = nil)
+
+    bob = create_new_customer("bob", "bob@b.com")
+    create_tote_item(bob, posting1, quantity = 1, frequency = nil, roll_until_filled = true)
+    create_tote_item(bob, posting2, quantity = 1, frequency = nil, roll_until_filled = true)
+
+    log_in_as bob
+    get root_path
+
+    #prior to authorization the calendar header icon superscript shoudl be blank
+    assert_select 'span.glyphicon-calendar + span.header-object-count', {text: "2", count: 0}
+    assert_select 'span.glyphicon-calendar + span.header-object-count', {text: "", count: 1}
+    create_rt_authorization_for_customer(bob)
+
+    #after authorization the calendar header icon superscript should say 2
+    log_in_as bob
+    get root_path
+    assert_select 'span.glyphicon-calendar + span.header-object-count', {text: "2", count: 1}
+
+    travel_to posting1.order_cutoff
+    RakeHelper.do_hourly_tasks
+    fully_fill_creditor_order(posting1.creditor_order)
+
+    #after order gets filled the calendar header icon should be blank
+    travel 1.minute
+    log_in_as bob
+    get root_path
+    assert_select 'span.glyphicon-calendar + span.header-object-count', {text: "", count: 1}
+
+    travel_back
+
+  end
+
   test "calendar display should include filled item" do
 
     nuke_all_postings

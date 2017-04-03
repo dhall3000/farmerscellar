@@ -1,5 +1,15 @@
 module ToteItemsHelper
 
+  def future_items(tote_items, relative_to = Time.zone.now.midnight)
+
+    if tote_items.nil?
+      return nil
+    end
+
+    return tote_items.where("postings.delivery_date >= ?", relative_to).where("tote_items.state" => [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED]]).order("postings.delivery_date asc")
+    
+  end
+
   def pickup_range_for(datetime)
 
     start_time = start_of_next_week(datetime) - 6.days
