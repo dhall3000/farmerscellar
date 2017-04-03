@@ -154,5 +154,72 @@ class OrdersCalendarTest < IntegrationHelper
 
   end
 
+  test "fix bansals bug" do
+    #bansal_sac@hotmail.com calendar situation: had whole milk that was delivered on thursday week 1.
+    #on friday week 1 (the next day) when spoofing his account the header said '2' for orders calendar, which was correct because he had an item set for tuesday delivery.
+    #this item set for tuesday delivery was a one-off posting.
+    #the calendar itself only rendered week 1 and never rendered week 2.
+    #then he added eggs delivery for week 2 and week 2 rendered properly.
+    #actually, i just finished implementing this test and i think i might have been smoking crack. it was the end of a stressful day at the end of a stressful week 
+    #when i thought i saw this bug and now i can't be sure but it appears to be doing the right thing
+
+    nuke_all_postings
+    nuke_all_users
+
+    next_thursday = get_next_wday_after(wday = 4, days_from_now = 7)
+    producer = create_producer
+    product = Product.create(name: "MyMilk")
+    posting1 = create_posting(producer, price = nil, product, unit = nil, delivery_date = next_thursday, order_cutoff = nil, units_per_case = nil, frequency = 1, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil, important_notes = nil, important_notes_body = nil)
+
+    bansal = create_user("bansal", "bansal_sac@hotmail.com")
+    create_tote_item(bansal, posting1, quantity = 1, frequency = nil, roll_until_filled = true)
+
+    log_in_as bansal
+    get root_path
+    assert_select 'span.glyphicon-calendar + span.header-object-count', {text: "", count: 1}
+    assert_select 'span.glyphicon-calendar + span.header-object-count', {text: "1", count: 0}
+    create_rt_authorization_for_customer(bansal)
+    log_in_as bansal
+    get root_path
+    assert_select 'span.glyphicon-calendar + span.header-object-count', {text: "1", count: 1}
+    assert_select 'span.glyphicon-calendar + span.header-object-count', {text: "", count: 0}
+
+    travel_to posting1.order_cutoff
+    RakeHelper.do_hourly_tasks
+
+    #now the next item in the series has been generated so header should say '2' for calendar
+    log_in_as bansal
+    get root_path
+    assert_select 'span.glyphicon-calendar + span.header-object-count', {text: "2", count: 1}
+
+    travel_to posting1.delivery_date + 12.hours
+
+    #milk order got botched, nobody got filled
+    fill_posting(posting1, 0)
+    
+    log_in_as bansal
+    get root_path
+    #order was rolled until the next week
+    assert_select 'span.glyphicon-calendar + span.header-object-count', {text: "1", count: 1}
+
+    posting2 = create_posting(producer, price = nil, product, unit = nil, delivery_date = get_next_wday_after(2, 0), order_cutoff = posting1.delivery_date + 1.day + 9.hours, units_per_case = nil, frequency = 0, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil, important_notes = nil, important_notes_body = nil)
+
+    create_tote_item(bansal, posting2, quantity = 1)
+    create_rt_authorization_for_customer(bansal)
+    log_in_as bansal
+    get root_path
+    #order was rolled until the next week
+    assert_select 'span.glyphicon-calendar + span.header-object-count', {text: "2", count: 1}
+
+    #now verify the calendar looks appropriate
+    get tote_items_path(calendar: 1)
+    assert_response :success
+    assert_template 'tote_items/calendar'
+    assert_select 'div.thumbnail.horizontal-scroller', 7
+
+    #go to noon on friday after 1st delivery
+    travel_to next_thursday + 1.day + 12.hours
+
+  end
 
 end
