@@ -25,9 +25,11 @@ class ToteItemsTest < IntegrationHelper
 
   test "customer should not see multiple items in a subscription series" do
 
-    posting1 = create_posting(farmer = nil, price = nil, product = Product.create(name: "Product1"), unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil, important_notes = nil, important_notes_body = nil)
-    posting2 = create_posting(posting1.user, price = nil, product = Product.create(name: "Product2"), unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil, important_notes = nil, important_notes_body = nil)    
-    posting3 = create_posting(posting1.user, price = nil, product = Product.create(name: "Product3"), unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil, important_notes = nil, important_notes_body = nil)    
+    friday_next_week = get_next_wday_after(wday = 5, days_from_now = 7)
+
+    posting1 = create_posting(farmer = nil, price = nil, product = Product.create(name: "Product1"), unit = nil, friday_next_week, friday_next_week - 2.days, units_per_case = nil, frequency = 1, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil, important_notes = nil, important_notes_body = nil)
+    posting2 = create_posting(posting1.user, price = nil, product = Product.create(name: "Product2"), unit = nil, friday_next_week, friday_next_week - 2.days, units_per_case = nil, frequency = 1, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil, important_notes = nil, important_notes_body = nil)    
+    posting3 = create_posting(posting1.user, price = nil, product = Product.create(name: "Product3"), unit = nil, friday_next_week, friday_next_week - 2.days, units_per_case = nil, frequency = 1, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil, important_notes = nil, important_notes_body = nil)    
     bob = create_user
     ti1 = create_tote_item(bob, posting1, quantity = 1, frequency = 1)
     ti2 = create_tote_item(bob, posting2, quantity = 1, frequency = 0)
@@ -41,6 +43,8 @@ class ToteItemsTest < IntegrationHelper
     ret = ToteItem.customer_visible_subscription_items(ti3.subscription)
     assert_equal 1, ret.count
     assert ret.last.state?(:AUTHORIZED)
+    visible_items = ToteItem.calendar_items_displayable(bob)
+    assert_equal 3, visible_items.count
 
     travel_to posting1.order_cutoff
     RakeHelper.do_hourly_tasks
@@ -53,16 +57,28 @@ class ToteItemsTest < IntegrationHelper
     ret = ToteItem.customer_visible_subscription_items(ti3.subscription)
     assert_equal 1, ret.count
     assert ret.last.state?(:COMMITTED)
+    visible_items = ToteItem.calendar_items_displayable(bob)
+    assert_equal 3, visible_items.count
 
     fully_fill_creditor_order(posting1.creditor_order)
-    travel 1.minute
+    travel (1.day + 1.minute)
 
-    #immediately after delivery user should see one auth'd item for the next delivery cycle of the subscription and zero items related to the RTF order
+    #after delivery user should see one auth'd item for the next delivery cycle of the subscription and zero items related to the RTF order
     ret = ToteItem.customer_visible_subscription_items(ti1.subscription)
     assert_equal 1, ret.count
     assert ret.last.state?(:AUTHORIZED)
     ret = ToteItem.customer_visible_subscription_items(ti3.subscription)
     assert_equal 0, ret.count
+    visible_items = ToteItem.calendar_items_displayable(bob)
+    assert_equal 4, visible_items.count
+
+    #user picks up three of his items
+    do_pickup_for(users(:dropsite1), bob.reload, logout_dropsite_user_after_pickup = true)
+    log_in_as bob
+
+    #now there should only be one item visible
+    visible_items = ToteItem.calendar_items_displayable(bob)
+    assert_equal 1, visible_items.count
 
     travel_back    
 

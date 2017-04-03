@@ -189,6 +189,18 @@ module ToteItemsHelper
 
   end
 
+  def get_authorized_subscription_objects_for(user)
+
+    rtba = user.get_active_rtba
+
+    if rtba.nil?
+      return nil
+    end
+
+    return Subscription.joins(rtauthorizations: :rtba).where(user: user, on: true).where("rtauthorizations.rtba_id" => rtba.id).distinct
+
+  end
+
   def get_active_subscriptions_for(user, include_paused_subscriptions = true, kind = nil)
 
     if user.nil?

@@ -34,7 +34,7 @@ class ToteItem < ApplicationRecord
   validates_presence_of :user, :posting  
 
   validates :price, numericality: { greater_than: 0 }
-  validates :quantity, numericality: { greater_than: 0, only_integer: true }
+  validates :quantity, numericality: { greater_than: 0, only_integer: true }  
 
   def self.states
   	{ADDED: 9, AUTHORIZED: 1, COMMITTED: 2, FILLED: 4, NOTFILLED: 5, REMOVED: 6}
@@ -59,8 +59,25 @@ class ToteItem < ApplicationRecord
     if user.dropsite.nil?
       return nil
     end
+    
+    authorized_subscription_objects = get_authorized_subscription_objects_for(user)
 
-    return user.tote_items.joins(:posting).where("postings.delivery_date > ?", user.pickup_items_start).where("tote_items.state" => [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED], ToteItem.states[:FILLED]]).order("postings.delivery_date asc")
+    if authorized_subscription_objects.nil?
+      return nil
+    end
+
+    subscription_items = ToteItem.none
+    authorized_subscription_objects.each do |subscription_object|
+      subscription_items = subscription_items.or(ToteItem.customer_visible_subscription_items(subscription_object))
+    end    
+    
+    individual_items = where(subscription: nil, state: [states[:AUTHORIZED], states[:COMMITTED]])    
+    ready_for_pickup_items = user.tote_items.joins(:posting).where("postings.delivery_date > ?", user.pickup_items_start).where("tote_items.state" => ToteItem.states[:FILLED])
+
+    ids = (subscription_items.pluck(:id) + individual_items.pluck(:id) + ready_for_pickup_items.pluck(:id)).uniq
+    visible_items = joins(:posting).where(id: ids).order("postings.delivery_date asc")
+
+    return visible_items
 
   end
 
