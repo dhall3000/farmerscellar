@@ -92,7 +92,7 @@ class HeaderTest < IntegrationHelper
 
   end
 
-  test "verify tote superscript accurate after tote item authorization" do
+  test "verify tote superscript accurate after tote item rtauthorization" do
 
     nuke_all_users
     nuke_all_postings
@@ -126,6 +126,45 @@ class HeaderTest < IntegrationHelper
 
     #now have 'bob' authorize his item and verify 'tote' link no longer says '1'
     create_rt_authorization_for_customer(bob)
+    assert_response :success        
+    verify_header(tote = 0, orders = 1, calendar = 1, subscriptions = 0, ready_to_pickup = 0)        
+
+  end
+
+  test "verify tote superscript accurate after tote item one time authorization" do
+
+    nuke_all_users
+    nuke_all_postings
+
+    #make a simple non-recurring posting and have 'bob' add a single tote item to it
+    #then verify his tote header link has the right value
+    posting = create_posting
+    bob = create_user("bob", "bob@b.com")
+    log_in_as bob
+    assert_response :redirect
+    follow_redirect!
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+    ti = create_tote_item(bob, posting, quantity = 1, frequency = nil, roll_until_filled = nil)
+    assert_response :redirect
+    follow_redirect!
+    verify_header(tote = 1, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+
+    #now make a new user 'chris', have him add one tote item, then verify bob's header is still accurate
+    chris = create_user("chris", "chris@c.com")
+    log_in_as chris
+    assert_response :redirect
+    follow_redirect!
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+    create_tote_item(chris, posting, quantity = 1, frequency = nil, roll_until_filled = nil)
+    assert_response :redirect
+    follow_redirect!    
+    verify_header(tote = 1, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+    log_in_as bob
+    follow_redirect!
+    verify_header(tote = 1, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+
+    #now have 'bob' authorize his item and verify 'tote' link no longer says '1'
+    create_one_time_authorization_for_customer(bob)
     assert_response :success        
     verify_header(tote = 0, orders = 1, calendar = 1, subscriptions = 0, ready_to_pickup = 0)        
 

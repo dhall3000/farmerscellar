@@ -445,3 +445,8 @@ email.postings << posting_apples
 email.save
 
 User.update_all(header_data_dirty: true)
+
+c1.set_dropsite(Dropsite.first)
+c2.set_dropsite(Dropsite.first)
+c3.set_dropsite(Dropsite.first)
+c4.set_dropsite(Dropsite.first)
