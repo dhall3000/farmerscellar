@@ -1,6 +1,209 @@
 require 'integration_helper'
 
 class HeaderTest < IntegrationHelper
+#test rtf orders next
+  test "verify subscription value correct after addition and removal" do
+    nuke_all_users
+    nuke_all_postings
+
+    #make a simple non-recurring posting and have 'bob' add a single tote item to it
+    #then verify his tote header link has the right value
+    posting = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil, important_notes = nil, important_notes_body = nil)
+    bob = create_user("bob", "bob@b.com")
+    log_in_as bob
+    assert_response :redirect
+    follow_redirect!
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+    ti = create_tote_item(bob, posting, quantity = 1, frequency = 1, roll_until_filled = nil)
+    assert_response :redirect
+    follow_redirect!
+    get root_path
+    verify_header(tote = 1, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+
+    #now make a new user 'chris', have him add one tote item, then verify bob's header is still accurate
+    chris = create_user("chris", "chris@c.com")
+    log_in_as chris
+    assert_response :redirect
+    follow_redirect!
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+    create_tote_item(chris, posting, quantity = 1, frequency = 1, roll_until_filled = nil)
+    assert_response :redirect
+    follow_redirect!    
+    verify_header(tote = 1, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+    log_in_as bob
+    follow_redirect!
+    verify_header(tote = 1, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+
+    #now have 'bob' authorize his subscription and verify 'tote' link no longer says '1', orders and calendar do say '1'
+    log_in_as bob
+    create_rt_authorization_for_customer(bob)
+    assert_response :success
+    verify_header(tote = 0, orders = 2, calendar = 1, subscriptions = 1, ready_to_pickup = 0)
+
+    #now have bob nuke his order
+    patch subscription_path(ti.subscription), params: {subscription: {on: 0}}
+    assert_response :redirect
+    follow_redirect!
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)            
+  end
+
+  test "verify tote superscript accurate after order cancelation" do
+
+    nuke_all_users
+    nuke_all_postings
+
+    #make a simple non-recurring posting and have 'bob' add a single tote item to it
+    #then verify his tote header link has the right value
+    posting = create_posting
+    bob = create_user("bob", "bob@b.com")
+    log_in_as bob
+    assert_response :redirect
+    follow_redirect!
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+    ti = create_tote_item(bob, posting, quantity = 1, frequency = nil, roll_until_filled = nil)
+    assert_response :redirect
+    follow_redirect!
+    verify_header(tote = 1, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+
+    #now make a new user 'chris', have him add one tote item, then verify bob's header is still accurate
+    chris = create_user("chris", "chris@c.com")
+    log_in_as chris
+    assert_response :redirect
+    follow_redirect!
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+    create_tote_item(chris, posting, quantity = 1, frequency = nil, roll_until_filled = nil)
+    assert_response :redirect
+    follow_redirect!    
+    verify_header(tote = 1, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+    log_in_as bob
+    follow_redirect!
+    verify_header(tote = 1, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+
+    #now have 'bob' authorize his item and verify 'tote' link no longer says '1', orders and calendar do say '1'
+    create_rt_authorization_for_customer(bob)
+    assert_response :success        
+    verify_header(tote = 0, orders = 1, calendar = 1, subscriptions = 0, ready_to_pickup = 0)
+
+    #now have bob nuke his order
+    delete tote_item_path(ti.reload)
+    assert_response :redirect
+    follow_redirect!
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)        
+
+  end
+
+  test "verify tote superscript accurate after tote item authorization" do
+
+    nuke_all_users
+    nuke_all_postings
+
+    #make a simple non-recurring posting and have 'bob' add a single tote item to it
+    #then verify his tote header link has the right value
+    posting = create_posting
+    bob = create_user("bob", "bob@b.com")
+    log_in_as bob
+    assert_response :redirect
+    follow_redirect!
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+    ti = create_tote_item(bob, posting, quantity = 1, frequency = nil, roll_until_filled = nil)
+    assert_response :redirect
+    follow_redirect!
+    verify_header(tote = 1, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+
+    #now make a new user 'chris', have him add one tote item, then verify bob's header is still accurate
+    chris = create_user("chris", "chris@c.com")
+    log_in_as chris
+    assert_response :redirect
+    follow_redirect!
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+    create_tote_item(chris, posting, quantity = 1, frequency = nil, roll_until_filled = nil)
+    assert_response :redirect
+    follow_redirect!    
+    verify_header(tote = 1, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+    log_in_as bob
+    follow_redirect!
+    verify_header(tote = 1, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+
+    #now have 'bob' authorize his item and verify 'tote' link no longer says '1'
+    create_rt_authorization_for_customer(bob)
+    assert_response :success        
+    verify_header(tote = 0, orders = 1, calendar = 1, subscriptions = 0, ready_to_pickup = 0)        
+
+  end
+
+  test "verify tote superscript accurate for tote item removals" do
+
+    nuke_all_users
+    nuke_all_postings
+
+    #make a simple non-recurring posting and have 'bob' add a single tote item to it
+    #then verify his tote header link has the right value
+    posting = create_posting
+    bob = create_user("bob", "bob@b.com")
+    log_in_as bob
+    assert_response :redirect
+    follow_redirect!
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+    ti = create_tote_item(bob, posting, quantity = 1, frequency = nil, roll_until_filled = nil)
+    assert_response :redirect
+    follow_redirect!
+    verify_header(tote = 1, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+
+    #now make a new user 'chris', have him add one tote item, then verify bob's header is still accurate
+    chris = create_user("chris", "chris@c.com")
+    log_in_as chris
+    assert_response :redirect
+    follow_redirect!
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+    create_tote_item(chris, posting, quantity = 1, frequency = nil, roll_until_filled = nil)
+    assert_response :redirect
+    follow_redirect!    
+    verify_header(tote = 1, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+    log_in_as bob
+    follow_redirect!
+    verify_header(tote = 1, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+
+    #now have 'bob' remove his item and verify 'tote' link no longer says '1'
+    delete tote_item_path(ti)
+    assert_response :redirect
+    follow_redirect!
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)        
+
+  end
+
+  test "verify tote superscript accurate for tote item additions" do
+
+    nuke_all_users
+    nuke_all_postings
+
+    #make a simple non-recurring posting and have 'bob' add a single tote item to it
+    #then verify his tote header link has the right value
+    posting = create_posting
+    bob = create_user("bob", "bob@b.com")
+    log_in_as bob
+    assert_response :redirect
+    follow_redirect!
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+    create_tote_item(bob, posting, quantity = 1, frequency = nil, roll_until_filled = nil)
+    assert_response :redirect
+    follow_redirect!
+    verify_header(tote = 1, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+
+    #now make a new user 'chris', have him add one tote item, then verify bob's header is still accurate
+    chris = create_user("chris", "chris@c.com")
+    log_in_as chris
+    assert_response :redirect
+    follow_redirect!
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+    create_tote_item(chris, posting, quantity = 1, frequency = nil, roll_until_filled = nil)
+    assert_response :redirect
+    follow_redirect!    
+    verify_header(tote = 1, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+    log_in_as bob
+    follow_redirect!
+    verify_header(tote = 1, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+
+  end
 
   test "number of active authorized subscriptions should be accurate" do
     bob = create_user
@@ -47,14 +250,17 @@ class HeaderTest < IntegrationHelper
     assert_equal 2, num_authorized_subscriptions_for(bob)
     assert_select 'span.glyphicon-repeat ~ span.header-object-count', "2"
     #cancel first sx
-    ti2.subscription.update(on: false)
-    get root_path
+    patch subscription_path(ti2.subscription), params: {subscription: {on: 0}}
+    assert_response :redirect
+    follow_redirect!
     #should report 1
     assert_equal 1, num_authorized_subscriptions_for(bob.reload)
     assert_select 'span.glyphicon-repeat ~ span.header-object-count', "1"    
     #cancel second sx
-    ti3.subscription.update(on: false)
-    get root_path
+
+    patch subscription_path(ti3.subscription), params: {subscription: {on: 0}}
+    assert_response :redirect
+    follow_redirect!    
     #should report 0
     assert_equal 0, num_authorized_subscriptions_for(bob.reload)
     assert_select 'span.glyphicon-repeat ~ span.header-object-count', ""

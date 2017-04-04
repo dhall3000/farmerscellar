@@ -1,6 +1,8 @@
 class ToteItem < ApplicationRecord
   include ToteItemsHelper
 
+  after_save :set_users_header_dirty_bit
+
   #this just allows you to hand a subscription and tote item state and it will return the set of tote items in the subscription series that match the given state
   scope :subscription_items_by_state, -> (subscription, state) { joins(posting: {posting_recurrence: :subscriptions}).where(subscription: subscription).where("tote_items.state = ?", state) }
   #when a customer has a subscription where Time.zone.now is between order cutoff and delivery their subscription object will have at least two tote items in its series, one of
@@ -40,6 +42,33 @@ class ToteItem < ApplicationRecord
   	{ADDED: 9, AUTHORIZED: 1, COMMITTED: 2, FILLED: 4, NOTFILLED: 5, REMOVED: 6}
   end
 
+  def self.get_header_data(user)
+
+    tote = ToteItemsController.helpers.unauthorized_items_for(user)
+    tote = tote.nil? ? 0 : tote.count
+
+    orders = ToteItemsController.helpers.num_order_objects(user)
+    
+    calendar = ToteItemsController.helpers.future_items(ToteItem.calendar_items_displayable(user))
+    calendar = calendar.nil? ? 0 : calendar.count
+
+    subscriptions = ToteItemsController.helpers.num_authorized_subscriptions_for(user)
+
+    ready_for_pickup = user.tote_items_to_pickup
+    ready_for_pickup = ready_for_pickup.nil? ? 0 : ready_for_pickup.count
+
+    header_data = {
+      tote: tote,
+      orders: orders,
+      calendar: calendar,
+      subscriptions: subscriptions,
+      ready_for_pickup: ready_for_pickup
+    }
+
+    return header_data
+
+  end
+
   def self.valid_state_values?(state_values)
 
     if state_values.nil?
@@ -60,7 +89,7 @@ class ToteItem < ApplicationRecord
       return nil
     end
     
-    authorized_subscription_objects = get_authorized_subscription_objects_for(user)
+    authorized_subscription_objects = ToteItemsController.helpers.get_authorized_subscription_objects_for(user)
 
     subscription_items = ToteItem.none
     if !authorized_subscription_objects.nil?
@@ -69,7 +98,7 @@ class ToteItem < ApplicationRecord
       end    
     end
     
-    individual_items = where(subscription: nil, state: [states[:AUTHORIZED], states[:COMMITTED]])    
+    individual_items = where(user: user, subscription: nil, state: [states[:AUTHORIZED], states[:COMMITTED]])    
     ready_for_pickup_items = user.tote_items.joins(:posting).where("postings.delivery_date > ?", user.pickup_items_start).where("tote_items.state" => ToteItem.states[:FILLED])
 
     ids = (subscription_items.pluck(:id) + individual_items.pluck(:id) + ready_for_pickup_items.pluck(:id)).uniq
@@ -307,6 +336,11 @@ class ToteItem < ApplicationRecord
   end
 
   private
+
+    def set_users_header_dirty_bit
+      #this makes it so that applicationcontroller will pull in fresh data from the db to update the header..specifically, in this case, the 'tote' link in the header
+      user.update(header_data_dirty: true)
+    end
 
     def create_funds_flow_objects
       create_purchase_receivable

@@ -20,67 +20,44 @@
       <% if logged_in? %>
         
         <div class="left-most-header-link header-link">
-          <%= link_to tote_items_path, class: "non-blue" do %>      
-            <%
-              unauthorized_items = unauthorized_items_for(current_user)
-              if unauthorized_items.nil? || (num_tote_items = unauthorized_items.count) == 0
-                num_items_string = ""
-              else
-                num_items_string = "#{num_tote_items.to_s}"
-              end
-            %>
-            <span class="glyphicon glyphicon-shopping-cart"></span><span class="header-object-count"><%= num_items_string %></span>
+          <%= link_to tote_items_path, class: "non-blue" do %>                  
+            <span class="glyphicon glyphicon-shopping-cart"></span><span class="header-object-count"> <%= (session[:tote] && (session[:tote] > 0)) ? session[:tote].to_s : "" %></span>
             <span> Tote</span>                    
           <% end %>
         </div>
 
 
-        <%
-          num_order_objects = num_order_objects(current_user)
-          if num_order_objects.nil? || num_order_objects == 0
-            num_order_objects = ""
-          else
-            num_order_objects= "#{num_order_objects.to_s}"
-          end
-        %>
         <div class="left-most-header-link header-link">
           <%= link_to tote_items_path(orders: true), class: "non-blue" do %>
-            <span class="glyphicon glyphicon glyphicon-list-alt"></span><span class="header-object-count"> <%= num_order_objects %></span>
+            <span class="glyphicon glyphicon glyphicon-list-alt"></span><span class="header-object-count"> <%= (session[:orders] && (session[:orders] > 0)) ? session[:orders].to_s : "" %></span>
             <span> Orders</span>
           <% end %>
         </div>
 
 
         <div class="left-most-header-link header-link">
-          <%= link_to tote_items_path(calendar: 1), class: "non-blue" do %>                
-            <%
-            calendar_items_displayable = ToteItem.calendar_items_displayable(current_user)
-            future_calendar_items_displayable = future_items(calendar_items_displayable)
-            if future_calendar_items_displayable.nil? || future_calendar_items_displayable.count == 0
-              calendar_items_displayable_count = ""
-            else
-              calendar_items_displayable_count = future_calendar_items_displayable.count
-            end
-            %>
-            <span class="glyphicon glyphicon glyphicon-calendar"></span><span class="header-object-count"> <%= calendar_items_displayable_count %></span>
+          <%= link_to tote_items_path(calendar: 1), class: "non-blue" do %>                            
+            <span class="glyphicon glyphicon glyphicon-calendar"></span><span class="header-object-count"> <%= (session[:calendar] && (session[:calendar] > 0)) ? session[:calendar].to_s : "" %></span>
             <span> Orders calendar</span>
           <% end %>
         </div>
 
+
         <div class="left-most-header-link header-link">
           <%= link_to subscriptions_path, class: "non-blue" do %>          
-            <span class="glyphicon glyphicon glyphicon-repeat"></span><span class="header-object-count"> <%= @num_authorized_subscriptions > 0 ? @num_authorized_subscriptions.to_s : " " %></span>
+            <span class="glyphicon glyphicon glyphicon-repeat"></span><span class="header-object-count"> <%= (session[:subscriptions] && (session[:subscriptions] > 0)) ? session[:subscriptions].to_s : "" %></span>
             <span> Subscriptions</span>
           <% end %>
         </div>
 
+
         <div class="left-most-header-link header-link">
           <%= link_to pickup_path, class: "non-blue" do %>          
-            <span class="glyphicon glyphicon glyphicon-ok"></span>
-            <span class="header-object-count"> <%= @num_ready_to_pickup > 0 ? @num_ready_to_pickup.to_s : " " %></span>
+            <span class="glyphicon glyphicon glyphicon-ok"></span><span class="header-object-count"> <%= (session[:ready_for_pickup] && (session[:ready_for_pickup] > 0)) ? session[:ready_for_pickup].to_s : "" %></span>
             <span> Ready for pickup</span>
           <% end %>
         </div>
+
 
         <hr class="header-section-divider" />
 

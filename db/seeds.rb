@@ -443,3 +443,5 @@ co.add_payment_payable(PaymentPayable.create(amount: 100, amount_paid: 0, fully_
 email = Email.new(subject: "Apples have worms", body: "Sorry to say but you should expect to eat into some worms on this batch of apples")
 email.postings << posting_apples
 email.save
+
+User.update_all(header_data_dirty: true)

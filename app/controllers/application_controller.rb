@@ -2,7 +2,7 @@ class ApplicationController < ActionController::Base
   include SessionsHelper, ToteItemsHelper
 
   before_action :redirect_dropsite_user, :fetch_header_data
-
+  
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :exception
@@ -29,10 +29,23 @@ class ApplicationController < ActionController::Base
       if !logged_in?
         return
       end      
-      @num_authorized_subscriptions = num_authorized_subscriptions_for(current_user)
 
-      ready_to_pickup = current_user.tote_items_to_pickup
-      @num_ready_to_pickup = ready_to_pickup.nil? ? 0 : ready_to_pickup.count
+      if session[:tote].nil? || current_user.header_data_dirty
+
+        #fetch the header data from db
+        header_data = ToteItem.get_header_data(current_user)
+
+        #load it in to the session
+        session[:tote] = header_data[:tote]
+        session[:orders] = header_data[:orders]
+        session[:calendar] = header_data[:calendar]
+        session[:subscriptions] = header_data[:subscriptions]
+        session[:ready_for_pickup] = header_data[:ready_for_pickup]
+
+        #header data is now clean
+        current_user.update(header_data_dirty: false)
+        
+      end
             
     end
 

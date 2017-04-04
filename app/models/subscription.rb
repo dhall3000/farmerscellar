@@ -2,6 +2,8 @@ class Subscription < ApplicationRecord
   include ToteItemsHelper
   include ActionView::Helpers::NumberHelper
 
+  after_save :set_users_header_dirty_bit
+
   belongs_to :user
   belongs_to :posting_recurrence
   has_many :subscription_skip_dates
@@ -264,6 +266,11 @@ class Subscription < ApplicationRecord
 
   private
 
+    def set_users_header_dirty_bit
+      #this makes it so that applicationcontroller will pull in fresh data from the db to update the header..specifically, in this case, the 'tote' link in the header
+      user.update(header_data_dirty: true)
+    end
+    
     def num_week_start_days_between_dates(date1, date2)
 
       start_date = [date1, date2].min
