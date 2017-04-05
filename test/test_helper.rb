@@ -302,6 +302,9 @@ class ActiveSupport::TestCase
 
   # Logs in a test user.
   def log_in_as(user, options = {})
+    log_out
+    assert_response :redirect
+    follow_redirect!
     password    = options[:password]    || 'dogdog'
     remember_me = options[:remember_me] || '1'
     if integration_test?
@@ -309,6 +312,23 @@ class ActiveSupport::TestCase
     else
       session[:user_id] = user.id
     end
+  end
+
+  def log_out
+    delete logout_path
+  end
+
+  def log_in_dropsite_user(dropsite_user)
+    log_in_as(dropsite_user)
+    assert :success
+    assert_redirected_to new_pickup_path
+    follow_redirect!
+    assert_template 'pickups/new'
+  end
+
+  def log_out_dropsite_user
+    get pickups_log_out_dropsite_user_path
+    follow_redirect!
   end
 
   def get_error_messages(active_record_object)

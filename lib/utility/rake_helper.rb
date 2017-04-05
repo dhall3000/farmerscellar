@@ -118,6 +118,9 @@ class RakeHelper
 				return
 			end
 
+      #dirty up everybody's header bit so that headers refresh after the end of the day
+      User.update_all(header_data_dirty: true)
+
 			#time stamp this run
 			NightlyTaskRun.create
 			

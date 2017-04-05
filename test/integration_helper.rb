@@ -275,14 +275,6 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
   end
 
-  def log_in_dropsite_user(dropsite_user)
-    log_in_as(dropsite_user)
-    assert :success
-    assert_redirected_to new_pickup_path
-    follow_redirect!
-    assert_template 'pickups/new'
-  end
-
   def do_pickup_for(dropsite_user, pickup_user, logout_dropsite_user_after_pickup = false)
 
     log_in_as(pickup_user)
@@ -344,15 +336,6 @@ end
     
     return tote_items
 
-  end
-
-  def log_out_dropsite_user
-    get pickups_log_out_dropsite_user_path
-    follow_redirect!
-  end
-
-  def log_out
-    delete logout_path
   end
 
   def go_to_delivery_day_and_fill_posting(posting, quantity = nil)

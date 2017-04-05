@@ -30,7 +30,7 @@ class ApplicationController < ActionController::Base
         return
       end      
 
-      if session[:tote].nil? || current_user.header_data_dirty
+      if !session_header_data_valid? || current_user.header_data_dirty
 
         #fetch the header data from db
         header_data = ToteItem.get_header_data(current_user)
@@ -46,7 +46,7 @@ class ApplicationController < ActionController::Base
         current_user.update(header_data_dirty: false)
         
       end
-            
+
     end
 
 end

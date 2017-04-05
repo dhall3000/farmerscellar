@@ -90,6 +90,11 @@ module SessionsHelper
   def log_out
     forget(current_user)
     session.delete(:user_id)
+    session.delete(:tote)
+    session.delete(:orders)
+    session.delete(:calendar)
+    session.delete(:subscriptions)
+    session.delete(:ready_for_pickup)
     @current_user = nil
   end
 
