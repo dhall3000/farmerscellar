@@ -5,179 +5,90 @@
   items_total_gross = local_assigns[:items_total_gross]
 %>
 
-<div class="row">
-  <div class="col-xs-12 col-sm-10 col-sm-offset-1">    
+  <% if subscriptions && subscriptions.any? %>
+    <h2>Subscriptions</h2>
+    <hr class="section-divider">
 
-    <div class="panel-group">
-
-
-      <% if subscriptions && subscriptions.any? %>
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h2>Subscriptions</h2>
-          </div>
-          <div class="panel-body">      
-            <table class="table">
-              <thead>
-                <tr>          
-                  <th class="text-left">Product</th>          
-                  <th class="text-center">Quantity</th>
-                  <th class="text-right">Sub total</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% subscriptions.each do |subscription| %>
-                  <% if !subscription.on %>
-                    <% next %>
-                  <% end %>
-                  <% posting = subscription.posting_recurrence.current_posting %>
-                  <tr>
-                    <td class="text-left">
-                      <%= posting.product.name %>
-                    </td>
-                    <td class="text-center">                
-                      <%= pluralize(subscription.quantity, posting.unit.name)%>
-                    </td>
-                    <td class="text-right">
-                      <%= "#{number_to_currency(subscription.sub_total_per_delivery)} #{subscription.friendly_frequency.downcase}" %>                      
-                    </td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-            <div><%= link_to "manage subscriptions", subscriptions_path, class: "fat-finger-spacing" %></div>
-          </div>
-        </div>
-      <% end %>
-
-
-      <% if tote_items && tote_items.any? %>
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h2>Items</h2>
-          </div>
-          <div class="panel-body">
-            <div id="scheduledDeliveryExplanation" class="collapse" data-chevron="#scheduledDeliveryExplanationChevron">
-              <div class="alert alert-info">
-                <span class="glyphicon glyphicon-asterisk"></span> Deliveries occur on schedule subject to several constraints. Please be aware of our <%= link_to "Delivery Not Guaranteed", how_things_work_path(anchor: "delivery_not_guaranteed") %> policy.
-              </div>
-            </div>
-            <table class="table">
-              <thead>
-                <tr>          
-                  <th class="text-left">Product</th>          
-                  <th class="text-center hidden-xs">Quantity</th>
-                  <th class="text-center hidden-xs">Price</th>
-
-                  <th class="text-center">
-                    <span data-toggle="collapse" data-target="#scheduledDeliveryExplanation">Scheduled Delivery 
-                      <span class="alert-info glyphicon glyphicon-asterisk""></span>
-                      <span id="scheduledDeliveryExplanationChevron" class="glyphicon glyphicon-chevron-down"></span>
-                    </span>
-                  </th>
-
-                  <th class="text-right">Sub total</th>                  
-                </tr>
-              </thead>
-              <tbody>
-                <% tote_items.each do |tote_item| %>        
-                  <tr>
-                    <td class="text-left">
-                      <%= tote_item.posting.product.name %>
-                    </td>
-                    <td class="text-center hidden-xs"><%= tote_item.quantity.to_s %></td>
-                    <td class="text-center hidden-xs"><%= number_to_currency(tote_item.posting.price) %> / <%= Unit.find_by(id: tote_item.posting.unit_id).name %></td>                    
-                    <td class="text-center">              
-                      <% if tote_item.subscription && tote_item.subscription.on && tote_item.subscription.kind?(:NORMAL) %>
-                        <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>
-                      <% end %>
-                      <%= tote_item.posting.delivery_date.strftime("%a %m/%d") %>
-                    </td>            
-                    <td class="text-right"><%= number_to_currency(get_gross_item(tote_item)) %></td>
-                  </tr>        
-                  <tr>
-
-                    <%
-                      additional_units_required_to_fill_my_case = tote_item.additional_units_required_to_fill_my_case
-                      biggest_order_minimum_producer_net_outstanding = tote_item.posting.biggest_order_minimum_producer_net_outstanding
-                    %>
-
-                    <td colspan="5" class="hidden-xs borderless">
-                      <div>                        
-                        <span data-toggle="collapse" data-target="#<%= 'toteItemDetails' + tote_item.id.to_s %>">                          
-                          <span id="<%= 'toteItemDetails' + tote_item.id.to_s + 'Chevron' %>" class="glyphicon glyphicon-chevron-down"></span>
-                          <% if additional_units_required_to_fill_my_case > 0 || biggest_order_minimum_producer_net_outstanding > 0 %>
-                            <span class="spin-continuously alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-                          <% end %>                          
-                          <% if tote_item.posting.important_notes && !tote_item.posting.important_notes.empty? %>
-                            <span class="alert-info glyphicon glyphicon-info-sign spin-continuously"></span>
-                          <% end %>
-                        </span>
-                        <% if show_remove_button %>
-                          <div style="float:right;">
-                            <% if tote_item.state == ToteItem.states[:ADDED] || tote_item.state == ToteItem.states[:AUTHORIZED] || tote_item.roll_until_filled? %>
-                              <%= link_to "", tote_item, class: "non-blue glyphicon glyphicon-remove", method: :delete %>
-                            <% else %>
-                              <% data_content = "This item cannot be removed. It is 'committed' because it is past its Order Cutoff. Please see " + link_to("Order Cancellation", how_things_work_path(anchor: "cancellation")) + "." %>
-                              <a class="non-blue" tabindex="0" role="button" data-container="body" data-placement="left" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=data_content%>"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
-                            <% end %>
-                          </div>
-                        <% end %>
-                      </div>
-
-                      <div id="<%= 'toteItemDetails' + tote_item.id.to_s %>" class="collapse" data-chevron="#<%= 'toteItemDetails' + tote_item.id.to_s + 'Chevron'%>">
-                        <%= render partial: "shared/tote_expansion_row", locals: { tote_item: tote_item, additional_units_required_to_fill_my_case: additional_units_required_to_fill_my_case, biggest_order_minimum_producer_net_outstanding: biggest_order_minimum_producer_net_outstanding } %>
-                      </div>
-                    </td>  
-
-                  
-                    <td colspan="4" class="hidden-sm hidden-md hidden-lg borderless">
-                      <div>                        
-                        <span data-toggle="collapse" data-target="#xs<%= 'toteItemDetails' + tote_item.id.to_s %>">                          
-                          <span id="xs<%= 'toteItemDetails' + tote_item.id.to_s + 'Chevron' %>" class="glyphicon glyphicon-chevron-down"></span>
-                          <% if additional_units_required_to_fill_my_case > 0 || biggest_order_minimum_producer_net_outstanding > 0 %>
-                            <span class="spin-continuously alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-                          <% end %>
-                          <% if tote_item.posting.important_notes && !tote_item.posting.important_notes.empty? %>
-                            <span class="alert-info glyphicon glyphicon-info-sign spin-continuously"></span>
-                          <% end %>
-                        </span>
-                        <% if show_remove_button %>
-                          <div style="float:right;">
-                            <% if tote_item.state == ToteItem.states[:ADDED] || tote_item.state == ToteItem.states[:AUTHORIZED] || tote_item.roll_until_filled? %>
-                              <%= link_to "", tote_item, class: "non-blue glyphicon glyphicon-remove", method: :delete %>
-                            <% else %>
-                              <% data_content = "This item cannot be removed. It is 'committed' because it is past its Order Cutoff. Please see " + link_to("Order Cancellation", how_things_work_path(anchor: "cancellation")) + "." %>
-                              <a class="non-blue" tabindex="0" role="button" data-container="body" data-placement="left" data-html="true" data-toggle="popover" data-trigger="focus" data-content="<%=data_content%>"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
-                            <% end %>
-                          </div>
-                        <% end %>                    
-                      </div>
-                      <div id="xs<%= 'toteItemDetails' + tote_item.id.to_s %>" class="collapse" data-chevron="#xs<%= 'toteItemDetails' + tote_item.id.to_s + 'Chevron' %>">
-                        <%= render partial: "shared/tote_expansion_row", locals: { tote_item: tote_item, additional_units_required_to_fill_my_case: additional_units_required_to_fill_my_case, biggest_order_minimum_producer_net_outstanding: biggest_order_minimum_producer_net_outstanding } %>
-                      </div>
-                    </td>
-
-                  </tr>
-                  
-                <% end %>
-              </tbody>
-            </table>
-            <div id="orderTotal">
-              Total: <%= number_to_currency(items_total_gross) %>              
-            </div>
-          </div>
-        </div>
-
-
-      <% end %>
-
-
-
-
-
-
+    
+    <div class="row gutter-10">
+      <div class="col-xs-offset-9 col-xs-3">
+        <div class="text-center"><strong>Total*</strong></div>
+      </div>
     </div>
 
-  </div>
-</div>
+
+    <% subscriptions.each do |subscription| %>
+      <div class="row gutter-10 toteRowPadding">
+        <div class="col-xs-9">
+          <div class="truncated-text-line" data-toggle="collapse" data-target="#subscriptionSeePosting<%= subscription.id.to_s %>">
+            <span id="subscriptionChevron<%= subscription.id.to_s %>" class="glyphicon glyphicon-chevron-down"> </span>
+            <%= "#{subscription.latest_delivery_date_item.friendly_description} delivered #{subscription.friendly_frequency.downcase}" %>
+          </div>
+
+          <div id="subscriptionSeePosting<%= subscription.id.to_s %>" class="collapse" data-chevron="#subscriptionChevron<%= subscription.id.to_s %>">
+            <%= link_to "View posting", posting_path(subscription.posting_recurrence.current_posting), class: "btn btn-lg btn-primary outline" %>
+          </div>
+        </div>
+
+        <div class="col-xs-3">
+          <div class="text-center">
+            <%= number_to_currency(subscription.sub_total_per_delivery) %>
+            <%= link_to "", subscription_path(subscription, subscription: {on: 0}), method: :patch, class: "non-blue glyphicon glyphicon-remove pull-right", style: "margin-top: 2px;" %>
+          </div>
+        </div>
+
+        
+      </div>      
+    <% end %>
+
+    <div class="row gutter-10">
+      <div class="col-xs-offset-8 col-xs-4 col-sm-offset-9 col-sm-3">
+        <div class="text-center">*each delivery</div>
+      </div>
+    </div>
+
+
+  <% end %>
+
+
+
+  <% if tote_items && tote_items.any? %>
+
+    <h2>Items</h2>
+    <hr class="section-divider">
+
+    <div class="row gutter-10">
+      <div class="col-xs-offset-9 col-xs-3">
+        <div class="text-center"><strong>Total</strong></div>
+      </div>
+    </div>
+
+    <% tote_items.each do |tote_item| %>
+
+      <div class="row gutter-10 toteRowPadding">
+        <div class="col-xs-9">
+          <div class="text-left truncated-text-line" data-toggle="collapse" data-target="#see-posting<%= tote_item.posting.id.to_s %>">
+            <span id="toteitemChevron<%= tote_item.posting.id.to_s %>" class="glyphicon glyphicon-chevron-down"> </span>
+            <span><%= tote_item.friendly_description %></span>
+          </div>
+          <div id="see-posting<%= tote_item.posting.id.to_s %>" class="collapse" data-chevron="#toteitemChevron<%= tote_item.posting.id.to_s %>">
+            <%= link_to "View posting", posting_path(tote_item.posting), class: "btn btn-lg btn-primary outline" %>              
+          </div>
+        </div>
+        <div class="col-xs-3">
+          <div class="text-center">
+            <%= number_to_currency(get_gross_item(tote_item)) %>
+            <%= link_to "", tote_item, class: "non-blue glyphicon glyphicon-remove pull-right", method: :delete, style: "margin-top: 2px;" %>
+          </div>
+        </div>
+      </div>
+
+    <% end %>
+
+    <div id="orderTotal">
+      Total: <%= number_to_currency(items_total_gross) %>
+    </div>
+
+
+
+  <% end %>

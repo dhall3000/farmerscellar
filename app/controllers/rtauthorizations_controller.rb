@@ -136,21 +136,10 @@ class RtauthorizationsController < ApplicationController
 		else
 			AdminNotificationMailer.general_message("Problem saving Rtauthorization!", @rtauthorization.errors.to_yaml).deliver_now
 		end
-
-    #20170404 sticking this in here but it will probably want to come out rather soonish. here's what's going on: ideally after every controller action but before render
-    #i'd like to poll current_user.header_data_dirty and pull in fresh header data from the db and stick it in the session so the header displays accurately. alas,
-    #there isn't a way to have stuff run on a filter after action before render. however, most of the time a tote item changes state the render happens as a result of a
-    #redirect. in these cases the applicationcontroller's fetch_header_data before_action works just fine cause it pulls in fresh header data from db before the final render.
-    #here, however, is an example of tote item state getting tweaked right before an immediate page render. so we have to hack things a bit to get proper header data displayed.
-    #i'm about to overhaul order flow...my current plan is that after authorization i'll redirect them to the orders calendar. if that plan sticks we will be able to yank this code
-    #cause the before action fetch_header_data will get called before the final calendar page render. actually, definitely remove it here to avoid double db data fetching.
-    #and by the way, this code must come after the @rtauthorization.authorize_items_and_subscriptions and @rtauthorization.save lines just above. 
-    current_user.reload
-    fetch_header_data
-  	
-  	flash.now[:success] = "Checkout successful"		
+  
+  	flash[:success] = "Checkout successful"		
     @authorization_succeeded = true
-    render 'authorizations/create'    
+    redirect_to tote_items_path(calendar: 1)
 
   end
 end
