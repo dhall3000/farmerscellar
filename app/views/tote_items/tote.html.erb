@@ -2,7 +2,7 @@
 
 <% if tote_has_stuff?(current_user) %>
 
-  <%= render partial: 'shared/orderables', locals: { tote_items: @tote_items, subscriptions: @subscriptions, show_remove_button: false, items_total_gross: @items_total_gross } %>
+  <%= render partial: 'shared/orderables', locals: { tote_items: @tote_items, subscriptions: @subscriptions, show_remove_button: true, items_total_gross: @items_total_gross } %>
 
   <% content_for :action do %>
     <% one_click = "One-click checkout" %>

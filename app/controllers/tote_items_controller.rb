@@ -276,7 +276,7 @@ class ToteItemsController < ApplicationController
         ti.transition(:customer_removed)        
         if ti.state?(:REMOVED)
 
-          flash_text = "#{ti.posting.product.name} for #{ti.posting.delivery_date.strftime("%A %B %d")} delivery canceled"
+          flash_text = "#{ti.posting.product.name} canceled"
 
           if ti.subscription && ti.subscription.on && !ti.subscription.paused && ti.subscription.kind?(:NORMAL)
 
