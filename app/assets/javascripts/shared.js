@@ -1,6 +1,10 @@
 $(function()
 {
 
+  $( ".truncated-text-line" ).click(function() {
+    $( this ).toggleClass("truncated-text-line");
+  });
+
   //this is here for iOS. divs don't listen to click events so can't toggle collapse without this code.
   //see here: http://stackoverflow.com/questions/33074160/bootstrap-collapse-half-working-on-iphone  
   $('div[data-toggle="collapse"], span[data-toggle="collapse"]').on('click', function() {});

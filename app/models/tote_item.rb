@@ -111,6 +111,11 @@ class ToteItem < ApplicationRecord
   validates :state, inclusion: { in: ToteItem.states.values }
   validates :state, numericality: {only_integer: true}
 
+  def friendly_description(use_quantity = true)
+    quantity_to_use = use_quantity ? quantity : quantity_filled
+    return "#{quantity_to_use.to_s} #{posting.user.farm_name} #{posting.product.name} #{posting.unit.name.pluralize(quantity_to_use)}"    
+  end
+
   def creditor
     return creditor_order.creditor
   end

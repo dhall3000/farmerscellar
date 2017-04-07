@@ -141,6 +141,7 @@ p {
   font-size: 1.8em;
   font-weight: bold;
   text-align: right;
+  padding-top: 15px;
 }
 
 
@@ -199,10 +200,7 @@ p {
 }
 
 .header-section-divider {
-  margin-left: 10px;
-  margin-right: 10px;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin: 10px;
   height:1px;
   border:none;
   color: $gray-medium-light;
@@ -527,9 +525,14 @@ a.non-blue { color: inherit; }
   margin-bottom: 5px;
 }
 
+.toteRowPadding {
+  padding-bottom: 8px;
+  padding-top: 8px;
+}
+
 .section-divider {
-  margin-top: 20px;
-  margin-bottom: 0px;
+  margin-top: 3px;
+  margin-bottom: 10px;
   height:1px;
   border:none;
   color: gray;
@@ -555,8 +558,8 @@ a.non-blue { color: inherit; }
 
 .truncated-text-line {
   white-space: nowrap;
-  text-overflow:ellipsis;
-  overflow: hidden;
+  text-overflow: ellipsis;
+  overflow: hidden;  
 }
 
 .producer-name-font {

@@ -48,6 +48,10 @@ class Posting < ApplicationRecord
     return product.food_category
   end
 
+  def friendly_description
+    return "#{user.farm_name} #{product.name} #{unit.name.pluralize}"
+  end
+
   def self.close(postings_closeable)
 
     if postings_closeable && postings_closeable.any?
