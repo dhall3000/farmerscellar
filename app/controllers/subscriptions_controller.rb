@@ -178,8 +178,7 @@ class SubscriptionsController < ApplicationController
         flash[:success] = flash_message + " canceled"
       end            
 
-      redirect_to subscriptions_path
-
+      redirect_to request.referer || subscriptions_path
       return
 
     end

@@ -2,10 +2,6 @@
 
 <% if tote_has_stuff?(current_user) %>
 
-  <%
-   #render partial: 'shared/orderables', locals: { tote_items: @tote_items, subscriptions: @subscriptions, show_remove_button: true, items_total_gross: @items_total_gross }
-  %>
-
 
   <% if @subscriptions && @subscriptions.any? %>
     <h2>Subscriptions</h2>
@@ -23,7 +19,7 @@
       <div class="row gutter-10 toteRowPadding">
         <div class="col-xs-9">
           <div class="truncated-text-line" data-toggle="collapse" data-target="#subscriptionSeePosting<%= subscription.id.to_s %>">
-            <span id="subscriptionChevron<%= subscription.id.to_s %>" class="glyphicon glyphicon-chevron-down" style="padding: 2px;"> </span>
+            <span id="subscriptionChevron<%= subscription.id.to_s %>" class="glyphicon glyphicon-chevron-down"> </span>
             <%= "#{subscription.latest_delivery_date_item.friendly_description} delivered #{subscription.friendly_frequency.downcase}" %>
           </div>
 
@@ -35,7 +31,7 @@
         <div class="col-xs-3">
           <div class="text-center">
             <%= number_to_currency(subscription.sub_total_per_delivery) %>
-            <%= link_to "", subscription_path(subscription, subscription: {on: 0}), method: :patch, class: "non-blue glyphicon glyphicon-remove pull-right" %>            
+            <%= link_to "", subscription_path(subscription, subscription: {on: 0}), method: :patch, class: "non-blue glyphicon glyphicon-remove pull-right", style: "margin-top: 2px;" %>
           </div>
         </div>
 
@@ -70,8 +66,8 @@
       <div class="row gutter-10 toteRowPadding">
         <div class="col-xs-9">
           <div class="text-left truncated-text-line" data-toggle="collapse" data-target="#see-posting<%= tote_item.posting.id.to_s %>">
-            <span id="toteitemChevron<%= tote_item.posting.id.to_s %>" class="glyphicon glyphicon-chevron-down" style="padding: 2px;"> </span>
-            <%= tote_item.friendly_description %>
+            <span id="toteitemChevron<%= tote_item.posting.id.to_s %>" class="glyphicon glyphicon-chevron-down"> </span>
+            <span><%= tote_item.friendly_description %></span>
           </div>
           <div id="see-posting<%= tote_item.posting.id.to_s %>" class="collapse" data-chevron="#toteitemChevron<%= tote_item.posting.id.to_s %>">
             <%= link_to "View posting", posting_path(tote_item.posting), class: "btn btn-lg btn-primary outline" %>              
@@ -80,7 +76,7 @@
         <div class="col-xs-3">
           <div class="text-center">
             <%= number_to_currency(get_gross_item(tote_item)) %>
-            <%= link_to "", tote_item, class: "non-blue glyphicon glyphicon-remove pull-right", method: :delete %>
+            <%= link_to "", tote_item, class: "non-blue glyphicon glyphicon-remove pull-right", method: :delete, style: "margin-top: 2px;" %>
           </div>
         </div>
       </div>
@@ -134,9 +130,7 @@
     <p class="small">(By proceeding with checkout you agree to transact with and through Farmer's Cellar in accordance with our policies and operational procedures detailed on our <%= link_to "How Things Work", how_things_work_path %> page)</p>    
   <% end %>
 
-  <%= 
-  render partial: 'shared/payflow_action', locals: { action_title: "Checkout" }
-  %>
+  <%= render partial: 'shared/payflow_action', locals: { action_title: "Checkout" } %>
 
 <% else %>  
 
