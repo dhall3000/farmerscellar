@@ -269,7 +269,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     assert_redirected_to tote_items_path(orders: true)
     follow_redirect!
     #verify danger flash message
-    assert_equal "#{second_ti.posting.product.name} for #{second_ti.posting.delivery_date.strftime("%A %B %d")} delivery canceled", flash[:success]
+    assert_equal "#{second_ti.posting.product.name} canceled", flash[:success]
     #verify one item REMOVED
     assert second_ti.reload.state?(:REMOVED)
     #verify subscription object off
@@ -432,7 +432,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     follow_redirect!
     assert_template 'tote_items/orders'
     #verify danger flash message
-    assert_equal "#{second_ti.posting.product.name} for #{second_ti.posting.delivery_date.strftime("%A %B %d")} delivery canceled", flash[:success]
+    assert_equal "#{second_ti.posting.product.name} canceled", flash[:success]
     #verify one item COMMITTED
     assert ti_sam.reload.state?(:COMMITTED)
     #verify one item REMOVED

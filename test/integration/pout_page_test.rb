@@ -38,13 +38,6 @@ class PoutPageTest < IntegrationHelper
     assert_response :success
     assert_template 'tote_items/orders'
 
-    #the reason for '4' is because there's elements for big and small screen and each of them have an expansion row containing a !
-    assert_select '.glyphicon-exclamation-sign', {count: 4}
-    #help text in the expansion row should exist
-    assert_select 'li div p span.wont-fully-ship', {count: 2, text: "Currently this item will not ship"}        
-    #there should be a 'More info' button to get user to the pout page
-    assert_select 'input[type=?][value=?]', "submit", "More info", 2#, {count: 2, text: "More info"}
-
     #user clicks 'More info' button
     post tote_items_pout_path, params: {id: ti_bob.id}
     assert_response :success
@@ -73,13 +66,6 @@ class PoutPageTest < IntegrationHelper
     get tote_items_path, params: {orders: true}
     assert_response :success
     assert_template 'tote_items/orders'
-
-    #the reason for '4' is because there's elements for big and small screen and each of them have an expansion row containing a !
-    assert_select '.glyphicon-exclamation-sign', {count: 4}
-    #help text in the expansion row should exist
-    assert_select 'li div p span.wont-fully-ship', {count: 2, text: "Currently this item will not ship"}        
-    #there should be a 'More info' button to get user to the pout page
-    assert_select 'input[type=?][value=?]', "submit", "More info", 2#, {count: 2, text: "More info"}
 
     #user clicks 'More info' button
     post tote_items_pout_path, params: {id: ti_sam.id}
@@ -136,13 +122,6 @@ class PoutPageTest < IntegrationHelper
     assert_response :success
     assert_template 'tote_items/orders'
 
-    #the reason for '4' is because there's elements for big and small screen and each of them have an expansion row containing a !
-    assert_select '.glyphicon-exclamation-sign', {count: 4}
-    #help text in the expansion row should exist
-    assert_select 'li div p span', {count: 2, text: "Currently this item will only partially ship"}
-    #there should be a 'More info' button to get user to the pout page
-    assert_select 'input[type=?][value=?]', "submit", "More info", 2#, {count: 2, text: "More info"}
-
     #user clicks 'More info' button
     post tote_items_pout_path, params: {id: ti_bob.id}
     assert_response :success
@@ -168,13 +147,6 @@ class PoutPageTest < IntegrationHelper
     get tote_items_path, params: {orders: true}
     assert_response :success
     assert_template 'tote_items/orders'
-
-    #the reason for '4' is because there's elements for big and small screen and each of them have an expansion row containing a !
-    assert_select '.glyphicon-exclamation-sign', {count: 4}
-    #help text in the expansion row should exist
-    assert_select 'li div p span', {count: 2, text: "Currently this item will not ship"}
-    #there should be a 'More info' button to get user to the pout page
-    assert_select 'input[type=?][value=?]', "submit", "More info", 2#, {count: 2, text: "More info"}
 
     #user clicks 'More info' button
     post tote_items_pout_path, params: {id: ti_sam.id}
@@ -305,15 +277,6 @@ class PoutPageTest < IntegrationHelper
     #total amount should be properly displayed    
     assert_select 'div#orderTotal', {count: 1, text: "Total: #{number_to_currency(ti_bob.quantity * ti_bob.posting.price)}" }
 
-    #icons in the tote should indicate a problem
-    assert_select '.glyphicon-exclamation-sign', {count: 4}
-
-    #help text in the expansion row should exist
-    assert_select 'li div p span', {count: 2, text: "Currently this item will not ship"}    
-    
-    #there should be a 'More info' button to get user to the pout page
-    assert_select 'input[type=?][value=?]', "submit", "More info", 2#, {count: 2, text: "More info"}
-
     #user clicks 'More info' button
     post tote_items_pout_path, params: {id: ti_bob.id}
     assert_response :success
@@ -422,15 +385,6 @@ class PoutPageTest < IntegrationHelper
 
     #total amount should be properly displayed    
     assert_select 'div#orderTotal', {count: 1, text: "Total: #{number_to_currency(ti_bob.quantity * ti_bob.posting.price)}" }
-
-    #icons in the tote should indicate a problem
-    assert_select '.glyphicon-exclamation-sign', {count: 4}
-
-    #help text in the expansion row should exist
-    assert_select 'li div p span', {count: 2, text: "Currently this item will not ship"}    
-    
-    #there should be a 'More info' button to get user to the pout page
-    assert_select 'input[type=?][value=?]', "submit", "More info", 2#, {count: 2, text: "More info"}
 
     #user clicks 'More info' button
     post tote_items_pout_path, params: {id: ti_bob.id}

@@ -407,8 +407,7 @@ class PostingsTest < IntegrationHelper
     get tote_items_path(orders: true)
     assert_response :success
     assert_template 'tote_items/orders'    
-    assert_select "span.glyphicon-exclamation-sign"
-
+    
     #log in as c2
     c2 = users(:c2)
     log_in_as(c2)

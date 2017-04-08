@@ -81,7 +81,10 @@ class Authorizer < IntegrationHelper
     verify_authorization_receipt_sent(num_mail_messages_sent, customer, authorization)
     assert_not_nil authorization
     assert_not_nil authorization.transaction_id
-    assert_template 'authorizations/create'
+    assert_response :redirect
+    assert_redirected_to tote_items_path(calendar: 1)
+    follow_redirect!
+    assert_template 'tote_items/calendar'
     return authorization
   end
 
