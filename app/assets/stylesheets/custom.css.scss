@@ -185,6 +185,28 @@ p {
   font-size: 1.3em;
 }
 
+.header-icon {
+  font-size: 1.7em;
+  color: #CCCCCC;
+  padding-right: 15px;
+  padding-left: 15px;
+  padding-top: 10px;  
+}
+
+.numberCircle {
+  position: absolute;
+  top: 3px;
+  left: 2px;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 0.62em;
+  background: $fc-primary-color;    
+  color: white;
+  text-align: center;
+  line-height: 15px;
+}
+
 .header-link {
   margin-top: 20px;  
   margin-bottom: 10px;
@@ -193,9 +215,14 @@ p {
   color: $gray-light;    
 }
 
+//removes the little underline thingy from <a> links when they become active from click
+a, a:hover, a:active, a:visited, a:focus {
+  text-decoration:none;
+}
+
 .left-most-header-link {
     margin-left: 10px;
-  }
+}
 
 .display-none {
   display: none;

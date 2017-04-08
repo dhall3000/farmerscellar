@@ -6,6 +6,62 @@
   </div>
 </div>
 
+<div class="row">
+  <div class="col-xs-12">
+    
+    <%= link_to "", root_path, class: "header-icon glyphicon glyphicon-home" %>
+
+    <% if logged_in? %>
+
+      <%= link_to tote_items_path, class: "non-blue" do %>                  
+        <span class="header-icon glyphicon glyphicon-shopping-cart">
+          <% if session[:tote] && (session[:tote] > 0) %>
+            <span class="numberCircle"><%= session[:tote].to_s %></span>
+          <% end %>
+        </span>
+      <% end %>
+
+
+      <%= link_to tote_items_path(orders: true), class: "non-blue" do %>
+        <span class="header-icon glyphicon glyphicon glyphicon-list-alt">
+          <% if session[:orders] && (session[:orders] > 0) %>
+            <span class="numberCircle"><%= session[:orders].to_s %></span>
+          <% end %>
+        </span>
+      <% end %>
+
+
+      <%= link_to tote_items_path(calendar: 1), class: "non-blue" do %>                            
+        <span class="header-icon glyphicon glyphicon glyphicon-calendar">
+          <% if session[:calendar] && (session[:calendar] > 0) %>
+            <span class="numberCircle"><%= session[:calendar].to_s %></span>
+          <% end %>
+        </span>
+      <% end %>
+
+
+      <%= link_to subscriptions_path, class: "non-blue" do %>          
+        <span class="header-icon glyphicon glyphicon glyphicon-repeat">
+          <% if session[:subscriptions] && (session[:subscriptions] > 0) %>
+            <span class="numberCircle"><%= session[:subscriptions].to_s %></span>
+          <% end %>
+        </span>
+      <% end %>
+
+      <%= link_to pickup_path, class: "non-blue" do %>          
+        <span class="header-icon glyphicon glyphicon glyphicon-ok">
+          <% if session[:ready_for_pickup] && (session[:ready_for_pickup] > 0) %>
+            <span class="numberCircle"><%= session[:ready_for_pickup].to_s %></span>
+          <% end %>
+        </span>
+      <% end %>
+
+
+    <% end %>
+
+  </div>
+</div>
+
 <% if (yield :nav_trinket).blank? %>
   <% if request.path != root_path %>
     <%= render partial: 'shared/nav_trinket', locals: { links: nil } %>
@@ -18,46 +74,6 @@
   <div class="col-xs-12 col-sm-3">
     <div id="headerContent" class="collapse" data-chevron="#headerContentChevron">        
       <% if logged_in? %>
-        
-        <div class="left-most-header-link header-link">
-          <%= link_to tote_items_path, class: "non-blue" do %>                  
-            <span class="glyphicon glyphicon-shopping-cart"></span><span class="header-object-count"> <%= (session[:tote] && (session[:tote] > 0)) ? session[:tote].to_s : "" %></span>
-            <span> Tote</span>                    
-          <% end %>
-        </div>
-
-
-        <div class="left-most-header-link header-link">
-          <%= link_to tote_items_path(orders: true), class: "non-blue" do %>
-            <span class="glyphicon glyphicon glyphicon-list-alt"></span><span class="header-object-count"> <%= (session[:orders] && (session[:orders] > 0)) ? session[:orders].to_s : "" %></span>
-            <span> Orders</span>
-          <% end %>
-        </div>
-
-
-        <div class="left-most-header-link header-link">
-          <%= link_to tote_items_path(calendar: 1), class: "non-blue" do %>                            
-            <span class="glyphicon glyphicon glyphicon-calendar"></span><span class="header-object-count"> <%= (session[:calendar] && (session[:calendar] > 0)) ? session[:calendar].to_s : "" %></span>
-            <span> Orders calendar</span>
-          <% end %>
-        </div>
-
-
-        <div class="left-most-header-link header-link">
-          <%= link_to subscriptions_path, class: "non-blue" do %>          
-            <span class="glyphicon glyphicon glyphicon-repeat"></span><span class="header-object-count"> <%= (session[:subscriptions] && (session[:subscriptions] > 0)) ? session[:subscriptions].to_s : "" %></span>
-            <span> Subscriptions</span>
-          <% end %>
-        </div>
-
-
-        <div class="left-most-header-link header-link">
-          <%= link_to pickup_path, class: "non-blue" do %>          
-            <span class="glyphicon glyphicon glyphicon-ok"></span><span class="header-object-count"> <%= (session[:ready_for_pickup] && (session[:ready_for_pickup] > 0)) ? session[:ready_for_pickup].to_s : "" %></span>
-            <span> Ready for pickup</span>
-          <% end %>
-        </div>
-
 
         <hr class="header-section-divider" />
 
