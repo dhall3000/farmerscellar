@@ -1,17 +1,17 @@
 <h1>Orders Calendar</h1>
 
 <% if @first_future_item %>
-  <div class="row">
-    <div class="col-xs-12">
-      <div class="beta-feature text-center">Beta feature, under construction...</div>
-    </div>
-  </div>
 
   <div class="row">
     <div class="col-xs-12">
-      <div class="text-center" style="padding-bottom: 20px;"><span><%= "Pickup any day you like, just note the #{current_user.dropsite.next_food_clearout.strftime("%A %l%p")} deadline." %></span></div>
+      <div class="nice-note text-center"><span>Pickup <u>any</u> day you like!</span></div>
     </div>
   </div>
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="text-center small" style="padding-bottom: 20px;"><span><%= "(just note the #{current_user.dropsite.next_food_clearout.strftime("%A %l%p")} deadline)" %></span></div>
+    </div>
+  </div>  
 
   <div class="row">
     <div class="col-xs-12">

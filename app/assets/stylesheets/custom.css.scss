@@ -175,6 +175,12 @@ p {
   transition:transform 180ms ease-in;
 }
 
+.nice-note {
+  font-family: 'Indie Flower', cursive;
+  font-size: 2em;
+  color: $fc-primary-color;
+}
+
 #local-food-connection {
   font-size: 1.3em;
 }
