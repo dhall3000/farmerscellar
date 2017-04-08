@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'model_test_ancestor'
 
-class EmailTest < ActiveSupport::TestCase
+class EmailTest < ModelTestAncestor
 
   test "email should have subject" do
     email = Email.new(body: "hello body")

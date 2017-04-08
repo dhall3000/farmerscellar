@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'model_test_ancestor'
 
-class PostingEmailTest < ActiveSupport::TestCase
+class PostingEmailTest < ModelTestAncestor
   # test "the truth" do
   #   assert true
   # end

@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'model_test_ancestor'
 
-class CreditorObligationTest < ActiveSupport::TestCase
+class CreditorObligationTest < ModelTestAncestor
   
   #case1: pp10, p15, pp10, p15, pp10: balance = 0
   test "case 1 funds exchange should check out" do

@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'model_test_ancestor'
 
-class FoodCategoryUploadTest < ActiveSupport::TestCase
+class FoodCategoryUploadTest < ModelTestAncestor
   # test "the truth" do
   #   assert true
   # end

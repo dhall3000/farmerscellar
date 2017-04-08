@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'model_test_ancestor'
 
-class SubscriptionSkipDateTest < ActiveSupport::TestCase
+class SubscriptionSkipDateTest < ModelTestAncestor
 
 	def setup
 		@subscription = Subscription.new(frequency: 1, on: true, quantity: 1)		

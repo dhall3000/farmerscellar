@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'model_test_ancestor'
 
-class BusinessInterfaceTest < ActiveSupport::TestCase
+class BusinessInterfaceTest < ModelTestAncestor
 
   test "can not belong to producer that has a distributor" do
     distributor = create_producer(name = "distributor name", email = "distributor@p.com")

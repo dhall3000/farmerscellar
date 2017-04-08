@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'model_test_ancestor'
 
-class RtpurchaseTest < ActiveSupport::TestCase
+class RtpurchaseTest < ModelTestAncestor
 
 	def setup
 		@rtpurchase = Rtpurchase.new(

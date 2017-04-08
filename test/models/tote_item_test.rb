@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'model_test_ancestor'
 
-class ToteItemTest < ActiveSupport::TestCase
+class ToteItemTest < ModelTestAncestor
 
   def setup
   	@tote_item = tote_items(:c1apple)

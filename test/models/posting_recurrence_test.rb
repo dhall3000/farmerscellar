@@ -1,7 +1,7 @@
-require 'test_helper'
+require 'model_test_ancestor'
 require 'utility/rake_helper'
 
-class PostingRecurrenceTest < ActiveSupport::TestCase
+class PostingRecurrenceTest < ModelTestAncestor
   
   def setup
   	

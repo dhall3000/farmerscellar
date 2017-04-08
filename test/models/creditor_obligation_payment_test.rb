@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'model_test_ancestor'
 
-class CreditorObligationPaymentTest < ActiveSupport::TestCase
+class CreditorObligationPaymentTest < ModelTestAncestor
   # test "the truth" do
   #   assert true
   # end

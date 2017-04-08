@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'model_test_ancestor'
 
-class DropsiteTest < ActiveSupport::TestCase
+class DropsiteTest < ModelTestAncestor
 
   def setup
     @dropsite = Dropsite.first

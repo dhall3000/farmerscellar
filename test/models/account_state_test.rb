@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'model_test_ancestor'
 
-class AccountStateTest < ActiveSupport::TestCase
+class AccountStateTest < ModelTestAncestor
   # test "the truth" do
   #   assert true
   # end

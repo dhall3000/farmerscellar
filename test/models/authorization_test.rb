@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'model_test_ancestor'
 
-class AuthorizationTest < ActiveSupport::TestCase
+class AuthorizationTest < ModelTestAncestor
   # test "the truth" do
   #   assert true
   # end

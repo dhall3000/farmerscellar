@@ -1,7 +1,7 @@
-require 'test_helper'
+require 'model_test_ancestor'
 require 'utility/rake_helper'
 
-class UserTest < ActiveSupport::TestCase
+class UserTest < ModelTestAncestor
 
   def setup
     puts "Test method: #{self.method_name}"

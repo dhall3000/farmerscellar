@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'model_test_ancestor'
 
-class SubscriptionTest < ActiveSupport::TestCase
+class SubscriptionTest < ModelTestAncestor
 
 	def setup
 		@posting_recurrence = PostingRecurrence.new(frequency: 1, on: true)

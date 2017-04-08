@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'model_test_ancestor'
 
-class CheckoutTest < ActiveSupport::TestCase
+class CheckoutTest < ModelTestAncestor
   # test "the truth" do
   #   assert true
   # end

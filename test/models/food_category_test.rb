@@ -1,4 +1,4 @@
-require 'test_helper'
+require 'model_test_ancestor'
 
-class FoodCategoryTest < ActiveSupport::TestCase
+class FoodCategoryTest < ModelTestAncestor
 end

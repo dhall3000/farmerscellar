@@ -1,7 +1,7 @@
-require 'test_helper'
+require 'model_test_ancestor'
 require 'utility/rake_helper'
 
-class PostingTest < ActiveSupport::TestCase
+class PostingTest < ModelTestAncestor
   include ToteItemsHelper
 
   def setup

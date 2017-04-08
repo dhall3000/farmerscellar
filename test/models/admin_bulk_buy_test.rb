@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'model_test_ancestor'
 
-class AdminBulkBuyTest < ActiveSupport::TestCase
+class AdminBulkBuyTest < ModelTestAncestor
   # test "the truth" do
   #   assert true
   # end

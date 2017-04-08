@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'model_test_ancestor'
 
-class PickupCodeTest < ActiveSupport::TestCase
+class PickupCodeTest < ModelTestAncestor
 
 	def setup
 		@pickup_code = PickupCode.new(user: users(:c1), code: "1234")

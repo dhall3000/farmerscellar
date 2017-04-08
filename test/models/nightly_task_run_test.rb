@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'model_test_ancestor'
 
-class NightlyTaskRunTest < ActiveSupport::TestCase
+class NightlyTaskRunTest < ModelTestAncestor
   # test "the truth" do
   #   assert true
   # end

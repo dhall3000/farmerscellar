@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'model_test_ancestor'
 
-class PickupTest < ActiveSupport::TestCase
+class PickupTest < ModelTestAncestor
   
   test "should not save without user" do
   	pickup = Pickup.new

@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'model_test_ancestor'
 
-class RtbaTest < ActiveSupport::TestCase
+class RtbaTest < ModelTestAncestor
 
 	def setup
 		@user = users(:c1)

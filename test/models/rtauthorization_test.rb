@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'model_test_ancestor'
 
-class RtauthorizationTest < ActiveSupport::TestCase
+class RtauthorizationTest < ModelTestAncestor
 
 	def setup
 		@rtba = rtbas(:one)

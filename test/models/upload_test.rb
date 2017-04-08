@@ -1,4 +1,4 @@
-require 'test_helper'
+require 'model_test_ancestor'
 
-class UploadTest < ActiveSupport::TestCase
+class UploadTest < ModelTestAncestor
 end
