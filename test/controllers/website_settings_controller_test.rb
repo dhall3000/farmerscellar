@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'integration_helper'
 
-class WebsiteSettingsControllerTest < ActionDispatch::IntegrationTest
+class WebsiteSettingsControllerTest < IntegrationHelper
 
   def setup
   	@admin = users(:a1)

@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'integration_helper'
 
-class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
+class SubscriptionsControllerTest < IntegrationHelper
 
   def setup
     @c1 = users(:c1)

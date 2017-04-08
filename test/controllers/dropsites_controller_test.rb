@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'integration_helper'
 
-class DropsitesControllerTest < ActionDispatch::IntegrationTest
+class DropsitesControllerTest < IntegrationHelper
 
   def setup
     @dropsite = dropsites(:dropsite1)

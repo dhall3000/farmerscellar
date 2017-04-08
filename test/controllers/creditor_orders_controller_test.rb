@@ -1,7 +1,7 @@
-require 'test_helper'
+require 'integration_helper'
 require 'utility/rake_helper'
 
-class CreditorOrdersControllerTest < ActionDispatch::IntegrationTest
+class CreditorOrdersControllerTest < IntegrationHelper
   test "should get index" do
 
     nuke_all_postings

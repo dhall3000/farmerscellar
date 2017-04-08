@@ -1,5 +1,5 @@
-require 'test_helper'
+require 'integration_helper'
 
-class AccountActivationsControllerTest < ActionDispatch::IntegrationTest
+class AccountActivationsControllerTest < IntegrationHelper
 
 end

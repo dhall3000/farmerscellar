@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'integration_helper'
 
-class PartnerUsersControllerTest < ActionDispatch::IntegrationTest
+class PartnerUsersControllerTest < IntegrationHelper
 
   test "should create new partner user if user does not already exist" do
     log_in_as(users(:a1))

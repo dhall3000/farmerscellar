@@ -1,4 +1,4 @@
-require 'test_helper'
+require 'integration_helper'
 
-class ProducersControllerTest < ActionDispatch::IntegrationTest
+class ProducersControllerTest < IntegrationHelper
 end

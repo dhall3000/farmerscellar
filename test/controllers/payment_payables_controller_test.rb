@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'integration_helper'
 
-class PaymentPayablesControllerTest < ActionDispatch::IntegrationTest
+class PaymentPayablesControllerTest < IntegrationHelper
 
   def setup
 

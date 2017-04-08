@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'integration_helper'
 
-class AccessCodesControllerTest < ActionDispatch::IntegrationTest
+class AccessCodesControllerTest < IntegrationHelper
 
   def setup
     @a1 = users(:a1)    

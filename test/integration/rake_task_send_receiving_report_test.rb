@@ -1,5 +1,3 @@
-require 'test_helper'
-require 'utility/rake_helper'
 require 'integration_helper'
 
 class RakeTaskSendReceivingReportTest < IntegrationHelper

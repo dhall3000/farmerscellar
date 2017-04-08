@@ -1,4 +1,4 @@
-require 'test_helper'
+require 'integration_helper'
 
-class DeliveriesControllerTest < ActionDispatch::IntegrationTest
+class DeliveriesControllerTest < IntegrationHelper
 end

@@ -1,5 +1,5 @@
-require 'test_helper'
+require 'integration_helper'
 
-class PaymentsControllerTest < ActionDispatch::IntegrationTest
+class PaymentsControllerTest < IntegrationHelper
   
 end

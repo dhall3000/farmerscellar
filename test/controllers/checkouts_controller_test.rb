@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'integration_helper'
 
-class CheckoutsControllerTest < ActionDispatch::IntegrationTest
+class CheckoutsControllerTest < IntegrationHelper
   
   def setup
   	@c1 = users(:c1)

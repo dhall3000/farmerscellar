@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'integration_helper'
 
-class UserDropsitesControllerTest < ActionDispatch::IntegrationTest
+class UserDropsitesControllerTest < IntegrationHelper
 
 	def setup
 		@user = users(:c1)

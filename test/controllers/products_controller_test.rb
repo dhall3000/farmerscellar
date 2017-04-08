@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'integration_helper'
 
-class ProductsControllerTest < ActionDispatch::IntegrationTest
+class ProductsControllerTest < IntegrationHelper
   
   def setup
     @admin = users(:a1)

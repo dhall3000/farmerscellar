@@ -1,4 +1,3 @@
-require 'test_helper'
 require 'authorization_helper'
 
 class AuthorizationsTest < Authorizer

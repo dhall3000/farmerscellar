@@ -1,5 +1,5 @@
-require 'test_helper'
+require 'integration_helper'
 
-class UploadsControllerTest < ActionDispatch::IntegrationTest
+class UploadsControllerTest < IntegrationHelper
 
 end

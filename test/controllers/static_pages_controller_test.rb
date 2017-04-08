@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'integration_helper'
 
-class StaticPagesControllerTest < ActionDispatch::IntegrationTest
+class StaticPagesControllerTest < IntegrationHelper
   test "should get home" do
     get root_path
     assert_response :success

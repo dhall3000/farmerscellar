@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'integration_helper'
 
-class PickupsControllerTest < ActionDispatch::IntegrationTest
+class PickupsControllerTest < IntegrationHelper
 
 	def setup
 		@customer = users(:c1)

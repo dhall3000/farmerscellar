@@ -1,4 +1,3 @@
-require 'test_helper'
 require 'bulk_buy_helper'
 
 class NotFilledToteItemsTest < BulkBuyer

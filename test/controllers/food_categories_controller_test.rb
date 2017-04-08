@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'integration_helper'
 
-class FoodCategoriesControllerTest < ActionDispatch::IntegrationTest
+class FoodCategoriesControllerTest < IntegrationHelper
   test "should get index" do
   end
 

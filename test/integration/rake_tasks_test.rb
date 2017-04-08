@@ -1,5 +1,3 @@
-require 'test_helper'
-require 'utility/rake_helper'
 require 'bulk_buy_helper'
 
 class RakeTasksTest < BulkBuyer

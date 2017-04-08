@@ -1,6 +1,6 @@
-require 'test_helper'
+require 'integration_helper'
 
-class RtauthorizationsControllerTest < ActionDispatch::IntegrationTest
+class RtauthorizationsControllerTest < IntegrationHelper
 
 	def setup
 		@c1 = users(:c1)
