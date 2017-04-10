@@ -16,7 +16,7 @@
       <%= link_to tote_items_path, class: "non-blue" do %>                  
         <span class="header-icon glyphicon glyphicon-shopping-cart">
           <% if session[:tote] && (session[:tote] > 0) %>
-            <span class="numberCircle"><%= session[:tote].to_s %></span>
+            <span class="badge"><%= session[:tote].to_s %></span>
           <% end %>
         </span>
       <% end %>
@@ -25,7 +25,7 @@
       <%= link_to tote_items_path(orders: true), class: "non-blue" do %>
         <span class="header-icon glyphicon glyphicon glyphicon-list-alt">
           <% if session[:orders] && (session[:orders] > 0) %>
-            <span class="numberCircle"><%= session[:orders].to_s %></span>
+            <span class="badge"><%= session[:orders].to_s %></span>
           <% end %>
         </span>
       <% end %>
@@ -34,7 +34,7 @@
       <%= link_to tote_items_path(calendar: 1), class: "non-blue" do %>                            
         <span class="header-icon glyphicon glyphicon glyphicon-calendar">
           <% if session[:calendar] && (session[:calendar] > 0) %>
-            <span class="numberCircle"><%= session[:calendar].to_s %></span>
+            <span class="badge"><%= session[:calendar].to_s %></span>
           <% end %>
         </span>
       <% end %>
@@ -43,7 +43,7 @@
       <%= link_to subscriptions_path, class: "non-blue" do %>          
         <span class="header-icon glyphicon glyphicon glyphicon-repeat">
           <% if session[:subscriptions] && (session[:subscriptions] > 0) %>
-            <span class="numberCircle"><%= session[:subscriptions].to_s %></span>
+            <span class="badge"><%= session[:subscriptions].to_s %></span>
           <% end %>
         </span>
       <% end %>
@@ -51,7 +51,7 @@
       <%= link_to pickup_path, class: "non-blue" do %>          
         <span class="header-icon glyphicon glyphicon glyphicon-ok">
           <% if session[:ready_for_pickup] && (session[:ready_for_pickup] > 0) %>
-            <span class="numberCircle"><%= session[:ready_for_pickup].to_s %></span>
+            <span class="badge"><%= session[:ready_for_pickup].to_s %></span>
           <% end %>
         </span>
       <% end %>
