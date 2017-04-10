@@ -333,7 +333,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     assert_redirected_to tote_items_path(orders: true)
     #verify danger flash message
     follow_redirect!
-    assert_equal "Order not canceled. Order Cutoff was #{ti_sam.posting.order_cutoff.strftime("%a %b %e at %l:%M %p")}. Please see 'Order Cancellation' on the 'How it Works' page for more details.", flash[:danger]
+    assert_equal "Order not canceled. Order Cutoff was #{ti_sam.posting.order_cutoff.strftime("%a %b %e at %l:%M %p")}. Please see 'Order Cancellation' on the 'How Things Works' page for more details.", flash[:danger]
     #verify one item COMMITTED
     assert ti_sam.reload.state?(:COMMITTED)
     #verify one item REMOVED

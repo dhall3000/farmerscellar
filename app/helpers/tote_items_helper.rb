@@ -1,5 +1,17 @@
 module ToteItemsHelper
 
+  def order_deficiencies?(tote_items)
+
+    tote_items.each do |tote_item|
+      if tote_item.additional_units_required_to_fill_my_case > 0 || tote_item.posting.biggest_order_minimum_producer_net_outstanding > 0
+        return true
+      end
+    end
+
+    return false
+    
+  end
+
   def session_header_data_valid?
     return session[:tote] && session[:orders] && session[:calendar] && session[:subscriptions] && session[:ready_for_pickup]
   end

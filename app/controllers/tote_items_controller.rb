@@ -271,7 +271,7 @@ class ToteItemsController < ApplicationController
     else
 
       if ti.state?(:COMMITTED)
-        flash[:danger] = "Order not canceled. Order Cutoff was #{ti.posting.order_cutoff.strftime("%a %b %e at %l:%M %p")}. Please see 'Order Cancellation' on the 'How it Works' page for more details."
+        flash[:danger] = "Order not canceled. Order Cutoff was #{ti.posting.order_cutoff.strftime("%a %b %e at %l:%M %p")}. Please see 'Order Cancellation' on the 'How Things Works' page for more details."
       else
         ti.transition(:customer_removed)        
         if ti.state?(:REMOVED)

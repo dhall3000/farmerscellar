@@ -26,15 +26,21 @@
 
           while delivery_date <= week_end
         %>
-
+ 
+            <%
+            tote_items_for_date = tote_items.where("postings.delivery_date = ?", delivery_date)
+            order_deficiencies = order_deficiencies?(tote_items_for_date)
+            %>
             <%= link_to '#', class: "black" do %>
-              <div class="thumbnail horizontal-scroller" style="position: relative;">        
-                <div class="text-right" style="padding-bottom: 10px; padding-right: 2px;<%= delivery_date == Time.zone.now.midnight ? "background-color: lightgray;" : "" %>">
+              <div class="thumbnail horizontal-scroller <%= tote_items_for_date.any? ? "calendar-delivery-day" : "" %>">
+                <div class="<%= delivery_date == Time.zone.now.midnight ? "calendar-delivery-day-header-today" : "calendar-delivery-day-header" %>">
+                  <% if order_deficiencies %>
+                    <span class="gentle-flash alert-danger glyphicon glyphicon-exclamation-sign pull-left" style="padding: 2px;"></span>
+                  <% end %>
                   <%= "#{delivery_date.strftime("%a, %b")} #{delivery_date.day.ordinalize}" %>
-                </div>
-                <% tote_items_for_date = tote_items.where("postings.delivery_date = ?", delivery_date) %>
+                </div>                
                 <% if tote_items_for_date.any? %>
-                  
+                  <div>
                     <%
                     max_count = 8
                     count = 0                  
@@ -48,33 +54,21 @@
                       <% if tote_item == @first_future_item %>
                         <span id="firstFutureItemThumbnailIndex" data-thumbnailindex="<%= thumbnail_index %>"></span>
                       <% end %>
-                      <div>
-                        <p>
-                          <% if [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED]].include? tote_item.state %>
-                            <%= link_to "", tote_item, class: "non-blue glyphicon glyphicon-remove", method: :delete %>
-                          <% end %>
-                          <%= tote_item.short_friendly_description %>                          
-                        </p>
-                        <% if [ToteItem.states[:ADDED], ToteItem.states[:ADDED], ToteItem.states[:ADDED]].include? tote_item.state %>
-                          <% if tote_item.additional_units_required_to_fill_my_case > 0 || tote_item.posting.biggest_order_minimum_producer_net_outstanding > 0 %>
-                            <span class="gentle-flash alert-danger glyphicon glyphicon-exclamation-sign"></span>
-                          <% end %>
-                        <% end %>                          
+                      <div class="truncated-text-line-no-expand">
+                        <%= tote_item.short_friendly_description %>
                       </div>
                       <% if count == max_count %>
-                        <div><%= link_to "See more", '#' %></div>
+                        <div style="padding-top: 10px; text-align: center;">More...</div>
                       <% end %>
                     <%
                       count += 1
                     end
                     %>              
-                  
+                  </div>
                 <% end %>
 
-                <% if delivery_date == week_end.midnight %>
-                  <div class="text-center">
-                    <div class="alert alert-danger" style="position: absolute; bottom: 0;"><%= "Pickup by #{week_end.strftime("%l%p")}" %></div>
-                  </div>
+                <% if delivery_date == week_end.midnight %>                  
+                    <div class="alert-danger calendar-pickup-deadline"><%= "Pickup by #{week_end.strftime("%l%p")}" %></div>
                 <% end %>
 
               </div>

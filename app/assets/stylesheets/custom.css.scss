@@ -14,11 +14,40 @@ $fc-primary-color: #AACB4F;
   box-sizing:         border-box;
 }
 
+.calendar-delivery-day-header {
+  text-align: right;
+  padding-bottom: 10px;
+  padding-right: 2px;
+}
+
+.calendar-delivery-day-header-today {
+  text-align: right;
+  padding-bottom: 10px;
+  padding-right: 2px;
+  border-radius: 3px;
+  background-color: lightgray;
+}
+
+.calendar-delivery-day {
+  background-color: #eeeeee;
+}
+
+.calendar-pickup-deadline {
+  position: absolute;
+  bottom: 15px;
+  width: 95%;
+  text-align: center;
+  border-radius: 2px;
+  padding: 5px;
+}
+
 .horizontal-scroller {
   width: 150px;
   height: 250px;
   display: inline-block;
   vertical-align: top;
+  position: relative;
+  white-space: normal;
 }
 
 .pagination > .pagination a {
@@ -584,6 +613,12 @@ a.non-blue { color: inherit; }
 }
 
 .truncated-text-line {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;  
+}
+
+.truncated-text-line-no-expand {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;  
