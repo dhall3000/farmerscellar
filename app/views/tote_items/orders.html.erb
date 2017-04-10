@@ -1,22 +1,76 @@
-<h1>Current Orders</h1>
+<h1>Orders</h1>
 
-<% if !logged_in? %>
-  <p>Sorry, you need to log in before you can view your orders</p>
-  <% return %>
-<% end %>
+<p class="text-center" style="margin-bottom: 15px;">
+  <%= link_to "Scheduled for delivery #{friendly_date_text(@delivery_date)}", how_things_work_path(anchor: "scheduled_delivery_date") %>
+</p>
 
-<% if orders_exist?(current_user) %>
-  <%= render partial: 'shared/orderables', locals: { tote_items: @tote_items, subscriptions: @subscriptions, show_remove_button: true, items_total_gross: @items_total_gross } %>
-<% else %>
+<% if @tote_items.any? %>
+
 
   <div class="row">
-    <div class="col-xs-12 col-sm-offset-3 col-sm-6">
-      <div class="panel panel-default">    
-        <div class="panel-body">
-          <p class="text-center">You have no current orders. First go to your <%= link_to "Shopping Tote", tote_items_path %> and check out, then your orders will show up here.</p>
+    <% @tote_items.each do |tote_item| %>
+      <div class="col-xs-6 col-sm-3">
+
+        <div class="thumbnail">
+
+          <% authorized = tote_item.state?(:AUTHORIZED) %>
+          <div>
+            <span id="toteItem<%= tote_item.id.to_s %>Chevron" class="glyphicon glyphicon-chevron-down" data-toggle="collapse" data-target="#toteItem<%= tote_item.id.to_s %>Details"></span>
+
+            <% if authorized %>
+              <%= link_to "", tote_item_path(tote_item), class: "black glyphicon glyphicon-remove pull-right", method: :delete %>
+            <% else #must be committed  %>              
+              <span class="lightgray glyphicon glyphicon-remove pull-right" data-toggle="collapse" data-target="#toteItem<%= tote_item.id.to_s %>Details"></span>
+            <% end %>
+          </div>
+
+          <div id="toteItem<%= tote_item.id.to_s %>Details" class="collapse" data-chevron="#toteItem<%= tote_item.id.to_s %>Chevron">
+            <%
+            oc = tote_item.posting.order_cutoff
+            cutoff_time = "#{friendly_time(oc)} #{friendly_date_text(oc)}"
+            %>
+            <div class="<%= authorized ? "" : "alert alert-danger" %>">
+              <div>
+                <%= link_to "Cancel Deadline", how_things_work_path(anchor: "cancellation") %>
+              </div>
+              <div>                
+                <%= cutoff_time %>                
+              </div>
+            </div>
+          </div>
+
+
+          <div class="quantity-delivered black">
+            <%= "#{pluralize(tote_item.quantity, tote_item.posting.unit.name)}" %>
+          </div>
+
+          <%= link_to tote_item.posting do %>
+           
+            <% if tote_item.posting.uploads.count > 0 %>        
+              <%= image_tag "#{tote_item.posting.uploads.first.file_name.square}", class: "img-responsive" %>
+            <% elsif (upload = Upload.find_by(title: NOPRODUCTIMAGETITLE)) %>
+              <%= image_tag upload.file_name.square, class: "img-responsive" %>
+            <% end %>
+
+            <div class="caption">
+              <div class="truncated-text-line-no-expand producer-name-font">
+                <%= tote_item.posting.user.farm_name %>
+              </div>
+              <div class="truncated-text-line-no-expand producer-name-font">
+                <%= tote_item.posting.product.name %>
+              </div>
+              <div>
+                <strong>Total <%= number_to_currency(get_gross_item(tote_item)) %></strong>
+              </div>
+            </div>
+          <% end %>
+
         </div>
       </div>
-    </div>
+    <% end %>
   </div>
-  
+
+
+<% else %>
+  <p class="text-center">Zilch.</p>
 <% end %>

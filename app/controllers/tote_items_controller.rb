@@ -41,6 +41,14 @@ class ToteItemsController < ApplicationController
       end
     end
 
+    if params[:orders]
+      if (@delivery_date = Time.zone.parse(params[:orders]))        
+        @tote_items = current_user.tote_items.joins(:posting).where("tote_items.state" => [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED]]).where("postings.delivery_date = ?", @delivery_date)
+        render 'tote_items/orders'
+        return
+      end
+    end
+
     if params[:calendar]
 
       @tote_items_by_week = []      
@@ -75,13 +83,7 @@ class ToteItemsController < ApplicationController
     @items_total_gross = 0    
     template = ''
 
-    if params[:orders]
-      #user wants to see their orders      
-      @tote_items = authorized_items_for(current_user).joins(:posting).order("postings.delivery_date")
-      @subscriptions = get_active_subscriptions_by_authorization_state(current_user, include_paused_subscriptions = false, kind = Subscription.kinds[:NORMAL])[:authorized]      
-      @items_total_gross = get_gross_tote(@tote_items)
-      template = 'tote_items/orders'      
-    elsif params[:history]
+    if params[:history]
       if Rails.env.development?
         if current_user.tote_items.where(state: ToteItem.states[:FILLED]).count == 0
           ToteItem.create(user: current_user, price: Posting.first.price, posting: Posting.first, quantity: 1, quantity_filled: 1, state: ToteItem.states[:FILLED])

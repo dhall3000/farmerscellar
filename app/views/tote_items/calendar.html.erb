@@ -31,7 +31,7 @@
             tote_items_for_date = tote_items.where("postings.delivery_date = ?", delivery_date)
             order_deficiencies = order_deficiencies?(tote_items_for_date)
             %>
-            <%= link_to '#', class: "black" do %>
+            <%= link_to tote_items_path(orders: delivery_date.to_s), class: "black" do %>
               <div class="thumbnail horizontal-scroller <%= tote_items_for_date.any? ? "calendar-delivery-day" : "" %>">
                 <div class="<%= delivery_date == Time.zone.now.midnight ? "calendar-delivery-day-header-today" : "calendar-delivery-day-header" %>">
                   <% if order_deficiencies %>
