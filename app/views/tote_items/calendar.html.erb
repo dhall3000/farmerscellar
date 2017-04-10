@@ -34,7 +34,7 @@
                 </div>
                 <% tote_items_for_date = tote_items.where("postings.delivery_date = ?", delivery_date) %>
                 <% if tote_items_for_date.any? %>
-                  <ul>
+                  
                     <%
                     max_count = 8
                     count = 0                  
@@ -48,22 +48,27 @@
                       <% if tote_item == @first_future_item %>
                         <span id="firstFutureItemThumbnailIndex" data-thumbnailindex="<%= thumbnail_index %>"></span>
                       <% end %>
-                      <li>
-                        <%= tote_item.posting.product.name %>
+                      <div>
+                        <p>
+                          <% if [ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED]].include? tote_item.state %>
+                            <%= link_to "", tote_item, class: "non-blue glyphicon glyphicon-remove", method: :delete %>
+                          <% end %>
+                          <%= tote_item.short_friendly_description %>                          
+                        </p>
                         <% if [ToteItem.states[:ADDED], ToteItem.states[:ADDED], ToteItem.states[:ADDED]].include? tote_item.state %>
                           <% if tote_item.additional_units_required_to_fill_my_case > 0 || tote_item.posting.biggest_order_minimum_producer_net_outstanding > 0 %>
                             <span class="gentle-flash alert-danger glyphicon glyphicon-exclamation-sign"></span>
                           <% end %>
                         <% end %>                          
-                      </li>
+                      </div>
                       <% if count == max_count %>
-                        <li><%= link_to "See more", '#' %></li>
+                        <div><%= link_to "See more", '#' %></div>
                       <% end %>
                     <%
                       count += 1
                     end
                     %>              
-                  </ul>            
+                  
                 <% end %>
 
                 <% if delivery_date == week_end.midnight %>
