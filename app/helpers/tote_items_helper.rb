@@ -208,6 +208,21 @@ module ToteItemsHelper
 
   end
 
+  #NOTE: there is a .where(paused: false) clause in here so it's not just getting a num of the get_authorized_subscriptions_for method
+  def num_authorized_subscriptions_for(user)
+    
+    num_authorized_subscriptions = get_authorized_subscriptions_for(user)
+    
+    if num_authorized_subscriptions.nil?
+      num_authorized_subscriptions = 0
+    else
+      num_authorized_subscriptions = num_authorized_subscriptions.where(paused: false).count
+    end
+
+    return num_authorized_subscriptions
+
+  end
+
   def get_authorized_subscriptions_for(user)
 
     rtba = user.get_active_rtba
