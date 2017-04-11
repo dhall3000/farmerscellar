@@ -2,11 +2,11 @@ module ToteItemsHelper
 
   def friendly_date_text(datetime)
     
-    if datetime == Time.zone.now.midnight
+    if datetime.midnight == Time.zone.now.midnight
       delivery_date_text = "today"
-    elsif datetime == Time.zone.now.midnight - 1.day
+    elsif datetime.midnight == Time.zone.now.midnight - 1.day
       delivery_date_text = "yesterday"
-    elsif datetime == Time.zone.now.midnight + 1.day
+    elsif datetime.midnight == Time.zone.now.midnight + 1.day
       delivery_date_text = "tomorrow"
     else
       delivery_date_text = "#{datetime.strftime("%a %b")} #{datetime.day.ordinalize}"
