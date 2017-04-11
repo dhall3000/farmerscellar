@@ -402,9 +402,9 @@ class PostingsTest < IntegrationHelper
     #as of right now c1 has 3 auth'd and c2 has 4 auth'd for a total of 7. so if we log in as c1 and go to the tote
     #we should still see the red exclamation mark telling us the case isn't full yet, we're short 4
     log_in_as(c1)
-    get tote_items_path(orders: true)
+    get tote_items_path(orders: c1_ti.posting.delivery_date.to_s)
     assert_response :success
-    assert_template 'tote_items/orders'    
+    assert_template 'tote_items/orders'
     
     #log in as c2
     c2 = users(:c2)
@@ -430,7 +430,7 @@ class PostingsTest < IntegrationHelper
 
     #now c1 shouldn't see the exclamation mark in the tote
     log_in_as(c1)
-    get tote_items_path(orders: true)
+    get tote_items_path(orders: c1_ti.posting.delivery_date.to_s)
     assert_response :success
     assert_template 'tote_items/orders'    
     assert_select "span.glyphicon-exclamation-sign", count: 0

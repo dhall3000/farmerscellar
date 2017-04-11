@@ -215,7 +215,7 @@ class ToteItemsController < ApplicationController
     #You complete a void on the funds remaining on the authorization. 
 
     #DESCRIPTION: the intent is for use by shopping tote editing feature enabling user to remove items from their tote
-    @referer = request.referer || tote_items_path(orders: true)
+    @referer = request.referer || tote_items_path(calendar: 1)
     ti = ToteItem.find_by_id(params[:id])
 
     if ti == nil
@@ -225,7 +225,8 @@ class ToteItemsController < ApplicationController
       if ti.state?(:COMMITTED)
         flash[:danger] = "Order not canceled. Order Cutoff was #{ti.posting.order_cutoff.strftime("%a %b %e at %l:%M %p")}. Please see 'Order Cancellation' on the 'How Things Works' page for more details."
       else
-        ti.transition(:customer_removed)        
+        ti.transition(:customer_removed)
+        ti.reload
         if ti.state?(:REMOVED)
 
           flash_text = "#{ti.posting.product.name} canceled"
@@ -255,9 +256,13 @@ class ToteItemsController < ApplicationController
       end
             
     end
-    
-    redirect_to @referer
 
+    if ti.nil?
+      redirect_to tote_items_path(calendar: 1)
+    else
+      redirect_to tote_items_path(orders: ti.posting.delivery_date.to_s)
+    end    
+    
   end
 
   private

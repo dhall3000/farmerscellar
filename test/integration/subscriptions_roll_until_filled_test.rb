@@ -265,7 +265,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     log_in_as(sam)
     delete tote_item_path(id: second_ti.id)
     assert_response :redirect
-    assert_redirected_to tote_items_path(orders: true)
+    assert_redirected_to tote_items_path(orders: second_ti.posting.delivery_date.to_s)
     follow_redirect!
     #verify danger flash message
     assert_equal "#{second_ti.posting.product.name} canceled", flash[:success]
@@ -330,7 +330,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     log_in_as(sam)
     delete tote_item_path(id: ti_sam.id)
     assert_response :redirect
-    assert_redirected_to tote_items_path(orders: true)
+    assert_redirected_to tote_items_path(orders: ti_sam.posting.delivery_date.to_s)
     #verify danger flash message
     follow_redirect!
     assert_equal "Order not canceled. Order Cutoff was #{ti_sam.posting.order_cutoff.strftime("%a %b %e at %l:%M %p")}. Please see 'Order Cancellation' on the 'How Things Works' page for more details.", flash[:danger]
@@ -420,14 +420,18 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     #attempt to cancel sam's order
     assert ti_sam.reload.state?(:COMMITTED)
     log_in_as(sam)
-    get tote_items_path params: {orders: true}
+    get tote_items_path params: {orders: ti_sam.posting.delivery_date.to_s}
     assert_response :success
     assert_template 'tote_items/orders'
+    #make sure there's not a 'nuke item' link
+    assert_select 'a.black.glyphicon-remove', 0
+    #make sure there is a faux 'nuke item' link
+    assert_select 'span.lightgray.glyphicon-remove', 1
     assert ti_sam.id != sam.reload.tote_items.last.id
     second_ti = sam.reload.tote_items.last
     delete tote_item_path(id: second_ti.id)
     assert_response :redirect
-    assert_redirected_to tote_items_path(orders: true)
+    assert_redirected_to tote_items_path(orders: second_ti.posting.delivery_date.to_s)
     follow_redirect!
     assert_template 'tote_items/orders'
     #verify danger flash message

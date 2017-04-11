@@ -9,6 +9,36 @@ class ToteItemsControllerTest < IntegrationHelper
     @posting_apples = postings(:postingf1apples)
   end
 
+  test "nuking a tote item should bring you right back to the same orders page" do
+
+    next_friday = get_next_wday_after(wday = 5, days_from_now = 7)
+    posting1 = create_posting(farmer = nil, price = nil, product = Product.create(name: "Product1"), unit = nil, delivery_date = next_friday, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil, important_notes = nil, important_notes_body = nil)
+    posting2 = create_posting(farmer = nil, price = nil, product = Product.create(name: "Product2"), unit = nil, delivery_date = next_friday, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil, important_notes = nil, important_notes_body = nil)
+
+    customer = create_new_customer
+    ti1 = create_tote_item(customer, posting1, quantity = 1, frequency = nil, roll_until_filled = nil)
+    ti2 = create_tote_item(customer, posting2, quantity = 1, frequency = nil, roll_until_filled = nil)
+    create_one_time_authorization_for_customer(customer)
+
+    log_in_as customer
+    get tote_items_path(orders: ti1.posting.delivery_date.to_s)
+    assert_response :success
+    assert_template 'tote_items/orders'
+    assert_select 'div.truncated-text-line-no-expand.producer-name-font', {count: 1, text: posting1.product.name}
+    assert_select 'div.truncated-text-line-no-expand.producer-name-font', {count: 1, text: posting2.product.name}
+
+    delete tote_item_path(id: ti1.id)
+    assert_response :redirect
+    assert_redirected_to tote_items_path(orders: ti2.posting.delivery_date.to_s)
+    follow_redirect!
+    assert_equal "#{posting1.product.name} canceled", flash[:success]
+
+    assert_template 'tote_items/orders'
+    assert_select 'div.truncated-text-line-no-expand.producer-name-font', {count: 0, text: posting1.product.name}
+    assert_select 'div.truncated-text-line-no-expand.producer-name-font', {count: 1, text: posting2.product.name}    
+
+  end
+
   test "posting important notes should display properly" do
     #we're going to test that the important_notes/important_notes_body do/don't show up at the right time
 
