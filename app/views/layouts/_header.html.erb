@@ -24,15 +24,6 @@
       <% end %>
 
 
-      <%= link_to tote_items_path(orders: true), class: "non-blue" do %>
-        <span class="header-icon glyphicon glyphicon glyphicon-list-alt">
-          <% if session[:orders] && (session[:orders] > 0) %>
-            <span class="badge"><%= session[:orders].to_s %></span>
-          <% end %>
-        </span>
-      <% end %>
-
-
       <%= link_to tote_items_path(calendar: 1), class: "non-blue" do %>                            
         <span class="header-icon glyphicon glyphicon glyphicon-calendar">
           <% if session[:calendar] && (session[:calendar] > 0) %>

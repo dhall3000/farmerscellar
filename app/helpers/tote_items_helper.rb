@@ -23,7 +23,7 @@ module ToteItemsHelper
   def order_deficiencies?(tote_items)
 
     tote_items.each do |tote_item|
-      if tote_item.additional_units_required_to_fill_my_case > 0 || tote_item.posting.biggest_order_minimum_producer_net_outstanding > 0
+      if tote_item.order_deficiency?
         return true
       end
     end

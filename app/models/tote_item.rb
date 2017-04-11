@@ -111,6 +111,10 @@ class ToteItem < ApplicationRecord
   validates :state, inclusion: { in: ToteItem.states.values }
   validates :state, numericality: {only_integer: true}
 
+  def order_deficiency?
+    return additional_units_required_to_fill_my_case > 0 || posting.biggest_order_minimum_producer_net_outstanding > 0
+  end
+
   def friendly_description(use_quantity = true)
     quantity_to_use = use_quantity ? quantity : quantity_filled
     return "#{quantity_to_use.to_s} #{posting.user.farm_name} #{posting.product.name} #{posting.unit.name.pluralize(quantity_to_use)}"    

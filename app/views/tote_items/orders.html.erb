@@ -1,21 +1,42 @@
 <h1>Orders</h1>
 
-<p class="text-center" style="margin-bottom: 15px;">
-  <%= link_to "Scheduled for delivery #{friendly_date_text(@delivery_date)}", how_things_work_path(anchor: "scheduled_delivery_date") %>
-</p>
+<div class="text-center" style="margin-bottom: 20px;">
+  <div data-toggle="collapse" data-target="#deliveryDateDetails">
+    <span><%= "Scheduled for delivery #{friendly_date_text(@delivery_date)}" %></span>
+    <span id="deliveryDateChevron" class="glyphicon glyphicon-chevron-down"></span>
+  </div>
+  <div id="deliveryDateDetails" class="collapse" data-chevron="#deliveryDateChevron">
+    <%= link_to "Scheduled delivery dates", how_things_work_path(anchor: "scheduled_delivery_date") %> sometimes slide. Please follow the link to make sure you understand how this works.
+  </div>
+</div>
 
 <% if @tote_items.any? %>
 
 
   <div class="row">
     <% @tote_items.each do |tote_item| %>
+      <%
+      additional_units_required_to_fill_my_case = tote_item.additional_units_required_to_fill_my_case
+      biggest_order_minimum_producer_net_outstanding = tote_item.posting.biggest_order_minimum_producer_net_outstanding
+      deficiency = additional_units_required_to_fill_my_case > 0 || biggest_order_minimum_producer_net_outstanding > 0
+      if additional_units_required_to_fill_my_case > 0
+        expected_fill_quantity = tote_item.expected_fill_quantity
+      end
+      %>
+
       <div class="col-xs-6 col-sm-3">
 
         <div class="thumbnail">
 
           <% authorized = tote_item.state?(:AUTHORIZED) %>
           <div>
-            <span id="toteItem<%= tote_item.id.to_s %>Chevron" class="glyphicon glyphicon-chevron-down" data-toggle="collapse" data-target="#toteItem<%= tote_item.id.to_s %>Details"></span>
+            <span data-toggle="collapse" data-target="#toteItem<%= tote_item.id.to_s %>Details">
+              <span id="toteItem<%= tote_item.id.to_s %>Chevron" class="glyphicon glyphicon-chevron-down"></span>
+
+              <% if deficiency %>
+                <span class="gentle-flash alert-danger glyphicon glyphicon-exclamation-sign"></span>
+              <% end %>
+            </span>
 
             <% if authorized %>
               <%= link_to "", tote_item_path(tote_item), class: "black glyphicon glyphicon-remove pull-right", method: :delete %>
@@ -37,6 +58,21 @@
                 <%= cutoff_time %>                
               </div>
             </div>
+
+            <% if deficiency %>
+              <div class="alert alert-danger">
+                <% if additional_units_required_to_fill_my_case > 0 %>                  
+                  <% if expected_fill_quantity > 0 %>
+                    <%= link_to "Item will partially fill", how_things_work_path(anchor: "case_constraints") %>. <%= expected_fill_quantity.to_s %> of your <%= tote_item.quantity.to_s %> units ordered will ship.
+                  <% else %>
+                    <%= link_to "Case not full", how_things_work_path(anchor: "case_constraints") %>. Item won't ship. <%= additional_units_required_to_fill_my_case.to_s %> more units needed to fill case.
+                  <% end %>
+                <% elsif biggest_order_minimum_producer_net_outstanding > 0 %>                  
+                  Item won't ship. <%= number_to_currency(biggest_order_minimum_producer_net_outstanding) %> <%= link_to "Group Order Minimum", how_things_work_path(anchor: "order_minimums") %> shortfall.
+                <% end %>
+              </div>
+            <% end %>
+
           </div>
 
 
