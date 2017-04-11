@@ -189,8 +189,6 @@ class OrdersCalendarTest < IntegrationHelper
     assert_template 'tote_items/calendar'
     assert_select 'div.text-center', "You have zero future deliveries scheduled."
  
-    assert_select 'a', "ready for pickup"
-
     travel_back
 
   end

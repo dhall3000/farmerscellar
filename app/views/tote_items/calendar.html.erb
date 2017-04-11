@@ -31,7 +31,7 @@
             tote_items_for_date = tote_items.where("postings.delivery_date = ?", delivery_date)
             order_deficiencies = order_deficiencies?(tote_items_for_date)
             %>
-            <%= link_to tote_items_path(orders: delivery_date.to_s), class: "black" do %>
+            <%= link_to tote_items_path(orders: delivery_date.to_s), class: "black non-blue" do %>
               <div class="thumbnail horizontal-scroller <%= tote_items_for_date.any? ? "calendar-delivery-day" : "" %>">
                 <div class="<%= delivery_date == Time.zone.now.midnight ? "calendar-delivery-day-header-today" : "calendar-delivery-day-header" %>">
                   <% if order_deficiencies %>
@@ -93,15 +93,4 @@
       <div class="text-center">You have zero future deliveries scheduled.</div>
     </div>
   </div>
-
-  <!--if there are no future items but there are items, that means there are only past items. if there are past items that means there's viewable content in 'ready for pickup'-->
-  <% if @tote_items_by_week.any? %>
-  <div class="row">
-    <div class="col-xs-12 col-sm-offset-3 col-sm-6">
-      <div class="text-center">
-        But you do have items <%= link_to "ready for pickup", pickup_path %>.
-      </div>
-    </div>
-  </div>  
-  <% end %>
 <% end %>

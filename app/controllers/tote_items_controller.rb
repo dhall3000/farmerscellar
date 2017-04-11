@@ -104,8 +104,8 @@ class ToteItemsController < ApplicationController
     else
       #user wants to see their shopping tote
       @tote_items = unauthorized_items_for(current_user).joins(:posting).order("postings.delivery_date")
-      @subscriptions = get_active_subscriptions_by_authorization_state(current_user, include_paused_subscriptions = true, kind = Subscription.kinds[:NORMAL])[:unauthorized]      
-      @recurring_orders = get_active_subscriptions_by_authorization_state(current_user, include_paused_subscriptions = true)[:unauthorized]            
+      @subscriptions = get_active_subscriptions_by_authorization_state(current_user, include_paused_subscriptions = false, kind = Subscription.kinds[:NORMAL])[:unauthorized]
+      @recurring_orders_exist = @tote_items.joins(:subscription).any?
       @items_total_gross = get_gross_tote(@tote_items)
       template = 'tote_items/tote'
     end

@@ -64,7 +64,7 @@ class SubscriptionsController < ApplicationController
   end
 
   def index
-    @subscriptions = Subscription.where(user_id: current_user.id, on: true, kind: Subscription.kinds[:NORMAL])
+    @subscriptions = get_authorized_subscriptions_for(current_user)    
     get_view_data_for_subscriptions(@subscriptions)
   end
 

@@ -50,7 +50,12 @@ class ToteItem < ApplicationRecord
     calendar = ToteItem.calendar_items_displayable(user)
     calendar = calendar.nil? ? 0 : calendar.count
 
-    subscriptions = ToteItemsController.helpers.num_authorized_subscriptions_for(user)
+    subscriptions = ToteItemsController.helpers.get_authorized_subscriptions_for(user)
+    if subscriptions.nil?
+      subscriptions = 0
+    else
+      subscriptions = subscriptions.where(paused: false).count
+    end    
 
     ready_for_pickup = user.tote_items_to_pickup
     ready_for_pickup = ready_for_pickup.nil? ? 0 : ready_for_pickup.count

@@ -203,8 +203,10 @@ class SubscriptionsControllerTest < IntegrationHelper
     assert_nil assigns(:skip_dates)
   end
 
-  test "index should show info when user has subscription" do
+  test "index should not show info when user has no authorized subscriptions" do
     user = @c_subscription
+    authd_subscriptions = get_authorized_subscriptions_for(user)
+    assert_nil authd_subscriptions
     assert_equal 1, user.subscriptions.count
     log_in_as(user)
     get subscriptions_path
@@ -212,8 +214,7 @@ class SubscriptionsControllerTest < IntegrationHelper
     assert_template 'subscriptions/index'
 
     sd = assigns(:skip_dates)
-    assert sd.count > 0
-    assert assigns(:end_date) > user.subscriptions.last.posting_recurrence.current_posting.delivery_date
+    assert_nil sd    
   end
 
   test "index should not show skip dates for subscriptions that are paused" do
