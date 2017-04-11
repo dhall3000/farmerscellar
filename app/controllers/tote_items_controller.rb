@@ -60,7 +60,7 @@ class ToteItemsController < ApplicationController
 
         delivery_date = calendar_start        
 
-        while delivery_date <= calendar_end
+        while delivery_date <= (calendar_end + 7.days)
 
           pickup_range = pickup_range_for(delivery_date)
           tote_items_for_range = tote_items.where("postings.delivery_date >= ? and postings.delivery_date <= ?", pickup_range[0], pickup_range[1])

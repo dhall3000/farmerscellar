@@ -1,12 +1,48 @@
 require 'integration_helper'
-require 'utility/rake_helper'
-require 'integration_helper'
 
 class ToteItemsControllerTest < IntegrationHelper
 
   def setup
     @c1 = users(:c1)
     @posting_apples = postings(:postingf1apples)
+  end
+
+  test "calendar should display all future authorized or committed items" do
+
+    nuke_all_postings
+
+    thursday_next_week = get_next_wday_after(wday = 4, days_from_now = 7)
+    friday_next_week = thursday_next_week + 1.day
+    tuesday_next_week = thursday_next_week - 2.days
+    tuesday_way_out = tuesday_next_week + 21.days
+
+    posting1 = create_posting(farmer = nil, price = nil, product = Product.create(name: "Product1"), unit = nil, delivery_date = thursday_next_week, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil, important_notes = nil, important_notes_body = nil)
+    posting2 = create_posting(posting1.user, price = nil, product = Product.create(name: "Product2"), unit = nil, delivery_date = friday_next_week, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil, important_notes = nil, important_notes_body = nil)
+    posting3 = create_posting(posting1.user, price = nil, product = Product.create(name: "Product3"), unit = nil, delivery_date = tuesday_way_out, order_cutoff = nil, units_per_case = nil, frequency = nil, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil, important_notes = nil, important_notes_body = nil)
+
+    customer = create_new_customer
+    ti_thursday = create_tote_item(customer, posting1, quantity = 1)    
+    ti_monday = create_tote_item(customer, posting3, quantity = 1)
+
+    create_rt_authorization_for_customer(customer)
+
+    ti_friday = create_tote_item(customer, posting2, quantity = 1)
+
+    log_in_as customer
+    get tote_items_path(calendar: 1)
+    assert_response :success
+    assert_template 'tote_items/calendar'
+    #header should say 2 because we didn't authorize the third item...it's still sitting in the tote
+    assert_select 'span.glyphicon-calendar span.badge', "2"
+
+    tote_items_by_week = assigns(:tote_items_by_week)
+    #there should be one item on each of two different weeks
+    assert_equal 2, tote_items_by_week.count
+    assert_equal 1, tote_items_by_week.first[:tote_items].count
+    assert_equal 1, tote_items_by_week.last[:tote_items].count
+    assert_equal ti_thursday, tote_items_by_week.first[:tote_items].first
+    assert_equal ti_monday, tote_items_by_week.last[:tote_items].first
+
   end
 
   test "nuking a tote item should bring you right back to the same orders page" do
