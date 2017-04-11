@@ -648,6 +648,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     assert ti.subscription.kind?(:ROLLUNTILFILLED)
     #3 view subscriptions index
     log_in_as(bob)
+    create_rt_authorization_for_customer(bob)
     get subscriptions_path
     assert_template 'subscriptions/index'    
     #4 verify normal subscription is visible
