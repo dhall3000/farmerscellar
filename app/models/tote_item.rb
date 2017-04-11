@@ -47,9 +47,7 @@ class ToteItem < ApplicationRecord
     tote = ToteItemsController.helpers.unauthorized_items_for(user)
     tote = tote.nil? ? 0 : tote.count
 
-    orders = ToteItemsController.helpers.num_order_objects(user)
-    
-    calendar = ToteItemsController.helpers.future_items(ToteItem.calendar_items_displayable(user))
+    calendar = ToteItem.calendar_items_displayable(user)
     calendar = calendar.nil? ? 0 : calendar.count
 
     subscriptions = ToteItemsController.helpers.num_authorized_subscriptions_for(user)
@@ -59,7 +57,6 @@ class ToteItem < ApplicationRecord
 
     header_data = {
       tote: tote,
-      orders: orders,
       calendar: calendar,
       subscriptions: subscriptions,
       ready_for_pickup: ready_for_pickup
@@ -99,9 +96,8 @@ class ToteItem < ApplicationRecord
     end
     
     individual_items = where(user: user, subscription: nil, state: [states[:AUTHORIZED], states[:COMMITTED]])    
-    ready_for_pickup_items = user.tote_items.joins(:posting).where("postings.delivery_date > ?", user.pickup_items_start).where("tote_items.state" => ToteItem.states[:FILLED])
 
-    ids = (subscription_items.pluck(:id) + individual_items.pluck(:id) + ready_for_pickup_items.pluck(:id)).uniq
+    ids = (subscription_items.pluck(:id) + individual_items.pluck(:id)).uniq
     visible_items = joins(:posting).where(id: ids).order("postings.delivery_date asc")
 
     return visible_items

@@ -33,7 +33,7 @@ module ToteItemsHelper
   end
 
   def session_header_data_valid?
-    return session[:tote] && session[:orders] && session[:calendar] && session[:subscriptions] && session[:ready_for_pickup]
+    return session[:tote] && session[:calendar] && session[:subscriptions] && session[:ready_for_pickup]
   end
 
   def future_items(tote_items, relative_to = Time.zone.now.midnight)

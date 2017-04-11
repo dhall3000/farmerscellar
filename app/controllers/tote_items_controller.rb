@@ -53,8 +53,7 @@ class ToteItemsController < ApplicationController
 
       @tote_items_by_week = []      
       tote_items = ToteItem.calendar_items_displayable(current_user)
-      @first_future_item = future_items(tote_items).first
-
+      
       if tote_items.any?
         calendar_start = tote_items.first.posting.delivery_date
         calendar_end = tote_items.last.posting.delivery_date

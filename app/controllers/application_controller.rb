@@ -37,7 +37,6 @@ class ApplicationController < ActionController::Base
 
         #load it in to the session
         session[:tote] = header_data[:tote]
-        session[:orders] = header_data[:orders]
         session[:calendar] = header_data[:calendar]
         session[:subscriptions] = header_data[:subscriptions]
         session[:ready_for_pickup] = header_data[:ready_for_pickup]
