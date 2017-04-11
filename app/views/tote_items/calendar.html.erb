@@ -51,7 +51,7 @@
                         next
                       end
                       %>
-                      <% if tote_item == @first_future_item %>
+                      <% if tote_item == @tote_items_by_week.first[:tote_items].first %>
                         <span id="firstFutureItemThumbnailIndex" data-thumbnailindex="<%= thumbnail_index %>"></span>
                       <% end %>
                       <div class="truncated-text-line-no-expand">
