@@ -20,14 +20,14 @@ class OrdersCalendarTest < IntegrationHelper
     get root_path
 
     #prior to authorization the calendar header icon superscript shoudl be blank
-    assert_select 'span.glyphicon-calendar + span.header-object-count', {text: "2", count: 0}
-    assert_select 'span.glyphicon-calendar + span.header-object-count', {text: "", count: 1}
+    assert_select 'span.glyphicon-calendar span.badge', {text: "2", count: 0}
+    assert_select 'span.glyphicon-calendar', {text: "", count: 1}
     create_rt_authorization_for_customer(bob)
 
     #after authorization the calendar header icon superscript should say 2
     log_in_as bob
     get root_path
-    assert_select 'span.glyphicon-calendar + span.header-object-count', {text: "2", count: 1}
+    assert_select 'span.glyphicon-calendar span.badge', {text: "2", count: 1}
 
     travel_to posting1.order_cutoff
     RakeHelper.do_hourly_tasks
@@ -37,7 +37,7 @@ class OrdersCalendarTest < IntegrationHelper
     travel 1.minute
     log_in_as bob
     get root_path
-    assert_select 'span.glyphicon-calendar + span.header-object-count', {text: "", count: 1}
+    assert_select 'span.glyphicon-calendar', {text: "", count: 1}
 
     travel_back
 
@@ -217,17 +217,17 @@ class OrdersCalendarTest < IntegrationHelper
 
     log_in_as bansal
     get root_path
-    assert_select 'span.glyphicon-shopping-cart + span.header-object-count', {text: "1", count: 1}
-    assert_select 'span.glyphicon-shopping-cart + span.header-object-count', {text: "", count: 0}
-    assert_select 'span.glyphicon-calendar + span.header-object-count', {text: "", count: 1}
-    assert_select 'span.glyphicon-calendar + span.header-object-count', {text: "1", count: 0}
+    assert_select 'span.glyphicon-shopping-cart span.badge', {text: "1", count: 1}
+    assert_select 'span.glyphicon-shopping-cart span.badge', {text: "", count: 0}
+    assert_select 'span.glyphicon-calendar', {text: "", count: 1}
+    assert_select 'span.glyphicon-calendar span.badge', {text: "1", count: 0}
     create_rt_authorization_for_customer(bansal)
     log_in_as bansal
     get root_path
-    assert_select 'span.glyphicon-shopping-cart + span.header-object-count', {text: "1", count: 0}
-    assert_select 'span.glyphicon-shopping-cart + span.header-object-count', {text: "", count: 1}
-    assert_select 'span.glyphicon-calendar + span.header-object-count', {text: "1", count: 1}
-    assert_select 'span.glyphicon-calendar + span.header-object-count', {text: "", count: 0}
+    assert_select 'span.glyphicon-shopping-cart span.badge', {text: "1", count: 0}
+    assert_select 'span.glyphicon-shopping-cart', {text: "", count: 1}
+    assert_select 'span.glyphicon-calendar span.badge', {text: "1", count: 1}
+    assert_select 'span.glyphicon-calendar span.badge', {text: "", count: 0}
 
     travel_to posting1.order_cutoff
     RakeHelper.do_hourly_tasks
@@ -235,10 +235,10 @@ class OrdersCalendarTest < IntegrationHelper
     #now the next item in the series has been generated so header should say '1' for calendar
     log_in_as bansal
     get root_path
-    assert_select 'span.glyphicon-shopping-cart + span.header-object-count', {text: "1", count: 0}
-    assert_select 'span.glyphicon-shopping-cart + span.header-object-count', {text: "", count: 1}
-    assert_select 'span.glyphicon-calendar + span.header-object-count', {text: "1", count: 1}
-    assert_select 'span.glyphicon-calendar + span.header-object-count', {text: "", count: 0}
+    assert_select 'span.glyphicon-shopping-cart span.badge', {text: "1", count: 0}
+    assert_select 'span.glyphicon-shopping-cart', {text: "", count: 1}
+    assert_select 'span.glyphicon-calendar span.badge', {text: "1", count: 1}
+    assert_select 'span.glyphicon-calendar', {text: "", count: 0}
 
     travel_to posting1.delivery_date + 12.hours
 
@@ -248,7 +248,7 @@ class OrdersCalendarTest < IntegrationHelper
     log_in_as bansal
     get root_path
     #order was rolled until the next week
-    assert_select 'span.glyphicon-calendar + span.header-object-count', {text: "1", count: 1}
+    assert_select 'span.glyphicon-calendar span.badge', {text: "1", count: 1}
 
     posting2 = create_posting(producer, price = nil, product, unit = nil, delivery_date = get_next_wday_after(2, 0), order_cutoff = posting1.delivery_date + 1.day + 9.hours, units_per_case = nil, frequency = 0, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil, important_notes = nil, important_notes_body = nil)
 
@@ -257,7 +257,7 @@ class OrdersCalendarTest < IntegrationHelper
     log_in_as bansal
     get root_path
     #order was rolled until the next week
-    assert_select 'span.glyphicon-calendar + span.header-object-count', {text: "2", count: 1}
+    assert_select 'span.glyphicon-calendar span.badge', {text: "2", count: 1}
 
     #now verify the calendar looks appropriate
     get tote_items_path(calendar: 1)

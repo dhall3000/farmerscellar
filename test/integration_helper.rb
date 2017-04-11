@@ -19,16 +19,19 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
 
   def verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
     verify_header_item("glyphicon-shopping-cart", tote)
-    verify_header_item("glyphicon-list-alt", orders)
     verify_header_item("glyphicon-calendar", calendar)
     verify_header_item("glyphicon-repeat", subscriptions)
     verify_header_item("glyphicon-ok", ready_to_pickup)
   end
 
   def verify_header_item(glyph = "glyphicon-shopping-cart", count = 0)
-    assert_select "span.#{glyph} ~ span.header-object-count", 1
+    assert_select "span.#{glyph}", 1
     count_string = count > 0 ? count.to_s : ""
-    assert_select "span.#{glyph} ~ span.header-object-count", count_string
+    if count == 0
+      assert_select "span.#{glyph}", count_string
+    else
+      assert_select "span.#{glyph} span.badge", count_string
+    end    
   end
 
   def create_business_interface(producer, name = "Producer's Business Interface Name", order_email = "orders@farmfactory.com", payment_method = BusinessInterface.payment_methods[:PAYPAL], payment_time = BusinessInterface.payment_times[:AFTERDELIVERY], paypal_email = "paypalpayment@farmfactory.com")

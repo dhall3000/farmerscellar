@@ -436,7 +436,7 @@ class HeaderTest < IntegrationHelper
     assert_template '/'
 
     #verify no subscriptions indicated
-    assert_select 'span.glyphicon-repeat ~ span.header-object-count', ""
+    assert_select 'span.glyphicon-repeat', ""
     #add a non-recurring tote item
     posting = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil)
     ti = create_tote_item(bob, posting, quantity = 1)
@@ -444,37 +444,37 @@ class HeaderTest < IntegrationHelper
     assert_response :redirect
     follow_redirect!
     #verify tote item shows in header
-    assert_select 'span.glyphicon-shopping-cart ~ span.header-object-count', "1"
+    assert_select 'span.glyphicon-shopping-cart span.badge', "1"
     #verify we do not see a subscription
-    assert_select 'span.glyphicon-repeat ~ span.header-object-count', ""
+    assert_select 'span.glyphicon-repeat', ""
     #add sx to tote
     ti2 = create_tote_item(bob, posting, quantity = 1, frequency = 1)
     follow_redirect!
     #should report 0
-    assert_select 'span.glyphicon-repeat ~ span.header-object-count', ""
+    assert_select 'span.glyphicon-repeat', ""
     assert_equal 0, num_authorized_subscriptions_for(bob)
     #create authorization
     create_rt_authorization_for_customer(bob)
     #should report 1    
     assert_equal 1, get_authorized_subscriptions_for(bob).count
-    assert_select 'span.glyphicon-repeat ~ span.header-object-count', "1"
+    assert_select 'span.glyphicon-repeat span.badge', "1"
     #add another subscription to tote
     ti3 = create_tote_item(bob, posting, quantity = 1, frequency = 1)
     follow_redirect!
     #should still only be one authorized subscription
     assert_equal 1, get_authorized_subscriptions_for(bob).count
-    assert_select 'span.glyphicon-repeat ~ span.header-object-count', "1"
+    assert_select 'span.glyphicon-repeat span.badge', "1"
     #now authorize and then verify there are two subscriptions
     create_rt_authorization_for_customer(bob)    
     assert_equal 2, num_authorized_subscriptions_for(bob)
-    assert_select 'span.glyphicon-repeat ~ span.header-object-count', "2"
+    assert_select 'span.glyphicon-repeat span.badge', "2"
     #cancel first sx
     patch subscription_path(ti2.subscription), params: {subscription: {on: 0}}
     assert_response :redirect
     follow_redirect!
     #should report 1
     assert_equal 1, num_authorized_subscriptions_for(bob.reload)
-    assert_select 'span.glyphicon-repeat ~ span.header-object-count', "1"    
+    assert_select 'span.glyphicon-repeat span.badge', "1"    
     #cancel second sx
 
     patch subscription_path(ti3.subscription), params: {subscription: {on: 0}}
@@ -482,13 +482,13 @@ class HeaderTest < IntegrationHelper
     follow_redirect!    
     #should report 0
     assert_equal 0, num_authorized_subscriptions_for(bob.reload)
-    assert_select 'span.glyphicon-repeat ~ span.header-object-count', ""
+    assert_select 'span.glyphicon-repeat', ""
 
     #now create a RTF order and verify this doesn't change the subscription count
     create_tote_item(bob, posting, quantity = 1, frequency = nil, roll_until_filled = true)
     create_rt_authorization_for_customer(bob)    
     assert_equal 0, num_authorized_subscriptions_for(bob.reload)
-    assert_select 'span.glyphicon-repeat ~ span.header-object-count', ""
+    assert_select 'span.glyphicon-repeat', ""
 
   end
 
@@ -512,7 +512,7 @@ class HeaderTest < IntegrationHelper
     create_one_time_authorization_for_customer(bob)
 
     #header should not display a number since there are zero items ready for pickup
-    assert_select 'span.glyphicon-ok ~ span.header-object-count', ""
+    assert_select 'span.glyphicon-ok', ""
 
     assert ti_posting1.reload.state?(:AUTHORIZED)
     assert ti_posting2.reload.state?(:AUTHORIZED)
@@ -533,12 +533,12 @@ class HeaderTest < IntegrationHelper
     assert_response :redirect
     follow_redirect!
     #header should now display there are 2 items ready for pickup
-    assert_select 'span.glyphicon-ok ~ span.header-object-count', "2"
+    assert_select 'span.glyphicon-ok span.badge', "2"
     do_pickup_for(users(:dropsite1), bob.reload, true)
     log_in_as bob
     assert_response :redirect
     follow_redirect!
-    assert_select 'span.glyphicon-ok ~ span.header-object-count', "2"
+    assert_select 'span.glyphicon-ok span.badge', "2"
 
     travel 61.minutes
     log_in_as bob
@@ -546,7 +546,7 @@ class HeaderTest < IntegrationHelper
     follow_redirect!
     #header should not display a number since there are zero items ready for pickup
     #since user just picked them up
-    assert_select 'span.glyphicon-ok ~ span.header-object-count', ""
+    assert_select 'span.glyphicon-ok', ""
 
     travel_back    
   end
@@ -586,7 +586,7 @@ class HeaderTest < IntegrationHelper
     #the header only shows future items. we want it this way so that people use the ready to pickup feature for pickups rather than the calendar. the reason for this is
     #using the ready for pickup feature on one's mobile device in the dropsite while picking up should drive down SNAFU rate. so calendar only shows future deliverables.
     #so right now for the every-other-week series there are no future items yet. for the weekly subscription there should be tomorrow's item displayed.
-    assert_select 'span.glyphicon-calendar ~ span.header-object-count', "1"
+    assert_select 'span.glyphicon-calendar span.badge', "1"
 
     travel_back
     
