@@ -1,6 +1,6 @@
 class ToteItemsController < ApplicationController
 
-  before_action :correct_user,   only: [:destroy, :pout]
+  before_action :correct_user, only: [:destroy]
   before_action :logged_in_user
 
   def pickup
@@ -201,56 +201,6 @@ class ToteItemsController < ApplicationController
 
     #try to upsell a subscription
     render 'how_often'
-
-  end
-
-  def pout
-
-    @tote_item = ToteItem.find_by(id: params[:id])
-
-    if @tote_item.nil?
-      #this should be impossible. email admin.
-      AdminNotificationMailer.general_message("unknown problem. pout message didn't display", "user id #{current_user.id.to_s} should have seen the pout page but @tote_item was nil. params[:id] = #{params[:id].to_s}").deliver_now
-      flash.discard
-      redirect_to postings_path
-      return    
-    end
-
-    @additional_units_required_to_fill_my_case = @tote_item.additional_units_required_to_fill_my_case
-    @biggest_order_minimum_producer_net_outstanding = @tote_item.posting.biggest_order_minimum_producer_net_outstanding
-
-    @posting = @tote_item.posting
-    @will_partially_fill = @tote_item.will_partially_fill?
-    @expected_fill_quantity = @tote_item.expected_fill_quantity
-
-    #if order minimums aren't met there's not going to be any filling whatsoever
-    if @biggest_order_minimum_producer_net_outstanding > 0
-      @expected_fill_quantity = 0
-      @will_partially_fill = false
-    end
-
-    if @additional_units_required_to_fill_my_case < 1 && @biggest_order_minimum_producer_net_outstanding <= 0
-      AdminNotificationMailer.general_message("pout message problem", "@additional_units_required_to_fill_my_case = #{@additional_units_required_to_fill_my_case.to_s}. @biggest_order_minimum_producer_net_outstanding = #{@biggest_order_minimum_producer_net_outstanding.to_s}. user id #{current_user.id.to_s} should have seen the pout page? @tote_item.id #{@tote_item.id.to_s}.").deliver_now
-      flash.discard
-      redirect_to postings_path
-      return
-    end
-
-    @account_on_hold = account_on_hold
-    @back_link = request.referer
-
-    case request.referer
-    when posting_url(@tote_item.posting)
-      @back_link = posting_path(@tote_item.posting)
-      @back_link_text = "continue shopping"
-    when tote_items_url
-      @back_link_text = "shopping tote"
-    when tote_items_url(orders: true)
-      @back_link_text = "current orders"
-    else
-      @back_link = nil
-      @back_link_text = nil
-    end
 
   end
 

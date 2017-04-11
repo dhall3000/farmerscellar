@@ -33,60 +33,40 @@ class PoutPageTest < IntegrationHelper
 
     #bob should see an exclamation in his tote
     log_in_as(get_bob)
-    get tote_items_path, params: {orders: true}
+    get tote_items_path, params: {calendar: 1}
+    assert_response :success
+    assert_template 'tote_items/calendar'
+    assert_select 'span.gentle-flash.glyphicon-exclamation-sign'
+
+    #now user drills in on a certain day
+    get tote_items_path(orders: ti_bob.posting.delivery_date.to_s)    
     assert_response :success
     assert_template 'tote_items/orders'
-
-    #user clicks 'More info' button
-    post tote_items_pout_path, params: {id: ti_bob.id}
-    assert_response :success
-    assert_template 'tote_items/pout'
-
-    additional_units_required_to_fill_my_case = assigns(:additional_units_required_to_fill_my_case)
-    biggest_order_minimum_producer_net_outstanding = assigns(:biggest_order_minimum_producer_net_outstanding)
-
-    assert_equal 7, additional_units_required_to_fill_my_case
-    assert biggest_order_minimum_producer_net_outstanding > 100
+    assert_select 'div.thumbnail span.gentle-flash.glyphicon-exclamation-sign'
 
     #we want to not tell bob that his order will only partially fill
-    assert_select 'p span', {count: 1, text: "Currently this item will not ship"}
-    assert_select 'p span', {count: 0, text: "Currently this item will only partially ship"}
-    assert_select 'li ul li', {count: 0, text: "Currently only 10 of the 11 units ordered are set to ship"}
-    #there is an OM deficiency in this case but let's not confuse the matter...let's just tell him about the case issues
-    #once he solves that we can inform him about the OM problem
-    assert_select 'li ul li a', {count: 0, text: "Group Order Minimum"}
-    assert_select 'li ul li', {count: 1, text: "Reason: the case that your order will ship in is not yet full"}
-    assert_select 'li h5', count: 1, text: "Resolution options"
-    assert_select 'li ul li div p', {count: 0, text: "Other customer orders may increase total ordered amount above the minimum, causing your order to ship."}
-    assert_select 'li ul li div p', {count: 1, text: "Other customer orders may fill this case, causing your order to ship."}    
+    assert_select 'div.alert.alert-danger', {count: 0, text: "Item will partially fill. 10 of your 11 units ordered will ship."}
+    assert_select 'div.alert.alert-danger', {count: 1, text: "Item won't ship. $108.50 Group Order Minimum shortfall."}
 
     #sam should see an exclamation in his tote
     log_in_as(get_sam)
-    get tote_items_path, params: {orders: true}
+    get tote_items_path, params: {calendar: 1}
+    assert_response :success
+    assert_template 'tote_items/calendar'
+
+    #now user drills in on a certain day
+    get tote_items_path(orders: ti_sam.posting.delivery_date.to_s)
     assert_response :success
     assert_template 'tote_items/orders'
 
-    #user clicks 'More info' button
-    post tote_items_pout_path, params: {id: ti_sam.id}
-    assert_response :success
-    assert_template 'tote_items/pout'
-
-    additional_units_required_to_fill_my_case = assigns(:additional_units_required_to_fill_my_case)
-    biggest_order_minimum_producer_net_outstanding = assigns(:biggest_order_minimum_producer_net_outstanding)
+    additional_units_required_to_fill_my_case = ti_sam.reload.additional_units_required_to_fill_my_case
+    biggest_order_minimum_producer_net_outstanding = ti_sam.posting.biggest_order_minimum_producer_net_outstanding
 
     assert_equal 7, additional_units_required_to_fill_my_case
     assert biggest_order_minimum_producer_net_outstanding > 100
 
     #we want to not tell sam that his order will only partially fill
-    assert_select 'p span', {count: 1, text: "Currently this item will not ship"}
-    assert_select 'p span', {count: 0, text: "Currently this item will only partially ship"}    
-    #there is an OM deficiency in this case but let's not confuse the matter...let's just tell him about the case issues
-    #once he solves that we can inform him about the OM problem
-    assert_select 'li ul li a', {count: 0, text: "Group Order Minimum"}
-    assert_select 'li ul li', {count: 1, text: "Reason: the case that your order will ship in is not yet full"}
-    assert_select 'li h5', count: 1, text: "Resolution options"
-    assert_select 'li ul li div p', {count: 0, text: "Other customer orders may increase total ordered amount above the minimum, causing your order to ship."}
-    assert_select 'li ul li div p', {count: 1, text: "Other customer orders may fill this case, causing your order to ship."}    
+    assert_select 'div.alert.alert-danger', {count: 1, text: "Item won't ship. $108.50 Group Order Minimum shortfall."}
 
   end
 
@@ -117,56 +97,32 @@ class PoutPageTest < IntegrationHelper
     
     #bob should see an exclamation in his tote
     log_in_as(get_bob)
-    get tote_items_path, params: {orders: true}
+    get tote_items_path, params: {calendar: 1}
+    assert_response :success
+    assert_template 'tote_items/calendar'
+    assert_select 'span.gentle-flash.glyphicon-exclamation-sign'
+
+    get tote_items_path, params: {orders: ti_bob.posting.delivery_date.to_s}
     assert_response :success
     assert_template 'tote_items/orders'
+    assert_select 'div.thumbnail span.gentle-flash.glyphicon-exclamation-sign'
 
-    #user clicks 'More info' button
-    post tote_items_pout_path, params: {id: ti_bob.id}
-    assert_response :success
-    assert_template 'tote_items/pout'
-
-    additional_units_required_to_fill_my_case = assigns(:additional_units_required_to_fill_my_case)
-    biggest_order_minimum_producer_net_outstanding = assigns(:biggest_order_minimum_producer_net_outstanding)
-
-    assert_equal 7, additional_units_required_to_fill_my_case
-    assert_equal 0, biggest_order_minimum_producer_net_outstanding
-
-    #we want to tell bob that his order will only partially fill
-    assert_select 'p span', {count: 1, text: "Currently this item will only partially ship"}
-    assert_select 'li ul li', {count: 1, text: "Currently only 10 of the 11 units ordered are set to ship"}
-    #we want to make sure to not tell him there's an OM problem
-    assert_select 'li ul li a', {count: 0, text: "Group Order Minimum"}
-    assert_select 'li ul li', {count: 1, text: "Reason: the case that your order will ship in is not yet full"}
-    assert_select 'li h5', count: 1, text: "Resolution options"
-    assert_select 'li ul li div p', {count: 1, text: "Other customer orders may fill this case, causing your order to fully ship."}
+    assert_select 'div.alert.alert-danger', {count: 1, text: "Item will partially fill. 10 of your 11 units ordered will ship."}
+    assert_select 'div.alert.alert-danger', {count: 0, text: "Item won't ship. $108.50 Group Order Minimum shortfall."}
 
     #now, what is the experience like from sam's perspective?
     log_in_as(get_sam)
-    get tote_items_path, params: {orders: true}
+    get tote_items_path, params: {calendar: 1}
+    assert_response :success
+    assert_template 'tote_items/calendar'
+    assert_select 'span.gentle-flash.glyphicon-exclamation-sign'
+
+    get tote_items_path, params: {orders: ti_bob.posting.delivery_date.to_s}
     assert_response :success
     assert_template 'tote_items/orders'
+    assert_select 'div.thumbnail span.gentle-flash.glyphicon-exclamation-sign'
 
-    #user clicks 'More info' button
-    post tote_items_pout_path, params: {id: ti_sam.id}
-    assert_response :success
-    assert_template 'tote_items/pout'
-
-    additional_units_required_to_fill_my_case = assigns(:additional_units_required_to_fill_my_case)
-    biggest_order_minimum_producer_net_outstanding = assigns(:biggest_order_minimum_producer_net_outstanding)
-
-    assert_equal 7, additional_units_required_to_fill_my_case
-    assert_equal 0, biggest_order_minimum_producer_net_outstanding
-
-    #we want to tell sam that his order will not ship because the case is not full
-    assert_select 'p span', {count: 1, text: "Currently this item will not ship"}
-    #we want to make sure the 'partially filled' message is not present
-    assert_no_match "units ordered are set to ship", response.body
-    #we want to make sure to not tell him there's an OM problem
-    assert_select 'li ul li a', {count: 0, text: "Group Order Minimum"}
-    assert_select 'li ul li', {count: 1, text: "Reason: the case that your order will ship in is not yet full"}
-    assert_select 'li h5', count: 1, text: "Resolution options"
-    assert_select 'li ul li div p', {count: 1, text: "Other customer orders may fill this case, causing your order to ship."}
+    assert_select 'div.alert.alert-danger', {count: 1, text: "Case not full. Item won't ship. 7 more units needed to fill case."}
 
   end
 
@@ -191,16 +147,17 @@ class PoutPageTest < IntegrationHelper
     #the OM for bob's item's posting should be fully satisfied    
     assert_equal 0, ti_bob.posting.biggest_order_minimum_producer_net_outstanding
 
-    get_bobs_orders_page
-    assert_select 'div#orderTotal', {count: 1, text: "Total: $60.00" }
+    log_in_as bob
+    get tote_items_path(calendar: 1)
+    assert_response :success
+    assert_template 'tote_items/calendar'
+    assert_select 'span.gentle-flash.glyphicon-exclamation-sign', 0
 
-    #there should be no problems indicated to the user
-    assert_select '.glyphicon-exclamation-sign', {count: 0}
-
-    #user shouldn't be able to get to the pout but if they did it should redirect them to the shopping pages
-    post tote_items_pout_path, params: {id: ti_bob.id}
-    assert_response :redirect
-    assert_redirected_to postings_path
+    get tote_items_path(orders: ti_bob.posting.delivery_date.to_s)
+    assert_response :success
+    assert_template 'tote_items/orders'
+    assert_select 'gentle-flash.glyphicon-exclamation-sign', 0
+    assert_select 'strong', {count: 1, text: "Total $60.00"}
     
   end
 
@@ -269,34 +226,21 @@ class PoutPageTest < IntegrationHelper
 
     #bob's user experience should reflect that the case his item is in isn't yet filled. it should say nothing about the unmet OM.
     log_in_as(get_bob)
-    get tote_items_path, params: {orders: true}
+    get tote_items_path, params: {calendar: 1}
+    assert_response :success
+    assert_template 'tote_items/calendar'
+    assert_select 'span.gentle-flash.glyphicon-exclamation-sign'
+
+    #now user drills in on a certain day
+    get tote_items_path(orders: ti_bob.posting.delivery_date.to_s)    
     assert_response :success
     assert_template 'tote_items/orders'
+    assert_select 'div.thumbnail span.gentle-flash.glyphicon-exclamation-sign'
 
-    #total amount should be properly displayed    
-    assert_select 'div#orderTotal', {count: 1, text: "Total: #{number_to_currency(ti_bob.quantity * ti_bob.posting.price)}" }
-
-    #user clicks 'More info' button
-    post tote_items_pout_path, params: {id: ti_bob.id}
-    assert_response :success
-    assert_template 'tote_items/pout'
-
-    additional_units_required_to_fill_my_case = assigns(:additional_units_required_to_fill_my_case)
-    biggest_order_minimum_producer_net_outstanding = assigns(:biggest_order_minimum_producer_net_outstanding)
-
-    assert_equal 0, additional_units_required_to_fill_my_case
-    assert biggest_order_minimum_producer_net_outstanding > 0    
-    assert biggest_order_minimum_producer_net_outstanding < posting.user.order_minimum_producer_net
-    assert_equal posting.reload.biggest_order_minimum_producer_net_outstanding, biggest_order_minimum_producer_net_outstanding
-
-    #there's a problem with OM but not with case so we don't want to show any text related to case technology
-    assert_select 'p span', {count: 1, text: "Currently this item will not ship"}
-    assert_select 'p span', {count: 0, text: "Currently this item will only partially ship"}    
-    assert_select 'li ul li a', {count: 1, text: "Group Order Minimum"}
-    assert_select 'li ul li', {count: 0, text: "Reason: the case that your order will ship in is not yet full"}
-    assert_select 'li h5', count: 1, text: "Resolution options"
-    assert_select 'li ul li div p', {count: 1, text: "Other customer orders may increase total ordered amount above the minimum, causing your order to ship."}
-    assert_select 'li ul li div p', {count: 0, text: "Other customer orders may fill this case, causing your order to ship."}    
+    #we want to not tell bob that his order will only partially fill
+    assert_select 'div.alert.alert-danger', {count: 0, text: "Item will partially fill. 10 of your 11 units ordered will ship."}
+    assert_select 'div.alert.alert-danger', {count: 1, text: "Item won't ship. $28.50 Group Order Minimum shortfall."}
+    assert_select 'strong', {count: 1, text: "Total #{number_to_currency(ti_bob.quantity * ti_bob.posting.price)}" }
 
   end
 
@@ -378,31 +322,21 @@ class PoutPageTest < IntegrationHelper
 
     #bob's user experience should reflect that the case his item is in isn't yet filled. it should say nothing about the unmet OM.
     log_in_as(get_bob)
-    get tote_items_path, params: {orders: true}
+    get tote_items_path, params: {calendar: 1}
+    assert_response :success
+    assert_template 'tote_items/calendar'
+    assert_select 'span.glyphicon-exclamation-sign', 1
+
+    get tote_items_path, params: {orders: ti_bob.posting.delivery_date.to_s}
     assert_response :success
     assert_template 'tote_items/orders'
+    assert_select 'span.glyphicon-exclamation-sign', 1
 
     #total amount should be properly displayed    
-    assert_select 'div#orderTotal', {count: 1, text: "Total: #{number_to_currency(ti_bob.quantity * ti_bob.posting.price)}" }
-
-    #user clicks 'More info' button
-    post tote_items_pout_path, params: {id: ti_bob.id}
-    assert_response :success
-    assert_template 'tote_items/pout'
-
-    additional_units_required_to_fill_my_case = assigns(:additional_units_required_to_fill_my_case)
-    biggest_order_minimum_producer_net_outstanding = assigns(:biggest_order_minimum_producer_net_outstanding)
-
-    assert_equal ti_bob.posting.units_per_case - total_quantity_ordered, additional_units_required_to_fill_my_case
-    assert_equal om_outstanding, biggest_order_minimum_producer_net_outstanding
+    assert_select 'strong', {count: 1, text: "Total #{number_to_currency(ti_bob.quantity * ti_bob.posting.price)}" }
 
     #since there's a problem with both case and OM we only want to display case issues
-    assert_select 'p span', {count: 1, text: "Currently this item will not ship"}    
-    #there should not be a link telling user about unmet group OM
-    assert_select 'li ul li a', {count: 0, text: "Group Order Minimum"}
-    assert_select 'li ul li', {count: 1, text: "Reason: the case that your order will ship in is not yet full"}
-    assert_select 'li h5', count: 1, text: "Resolution options"
-    assert_select 'li ul li div p', {count: 1, text: "Other customer orders may fill this case, causing your order to ship."}
+    assert_select 'div.alert.alert-danger', {count: 1, text: "Item won't ship. #{ActiveSupport::NumberHelper.number_to_currency(ti_bob.posting.biggest_order_minimum_producer_net_outstanding)} Group Order Minimum shortfall."}
 
   end
 
