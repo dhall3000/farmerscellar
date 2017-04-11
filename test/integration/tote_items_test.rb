@@ -70,7 +70,8 @@ class ToteItemsTest < IntegrationHelper
     ret = ToteItem.customer_visible_subscription_items(ti3.subscription)
     assert_equal 0, ret.count
     visible_items = ToteItem.calendar_items_displayable(bob)
-    assert_equal 4, visible_items.count
+    assert_equal 1, visible_items.count
+    assert_equal 3, bob.tote_items_to_pickup.count
 
     #user picks up three of his items
     do_pickup_for(users(:dropsite1), bob.reload, logout_dropsite_user_after_pickup = true)
