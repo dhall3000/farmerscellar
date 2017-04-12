@@ -112,40 +112,6 @@ class CheckoutsController < ApplicationController
 
     end
 
-    def get_order_summary_details_for_paypal_display(tote_items)
-      summary_items = []
-
-      if tote_items == nil || !tote_items.any?
-        return summary_items
-      end
-
-      tote_items.each do |tote_item|
-        summary_item = get_order_summary_item(tote_item)
-        summary_items << summary_item
-      end
-
-      return summary_items
- 
-    end
-
-    def get_order_summary_item(tote_item)
-      summary_item = {}
-
-      if tote_item == nil
-        return summary_item
-      end
-
-      name = tote_item.posting.product.name
-      description = "Producer - " + tote_item.posting.user.farm_name
-
-      summary_item[:name] = name
-      summary_item[:description] = description
-      summary_item[:quantity] = tote_item.quantity
-      summary_item[:amount] = (tote_item.price).round(2) * 100
-
-      return summary_item
-      
-    end
 end
 
 class FakeCheckoutResponse

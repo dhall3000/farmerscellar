@@ -36,17 +36,22 @@ class Rtpurchase < ApplicationRecord
     puts "Rturchase.go start"
 
     @amount_to_capture = 0
+    tote_items = []
 
     prs.each do |pr|
+      pr.tote_items.each do |ti|
+        tote_items << ti
+      end
       purchase_receivables << pr
       amount = (pr.amount - pr.amount_purchased).round(2)
       @amount_to_capture = (@amount_to_capture + amount).round(2)
     end    
 
     amount_to_capture_in_cents = (@amount_to_capture * 100).round(2)
+    items = ToteItemsController.helpers.get_order_summary_details_for_paypal_display(tote_items)
     
     if USEGATEWAY
-      response = GATEWAY.reference_transaction(amount_to_capture_in_cents, reference_id: rtauthorization.rtba.ba_id, currency: 'USD')          
+      response = GATEWAY.reference_transaction(amount_to_capture_in_cents, reference_id: rtauthorization.rtba.ba_id, currency: 'USD', items: items)
     else      
       response = FakeRtpurchaseResponseSuccess.new(@amount_to_capture)      
     end
@@ -72,7 +77,8 @@ class Rtpurchase < ApplicationRecord
       #tote_items = ToteItem.joins(:purchase_receivables).where(purchase_receivables: {id: purchase_receivables}).distinct
       #and if that happens then self.payment_processor_fee_withheld_from_producer evaluates to $0
       tote_items = ToteItem.joins(:purchase_receivables).where(purchase_receivables: {id: purchase_receivables}).distinct
-      payment_processor_fee_tote = get_payment_processor_fee_tote(tote_items, filled = true)    
+      
+      payment_processor_fee_tote = ToteItemsController.helpers.get_payment_processor_fee_tote(tote_items, filled = true)    
       self.payment_processor_fee_withheld_from_producer = payment_processor_fee_tote
 
       #apply purchase amount to purchase receivables

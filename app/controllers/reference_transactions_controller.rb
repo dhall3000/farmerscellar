@@ -59,10 +59,10 @@ class ReferenceTransactionsController < ApplicationController
 
   def do_rtpurchase
 
-    amount = 10
+    tote_items = [ToteItem.first, ToteItem.last]
 
     #create a purchase receivable object
-    pr = create_purchase_receivable(amount)
+    pr = create_purchase_receivable(tote_items)
     #make prs array
     prs = [pr]
     #create rtba object
@@ -98,6 +98,8 @@ class ReferenceTransactionsController < ApplicationController
 
   def do_bulk_purchase
     amount = 10
+
+    #i just broke this working on another project. if you want to resurrect this some day you're going to need to send an array of tote items in rahter than an amount
     pr = create_purchase_receivable_for_bulk_purchase(amount)
     bulk_purchase = BulkPurchase.new(gross: 0, payment_processor_fee_withheld_from_us: 0, commission: 0, net: 0)
     bulk_purchase.load_unpurchased_receivables_for_users(User.all)
@@ -107,10 +109,15 @@ class ReferenceTransactionsController < ApplicationController
 
   private
 
-    def create_purchase_receivable(amount)
+    def create_purchase_receivable(tote_items)
+
+      amount = get_gross_tote(tote_items)
+
       pr = PurchaseReceivable.new(amount: amount, amount_purchased: 0, kind: PurchaseReceivable.kind[:NORMAL], state: PurchaseReceivable.states[:READY])
       pr.users << current_user
+      pr.tote_items = tote_items
       pr.save
+
       return pr
     end
 
