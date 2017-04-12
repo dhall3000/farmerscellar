@@ -3,6 +3,17 @@
 <% if @tote_items && @tote_items.any? %>
 
   <div class="row">
+    <div class="col-xs-12">
+      <div class="nice-note text-center"><span>Pickup <u>any</u> day you like!</span></div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="text-center small" style="padding-bottom: 20px;"><span><%= "(just note the #{current_user.dropsite.next_food_clearout.strftime("%A %l%p")} deadline)" %></span></div>
+    </div>
+  </div>
+
+  <div class="row">
     <div class="col-xs-12 col-sm-offset-4 col-sm-4">
       <% if current_user.dropsite %>
         <div class="panel panel-default">
