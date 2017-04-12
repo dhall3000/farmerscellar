@@ -1,5 +1,27 @@
 module SessionsHelper
 
+  def header_data_valid?
+    return session[:tote] && session[:calendar] && session[:subscriptions] && session[:ready_for_pickup]
+  end
+
+  def refresh_header_data
+    #fetch the header data from db
+    header_data = ToteItem.get_header_data(current_user)
+
+    #load it in to the session
+    session[:tote] = header_data[:tote]
+    session[:calendar] = header_data[:calendar]
+    session[:subscriptions] = header_data[:subscriptions]
+    session[:ready_for_pickup] = header_data[:ready_for_pickup]
+  end
+
+  def nuke_header_data
+    session.delete(:tote)    
+    session.delete(:calendar)
+    session.delete(:subscriptions)
+    session.delete(:ready_for_pickup)
+  end
+
   def admin_logged_in?
     return !current_user.nil? && current_user.account_type_is?(:ADMIN)
   end
@@ -10,6 +32,8 @@ module SessionsHelper
 
   def log_in(user)
     session[:user_id] = user.id
+    nuke_header_data
+    refresh_header_data
     UserAccountState.ensure_state_exists(user)
   end
 
@@ -90,12 +114,8 @@ module SessionsHelper
   def log_out
     forget(current_user)
     session.delete(:user_id)
-    session.delete(:tote)
-    session.delete(:orders)
-    session.delete(:calendar)
-    session.delete(:subscriptions)
-    session.delete(:ready_for_pickup)
     @current_user = nil
+    nuke_header_data
   end
 
   def remember(user)

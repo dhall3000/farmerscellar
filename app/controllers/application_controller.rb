@@ -30,20 +30,9 @@ class ApplicationController < ActionController::Base
         return
       end      
 
-      if !session_header_data_valid? || current_user.header_data_dirty
-
-        #fetch the header data from db
-        header_data = ToteItem.get_header_data(current_user)
-
-        #load it in to the session
-        session[:tote] = header_data[:tote]
-        session[:calendar] = header_data[:calendar]
-        session[:subscriptions] = header_data[:subscriptions]
-        session[:ready_for_pickup] = header_data[:ready_for_pickup]
-
-        #header data is now clean
-        current_user.update(header_data_dirty: false)
-        
+      if current_user.header_data_dirty || !header_data_valid?
+        refresh_header_data
+        current_user.update(header_data_dirty: false)        
       end
 
     end

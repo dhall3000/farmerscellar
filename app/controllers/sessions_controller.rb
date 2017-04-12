@@ -20,6 +20,7 @@ class SessionsController < ApplicationController
     end
 
     session[:spoofing_admin_id] = current_user.id
+    log_out
     log_in user
 
     flash[:success] = "Now spoofing user #{user.email}"
