@@ -39,7 +39,12 @@ class RtauthorizationsController < ApplicationController
   	token = params[:token]
 
   	#try to pull up an active ba
-  	rtba = Rtba.find_by(token: token)
+    #EDGE CASE: 'laszlo' is user id 37. not sure how this happened but he has two different rtba objects in the db with exact same info except primary id (9 and 10)
+    #and created_at diffs by about 0.5 seconds. my guess is he double-clicked the authorize button before i had disable code on the button. anyway, the following line
+    #used to be Rtba.find_by(token: token). but that query pulls up .first. if you go to method def get_authorized_subscription_objects_for(user) the top of the
+    #method is rtba = user.get_active_rtba, whose implementation calls rtbas.order("rtbas.id").last. that doesn't work. they either need to both point at .first or both
+    #point at .last
+  	rtba = Rtba.where(token: token).last
 
   	if rtba.nil?
   		#if we come from view/rtauth/new.html this means we're trying to set up a new billing agreement
