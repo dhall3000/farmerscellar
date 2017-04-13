@@ -26,7 +26,7 @@ Hello,
   <% end %>
 <% else %>
   <!-- xunrfomunchfve this line needs to get changed if we ever go back to sending delivery notifications on a day when zero products were delivered -->
-  <p>Products have been delivered for you and are <%= link_to "ready for pickup", pickup_url %>.</p>
+  <p>You have products <%= link_to "ready for pickup", pickup_url %>.</p>
 <% end %>
 
 <p>

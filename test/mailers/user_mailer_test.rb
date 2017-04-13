@@ -52,7 +52,7 @@ class UserMailerTest < ActionMailer::TestCase
     assert_equal [user.email], mail.to
     assert_equal ["david@farmerscellar.com"], mail.from
 
-    assert_match "Products have been delivered for you and are", mail.body.encoded
+    assert_match "You have products", mail.body.encoded
     
   end
 
@@ -93,7 +93,7 @@ class UserMailerTest < ActionMailer::TestCase
     #assert_match basil.user.farm_name, mail.body.encoded
     #assert_match avocado.unit.name, mail.body.encoded
     #assert_match avocado.user.farm_name, mail.body.encoded
-    assert_match "Products have been delivered for you and are", mail.body.encoded
+    assert_match "You have products", mail.body.encoded
     
   end
 
