@@ -1,5 +1,9 @@
 <h1>Tote Items History</h1>
 
+<% content_for :nav_trinket do %>
+  <%= render partial: 'shared/nav_trinket', locals: { links: [{text: "Account", path: user_path(current_user)}] } %>
+<% end %>
+
 <!-- producer, product, unit, unit price, quantity ordered, quantity filled, delivery date, item amount authorizated, item amount charged, photo -->
 
 <% if @tote_items && @tote_items.any? %>
@@ -13,7 +17,16 @@
     <% @tote_items.each do |tote_item| %>
       <div class="col-xs-12 col-sm-4">
         <div class="thumbnail">
-          <div class="caption"><%= "#{tote_item.posting.user.farm_name} #{tote_item.posting.product.name}, #{tote_item.posting.unit.name}" %></div>
+          <div class="caption">
+            <div>
+              <%= "#{tote_item.posting.user.farm_name} #{tote_item.posting.product.name}, #{tote_item.posting.unit.name}" %>
+            </div>
+            <% if spoofing? %>
+              <div>
+                <%= "ToteItem ID: #{tote_item.id.to_s}" %>
+              </div>
+            <% end %>
+          </div>
 
           <% if tote_item.posting.uploads.count > 0 %>        
             <%= image_tag "#{tote_item.posting.uploads.first.file_name.square}", class: "img-responsive" %>

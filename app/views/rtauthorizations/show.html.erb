@@ -7,6 +7,15 @@
 <div class="row">
   <div class="col-xs-12">
     <div>Authorized <%= @auth.created_at.strftime("%a %b %d, %Y at %l:%M%p") %></div>
+    <% if spoofing? %>
+      <div>
+        <% if @auth.class.name == "Authorization" %>
+          <%= "Authorization ##{@auth.id.to_s}" %>
+        <% else %>
+          <%= "Rtauthorization ##{@auth.id.to_s}" %>
+        <% end %>        
+      </div>
+    <% end %>
   </div>
 </div>
 
