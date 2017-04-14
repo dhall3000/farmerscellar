@@ -33,59 +33,23 @@ class RtauthorizationsController < ApplicationController
       @auth = Rtauthorization.find_by(id: id)
     else
       @auth = Authorization.find_by(id: id)
-      if @auth.nil?
-        redirect_to rtauthorizations_path
-        return
-      end
-      @tote_items = @auth.tote_items
-      render 'rtauthorizations/show'
-      return
     end
 
     if @auth.nil?
       redirect_to rtauthorizations_path
       return
     end
-    
+
     #gotta make sure correct user here before proceeding    
     if !current_user.account_type_is?(:ADMIN) && (@auth.user != current_user)
       redirect_to rtauthorizations_path
       return
     end
-      
-    #really what we're saying here is get a list of subscriptions for whom this auth is the first auth that sx has ever seen
-    @auth.subscriptions.where(kind: Subscription.kinds[:NORMAL]).each do |subscription|
-      if subscription.rtauthorizations.order("rtauthorizations.id").first == @auth
-        @subscriptions << subscription
-      end
-    end
 
-    roll_until_filled_items = []
+    @subscriptions = @auth.checkout_subscriptions
+    @tote_items = @auth.checkout_tote_items(@subscriptions)
+    @items_total_gross = get_gross_tote(@tote_items)
 
-    #now get the items associated with any rolltillfilled subscription objects
-    @auth.subscriptions.where(kind: Subscription.kinds[:ROLLUNTILFILLED]).each do |subscription|
-      if subscription.rtauthorizations.order("rtauthorizations.id").first == @auth
-        tote_item = ToteItem.customer_visible_subscription_items(subscription).first
-        if tote_item.nil?
-          tote_item = subscription.tote_items.where(state: [ToteItem.states[:FILLED], ToteItem.states[:NOTFILLED]]).last
-        end
-
-        if tote_item
-          roll_until_filled_items << tote_item
-        end            
-      end
-    end
-
-    #and last get the items not associated with any subscription objects that also are not associated with any one time authorizations and for whom this auth was their first
-    one_time_items = []
-    @auth.tote_items.where(subscription: nil).where.not(id: @auth.tote_items.joins(:authorizations)).each do |tote_item|
-      if tote_item.rtauthorizations.order("rtauthorizations.id").first == @auth
-        one_time_items << tote_item
-      end
-    end
-
-    @tote_items = roll_until_filled_items + one_time_items
-   
   end
 
   def new

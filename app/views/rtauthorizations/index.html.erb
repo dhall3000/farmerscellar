@@ -8,11 +8,11 @@
   <% @all_auths.each do |auth| %>
     <div class="row">
       <div class="col-xs-8 col-sm-offset-4 col-sm-3">
-        <%= auth.class.name == "Rtauthorization" ? (link_to auth.created_at.strftime("%a %b %d, %Y %l:%M%p"), rtauthorization_path(auth, rta: 1)) : (link_to auth.created_at.to_s, rtauthorization_path(auth)) %>
+        <%= auth.class.name == "Rtauthorization" ? (link_to auth.created_at.strftime("%a %b %d, %Y %l:%M%p"), rtauthorization_path(auth, rta: 1)) : (link_to auth.created_at.strftime("%a %b %d, %Y %l:%M%p"), rtauthorization_path(auth)) %>
       </div>
       <div class="col-xs-4 col-sm-1">
         <div class="text-right">
-          <%= number_to_currency(get_gross_tote(auth.tote_items)) %>
+          <%= number_to_currency(auth.total) %>
         </div>
       </div>      
     </div>

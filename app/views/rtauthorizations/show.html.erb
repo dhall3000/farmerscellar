@@ -4,32 +4,4 @@
   <%= render partial: 'shared/nav_trinket', locals: { links: [{text: "Account", path: user_path(current_user)}, {text: "Authorizations", path: rtauthorizations_path}] } %>
 <% end %>
 
-<div><%= @auth.created_at.to_s %></div>
-<div><%= number_to_currency(get_gross_tote(@auth.tote_items)) %></div>
-
-<% if @auth && @auth.tote_items.any? %>
-  <div class="row">
-
-    <% @auth.tote_items.each do |tote_item| %>
-      <div class="col-xs-6 col-sm-3">
-
-        <div class="thumbnail">
-          <div class="caption">
-            <div class="truncated-text-line producer-name-font">
-              <%= tote_item.posting.user.farm_name %>
-            </div>
-            <div class="truncated-text-line">
-              <%= tote_item.posting.product.name %>
-            </div>
-            <div>
-              <strong>Total <%= number_to_currency(get_gross_item(tote_item)) %></strong>
-            </div>
-          </div>
-        </div>
-
-      </div>
-      
-    <% end %>
-    
-  </div>
-<% end %>
+<%= render partial: 'shared/orderables', locals: { tote_items: @tote_items, subscriptions: @subscriptions, show_remove_button: false, items_total_gross: @items_total_gross } %>

@@ -13,6 +13,63 @@ class Rtauthorization < ApplicationRecord
   #it's presently impossible to attemp to authorize without tote items in the tote, hence the validation.
   validates_presence_of :rtba, :tote_items
 
+  def checkout_subscriptions
+
+    scrips = []
+
+    #really what we're saying here is get a list of subscriptions for whom this auth is the first auth that sx has ever seen
+    subscriptions.where(kind: Subscription.kinds[:NORMAL]).each do |subscription|
+      if subscription.rtauthorizations.order("rtauthorizations.id").first == self
+        scrips << subscription
+      end
+    end
+
+    return scrips
+
+  end
+
+  def checkout_tote_items(checkout_subscriptions = [])
+
+    subscription_items = []
+    checkout_subscriptions.each do |checkout_subscription|
+      subscription_items << checkout_subscription.tote_items.first
+    end
+
+    roll_until_filled_items = []
+    #now get the items associated with any rolltillfilled subscription objects
+    subscriptions.where(kind: Subscription.kinds[:ROLLUNTILFILLED]).each do |subscription|
+      if subscription.rtauthorizations.order("rtauthorizations.id").first == self
+        tote_item = ToteItem.customer_visible_subscription_items(subscription).first
+        if tote_item.nil?
+          tote_item = subscription.tote_items.where(state: [ToteItem.states[:FILLED], ToteItem.states[:NOTFILLED]]).last
+        end
+
+        if tote_item
+          roll_until_filled_items << tote_item
+        end            
+      end
+    end
+
+    #and last get the items not associated with any subscription objects that also are not associated with any one time authorizations and for whom this auth was their first
+    one_time_items = []
+    tote_items.where(subscription: nil).where.not(id: tote_items.joins(:authorizations)).each do |tote_item|
+      if tote_item.rtauthorizations.order("rtauthorizations.id").first == self
+        one_time_items << tote_item
+      end
+    end
+
+    tote_items = subscription_items + roll_until_filled_items + one_time_items
+
+    return tote_items
+
+  end
+
+  def total
+    sx = checkout_subscriptions
+    items = checkout_tote_items(sx)
+    return ToteItemsController.helpers.get_gross_tote(items)
+  end
+
   def user
     if tote_items.any?
       return tote_items.first.user
