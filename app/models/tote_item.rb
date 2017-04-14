@@ -18,6 +18,7 @@ class ToteItem < ApplicationRecord
 
   has_many :tote_item_checkouts
   has_many :checkouts, through: :tote_item_checkouts
+  has_many :authorizations, through: :checkouts
 
   has_many :bulk_buy_tote_items
   has_many :bulk_buys, through: :bulk_buy_tote_items

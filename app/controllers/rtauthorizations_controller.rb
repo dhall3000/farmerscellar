@@ -60,6 +60,8 @@ class RtauthorizationsController < ApplicationController
       end
     end
 
+    roll_until_filled_items = []
+
     #now get the items associated with any rolltillfilled subscription objects
     @auth.subscriptions.where(kind: Subscription.kinds[:ROLLUNTILFILLED]).each do |subscription|
       if subscription.rtauthorizations.order("rtauthorizations.id").first == @auth
@@ -69,13 +71,20 @@ class RtauthorizationsController < ApplicationController
         end
 
         if tote_item
-          @tote_items << tote_item
+          roll_until_filled_items << tote_item
         end            
       end
     end
 
-    #and last get thet items not associated with any subscription objects
-    @tote_items = @tote_items + @auth.tote_items.where(subscription: nil).to_a
+    #and last get the items not associated with any subscription objects that also are not associated with any one time authorizations and for whom this auth was their first
+    one_time_items = []
+    @auth.tote_items.where(subscription: nil).where.not(id: @auth.tote_items.joins(:authorizations)).each do |tote_item|
+      if tote_item.rtauthorizations.order("rtauthorizations.id").first == @auth
+        one_time_items << tote_item
+      end
+    end
+
+    @tote_items = roll_until_filled_items + one_time_items
    
   end
 

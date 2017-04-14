@@ -102,6 +102,261 @@ class AuthorizationsTest < Authorizer
 
   end
 
+  test "user should see only one subscription on each of two different auth show views" do
+
+    nuke_all_postings
+    friday_next_week = get_next_wday_after(wday = 5, days_from_now = 7)
+    posting1 = create_posting(farmer = nil, price = nil, product = Product.create(name: "Product1"), unit = nil, delivery_date = friday_next_week, order_cutoff = nil, units_per_case = nil, frequency = 1)
+    posting2 = create_posting(posting1.user, price = nil, product = Product.create(name: "Product2"), unit = nil, delivery_date = friday_next_week, order_cutoff = nil, units_per_case = nil, frequency = 1)
+    
+    customer = create_new_customer
+    sx1 = create_tote_item(customer, posting1, quantity = 1, frequency = 1, roll_until_filled = false).subscription
+    assert sx1.valid?
+    rtauth1 = create_rt_authorization_for_customer(customer)
+    sx2 = create_tote_item(customer, posting2, quantity = 1, frequency = 1, roll_until_filled = false).subscription
+    assert sx2.valid?
+    rtauth2 = create_rt_authorization_for_customer(customer)
+    log_in_as customer
+
+    #when viewing auth1 user should only see sx1
+    get rtauthorization_path(rtauth1, rta: 1)
+    assert_response :success
+    assert_template 'rtauthorizations/show'
+    subscriptions = assigns(:subscriptions)
+    assert subscriptions
+    assert subscriptions.any?
+    assert_equal 1, subscriptions.count
+    sx = subscriptions.first
+    assert_equal sx1, sx
+
+    #when viewing auth2 user should only see sx2
+    get rtauthorization_path(rtauth2, rta: 1)
+    assert_response :success
+    assert_template 'rtauthorizations/show'
+    subscriptions = assigns(:subscriptions)
+    assert subscriptions
+    assert subscriptions.any?
+    assert_equal 1, subscriptions.count
+    sx = subscriptions.first
+    assert_equal sx2, sx
+
+    #sx1 should have two authorizations
+    assert_equal 2, sx1.rtauthorizations.count
+    #sx2 should have one authorization
+    assert_equal 1, sx2.rtauthorizations.count
+
+    #there shouldn't be any stand alone tote items to look at
+    assert_equal 0, assigns(:tote_items).count
+
+  end
+
+  test "items should show up on different authorization show pages" do
+    #the very first authorization made is a one-time authorization. But then before the order cut off hits that person decides to authorize a subscription and a
+    #different one time authorization. Something like that. The idea is that this would create two different authorizations when the user goes to their authorizations
+    #index page they should see two rows when they click on the first authorization it should display only that first one time item then when they go back
+    #to the index and click the second authorization they should then see the subscription and the second one time item but they should not see the first
+    #one time item even though that item will be associated with the second authorization
+
+    nuke_all_postings
+    friday_next_week = get_next_wday_after(wday = 5, days_from_now = 7)
+    posting1 = create_posting(farmer = nil, price = nil, product = Product.create(name: "Product1"), unit = nil, delivery_date = friday_next_week, order_cutoff = nil, units_per_case = nil, frequency = 1)
+    posting2 = create_posting(posting1.user, price = nil, product = Product.create(name: "Product2"), unit = nil, delivery_date = friday_next_week, order_cutoff = nil, units_per_case = nil, frequency = 1)
+    posting3 = create_posting(posting1.user, price = nil, product = Product.create(name: "Product3"), unit = nil, delivery_date = friday_next_week, order_cutoff = nil, units_per_case = nil, frequency = 1)
+    
+    customer = create_new_customer
+
+    #create first one time item
+    ti1 = create_tote_item(customer, posting1, quantity = 1, frequency = nil, roll_until_filled = false)
+    assert_not ti1.subscription
+
+    #now make one time auth
+    auth1 = create_one_time_authorization_for_customer(customer)
+    assert_equal flash[:success], "Checkout successful"
+    assert auth1.valid?
+
+    #create 2nd one time item
+    ti2 = create_tote_item(customer, posting2, quantity = 1, frequency = nil, roll_until_filled = false)
+    assert_not ti2.subscription
+
+    #create subscription
+    sx = create_tote_item(customer, posting2, quantity = 1, frequency = 1, roll_until_filled = false).subscription
+
+    #and now create rt auth
+    auth2 = create_rt_authorization_for_customer(customer)
+
+    #now let's go peruse the auth pages and verify things look good
+    log_in_as customer
+    get rtauthorizations_path
+    assert_response :success
+    assert_template 'rtauthorizations/index'
+
+    authorizations = assigns(:authorizations)
+    assert authorizations
+    assert authorizations.any?
+    assert_equal 1, authorizations.count
+    assert_equal auth1, authorizations.first
+
+    rtauths = assigns(:rtauthorizations)
+    assert rtauths
+    assert rtauths.any?
+    assert_equal 1, rtauths.count
+    assert_equal auth2, rtauths.first
+
+    #now let's examine auth1 and verify data looks good
+    get rtauthorization_path(auth1)
+    assert_response :success
+    assert_template 'rtauthorizations/show'
+    #there should be no subscriptions
+    subscriptions = assigns(:subscriptions)
+    assert subscriptions
+    assert_not subscriptions.any?
+    #there should be one tote item and it should equal ti1
+    tote_items = assigns(:tote_items)
+    assert tote_items
+    assert tote_items.any?
+    assert_equal 1, tote_items.count
+    tote_item = tote_items.first
+    assert_equal ti1, tote_item
+
+    #now let's examine auth2 and verify data looks good
+    get rtauthorization_path(auth2, rta: 1)
+    assert_response :success
+    assert_template 'rtauthorizations/show'
+    #there should be one subscription
+    subscriptions = assigns(:subscriptions)
+    assert subscriptions
+    assert subscriptions.any?
+    assert_equal 1, subscriptions.count
+    #there should be one tote item and it should equal ti2
+    tote_items = assigns(:tote_items)
+    assert tote_items
+    assert tote_items.any?
+    assert_equal 1, tote_items.count
+    tote_item = tote_items.first
+    assert_equal ti2, tote_item
+
+  end
+
+  test "items should show up on different authorization show pages 2" do
+    #the very first authorization made is a one-time authorization. But then before the order cut off hits that person decides to authorize a subscription and a
+    #different one time authorization. Something like that. The idea is that this would create two different authorizations when the user goes to their authorizations
+    #index page they should see two rows when they click on the first authorization it should display only that first one time item then when they go back
+    #to the index and click the second authorization they should then see the subscription and the second one time item but they should not see the first
+    #one time item even though that item will be associated with the second authorization
+
+    nuke_all_postings
+    friday_next_week = get_next_wday_after(wday = 5, days_from_now = 7)
+    posting1 = create_posting(farmer = nil, price = nil, product = Product.create(name: "Product1"), unit = nil, delivery_date = friday_next_week, order_cutoff = nil, units_per_case = nil, frequency = 1)
+    posting2 = create_posting(posting1.user, price = nil, product = Product.create(name: "Product2"), unit = nil, delivery_date = friday_next_week, order_cutoff = nil, units_per_case = nil, frequency = 1)
+    posting3 = create_posting(posting1.user, price = nil, product = Product.create(name: "Product3"), unit = nil, delivery_date = friday_next_week, order_cutoff = nil, units_per_case = nil, frequency = 1)
+    
+    customer = create_new_customer
+
+    #create first one time item
+    ti1 = create_tote_item(customer, posting1, quantity = 1, frequency = nil, roll_until_filled = false)
+    assert_not ti1.subscription
+
+    #now make one time auth
+    auth1 = create_one_time_authorization_for_customer(customer)
+    assert_equal flash[:success], "Checkout successful"
+    assert auth1.valid?
+
+    #create 2nd one time item
+    ti2 = create_tote_item(customer, posting2, quantity = 1, frequency = nil, roll_until_filled = false)
+    assert_not ti2.subscription
+
+    #create subscription
+    sx1 = create_tote_item(customer, posting2, quantity = 1, frequency = 1, roll_until_filled = false).subscription
+    assert sx1.valid?
+    assert_equal 1, sx1.tote_items.count
+    sxti1 = sx1.tote_items.first
+
+    #and now create rt auth
+    auth2 = create_rt_authorization_for_customer(customer)
+
+    #now create objects for auth3
+    ti3 = create_tote_item(customer, posting1, quantity = 1, frequency = nil, roll_until_filled = false)
+    assert_not ti3.subscription
+    sx2 = create_tote_item(customer, posting2, quantity = 1, frequency = 1, roll_until_filled = false).subscription
+    assert sx2.valid?
+    assert_equal 1, sx2.tote_items.count
+    sxti2 = sx2.tote_items.first
+
+    #and now create rt auth3
+    auth3 = create_rt_authorization_for_customer(customer)
+
+    #now let's go peruse the auth pages and verify things look good
+    log_in_as customer
+    get rtauthorizations_path
+    assert_response :success
+    assert_template 'rtauthorizations/index'
+
+    authorizations = assigns(:authorizations)
+    assert authorizations
+    assert authorizations.any?
+    assert_equal 1, authorizations.count
+    assert_equal auth1, authorizations.first
+
+    rtauths = assigns(:rtauthorizations)
+    assert rtauths
+    assert rtauths.any?
+    assert_equal 2, rtauths.count
+    assert_equal auth2, rtauths.first
+    assert_equal auth3, rtauths.last
+
+    #now let's examine auth1 and verify data looks good
+    get rtauthorization_path(auth1)
+    assert_response :success
+    assert_template 'rtauthorizations/show'
+    #there should be no subscriptions
+    subscriptions = assigns(:subscriptions)
+    assert subscriptions
+    assert_not subscriptions.any?
+    #there should be one tote item and it should equal ti1
+    tote_items = assigns(:tote_items)
+    assert tote_items
+    assert tote_items.any?
+    assert_equal 1, tote_items.count
+    tote_item = tote_items.first
+    assert_equal ti1, tote_item
+
+    #now let's examine auth2 and verify data looks good
+    get rtauthorization_path(auth2, rta: 1)
+    assert_response :success
+    assert_template 'rtauthorizations/show'
+    #there should be one subscription
+    subscriptions = assigns(:subscriptions)
+    assert subscriptions
+    assert subscriptions.any?
+    assert_equal 1, subscriptions.count
+    #there should be one tote item and it should equal ti2
+    tote_items = assigns(:tote_items)
+    assert tote_items
+    assert tote_items.any?
+    assert_equal 1, tote_items.count
+    tote_item = tote_items.first
+    assert_equal ti2, tote_item
+
+    #now lets examine auth3 show
+    get rtauthorization_path(auth3, rta: 1)
+    assert_response :success
+    assert_template 'rtauthorizations/show'
+    subscriptions = assigns(:subscriptions)
+    #there should be one subscription and it should equal sx2
+    assert subscriptions
+    assert subscriptions.any?
+    assert_equal 1, subscriptions.count
+    assert_equal sx2, subscriptions.first
+    #there should be one tote item and it should equal ti3
+    tote_items = assigns(:tote_items)
+    assert tote_items
+    assert tote_items.any?
+    assert_equal 1, tote_items.count
+    tote_item = tote_items.first
+    assert_equal ti3, tote_item
+
+  end
+
   #this should create an auth in the db for each customer that has tote items
   test "should create new authorizations" do
     puts "test: should create new authorizations"
