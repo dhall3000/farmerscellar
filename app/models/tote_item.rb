@@ -295,6 +295,10 @@ class ToteItem < ApplicationRecord
     return state == ToteItem.states[state_key]
   end
 
+  def original_one_time_authorization
+    return authorizations.order("authorizations.id").last
+  end
+
   def authorization
 
     if !checkouts
@@ -332,6 +336,10 @@ class ToteItem < ApplicationRecord
 
     return auth
 
+  end
+
+  def original_rtauthorization
+    return rtauthorizations.order("rtauthorizations.id").first    
   end
 
   def rtauthorization

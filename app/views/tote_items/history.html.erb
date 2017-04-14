@@ -28,6 +28,11 @@
             <div>Delivery Date: <%= tote_item.posting.delivery_date.strftime("%B #{tote_item.posting.delivery_date.day.ordinalize}, %Y") %></div>
             <div>Amount Ordered: <%= number_to_currency(get_gross_item(tote_item, filled = false)) %></div>
             <div>Amount Charged: <%= number_to_currency(get_gross_item(tote_item, filled = true)) %></div>
+            <% if (auth = tote_item.original_one_time_authorization) %>
+              <%= link_to "View authorization", rtauthorization_path(auth), class: "btn btn-lg btn-primary outline" %>
+            <% elsif (auth = tote_item.original_rtauthorization) %>
+              <%= link_to "View authorization", rtauthorization_path(auth, rta: 1), class: "btn btn-lg btn-primary outline" %>
+            <% end %>            
           </div>
         </div>
       </div>
