@@ -1,6 +1,84 @@
 class RtauthorizationsController < ApplicationController
   before_action :logged_in_user
 
+  def index
+
+    if current_user.account_type_is?(:ADMIN)
+      @authorizations = Authorization.all
+      @rtauthorizations = Rtauthorization.all
+    else
+      @authorizations = Authorization.joins(tote_items: :user).where(users: {id: current_user.id}).distinct
+      @rtauthorizations = Rtauthorization.joins(rtba: :user).where(users: {id: current_user.id}).distinct
+    end
+
+    #this is some serious hack gnarly code. yes, i'm sticking two completely unrelated classes in the same array for use by
+    #common code, treating them as though they have a common ancestor. nope. why? cause i'm in a hurry...
+    @all_auths = ((@authorizations.to_a + @rtauthorizations.to_a).sort_by &:created_at).reverse!
+
+  end
+
+  def show
+
+    id = params[:id].to_i
+
+    if id.nil?
+      redirect_to rtauthorizations_path
+      return
+    end
+
+    @subscriptions = []
+    @tote_items = []
+
+    if params[:rta]
+      @auth = Rtauthorization.find_by(id: id)
+    else
+      @auth = Authorization.find_by(id: id)
+      if @auth.nil?
+        redirect_to rtauthorizations_path
+        return
+      end
+      @tote_items = @auth.tote_items
+      render 'rtauthorizations/show'
+      return
+    end
+
+    if @auth.nil?
+      redirect_to rtauthorizations_path
+      return
+    end
+    
+    #gotta make sure correct user here before proceeding    
+    if !current_user.account_type_is?(:ADMIN) && (@auth.user != current_user)
+      redirect_to rtauthorizations_path
+      return
+    end
+      
+    #really what we're saying here is get a list of subscriptions for whom this auth is the first auth that sx has ever seen
+    @auth.subscriptions.where(kind: Subscription.kinds[:NORMAL]).each do |subscription|
+      if subscription.rtauthorizations.order("rtauthorizations.id").first == @auth
+        @subscriptions << subscription
+      end
+    end
+
+    #now get the items associated with any rolltillfilled subscription objects
+    @auth.subscriptions.where(kind: Subscription.kinds[:ROLLUNTILFILLED]).each do |subscription|
+      if subscription.rtauthorizations.order("rtauthorizations.id").first == @auth
+        tote_item = ToteItem.customer_visible_subscription_items(subscription).first
+        if tote_item.nil?
+          tote_item = subscription.tote_items.where(state: [ToteItem.states[:FILLED], ToteItem.states[:NOTFILLED]]).last
+        end
+
+        if tote_item
+          @tote_items << tote_item
+        end            
+      end
+    end
+
+    #and last get thet items not associated with any subscription objects
+    @tote_items = @tote_items + @auth.tote_items.where(subscription: nil).to_a
+   
+  end
+
   def new
 
   	#note: this is a bit of a misnomer. this #new action might make you think we're creating a new Rtauthorization. We're not. It's a hack

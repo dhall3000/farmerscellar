@@ -9,7 +9,7 @@ class ToteItem < ApplicationRecord
   #which will be AUTHORIZED and one of which will be COMMITTED. the auth'd one will be for the next delivery cycle out. but we don't want to show this next-out item to the customer.
   #it clutters up their view (best case) and in the scenaro of a RTF order (Roll Till Filled) it's extra bad because the customer will see two items (one for the upcoming delivery
   #and the other for the one after that) and think FC is playing tricks by signing them up for multiple deliveries, not knowing the system will auto-cancel if the upcoming delivery
-  #doesn't get filled. best bet is to just hide the future-most item from customer's view...what they don't know won't hurt them. so this method intends to help with that.
+  #fill. best bet is to just hide the future-most item from customer's view...what they don't know won't hurt them. so this method intends to help with that.
   #logic: if a subscription's tote items series has a COMMITTED item, we only want to return that. if it does not have any COMMITTED items then we want to show them any AUTH'd items
   scope :customer_visible_subscription_items, -> (subscription) { (committed = subscription_items_by_state(subscription, ToteItem.states[:COMMITTED])).any? ? committed : subscription_items_by_state(subscription, ToteItem.states[:AUTHORIZED]) }
 

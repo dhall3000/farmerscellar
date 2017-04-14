@@ -260,7 +260,7 @@ upload = Upload.create(file_name: File.open(File.join("/home/david/fc/website/as
 bakery.uploads << upload
 bakery.save
 
-product_apples = Product.create(name: "Fuji Apples", food_category: fruit)
+product_apples = Product.create(name: "Minced Alligator Hindquarters", food_category: fruit)
 product_carrots = Product.create(name: "Carrots", food_category: veggies)
 product_milk = Product.create(name: "Milk", food_category: dairy)
 product_beef = Product.create(name: "Beef", food_category: meat)
@@ -400,7 +400,9 @@ milk.transition(:order_cutoffed)
 ToteItem.create(quantity: 2, price: posting_apples.price, state: ToteItem.states[:ADDED], user_id: c3.id, posting_id: posting_apples.id).transition(:customer_authorized)
 ToteItem.create(quantity: 1, price: posting_apples.price, state: ToteItem.states[:ADDED], user_id: c4.id, posting_id: posting_apples.id).transition(:customer_authorized)
 ToteItem.create(quantity: 5, price: posting_apples.price, state: ToteItem.states[:ADDED], user_id: c2.id, posting_id: posting_apples.id).transition(:customer_authorized)
-ToteItem.create(quantity: 3, price: posting_apples.price, state: ToteItem.states[:ADDED], user_id: c1.id, posting_id: posting_apples.id).transition(:customer_authorized)
+ti = ToteItem.create(quantity: 3, price: posting_apples.price, state: ToteItem.states[:ADDED], user_id: c1.id, posting_id: posting_apples.id)
+ti.reload.transition(:customer_authorized)
+ti.reload.transition(:order_cutoffed)
 
 #Milk
 ToteItem.create(quantity: 2, price: posting_milk.price, state: ToteItem.states[:ADDED], user_id: c3.id, posting_id: posting_milk.id).transition(:customer_authorized)

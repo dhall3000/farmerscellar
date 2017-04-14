@@ -1,0 +1,42 @@
+<h1>Authorizations</h1>
+
+<% content_for :nav_trinket do %>
+  <%= render partial: 'shared/nav_trinket', locals: { links: [{text: "Account", path: user_path(current_user)}] } %>
+<% end %>
+
+<% if @all_auths && @all_auths.any? %>
+  <% @all_auths.each do |auth| %>
+    <div class="row">
+      <div class="col-xs-8 col-sm-offset-4 col-sm-3">
+        <%= auth.class.name == "Rtauthorization" ? (link_to auth.created_at.strftime("%a %b %d, %Y %l:%M%p"), rtauthorization_path(auth, rta: 1)) : (link_to auth.created_at.to_s, rtauthorization_path(auth)) %>
+      </div>
+      <div class="col-xs-4 col-sm-1">
+        <div class="text-right">
+          <%= number_to_currency(get_gross_tote(auth.tote_items)) %>
+        </div>
+      </div>      
+    </div>
+    <% if current_user.account_type_is?(:ADMIN) %>
+      <div class="row">
+        <div class="col-xs-12 col-sm-offset-4 col-sm-4">
+          <%= auth.user.email %>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12 col-sm-offset-4 col-sm-4">
+          <%= form_tag sessions_spoof_path do %>      
+            <%= hidden_field_tag :email, auth.user.email, class: "form-control" %>
+            <%= submit_tag "Spoof", class: "btn btn-lg btn-primary outline" %>
+          <% end %>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12 col-sm-offset-4 col-sm-4">
+          <hr>
+        </div>
+      </div>      
+    <% end %>
+  <% end %>
+<% else %>
+  <div class="text-center">You have no authorizations to look at</div>
+<% end %>

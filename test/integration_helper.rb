@@ -652,12 +652,12 @@ end
       post rtauthorizations_create_path, params: {token: customer.rtbas.last.token}    
     end
 
+    rtauthorization = assigns(:rtauthorization)
+
     assert_response :redirect
     assert_redirected_to tote_items_path(calendar: 1)
     follow_redirect!
-    assert_template 'tote_items/calendar'
-    
-    rtauthorization = assigns(:rtauthorization)
+    assert_template 'tote_items/calendar'        
 
     return rtauthorization
 

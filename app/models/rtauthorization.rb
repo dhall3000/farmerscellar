@@ -13,6 +13,13 @@ class Rtauthorization < ApplicationRecord
   #it's presently impossible to attemp to authorize without tote items in the tote, hence the validation.
   validates_presence_of :rtba, :tote_items
 
+  def user
+    if tote_items.any?
+      return tote_items.first.user
+    end
+    return nil
+  end
+
   def authorized?
   	return rtba && rtba.active
   end
