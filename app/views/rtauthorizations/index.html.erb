@@ -5,6 +5,15 @@
 <% end %>
 
 <% if @all_auths && @all_auths.any? %>
+
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="text-center">
+        <%= will_paginate @all_auths, inner_window: 1, outer_window: 0 %>
+      </div>
+    </div>
+  </div>
+
   <% @all_auths.each do |auth| %>
     <div class="row">
       <div class="col-xs-8 col-sm-offset-4 col-sm-3">
@@ -37,6 +46,17 @@
       </div>      
     <% end %>
   <% end %>
+
+
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="text-center">
+        <%= will_paginate @all_auths, inner_window: 1, outer_window: 0 %>
+      </div>
+    </div>
+  </div>
+
+
 <% else %>
   <div class="text-center">You have no authorizations to look at</div>
 <% end %>

@@ -3,17 +3,27 @@ class RtauthorizationsController < ApplicationController
 
   def index
 
+    per_page = 10
+
     if current_user.account_type_is?(:ADMIN)
-      @authorizations = Authorization.all
-      @rtauthorizations = Rtauthorization.all
+      #@authorizations = Authorization.all.paginate(:page => params[:page], :per_page => per_page)
+      @rtauthorizations = Rtauthorization.all.paginate(:page => params[:page], :per_page => per_page)
     else
-      @authorizations = Authorization.joins(tote_items: :user).where(users: {id: current_user.id}).distinct
-      @rtauthorizations = Rtauthorization.joins(rtba: :user).where(users: {id: current_user.id}).distinct
+      #@authorizations = Authorization.joins(tote_items: :user).where(users: {id: current_user.id}).paginate(:page => params[:page], :per_page => per_page).distinct
+      @rtauthorizations = Rtauthorization.joins(rtba: :user).where(users: {id: current_user.id}).paginate(:page => params[:page], :per_page => per_page).distinct
     end
 
     #this is some serious hack gnarly code. yes, i'm sticking two completely unrelated classes in the same array for use by
     #common code, treating them as though they have a common ancestor. nope. why? cause i'm in a hurry...
-    @all_auths = ((@authorizations.to_a + @rtauthorizations.to_a).sort_by &:created_at).reverse!
+    #@all_auths = ((@authorizations.to_a + @rtauthorizations.to_a).sort_by &:created_at).reverse!
+
+    #and here's a hack on the hack. this hack hack is being added as i go to put pagination on. i don't want to spend the time right now to figure out how to lace the Authorizations and
+    #Rtauthorizations together. especially so because a business strategy for the indefinite future is to pretty much eliminate one time Authorization use. They actually still are in the
+    #code but it's anedge case. first, the posting would have to be non-recurring. second, the user must be one who doesn't already have a billing agreement established with us. then
+    #we still do expose to them the option of one time. actually, that's the only thing they could do since it's a one time purchase. then, after all this, they'd have to want to use this
+    #auth view feature, which itself should be a rarely-used and non-critical feature. so don't pound it all out now. it's primarily a tool to use to track production progress (99.99% Rtauth)
+    #or when problems arise with customer (99.99% Rtauth). in the 0.01% time we'll need to view an Auth we can just poke around the db manually. for now.
+    @all_auths = @rtauthorizations
 
   end
 

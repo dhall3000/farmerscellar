@@ -9,7 +9,9 @@
 <% if @tote_items && @tote_items.any? %>
   <div class="row">
     <div class="col-xs-12">
-      <%= will_paginate @tote_items, inner_window: 1, outer_window: 0 %>
+      <div class="text-center">
+        <%= will_paginate @tote_items, inner_window: 1, outer_window: 0 %>
+      </div>
     </div>
   </div>
 
@@ -53,9 +55,9 @@
   </div>
 
   <div class="row">
-    <div class="col-xs-12">
-      <%= will_paginate @tote_items, inner_window: 1, outer_window: 0 %>
-    </div>
+      <div class="text-center">
+        <%= will_paginate @tote_items, inner_window: 1, outer_window: 0 %>
+      </div>
   </div>
 
 <% else %>
