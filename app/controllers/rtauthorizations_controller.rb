@@ -57,7 +57,7 @@ class RtauthorizationsController < ApplicationController
     end
 
     @subscriptions = @auth.checkout_subscriptions
-    @tote_items = @auth.checkout_tote_items(@subscriptions)
+    @tote_items = @auth.checkout_tote_items
     @items_total_gross = get_gross_tote(@tote_items)
 
   end

@@ -14,7 +14,7 @@ class Authorization < ApplicationRecord
   end
 
   #hack: this is here so i can treat auths the same as rtauths
-  def checkout_tote_items(checkout_subscriptions = nil)
+  def checkout_tote_items
     tote_items
   end
 

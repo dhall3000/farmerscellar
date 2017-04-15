@@ -19,7 +19,7 @@ class Rtauthorization < ApplicationRecord
 
     #really what we're saying here is get a list of subscriptions for whom this auth is the first auth that sx has ever seen
     subscriptions.where(kind: Subscription.kinds[:NORMAL]).each do |subscription|
-      if subscription.rtauthorizations.order("rtauthorizations.id").first == self
+      if subscription.original_rtauthorization == self
         scrips << subscription
       end
     end
@@ -28,25 +28,12 @@ class Rtauthorization < ApplicationRecord
 
   end
 
-  def checkout_tote_items(checkout_subscriptions = [])
+  def checkout_tote_items
 
     subscription_items = []
-    checkout_subscriptions.each do |checkout_subscription|
-      subscription_items << checkout_subscription.tote_items.first
-    end
-
-    roll_until_filled_items = []
-    #now get the items associated with any rolltillfilled subscription objects
-    subscriptions.where(kind: Subscription.kinds[:ROLLUNTILFILLED]).each do |subscription|
-      if subscription.rtauthorizations.order("rtauthorizations.id").first == self
-        tote_item = ToteItem.customer_visible_subscription_items(subscription).first
-        if tote_item.nil?
-          tote_item = subscription.tote_items.where(state: [ToteItem.states[:FILLED], ToteItem.states[:NOTFILLED]]).last
-        end
-
-        if tote_item
-          roll_until_filled_items << tote_item
-        end            
+    subscriptions.each do |subscription|
+      if subscription.original_rtauthorization == self
+        subscription_items << subscription.tote_items.first
       end
     end
 
@@ -58,7 +45,7 @@ class Rtauthorization < ApplicationRecord
       end
     end
 
-    tote_items = subscription_items + roll_until_filled_items + one_time_items
+    tote_items = subscription_items + one_time_items
 
     return tote_items
 
@@ -66,7 +53,7 @@ class Rtauthorization < ApplicationRecord
 
   def total
     sx = checkout_subscriptions
-    items = checkout_tote_items(sx)
+    items = checkout_tote_items
     return ToteItemsController.helpers.get_gross_tote(items)
   end
 
