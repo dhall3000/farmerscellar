@@ -126,12 +126,11 @@ class UserMailerTest < ActionMailer::TestCase
     assert_equal [user.email], mail.to
     assert_equal ["david@farmerscellar.com"], mail.from
 
-    assert_match "This is your Farmer's Cellar receipt for payment authorization", mail.body.encoded
+    assert_match "You just successfully authorized payment of", mail.body.encoded
     authorized_amount = ToteItemsController.helpers.get_gross_tote(checkout.tote_items)
     assert authorized_amount > 0
-    assert_match ActiveSupport::NumberHelper.number_to_currency(authorized_amount), mail.body.encoded
-    assert_match "The total payment amount authorized is", mail.body.encoded
-    assert_match "We'll send a delivery notification email on any day that product is delivered", mail.body.encoded    
+    assert_match ActiveSupport::NumberHelper.number_to_currency(authorized_amount), mail.body.encoded    
+    assert_match "We'll email you when products are ready for pickup.", mail.body.encoded    
    
   end
 
@@ -157,13 +156,11 @@ class UserMailerTest < ActionMailer::TestCase
     assert_equal [user.email], mail.to
     assert_equal ["david@farmerscellar.com"], mail.from
 
-    assert_match "This is your Farmer's Cellar receipt for payment authorization", mail.body.encoded
+    assert_match "You just successfully authorized payment of", mail.body.encoded
     authorized_amount = ToteItemsController.helpers.get_gross_tote(user.tote_items)
     assert authorized_amount > 0
     assert_match ActiveSupport::NumberHelper.number_to_currency(authorized_amount), mail.body.encoded
-    assert_match "Additionally, you authorized future charges to your payment account associated with the following subscription", mail.body.encoded
-    assert_match user.subscriptions.last.description, mail.body.encoded
-    assert_match "We'll send a delivery notification email on any day that product is delivered", mail.body.encoded    
+    assert_match "We'll email you when products are ready for pickup.", mail.body.encoded    
 
   end
 

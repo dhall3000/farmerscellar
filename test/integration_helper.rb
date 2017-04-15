@@ -1042,8 +1042,6 @@ end
 
   end
 
-
-
   def verify_authorization_receipt_sent(num_mail_messages_sent, user, authorization)
 
     #did a mail message even go out?
@@ -1052,16 +1050,8 @@ end
     mail = ActionMailer::Base.deliveries.last
     assert_equal [user.email], mail.to
     assert_match "Authorization receipt", mail.subject    
-    assert_match "This is your Farmer's Cellar receipt for payment authorization", mail.body.encoded
-    
-    assert_match authorization.checkouts.last.tote_items.last.posting.user.farm_name, mail.body.encoded
-    assert_match authorization.checkouts.last.tote_items.last.posting.product.name, mail.body.encoded
-    assert_match authorization.checkouts.last.tote_items.last.price.to_s, mail.body.encoded
-    assert authorization.checkouts.last.tote_items.last.price > 0
-    assert authorization.checkouts.last.tote_items.last.quantity > 0
-    assert_match authorization.checkouts.last.tote_items.last.quantity.to_s, mail.body.encoded
-    assert_match authorization.checkouts.last.tote_items.last.posting.unit.name, mail.body.encoded
-    assert_match authorization.checkouts.last.tote_items.last.posting.delivery_date.strftime("%A %b %d, %Y"), mail.body.encoded
+    assert_match "You just successfully authorized payment of", mail.body.encoded
+    assert_match "We'll email you when products are ready for pickup.", mail.body.encoded    
 
     assert authorization.amount > 0
     assert_match authorization.amount.to_s, mail.body.encoded

@@ -26,7 +26,7 @@ class AuthorizationTest < ModelTestAncestor
 
   test "should return all authorized tote items" do
     assert_not @authorization.checkouts.any?
-    assert_nil @authorization.tote_items
+    assert_equal 0, @authorization.tote_items.count
     @authorization.checkouts << @checkout
     assert @authorization.save
     tote_items = @authorization.tote_items

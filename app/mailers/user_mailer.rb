@@ -30,19 +30,13 @@ class UserMailer < ApplicationMailer
 
   #the 'authorization' param can be either a Authorization or a Rtauthorization
   def authorization_receipt(user, authorization, tote_items_getting_authorized = nil, subscriptions = nil)
-    
-    @policies_update_time = PageUpdate.get_update_time("HowThingsWork")
-    @user = user    
 
     if tote_items_getting_authorized
-      @id = "Z#{authorization.id.to_s}"
-      @amount = get_gross_tote(tote_items_getting_authorized)      
-      @tote_items = tote_items_getting_authorized
-      @subscriptions = subscriptions
+      @amount = get_gross_tote(tote_items_getting_authorized)
+      @link = rtauthorization_url(authorization, rta: 1)
     else
-      @id = authorization.id.to_s
       @amount = authorization.amount
-      @tote_items = authorization.tote_items
+      @link = rtauthorization_url(authorization)
     end
 
     mail to: user.email, subject: "Authorization receipt"

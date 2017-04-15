@@ -1,35 +1,8 @@
 Hello,
 
-This is your Farmer's Cellar receipt for payment authorization #<%= @id %>.
+You just successfully authorized payment of <%= number_to_currency(@amount) %>. See authorization details here: <%= @link %>
 
-Here is the product information for which you authorized payment:
-
-*Please be aware of our Delivery Not Guaranteed policy: <%= how_things_work_url(anchor: "delivery_not_guaranteed") %>
-<% @tote_items.each do |tote_item| %>
---------------------------------------------------------------------------------------------------------
-ID=<%= tote_item.id %>, <%= tote_item.posting.user.farm_name %> <%= tote_item.posting.product.name %> quantity <%= tote_item.quantity %> @ <%= number_to_currency(tote_item.price) %> per <%= tote_item.posting.unit.name %>, Sub Total <%= number_to_currency(get_gross_item(tote_item)) %>, scheduled delivery* on <%= tote_item.posting.delivery_date.strftime("%A %b %d, %Y") %>
-<% end %>
-
-<% if @subscriptions %>
-The total payment amount authorized for the products listed above is <%= number_to_currency(@amount) %>. Additionally, you authorized future charges to your payment account associated with the following <%= "subscription".pluralize(@subscriptions.count) %>:
-
-	<% @subscriptions.each do |subscription| %>
-    <%= subscription.description %>
-  <% end %>
-<% else %>
-The total payment amount authorized is <%= number_to_currency(@amount) %>.
-<% end %>
-
-When products are delivered:
-
--We'll send a delivery notification email on any day that product is delivered
--The delivery notification email will contain all information necessary to pick up your products
--Delivered products must be picked up by 8PM the Monday following delivery
--Charges to your payment account will be made after products are delivered
-<% if @policies_update_time %>
-
-Our policies were last updated <%= @policies_update_time.strftime("%A, %B %d, %Y") %> and are detailed here: <%= how_things_work_url %>.
-<% end %>
+We'll email you when products are ready for pickup.
 
 Thanks!
 
