@@ -256,9 +256,10 @@ class RakeTasksTest < BulkBuyer
       #this is after the nightly tasks on the Monday delivery
       if Time.zone.now.midnight == @p1.delivery_date
         assert_equal 3, PurchaseReceivable.count, "There should be exactly 3 PurchaseReceivables because one was created for each of the three tote items that was filled & delivered on Monday even though the other two customers still have tote items to be delivered later on this week"
-        assert_equal 2, ActionMailer::Base.deliveries.count
-        assert_appropriate_email(emails[0], "c5@c.com", "Purchase receipt", "Here is your Farmer's Cellar purchase receipt.")        
-        assert_appropriate_email(emails[1], "david@farmerscellar.com", "bulk purchase report", "BulkPurchase id: ")
+        #nuking purchase_receipt emails
+        #assert_equal 2, ActionMailer::Base.deliveries.count
+        #assert_appropriate_email(emails[0], "c5@c.com", "Purchase receipt", "Here is your Farmer's Cellar purchase receipt.")        
+        #assert_appropriate_email(emails[1], "david@farmerscellar.com", "bulk purchase report", "BulkPurchase id: ")
       end
 
       #this is after the nightly tasks on the Wednesday delivery
@@ -282,26 +283,26 @@ class RakeTasksTest < BulkBuyer
         #check the bulkpayment amount is in line with the bulkpurchases' amounts
         assert_equal BulkPayment.last.total_payments_amount, (BulkPurchase.first.net + BulkPurchase.last.net).round(2), "The sum of the two BulkPurchases should equal the total BulkPayment masspayment payout"
 
-        assert_equal 7, ActionMailer::Base.deliveries.count
+        assert_equal 4, ActionMailer::Base.deliveries.count
         emails_to = get_emails_to(ActionMailer::Base.deliveries, "c7@c.com")
-        assert_equal 1, emails_to.count
-        assert_appropriate_email(emails_to[0], "c7@c.com", "Purchase receipt", "Here is your Farmer's Cellar purchase receipt.")
+        assert_equal 0, emails_to.count
+        #assert_appropriate_email(emails_to[0], "c7@c.com", "Purchase receipt", "Here is your Farmer's Cellar purchase receipt.")
         
         emails_to = get_emails_to(ActionMailer::Base.deliveries, "c6@c.com")
-        assert_equal 1, emails_to.count
-        assert_appropriate_email(emails_to[0], "c6@c.com", "Purchase receipt", "Here is your Farmer's Cellar purchase receipt.")          
+        assert_equal 0, emails_to.count
+        #assert_appropriate_email(emails_to[0], "c6@c.com", "Purchase receipt", "Here is your Farmer's Cellar purchase receipt.")          
 
         emails_to = get_emails_to(ActionMailer::Base.deliveries, "david@farmerscellar.com")
-        assert_equal 2, emails_to.count
-        emails_to = get_emails_by_subject(emails_to, "bulk purchase report")
         assert_equal 1, emails_to.count
-        assert_appropriate_email(emails_to[0], "david@farmerscellar.com", "bulk purchase report", "BulkPurchase id: ")
+        emails_to = get_emails_by_subject(emails_to, "bulk purchase report")
+        assert_equal 0, emails_to.count
+        #assert_appropriate_email(emails_to[0], "david@farmerscellar.com", "bulk purchase report", "BulkPurchase id: ")
 
         emails_to = get_emails_to(ActionMailer::Base.deliveries, "f1@f.com")
         assert_equal 2, emails_to.count
         assert_appropriate_email(emails_to[0], "f1@f.com", "Payment receipt", "Here's a 'paper' trail for the")
         #yep, there should be two to f1. reason is because F1 had a delivery on Monday and another on Wednesday. they have different order cutoffs so they got submitted to
-        #producer on different orders so they get different payments even though payment went through on the same day. we want it this way because a 1-1 ration of
+        #producer on different orders so they get different payments even though payment went through on the same day. we want it this way because a 1-1 ratio of
         #orders and payments will make reconciliation easier. plus, it's unlikely we'll have same farmer delivering on different days in same week.
         assert_appropriate_email(emails_to[1], "f1@f.com", "Payment receipt", "Here's a 'paper' trail for the")
 
@@ -310,7 +311,7 @@ class RakeTasksTest < BulkBuyer
         assert_appropriate_email(emails_to[0], "f2@f.com", "Payment receipt", "Here's a 'paper' trail for the")
 
         emails_to = get_emails_to(ActionMailer::Base.deliveries, "david@farmerscellar.com")
-        assert_equal 2, emails_to.count
+        assert_equal 1, emails_to.count
         emails_to = get_emails_by_subject(emails_to, "BulkPayment report")
         assert_equal 1, emails_to.count
         assert_appropriate_email(emails_to[0], "david@farmerscellar.com", "BulkPayment report", "The sum of paypal payments is")
@@ -324,11 +325,11 @@ class RakeTasksTest < BulkBuyer
       #this is after the nightly tasks on the 2nd Monday delivery
       if Time.zone.now.midnight == @p4.delivery_date
         assert_equal 7, PurchaseReceivable.count, "There should be a 7th PurchaseReceivable because we're in the next week now which is where c5's 2nd tote item is delivered" 
-        assert_equal 4, ActionMailer::Base.deliveries.count
-        assert_appropriate_email(emails[0], "c5@c.com", "Purchase receipt", "Here is your Farmer's Cellar purchase receipt.")
-        assert_appropriate_email(emails[1], "david@farmerscellar.com", "bulk purchase report", "BulkPurchase id: ")
-        assert_appropriate_email(emails[2], "f2@f.com", "Payment receipt", "Here's a 'paper' trail for the")
-        assert_appropriate_email(emails[3], "david@farmerscellar.com", "BulkPayment report", "The sum of paypal payments is")
+        assert_equal 2, ActionMailer::Base.deliveries.count
+        #assert_appropriate_email(emails[0], "c5@c.com", "Purchase receipt", "Here is your Farmer's Cellar purchase receipt.")
+        #assert_appropriate_email(emails[1], "david@farmerscellar.com", "bulk purchase report", "BulkPurchase id: ")
+        assert_appropriate_email(emails[0], "f2@f.com", "Payment receipt", "Here's a 'paper' trail for the")
+        assert_appropriate_email(emails[1], "david@farmerscellar.com", "BulkPayment report", "The sum of paypal payments is")
       end
 
     end

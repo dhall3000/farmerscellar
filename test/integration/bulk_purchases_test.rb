@@ -255,7 +255,7 @@ class BulkPurchasesTest < BulkBuyer
     assert UserAccountState.count, previous_user_account_state_count
     assert 1, UserAccountState.order(:created_at).last.account_state.state
     
-    verify_proper_purchase_receipt_emails(bulk_purchase)    
+    #verify_proper_purchase_receipt_emails(bulk_purchase)    
     verify_proper_account_states([x1, x2, x3, x4])
     log_in_as(get_admin)
     

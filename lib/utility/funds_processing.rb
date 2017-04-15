@@ -20,7 +20,7 @@ class FundsProcessing
     end
 
     bulk_purchase.go
-    bulk_purchase.do_bulk_email_communication
+    #bulk_purchase.do_bulk_email_communication
 
     puts "FundsProcessing.do_bulk_customer_purchase end"
 
