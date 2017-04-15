@@ -360,6 +360,61 @@ class AuthorizationsTest < Authorizer
 
   end
 
+  test "all items in the series should point to the proper authorization 00" do
+    #many auths throughout a subscription's lifetime. all items in the series should point to the proper authorization
+    #sx gets auth'd, one item gets delivered, a different item gets auth'd. then another item in the sx series gets delivered. going to the tote item history should show link
+    #to first authorization
+    nuke_all_postings
+    friday_next_week = get_next_wday_after(wday = 5, days_from_now = 7)
+    posting1 = create_posting(farmer = nil, price = nil, product = Product.create(name: "Product1"), unit = nil, delivery_date = friday_next_week, order_cutoff = nil, units_per_case = nil, frequency = 1)
+    posting2 = create_posting(posting1.user, price = nil, product = Product.create(name: "Product2"), unit = nil, delivery_date = friday_next_week, order_cutoff = nil, units_per_case = nil, frequency = 1)
+    posting3 = create_posting(posting1.user, price = nil, product = Product.create(name: "Product3"), unit = nil, delivery_date = friday_next_week, order_cutoff = nil, units_per_case = nil, frequency = 1)
+    
+    customer = create_new_customer
+
+    #create first one time item
+    ti1 = create_tote_item(customer, posting1, quantity = 1, frequency = 1, roll_until_filled = false)
+    sx1 = ti1.subscription
+    assert sx1
+    assert sx1.valid?
+
+    #make auth1
+    auth1 = create_rt_authorization_for_customer(customer)
+    assert_equal flash[:success], "Checkout successful"
+    assert auth1.valid?
+
+    #add 2nd product to tote
+    ti1_posting2 = create_tote_item(customer, posting2, quantity = 1, frequency = nil, roll_until_filled = false)
+    #make auth2
+    auth2 = create_rt_authorization_for_customer(customer)
+
+    #1st order cutoff
+    travel_to posting1.order_cutoff
+    RakeHelper.do_hourly_tasks
+    #1st delivery
+    fully_fill_creditor_order(posting1.creditor_order)
+    assert ti1.reload.state?(:FILLED)
+    assert ti1_posting2.reload.state?(:FILLED)
+
+    #2nd order cutoff
+    current_posting = sx1.reload.current_posting
+    travel_to current_posting.order_cutoff
+    RakeHelper.do_hourly_tasks
+    #2nd delivery
+    fully_fill_creditor_order(current_posting.creditor_order)
+
+    #now user goes to their history page
+    log_in_as customer
+    get tote_items_path(history: true)
+    assert_response :success
+    assert_template 'tote_items/history'
+    tote_items = assigns(:tote_items)
+    assert_equal 3, tote_items.count
+    assert_select "div.caption a[href=?]", rtauthorization_path(auth1, rta: 1), {text: "View authorization", count: 2}   
+    assert_select "div.caption a[href=?]", rtauthorization_path(auth2, rta: 1), {text: "View authorization", count: 1}
+
+  end
+
   #this should create an auth in the db for each customer that has tote items
   test "should create new authorizations" do
     puts "test: should create new authorizations"

@@ -339,7 +339,13 @@ class ToteItem < ApplicationRecord
   end
 
   def original_rtauthorization
-    return rtauthorizations.order("rtauthorizations.id").first    
+
+    if subscription
+      return subscription.original_rtauthorization
+    end
+
+    return rtauthorizations.order("rtauthorizations.id").first
+
   end
 
   def rtauthorization

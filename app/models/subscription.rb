@@ -23,6 +23,10 @@ class Subscription < ApplicationRecord
 
   validates :kind, inclusion: { in: Subscription.kinds.values }
 
+  def original_rtauthorization
+    return rtauthorizations.order("rtauthorizations.id").first
+  end
+
   def current_posting
     return posting_recurrence.current_posting
   end
