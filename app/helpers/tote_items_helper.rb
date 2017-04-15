@@ -1,6 +1,6 @@
 module ToteItemsHelper
 
-  def get_order_summary_details_for_paypal_display(tote_items)
+  def get_order_summary_details_for_paypal_display(tote_items, use_quantity_filled = false)
     summary_items = []
 
     if tote_items == nil || !tote_items.any?
@@ -8,7 +8,7 @@ module ToteItemsHelper
     end
 
     tote_items.each do |tote_item|
-      summary_item = get_order_summary_item(tote_item)
+      summary_item = get_order_summary_item(tote_item, use_quantity_filled)
       summary_items << summary_item
     end
 
@@ -16,7 +16,7 @@ module ToteItemsHelper
 
   end
 
-  def get_order_summary_item(tote_item)
+  def get_order_summary_item(tote_item, use_quantity_filled)
     summary_item = {}
 
     if tote_item == nil
@@ -24,8 +24,8 @@ module ToteItemsHelper
     end      
 
     summary_item[:name] = tote_item.friendly_description
-    summary_item[:quantity] = tote_item.quantity
-    summary_item[:amount] = (tote_item.price).round(2) * 100
+    summary_item[:quantity] = use_quantity_filled ? tote_item.quantity_filled : tote_item.quantity
+    summary_item[:amount] = ((tote_item.price).round(2) * 100).round(2)
 
     return summary_item
     

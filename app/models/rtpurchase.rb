@@ -48,7 +48,7 @@ class Rtpurchase < ApplicationRecord
     end    
 
     amount_to_capture_in_cents = (@amount_to_capture * 100).round(2)
-    items = ToteItemsController.helpers.get_order_summary_details_for_paypal_display(tote_items)
+    items = ToteItemsController.helpers.get_order_summary_details_for_paypal_display(tote_items, use_quantity_filled = true)
     
     if USEGATEWAY
       response = GATEWAY.reference_transaction(amount_to_capture_in_cents, reference_id: rtauthorization.rtba.ba_id, currency: 'USD', items: items)
