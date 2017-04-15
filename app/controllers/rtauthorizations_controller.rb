@@ -23,7 +23,7 @@ class RtauthorizationsController < ApplicationController
     #we still do expose to them the option of one time. actually, that's the only thing they could do since it's a one time purchase. then, after all this, they'd have to want to use this
     #auth view feature, which itself should be a rarely-used and non-critical feature. so don't pound it all out now. it's primarily a tool to use to track production progress (99.99% Rtauth)
     #or when problems arise with customer (99.99% Rtauth). in the 0.01% time we'll need to view an Auth we can just poke around the db manually. for now.
-    @all_auths = @rtauthorizations
+    @all_auths = @rtauthorizations.order(id: :desc)
 
   end
 
