@@ -37,7 +37,10 @@ class UploadsController < ApplicationController
 
       flash[:success] = "Uploaded successfully"
 
-      @upload.update(square_size: @upload.file_name.square.size, large_size: @upload.file_name.large.size)
+      #we were using the size in posting#show to determine if we wanted to display square or large. we'd display whichever was larger. however, that made the carousel sometimes
+      #change sizes as it cycled through the posting's photos, making the text descriptions etc. hard to read. so we're unconditionally using .square now so have no need
+      #to store the size. furthermore, i am suspicious that this size-computing code is causing memory leak type behavior. so nuking it for now.
+      #@upload.update(square_size: @upload.file_name.square.size, large_size: @upload.file_name.large.size)
 
       if params[:posting_id]
         posting = Posting.find(params[:posting_id])
