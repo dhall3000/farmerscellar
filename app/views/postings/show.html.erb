@@ -30,20 +30,9 @@
             <% @posting.uploads.order(created_at: :asc).each do |upload| %>
               <div class="item <%= 'active' if upload == first_upload %>">
                 <%
-                
-                  #sometimes all we can find by way of product image is a tiny thumb. in that case it appears that the 'large' ImageUploader process
-                  #doesn't modify the size. so when you're here if you just unconditionally use .large you'll sometimes see a carousel with huge
-                  #whitespace and a tiny thumb. looks really bad. so we're here saying to get whichever is larger, .large or .square.
-                  if upload.large_size == 0 || upload.square_size == 0
-                    upload.update(square_size: upload.file_name.square.size, large_size: upload.file_name.large.size)
-                  end
-
-                  if upload.large_size > upload.square_size
-                    image = upload.file_name.large
-                  else
-                    image = upload.file_name.square
-                  end
-
+                #i believe large versions have original aspect ratio. the problem with this is that when you have multiple photos on a posting with different aspect
+                #ratios the carousel resizes which pushes the posting's description text down, then up, then down etc. making it really hard to read
+                image = upload.file_name.square
                 %>
                 <%= image_tag "#{image}", class: "img-responsive" %>
               </div>
