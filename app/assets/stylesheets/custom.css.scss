@@ -7,7 +7,9 @@ html {overflow-y: scroll;}
 
 $gray-medium-light: #eaeaea;
 $fc-primary-color: #AACB4F;
-
+$fc-medium-color: #cfe29d;
+$fc-light-color: #f5f9eb;
+ 
 @mixin box_sizing {
   -moz-box-sizing:    border-box;
   -webkit-box-sizing: border-box;
@@ -118,6 +120,23 @@ div.pagination > ul.pagination > li.active > a {
   background-color: $fc-primary-color;
   border-color: $fc-primary-color;
   box-shadow: none;
+}
+
+.rdio {
+  padding: 20px;
+  color: $fc-primary-color;
+  background-color: $fc-light-color;
+  border-color: $fc-primary-color;
+}
+
+.rdio:active, .rdio.active, .rdio:active:focus {
+  background-color: $fc-primary-color;
+  border-color: white;
+}
+
+.btn-primary.rdio:hover {
+  background-color: $fc-medium-color;
+  border-color: white;
 }
 
 /* universal */
