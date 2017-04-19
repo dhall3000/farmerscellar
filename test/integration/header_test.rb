@@ -2,6 +2,125 @@ require 'integration_helper'
 
 class HeaderTest < IntegrationHelper
 
+  test "user should be able to see one time postings when they view postings" do
+
+    nuke_all_postings
+
+    next_tuesday = get_next_wday_after(wday = 2, days_from_now = 1)
+    next_wednesday = next_tuesday + 1.day
+    next_friday = next_wednesday + 2.days
+
+    travel_to next_tuesday
+
+    posting_recurring = create_posting(farmer = nil, price = nil, product = Product.create(name: "Product1"), unit = nil, delivery_date = next_friday, order_cutoff = next_wednesday, units_per_case = nil, frequency = 1)
+    posting_one_time = create_posting(farmer = nil, price = nil, product = Product.create(name: "Product2"), unit = nil, delivery_date = next_friday, order_cutoff = next_wednesday, units_per_case = nil, frequency = nil)
+
+    #user creates new account and logs in. there are two postings so i'd love it if the header icon badge showed two but let's not sweat that and just show 1. this allows
+    #us to get a quick badge number to display by only querying db for postingrecurrence.count rather than a big messy query to get a precise number. precision doesn't matter
+    #anyway...we just want a number...any number will do...in the icon to entice user to click/view/shop/buy
+    customer = create_new_customer
+    log_in_as customer
+    assert_response :redirect
+    follow_redirect!
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0, whats_new = 1)
+
+    #but we need to make sure we haven't broken regular browsing experience. there really are two postings so both sould be displayed when user goes to do regular shopping
+    get postings_path(food_category: posting_recurring.product.food_category.name)
+    assert_response :success
+    assert_template 'postings/index'
+
+    this_weeks_postings = assigns(:this_weeks_postings)
+    assert_equal 2, this_weeks_postings.count    
+
+  end
+
+  test "whats new postings query should fetch the right stuff and order it properly" do
+
+    nuke_all_postings
+
+    next_tuesday = get_next_wday_after(wday = 2, days_from_now = 1)
+    next_wednesday = next_tuesday + 1.day
+    next_friday = next_wednesday + 2.days
+    travel_to next_tuesday
+
+    #create first posting
+    posting1 = create_posting(farmer = nil, price = nil, product = Product.create(name: "Product1"), unit = nil, delivery_date = next_friday, order_cutoff = next_wednesday, units_per_case = nil, frequency = 1)
+
+    #new person makes account, logs in, sees whats new, views whats new
+    customer = create_new_customer
+    log_in_as customer
+    assert_response :redirect
+    follow_redirect!
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0, whats_new = 1)
+
+    posting2 = create_posting(posting1.user, price = nil, product = Product.create(name: "Product2"), unit = nil, delivery_date = next_friday, order_cutoff = next_wednesday, units_per_case = nil, frequency = 1)
+
+    #user logs in again and should now see 2 items in header icon
+    log_in_as customer
+    assert_response :redirect
+    follow_redirect!
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0, whats_new = 2)
+
+    get postings_path(whats_new: 1)
+    assert_response :redirect
+    assert_redirected_to postings_path(whats_new: 1)
+    follow_redirect!
+    assert_response :success
+    assert_template 'postings/index'
+
+    #user should see most recently posted ads first
+    this_weeks_postings = assigns(:this_weeks_postings)
+    assert_equal 2, this_weeks_postings.count
+    assert_equal posting2, this_weeks_postings.first
+    assert_equal posting1, this_weeks_postings.last
+
+    travel 1.second
+
+    #next week postings
+    posting3 = create_posting(posting1.user, price = nil, product = Product.create(name: "Product3"), unit = nil, delivery_date = posting1.delivery_date + 7.days, order_cutoff = posting1.order_cutoff + 7.days, units_per_case = nil, frequency = 1)
+    posting4 = create_posting(posting1.user, price = nil, product = Product.create(name: "Product4"), unit = nil, delivery_date = posting2.delivery_date + 7.days, order_cutoff = posting2.order_cutoff + 7.days, units_per_case = nil, frequency = 1)
+
+    #future postings
+    posting5 = create_posting(posting1.user, price = nil, product = Product.create(name: "Product5"), unit = nil, delivery_date = posting3.delivery_date + 7.days, order_cutoff = posting1.order_cutoff + 7.days, units_per_case = nil, frequency = 1)
+    posting6 = create_posting(posting1.user, price = nil, product = Product.create(name: "Product6"), unit = nil, delivery_date = posting4.delivery_date + 7.days, order_cutoff = posting2.order_cutoff + 7.days, units_per_case = nil, frequency = 1)
+
+    travel 25.hours
+
+    #customer logs back in
+    log_in_as customer
+    assert_response :redirect
+    follow_redirect!
+    #should see 4 since user just logged in and that always refreshes the header data
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0, whats_new = 4)
+
+    get postings_path(whats_new: 1)
+    assert_response :redirect
+    assert_redirected_to postings_path(whats_new: 1)
+    follow_redirect!
+    assert_response :success
+    assert_template 'postings/index'
+
+    #user should see most recently posted postings first
+    this_weeks_postings = assigns(:this_weeks_postings)
+    assert_equal 2, this_weeks_postings.count
+    assert_equal posting2, this_weeks_postings.first
+    assert_equal posting1, this_weeks_postings.last
+
+    next_weeks_postings = assigns(:next_weeks_postings)
+    assert_equal 2, next_weeks_postings.count
+    assert_equal posting4, next_weeks_postings.first
+    assert_equal posting3, next_weeks_postings.last
+
+    future_postings = assigns(:future_postings)
+    assert_equal 2, future_postings.count
+    assert_equal posting6, future_postings.first
+    assert_equal posting5, future_postings.last    
+
+    #user should see no whats new postings indicated in the header icon
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0, whats_new = 0)
+
+  end
+
   test "whats new badge should display proper number for new user" do
 
     nuke_all_postings

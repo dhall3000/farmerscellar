@@ -50,7 +50,7 @@ class PostingsController < ApplicationController
       next_week_start = start_of_next_week
       next_week_end = next_week_start + 7.days
 
-      products = Product.joins(:food_category).where.not(food_category: nil)
+      products = Product.joins(:food_category)
 
       @this_weeks_postings = get_postings(products, Time.zone.now.midnight, next_week_start).order("posting_recurrences.id desc")
       @next_weeks_postings = get_postings(products, next_week_start, next_week_end).order("posting_recurrences.id desc")
@@ -245,7 +245,7 @@ class PostingsController < ApplicationController
 
     def get_postings(products, start_time, end_time, limit = nil)    
 
-      return_postings = Posting.joins(:posting_recurrence).includes(:user, :product, :unit).where(product: products).where("delivery_date >= ? and delivery_date < ? and live = ? and postings.state = ?", start_time, end_time, true, Posting.states[:OPEN])
+      return_postings = Posting.includes(:posting_recurrence, :user, :product, :unit).where(product: products).where("delivery_date >= ? and delivery_date < ? and live = ? and postings.state = ?", start_time, end_time, true, Posting.states[:OPEN])
 
       if limit
         #if we're going to limit the postings it's because we think we have too many. if we have too many
