@@ -2,6 +2,56 @@ require 'integration_helper'
 
 class HeaderTest < IntegrationHelper
 
+  test "whats new badge should display proper number for new user" do
+
+    nuke_all_postings
+
+    posting1 = create_posting(farmer = nil, price = nil, product = Product.create(name: "Product1"), unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil, important_notes = nil, important_notes_body = nil)
+    posting2 = create_posting(posting1.user, price = nil, product = Product.create(name: "Product2"), unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil, important_notes = nil, important_notes_body = nil)
+    customer = create_new_customer
+
+    #a new user should see a number corresponding to the total number of posting recurrences created
+    log_in_as customer
+    assert_response :redirect
+    follow_redirect!
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0, whats_new = 2)
+
+    #once the user views the 'whats new' page he should see a badge value of 0 in the header for whats new
+    get postings_path(whats_new: 1)
+    assert_redirected_to postings_path(whats_new: 1)
+    follow_redirect!
+    assert_template 'postings/index'
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0, whats_new = 0)
+
+    #another posting recurrence is created so next time user sees his header it should say '1'
+    posting2 = create_posting(posting1.user, price = nil, product = Product.create(name: "Product3"), unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1, order_minimum_producer_net = 0, product_id_code = nil, producer_net_unit = nil, important_notes = nil, important_notes_body = nil)
+    log_in_as customer
+    assert_response :redirect
+    follow_redirect!
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0, whats_new = 1)
+
+    #time travels to the next day. reason being cause we only want to write to the user's record once per day, not every time they click on what's new because
+    #they might click on what's new many times in succession and we want that to be fast
+    #current_user.update(last_whats_new_view: Time.zone.now, header_data_dirty: true)
+    travel 25.hours
+
+    #user goes to their tote and should still see the whats new badge saying 1
+    get tote_items_path
+    assert_response :success
+    assert_template 'tote_items/tote'
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0, whats_new = 1)
+
+    #now user clicks on the whats new icon. should be taken to whats new page and icon badge should disappear
+    get postings_path(whats_new: 1)
+    assert_response :redirect
+    assert_redirected_to postings_path(whats_new: 1)
+    follow_redirect!
+    assert_response :success
+    assert_template 'postings/index'
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0, whats_new = 0)
+
+  end
+
   test "verify rtf order does not show two items during committment window" do
     
     nuke_all_postings

@@ -5,6 +5,7 @@ module SessionsHelper
   end
 
   def refresh_header_data
+    
     #fetch the header data from db
     header_data = ToteItem.get_header_data(current_user)
 
@@ -14,6 +15,9 @@ module SessionsHelper
     session[:subscriptions] = header_data[:subscriptions]
     session[:ready_for_pickup] = header_data[:ready_for_pickup]
     session[:whats_new] = header_data[:whats_new]
+
+    current_user.update(header_data_dirty: false)
+
   end
 
   def nuke_header_data

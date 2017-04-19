@@ -31,8 +31,7 @@ class ApplicationController < ActionController::Base
       end      
 
       if current_user.header_data_dirty || !header_data_valid?
-        refresh_header_data
-        current_user.update(header_data_dirty: false)        
+        refresh_header_data        
       end
 
     end

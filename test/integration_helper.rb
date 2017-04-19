@@ -17,11 +17,12 @@ class IntegrationHelper < ActionDispatch::IntegrationTest
     travel_back
   end
 
-  def verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+  def verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0, whats_new = 0)
     verify_header_item("glyphicon-shopping-cart", tote)
     verify_header_item("glyphicon-calendar", calendar)
     verify_header_item("glyphicon-repeat", subscriptions)
     verify_header_item("glyphicon-ok", ready_to_pickup)
+    verify_header_item("glyphicon-star", whats_new)
   end
 
   def verify_header_item(glyph = "glyphicon-shopping-cart", count = 0)

@@ -56,7 +56,7 @@ class ToteItem < ApplicationRecord
     ready_for_pickup = user.tote_items_to_pickup
     ready_for_pickup = ready_for_pickup.nil? ? 0 : ready_for_pickup.count
 
-    whats_new = Posting.whats_new(user).count
+    whats_new = Posting.whats_new_count(user)
 
     header_data = {
       tote: tote,

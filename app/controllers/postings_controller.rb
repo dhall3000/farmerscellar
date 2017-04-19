@@ -34,12 +34,12 @@ class PostingsController < ApplicationController
   def index
 
     if params[:whats_new]
-      
+
       if logged_in?
         #we don't want to write a new time stamp to the db every time user clicks the 'view what's new' header icon.
         #once per day is adequate
         if current_user.last_whats_new_view.nil? || current_user.last_whats_new_view.midnight != Time.zone.now.midnight
-          current_user.update(last_whats_new_view: Time.zone.now, header_data_dirty: true)          
+          current_user.update(last_whats_new_view: Time.zone.now, header_data_dirty: true)
           #redirect right back here...this will trigger the header refresh to happen before page is displayed. otherwise user won't see the updated header icon's badege
           #until the next page load
           redirect_to postings_path(whats_new: 1)
@@ -47,14 +47,15 @@ class PostingsController < ApplicationController
         end      
       end
 
-      postings = Posting.whats_new(current_user)
-
       next_week_start = start_of_next_week
       next_week_end = next_week_start + 7.days
 
-      @this_weeks_postings = postings.where("delivery_date >= ? and delivery_date < ?", Time.zone.now.midnight, next_week_start).order("posting_recurrences.id")
-      @next_weeks_postings = postings.where("delivery_date >= ? and delivery_date < ?", next_week_start, next_week_end).order("posting_recurrences.id")
-      @future_postings =     postings.where("delivery_date >= ?", next_week_end).order("posting_recurrences.id")
+      products = Product.joins(:food_category).where.not(food_category: nil)
+
+      @this_weeks_postings = get_postings(products, Time.zone.now.midnight, next_week_start).order("posting_recurrences.id desc")
+      @next_weeks_postings = get_postings(products, next_week_start, next_week_end).order("posting_recurrences.id desc")
+      @future_postings = get_postings(products, next_week_end, next_week_end + 10.years).order("posting_recurrences.id desc")
+
       @title = "What's New?"
 
       return
@@ -244,7 +245,7 @@ class PostingsController < ApplicationController
 
     def get_postings(products, start_time, end_time, limit = nil)    
 
-      return_postings = Posting.includes(:user, :product, :unit).where(product: products).where("delivery_date >= ? and delivery_date < ? and live = ? and postings.state = ?", start_time, end_time, true, Posting.states[:OPEN])
+      return_postings = Posting.joins(:posting_recurrence).includes(:user, :product, :unit).where(product: products).where("delivery_date >= ? and delivery_date < ? and live = ? and postings.state = ?", start_time, end_time, true, Posting.states[:OPEN])
 
       if limit
         #if we're going to limit the postings it's because we think we have too many. if we have too many
