@@ -52,9 +52,9 @@ class PostingsController < ApplicationController
 
       products = Product.joins(:food_category)
 
-      @this_weeks_postings = get_postings(products, Time.zone.now.midnight, next_week_start).order("posting_recurrences.id desc")
-      @next_weeks_postings = get_postings(products, next_week_start, next_week_end).order("posting_recurrences.id desc")
-      @future_postings = get_postings(products, next_week_end, next_week_end + 10.years).order("posting_recurrences.id desc")
+      @this_weeks_postings = get_postings(products, Time.zone.now.midnight, next_week_start, params[:this_week]).order("posting_recurrences.id desc")
+      @next_weeks_postings = get_postings(products, next_week_start, next_week_end, params[:next_week]).order("posting_recurrences.id desc")
+      @future_postings = get_postings(products, next_week_end, next_week_end + 10.years, params[:future]).order("posting_recurrences.id desc")
 
       @title = "What's New?"
 
@@ -72,9 +72,9 @@ class PostingsController < ApplicationController
       
       products = @food_category.products
 
-      @this_weeks_postings = get_postings(products, Time.zone.now.midnight, next_week_start)
-      @next_weeks_postings = get_postings(products, next_week_start, next_week_end)
-      @future_postings = get_postings(products, next_week_end, next_week_end + 10.years)
+      @this_weeks_postings = get_postings(products, Time.zone.now.midnight, next_week_start, params[:this_week])
+      @next_weeks_postings = get_postings(products, next_week_start, next_week_end, params[:next_week])
+      @future_postings = get_postings(products, next_week_end, next_week_end + 10.years, params[:future])
 
     else      
       redirect_to root_path
@@ -243,18 +243,13 @@ class PostingsController < ApplicationController
       
     end  
 
-    def get_postings(products, start_time, end_time, limit = nil)    
+    def get_postings(products, start_time, end_time, page_name)
 
-      return_postings = Posting.includes(:posting_recurrence, :user, :product, :unit).where(product: products).where("delivery_date >= ? and delivery_date < ? and live = ? and postings.state = ?", start_time, end_time, true, Posting.states[:OPEN])
-
-      if limit
-        #if we're going to limit the postings it's because we think we have too many. if we have too many
-        #then let's only show the postings that have pics, hence the .joins(:uploads)
-        return_postings = return_postings.joins(:uploads).distinct.limit(limit)
-      end    
+      return Posting.includes(:posting_recurrence, :user, :product, :unit)
+        .where(product: products)
+        .where("delivery_date >= ? and delivery_date < ? and live = ? and postings.state = ?", start_time, end_time, true, Posting.states[:OPEN])
+        .paginate(page: page_name, per_page: 20)      
       
-      return return_postings
-
     end
 
     def load_posting_choices

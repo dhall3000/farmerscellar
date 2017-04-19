@@ -4,15 +4,15 @@ module PostingsHelper
 
     count = 0
 
-    if this_weeks_postings.any?
+    if this_weeks_postings && this_weeks_postings.any?
       count += 1
     end
 
-    if next_weeks_postings.any?
+    if next_weeks_postings && next_weeks_postings.any?
       count += 1
     end
 
-    if future_postings.any?
+    if future_postings && future_postings.any?
       count += 1
     end
 
