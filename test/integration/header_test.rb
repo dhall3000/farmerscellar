@@ -185,31 +185,31 @@ class HeaderTest < IntegrationHelper
     log_in_as bob
     assert_response :redirect
     follow_redirect!
-    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0, whats_new = 1)
     ti = create_tote_item(bob, posting, quantity = 1, frequency = nil, roll_until_filled = true)
     assert_response :redirect
     follow_redirect!
-    verify_header(tote = 1, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+    verify_header(tote = 1, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0, whats_new = 1)
 
     #now make a new user 'chris', have him add one tote item, then verify bob's header is still accurate
     chris = create_user("chris", "chris@c.com")
     log_in_as chris
     assert_response :redirect
     follow_redirect!
-    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0, whats_new = 1)
     create_tote_item(chris, posting, quantity = 1, frequency = 1, roll_until_filled = nil)
     assert_response :redirect
     follow_redirect!    
-    verify_header(tote = 1, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+    verify_header(tote = 1, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0, whats_new = 1)
     log_in_as bob
     follow_redirect!
-    verify_header(tote = 1, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+    verify_header(tote = 1, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0, whats_new = 1)
 
     #now have 'bob' authorize his subscription and verify 'tote' link no longer says '1', orders and calendar do say '1'
     log_in_as bob
     create_rt_authorization_for_customer(bob)
     assert_response :success
-    verify_header(tote = 0, orders = 1, calendar = 1, subscriptions = 0, ready_to_pickup = 0)
+    verify_header(tote = 0, orders = 1, calendar = 1, subscriptions = 0, ready_to_pickup = 0, whats_new = 1)
 
     #now go to order cutoff and transition to committment zone
     travel_to ti.posting.order_cutoff
@@ -224,7 +224,7 @@ class HeaderTest < IntegrationHelper
     follow_redirect!
 
     #orders = 3 is wonky but not going to fix it because we're going to yank it soon. it's the calendar we want to verify is correct
-    verify_header(tote = 0, orders = 2, calendar = 1, subscriptions = 0, ready_to_pickup = 0)
+    verify_header(tote = 0, orders = 2, calendar = 1, subscriptions = 0, ready_to_pickup = 0, whats_new = 1)
     calendar_items = ToteItemsController.helpers.future_items(ToteItem.calendar_items_displayable(bob))
     assert_equal 1, calendar_items.count
     assert_equal ti.posting.delivery_date, calendar_items.first.posting.delivery_date    
@@ -238,7 +238,7 @@ class HeaderTest < IntegrationHelper
     follow_redirect!
     #so after delivery bob should see orders 2 (wonky and doomed as it is), one for the subscription and one for the next deliverable item which will be 6 days from now.
     #calendar should be 1, which would be the delivery 6 days from now. and of course ready to pickup 1 cause yesterday's fill
-    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 1)
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 1, whats_new = 1)
 
     #now bob does a pickup
     assert_equal 0, bob.reload.pickups.count
@@ -251,14 +251,14 @@ class HeaderTest < IntegrationHelper
     follow_redirect!
     
     #when he looks at his header he's still going to see ready to pickup 1 cause we have to wait until the nightly tasks dirties up his user header bit
-    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 1)
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 1, whats_new = 1)
     #even one hour later he'll still see ready for pickup 1 because we don't dirty up his user object until 10pm with the rake nightly tasks
     travel 1.hour
     get root_path
-    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 1)
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 1, whats_new = 1)
     travel 1.hour
     get root_path
-    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 1)
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 1, whats_new = 1)
 
     #now go to 10pm and do the nightly tasks, then verify user sees 0 ready for pickup
     travel_to Time.zone.now.midnight + 22.hours
@@ -268,7 +268,7 @@ class HeaderTest < IntegrationHelper
     log_in_as bob
     assert_response :redirect
     follow_redirect!
-    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0)
+    verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0, whats_new = 1)
 
     travel_back
 
