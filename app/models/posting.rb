@@ -44,6 +44,23 @@ class Posting < ApplicationRecord
   
   before_create :delivery_date_must_be_after_today  
 
+  def self.whats_new(user = nil)
+
+    if user
+      last_view = user.last_whats_new_view
+    else
+      last_view = Time.zone.now - 30.days
+    end
+
+    postings = Posting.joins(:posting_recurrence).includes(:user, :unit, product: :food_category)
+    .where.not(products: {food_category: nil})
+    .where("delivery_date >= ? and live = ? and postings.state = ?", Time.zone.now.midnight, true, Posting.states[:OPEN])
+    .where("posting_recurrences.created_at > ?", last_view)
+
+    return postings
+
+  end
+
   def food_category
     return product.food_category
   end

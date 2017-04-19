@@ -1,7 +1,7 @@
 module SessionsHelper
 
   def header_data_valid?
-    return session[:tote] && session[:calendar] && session[:subscriptions] && session[:ready_for_pickup]
+    return session[:tote] && session[:calendar] && session[:subscriptions] && session[:ready_for_pickup] && session[:whats_new]
   end
 
   def refresh_header_data
@@ -13,6 +13,7 @@ module SessionsHelper
     session[:calendar] = header_data[:calendar]
     session[:subscriptions] = header_data[:subscriptions]
     session[:ready_for_pickup] = header_data[:ready_for_pickup]
+    session[:whats_new] = header_data[:whats_new]
   end
 
   def nuke_header_data
@@ -20,6 +21,7 @@ module SessionsHelper
     session.delete(:calendar)
     session.delete(:subscriptions)
     session.delete(:ready_for_pickup)
+    session.delete(:whats_new)
   end
 
   def admin_logged_in?

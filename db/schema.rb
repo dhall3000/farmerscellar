@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170404005955) do
+ActiveRecord::Schema.define(version: 20170418220828) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -712,6 +712,7 @@ ActiveRecord::Schema.define(version: 20170404005955) do
     t.float    "order_minimum_producer_net", default: 0.0,   null: false
     t.boolean  "partner_user",               default: false
     t.boolean  "header_data_dirty",          default: true
+    t.datetime "last_whats_new_view"
     t.index ["account_type"], name: "index_users_on_account_type", using: :btree
     t.index ["distributor_id"], name: "index_users_on_distributor_id", using: :btree
     t.index ["email"], name: "index_users_on_email", unique: true, using: :btree

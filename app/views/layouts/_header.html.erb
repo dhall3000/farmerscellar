@@ -13,6 +13,14 @@
       <span class="header-icon glyphicon glyphicon-home"></span>
     <% end %>
 
+    <%= link_to postings_path(whats_new: 1), class: "non-blue" do %>
+      <span class="header-icon glyphicon glyphicon-star">
+        <% if session[:whats_new] && (session[:whats_new] > 0) %>
+          <span class="badge"><%= session[:whats_new].to_s %></span>
+        <% end %>
+      </span>
+    <% end %>
+
     <% if logged_in? %>
 
       <%= link_to tote_items_path, class: "non-blue" do %>                  
