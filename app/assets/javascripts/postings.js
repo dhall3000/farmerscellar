@@ -1,14 +1,14 @@
 $(function()
 { 
 
-  if (sessionStorage[document.location] == "next") {
+  if (sessionStorage['weekSelection'] == "next") {
     $('#next-week').click();
     $('.this-week').hide();
     $('.next-week').show();
     $('.future').hide();    
   }
 
-  if (sessionStorage[document.location] == "future") {
+  if (sessionStorage['weekSelection'] == "future") {
     $('#future').click();
     $('.this-week').hide();
     $('.next-week').hide();
@@ -22,7 +22,7 @@ $(function()
         $('.this-week').fadeIn('fast', function() {
         });
       });
-      sessionStorage[document.location] = "this";
+      sessionStorage['weekSelection'] = "this";
     }
 
     if ($('.future').is(':visible')) {
@@ -30,7 +30,7 @@ $(function()
         $('.this-week').fadeIn('fast', function() {
         });
       });
-      sessionStorage[document.location] = "this";
+      sessionStorage['weekSelection'] = "this";
     }    
 
   });
@@ -42,7 +42,7 @@ $(function()
         $('.next-week').fadeIn('fast', function() {
         });
       });
-      sessionStorage[document.location] = "next";
+      sessionStorage['weekSelection'] = "next";
     }
 
 
@@ -51,7 +51,7 @@ $(function()
         $('.next-week').fadeIn('fast', function() {
         });
       });
-      sessionStorage[document.location] = "next";
+      sessionStorage['weekSelection'] = "next";
     }
 
   });
@@ -63,7 +63,7 @@ $(function()
         $('.future').fadeIn('fast', function() {
         });
       });
-      sessionStorage[document.location] = "future";
+      sessionStorage['weekSelection'] = "future";
     }
 
     if ($('.next-week').is(':visible')) {
@@ -71,7 +71,7 @@ $(function()
         $('.future').fadeIn('fast', function() {
         });
       });
-      sessionStorage[document.location] = "future";
+      sessionStorage['weekSelection'] = "future";
     }
 
   });
