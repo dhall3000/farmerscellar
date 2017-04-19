@@ -4,13 +4,6 @@
 %>
 
 <% if postings && postings.any? %>
-
-  <div class="col-xs-12">
-    <div class="text-center">
-      <%= will_paginate postings, param_name: pagination_page_name, inner_window: 1, outer_window: 0 %>
-    </div>
-  </div>
-
   <div class="row">
     <div class="col-xs-12">
       <div style="padding-top: 10px; padding-bottom: 10px;">
@@ -44,5 +37,12 @@
         <% end %>
       </div>
     <% end %>
+  </div>
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="text-center">
+        <%= will_paginate postings, param_name: pagination_page_name, inner_window: 2, outer_window: 0 %>
+      </div>
+    </div>
   </div>
 <% end %>

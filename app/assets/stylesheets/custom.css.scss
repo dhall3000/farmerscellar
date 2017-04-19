@@ -9,6 +9,17 @@ $gray-medium-light: #eaeaea;
 $fc-primary-color: #AACB4F;
 $fc-medium-color: #cfe29d;
 $fc-light-color: #f5f9eb;
+
+.pagination {
+  @media (max-width: 480px) {
+    li {
+      display: none;
+      &.active,&.prev,&.next {
+        display: inline;
+      }
+    }
+  }
+}
  
 @mixin box_sizing {
   -moz-box-sizing:    border-box;
