@@ -72,9 +72,9 @@ class PostingsController < ApplicationController
       
       products = @food_category.products
 
-      @this_weeks_postings = get_postings(products, Time.zone.now.midnight, next_week_start, params[:this_week])
-      @next_weeks_postings = get_postings(products, next_week_start, next_week_end, params[:next_week])
-      @future_postings = get_postings(products, next_week_end, next_week_end + 10.years, params[:future])
+      @this_weeks_postings = get_postings(products, Time.zone.now.midnight, next_week_start, params[:this_week]).order("users.farm_name").order("products.name").order("postings.price")
+      @next_weeks_postings = get_postings(products, next_week_start, next_week_end, params[:next_week]).order("users.farm_name").order("products.name").order("postings.price")
+      @future_postings = get_postings(products, next_week_end, next_week_end + 10.years, params[:future]).order("users.farm_name").order("products.name").order("postings.price")
 
     else      
       redirect_to root_path
