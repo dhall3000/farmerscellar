@@ -22,6 +22,7 @@ module SampleApp
 
     config.after_initialize do
       AccountState.auto_populate_database      
+      ::POSTINGSPERPAGE = 20
     end
 
   end

@@ -243,12 +243,12 @@ class PostingsController < ApplicationController
       
     end  
 
-    def get_postings(products, start_time, end_time, page_name)
+    def get_postings(products, start_time, end_time, page)
 
       return Posting.includes(:posting_recurrence, :user, :product, :unit)
         .where(product: products)
         .where("delivery_date >= ? and delivery_date < ? and live = ? and postings.state = ?", start_time, end_time, true, Posting.states[:OPEN])
-        .paginate(page: page_name, per_page: 20)      
+        .paginate(page: page, per_page: POSTINGSPERPAGE)
       
     end
 
