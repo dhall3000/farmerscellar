@@ -52,7 +52,7 @@ class Posting < ApplicationRecord
       last_view = Time.zone.now - 30.days
     end
 
-    return PostingRecurrence.where("created_at > ?", last_view).count
+    return PostingRecurrence.where(on: true).where("created_at > ?", last_view).count
 
   end
 
