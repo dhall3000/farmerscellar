@@ -2,17 +2,21 @@ $(function()
 { 
 
   if (sessionStorage['weekSelection'] == "next") {
-    $('#next-week').click();
-    $('.this-week').hide();
-    $('.next-week').show();
-    $('.future').hide();    
+    if ($('#next-week').length > 0) {
+      $('#next-week').click();
+      $('.this-week').hide();
+      $('.next-week').show();
+      $('.future').hide();    
+    }
   }
 
   if (sessionStorage['weekSelection'] == "future") {
-    $('#future').click();
-    $('.this-week').hide();
-    $('.next-week').hide();
-    $('.future').show();    
+    if ($('#future').length > 0) {
+      $('#future').click();
+      $('.this-week').hide();
+      $('.next-week').hide();
+      $('.future').show();    
+    }
   }
 
   $('#this-week').change(function(){
