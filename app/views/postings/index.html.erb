@@ -66,26 +66,38 @@
   <div class="row">
     <div class="col-xs-12">
 
-      <div id="delivery-time-buttons" class="btn-group btn-group-justified" data-toggle="buttons">
-        
-        <% if @this_weeks_postings.any? %>
-          <label class="btn btn-primary rdio active">
-            <input type="radio" name="options" id="this-week" autocomplete="off" checked> This Week
-          </label>
-        <% end %>
+      <!-- the padding on this div...wow. what happens is the btn-group-justified class causes mobile devices to have a horizontal scroll bar.
+      this makes the experience on those pages really lame. on an iphone 4 i was able to get away with 8px of padding but the nexus 5 wanted 14.
+      super hack. i just need to move on. don't know if this will work for other popular mobiles. what a pain...
+       -->
+      <!-- the above comment is obsolete. God gave me some insight for searching the google monster and it turned up the following overflow: hidden
+      'solution'. anyway, putting that on there makes unnecessary / mysterious horizontal scrollbar go away. good riddance! by the way, the reason
+      i kept looking for a solution after authoring the above comment is because i went to test 14 pixels on other mobile device on chrome emulator
+      and found that the iPhone 6 Plus required 20 pixels to get the h scrollbar to go away. that was intractable for smaller devices like iphone 4.
+       -->
+      <div style="overflow: hidden;">
 
-        <% if @next_weeks_postings.any? %>
-          <label class="btn btn-primary rdio <%= 'active' if !@this_weeks_postings.any? %>">
-            <input type="radio" name="options" id="next-week" autocomplete="off"> Next Week
-          </label>
-        <% end %>
+        <div id="delivery-time-buttons" class="btn-group btn-group-justified" data-toggle="buttons">
+          
+          <% if @this_weeks_postings.any? %>
+            <label class="btn btn-primary rdio active">
+              <input type="radio" name="options" id="this-week" autocomplete="off" checked> This Week
+            </label>
+          <% end %>
 
-        <% if @future_postings.any? && (@this_weeks_postings.any? || @next_weeks_postings.any?) %>
-          <label class="btn btn-primary rdio">
-            <input type="radio" name="options" id="future" autocomplete="off"> Future
-          </label>
-        <% end %>
+          <% if @next_weeks_postings.any? %>
+            <label class="btn btn-primary rdio <%= 'active' if !@this_weeks_postings.any? %>">
+              <input type="radio" name="options" id="next-week" autocomplete="off"> Next Week
+            </label>
+          <% end %>
 
+          <% if @future_postings.any? && (@this_weeks_postings.any? || @next_weeks_postings.any?) %>
+            <label class="btn btn-primary rdio">
+              <input type="radio" name="options" id="future" autocomplete="off"> Future
+            </label>
+          <% end %>
+
+        </div>
       </div>
 
     </div>
