@@ -11,6 +11,110 @@ class SubscriptionsTest < IntegrationHelper
     @posting = postings(:postingf1apples)
   end  
 
+  test "should not show skip date for invalid date for bi weekly subscription that has a not filled item" do
+    #production bug: user had bi weekly subscription to a weekly recurrence. an item did not get filled. the day after the delivery date of the
+    #not filled item, when spoofing the user, a skip date checkbox was available for the following producer delivery date whereas the
+    #following producer delivery date should have been a by week for the bi-weekly subscription.
+    #question of intent: if a user signs up for a bi weekly subscription, what do they want to have happen if a scheduled delivery ever goes unfilled? do they
+    #want us to fill them on the next available producer delivery date? or would they prefer we stick to the original one on, on off schedule?
+    #answer: ambiguous.
+    #here are two scenarios in which a user would want to stick to the one on one off schedule. first, a user alternates cow milk, goat milk, one one week, the other
+    #the next. if a goat milk delivery got skipped this user would want us to stay on schedule so that hte goat and cow milk dont end up cming on the same week.
+    #scenario two is user travels from far away to pick up. it only makes sense for themto pick up when they combine trips with some other obligation in teh vicinity.
+    #if we filled on next available producer deliver day rather than sticking to schedule we'd get them out of sync with their calendar schedule.
+    #probalby the more common case, however, is a user only drinks one half gallon every two weeks. so if a delivery went unfilled they would want us to fill them
+    #at the next available opportunity. however, it comes down to a choice for us between which kind of ticked off customer do we want...one that has too much or one
+    #that has too little? i think the customer that has too little is easier to recover from than the one that has too much. by too much i mean this user now is
+    #getting cow and goat milk on the same week, for example. they would have to take a bunch of steps to get thier ship righted, in addition to drinking cow and goat milk in teh same
+    #week. if we give them too little the situation corrects on its own after time.
+    #well now that i wrote that comment i've finished this test and the app code change and realized that the code consistently just says 'if the duration of time between
+    #non-REMOVED tote items >= the subscription frequency (e.g. >= 2 weeks for a bi-weekly sx) than go ahead and deliver on the next available producer delivery day.
+    #just let sleepign dogs lie. it's a rare case anyway.
+
+    nuke_all_postings
+
+    #going to recreate the production scenario
+    thu6 = Time.zone.local(2017, 4, 6, 12, 00)
+    travel_to thu6
+    thu13 = Time.zone.local(2017, 4, 13, 0, 0)
+    order_cutoff = Time.zone.local(2017, 4, 11, 8, 0)
+
+    #weekly recurrence
+    posting = create_posting(farmer = nil, price = nil, product = nil, unit = nil, delivery_date = thu13, order_cutoff, units_per_case = nil, frequency = 1)
+
+    #new customer creates bi weekly subscription and authorizes
+    customer = create_new_customer
+    ti = create_tote_item(customer, posting, quantity = 1, frequency = 2)
+    sx = ti.subscription
+    pr = sx.posting_recurrence
+    create_rt_authorization_for_customer(customer)
+
+    #customer immediately goes in and pauses the subscription
+    log_in_as customer
+    patch subscription_path(sx), params: {subscription: { paused: "1", on: "1" }}
+    assert_response :redirect
+    assert_redirected_to subscriptions_path
+    assert_not flash.empty?
+
+    #now the subscription should only have one item and it should be removed
+    assert_equal 1, sx.tote_items.count    
+    assert sx.tote_items.first.state?(:REMOVED)
+
+    travel_to posting.order_cutoff
+    RakeHelper.do_hourly_tasks
+
+    #on sunday april 16th user unpauses subscription (i think. i can't come up with any other explanation for how a tote item in her series was created on this date)
+    sun16 = Time.zone.local(2017, 4, 16, 12, 00)
+    travel_to sun16
+
+    log_in_as customer
+    patch subscription_path(sx), params: {subscription: { paused: "0", on: "1" }}
+    assert_response :redirect
+    assert_redirected_to subscriptions_path
+    assert_not flash.empty?
+
+    #this should have generated a new tote item
+    assert_equal 2, sx.tote_items.count    
+    assert sx.tote_items.last.state?(:AUTHORIZED)
+    posting_thu20 = pr.reload.current_posting
+    assert_equal thu20 = Time.zone.local(2017, 4, 20), posting_thu20.delivery_date
+
+    #go to order cutoff and run hourly tasks
+    travel_to tue18 = Time.zone.local(2017, 4, 18, 8)
+    assert_equal posting_thu20.order_cutoff, Time.zone.now
+    RakeHelper.do_hourly_tasks
+
+    #there should not be any more tote items generated since this is a biweekly sx
+    assert_equal 2, sx.reload.tote_items.count
+
+    #now go to delivery date...item doesn't get filled
+    travel_to posting_thu20.delivery_date + 12.hours
+    fill_posting(posting_thu20, 0)
+
+    #2nd tote item should now be NOTFILLED
+    assert sx.reload.tote_items.last.state?(:NOTFILLED)    
+
+
+    #to make debugging easier let's go to a new time to have the user log in and view skip dates
+    thu20at1pm = Time.zone.local(2017, 4, 20, 13)
+    travel_to thu20at1pm
+
+    #now user logs in and views subscription
+    log_in_as customer
+    get edit_subscription_path(sx)
+    assert_response :success
+    assert_template 'subscriptions/edit'
+
+    #user should not see skip date option for apr 27. the first should be may 4th
+    apr27 = Time.zone.local(2017, 4, 27)
+    may04 = Time.zone.local(2017, 5, 4)
+    skip_dates = assigns(:skip_dates)
+    assert skip_dates.count > 0
+    assert_not_equal apr27, skip_dates.first[:date]
+    assert_equal may04, skip_dates.first[:date]
+
+  end
+
   test "should generate tote item if when a bi weekly subscription is paused producer changes delivery day then user unpauses subscription" do
     nuke_all_postings
 

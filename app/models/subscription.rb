@@ -195,8 +195,8 @@ class Subscription < ApplicationRecord
 
         if subscriber_delivery_dates.any?
           reference_date = subscriber_delivery_dates.last
-        elsif tote_items.where.not(state: [ToteItem.states[:REMOVED], ToteItem.states[:NOTFILLED]]).any?        
-          reference_date = tote_items.joins(:posting).where.not(state: [ToteItem.states[:REMOVED], ToteItem.states[:NOTFILLED]]).order("postings.delivery_date").last.delivery_date
+        elsif (tis = tote_items.where.not(state: ToteItem.states[:REMOVED])).any?
+          reference_date = tis.last.delivery_date
         else
           reference_date = Time.zone.now - 365.days
         end
