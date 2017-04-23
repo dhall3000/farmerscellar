@@ -13,7 +13,7 @@
   <%= f.text_field :name, class: 'form-control' %>
 
   <%= f.label :parent %>
-  <%= select_tag :parent, options_from_collection_for_select(@food_categories, "id", "name"), class: 'form-control' %>
+  <%= select_tag :parent, options_for_select(@food_categories.map { |obj| [obj[:name], obj[:id]] }), include_blank: "No Parent", class: 'form-control' %>
   
   <%= f.submit "Create", class: "btn btn-lg btn-primary outline" %>
 

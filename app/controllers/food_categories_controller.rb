@@ -12,7 +12,7 @@ class FoodCategoriesController < ApplicationController
 
   def new
     @food_category = FoodCategory.new
-    @food_categories = FoodCategory.all.order(:name)
+    @food_categories = FoodCategoriesController.helpers.get_options_for_select
   end
 
   def create
