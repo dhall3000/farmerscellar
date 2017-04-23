@@ -21,9 +21,9 @@
 
       <%= f.label :parent %>
       <% if @food_category.parent %>
-        <%= select_tag :parent, options_from_collection_for_select(@food_categories, "id", "name", @food_category.parent.id), class: 'form-control' %>
+        <%= select_tag :parent, options_for_select(@food_categories.map { |obj| [obj[:name], obj[:id]] }, @food_category.parent.id), class: 'form-control' %>
       <% else %>
-        <%= select_tag :parent, options_from_collection_for_select(@food_categories, "id", "name", nil), class: 'form-control', include_blank: "No Parent" %>
+        <%= select_tag :parent, options_for_select(@food_categories.map { |obj| [obj[:name], obj[:id]] }), include_blank: "No Parent", class: 'form-control' %>
       <% end %>
       
       <%= f.submit "Update", class: "btn btn-lg btn-primary outline" %>

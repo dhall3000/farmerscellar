@@ -41,7 +41,7 @@ module FoodCategoriesHelper
   end
 
   def get_options_for_select
-    food_categories = FoodCategory.all.order(:name)
+    food_categories = FoodCategory.order(:name)
     food_categories_for_select = []
     
     food_categories.each do |fc|

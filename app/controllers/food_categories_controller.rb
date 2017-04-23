@@ -38,7 +38,7 @@ class FoodCategoriesController < ApplicationController
 
   def edit
     @food_category = FoodCategory.find(params[:id])
-    @food_categories = FoodCategory.all.order(:name)
+    @food_categories = FoodCategoriesController.helpers.get_options_for_select
     @upload = Upload.new
   end
 
