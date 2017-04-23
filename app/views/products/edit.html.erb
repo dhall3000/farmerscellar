@@ -11,9 +11,9 @@
   <%= f.text_field :name, class: "form-control" %>
   <%= f.label :food_category %>
   <% if @product.food_category %>
-    <%= f.select :food_category_id, options_from_collection_for_select(@food_categories, "id", "name", @product.food_category.id), {}, class: 'form-control' %>
+    <%= f.select :food_category_id, options_for_select(@food_categories.map { |obj| [obj[:name], obj[:id]] }, @product.food_category.id), {}, class: 'form-control' %>
   <% else %>
-    <%= f.select :food_category_id, options_from_collection_for_select(@food_categories, "id", "name"), {}, class: 'form-control' %>
+    <%= f.select :food_category_id, options_for_select(@food_categories.map { |obj| [obj[:name], obj[:id]] }), {}, class: 'form-control' %>
   <% end %>
   <%= f.submit "Update", class: "btn btn-lg btn-primary outline" %>
 <% end %>

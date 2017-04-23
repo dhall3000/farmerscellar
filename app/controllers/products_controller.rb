@@ -2,8 +2,8 @@ class ProductsController < ApplicationController
   before_action :redirect_to_root_if_user_not_admin
 
   def new
-    @product = Product.new
-    @food_categories = FoodCategory.all.order(:name)
+    @food_categories = FoodCategoriesController.helpers.get_options_for_select
+    @product = Product.new    
   end
 
   def create
@@ -19,9 +19,9 @@ class ProductsController < ApplicationController
     
   end
 
-  def edit
+  def edit    
+    @food_categories = FoodCategoriesController.helpers.get_options_for_select
     @product = Product.find(params[:id])
-    @food_categories = FoodCategory.all.order(:name)
   end
 
   def update
@@ -38,7 +38,7 @@ class ProductsController < ApplicationController
     end
   end
 
-  def show
+  def show    
     @product = Product.find(params[:id])
   end
 

@@ -27,4 +27,30 @@ module FoodCategoriesHelper
 
   end
 
+  def get_top_down_ancestors_string(food_category)
+    #this returns a string something like "Market - Dairy - Milk - 2%"
+
+    parents = get_top_down_ancestors(food_category, include_self = false)
+    parent_string = ""
+    parents.each do |parent|
+      parent_string += parent[:text] + " / "
+    end
+
+    parent_string += food_category.name
+
+  end
+
+  def get_options_for_select
+    food_categories = FoodCategory.all.order(:name)
+    food_categories_for_select = []
+    
+    food_categories.each do |fc|
+      ancestors_string = get_top_down_ancestors_string(fc)
+      food_categories_for_select << {id: fc.id, name: ancestors_string}
+    end
+
+    return food_categories_for_select
+
+  end
+
 end

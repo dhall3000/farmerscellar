@@ -12,7 +12,7 @@
 <h2><%= @product.name %></h2>
 <p>ID: <%= @product.id.to_s %>
 <% if @product.food_category %>
-  <p>Food Category: <%= link_to @product.food_category.name, food_category_path(@product.food_category) %></p>
+  <p>Food Category: <%= link_to FoodCategoriesController.helpers.get_top_down_ancestors_string(@product.food_category), food_category_path(@product.food_category) %></p>
 <% else %>
   <p>Food Category: nil</p>
 <% end %>

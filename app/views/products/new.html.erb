@@ -1,6 +1,6 @@
 <h1>New Product</h1>
 <div class="row">
-  <div class="col-md-4 col-md-offset-4">
+  <div class="col-md-6 col-md-offset-3">
     <p>
       <span class="glyphicon glyphicon-arrow-left"></span>
       <%= link_to "Products", products_path %>
@@ -10,7 +10,7 @@
       <%= f.label :name %>
       <%= f.text_field :name, class: "form-control" %>
       <%= f.label :food_category %>
-      <%= f.select :food_category_id, options_from_collection_for_select(@food_categories, "id", "name"), {}, class: 'form-control' %>
+      <%= f.select :food_category_id, options_for_select(@food_categories.map { |obj| [obj[:name], obj[:id]] }), {}, class: 'form-control' %>
       <%= f.submit "Create new product", class: "btn btn-lg btn-primary outline" %>
     <% end %>
   </div>
