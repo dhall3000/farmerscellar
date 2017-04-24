@@ -339,6 +339,8 @@ class PostingsController < ApplicationController
         :important_notes,
         :important_notes_body,
         :live,
+        :delivery_date,
+        :order_cutoff,
         :price,
         :units_per_case,
         :product_id_code,

@@ -68,6 +68,22 @@
           <%= f.label :order_minimum_producer_net %>
           <%= f.number_field :order_minimum_producer_net, min: 0.01, step: 0.01, class: 'form-control' %>
 
+          <%= f.label :order_cutoff, "Order Cutoff (Date & Time)" %>
+          <div class="input-group date" id="dtpOrderCutoff" data-ordercutoff="<%= @posting.order_cutoff.strftime("%Y-%m-%d %H:%M") %>">
+            <%= f.text_field :order_cutoff, class: 'form-control', readonly: true %>
+            <span class="input-group-addon">
+              <span class="glyphicon glyphicon-calendar"></span>
+            </span>
+          </div>
+
+          <%= f.label :delivery_date, "Delivery Date (Date only)", id: "czsLabel" %>
+          <div class="input-group date" id="dtpDeliveryDate" data-deliverydate="<%= @posting.delivery_date.strftime("%Y-%m-%d %H:%M") %>">
+            <%= f.text_field :delivery_date, class: 'form-control', readonly: true %>
+            <span class="input-group-addon">
+              <span class="glyphicon glyphicon-calendar"></span>
+            </span>
+          </div>
+
           <%= f.label :live, class: "inline" do %>
             <%= f.check_box :live %>
             <span class="checkboxText">Live</span>
