@@ -45,11 +45,28 @@ module FoodCategoriesHelper
     food_categories_for_select = []
     
     food_categories.each do |fc|
-      ancestors_string = get_top_down_ancestors_string(fc)
+      ancestors_string = get_ancestors_string(fc)
       food_categories_for_select << {id: fc.id, name: ancestors_string}
     end
 
     return food_categories_for_select
+
+  end
+
+  def get_ancestors_string(food_category)
+
+    if food_category.nil?
+      return nil
+    end
+
+    ancestors_string = food_category.name
+
+    while food_category.parent
+      food_category = food_category.parent
+      ancestors_string += " / #{food_category.name}"
+    end
+
+    return ancestors_string
 
   end
 
