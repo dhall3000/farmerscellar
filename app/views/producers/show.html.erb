@@ -2,6 +2,12 @@
 
 <div><%= link_to "producers", producers_path, class: "fat-finger-spacing" %></div>
 <div><%= link_to "Edit", edit_producer_path(@producer), class: "btn btn-lg btn-primary outline fat-finger-spacing" %></div>
+<div>
+  <%= form_tag sessions_spoof_path do %>      
+    <%= hidden_field_tag :email, @producer.email %>
+    <%= submit_tag "Spoof", class: "btn btn-lg btn-primary outline fat-finger-spacing" %>
+  <% end %>
+</div>
 
 <div class="panel-group">
 
