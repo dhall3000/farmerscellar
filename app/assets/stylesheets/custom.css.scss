@@ -244,8 +244,8 @@ p {
 .header-icon {
   font-size: 2.2em;
   color: #CCCCCC;
-  padding-right: 5px;
-  padding-left: 8px;
+  padding-right: 10px;
+  padding-left: 10px;
   padding-top: 10px;  
 }
 
@@ -258,9 +258,8 @@ p {
 }
 
 .header-link {
-  margin-top: 20px;  
-  margin-bottom: 10px;
-  margin-right: 3px;
+  padding-top: 20px;
+  padding-right: 3px;
   font-size: 0.85em;  
   color: $gray-light;    
 }

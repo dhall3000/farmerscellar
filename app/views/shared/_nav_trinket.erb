@@ -4,15 +4,14 @@
 
 <div class="row">
   <div class="col-xs-12">    
-    <div style="padding-top: 10px;">
+    <div style="padding-top: 20px;">
+      <%= link_to "Home", root_path, class: "left-most-header-link header-link" %>
       <%
         index = 0
         while (links && index < links.count)          
-      %>
-        <% if index > 0 %>
-          <span class="header-link"><%= "/ " %></span>
-        <% end %>
-          <%= link_to links[index][:text], links[index][:path], class: "header-link" %>
+      %>        
+        <span class="header-link"><%= "/ " %></span>        
+        <%= link_to links[index][:text], links[index][:path], class: "header-link" %>
       <%
           index += 1
         end
