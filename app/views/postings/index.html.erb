@@ -16,7 +16,7 @@
     <div class="row">
       <% @food_category.children.each do |food_category| %>      
         <div class="col-xs-6 col-sm-3">
-          <%= link_to postings_path(food_category: food_category.name), class: "thumbnail" do %>
+          <%= link_to food_category_path_helper(food_category), class: "thumbnail" do %>
             <% if food_category.uploads.last %>
               <%= image_tag "#{food_category.uploads.last.file_name.square}", class: "img-responsive" %>
             <% end %>        

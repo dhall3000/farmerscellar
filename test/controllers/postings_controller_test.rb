@@ -580,7 +580,7 @@ class PostingsControllerTest < IntegrationHelper
     root_category = FoodCategory.get_root_category
     assert root_category
 
-    get postings_path(food_category: root_category.name)
+    get food_category_path_helper(root_category)
     assert :success
     assert_template 'postings/index'
 
@@ -875,7 +875,7 @@ class PostingsControllerTest < IntegrationHelper
 
     root_category = FoodCategory.get_root_category
 
-    get postings_path(food_category: root_category.name)
+    get food_category_path_helper(root_category)
     this_weeks_postings = assigns(:this_weeks_postings)
     next_weeks_postings = assigns(:next_weeks_postings)
     future_postings = assigns(:future_postings)    
@@ -1044,7 +1044,7 @@ class PostingsControllerTest < IntegrationHelper
     root_category = FoodCategory.get_root_category
     assert root_category
 
-    get postings_path(food_category: root_category.name)
+    get food_category_path_helper(root_category)
     assert :success
     assert_template 'postings/index'
 

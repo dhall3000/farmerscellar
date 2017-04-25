@@ -62,7 +62,7 @@ class PostingsController < ApplicationController
 
     end
 
-    @food_category = FoodCategory.includes(:parent, children: :uploads).where(name: params[:food_category]).first
+    @food_category = FoodCategory.includes(:parent, children: :uploads).where(id: params[:food_category]).first
  
     #this is midnight the first day of the new week's cycle
     next_week_start = start_of_next_week    

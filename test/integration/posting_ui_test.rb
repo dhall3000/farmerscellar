@@ -36,10 +36,10 @@ class PostingUiTest < IntegrationHelper
     follow_redirect!
     assert_template '/'
 
-    food_category = posting.product.food_category.name
+    food_category = posting.product.food_category
 
     #new customer browses to the postings page
-    get postings_path(food_category: food_category)
+    get food_category_path_helper(food_category)
     assert_response :success
     assert_template 'postings/index'
 
@@ -49,12 +49,12 @@ class PostingUiTest < IntegrationHelper
 
     #there should be one pagination page link for each of the pages we created
     num_pages.times do |i|
-      assert_select 'div.pagination li a[href=?]', postings_path(food_category: food_category, next_week: (i + 1).to_s)
+      assert_select 'div.pagination li a[href=?]', postings_path(food_category: food_category.id, next_week: (i + 1).to_s)
     end
 
     #the prod crash was happening when user clicked on page 2
     assert num_pages > 1
-    get postings_path(food_category: food_category, next_week: "2")
+    get postings_path(food_category: food_category.id, next_week: "2")
     assert_response :success
     assert_template 'postings/index'
     

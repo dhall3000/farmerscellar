@@ -98,7 +98,7 @@ class PostingsTest < IntegrationHelper
     next_weeks_posting = create_posting(producer, price = nil, product = nil, unit = nil, base_delivery_date + 7.days)
     future_posting = create_posting(producer, price = nil, product = nil, unit = nil, base_delivery_date + 14.days)
 
-    get postings_path(food_category: FoodCategory.get_root_category.name)
+    get food_category_path_helper(FoodCategory.get_root_category)
     assert_response :success
     assert_template 'index'
 
@@ -142,7 +142,7 @@ class PostingsTest < IntegrationHelper
     next_weeks_posting = create_posting(producer, price = nil, product = nil, unit = nil, base_delivery_date + 7.days)
     future_posting = create_posting(producer, price = nil, product = nil, unit = nil, base_delivery_date + 14.days)
 
-    get postings_path(food_category: FoodCategory.get_root_category.name)
+    get food_category_path_helper(FoodCategory.get_root_category)
     assert_response :success
     assert_template 'index'
 
@@ -190,7 +190,7 @@ class PostingsTest < IntegrationHelper
     second_posting = create_posting(producer, price = nil, product = nil, unit = nil, base_delivery_date + 7.days)
     third_posting = create_posting(producer, price = nil, product = nil, unit = nil, base_delivery_date + 14.days)
 
-    get postings_path(food_category: FoodCategory.get_root_category.name)
+    get food_category_path_helper(FoodCategory.get_root_category)
     assert_response :success
     assert_template 'index'
 
@@ -622,7 +622,7 @@ class PostingsTest < IntegrationHelper
         posting = Posting.find posting_id
       end
 
-      get postings_path(food_category: posting.product.food_category.name)
+      get food_category_path_helper(posting.product.food_category)
     else
       count = 0
     end
@@ -635,7 +635,7 @@ class PostingsTest < IntegrationHelper
   def verify_post_visibility(price, unit, count)
     if count > 0
       posting = Posting.where(price: price).first
-      get postings_path(food_category: posting.product.food_category.name)
+      get food_category_path_helper(posting.product.food_category)
     else
       get postings_path
     end    
@@ -685,7 +685,7 @@ class PostingsTest < IntegrationHelper
     unit = units(:pound)    
     assert @posting.product.food_category
 
-    get postings_path(food_category: @posting.product.food_category.name)
+    get food_category_path_helper(@posting.product.food_category)
     assert :success
     verify_price_on_postings_page(price, unit, count = 1)
 
@@ -698,7 +698,7 @@ class PostingsTest < IntegrationHelper
 
     assert :success  
     assert_redirected_to @farmer
-    get postings_path(food_category: @posting.product.food_category.name)
+    get food_category_path_helper(@posting.product.food_category)
     assert :success
     assert_select '.price', {text: "$2.75 / Pound", count: 0}
 
@@ -717,7 +717,7 @@ class PostingsTest < IntegrationHelper
       order_cutoff: posting.order_cutoff
     }}
 
-    get postings_path(food_category: posting.product.food_category.name)
+    get food_category_path_helper(posting.product.food_category)
     assert :success        
     verify_price_on_postings_page(price, posting.unit, count = 1)
 

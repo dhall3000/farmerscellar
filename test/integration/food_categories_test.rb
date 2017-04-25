@@ -66,7 +66,8 @@ class FoodCategoriesTest < IntegrationHelper
     bob = create_new_customer("bob", "bob@b.com")
 
     log_in_as(bob)
-    get postings_path(food_category: "Meat")
+    fc = FoodCategory.find_by(name: "Meat")    
+    get food_category_path_helper(fc)
 
   end
 

@@ -169,7 +169,7 @@ class BulkPurchasesTest < BulkBuyer
     #check for the existence of nasty-gram related to account state
     if account_ok
       assert_response :redirect
-      assert_redirected_to postings_path(food_category: Posting.last.product.food_category.name)
+      assert_redirected_to food_category_path_helper(Posting.last.product.food_category)
       assert_not flash.empty?      
       assert_equal "Tote item added", flash[:success]
     else

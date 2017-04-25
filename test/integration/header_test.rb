@@ -25,7 +25,7 @@ class HeaderTest < IntegrationHelper
     verify_header(tote = 0, orders = 0, calendar = 0, subscriptions = 0, ready_to_pickup = 0, whats_new = 1)
 
     #but we need to make sure we haven't broken regular browsing experience. there really are two postings so both sould be displayed when user goes to do regular shopping
-    get postings_path(food_category: posting_recurring.product.food_category.name)
+    get food_category_path_helper(posting_recurring.product.food_category)
     assert_response :success
     assert_template 'postings/index'
 

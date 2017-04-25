@@ -676,7 +676,7 @@ end
     assert posting.product.food_category
     food_category = posting.product.food_category
 
-    get postings_path(food_category: food_category.name)
+    get food_category_path_helper(food_category)
     assert_response :success
     assert_template 'postings/index'
     get posting_path(posting)
@@ -1000,7 +1000,7 @@ end
     assert posting.valid?
 
     if posting.product.food_category
-      get postings_path(food_category: posting.product.food_category.name)
+      get food_category_path_helper(posting.product.food_category)
     else
       get postings_path
     end

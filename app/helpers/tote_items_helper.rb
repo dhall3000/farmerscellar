@@ -90,7 +90,7 @@ module ToteItemsHelper
 
   def food_category_path_helper(food_category)
     if food_category
-      postings_path(food_category: food_category.name)
+      postings_path(food_category: food_category.id)
     else
       postings_path
     end
