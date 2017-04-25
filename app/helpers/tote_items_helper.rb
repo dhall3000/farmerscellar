@@ -90,9 +90,9 @@ module ToteItemsHelper
 
   def food_category_path_helper(food_category)
     if food_category
-      postings_path(food_category: food_category.id)
+      Rails.application.routes.url_helpers.postings_path(food_category: food_category.id)
     else
-      postings_path
+      Rails.application.routes.url_helpers.postings_path
     end
   end
 
