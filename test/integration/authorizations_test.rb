@@ -2,6 +2,95 @@ require 'authorization_helper'
 
 class AuthorizationsTest < Authorizer
 
+  test "user should still see authorization even if they cancel subscription right after creating it" do
+
+    nuke_all_postings
+
+    #create postings
+    friday_next_week = get_next_wday_after(wday = 5, days_from_now = 7)
+    posting1 = create_posting(farmer = nil, price = nil, product = Product.create(name: "Product1"), unit = nil, delivery_date = friday_next_week, order_cutoff = nil, units_per_case = nil, frequency = 1)
+    posting2 = create_posting(posting1.user, price = nil, product = Product.create(name: "Product2"), unit = nil, delivery_date = friday_next_week, order_cutoff = nil, units_per_case = nil, frequency = 1)
+
+    #create customer, subscription and authorization    
+    customer = create_new_customer
+    sx1 = create_tote_item(customer, posting1, quantity = 1, frequency = 1, roll_until_filled = false).subscription
+    assert sx1.valid?
+    rtauth1 = create_rt_authorization_for_customer(customer)        
+
+    #user logs in to view auth
+    log_in_as customer
+    get rtauthorization_path(rtauth1, rta: 1)
+    assert_response :success
+    assert_template 'rtauthorizations/show'
+    subscriptions = assigns(:subscriptions)
+    assert subscriptions
+    assert subscriptions.any?
+    assert_equal 1, subscriptions.count
+    sx = subscriptions.first
+    assert_equal sx1, sx
+
+    #user then cancels the subscription
+    assert sx1.reload.on
+    patch subscription_path(sx1), params: {subscription: {on: 0}}
+    assert_not sx1.reload.on
+
+    #user then tries to view the authorization again
+    get rtauthorization_path(rtauth1, rta: 1)
+    assert_response :success
+    assert_template 'rtauthorizations/show'
+    subscriptions = assigns(:subscriptions)
+    assert subscriptions
+    assert subscriptions.any?
+    assert_equal 1, subscriptions.count
+    sx = subscriptions.first
+    assert_equal sx1, sx
+    
+  end
+
+  test "user should still see authorization even if they cancel item right after creating it" do
+    nuke_all_postings
+
+    #create postings
+    friday_next_week = get_next_wday_after(wday = 5, days_from_now = 7)
+    posting1 = create_posting(farmer = nil, price = nil, product = Product.create(name: "Product1"), unit = nil, delivery_date = friday_next_week, order_cutoff = nil, units_per_case = nil, frequency = 1)
+    posting2 = create_posting(posting1.user, price = nil, product = Product.create(name: "Product2"), unit = nil, delivery_date = friday_next_week, order_cutoff = nil, units_per_case = nil, frequency = 1)
+
+    #create customer, tote item and authorization    
+    customer = create_new_customer
+    ti1 = create_tote_item(customer, posting1, quantity = 1, frequency = 0, roll_until_filled = true)
+    assert ti1.valid?
+    rtauth1 = create_rt_authorization_for_customer(customer)        
+
+    #user logs in to view auth
+    log_in_as customer
+    get rtauthorization_path(rtauth1, rta: 1)
+    assert_response :success
+    assert_template 'rtauthorizations/show'
+    tote_items = assigns(:tote_items)
+    assert tote_items
+    assert tote_items.any?
+    assert_equal 1, tote_items.count
+    ti = tote_items.first
+    assert_equal ti1, ti
+
+    #user then cancels the tote item
+    assert ti1.reload.state?(:AUTHORIZED)
+    delete tote_item_path(ti1)
+    assert ti1.reload.state?(:REMOVED)
+
+    #user then tries to view the authorization again
+    get rtauthorization_path(rtauth1, rta: 1)
+    assert_response :success
+    assert_template 'rtauthorizations/show'
+    tote_items = assigns(:tote_items)
+    assert tote_items
+    assert tote_items.any?
+    assert_equal 1, tote_items.count
+    ti = tote_items.first
+    assert_equal ti1, ti
+    
+  end
+
   test "dev driver" do
     
     nuke_all_postings

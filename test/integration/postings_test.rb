@@ -206,8 +206,10 @@ class PostingsTest < IntegrationHelper
     future_postings = assigns(:future_postings)
     assert_not future_postings.nil?
     assert_equal 2, future_postings.count
-    assert_equal second_posting, future_postings.first
-    assert_equal third_posting, future_postings.last
+    
+    #these two postings have the same producer/product/price so you can't be sure the order are    
+    assert (future_postings.first == second_posting) || (future_postings.first == third_posting)
+    assert (future_postings.last == second_posting) || (future_postings.last == third_posting)
 
     travel_back
 

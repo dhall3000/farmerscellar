@@ -22,7 +22,7 @@
         <div class="col-xs-9">
           <div class="truncated-text-line" data-toggle="collapse" data-target="#subscriptionSeePosting<%= subscription.id.to_s %>">
             <span id="subscriptionChevron<%= subscription.id.to_s %>" class="glyphicon glyphicon-chevron-down"> </span>
-            <%= "#{subscription.latest_delivery_date_item.friendly_description} delivered #{subscription.friendly_frequency.downcase}" %>
+            <%= "#{subscription.tote_items.first.friendly_description} delivered #{subscription.friendly_frequency.downcase}" %>
           </div>
 
           <div id="subscriptionSeePosting<%= subscription.id.to_s %>" class="collapse" data-chevron="#subscriptionChevron<%= subscription.id.to_s %>">
