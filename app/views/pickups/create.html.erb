@@ -39,16 +39,9 @@
 
 <div class="row" style="padding-bottom: 5px;">
   <div class="col-xs-6">
-    <%= form_tag pickups_toggle_garage_door_path do %>
-      
-      <% if @mockup_mode %>
-        <%= hidden_field_tag :pickup_code, "1111" %>
-      <% else %>
-        <%= hidden_field_tag :pickup_code, @pickup_code.code %>
-      <% end %>                   
-
-      <%= submit_tag "Open/Close garage door", class: 'btn btn-lg btn-primary outline', data: { disable_with: "Please wait...sometimes slow! :(" } %>      
-    <% end %>
+    <button type="button" id="garageDoorButton" class="btn btn-lg btn-primary outline" autocomplete="off">
+      Open / Close door
+    </button>
   </div>
   <div class="col-xs-6">
     <%= link_to "Log out", new_pickup_path, class: 'btn btn-lg btn-primary outline btn-block', data: { disable_with: "Please wait..." } %>
