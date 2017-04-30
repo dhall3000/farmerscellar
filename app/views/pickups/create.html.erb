@@ -37,14 +37,14 @@
 </div>
 
 
-<div class="row" style="padding-bottom: 5px;">
+<div class="row" style="padding-bottom: 25px;">
   <div class="col-xs-6">
-    <button type="button" id="garageDoorButton" class="btn btn-lg btn-primary outline btn-block" autocomplete="off">
-      Open / Close door
+    <button type="button" id="garageDoorButton" class="btn btn-lg btn-primary outline btn-block btn-kiosk" autocomplete="off" data-disable-with="Please wait...">
+      Door
     </button>
   </div>
   <div class="col-xs-6">
-    <%= link_to "Log out", new_pickup_path, class: 'btn btn-lg btn-primary outline btn-block', data: { disable_with: "Please wait..." } %>
+    <%= link_to "Log out", new_pickup_path, class: "btn btn-lg btn-primary outline btn-block btn-kiosk", data: { disable_with: "wait..." } %>
   </div>
 </div>
 

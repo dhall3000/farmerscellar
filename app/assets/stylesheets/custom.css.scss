@@ -10,6 +10,10 @@ $fc-primary-color: #AACB4F;
 $fc-medium-color: #cfe29d;
 $fc-light-color: #f5f9eb;
 
+.btn-kiosk {
+  font-size: 50px;  
+}
+
 .pagination {
   @media (max-width: 480px) {
     li {

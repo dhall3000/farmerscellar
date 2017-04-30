@@ -34,8 +34,8 @@
         </p>
       </div>
       <div class="modal-footer">
-        <button id="disagree" type="button" class="btn btn-lg btn-default outline" data-dismiss="modal">I do not agree</button>
-        <button id="agree" type="button" class="btn btn-lg btn-primary outline">I agree</button>
+        <button id="disagree" type="button" class="btn btn-lg btn-default outline btn-kiosk" data-dismiss="modal">Nope</button>
+        <button id="agree" type="button" class="btn btn-lg btn-primary outline btn-kiosk">I agree</button>
       </div>
     </div>
   </div>
@@ -60,9 +60,9 @@
 <div class="row" style="padding-top: 50px;">
 	<div class="col-xs-8 col-xs-offset-2 col-sm-4 col-sm-offset-4">
 		<%= form_tag pickups_path, id: "pinForm" do %>
-			<%= number_field_tag :pickup_code, nil, id: "pinField", class: 'input-lg fat-finger-spacing', placeholder: "Tap here to enter pickup code..." %>
+			<%= number_field_tag :pickup_code, nil, id: "pinField", class: 'input-lg fat-finger-spacing btn-kiosk', placeholder: "Tap here first..." %>
 		<% end %>
-    <%= button_tag "Enter", class: 'btn btn-lg btn-primary outline btn-block', data: { 
+    <%= button_tag "Enter", class: 'btn btn-lg btn-primary outline btn-block btn-kiosk', data: { 
       disable_with: "Please wait...sometimes slow! :(",
       toggle: "modal",
       target: "#finePolicyModal"}
