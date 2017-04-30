@@ -12,12 +12,66 @@ class RakeHelper
 		send_pickup_deadline_reminders
     send_postings_receivable_to_admin
     do_db_integrity_checks
+    keep_garage_door_opener_alive
 
 	  puts "finished with hourly tasks."
 
 	end
 
 	private
+
+    #what is the deal with this? currently (2017-04-29) we're in prototype mode using the garage of david hall's house as the dropsite. been having a vexatious
+    #time trying to get the door to be reliable for customers. the symptoms were customers would poke, stab and hack at the buttons on the kiosk with mixed results.
+    #sometimes it would be flawless. sometimes it would open after 5 - 20 seconds. sometimes it wouldn't open at all. of course, doesn't help that users would
+    #keep poking away at the button, exacerbating the problem. first i thought it was the super cheap, slow android tab. got a nicer one. that improved things somewhat.
+    #then i figured it was a network issue....the tab sends message to router 1, goes through router 2 up to FC server, then back to router 2 then port-forwarded to
+    #router 1, then to the garagedoorbuddy device to open the door. so i decided to put the kiosk tab on the same router (i.e. "router1") as the GDB device and change the
+    #kiosk's "open/close door" button to point straight at the GDB device. this is a massive improvement...when it works. that is, when it works it is instantaneous whereas
+    #the previous setup would be ~500ms delay best case scenario. however, there has been at least one incident where a user was not able to open the door at all. oh, i also
+    #tried cleaning the kiosk with a baby wipe. that could have improved things so i should do that more. so now i'm wondering if a 'keep alive' is needed...perhaps the
+    #wifi connection is dropping between router1 <-> GDB device or perhaps GDB goes to sleep after some time. a good argument against this, however, is that when i observed the one
+    #recent customer unable to get in with the new setup i poked my admin "toggle door" button and the door opened immediately. this suggests the wifi connection was fine and
+    #the GDB device was awake.
+    #all things considered, it might be most likely that simply keeping the tab clean is the deal.
+    #nevertheless, putting this simple code in to ping the GDB device once per hour. we'll see if things improve...
+    #also, note that i'm intentionally pinging the wrong "door". with GDB you can control two different doors with the http GET params. like this:
+    #http://[IP address]:1984/client?command=door1
+    #http://[IP address]:1984/client?command=door2
+    #'door2' is the actual door. 'door1' is not hooked to anything but the GDB device doesn't know that and will attempt to open that 'door' anyway so here we're pinging the
+    #phantom door to keep GDB alive.
+    def self.keep_garage_door_opener_alive
+      
+      puts "RakeHelper.keep_garage_door_opener_alive start"
+
+      if Rails.env.production?
+
+        http = Net::HTTP.new(Dropsite.first.ip_address, 1984)
+        http.open_timeout = 10
+        http.read_timeout = 10
+        response = nil
+        #flash_message = "If the garage door isn't working please knock on the front door for help."
+
+        begin
+          response = http.get("/client?command=door1")
+        rescue Net::ReadTimeout => e1
+          #flash.now[:danger] = flash_message
+          puts "RakeHelper.keep_garage_door_opener_alive timeout. e1.message = #{e1.message}"
+        rescue Net::OpenTimeout => e2
+          #flash.now[:danger] = flash_message
+          puts "RakeHelper.keep_garage_door_opener_alive timeout. e2.message = #{e2.message}"
+        end
+
+        if response
+          puts "RakeHelper.keep_garage_door_opener_alive response: #{response.class.to_s}"
+        else
+          puts "RakeHelper.keep_garage_door_opener_alive response is nil"
+        end      
+
+      end
+
+      puts "RakeHelper.keep_garage_door_opener_alive end"    
+      
+    end
 
     def self.do_db_integrity_checks
       producers = User.where(account_type: User.types[:PRODUCER])
