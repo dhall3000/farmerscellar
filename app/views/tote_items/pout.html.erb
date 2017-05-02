@@ -59,7 +59,7 @@
 
                   <% elsif @biggest_order_minimum_producer_net_outstanding > 0 %>
 
-                    <li><%= link_to "Group Order Minimum", how_things_work_path(anchor: "order_minimums") %> unmet</li>
+                    <li><%= link_to "Club Order Minimum", how_things_work_path(anchor: "order_minimums") %> unmet</li>
                     <li><%= number_to_currency(@biggest_order_minimum_producer_net_outstanding) %> more required</li>
 
                   <% end %>

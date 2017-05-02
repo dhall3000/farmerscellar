@@ -62,7 +62,7 @@
             <% if deficiency %>
               <div class="alert alert-danger">
                 <% if biggest_order_minimum_producer_net_outstanding > 0 %>                  
-                  Item won't ship. <%= number_to_currency(biggest_order_minimum_producer_net_outstanding) %> <%= link_to "Group Order Minimum", how_things_work_path(anchor: "order_minimums") %> shortfall.
+                  Item won't ship. <%= number_to_currency(biggest_order_minimum_producer_net_outstanding) %> <%= link_to "Club Order Minimum", how_things_work_path(anchor: "order_minimums") %> shortfall.
                 <% elsif additional_units_required_to_fill_my_case > 0 %>
                   <% if expected_fill_quantity > 0 %>
                     <%= link_to "Item will partially fill", how_things_work_path(anchor: "case_constraints") %>. <%= expected_fill_quantity.to_s %> of your <%= tote_item.quantity.to_s %> units ordered will ship.
