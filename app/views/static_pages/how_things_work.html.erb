@@ -6,23 +6,31 @@
 
   <div class="col-xs-12 col-sm-8 col-sm-offset-2">
 
-    <% if @update_time %>      
-      <p>Last update: <%= @update_time.strftime("%B %d, %Y") %></p>        
-    <% end %>
-
     <div class="panel-group" id="accordion">
 
       <div class="panel panel-default">
         <div class="anchor panel-heading" id="the_simple_version">
           <div class="panel-title" data-toggle="collapse" data-parent="#accordion" data-target="#collapseSimpleVersion">
-            The Simple Version<span id="collapseSimpleVersionChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>            
+            Brief<span id="collapseSimpleVersionChevron" class="glyphicon glyphicon-chevron-up pull-right"></span>            
           </div>
         </div>
-        <div id="collapseSimpleVersion" class="panel-collapse collapse" data-chevron="#collapseSimpleVersionChevron">
+        <div id="collapseSimpleVersion" class="panel-collapse collapse in" data-chevron="#collapseSimpleVersionChevron">
           <div class="panel-body">
+            <p>
+              We are a local foods buying club. Club members pool buying power by ordering collectively, purchasing direct-from-producer at wholesale pricing.
+            </p>
+            <p>
+              We have no membership fees, joining fees, dues or individual order minimums.
+            </p>
+            <p>
+              Of the price you pay, we keep 10%, Paypal gets 3.5%, farmer gets 86.5%.
+            </p>
+            <h3>Sequence</h3>
             <ol>
-              <li>Pre-order online</li>        
-              <li>Pickup whenever</li>
+              <li>You place your order with us</li>
+              <li>At order cutoff we place club's order with producer</li>
+              <li>Food arrives on 'delivery date'</li>
+              <li>You pick up at our self-serve dropsite at your convenience</li>
             </ol> 
           </div>
         </div>
@@ -30,22 +38,24 @@
 
 
       <div class="panel panel-default">
-        <div class="anchor panel-heading" id="more_details">
-          <div class="panel-title" data-toggle="collapse" data-parent="#accordion" data-target="#collapseMoreDetails">            
-            More Details<span id="collapseMoreDetailsChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>            
+        <div class="anchor panel-heading">
+          <div class="panel-title" data-toggle="collapse" data-parent="#accordion" data-target="#collapseGetInvolved">
+            Get Involved<span id="collapseGetInvolvedChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>            
           </div>
         </div>
-        <div id="collapseMoreDetails" class="panel-collapse collapse" data-chevron="#collapseMoreDetailsChevron">
+        <div id="collapseGetInvolved" class="panel-collapse collapse" data-chevron="#collapseGetInvolvedChevron">
           <div class="panel-body">
-            <ul>
-              <li>We are dropsite based. We don't do home or 'door-to-door' delivery.</li>
-              <li>A dropsite is just a common site where products are dropped off so that customers can come to pick them up at their convenience.</li>
-              <li>Dropsites are secure and have plenty of dry storage, refrigeration and freezer space.</li>
-              <li>We never hold any inventory; every product in our dropsites is already paid for by pre-order customers.</li>        
-              <li>You get notified the moment your products arrive at the dropsite so that you can pick up whenever you want.</li>
-              <li>Products can arrive at the dropsite on different days since we don't hold them in a warehouse anywhere.</li>
-              <li>Feel free to pick up right when products are delivered (for maximum freshness) or wait until all your products arrive (subject to our <%= link_to "Pickup Deadline policy", how_things_work_path(anchor: "pickup_deadline"), class: "self-link" %>) and make a single stop (for maximum convenience). You control the balance between convenience and freshness.</li>
-            </ul> 
+            <p>
+              Our goals are great products at great prices. Your help is critical!
+            </p>
+            <p>
+              The main way to help is by recruiting your friends to join. This helps:
+            </p>
+            <ol>
+              <li>Lower prices</li>
+              <li>Increase product selection</li>
+            </ol>
+            <p>Next, don't leave us guessing...tell us what products to source!</p>
           </div>
         </div>
       </div>
@@ -289,6 +299,9 @@
     </div>
 
 
+    <% if @update_time %>      
+      <p>Last update: <%= @update_time.strftime("%B %d, %Y") %></p>        
+    <% end %>
 
 
   </div>
