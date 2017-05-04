@@ -1,6 +1,9 @@
 class StaticPagesController < ApplicationController
   before_action :redirect_to_root_if_user_not_admin, only: [:test_page, :test_exception, :toggle_garage_door]
 
+  def survey    
+  end
+
   def news
     @update_time = PageUpdate.get_update_time("News")    
   end

@@ -18,6 +18,7 @@ Rails.application.routes.draw do
   get 'contact' => 'static_pages#contact'
   get 'support' => 'static_pages#support'
   get 'how_things_work' => 'static_pages#how_things_work'
+  get 'survey' => 'static_pages#survey'
   get 'signup' => 'users#new'
   get 'login' => 'sessions#new'
   post 'login' => 'sessions#create'
