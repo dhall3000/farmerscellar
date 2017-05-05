@@ -29,6 +29,17 @@ Hello,
   <p>You have products <%= link_to "ready for pickup", pickup_url %>.</p>
 <% end %>
 
+<% if true %>
+
+  <h1>Help us Continue...</h1>
+  <p>We need to grow to sustain operations beyond 2017. You can help us simply by telling us which products you'd like us to source.</p>
+  <p>As a <%= link_to "local foods buying club", how_things_work_url %> we have wholesale access to <%= link_to "pretty much anything in the state", "http://www.sfmamarkets.com/vendor-list" %>.</p>
+  <p>So....<%= link_to "tell us what we should get!", survey_url %></p>
+  <p>Thanks!</p>
+  <p>David &amp; Kellye</p>
+  <%= link_to "farmerscellar.com/news", news_url %>
+<% else %>
+
 <p>
 Thanks!
 </p>
@@ -36,3 +47,4 @@ Thanks!
 Farmer's Cellar<br>
 <%= link_to "farmerscellar.com/news", news_url %>
 </p>
+<% end %>
