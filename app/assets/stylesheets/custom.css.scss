@@ -349,6 +349,14 @@ input, textarea, select, .uneditable-input {
   @include box_sizing;
 }
 
+/*
+the 'width: 100%' for 'input' elements screws up checkboxes and radio buttons when you use radio-inline or
+checkbox-inline. so we need to override that with this
+*/
+.radio-checkbox {
+  width: auto;
+}
+
 input {
   height: auto !important;
 }

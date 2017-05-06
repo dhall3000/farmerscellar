@@ -7,7 +7,7 @@
   <ul>
     <li>
       <%= label_tag :to_category, class: "radio-inline" do %>
-        <%= radio_button_tag :to_category, food_category.id %>        
+        <%= radio_button_tag :to_category, food_category.id, nil, class: "radio-checkbox" %>        
         <span class="category-background"><%= link_to food_category.name, food_category_path(food_category) %></span>        
       <% end %>
     </li>
@@ -20,7 +20,7 @@
         <% food_category.products.each do |product| %>
           <li>
             <%= label_tag :to_category, class: "checkbox-inline" do %>
-              <%= check_box_tag "products[]", product.id %>
+              <%= check_box_tag "products[]", product.id, nil, class: "radio-checkbox" %>
               <span class="product-background"><%= link_to product.name, product_path(product) %></span>              
             <% end %>
           </li>
