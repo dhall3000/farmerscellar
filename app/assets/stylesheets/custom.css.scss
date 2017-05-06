@@ -67,6 +67,7 @@ $fc-light-color: #f5f9eb;
   white-space: normal;
 }
 
+//ADMIN PAGINATION START
 .pagination > .pagination a {
     color: $fc-primary-color;
 }
@@ -83,6 +84,25 @@ div.pagination > ul.pagination > li.active > a {
     background-color: $fc-primary-color;
     border-color: $fc-primary-color;
 }
+//ADMIN PAGINATION END
+
+//USER PAGINATION START
+ul.pagination li span.glyphicon {
+  color: $fc-primary-color;
+}
+
+ul.pagination.pagination-lg li.disabled {
+  display: none;
+}
+
+ul.pagination.pagination-lg li.prev.disabled {
+  display: inline;
+}
+
+ul.pagination.pagination-lg li.next.disabled {
+  display: inline;
+}
+//USER PAGINATION END
 
 .quantity-delivered {
   font-weight: 900;
