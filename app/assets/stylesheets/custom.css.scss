@@ -67,26 +67,16 @@ $fc-light-color: #f5f9eb;
   white-space: normal;
 }
 
-//ADMIN PAGINATION START
-.pagination > .pagination a {
-    color: $fc-primary-color;
+ul.pagination.pagination-lg li.active span {
+  background-color: $fc-primary-color;
+  border-color: $fc-primary-color;
 }
 
-.pagination > .pagination a:hover {
-    color: $fc-primary-color;
+ul.pagination.pagination-lg li a {
+  border-color: $fc-primary-color;
+  color: $fc-primary-color;
 }
 
-.pagination > .pagination > li.active > a {
-    color: white;
-}
-
-div.pagination > ul.pagination > li.active > a {
-    background-color: $fc-primary-color;
-    border-color: $fc-primary-color;
-}
-//ADMIN PAGINATION END
-
-//USER PAGINATION START
 ul.pagination li span.glyphicon {
   color: $fc-primary-color;
 }
@@ -102,7 +92,7 @@ ul.pagination.pagination-lg li.prev.disabled {
 ul.pagination.pagination-lg li.next.disabled {
   display: inline;
 }
-//USER PAGINATION END
+
 
 .quantity-delivered {
   font-weight: 900;
