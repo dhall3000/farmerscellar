@@ -1,6 +1,17 @@
 class FoodCategoriesController < ApplicationController
   before_action :redirect_to_root_if_user_not_admin
 
+  def recategorize_products
+
+    products = Product.where(id: params[:products])
+    to_category = FoodCategory.find(params[:to_category])
+
+    products.update_all(food_category_id: to_category.id)
+
+    redirect_to food_categories_path    
+
+  end
+
   def index    
     @root = FoodCategory.where(parent: nil).first
     @homeless_products = Product.where(food_category: nil).order(:name)

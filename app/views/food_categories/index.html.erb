@@ -15,7 +15,10 @@
       <div class="panel-body">
         <% if @root %>
           <p><span class="category-background">Category</span>, <span class="product-background">Product</span></p>          
-          <%= render partial: 'food_category_branch', locals: { food_category: @root } %>
+          <%= form_tag food_categories_recategorize_products_path do %>
+            <%= render partial: 'food_category_branch', locals: { food_category: @root } %>
+            <%= submit_tag "Recategorize Products", class: "btn btn-primary outline btn-lg form-control fat-finger-spacing" %>
+          <% end %>
         <% else %>
           <p>No categories yet</p>
         <% end %>          

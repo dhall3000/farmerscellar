@@ -5,7 +5,12 @@
 <% if food_category %>
 
   <ul>
-    <li><span class="category-background"><%= link_to food_category.name, food_category_path(food_category) %></span></li>
+    <li>
+      <%= label_tag :to_category, class: "radio-inline" do %>
+        <%= radio_button_tag :to_category, food_category.id %>        
+        <span class="category-background"><%= link_to food_category.name, food_category_path(food_category) %></span>        
+      <% end %>
+    </li>
     <% food_category.children.each do |child_food_category| %>    
       <%= render partial: 'food_category_branch', locals: { food_category: child_food_category } %>    
     <% end %>
@@ -13,7 +18,12 @@
     <% if food_category.products.any? %>
       <ul>
         <% food_category.products.each do |product| %>
-          <li><span class="product-background"><%= link_to product.name, product_path(product) %></span></li>
+          <li>
+            <%= label_tag :to_category, class: "checkbox-inline" do %>
+              <%= check_box_tag "products[]", product.id %>
+              <span class="product-background"><%= link_to product.name, product_path(product) %></span>              
+            <% end %>
+          </li>
         <% end %>
       </ul>
     <% end %>

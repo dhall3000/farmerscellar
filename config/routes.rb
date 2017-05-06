@@ -38,6 +38,7 @@ Rails.application.routes.draw do
   post 'partner_users/create'
   post 'partner_users/send_delivery_notification'
   get 'postings/delivery_date_range_selection_got_it'
+  post 'food_categories/recategorize_products'
 
   resources :rtauthorizations, only: [:index, :show]
   resources :producers
