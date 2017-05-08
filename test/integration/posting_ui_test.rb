@@ -46,11 +46,12 @@ class PostingUiTest < IntegrationHelper
     #controller should have queried up the correct number of postings
     next_weeks_postings = assigns(:next_weeks_postings)
     assert_equal num_postings, next_weeks_postings.count
+    
+    #there should be a prev button that's disabled
+    assert_select 'ul.pagination.pagination-lg li.prev.disabled span.glyphicon-chevron-left'
 
-    #there should be one pagination page link for each of the pages we created
-    num_pages.times do |i|
-      assert_select 'div.pagination li a[href=?]', postings_path(food_category: food_category.id, next_week: (i + 1).to_s)
-    end
+    #there should be a next button with a link to page 2
+    assert_select 'ul.pagination.pagination-lg li.next a[href=?]', postings_path(food_category: food_category.id, next_week: "2")
 
     #the prod crash was happening when user clicked on page 2
     assert num_pages > 1

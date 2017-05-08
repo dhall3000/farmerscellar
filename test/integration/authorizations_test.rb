@@ -402,8 +402,9 @@ end
     assert rtauths
     assert rtauths.any?
     assert_equal 2, rtauths.count
-    assert_equal auth2, rtauths.first
-    assert_equal auth3, rtauths[1]
+    assert (auth2 == rtauths[0]) || (auth2 == rtauths[1])
+    assert (auth3 == rtauths[0]) || (auth3 == rtauths[1])
+    assert_not_equal auth2, auth3
 
     #now let's examine auth1 and verify data looks good
     get rtauthorization_path(auth1)

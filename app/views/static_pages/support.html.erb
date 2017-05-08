@@ -24,14 +24,14 @@
               <h3>Club Order Minimums</h3> 
               
               <div class="well">
-                <p>How can I tell if a Club Order Minimum has been met before I place my order?</p>
+                <p>How can I tell if a <%= link_to "Club Order Minimum", how_things_work_path(anchor: "order_minimums") %> has been met before I place my order?</p>
                 <p>
-                  First browse to the product of interest and click on it. Then look for 'Unmet Club Order Minimum' with one of these icons <span class="spin-continuously alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>. Click that icon to see how much remains to achieve the minimum. And if you don't see that icon then there's either no order minimum for that product or the order minimum has been met.
+                  First browse to the product of interest and click on it. If an unmet Club Order Minimum exists you'll see a <span class="alert-danger">red section</span> below the product photo that will say how much more must be ordered to hit the <%= link_to "Club Order Minimum", how_things_work_path(anchor: "order_minimums") %>.
                 </p>
               </div>
 
               <div class="well">
-                <p>How can I tell if a Club Order Minimum has been met after I place my order?</p>
+                <p>How can I tell if a <%= link_to "Club Order Minimum", how_things_work_path(anchor: "order_minimums") %> has been met after I place my order?</p>
                 <p>
                   If you’ve already ordered and later want to see if a <%= link_to "Club Order Minimum", how_things_work_path(anchor: "order_minimums") %> has been achieved, log in to your Farmer’s Cellar account and click the green company name at the top of any page. Then click either ‘Tote’ or ‘Orders’ to display the products you've selected. If any of the products you’ve selected still have unmet Club Order Minimums you’ll see one of these icons next to it <span class="spin-continuously alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>. Whenever you see that icon click it to find out more information.
                 </p>

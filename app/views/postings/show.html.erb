@@ -211,46 +211,17 @@
           </div>  
         </div>
 
-
-
-
-
         <% if @biggest_order_minimum_producer_net_outstanding && @biggest_order_minimum_producer_net_outstanding > 0 %>
           <div class="row gutter-10" data-toggle="collapse" data-target="#orderMinimumBody">
-
-            <div class="col-xs-10">
-              <div class="truncated-text-line">
-                Unmet Club Order Minimum
-              </div>
-            </div>
-
-            <div class="col-xs-2">      
-              <span id="orderMinimumChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>
-              <span class="alert-danger glyphicon glyphicon-exclamation-sign spin-continuously pull-right"></span>      
-            </div>
-
-          </div>
-
-          <div class="row gutter-10">
-            <div class="col-xs-10">
-              <div id="orderMinimumBody" class="collapse" data-chevron="#orderMinimumChevron">
-                This product is subject to a <%= link_to "Club Order Minimum", how_things_work_path(anchor: "order_minimums") %>. To meet the minimum, the customer community must collectively order an additional <%= number_to_currency(@biggest_order_minimum_producer_net_outstanding) %>.        
+            <div class="col-xs-12">
+              <div class="alert alert-danger" style="margin-top: 15px; margin-bottom: 0px;">
+                Unmet <%= link_to "Club Order Minimum", how_things_work_path(anchor: "order_minimums") %>. Current shortfall is:  <%= number_to_currency(@biggest_order_minimum_producer_net_outstanding) %>
               </div>
             </div>
           </div>
         <% end %>
 
-
-
-
-
         <%= render partial: "add_quantity", locals: { posting: @posting } %>
-
-
-
-
-
-
 
       </div>
     </div>
