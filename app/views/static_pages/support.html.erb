@@ -31,9 +31,14 @@
               </div>
 
               <div class="well">
-                <p>How can I tell if a <%= link_to "Club Order Minimum", how_things_work_path(anchor: "order_minimums") %> has been met after I place my order?</p>
+                <p>How can I tell if a <%= link_to "Club Order Minimum", how_things_work_path(anchor: "order_minimums") %> has been met after I place my order?</p>                
+                <ol>
+                  <li>Log in to your Farmer’s Cellar account</li>
+                  <li>Click the calendar icon <span class="header-icon glyphicon glyphicon-calendar"></span> at the top of the page</li>
+                  <li>Click the day on which your product is scheduled to arrive</li>
+                </ol>
                 <p>
-                  If you’ve already ordered and later want to see if a <%= link_to "Club Order Minimum", how_things_work_path(anchor: "order_minimums") %> has been achieved, log in to your Farmer’s Cellar account and click the green company name at the top of any page. Then click either ‘Tote’ or ‘Orders’ to display the products you've selected. If any of the products you’ve selected still have unmet Club Order Minimums you’ll see one of these icons next to it <span class="spin-continuously alert-danger glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>. Whenever you see that icon click it to find out more information.
+                  If your product has an unmet <%= link_to "Club Order Minimum", how_things_work_path(anchor: "order_minimums") %> you'll see a <span class="alert-danger">red section</span> with the additional amount necessary to ship.
                 </p>
               </div>
               
