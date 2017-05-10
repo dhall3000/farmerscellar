@@ -170,14 +170,14 @@ class RtauthorizationsController < ApplicationController
       redirect_to tote_items_path
       return
     end
-
+    
     @all_subscriptions = get_active_subscriptions_by_authorization_state(current_user, include_paused_subscriptions = true, kind = Subscription.kinds[:NORMAL])
     recurring_orders = get_active_subscriptions_by_authorization_state(current_user, include_paused_subscriptions = true)
 
     @tote_items = unauthorized_items_for(current_user)
     @subscriptions = @all_subscriptions[:unauthorized]
 
-    @all_tote_items = all_items_for(current_user)
+    @all_tote_items = all_items_to_authorize_for(current_user)
     @all_subscriptions = @all_subscriptions[:unauthorized] + @all_subscriptions[:authorized]
 
     @items_total_gross = get_gross_tote(@tote_items)

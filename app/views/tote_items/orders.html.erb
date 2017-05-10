@@ -32,10 +32,6 @@
           <div>
             <span data-toggle="collapse" data-target="#toteItem<%= tote_item.id.to_s %>Details">
               <span id="toteItem<%= tote_item.id.to_s %>Chevron" class="glyphicon glyphicon-chevron-down"></span>
-
-              <% if deficiency %>
-                <span class="gentle-flash alert-danger glyphicon glyphicon-exclamation-sign"></span>
-              <% end %>
             </span>
 
             <% if authorized %>

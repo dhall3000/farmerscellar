@@ -208,6 +208,10 @@ module ToteItemsHelper
     return authorized_items_for(user).or(unauthorized_items_for(user))
   end
 
+  def all_items_to_authorize_for(user)
+    return ToteItem.includes(purchase_receivables: :rtpurchases).where(user: user, state: [ToteItem.states[:ADDED], ToteItem.states[:AUTHORIZED], ToteItem.states[:COMMITTED], ToteItem.states[:FILLED]]).where(rtpurchases: {id: nil}).distinct
+  end
+
   def get_active_subscriptions_by_authorization_state(user, include_paused_subscriptions = true, kind = nil)
 
     if user.nil? || !user.valid?

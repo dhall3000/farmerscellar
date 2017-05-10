@@ -42,11 +42,10 @@ class PoutPageTest < IntegrationHelper
     get tote_items_path(orders: ti_bob.posting.delivery_date.to_s)    
     assert_response :success
     assert_template 'tote_items/orders'
-    assert_select 'div.thumbnail span.gentle-flash.glyphicon-exclamation-sign'
-
+    
     #we want to not tell bob that his order will only partially fill
     assert_select 'div.alert.alert-danger', {count: 0, text: "Item will partially fill. 10 of your 11 units ordered will ship."}
-    assert_select 'div.alert.alert-danger', {count: 1, text: "Item won't ship. $108.50 Club Order Minimum shortfall."}
+    assert_select 'div.alert.alert-danger', {count: 1, text: "Unmet Club Order Minimum. Current shortfall is #{ActiveSupport::NumberHelper.number_to_currency(ti_bob.posting.biggest_order_minimum_producer_net_outstanding)}"}
 
     #sam should see an exclamation in his tote
     log_in_as(get_sam)
@@ -66,7 +65,7 @@ class PoutPageTest < IntegrationHelper
     assert biggest_order_minimum_producer_net_outstanding > 100
 
     #we want to not tell sam that his order will only partially fill
-    assert_select 'div.alert.alert-danger', {count: 1, text: "Item won't ship. $108.50 Club Order Minimum shortfall."}
+    assert_select 'div.alert.alert-danger', {count: 1, text: "Unmet Club Order Minimum. Current shortfall is #{ActiveSupport::NumberHelper.number_to_currency(ti_sam.posting.biggest_order_minimum_producer_net_outstanding)}"}
 
   end
 
@@ -105,7 +104,6 @@ class PoutPageTest < IntegrationHelper
     get tote_items_path, params: {orders: ti_bob.posting.delivery_date.to_s}
     assert_response :success
     assert_template 'tote_items/orders'
-    assert_select 'div.thumbnail span.gentle-flash.glyphicon-exclamation-sign'
 
     assert_select 'div.alert.alert-danger', {count: 1, text: "Item will partially fill. 10 of your 11 units ordered will ship."}
     assert_select 'div.alert.alert-danger', {count: 0, text: "Item won't ship. $108.50 Club Order Minimum shortfall."}
@@ -120,8 +118,7 @@ class PoutPageTest < IntegrationHelper
     get tote_items_path, params: {orders: ti_bob.posting.delivery_date.to_s}
     assert_response :success
     assert_template 'tote_items/orders'
-    assert_select 'div.thumbnail span.gentle-flash.glyphicon-exclamation-sign'
-
+    
     assert_select 'div.alert.alert-danger', {count: 1, text: "Case not full. Item won't ship. 7 more units needed to fill case."}
 
   end
@@ -235,11 +232,10 @@ class PoutPageTest < IntegrationHelper
     get tote_items_path(orders: ti_bob.posting.delivery_date.to_s)    
     assert_response :success
     assert_template 'tote_items/orders'
-    assert_select 'div.thumbnail span.gentle-flash.glyphicon-exclamation-sign'
-
+    
     #we want to not tell bob that his order will only partially fill
     assert_select 'div.alert.alert-danger', {count: 0, text: "Item will partially fill. 10 of your 11 units ordered will ship."}
-    assert_select 'div.alert.alert-danger', {count: 1, text: "Item won't ship. $28.50 Club Order Minimum shortfall."}
+    assert_select 'div.alert.alert-danger', {count: 1, text: "Unmet Club Order Minimum. Current shortfall is #{ActiveSupport::NumberHelper.number_to_currency(ti_bob.posting.biggest_order_minimum_producer_net_outstanding)}"}
     assert_select 'strong', {count: 1, text: "Total #{number_to_currency(ti_bob.quantity * ti_bob.posting.price)}" }
 
   end
@@ -330,13 +326,12 @@ class PoutPageTest < IntegrationHelper
     get tote_items_path, params: {orders: ti_bob.posting.delivery_date.to_s}
     assert_response :success
     assert_template 'tote_items/orders'
-    assert_select 'span.glyphicon-exclamation-sign', 1
 
     #total amount should be properly displayed    
     assert_select 'strong', {count: 1, text: "Total #{number_to_currency(ti_bob.quantity * ti_bob.posting.price)}" }
 
     #since there's a problem with both case and OM we only want to display case issues
-    assert_select 'div.alert.alert-danger', {count: 1, text: "Item won't ship. #{ActiveSupport::NumberHelper.number_to_currency(ti_bob.posting.biggest_order_minimum_producer_net_outstanding)} Club Order Minimum shortfall."}
+    assert_select 'div.alert.alert-danger', {count: 1, text: "Unmet Club Order Minimum. Current shortfall is #{ActiveSupport::NumberHelper.number_to_currency(ti_bob.posting.biggest_order_minimum_producer_net_outstanding)}"}
 
   end
 
