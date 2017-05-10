@@ -215,7 +215,7 @@
           <div class="row gutter-10" data-toggle="collapse" data-target="#orderMinimumBody">
             <div class="col-xs-12">
               <div class="alert alert-danger" style="margin-top: 15px; margin-bottom: 0px;">
-                Unmet <%= link_to "Club Order Minimum", how_things_work_path(anchor: "order_minimums") %>. Current shortfall is:  <%= number_to_currency(@biggest_order_minimum_producer_net_outstanding) %>
+                Unmet <%= link_to "Club Order Minimum", how_things_work_path(anchor: "order_minimums") %>. Current shortfall is <%= number_to_currency(@biggest_order_minimum_producer_net_outstanding) %>
               </div>
             </div>
           </div>
