@@ -223,6 +223,19 @@ class PostingsController < ApplicationController
       @facebook_share_url = posting_url(@posting)
     end
 
+    @title_content = "Local #{@posting.product.name} "
+    if @posting.price_body
+      @title_content += @posting.price_body
+    else
+      @title_content += "$#{@posting.price.round(2)} / #{@posting.unit.name}" 
+    end
+
+    producer = @posting.user
+    @description_content = "#{@posting.product.name} by #{producer.farm_name} from #{producer.city}, #{producer.state}. #{@posting.description}"
+    if @description_content.last != "."
+      @description_content += "."
+    end
+
   end
 
   private
