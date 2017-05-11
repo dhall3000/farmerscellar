@@ -215,13 +215,7 @@ class PostingsController < ApplicationController
     @links = FoodCategoriesController.helpers.get_top_down_ancestors(@posting_food_category, include_self = true)    
     @biggest_order_minimum_producer_net_outstanding = @posting.biggest_order_minimum_producer_net_outstanding
 
-    if @posting.posting_recurrence
-      #we always want the facebook share/like buttons to point at the first posting in the series so that it's a static posting id so that
-      #facebook can count how many times the page has been liked. otherwise every week PJ milk (for example) is going to have a new url
-      @facebook_share_url = posting_url(@posting.posting_recurrence.postings.order(:id).first)
-    else
-      @facebook_share_url = posting_url(@posting)
-    end
+    @facebook_share_url = posting_url(@posting)
 
     @title_content = "Local #{@posting.product.name} "
     if @posting.price_body.blank?
