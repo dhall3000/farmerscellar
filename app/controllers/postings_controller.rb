@@ -224,10 +224,10 @@ class PostingsController < ApplicationController
     end
 
     @title_content = "Local #{@posting.product.name} "
-    if @posting.price_body
-      @title_content += @posting.price_body
+    if @posting.price_body.blank?
+      @title_content += "#{ActiveSupport::NumberHelper.number_to_currency(@posting.price)} / #{@posting.unit.name}" 
     else
-      @title_content += "$#{@posting.price.round(2)} / #{@posting.unit.name}" 
+      @title_content += @posting.price_body
     end
 
     producer = @posting.user
