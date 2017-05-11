@@ -24,7 +24,7 @@
           <!-- Indicators -->
           <% first_upload = @posting.uploads.order(created_at: :asc).first %>
           <% content_for :image do %>
-            <meta property="og:image" content="<%= first_upload.file_name.square.url %>" />
+            <meta property="og:image" content="<%= first_upload.file_name.url %>" />
           <% end %>
 
           <% if @posting.uploads.count > 1 %>
