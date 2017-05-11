@@ -31,9 +31,15 @@
     <meta name="msapplication-TileImage" content="/favicon-144.png">
     <meta name="msapplication-config" content="/browserconfig.xml">
 
+    <meta property="fb:app_id" content="597003080458571"/>
+    <meta property="fb:admins" content="100009016571708"/>    
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Farmer's Cellar" />
+
     <%= yield :fb_title %>
     <%= yield :description %>
     <%= yield :image %>
+    <%= yield :url %>
     
     <%= render 'layouts/shim' %>
   </head>

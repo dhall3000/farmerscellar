@@ -6,6 +6,9 @@
 <% content_for :fb_title do %>
   <meta property="og:title" content="<%= @title_content %>" />
 <% end %>
+<% content_for :url do %>
+  <meta property="og:url" content="<%= @facebook_share_url %>"/>
+<% end %>
 
 <% provide(:title, @posting.product.name) %>
 <% if @posting_food_category %>  
