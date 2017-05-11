@@ -1,6 +1,11 @@
 <div id="fb-root"></div>
-<meta property="og:title" content="<%= @title_content %>" />
-<meta property="og:description" content="<%= @description_content %>" />
+
+<% content_for :description do %>
+  <meta property="og:description" content="<%= @description_content %>" />
+<% end %>
+<% content_for :fb_title do %>
+  <meta property="og:title" content="<%= @title_content %>" />
+<% end %>
 
 <% provide(:title, @posting.product.name) %>
 <% if @posting_food_category %>  
