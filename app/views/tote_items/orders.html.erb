@@ -69,6 +69,21 @@
                   <%= link_to "Case not full", how_things_work_path(anchor: "case_constraints") %>. Item won't ship. <%= additional_units_required_to_fill_my_case.to_s %> more units needed to fill case.
                 <% end %>
               <% end %>
+
+                <div style="padding-top: 10px;">
+                  <div
+                    class="fb-like"
+                    data-href="<%= posting_url(tote_item.posting) %>"
+                    data-layout="button"
+                    data-action="like"
+                    data-size="large"
+                    data-show-faces="true"
+                    data-share="true">
+                  </div>
+                  Tip: invite your friends to help cure this shortfall!
+                </div>
+
+
             </div>
           <% end %>
 
