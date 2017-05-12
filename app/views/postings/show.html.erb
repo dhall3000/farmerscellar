@@ -168,9 +168,27 @@
         <div class="row gutter-10">
           <div class="col-xs-12">
 
+            
             <div>
               <strong><%= "#{number_to_currency(@posting.price)} / #{@posting.unit.name}" %></strong>
-            </div>      
+            </div>
+
+            <% if @biggest_order_minimum_producer_net_outstanding.nil? || @biggest_order_minimum_producer_net_outstanding == 0 %>
+              <div style="padding-top: 10px; padding-bottom: 10px;">
+                <span
+                  class="fb-like"
+                  data-href="<%= @facebook_share_url %>"
+                  data-layout="button"
+                  data-action="like"
+                  data-size="large"
+                  data-show-faces="true"
+                  data-share="true">
+                </span>                  
+                Tip: sharing helps us get lower prices and more selection.
+              </div>
+            <% end %>
+            
+
             <% if !@posting.unit_body.blank? || !@posting.price_body.blank? %>
               <div>
                 <ul>
@@ -232,7 +250,6 @@
               <div class="alert alert-danger" style="margin-top: 15px; margin-bottom: 0px;">
                 Unmet <%= link_to "Club Order Minimum", how_things_work_path(anchor: "order_minimums") %>. Current shortfall is <%= number_to_currency(@biggest_order_minimum_producer_net_outstanding) %>
                 <div style="padding-top: 10px;">
-                Tip: invite your friends to help hit this order minimum!
                   <div
                     class="fb-like"
                     data-href="<%= @facebook_share_url %>"
@@ -242,6 +259,7 @@
                     data-show-faces="true"
                     data-share="true">
                   </div>
+                  Tip: invite your friends to help hit this order minimum!
                 </div>
               </div> 
             </div>
@@ -249,8 +267,7 @@
         <% end %>
 
 
-
-        
+       
 
 
         <%= render partial: "add_quantity", locals: { posting: @posting } %>
