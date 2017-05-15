@@ -16,7 +16,11 @@
   		<% end %>
 
   		<%= f.label :product_id %>
-  		<%= f.select :product_id, options_for_select(@products_for_select.map { |obj| [obj[:name], obj[:id]] }), {}, class: 'form-control' %>		
+      <% if @posting.product %>
+        <%= f.select :product_id, options_for_select(@products_for_select.map { |obj| [obj[:name], obj[:id]] }, @posting.product.id), {}, class: 'form-control' %>   
+      <% else %>
+        <%= f.select :product_id, options_for_select(@products_for_select.map { |obj| [obj[:name], obj[:id]] }, nil), {}, class: 'form-control' %>   
+      <% end %>  		
       
   		<%= f.label :description %>
   		<%= f.text_area :description, class: "form-control", rows: "2" %>
