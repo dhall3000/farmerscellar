@@ -189,7 +189,7 @@
             <% end %>
             
 
-            <% if !@posting.unit_body.blank? || !@posting.price_body.blank? %>
+            <% if !@posting.unit_body.blank? || !@posting.price_body.blank? || !@posting.refundable_deposit_instructions.blank? %>
               <div>
                 <ul>
                   <% if !@posting.unit_body.blank? %>
@@ -197,6 +197,10 @@
                   <% end %>
                   <% if !@posting.price_body.blank? %>
                     <li><%= @posting.price_body %></li>
+                  <% end %>
+                  <% if !@posting.refundable_deposit_instructions.blank? %>
+                    <li><%= number_to_currency(@posting.refundable_deposit) %> bottle deposit</li>
+                    <li><%= @posting.refundable_deposit_instructions %></li>
                   <% end %>
                 </ul>        
               </div>
