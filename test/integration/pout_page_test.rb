@@ -44,8 +44,8 @@ class PoutPageTest < IntegrationHelper
     assert_template 'tote_items/orders'
     
     #we want to not tell bob that his order will only partially fill
-    assert_select 'div.alert.alert-danger', {count: 0, text: "Item will partially fill. 10 of your 11 units ordered will ship."}
-    assert_select 'div.alert.alert-danger', {count: 1, text: "Unmet Club Order Minimum. Current shortfall is #{ActiveSupport::NumberHelper.number_to_currency(ti_bob.posting.biggest_order_minimum_producer_net_outstanding)}"}
+    assert_select 'div.alert.alert-danger span', {count: 0, text: "Item will partially fill. 10 of your 11 units ordered will ship."}
+    assert_select 'div.alert.alert-danger span', {count: 1, text: "Unmet Club Order Minimum. Current shortfall is #{ActiveSupport::NumberHelper.number_to_currency(ti_bob.posting.biggest_order_minimum_producer_net_outstanding)}"}
 
     #sam should see an exclamation in his tote
     log_in_as(get_sam)
@@ -65,7 +65,7 @@ class PoutPageTest < IntegrationHelper
     assert biggest_order_minimum_producer_net_outstanding > 100
 
     #we want to not tell sam that his order will only partially fill
-    assert_select 'div.alert.alert-danger', {count: 1, text: "Unmet Club Order Minimum. Current shortfall is #{ActiveSupport::NumberHelper.number_to_currency(ti_sam.posting.biggest_order_minimum_producer_net_outstanding)}"}
+    assert_select 'div.alert.alert-danger span', {count: 1, text: "Unmet Club Order Minimum. Current shortfall is #{ActiveSupport::NumberHelper.number_to_currency(ti_sam.posting.biggest_order_minimum_producer_net_outstanding)}"}
 
   end
 
@@ -105,8 +105,8 @@ class PoutPageTest < IntegrationHelper
     assert_response :success
     assert_template 'tote_items/orders'
 
-    assert_select 'div.alert.alert-danger', {count: 1, text: "Item will partially fill. 10 of your 11 units ordered will ship."}
-    assert_select 'div.alert.alert-danger', {count: 0, text: "Item won't ship. $108.50 Club Order Minimum shortfall."}
+    assert_select 'div.alert.alert-danger span', {count: 1, text: "Item will partially fill. 10 of your 11 units ordered will ship."}
+    assert_select 'div.alert.alert-danger span', {count: 0, text: "Item won't ship. $108.50 Club Order Minimum shortfall."}
 
     #now, what is the experience like from sam's perspective?
     log_in_as(get_sam)
@@ -119,7 +119,7 @@ class PoutPageTest < IntegrationHelper
     assert_response :success
     assert_template 'tote_items/orders'
     
-    assert_select 'div.alert.alert-danger', {count: 1, text: "Case not full. Item won't ship. 7 more units needed to fill case."}
+    assert_select 'div.alert.alert-danger span', {count: 1, text: "Case not full. Item won't ship. 7 more units needed to fill case."}
 
   end
 
@@ -234,8 +234,8 @@ class PoutPageTest < IntegrationHelper
     assert_template 'tote_items/orders'
     
     #we want to not tell bob that his order will only partially fill
-    assert_select 'div.alert.alert-danger', {count: 0, text: "Item will partially fill. 10 of your 11 units ordered will ship."}
-    assert_select 'div.alert.alert-danger', {count: 1, text: "Unmet Club Order Minimum. Current shortfall is #{ActiveSupport::NumberHelper.number_to_currency(ti_bob.posting.biggest_order_minimum_producer_net_outstanding)}"}
+    assert_select 'div.alert.alert-danger span', {count: 0, text: "Item will partially fill. 10 of your 11 units ordered will ship."}
+    assert_select 'div.alert.alert-danger span', {count: 1, text: "Unmet Club Order Minimum. Current shortfall is #{ActiveSupport::NumberHelper.number_to_currency(ti_bob.posting.biggest_order_minimum_producer_net_outstanding)}"}
     assert_select 'strong', {count: 1, text: "Total #{number_to_currency(ti_bob.quantity * ti_bob.posting.price)}" }
 
   end
@@ -331,7 +331,7 @@ class PoutPageTest < IntegrationHelper
     assert_select 'strong', {count: 1, text: "Total #{number_to_currency(ti_bob.quantity * ti_bob.posting.price)}" }
 
     #since there's a problem with both case and OM we only want to display case issues
-    assert_select 'div.alert.alert-danger', {count: 1, text: "Unmet Club Order Minimum. Current shortfall is #{ActiveSupport::NumberHelper.number_to_currency(ti_bob.posting.biggest_order_minimum_producer_net_outstanding)}"}
+    assert_select 'div.alert.alert-danger span', {count: 1, text: "Unmet Club Order Minimum. Current shortfall is #{ActiveSupport::NumberHelper.number_to_currency(ti_bob.posting.biggest_order_minimum_producer_net_outstanding)}"}
 
   end
 

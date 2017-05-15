@@ -61,12 +61,12 @@
           <% if deficiency %>
             <div class="alert alert-danger">                
               <% if biggest_order_minimum_producer_net_outstanding > 0 %>                  
-                Unmet <%= link_to "Club Order Minimum", how_things_work_path(anchor: "order_minimums") %>. Current shortfall is <%= number_to_currency(biggest_order_minimum_producer_net_outstanding) %>
+                <span>Unmet <%= link_to "Club Order Minimum", how_things_work_path(anchor: "order_minimums") %>. Current shortfall is <%= number_to_currency(biggest_order_minimum_producer_net_outstanding) %></span>
               <% elsif additional_units_required_to_fill_my_case > 0 %>
                 <% if expected_fill_quantity > 0 %>
-                  <%= link_to "Item will partially fill", how_things_work_path(anchor: "case_constraints") %>. <%= expected_fill_quantity.to_s %> of your <%= tote_item.quantity.to_s %> units ordered will ship.
+                  <span><%= link_to "Item will partially fill", how_things_work_path(anchor: "case_constraints") %>. <%= expected_fill_quantity.to_s %> of your <%= tote_item.quantity.to_s %> units ordered will ship.</span>
                 <% else %>
-                  <%= link_to "Case not full", how_things_work_path(anchor: "case_constraints") %>. Item won't ship. <%= additional_units_required_to_fill_my_case.to_s %> more units needed to fill case.
+                  <span><%= link_to "Case not full", how_things_work_path(anchor: "case_constraints") %>. Item won't ship. <%= additional_units_required_to_fill_my_case.to_s %> more units needed to fill case.</span>
                 <% end %>
               <% end %>
 
