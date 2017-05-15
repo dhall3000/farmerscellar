@@ -2,7 +2,7 @@ class ProductsController < ApplicationController
   before_action :redirect_to_root_if_user_not_admin
 
   def new
-    @food_categories = FoodCategoriesController.helpers.get_options_for_select
+    @food_categories = FoodCategoriesController.helpers.get_options_for_select_fc
     @product = Product.new    
   end
 
@@ -20,7 +20,7 @@ class ProductsController < ApplicationController
   end
 
   def edit    
-    @food_categories = FoodCategoriesController.helpers.get_options_for_select
+    @food_categories = FoodCategoriesController.helpers.get_options_for_select_fc
     @product = Product.find(params[:id])
   end
 
@@ -43,7 +43,7 @@ class ProductsController < ApplicationController
   end
 
   def index
-    @products_for_select = ProductsController.helpers.get_options_for_select
+    @products_for_select = ProductsController.helpers.get_options_for_select_products
   end
 
   def destroy

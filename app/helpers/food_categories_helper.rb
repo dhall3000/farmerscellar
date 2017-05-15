@@ -40,7 +40,7 @@ module FoodCategoriesHelper
 
   end
 
-  def get_options_for_select
+  def get_options_for_select_fc
     food_categories = FoodCategory.order(:name)
     food_categories_for_select = []
     

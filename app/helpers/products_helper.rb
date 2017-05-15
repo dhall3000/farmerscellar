@@ -1,6 +1,6 @@
 module ProductsHelper
 
-  def get_options_for_select
+  def get_options_for_select_products
 
     products = Product.order(:name)
     products_for_select = []
