@@ -43,7 +43,7 @@ class ProductsController < ApplicationController
   end
 
   def index
-    @products = Product.all.order(:name)
+    @products_for_select = ProductsController.helpers.get_options_for_select
   end
 
   def destroy
