@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170418220828) do
+ActiveRecord::Schema.define(version: 20170515193803) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -427,6 +427,8 @@ ActiveRecord::Schema.define(version: 20170418220828) do
     t.string   "important_notes_body"
     t.float    "inbound_order_value_producer_net", default: 0.0,   null: false
     t.float    "producer_net_unit",                default: 0.0,   null: false
+    t.float    "refundable_deposit"
+    t.text     "refundable_deposit_instructions"
     t.index ["delivery_date"], name: "index_postings_on_delivery_date", using: :btree
     t.index ["live"], name: "index_postings_on_live", using: :btree
     t.index ["order_cutoff"], name: "index_postings_on_order_cutoff", using: :btree

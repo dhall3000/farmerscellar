@@ -37,10 +37,10 @@ class Posting < ApplicationRecord
   validates :price, :producer_net_unit, numericality: { greater_than: 0 }
 
   validates :units_per_case, numericality: { greater_than: 0, only_integer: true }, allow_nil: true
-  validates :order_minimum_producer_net, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true    
+  validates :order_minimum_producer_net, :refundable_deposit, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true    
   validates :inbound_order_value_producer_net, numericality: { greater_than_or_equal_to: 0 }, allow_nil: false
 
-  validate :producer_must_have_associated_business_interface, :important_notes_body_not_present_without_important_notes, :delivery_date_not_food_clearout_day, :order_cutoff_must_be_before_delivery_date
+  validate :producer_must_have_associated_business_interface, :important_notes_body_not_present_without_important_notes, :delivery_date_not_food_clearout_day, :order_cutoff_must_be_before_delivery_date, :refundable_deposit_instructions_exist_as_appropriate
   
   before_create :delivery_date_must_be_after_today  
 
@@ -586,6 +586,12 @@ class Posting < ApplicationRecord
         errors.add(:user, "producer must have associated BusinessInterface")
       end
 
+    end
+
+    def refundable_deposit_instructions_exist_as_appropriate
+      if refundable_deposit && refundable_deposit > 0 && refundable_deposit_instructions.blank?
+        errors.add(:refundable_deposit_instructions, "You must provide deposit refund instructions if you have a refundable deposit")
+      end
     end
 
 end

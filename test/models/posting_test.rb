@@ -31,6 +31,36 @@ class PostingTest < ModelTestAncestor
 
   end
 
+  test "posting should not save with negative refundable deposit" do
+    posting = create_posting
+    posting.refundable_deposit = -1
+    assert_not posting.valid?
+    assert_not posting.save
+  end
+
+  test "posting should not save with refundable deposit greater zero and instructions nil" do
+    posting = create_posting
+    posting.refundable_deposit = 1
+    assert posting.refundable_deposit_instructions.nil?
+    assert_not posting.valid?
+    assert_not posting.save
+  end
+
+  test "posting should save with refundable deposit zero" do
+    posting = create_posting
+    posting.refundable_deposit = 0
+    assert posting.refundable_deposit_instructions.nil?
+    assert posting.valid?
+    assert posting.save
+  end
+
+  test "posting should save with refundable deposit nil" do
+    posting = create_posting
+    assert posting.refundable_deposit.nil?
+    assert posting.refundable_deposit_instructions.nil?
+    assert posting.valid?
+  end
+
   test "should save when producer has an associated business interface" do
     
     producer = User.new(
