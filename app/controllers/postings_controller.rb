@@ -268,7 +268,7 @@ class PostingsController < ApplicationController
     end
 
     def load_posting_choices
-      @products = Product.all.order(:name)
+      @products_for_select = ProductsController.helpers.get_options_for_select
       @units = Unit.all.order(:name)      
       @producers = User.where(account_type: User.types[:PRODUCER]).order(:farm_name)
     end

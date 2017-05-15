@@ -3,7 +3,7 @@
 <h1>New posting</h1>
 
 <div class="row">
-	<div class="col-md-6 col-md-offset-3">
+	<div class="col-md-8 col-md-offset-2">
 		<%= form_for @posting do |f| %>
 
 		  <%= render 'shared/error_messages_posting' %>
@@ -16,8 +16,8 @@
   		<% end %>
 
   		<%= f.label :product_id %>
-  		<%= f.collection_select(:product_id, @products, :id, :name, {prompt: true}, {class: 'form-control'}) %>		
-
+  		<%= f.select :product_id, options_for_select(@products_for_select.map { |obj| [obj[:name], obj[:id]] }), {}, class: 'form-control' %>		
+      
   		<%= f.label :description %>
   		<%= f.text_area :description, class: "form-control", rows: "2" %>
 
