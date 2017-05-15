@@ -50,6 +50,12 @@
   		<%= f.label :price, "Price per unit (retail)" %>
   		<%= f.number_field :price, min: 0.01, step: 0.01, class: 'form-control' %>
 
+      <%= f.label :refundable_deposit %>
+      <%= f.number_field :refundable_deposit, min: 0.01, step: 0.01, class: 'form-control' %>
+
+      <%= f.label :refundable_deposit_instructions %>
+      <%= f.text_area :refundable_deposit_instructions, class: 'form-control', rows: 2 %>
+
   		<%= f.label :price_body %>
   		<%= f.text_field :price_body, class: 'form-control' %>
 

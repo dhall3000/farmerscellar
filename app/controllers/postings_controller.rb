@@ -314,7 +314,9 @@ class PostingsController < ApplicationController
         :product_id_code,
         :producer_net_unit,
         :important_notes,
-        :important_notes_body        
+        :important_notes_body,
+        :refundable_deposit,
+        :refundable_deposit_instructions
         )      
 
       posting[:price] = posting[:price].to_f.round(2)
@@ -360,7 +362,9 @@ class PostingsController < ApplicationController
         :units_per_case,
         :product_id_code,
         :order_minimum_producer_net,
-        :producer_net_unit
+        :producer_net_unit,
+        :refundable_deposit,
+        :refundable_deposit_instructions
         )
 
       return posting
