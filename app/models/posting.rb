@@ -56,6 +56,18 @@ class Posting < ApplicationRecord
 
   end
 
+  def display_price              
+    
+    if refundable_deposit && refundable_deposit > 0 
+      display_price = (price - refundable_deposit).round(2)
+    else
+      display_price = price
+    end
+
+    return display_price
+
+  end
+
   def food_category
     return product.food_category
   end

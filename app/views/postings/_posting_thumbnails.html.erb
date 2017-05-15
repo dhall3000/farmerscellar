@@ -31,7 +31,7 @@
               <%= posting.description %>
             </div>
             <div class="truncated-text-line">
-              <strong><%= "#{number_to_currency(posting.price)} / #{posting.unit.name}" %></strong>        
+              <strong><%= "#{number_to_currency(posting.display_price)} / #{posting.unit.name}" %></strong>        
             </div>
           </div>
         <% end %>

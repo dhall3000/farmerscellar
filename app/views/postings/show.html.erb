@@ -170,7 +170,7 @@
 
             
             <div>
-              <strong><%= "#{number_to_currency(@posting.price)} / #{@posting.unit.name}" %></strong>
+              <strong><%= "#{number_to_currency(@posting.display_price)} / #{@posting.unit.name}" %></strong>
             </div>
 
             <% if @biggest_order_minimum_producer_net_outstanding.nil? || @biggest_order_minimum_producer_net_outstanding == 0 %>
