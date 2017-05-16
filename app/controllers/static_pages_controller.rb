@@ -15,7 +15,7 @@ class StaticPagesController < ApplicationController
 
     root_food_category = FoodCategory.includes(children: :uploads).where(parent: nil).first
     if root_food_category
-      @food_categories = root_food_category.children.joins(:uploads).distinct
+      @food_categories = root_food_category.children.order(:sequence).joins(:uploads).distinct
     end
     
   end
