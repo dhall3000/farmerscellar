@@ -35,7 +35,7 @@ class FoodCategoriesController < ApplicationController
       parent_food_category = FoodCategory.find(parent_id)
     end
     
-    food_category = FoodCategory.new(name: name, parent: parent_food_category)
+    food_category = FoodCategory.new(name: name, parent: parent_food_category, sequence: params[:food_category][:sequence])
 
     if food_category.save
       flash[:success] = "FoodCategory created"
@@ -58,6 +58,7 @@ class FoodCategoriesController < ApplicationController
     @food_category = FoodCategory.find(params[:id])
     old_name = @food_category.name
     @food_category.name = params[:food_category][:name]
+    @food_category.sequence = params[:food_category][:sequence]
     @parent_food_category = FoodCategory.find_by(id: params[:parent])
     @food_category.parent = @parent_food_category
 
@@ -76,7 +77,7 @@ class FoodCategoriesController < ApplicationController
 
   private
     def create_params
-      return params.require(:food_category).permit(:name, :parent)
+      return params.require(:food_category).permit(:name, :parent, :sequence)
     end
 
 end

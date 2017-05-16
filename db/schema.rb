@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170515193803) do
+ActiveRecord::Schema.define(version: 20170516173437) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -276,6 +276,7 @@ ActiveRecord::Schema.define(version: 20170515193803) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer  "parent_id"
+    t.string   "sequence"
     t.index ["name"], name: "index_food_categories_on_name", using: :btree
     t.index ["parent_id"], name: "index_food_categories_on_parent_id", using: :btree
   end

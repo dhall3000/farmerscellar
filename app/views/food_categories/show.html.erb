@@ -5,81 +5,89 @@
   <%= link_to "Food Categories", food_categories_path %>
 </p>
 
-<% if @food_category.children.any? || @food_category.products.any? %>
 
-  <div class="panel-group">
 
-    <% if @food_category.parent %>
+<div class="panel-group">
 
-      <div class="panel panel-default">
-        <div class="anchor panel-heading" id="the_simple_version">
-          <div class="panel-title">
-            Parent
-          </div>
-        </div>
-        <div class="panel-body">
-          <ul>          
-            <li><%= link_to @food_category.parent.name, food_category_path(@food_category.parent) %></li>          
-          </ul>
+  <% if @food_category.parent %>
+
+    <div class="panel panel-default">
+      <div class="anchor panel-heading" id="the_simple_version">
+        <div class="panel-title">
+          Parent
         </div>
       </div>
+      <div class="panel-body">
+        <ul>          
+          <li><%= link_to @food_category.parent.name, food_category_path(@food_category.parent) %></li>          
+        </ul>
+      </div>
+    </div>
 
-    <% end %>
+  <% end %>
 
-    <h2><%= @food_category.name %></h2>
+  <%
+  if @food_category.sequence.blank?
+    sequence = ""
+  else
+    sequence = ", Display Sequence: #{@food_category.sequence}"
+  end
+  %>
 
-    <% if @food_category.uploads.count > 0 %>
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <div class="panel-title">
-            Photos
-          </div>
+  <h2>Name: <%= @food_category.name + sequence %></h2>
+
+  <% if @food_category.uploads.count > 0 %>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <div class="panel-title">
+          Photos
         </div>
-        <div class="panel-body">
-          <% @food_category.uploads.each do |upload| %>            
-            <span>
-              <img src=<%= "#{upload.file_name.thumb}" %>>              
-            </span>
+      </div>
+      <div class="panel-body">
+        <% @food_category.uploads.each do |upload| %>            
+          <span>
+            <img src=<%= "#{upload.file_name.thumb}" %>>              
+          </span>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @food_category.children.any? %>
+    <div class="panel panel-default">
+      <div class="anchor panel-heading" id="the_simple_version">
+        <div class="panel-title">
+          Children
+        </div>
+      </div>
+      <div class="panel-body">
+        <ul>
+          <% @food_category.children.order(:sequence).each do |child| %>
+            <li><%= link_to child.name, food_category_path(child) %></li>
           <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @food_category.products.any? %>
+    <div class="panel panel-default">
+      <div class="anchor panel-heading" id="the_simple_version">
+        <div class="panel-title">
+          Products
         </div>
       </div>
-    <% end %>
-
-    <% if @food_category.children.any? %>
-      <div class="panel panel-default">
-        <div class="anchor panel-heading" id="the_simple_version">
-          <div class="panel-title">
-            Children
-          </div>
-        </div>
-        <div class="panel-body">
-          <ul>
-            <% @food_category.children.each do |child| %>
-              <li><%= link_to child.name, food_category_path(child) %></li>
-            <% end %>
-          </ul>
-        </div>
+      <div class="panel-body">
+        <ul>
+          <% @food_category.products.order(:name).each do |product| %>
+            <li><%= link_to product.name, product_path(product) %></li>
+          <% end %>
+        </ul>
       </div>
-    <% end %>
+    </div>
+  <% end %>
 
-    <% if @food_category.products.any? %>
-      <div class="panel panel-default">
-        <div class="anchor panel-heading" id="the_simple_version">
-          <div class="panel-title">
-            Products
-          </div>
-        </div>
-        <div class="panel-body">
-          <ul>
-            <% @food_category.products.each do |product| %>
-              <li><%= link_to product.name, product_path(product) %></li>
-            <% end %>
-          </ul>
-        </div>
-      </div>
-    <% end %>
+</div>
 
-  </div>
-<% end %>
 
 <%= link_to "Edit", edit_food_category_path(@food_category), class: "btn btn-lg btn-primary outline" %>

@@ -19,6 +19,9 @@
       <%= f.label :name %>
       <%= f.text_field :name, class: 'form-control' %>
 
+      <%= f.label :sequence %>
+      <%= f.text_field :sequence, class: 'form-control' %>
+
       <%= f.label :parent %>
       <% if @food_category.parent %>
         <%= select_tag :parent, options_for_select(@food_categories.map { |obj| [obj[:name], obj[:id]] }, @food_category.parent.id), class: 'form-control' %>
