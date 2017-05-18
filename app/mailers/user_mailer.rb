@@ -54,11 +54,13 @@ class UserMailer < ApplicationMailer
     @dropsite = dropsite
     @tote_items = tote_items
     @partner_name = partner_name
+
+    subject = "Raw Milk $6.94 / gal & "
     
     if partner_name
-      subject = partner_name + " delivery notification"
+      subject += partner_name + " delivery notification"
     else
-      subject = "Delivery notification"
+      subject += "Delivery notification"
     end
 
     mail to: user.email, subject: subject

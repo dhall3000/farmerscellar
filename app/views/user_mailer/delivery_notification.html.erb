@@ -2,13 +2,28 @@
 Hello,
 </p>
 
+<h1>Raw Milk</h1>
+We are working on putting together a weekly run to <%= link_to "Pure Eire Dairy", "https://www.pureeiredairy.com/", target: "blank" %> in Othello, WA to pick up their certified organic, 100% grass fed Jersey cow dairy products. Here's the kind of prices we can get by picking up on-farm ourselves:
+<br>
+<ul>
+  <li><%= link_to "Raw Milk $6.94 / Gallon", "https://www.farmerscellar.com/postings/2683", target: "blank" %></li>
+  <li><%= link_to "Raw Milk $3.76 / Glass Bottle", "https://www.farmerscellar.com/postings/2685", target: "blank" %></li>
+  <li><%= link_to "Whole Milk $5.78 / Gallon", "https://www.farmerscellar.com/postings/2745", target: "blank" %></li>
+</ul>
+<p>
+In order to pull this off we need to build a group of about 100 interested people. To participate, just place an order for <%= link_to "any Pure Eire Dairy product", "https://www.farmerscellar.com/postings?food_category=31", target: "blank" %> then <%= link_to "join our facebook group", "https://www.facebook.com/groups/farmerscellar", target: "blank" %> to stay in the loop as we work towards our '100 people' goal.
+</p>
+
+<p>Also, once we're making this weekly dairy run we should be able to stop at many other farms along the way to pick up more great deals so let's get it done!</p>
+
+<p>
+Last thing...the more you share the quicker we can hit this goal so <strong>share, share, share</strong> cause harvest 2017 is already here! (tip: every <%= link_to "product page", "https://www.farmerscellar.com/postings/2754", target: "blank" %> has a facebook 'share' button down near the price)
+</p>
+
+<h1><%= "#{@partner_name} Delivery Notification" %></h1>
 <% if @partner_name %>
   <p>
-  This email is your Farmer's Cellar delivery notification.
-  </p>
-
-  <p>
-    Your products are available for you to pick up at your convenience. However, all products must be picked up by <%= @dropsite.next_food_clearout.strftime("%l%p on %A %B %d, %Y") %> according to <%= link_to "our pickup deadline policy outlined here", how_things_work_url(anchor: "pickup_deadline") %>.
+    Your products are available for you to pick up anytime before <%= @dropsite.next_food_clearout.strftime("%l%p on %A %B %d, %Y") %>.
   </p>
   <p>First time user? Watch <%= link_to "this", "https://youtu.be/oE4D93bALnM", target: false %> to see what to expect at pickup.</p>
   <p>Your dropsite is:</p>
@@ -29,8 +44,7 @@ Hello,
   <p>You have products <%= link_to "ready for pickup", pickup_url %>.</p>
 <% end %>
 
-<% if true %>
-
+<% if false %>
   <h1>Help us Continue...</h1>
   <p>We need to grow to sustain operations beyond 2017. You can help us simply by telling us which products you'd like us to source.</p>
   <p>As a <%= link_to "local foods buying club", how_things_work_url %> we have wholesale access to <%= link_to "pretty much anything in the state", "http://www.sfmamarkets.com/vendor-list" %>.</p>
