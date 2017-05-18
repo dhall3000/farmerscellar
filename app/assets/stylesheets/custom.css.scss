@@ -10,7 +10,7 @@ $fc-primary-color: #AACB4F;
 $fc-medium-color: #cfe29d;
 $fc-light-color: #f5f9eb;
 
-.home-social-icons {
+.home-social-icons, .home-social-icons:hover, .home-social-icons:active, .home-social-icons:focus {
   font-size: 40px;
   color: $fc-medium-color;
   padding-bottom: 25px;
