@@ -5,7 +5,7 @@ class StaticPagesController < ApplicationController
   end
 
   def news
-    @update_time = PageUpdate.get_update_time("News")    
+    redirect_to "https://www.facebook.com/groups/farmerscellar"
   end
   
   def home
