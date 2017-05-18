@@ -16,6 +16,11 @@ $fc-light-color: #f5f9eb;
   padding-bottom: 25px;
 }
 
+.footer-social-icons, .footer-social-icons:hover, .footer-social-icons:active, .footer-social-icons:focus {
+  font-size: 1.6em;
+  color: $fc-medium-color;  
+}
+
 .btn-kiosk {
   font-size: 50px;
 }
