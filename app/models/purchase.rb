@@ -83,6 +83,9 @@ class Purchase < ApplicationRecord
       purchase_receivables.each do |pr|
         PurchaseReceivable.transition(:purchase_failed, {purchase_receivables: [pr]})  
       end
+      
+      AdminNotificationMailer.general_message("purchase failed", "purchase id: #{self.id.to_s}").deliver_now
+
     end    
 
     s = JunkCloset.puts_helper("", "@amount_to_capture", number_to_currency(@amount_to_capture))
