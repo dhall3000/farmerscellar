@@ -1,0 +1,14 @@
+<%
+records = local_assigns[:records]
+inner_window = local_assigns[:inner_window] || 1
+outer_window = local_assigns[:outer_window] || 0
+param_name = local_assigns[:param_name] || "page"
+%>
+
+<div class="row">
+  <div class="col-xs-12">
+    <div class="text-center">        
+      <%= will_paginate records, previous_label: '<span class="glyphicon glyphicon-chevron-left"></span>', next_label: '<span class="glyphicon glyphicon-chevron-right"></span>', inner_window: inner_window, outer_window: outer_window, renderer: BootstrapPagination::Rails, class: "pagination-lg", param_name: param_name %>
+    </div>
+  </div>
+</div>

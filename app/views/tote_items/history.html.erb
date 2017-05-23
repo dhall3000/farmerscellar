@@ -7,14 +7,7 @@
 <!-- producer, product, unit, unit price, quantity ordered, quantity filled, delivery date, item amount authorizated, item amount charged, photo -->
 
 <% if @tote_items && @tote_items.any? %>
-  <div class="row">
-    <div class="col-xs-12">
-      <div class="text-center">        
-        <%= will_paginate @tote_items, previous_label: '<span class="glyphicon glyphicon-chevron-left"></span>', next_label: '<span class="glyphicon glyphicon-chevron-right"></span>', inner_window: 1, outer_window: 0, renderer: BootstrapPagination::Rails, class: "pagination-lg" %>
-      </div>
-    </div>
-  </div>
-
+  <%= render partial: 'shared/paginator', locals: { records: @tote_items } %>
   <div class="row">
     <% @tote_items.each do |tote_item| %>
       <div class="col-xs-12 col-sm-4">
@@ -53,13 +46,7 @@
       </div>
     <% end %>    
   </div>
-
-  <div class="row">
-      <div class="text-center">
-        <%= will_paginate @tote_items, previous_label: '<span class="glyphicon glyphicon-chevron-left"></span>', next_label: '<span class="glyphicon glyphicon-chevron-right"></span>', inner_window: 1, outer_window: 0, renderer: BootstrapPagination::Rails, class: "pagination-lg" %>
-      </div>
-  </div>
-
+  <%= render partial: 'shared/paginator', locals: { records: @tote_items } %>
 <% else %>
   <p class="text-center">You have zero past tote items.</p>
 <% end %>

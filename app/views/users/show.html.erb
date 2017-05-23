@@ -90,12 +90,8 @@
           <div class="text-center">
             <%= link_to "Create new posting", new_posting_path(current_user), class: "btn btn-lg btn-primary outline" %>
           </div>
-          <% if !@postings.nil? && @postings.any? %>      
-            <div class="row">
-              <div class="col-xs-12">
-                <%= will_paginate @postings, inner_window: 1, outer_window: 0 %>
-              </div>
-            </div>
+          <% if !@postings.nil? && @postings.any? %>            
+            <%= render partial: 'shared/paginator', locals: { records: @postings } %>
             <table class="table">
               <thead>
                 <tr>        
@@ -125,14 +121,8 @@
                   </tr>
                 <% end %>
               </tbody>
-            </table>        
-
-            <div class="row">
-              <div class="col-xs-12">
-                <%= will_paginate @postings, inner_window: 1, outer_window: 0 %>
-              </div>
-            </div>
-
+            </table>
+            <%= render partial: 'shared/paginator', locals: { records: @postings } %>
           <% end %>
         </div>
       </div>
