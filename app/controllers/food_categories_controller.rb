@@ -59,6 +59,7 @@ class FoodCategoriesController < ApplicationController
     old_name = @food_category.name
     @food_category.name = params[:food_category][:name]
     @food_category.sequence = params[:food_category][:sequence]
+    @food_category.display = params[:food_category][:display]
     @parent_food_category = FoodCategory.find_by(id: params[:parent])
     @food_category.parent = @parent_food_category
 

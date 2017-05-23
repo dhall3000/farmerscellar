@@ -35,6 +35,12 @@
   %>
 
   <h2>Name: <%= @food_category.name + sequence %></h2>
+  <%= label_tag :display, class: "checkbox-inline" do %>
+    <%= check_box_tag "display", @food_category.id, checked = @food_category.display, disabled: true, class: "radio-checkbox" %>
+    Display
+  <% end %>  
+
+  <div class="fat-finger-spacing"></div>
 
   <% if @food_category.uploads.count > 0 %>
     <div class="panel panel-default">

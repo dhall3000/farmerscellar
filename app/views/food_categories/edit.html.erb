@@ -22,6 +22,13 @@
       <%= f.label :sequence %>
       <%= f.text_field :sequence, class: 'form-control' %>
 
+      <div class="fat-finger-spacing">
+        <%= f.label :display, class: "checkbox-inline" do %>
+          <%= f.check_box :display, checked: @food_category.display, class: "radio-checkbox" %>
+          <span>Display</span>
+        <% end %>        
+      </div>
+
       <%= f.label :parent %>
       <% if @food_category.parent %>
         <%= select_tag :parent, options_for_select(@food_categories.map { |obj| [obj[:name], obj[:id]] }, @food_category.parent.id), class: 'form-control' %>
