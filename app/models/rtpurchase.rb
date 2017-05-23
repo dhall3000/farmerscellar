@@ -99,6 +99,14 @@ class Rtpurchase < ApplicationRecord
         PurchaseReceivable.transition(:purchase_failed, {purchase_receivables: [pr]})  
       end
 
+      if user
+        email = user.email
+      else
+        email = "user was nil"
+      end
+
+      AdminNotificationMailer.general_message("rtpurchase failed", "rtpurchase id: #{self.id.to_s} for user #{email}").deliver_now
+
       #TODO:
       #-invalidate the rtba / rtauth?
       #-put user account on hold?

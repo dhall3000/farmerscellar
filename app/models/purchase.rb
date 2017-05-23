@@ -83,8 +83,14 @@ class Purchase < ApplicationRecord
       purchase_receivables.each do |pr|
         PurchaseReceivable.transition(:purchase_failed, {purchase_receivables: [pr]})  
       end
-      
-      AdminNotificationMailer.general_message("purchase failed", "purchase id: #{self.id.to_s}").deliver_now
+
+      if user
+        email = user.email
+      else
+        email = "user was nil"
+      end
+
+      AdminNotificationMailer.general_message("purchase failed", "purchase id: #{self.id.to_s} for user #{email}").deliver_now
 
     end    
 
