@@ -56,6 +56,7 @@ class UserMailer < ApplicationMailer
     @partner_name = partner_name
 
     subject = "Raw Milk $6.94 / gal & "
+    subject = ""
     
     if partner_name
       subject += partner_name + " delivery notification"

@@ -2,6 +2,7 @@
 Hello,
 </p>
 
+<% if false %>
 <h1>Raw Milk</h1>
 We are working on putting together a weekly run to <%= link_to "Pure Eire Dairy", "https://www.pureeiredairy.com/", target: "blank" %> in Othello, WA to pick up their certified organic, 100% grass fed Jersey cow dairy products. Here's the kind of prices we can get by picking up on-farm ourselves:
 <br>
@@ -21,6 +22,8 @@ Last thing...the more you share the quicker we can hit this goal so <strong>shar
 </p>
 
 <h1><%= "#{@partner_name} Delivery Notification" %></h1>
+<% end %>
+
 <% if @partner_name %>
   <p>
     Your products are available for you to pick up anytime before <%= @dropsite.next_food_clearout.strftime("%l%p on %A %B %d, %Y") %>.
