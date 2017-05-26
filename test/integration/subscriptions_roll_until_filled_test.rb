@@ -2,6 +2,51 @@ require 'integration_helper'
 
 class SubscriptionsRollUntilFilledTest < IntegrationHelper
 
+  test "user should be charged the amount they authorized if we raise the price before they get filled" do
+
+    nuke_all_postings
+    posting1 = create_posting(producer = nil, price = 1, product = nil, unit = nil, delivery_date = nil, order_cutoff = nil, units_per_case = nil, frequency = 1, order_minimum_producer_net = 10)
+    bob = create_new_customer("bob", "bob@b.com")
+    sam = create_new_customer("sam", "sam@b.com")
+
+    #bob auths one which isn't enough to hit the OM so it won't fill
+    ti_bob = create_tote_item(bob, posting1, quantity = 1, frequency = nil, roll_until_filled = true)
+    create_rt_authorization_for_customer(bob)
+
+    travel_to posting1.order_cutoff
+    RakeHelper.do_hourly_tasks
+
+    posting2 = posting1.reload.posting_recurrence.current_posting
+    assert_not_equal posting1, posting2
+
+    #log in as farmer
+    log_in_as posting2.user
+    #increase the price
+    patch posting_path(posting2), params: { posting: {price: 1.5, posting_recurrence: {on: 1}} }
+    assert_response :redirect
+    assert_redirected_to user_path(posting2.user)
+    follow_redirect!
+    assert_not flash.empty?
+    assert_equal "Posting updated!", flash[:success]
+    assert_equal 1.5, posting2.reload.price
+
+    ti_sam = create_tote_item(sam, posting2, quantity = 1, frequency = nil, roll_until_filled = true)
+    create_rt_authorization_for_customer(sam)
+
+    assert_equal 1.5, ti_sam.price
+    assert_equal 1.0, ti_bob.price
+
+    #order min still isn't met so let's fast forward to posting2 oc
+    travel_to posting2.order_cutoff
+    RakeHelper.do_hourly_tasks
+
+    ti = ti_bob.subscription.current_tote_item
+    debugger
+    xxx = 1
+
+
+  end
+
   test "should show just once option when no constraints present" do
 
     #this functionality is intended for FC's bootstrap launching phase. that is, right now it's 12/16/16 and we have products with $1000 OM

@@ -31,6 +31,10 @@ class Subscription < ApplicationRecord
     return posting_recurrence.current_posting
   end
 
+  def current_tote_item
+    return tote_items.order("tote_items.id").last
+  end
+
   def kind?(kind_token)
     return self.kind == Subscription.kinds[kind_token]
   end
