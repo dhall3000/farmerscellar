@@ -14,7 +14,7 @@ Hello,
   <ul>
     <li>Organic, 100% grass-fed: <%= link_to "$8.75 / gallon", "https://www.farmerscellar.com/postings/3273" %></li>
     <li>Organic, 100% grass-fed, <strong><u>glass bottle</u></strong>: <%= link_to "$4.90 / half gallon", "https://www.farmerscellar.com/postings/3271" %></li>
-  </ul>  
+  </ul>
   <h1><%= "#{@partner_name} Delivery Notification" %></h1>
 <% end %>
 
@@ -37,6 +37,21 @@ Hello,
     </p>
   <% end %>
 <% else %>
+
+  <h1>Pure Eire Raw Milk</h1>
+  <p>
+    We are working on putting together a weekly run to Pure Eire Dairy in Othello, WA. We need about 10 more PE orders to to cover fuel, then we can get started. The plan is once we get a stable weekly trip to PE we'll be able to pick up other great products from PE's many neighbor farms.
+  </p>
+  <p>
+    To join the fun, just place an order for any PE product. We'll notify you once we get another 10 orders before we actually start making the trips.
+  </p>
+  <ul>
+    <li>Organic, 100% grass-fed: <%= link_to "$8.75 / gallon", "https://www.farmerscellar.com/postings/3273" %></li>
+    <li>Organic, 100% grass-fed, <strong><u>glass bottle</u></strong>: <%= link_to "$4.90 / half gallon", "https://www.farmerscellar.com/postings/3271" %></li>
+  </ul>
+
+  <h1>Delivery Notification</h1>
+
   <!-- xunrfomunchfve this line needs to get changed if we ever go back to sending delivery notifications on a day when zero products were delivered -->
   <p>You have products <%= link_to "ready for pickup", pickup_url %>.</p>
 <% end %>
