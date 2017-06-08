@@ -2,26 +2,20 @@
 Hello,
 </p>
 
-<% if false %>
-<h1>Raw Milk</h1>
-We are working on putting together a weekly run to <%= link_to "Pure Eire Dairy", "https://www.pureeiredairy.com/", target: "blank" %> in Othello, WA to pick up their certified organic, 100% grass fed Jersey cow dairy products. Here's the kind of prices we can get by picking up on-farm ourselves:
-<br>
-<ul>
-  <li><%= link_to "Raw Milk $6.94 / Gallon", "https://www.farmerscellar.com/postings/2683", target: "blank" %></li>
-  <li><%= link_to "Raw Milk $3.76 / Glass Bottle", "https://www.farmerscellar.com/postings/2685", target: "blank" %></li>
-  <li><%= link_to "Whole Milk $5.78 / Gallon", "https://www.farmerscellar.com/postings/2745", target: "blank" %></li>
-</ul>
-<p>
-In order to pull this off we need to build a group of about 100 interested people. To participate, just place an order for <%= link_to "any Pure Eire Dairy product", "https://www.farmerscellar.com/postings?food_category=31", target: "blank" %> then <%= link_to "join our facebook group", "https://www.facebook.com/groups/farmerscellar", target: "blank" %> to stay in the loop as we work towards our '100 people' goal.
-</p>
-
-<p>Also, once we're making this weekly dairy run we should be able to stop at many other farms along the way to pick up more great deals so let's get it done!</p>
-
-<p>
-Last thing...the more you share the quicker we can hit this goal so <strong>share, share, share</strong> cause harvest 2017 is already here! (tip: every <%= link_to "product page", "https://www.farmerscellar.com/postings/2754", target: "blank" %> has a facebook 'share' button down near the price)
-</p>
-
-<h1><%= "#{@partner_name} Delivery Notification" %></h1>
+<% if @partner_name %>
+  <h1>Farmer's Cellar</h1>
+  <p>
+    We are a local foods buying club and a free <%= @partner_name %> dropsite. The idea is you can order local products from us and pick them up at the same time as your <%= @partner_name %> products.
+  </p>
+  <p>
+    We specialize in raw milk. Click any link below to place an order or give us a call/text/email if you have any questions.
+  </p>
+  <h3>Raw Milk</h3>
+  <ul>
+    <li>Organic, 100% grass-fed: <%= link_to "$8.75 / gallon", "https://www.farmerscellar.com/postings/3273" %></li>
+    <li>Organic, 100% grass-fed, <strong><u>glass bottle</u></strong>: <%= link_to "$4.90 / half gallon", "https://www.farmerscellar.com/postings/3271" %></li>
+  </ul>  
+  <h1><%= "#{@partner_name} Delivery Notification" %></h1>
 <% end %>
 
 <% if @partner_name %>
@@ -47,21 +41,11 @@ Last thing...the more you share the quicker we can hit this goal so <strong>shar
   <p>You have products <%= link_to "ready for pickup", pickup_url %>.</p>
 <% end %>
 
-<% if false %>
-  <h1>Help us Continue...</h1>
-  <p>We need to grow to sustain operations beyond 2017. You can help us simply by telling us which products you'd like us to source.</p>
-  <p>As a <%= link_to "local foods buying club", how_things_work_url %> we have wholesale access to <%= link_to "pretty much anything in the state", "http://www.sfmamarkets.com/vendor-list" %>.</p>
-  <p>So....<%= link_to "tell us what we should get!", survey_url %></p>
-  <p>Thanks!</p>
-  <p>David &amp; Kellye</p>
-  <%= link_to "farmerscellar.com/news", news_url %>
-<% else %>
-
 <p>
 Thanks!
 </p>
 <p>
-Farmer's Cellar<br>
+Farmer's Cellar<br><br>
+206-588-6579<br>
 <%= link_to "farmerscellar.com/news", news_url %>
 </p>
-<% end %>
