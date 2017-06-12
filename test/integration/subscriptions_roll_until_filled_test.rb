@@ -41,9 +41,6 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     RakeHelper.do_hourly_tasks
 
     ti = ti_bob.subscription.current_tote_item
-    debugger
-    xxx = 1
-
 
   end
 

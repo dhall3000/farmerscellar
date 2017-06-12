@@ -48,7 +48,7 @@ class UserMailerTest < ActionMailer::TestCase
 
     mail = UserMailer.delivery_notification(user, dropsite, tote_items)
 
-    assert_equal "Raw Milk $6.94 / gal & Delivery notification", mail.subject
+    assert_equal "Raw Milk $8.75 / gal & Delivery notification", mail.subject
     assert_equal [user.email], mail.to
     assert_equal ["david@farmerscellar.com"], mail.from
 
@@ -83,7 +83,7 @@ class UserMailerTest < ActionMailer::TestCase
     #the above line is what it used to be. but then we implemented the pickup list feature so we'll warn users there about 'important message'.
     #also, even if they don't view the online pickup list they'll be confronted with it when they access the kiosk and hopefully see the 'alert-danger's 
     #on the less-than-fully-filled items
-    assert_equal "Raw Milk $6.94 / gal & Delivery notification", mail.subject
+    assert_equal "Raw Milk $8.75 / gal & Delivery notification", mail.subject
 
     assert_equal [user.email], mail.to
     assert_equal ["david@farmerscellar.com"], mail.from

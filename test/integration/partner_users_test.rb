@@ -26,7 +26,7 @@ class PartnerUsersTest < IntegrationHelper
     assert_redirected_to partner_users_index_path
     assert_equal 1, ActionMailer::Base.deliveries.count
     mail = ActionMailer::Base.deliveries.first
-    subject = "Raw Milk $6.94 / gal & Azure Standard delivery notification"
+    subject = "Raw Milk $8.75 / gal & Azure Standard delivery notification"
     assert_appropriate_email(mail, user.email, subject, "Your pickup code is: #{user.pickup_code.code}")
     #log in as dropsite user
     log_in_as(users(:dropsite1))
