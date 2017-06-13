@@ -57,13 +57,14 @@ class ToteItemsControllerTest < IntegrationHelper
     create_one_time_authorization_for_customer(customer)
 
     log_in_as customer
-    get tote_items_path(orders: ti1.posting.delivery_date.to_s)
+    get tote_items_path(orders: ti1.reload.posting.delivery_date.to_s)
     assert_response :success
     assert_template 'tote_items/orders'
     assert_select 'div.truncated-text-line-no-expand.producer-name-font', {count: 1, text: posting1.product.name}
     assert_select 'div.truncated-text-line-no-expand.producer-name-font', {count: 1, text: posting2.product.name}
 
-    delete tote_item_path(id: ti1.id)
+    #apparently must set 'referer'...not sure why this doesn't happen automatically in test
+    delete tote_item_path(id: ti1.id), {}, {'HTTP_REFERER' => tote_items_path(orders: ti1.reload.posting.delivery_date.to_s)}
     assert_response :redirect
     assert_redirected_to tote_items_path(orders: ti2.posting.delivery_date.to_s)
     follow_redirect!

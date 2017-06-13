@@ -305,7 +305,7 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
 
     #attempt to cancel sam's order    
     log_in_as(sam)
-    delete tote_item_path(id: second_ti.id)
+    delete tote_item_path(id: second_ti.id), {}, {'HTTP_REFERER' => tote_items_path(orders: second_ti.reload.posting.delivery_date.to_s)}    
     assert_response :redirect
     assert_redirected_to tote_items_path(orders: second_ti.posting.delivery_date.to_s)
     follow_redirect!
@@ -369,8 +369,8 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
 
     #attempt to cancel sam's order
     assert ti_sam.reload.state?(:COMMITTED)
-    log_in_as(sam)
-    delete tote_item_path(id: ti_sam.id)
+    log_in_as(sam)    
+    delete tote_item_path(id: ti_sam.id), {}, {'HTTP_REFERER' => tote_items_path(orders: ti_sam.reload.posting.delivery_date.to_s)}        
     assert_response :redirect
     assert_redirected_to tote_items_path(orders: ti_sam.posting.delivery_date.to_s)
     #verify danger flash message
@@ -470,8 +470,8 @@ class SubscriptionsRollUntilFilledTest < IntegrationHelper
     #make sure there is a faux 'nuke item' link
     assert_select 'span.lightgray.glyphicon-remove', 1
     assert ti_sam.id != sam.reload.tote_items.last.id
-    second_ti = sam.reload.tote_items.last
-    delete tote_item_path(id: second_ti.id)
+    second_ti = sam.reload.tote_items.last    
+    delete tote_item_path(id: second_ti.id), {}, {'HTTP_REFERER' => tote_items_path(orders: second_ti.reload.posting.delivery_date.to_s)}
     assert_response :redirect
     assert_redirected_to tote_items_path(orders: second_ti.posting.delivery_date.to_s)
     follow_redirect!
