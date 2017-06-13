@@ -259,7 +259,7 @@ class ToteItemsController < ApplicationController
     if ti.nil?
       redirect_to tote_items_path(calendar: 1)
     else
-      redirect_to tote_items_path(orders: ti.posting.delivery_date.to_s)
+      redirect_to @referer
     end    
     
   end
