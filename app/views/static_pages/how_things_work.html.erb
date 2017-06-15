@@ -40,7 +40,7 @@
 
               <li>We place club's order with producer (at <%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff"), class: "self-link" %>)</li>
               <li>Food arrives on 'delivery date'</li>
-              <li>You pick up at our self-serve dropsite at your convenience</li>
+              <li>You pick up at <%= link_to "our self-serve dropsite", dropsite_path(Dropsite.first) %> at your convenience</li>
             </ol> 
           </div>
         </div>

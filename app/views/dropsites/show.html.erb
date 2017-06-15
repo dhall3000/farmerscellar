@@ -1,4 +1,18 @@
 <h1>Dropsite</h1>
+
+<div class="row">
+  <div class="col-sm-8 col-sm-offset-2">
+    <div>
+      <%
+      upload = Upload.find_by(title: "DROPSITE")
+      if upload
+      %>
+        <%= image_tag upload.file_name.large, class: "img-responsive" %>
+      <% end %>
+    </div>    
+  </div>
+</div>
+
 <div class="row">
   <div class="col-md-4 col-md-offset-4">
     Name: <%= @dropsite.name %>
