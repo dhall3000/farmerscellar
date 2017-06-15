@@ -6,6 +6,8 @@
 
   <div class="col-xs-12 col-sm-8 col-sm-offset-2">
 
+
+
     <div class="panel-group" id="accordion">
 
       <div class="panel panel-default">
@@ -17,18 +19,26 @@
         <div id="collapseSimpleVersion" class="panel-collapse collapse in" data-chevron="#collapseSimpleVersionChevron">
           <div class="panel-body">
             <p>
-              We are a local foods buying club. Club members pool buying power by ordering collectively, purchasing direct-from-producer at wholesale pricing.
+              We are a local foods buying club. Club members pool buying power by ordering collectively, purchasing direct-from-producer at discount pricing.
             </p>
             <p>
               We have no membership fees, joining fees, dues or individual order minimums.
             </p>
-            <p>
-              Of the price you pay, we keep 10%, Paypal gets 3.5%, farmer gets 86.5%.
-            </p>
             <h3>Sequence</h3>
             <ol>
-              <li>You place your order with us</li>
-              <li>At order cutoff we place club's order with producer</li>
+              <li>
+                <span data-toggle="collapse" data-target="#family">You place your order with us</span><span id="familyChevron" class="glyphicon glyphicon-chevron-down"></span>
+                <div id="family" class="collapse" data-chevron="#familyChevron">
+                  <%
+                  upload = Upload.find_by(title: "FAMILY")
+                  if upload
+                  %>
+                    <%= image_tag upload.file_name.large, class: "img-responsive" %>                    
+                  <% end %>                  
+                </div>
+              </li>
+
+              <li>We place club's order with producer (at <%= link_to "Order Cutoff", how_things_work_path(anchor: "cutoff"), class: "self-link" %>)</li>
               <li>Food arrives on 'delivery date'</li>
               <li>You pick up at our self-serve dropsite at your convenience</li>
             </ol> 
@@ -91,7 +101,7 @@
             <div class="anchor" id="cutoff">
               <h3>Order Cutoff</h3>
               <p>
-                This is the latest date and time you can place an order and still get delivery on the date specified. At the moment of the Order Cutoff, the producer gets notified and begins to fill your order. It's also the latest you can cancel an existing order for the scheduled delivery date. To view Order Cutoff information, please see <%= link_to "How can I view Order Cutoff?", support_path(anchor: "order_cutoff") %>
+                This is the latest date and time you can place an order and still get delivery on the date specified. At the moment of the Order Cutoff, the producer gets notified and begins to fill your order. The Order Cutoff is also the latest you can cancel an existing order for the scheduled delivery date. To view Order Cutoff information, please see <%= link_to "How can I view Order Cutoff?", support_path(anchor: "order_cutoff") %>
               </p>
             </div>
 
