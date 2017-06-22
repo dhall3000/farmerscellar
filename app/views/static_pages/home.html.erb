@@ -26,6 +26,21 @@
       <div class="panel-group">
 
 
+        <div class="panel panel-default">      
+
+          <div class="panel-heading">
+            <h2 class="panel-title">User Spoof</h2>
+          </div>
+          <div class="panel-body">
+            <%= form_tag sessions_spoof_path do %>      
+              <%= label_tag :email %>
+              <%= text_field_tag :email, nil, class: "form-control" %>                        
+              <%= submit_tag "Spoof user", class: "btn btn-lg btn-primary outline btn-block" %>
+            <% end %>
+          </div>
+
+        </div>
+
 
         <div class="panel panel-default">      
 
@@ -59,21 +74,6 @@
 
         </div>
 
-
-        <div class="panel panel-default">      
-
-          <div class="panel-heading">
-            <h2 class="panel-title">User Spoof</h2>
-          </div>
-          <div class="panel-body">
-            <%= form_tag sessions_spoof_path do %>      
-              <%= label_tag :email %>
-              <%= text_field_tag :email, nil, class: "form-control" %>                        
-              <%= submit_tag "Spoof user", class: "btn btn-lg btn-primary outline btn-block" %>
-            <% end %>
-          </div>
-
-        </div>
 
         <div class="panel panel-default">      
 
